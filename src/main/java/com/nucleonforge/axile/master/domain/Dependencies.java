@@ -1,4 +1,6 @@
-package com.nucleonforge.axile.app.domain;
+package com.nucleonforge.axile.master.domain;
+
+import java.util.Set;
 
 /**
  * Holds the references to root dependencies that are used by a particular application.

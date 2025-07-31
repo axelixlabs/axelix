@@ -1,4 +1,6 @@
-package com.nucleonforge.axile.app.domain;
+package com.nucleonforge.axile.master.domain;
+
+import java.util.Set;
 
 /**
  * The app that is deployed, potentially in multiple instances.
@@ -16,5 +18,5 @@ public class Application {
     /**
      * Instances of the given application, e.g. K8S pods.
      */
-    private java.util.Set<Instance> instances;
+    private Set<Instance> instances;
 }

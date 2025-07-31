@@ -1,4 +1,6 @@
-package com.nucleonforge.axile.app.domain;
+package com.nucleonforge.axile.master.domain;
+
+import java.time.Instant;
 
 /**
  * Information related to Git commit

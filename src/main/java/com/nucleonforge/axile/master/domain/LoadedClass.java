@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.app.domain;
+package com.nucleonforge.axile.master.domain;
 
 /**
  * The link to the class that is loaded by the application.

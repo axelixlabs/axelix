@@ -1,6 +1,6 @@
-package com.nucleonforge.axile.app.domain.spring;
+package com.nucleonforge.axile.master.domain.spring;
 
-import com.nucleonforge.axile.app.domain.LoadedClass;
+import com.nucleonforge.axile.master.domain.LoadedClass;
 
 public class SpringCacheManager {
 

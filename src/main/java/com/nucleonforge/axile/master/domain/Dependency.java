@@ -1,4 +1,6 @@
-package com.nucleonforge.axile.app.domain;
+package com.nucleonforge.axile.master.domain;
+
+import java.util.Set;
 
 /**
  * Represents a dependency JAR that the app relies upon.
@@ -6,7 +8,7 @@ package com.nucleonforge.axile.app.domain;
  * @since 19.07.2025
  * @author Mikhail Polivakha
  */
-public class Dependency {
+public class Dependency implements ClassPathEntry {
 
     /**
      * Group ID of the dependency

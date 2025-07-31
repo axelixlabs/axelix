@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.app.api;
+package com.nucleonforge.axile.master.api;
 
 /**
  *
