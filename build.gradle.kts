@@ -14,6 +14,7 @@ dependencies {
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2022.0.4"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.jspecify:jspecify:1.0.0")
 
 //    // lombok
 //    compileOnly("org.projectlombok:lombok")
