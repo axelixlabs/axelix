@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("com.diffplug.spotless") version "7.1.0"
 }
 
 group = "com.nucleonforge.axile"
@@ -22,9 +23,32 @@ dependencies {
 //    annotationProcessor("org.projectlombok:lombok")
 //    testAnnotationProcessor("org.projectlombok:lombok")
 
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    // Test
+    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:3.0.13"))
+    testImplementation(platform("org.springframework.cloud:spring-cloud-dependencies:2022.0.4"))
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+spotless {
+    java {
+        palantirJavaFormat("2.69.0")
+        target("src/**/*.java")
+        importOrder(
+            "java",
+            "javax",
+            "jakarta",
+            "",
+            "org.springframework",
+            "com.nucleonforge",
+            "\\#"
+        )
+        removeUnusedImports()
+        removeWildcardImports()
+        trimTrailingWhitespace()
+    }
 }

@@ -9,5 +9,4 @@ import com.nucleonforge.axile.master.service.InstanceRegistry;
  *
  * @author Mikhail Polivakha
  */
-public class InstanceAlreadyRegisteredException extends RuntimeException {
-}
+public class InstanceAlreadyRegisteredException extends RuntimeException {}

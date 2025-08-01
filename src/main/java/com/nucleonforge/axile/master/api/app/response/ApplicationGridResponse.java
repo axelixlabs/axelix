@@ -7,7 +7,4 @@ import java.util.Set;
  *
  * @author Mikhail Polivakha
  */
-public record ApplicationGridResponse(
-        Set<ApplicationResponse> applications
-) {
-}
+public record ApplicationGridResponse(Set<ApplicationResponse> applications) {}

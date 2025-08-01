@@ -5,5 +5,4 @@ package com.nucleonforge.axile.master.domain;
  *
  * @author Mikhail Polivakha
  */
-public interface ClassPathEntry {
-}
+public interface ClassPathEntry {}

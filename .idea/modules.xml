@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/axile-master.main.iml" filepath="$PROJECT_DIR$/.idea/modules/axile-master.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/axile-master.test.iml" filepath="$PROJECT_DIR$/.idea/modules/axile-master.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.nucleonforge.axile.axile-master.test.iml" filepath="$PROJECT_DIR$/.idea/modules/com.nucleonforge.axile.axile-master.test.iml" />
     </modules>
   </component>
 </project>

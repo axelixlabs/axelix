@@ -19,4 +19,17 @@ public class CommitInfo {
     private String commitAuthorName;
 
     private String commitAuthorEmail;
+
+    public CommitInfo(
+            String commitShaShort,
+            String commitSha,
+            Instant commitTimestamp,
+            String commitAuthorName,
+            String commitAuthorEmail) {
+        this.commitShaShort = commitShaShort;
+        this.commitSha = commitSha;
+        this.commitTimestamp = commitTimestamp;
+        this.commitAuthorName = commitAuthorName;
+        this.commitAuthorEmail = commitAuthorEmail;
+    }
 }

@@ -11,4 +11,8 @@ import java.util.Set;
 public class JvmProperties {
 
     private Set<JvmProperty> jvmProperties;
+
+    public JvmProperties(Set<JvmProperty> jvmProperties) {
+        this.jvmProperties = jvmProperties;
+    }
 }

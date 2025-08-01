@@ -9,5 +9,4 @@ import com.nucleonforge.axile.master.service.InstanceRegistry;
  *
  * @author Mikhail Polivakha
  */
-public class NoSuchInstanceException extends RuntimeException {
-}
+public class NoSuchInstanceException extends RuntimeException {}
