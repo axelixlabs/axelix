@@ -11,4 +11,8 @@ import java.util.Set;
 public class Dependencies {
 
     private Set<Dependency> dependencies;
+
+    public Dependencies(Set<Dependency> dependencies) {
+        this.dependencies = dependencies;
+    }
 }

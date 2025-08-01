@@ -7,5 +7,4 @@ package com.nucleonforge.axile.master.domain;
  * @param option option as it is. Potentially a key value pair.
  * @author Mikhail Polivakha
  */
-public record JvmNonStandardOption(String option) {
-}
+public record JvmNonStandardOption(String option) {}

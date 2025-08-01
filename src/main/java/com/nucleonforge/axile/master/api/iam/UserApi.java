@@ -1,12 +1,13 @@
 package com.nucleonforge.axile.master.api.iam;
 
-import com.nucleonforge.axile.master.api.iam.request.LoginRequest;
-import com.nucleonforge.axile.master.api.iam.response.UserProfileResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.nucleonforge.axile.master.api.iam.request.LoginRequest;
+import com.nucleonforge.axile.master.api.iam.response.UserProfileResponse;
 
 /**
  * The API for working with users.

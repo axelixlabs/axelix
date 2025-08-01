@@ -9,11 +9,11 @@ import java.util.Set;
  */
 public record UserProfileResponse(String username, Roles roles) {
 
-    public record Roles(Set<Role> roles) { }
+    public record Roles(Set<Role> roles) {}
 
-    public record Role(String name, Authorities authorities) { }
+    public record Role(String name, Authorities authorities) {}
 
-    public record Authorities(Set<Authority> authorities) { }
+    public record Authorities(Set<Authority> authorities) {}
 
-    public record Authority(String name) { }
+    public record Authority(String name) {}
 }

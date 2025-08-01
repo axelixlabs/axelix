@@ -5,5 +5,4 @@ package com.nucleonforge.axile.master.api.iam.request;
  *
  * @author Mikhail Polivakha
  */
-public record LoginRequest(String username, String password) {
-}
+public record LoginRequest(String username, String password) {}

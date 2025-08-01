@@ -39,4 +39,13 @@ public class Dependency implements ClassPathEntry {
      * Might be empty, never null
      */
     private Set<Dependency> dependsOn;
+
+    public Dependency(
+            String groupId, String artifactId, String version, Dependency broughtBy, Set<Dependency> dependsOn) {
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+        this.broughtBy = broughtBy;
+        this.dependsOn = dependsOn;
+    }
 }

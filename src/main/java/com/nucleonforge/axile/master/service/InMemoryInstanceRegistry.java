@@ -6,10 +6,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.jspecify.annotations.NullMarked;
+
 import com.nucleonforge.axile.master.domain.Instance;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
 import com.nucleonforge.axile.master.exception.NoSuchInstanceException;
-import org.jspecify.annotations.NullMarked;
 
 /**
  * Implementation of the {@link InstanceRegistry} that holds the data in the process memory.

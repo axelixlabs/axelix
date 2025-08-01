@@ -1,8 +1,6 @@
 package com.nucleonforge.axile.master.domain;
 
-import org.jspecify.annotations.NonNull;
-
-import org.springframework.util.Assert;
+import java.util.Objects;
 
 public class Instance {
 
@@ -48,5 +46,20 @@ public class Instance {
 
     public LaunchDetails getLaunchDetails() {
         return launchDetails;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Instance instance)) return false;
+        return Objects.equals(id, instance.id)
+                && Objects.equals(buildInfo, instance.buildInfo)
+                && Objects.equals(loadedClasses, instance.loadedClasses)
+                && Objects.equals(launchDetails, instance.launchDetails);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, buildInfo, loadedClasses, launchDetails);
     }
 }

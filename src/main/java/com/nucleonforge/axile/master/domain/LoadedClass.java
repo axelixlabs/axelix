@@ -22,4 +22,10 @@ public class LoadedClass {
      * The class-path-entry from which the given class is loaded.
      */
     private ClassPathEntry classPathEntry;
+
+    public LoadedClass(ClassLoader classLoader, String fqcn, ClassPathEntry classPathEntry) {
+        this.classLoader = classLoader;
+        this.fqcn = fqcn;
+        this.classPathEntry = classPathEntry;
+    }
 }

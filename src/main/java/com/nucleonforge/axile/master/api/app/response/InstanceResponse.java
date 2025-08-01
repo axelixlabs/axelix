@@ -8,5 +8,4 @@ import com.nucleonforge.axile.master.domain.Instance;
  * @see Instance
  * @author Mikhail Polivakha
  */
-public class InstanceResponse {
-}
+public class InstanceResponse {}

@@ -6,5 +6,4 @@ package com.nucleonforge.axile.master.domain;
  *
  * @author Mikhail Polivakha
  */
-public record JvmProperty(String key, String value) {
-}
+public record JvmProperty(String key, String value) {}

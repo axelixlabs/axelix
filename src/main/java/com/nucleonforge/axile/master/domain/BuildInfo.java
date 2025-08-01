@@ -5,10 +5,15 @@ public class BuildInfo {
     /**
      * The information about deployed commit.
      */
-    private CommitInfo commitInfo;
+    private final CommitInfo commitInfo;
 
     /**
      * Dependencies that are included in the runtime.
      */
-    private Dependencies dependencies;
+    private final Dependencies dependencies;
+
+    public BuildInfo(CommitInfo commitInfo, Dependencies dependencies) {
+        this.commitInfo = commitInfo;
+        this.dependencies = dependencies;
+    }
 }
