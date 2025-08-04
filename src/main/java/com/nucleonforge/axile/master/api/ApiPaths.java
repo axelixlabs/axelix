@@ -7,8 +7,7 @@ package com.nucleonforge.axile.master.api;
  */
 public final class ApiPaths {
 
-    private ApiPaths() {
-    }
+    private ApiPaths() {}
 
     public static final class UsersApi {
 

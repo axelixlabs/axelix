@@ -1,12 +1,10 @@
 package com.nucleonforge.axile.master.api.app;
 
-import com.nucleonforge.axile.master.api.ApiPaths;
-import com.nucleonforge.axile.master.api.app.response.ApplicationGridResponse;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.nucleonforge.axile.master.api.ApiPaths;
 import com.nucleonforge.axile.master.api.app.response.ApplicationGridResponse;
 
 /**

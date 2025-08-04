@@ -5,7 +5,4 @@ package com.nucleonforge.axile.master.service;
  *
  * @author Mikhail Polivakha
  */
-public interface ApplicationService {
-
-    
-}
+public interface ApplicationService {}

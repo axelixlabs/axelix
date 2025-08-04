@@ -3,7 +3,6 @@ package com.nucleonforge.axile.master.convert;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -16,7 +15,8 @@ import org.jspecify.annotations.Nullable;
  */
 public interface Converter<S, T> {
 
-    @Nullable T convert(@Nullable S source);
+    @Nullable
+    T convert(@Nullable S source);
 
     default @NonNull Collection<@Nullable T> convertAll(@NonNull Collection<@Nullable S> sources) {
         List<T> result = new ArrayList<>();
