@@ -23,10 +23,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import com.nucleonforge.axile.Main;
 import com.nucleonforge.axile.spring.utils.ContextKeepAliveTestListener;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for {@link ProfileManagementEndpoint} using {@link TestRestTemplate}
@@ -46,11 +43,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestExecutionListeners(
-        listeners = {
-            DependencyInjectionTestExecutionListener.class,
-            DirtiesContextTestExecutionListener.class,
-            ContextKeepAliveTestListener.class
-        })
+    listeners = {
+        DependencyInjectionTestExecutionListener.class,
+        DirtiesContextTestExecutionListener.class,
+        ContextKeepAliveTestListener.class
+    })
 @Import({
     TestFeatureServiceConfigs.PremiumFeatureService.class,
     TestFeatureServiceConfigs.PremiumFeatureServiceConfig.class
@@ -71,15 +68,15 @@ class ProfileManagementEndpointTest {
 
         // Verify bean after activating profile
         Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
-        assertTrue(containsBean(updatedBeans, premiumService));
+        assertThat(containsBean(updatedBeans, premiumService)).isTrue();
     }
 
     @Test
     void shouldReplace_ActiveProfilesDynamically() throws InterruptedException {
         String basicService = "basicFeatureService",
-                premiumService = "premiumFeatureService",
-                advancedService = "advancedFeatureService",
-                legacyService = "legacyFeatureService";
+            premiumService = "premiumFeatureService",
+            advancedService = "advancedFeatureService",
+            legacyService = "legacyFeatureService";
 
         checkNoActiveProfilesAndNoBeans(basicService, premiumService);
 
@@ -87,18 +84,18 @@ class ProfileManagementEndpointTest {
 
         // Verify beans after activating profiles
         Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
-        assertTrue(containsBean(updatedBeans, basicService));
-        assertTrue(containsBean(updatedBeans, premiumService));
+        assertThat(containsBean(updatedBeans, basicService)).isTrue();
+        assertThat(containsBean(updatedBeans, premiumService)).isTrue();
 
         // Replace profiles
         activateProfiles("profile-legacy,profile-advanced");
 
         // Verify beans after replacing profiles
         updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
-        assertTrue(containsBean(updatedBeans, legacyService));
-        assertTrue(containsBean(updatedBeans, advancedService));
-        assertFalse(containsBean(updatedBeans, basicService));
-        assertFalse(containsBean(updatedBeans, premiumService));
+        assertThat(containsBean(updatedBeans, legacyService)).isTrue();
+        assertThat(containsBean(updatedBeans, advancedService)).isTrue();
+        assertThat(containsBean(updatedBeans, basicService)).isFalse();
+        assertThat(containsBean(updatedBeans, premiumService)).isFalse();
     }
 
     @Test
@@ -111,24 +108,24 @@ class ProfileManagementEndpointTest {
 
         // Verify beans after activating profiles
         Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
-        assertTrue(containsBean(updatedBeans, advancedService));
-        assertTrue(containsBean(updatedBeans, legacyService));
+        assertThat(containsBean(updatedBeans, advancedService)).isTrue();
+        assertThat(containsBean(updatedBeans, legacyService)).isTrue();
 
         // Disable all profiles
         activateProfiles(" ");
 
         // Verify beans after disabling all profiles
         updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
-        assertFalse(containsBean(updatedBeans, legacyService));
-        assertFalse(containsBean(updatedBeans, advancedService));
+        assertThat(containsBean(updatedBeans, advancedService)).isFalse();
+        assertThat(containsBean(updatedBeans, legacyService)).isFalse();
     }
 
     @Test
     void replaceProfiles_shouldReturnBadRequest() {
         ResponseEntity<ProfileMutationResponse> response =
-                restTemplate.postForEntity(path(""), defaultEntity(), ProfileMutationResponse.class);
+            restTemplate.postForEntity(path(""), defaultEntity(), ProfileMutationResponse.class);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -139,11 +136,15 @@ class ProfileManagementEndpointTest {
      */
     private void activateProfiles(String profiles) throws InterruptedException {
         ResponseEntity<ProfileMutationResponse> response =
-                restTemplate.postForEntity(path("/" + profiles), defaultEntity(), ProfileMutationResponse.class);
+            restTemplate.postForEntity(path("/" + profiles), defaultEntity(), ProfileMutationResponse.class);
+
         TimeUnit.SECONDS.sleep(7); // wait for context update
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().updated());
+        assertThat(response)
+            .isNotNull()
+            .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
+            .extracting(ResponseEntity::getBody)
+            .isNotNull()
+            .returns(true, ProfileMutationResponse::updated);
 
         String[] expectedProfiles = profiles.isBlank() ? new String[0] : profiles.split(",");
         checkActiveProfiles(expectedProfiles);
@@ -158,10 +159,10 @@ class ProfileManagementEndpointTest {
     private void checkActiveProfiles(String... expectedProfiles) {
         Map<?, ?> env = restTemplate.getForObject("/actuator/env", Map.class);
         List<String> activeProfiles = (List<String>) env.get("activeProfiles");
-        assertEquals(expectedProfiles.length, activeProfiles.size());
+        assertThat(activeProfiles).hasSize(expectedProfiles.length);
 
         for (String profile : expectedProfiles) {
-            assertTrue(activeProfiles.contains(profile));
+            assertThat(activeProfiles).contains(profile);
         }
     }
 
@@ -174,11 +175,11 @@ class ProfileManagementEndpointTest {
     private void checkNoActiveProfilesAndNoBeans(String... expectedMissingBeans) {
         Map<?, ?> env = restTemplate.getForObject("/actuator/env", Map.class);
         List<String> activeProfiles = (List<String>) env.get("activeProfiles");
-        assertEquals(0, activeProfiles.size());
+        assertThat(activeProfiles).isEmpty();
 
         Map<?, ?> beans = restTemplate.getForObject("/actuator/beans", Map.class);
         for (String beanName : expectedMissingBeans) {
-            assertFalse(containsBean(beans, beanName));
+            assertThat(containsBean(beans, beanName)).isFalse();
         }
     }
 

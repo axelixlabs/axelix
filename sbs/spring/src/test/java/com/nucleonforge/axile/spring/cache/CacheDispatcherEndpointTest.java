@@ -16,11 +16,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axile.Main;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for {@link CacheDispatcherEndpoint} using {@link TestRestTemplate}
@@ -53,68 +49,71 @@ class CacheDispatcherEndpointTest {
     void clear_shouldClearEntireCache() {
         String key = "key";
         Cache cache = cacheManager.getCache("cache");
-        assertNotNull(cache);
+        assertThat(cache).isNotNull();
+
         cache.put(key, "value");
-        assertNotNull(cache.get(key));
+        assertThat(cache.get(key)).isNotNull();
 
-        CacheClearResponse result = testRestTemplate.postForObject(
-                path("/cacheManager/cache?key=key"), defaultEntity(), CacheClearResponse.class);
+        CacheClearResponse response = testRestTemplate.postForObject(
+            path("/cacheManager/cache?key=key"), defaultEntity(), CacheClearResponse.class);
 
-        assertTrue(result.cleared());
-        assertNull(cache.get(key));
+        assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
+        assertThat(cache.get(key)).isNull();
     }
 
     @Test
     void clearKey_shouldEvictSingleEntry() {
         String key1 = "key1", key2 = "key2";
         Cache cache = cacheManager.getCache("cache");
-        assertNotNull(cache);
+        assertThat(cache).isNotNull();
+
         cache.put(key1, "value1");
         cache.put(key2, "value2");
-        assertNotNull(cache.get(key1));
-        assertNotNull(cache.get(key2));
+        assertThat(cache.get(key1)).isNotNull();
+        assertThat(cache.get(key2)).isNotNull();
 
-        CacheClearResponse result = testRestTemplate.postForObject(
-                path("/cacheManager/cache?key=key2"), defaultEntity(), CacheClearResponse.class);
+        CacheClearResponse response = testRestTemplate.postForObject(
+            path("/cacheManager/cache?key=key2"), defaultEntity(), CacheClearResponse.class);
 
-        assertTrue(result.cleared());
-        assertNull(cache.get(key2));
-        assertNotNull(cache.get(key1));
+        assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
+        assertThat(cache.get(key2)).isNull();
+        assertThat(cache.get(key1)).isNotNull();
     }
 
     @Test
     void clear_shouldFallbackToClearCache_whenKeyIsMissing() {
         String key = "key";
         Cache cache = cacheManager.getCache("cache");
-        assertNotNull(cache);
+        assertThat(cache).isNotNull();
+
         cache.put(key, "value");
-        assertNotNull(cache.get(key));
+        assertThat(cache.get(key)).isNotNull();
 
-        CacheClearResponse result =
-                testRestTemplate.postForObject(path("/cacheManager/cache"), defaultEntity(), CacheClearResponse.class);
+        CacheClearResponse response =
+            testRestTemplate.postForObject(path("/cacheManager/cache"), defaultEntity(), CacheClearResponse.class);
 
-        assertTrue(result.cleared());
-        assertNull(cache.get(key));
+        assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
+        assertThat(cache.get(key)).isNull();
     }
 
     @Test
     void clearKey_shouldReturnFalseEvenIfKeyDoesNotExist() {
         Cache cache = cacheManager.getCache("cache");
-        assertNotNull(cache);
-        assertNull(cache.get("nonExistingKey"));
+        assertThat(cache).isNotNull();
+        assertThat(cache.get("nonExistingKey")).isNull();
 
-        CacheClearResponse result = testRestTemplate.postForObject(
-                path("/cacheManager/cache?key=nonExistingKey"), defaultEntity(), CacheClearResponse.class);
+        CacheClearResponse response = testRestTemplate.postForObject(
+            path("/cacheManager/cache?key=nonExistingKey"), defaultEntity(), CacheClearResponse.class);
 
-        assertFalse(result.cleared());
+        assertThat(response).isNotNull().returns(false, CacheClearResponse::cleared);
     }
 
     @Test
     void clear_shouldReturnFalse_cacheDoesNotExist() {
-        CacheClearResponse result = testRestTemplate.postForObject(
-                path("/cacheManager/nonExistentCache"), defaultEntity(), CacheClearResponse.class);
+        CacheClearResponse response = testRestTemplate.postForObject(
+            path("/cacheManager/nonExistentCache"), defaultEntity(), CacheClearResponse.class);
 
-        assertFalse(result.cleared());
+        assertThat(response).isNotNull().returns(false, CacheClearResponse::cleared);
     }
 
     @Test
@@ -122,46 +121,46 @@ class CacheDispatcherEndpointTest {
         String key1 = "key1", key2 = "key2";
         Cache cache1 = cacheManager.getCache("cache1");
         Cache cache2 = cacheManager.getCache("cache2");
+        assertThat(cache1).isNotNull();
+        assertThat(cache2).isNotNull();
+
         cache1.put(key1, "value1");
         cache2.put(key2, "value2");
-        assertNotNull(cache1.get(key1));
-        assertNotNull(cache2.get(key2));
+        assertThat(cache1.get(key1)).isNotNull();
+        assertThat(cache2.get(key2)).isNotNull();
 
-        CacheClearResponse result =
-                testRestTemplate.postForObject(path("/cacheManager"), defaultEntity(), CacheClearResponse.class);
+        CacheClearResponse response =
+            testRestTemplate.postForObject(path("/cacheManager"), defaultEntity(), CacheClearResponse.class);
 
-        assertTrue(result.cleared());
-        assertNull(cache1.get(key1));
-        assertNull(cache2.get(key2));
+        assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
+        assertThat(cache1.get(key1)).isNull();
+        assertThat(cache2.get(key2)).isNull();
     }
 
     @Test
     void clearAll_shouldReturnFalse_cacheManagerDoesNotExist() {
-        CacheClearResponse result =
-                testRestTemplate.postForObject(path("/nonExistentManager"), defaultEntity(), CacheClearResponse.class);
+        CacheClearResponse response =
+            testRestTemplate.postForObject(path("/nonExistentManager"), defaultEntity(), CacheClearResponse.class);
 
-        assertFalse(result.cleared());
+        assertThat(response.cleared()).isFalse();
+
     }
 
     @Test
     void invalidPath_shouldReturn404() {
         ResponseEntity<String> response =
-                testRestTemplate.postForEntity("/actuator/cache-dispatch", defaultEntity(), String.class);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            testRestTemplate.postForEntity("/actuator/cache-dispatch", defaultEntity(), String.class);
+        assertThat(response)
+            .isNotNull()
+            .returns(HttpStatus.NOT_FOUND, ResponseEntity::getStatusCode);
     }
 
-    /**
-     * Helper to creates a default HttpEntity with application/json headers and no body.
-     */
     private HttpEntity<Void> defaultEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<>(headers);
     }
 
-    /**
-     * Helper to construct a relative path to the cache-dispatcher actuator endpoint.
-     */
     private String path(String relative) {
         return "/actuator/cache-dispatcher" + relative;
     }
