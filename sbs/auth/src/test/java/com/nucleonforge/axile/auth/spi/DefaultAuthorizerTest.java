@@ -13,9 +13,8 @@ import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Unit tests for {@link DefaultAuthorizer}.
@@ -29,31 +28,34 @@ class DefaultAuthorizerTest {
     @Test
     void shouldAuthorize_UserHasRequiredAuthorities() {
         Role role = new DefaultRole(
-                "testRole", Set.of(DefaultAuthority.BEANS, DefaultAuthority.HEALTH), Collections.emptySet());
+            "testRole", Set.of(DefaultAuthority.BEANS, DefaultAuthority.HEALTH), Collections.emptySet());
         User user = new DefaultUser("testUser", Set.of(role));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.HEALTH));
 
-        assertDoesNotThrow(() -> authorizer.authorize(user, request));
+        assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
 
     @Test
     void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole() {
         Role role1 =
-                new DefaultRole("firstTestRole", Set.of(DefaultAuthority.CACHE_DISPATCHER), Collections.emptySet());
+            new DefaultRole("firstTestRole", Set.of(DefaultAuthority.CACHE_DISPATCHER), Collections.emptySet());
         Role role2 =
-                new DefaultRole("secondTestRole", Set.of(DefaultAuthority.PROFILE_MANAGEMENT), Collections.emptySet());
+            new DefaultRole("secondTestRole", Set.of(DefaultAuthority.PROFILE_MANAGEMENT), Collections.emptySet());
         User user = new DefaultUser("testUser", Set.of(role1, role2));
 
-        assertDoesNotThrow(() ->
-                authorizer.authorize(user, new AuthorizationRequest(Set.of(DefaultAuthority.PROFILE_MANAGEMENT))));
-        assertDoesNotThrow(
-                () -> authorizer.authorize(user, new AuthorizationRequest(Set.of(DefaultAuthority.CACHE_DISPATCHER))));
+        assertThatNoException()
+            .isThrownBy(() -> authorizer.authorize(
+                user, new AuthorizationRequest(Set.of(DefaultAuthority.PROFILE_MANAGEMENT))));
+
+        assertThatNoException()
+            .isThrownBy(() -> authorizer.authorize(
+                user, new AuthorizationRequest(Set.of(DefaultAuthority.CACHE_DISPATCHER))));
     }
 
     @Test
     void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInInnerRole() {
-        Role innerRole1 = new DefaultRole("firstInnerTestRole", Set.of(DefaultAuthority.CACHE_DISPATCHER), Set.of());
+        Role innerRole1 = new DefaultRole("firstInnerTestRole", Set.of(DefaultAuthority.PROPERTY_MANAGEMENT), Set.of());
         Role role1 = new DefaultRole("firstTestRole", null, Set.of(innerRole1));
 
         Role innerRole2 = new DefaultRole("secondInnerTestRole", Set.of(DefaultAuthority.PROFILE_MANAGEMENT), Set.of());
@@ -61,10 +63,13 @@ class DefaultAuthorizerTest {
 
         User user = new DefaultUser("testUser", Set.of(role1, role2));
 
-        assertDoesNotThrow(() ->
-                authorizer.authorize(user, new AuthorizationRequest(Set.of(DefaultAuthority.PROFILE_MANAGEMENT))));
-        assertDoesNotThrow(
-                () -> authorizer.authorize(user, new AuthorizationRequest(Set.of(DefaultAuthority.CACHE_DISPATCHER))));
+        assertThatNoException()
+            .isThrownBy(() -> authorizer.authorize(
+                user, new AuthorizationRequest(Set.of(DefaultAuthority.PROPERTY_MANAGEMENT))));
+
+        assertThatNoException()
+            .isThrownBy(() -> authorizer.authorize(
+                user, new AuthorizationRequest(Set.of(DefaultAuthority.PROFILE_MANAGEMENT))));
     }
 
     @Test
@@ -75,7 +80,7 @@ class DefaultAuthorizerTest {
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.HEALTH));
 
-        assertDoesNotThrow(() -> authorizer.authorize(user, request));
+        assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
 
     @Test
@@ -85,10 +90,10 @@ class DefaultAuthorizerTest {
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.METRICS));
 
-        AuthorizationException exception =
-                assertThrows(AuthorizationException.class, () -> authorizer.authorize(user, request));
-
-        assertTrue(exception.getMessage().contains("Access denied: missing required authorities "));
+        assertThatThrownBy(() -> authorizer.authorize(user, request))
+            .isInstanceOf(AuthorizationException.class)
+            .hasMessageContaining(
+                "Access denied: missing required authorities " + Set.of(DefaultAuthority.METRICS));
     }
 
     @Test
@@ -97,11 +102,9 @@ class DefaultAuthorizerTest {
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.CACHE_DISPATCHER));
 
-        AuthorizationException exception =
-                assertThrows(AuthorizationException.class, () -> authorizer.authorize(user, request));
-
-        String message = exception.getMessage();
-        assertTrue(message.contains(
-                "Access denied: missing required authorities " + Set.of(DefaultAuthority.CACHE_DISPATCHER)));
+        assertThatThrownBy(() -> authorizer.authorize(user, request))
+            .isInstanceOf(AuthorizationException.class)
+            .hasMessageContaining(
+                "Access denied: missing required authorities " + Set.of(DefaultAuthority.CACHE_DISPATCHER));
     }
 }
