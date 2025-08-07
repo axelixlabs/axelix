@@ -10,11 +10,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for {@link DefaultCacheDispatcher} with a real {@link ConcurrentMapCacheManager}.
@@ -44,20 +40,18 @@ class DefaultCacheDispatcherTest {
         String cacheName = "cache";
         String cacheManagerName = "cacheManager";
         Cache cache = cacheManager.getCache(cacheName);
+        assertThat(cache).isNotNull();
+
         cache.put(key, "value");
-        assertNotNull(cache.get(key));
+        assertThat(cache.get(key)).isNotNull();
 
-        boolean result = dispatcher.clear(cacheManagerName, cacheName);
-
-        assertTrue(result);
-        assertNull(cache.get(key));
+        assertThat(dispatcher.clear(cacheManagerName, cacheName)).isTrue();
+        assertThat(cache.get(key)).isNull();
     }
 
     @Test
     void clear_shouldReturnFalse() {
-        boolean result = dispatcher.clear("nonExistentCacheManager", "cache");
-
-        assertFalse(result);
+        assertThat(dispatcher.clear("nonExistentCacheManager", "cache")).isFalse();
     }
 
     @Test
@@ -66,24 +60,23 @@ class DefaultCacheDispatcherTest {
         String keyToRemove = "keyToRemove", keyToKeep = "keyToKeep";
         String cacheManagerName = "cacheManager";
         Cache cache = cacheManager.getCache(cacheName);
+        assertThat(cache).isNotNull();
+
         cache.put(keyToRemove, "value1");
         cache.put(keyToKeep, "value2");
-        assertNotNull(cache.get(keyToRemove));
-        assertNotNull(cache.get(keyToKeep));
+        assertThat(cache.get(keyToRemove)).isNotNull();
+        assertThat(cache.get(keyToKeep)).isNotNull();
 
-        boolean result = dispatcher.clear(cacheManagerName, cacheName, keyToRemove);
+        assertThat(dispatcher.clear(cacheManagerName, cacheName, keyToRemove)).isTrue();
 
-        assertTrue(result);
-        assertNull(cache.get(keyToRemove));
-        assertNotNull(cache.get(keyToKeep));
-        assertEquals("value2", cache.get(keyToKeep).get());
+        assertThat(cache.get(keyToRemove)).isNull();
+        assertThat(cache.get(keyToKeep)).isNotNull().satisfies(cacheValue -> assertThat(cacheValue.get())
+            .isEqualTo("value2"));
     }
 
     @Test
     void clearKey_shouldReturnFalse() {
-        boolean result = dispatcher.clear("nonExistentCacheManager", "cache", "key");
-
-        assertFalse(result);
+        assertThat(dispatcher.clear("nonExistentCacheManager", "cache", "key")).isFalse();
     }
 
     @Test
@@ -92,22 +85,22 @@ class DefaultCacheDispatcherTest {
         String cacheManagerName = "cacheManager";
         Cache cache1 = cacheManager.getCache("cache1");
         Cache cache2 = cacheManager.getCache("cache2");
+        assertThat(cache1).isNotNull();
+        assertThat(cache2).isNotNull();
+
         cache1.put(key1, "value1");
         cache2.put(key2, "value2");
-        assertNotNull(cache1.get(key1));
-        assertNotNull(cache2.get(key2));
+        assertThat(cache1.get(key1)).isNotNull();
+        assertThat(cache2.get(key2)).isNotNull();
 
-        boolean result = dispatcher.clearAll(cacheManagerName);
+        assertThat(dispatcher.clearAll(cacheManagerName)).isTrue();
 
-        assertTrue(result);
-        assertNull(cache1.get(key1));
-        assertNull(cache2.get(key2));
+        assertThat(cache1.get(key1)).isNull();
+        assertThat(cache2.get(key2)).isNull();
     }
 
     @Test
     void clearAll_shouldReturnFalse() {
-        boolean result = dispatcher.clearAll("nonExistentCacheManager");
-
-        assertFalse(result);
+        assertThat(dispatcher.clearAll("nonExistentCacheManager")).isFalse();
     }
 }

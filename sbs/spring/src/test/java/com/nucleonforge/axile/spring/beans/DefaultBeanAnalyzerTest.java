@@ -32,11 +32,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test class for verifying the functionality of {@link DefaultBeanAnalyzer}.
@@ -52,76 +48,82 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DefaultBeanAnalyzerTest {
 
     @Autowired
-    BeanAnalyzer analyzer;
+    private BeanAnalyzer analyzer;
 
     @Test
     void shouldAnalyzeServiceBean() {
-        Optional<BeanProfile> optionalResponse = analyzer.analyze("myService");
-        assertTrue(optionalResponse.isPresent());
+        Optional<BeanProfile> optResponse = analyzer.analyze("myService");
 
-        BeanProfile response = optionalResponse.get();
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
+            assertThat(response.beanClass()).isNotNull();
+            assertThat(response.beanClass().getSimpleName()).isEqualTo("MyService");
 
-        assertNotNull(response.beanClass());
-        assertEquals("MyService", response.beanClass().getSimpleName());
-        assertEquals("singleton", response.scope());
-        assertNull(response.definingMethod());
-        assertFalse(response.factoryBean());
+            assertThat(response)
+                .returns("singleton", BeanProfile::scope)
+                .returns(null, BeanProfile::definingMethod)
+                .returns(false, BeanProfile::factoryBean);
+        });
     }
 
     @Test
     void shouldAnalyzeCustomMethod() {
-        Optional<BeanProfile> response = analyzer.analyze("customBean");
+        Optional<BeanProfile> optResponse = analyzer.analyze("customBean");
 
-        assertTrue(response.isPresent());
-        assertNotNull(response.get().definingMethod());
-        assertEquals("customBean", response.get().definingMethod().getName());
-        assertTrue(response.get().factoryBean());
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
+            assertThat(response.definingMethod().getName()).isEqualTo("customBean");
+            assertThat(response.beanClass().getSimpleName()).isEqualTo("DefaultBeanAnalyzerTestConfig");
+
+            assertThat(response).returns("singleton", BeanProfile::scope).returns(true, BeanProfile::factoryBean);
+        });
     }
 
     @Test
     void shouldAnalyzeRepositoryBean() {
-        Optional<BeanProfile> response =
-                analyzer.analyze("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig.MyRepository");
+        Optional<BeanProfile> optResponse =
+            analyzer.analyze("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig.MyRepository");
 
-        assertTrue(response.isPresent());
-        assertNotNull(response.get().beanClass());
-        assertTrue(response.get().beanClass().getSimpleName().contains("JpaRepositoryFactoryBean"));
-        assertFalse(response.get().factoryBean());
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
+            assertThat(response.beanClass()).isNotNull();
+            assertThat(response.beanClass().getSimpleName()).contains("JpaRepositoryFactoryBean");
+
+            assertThat(response)
+                .returns("singleton", BeanProfile::scope)
+                .returns(false, BeanProfile::factoryBean)
+                .returns(null, BeanProfile::definingMethod);
+        });
     }
 
     @Test
     void shouldReturnEmptyForUnknownBean() {
-        Optional<BeanProfile> response = analyzer.analyze("nonExistentBean");
-        assertTrue(response.isEmpty());
+        Optional<BeanProfile> optResponse = analyzer.analyze("nonExistentBean");
+        assertThat(optResponse).isEmpty();
     }
 
     @Test
     void shouldAnalyzeDefaultBeanAnalyzer() {
-        Optional<BeanProfile> optionalResponse = analyzer.analyze("defaultBeanAnalyzer");
-        assertTrue(optionalResponse.isPresent());
+        Optional<BeanProfile> optResponse = analyzer.analyze("defaultBeanAnalyzer");
 
-        BeanProfile response = optionalResponse.get();
-
-        assertEquals("singleton", response.scope());
-        assertTrue(response.factoryBean());
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> assertThat(response)
+            .returns("singleton", BeanProfile::scope)
+            .returns(true, BeanProfile::factoryBean));
     }
 
     @Test
     void shouldAnalyzePrototypeBean() {
-        Optional<BeanProfile> response = analyzer.analyze("myPrototypeBean");
+        Optional<BeanProfile> optResponse = analyzer.analyze("myPrototypeBean");
 
-        assertTrue(response.isPresent());
-        assertEquals("prototype", response.get().scope());
-        assertTrue(response.get().factoryBean());
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> assertThat(response)
+            .returns("prototype", BeanProfile::scope)
+            .returns(true, BeanProfile::factoryBean));
     }
 
     @Test
     void shouldAnalyzeRequestBean() {
-        Optional<BeanProfile> response = analyzer.analyze("myRequestBean");
+        Optional<BeanProfile> optResponse = analyzer.analyze("myRequestBean");
 
-        assertTrue(response.isPresent());
-        assertEquals("request", response.get().scope());
-        assertTrue(response.get().factoryBean());
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> assertThat(response)
+            .returns("request", BeanProfile::scope)
+            .returns(true, BeanProfile::factoryBean));
     }
 
     /**
@@ -132,16 +134,16 @@ class DefaultBeanAnalyzerTest {
      */
     @TestConfiguration
     @EnableJpaRepositories(
-            basePackageClasses = DefaultBeanAnalyzerTestConfig.MyRepository.class,
-            considerNestedRepositories = true)
+        basePackageClasses = DefaultBeanAnalyzerTestConfig.MyRepository.class,
+        considerNestedRepositories = true)
     @EntityScan(basePackageClasses = DefaultBeanAnalyzerTestConfig.MyEntity.class)
     public static class DefaultBeanAnalyzerTestConfig {
 
         @Bean
         public DataSource dataSource() {
             return new EmbeddedDatabaseBuilder()
-                    .setType(EmbeddedDatabaseType.H2)
-                    .build();
+                .setType(EmbeddedDatabaseType.H2)
+                .build();
         }
 
         @Bean
