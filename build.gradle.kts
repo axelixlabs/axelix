@@ -1,54 +1,78 @@
 plugins {
-    id("java")
+    id("maven-publish")
     id("com.diffplug.spotless") version "7.1.0"
 }
 
-group = "com.nucleonforge.axile"
-version = "1.0.O-SNAPSHOT"
+allprojects {
+    group = "com.nucleonforge.axile"
+    version = "1.0.O-SNAPSHOT"
 
-repositories {
-    mavenCentral()
+    repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/Nucleon-Forge/axile")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+            }
+        }
+
+        mavenCentral()
+    }
 }
 
-dependencies {
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.0.13"))
-    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2022.0.4"))
+subprojects {
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.jspecify:jspecify:1.0.0")
+    // TODO: Do we even need this check?
+    if (!name.startsWith(":sbs:") && !name.startsWith(":master:") && !name.startsWith(":common:")) {
+        return@subprojects
+    }
 
-//    // lombok
-//    compileOnly("org.projectlombok:lombok")
-//    testCompileOnly("org.projectlombok:lombok")
-//    annotationProcessor("org.projectlombok:lombok")
-//    testAnnotationProcessor("org.projectlombok:lombok")
+    apply(plugin = "maven-publish")
+    apply(plugin = "com.diffplug.spotless")
 
-    // Test
-    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:3.0.13"))
-    testImplementation(platform("org.springframework.cloud:spring-cloud-dependencies:2022.0.4"))
+    plugins.withType<JavaPlugin> {
+        tasks.withType<Test>().configureEach {
+            useJUnitPlatform()
+        }
+    }
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
+    spotless {
+        java {
+            palantirJavaFormat("2.69.0")
+            target("src/**/*.java")
+            importOrder(
+                "java",
+                "javax",
+                "jakarta",
+                "",
+                "org.springframework",
+                "com.nucleonforge",
+                "\\#"
+            )
+            removeUnusedImports()
+            removeWildcardImports()
+            trimTrailingWhitespace()
+        }
+    }
 
-tasks.test {
-    useJUnitPlatform()
-}
+    configure<PublishingExtension> {
+        repositories {
+            maven {
+                name = "NucleonForgeAxile"
+                url = uri("https://maven.pkg.github.com/Nucleon-Forge/axile")
+                credentials {
+                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
 
-spotless {
-    java {
-        palantirJavaFormat("2.69.0")
-        target("src/**/*.java")
-        importOrder(
-            "java",
-            "javax",
-            "jakarta",
-            "",
-            "org.springframework",
-            "com.nucleonforge",
-            "\\#"
-        )
-        removeUnusedImports()
-        removeWildcardImports()
-        trimTrailingWhitespace()
+        publications {
+
+            // Publish to GitHub Package Registry
+            register<MavenPublication>("gpr") {
+                from(components["java"])
+            }
+        }
     }
 }

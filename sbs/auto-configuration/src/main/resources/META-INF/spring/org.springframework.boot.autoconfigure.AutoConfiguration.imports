@@ -1,0 +1,8 @@
+com.nucleonforge.axile.autoconfiguration.spring.BeanAnalyzerAutoConfiguration
+com.nucleonforge.axile.autoconfiguration.spring.CacheDispatcherAutoConfiguration
+com.nucleonforge.axile.autoconfiguration.spring.SpringCloudFeignAutoConfiguration
+com.nucleonforge.axile.autoconfiguration.spring.ContextRestarterAutoConfiguration
+com.nucleonforge.axile.autoconfiguration.spring.PropertyManagementAutoConfiguration
+com.nucleonforge.axile.autoconfiguration.spring.ProfileManagementAutoConfiguration
+com.nucleonforge.axile.autoconfiguration.spring.KafkaIntegrationAutoConfiguration
+com.nucleonforge.axile.autoconfiguration.auth.JwtAuthAutoConfiguration

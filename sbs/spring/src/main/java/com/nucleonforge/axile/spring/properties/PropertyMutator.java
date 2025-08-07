@@ -1,0 +1,23 @@
+package com.nucleonforge.axile.spring.properties;
+
+import org.springframework.context.ApplicationContext;
+
+/**
+ * The interface that is capable to modify the {@link Property} value.
+ * <p>
+ * The implementations must reload all necessary {@link ApplicationContext} components that rely on this property.
+ *
+ * @since 07.04.25
+ * @author Mikhail Polivakha
+ */
+public interface PropertyMutator {
+
+    /**
+     * Mutate the property
+     *
+     * @param property the property to be mutated
+     * @param newValue the new value of the property
+     * @return the result of the mutation
+     */
+    MutationResponse mutate(Property property, String newValue);
+}
