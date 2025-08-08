@@ -28,7 +28,7 @@ class DefaultAuthorizerTest {
     @Test
     void shouldAuthorize_UserHasRequiredAuthorities() {
         Role role = new DefaultRole(
-            "testRole", Set.of(DefaultAuthority.BEANS, DefaultAuthority.HEALTH), Collections.emptySet());
+                "testRole", Set.of(DefaultAuthority.BEANS, DefaultAuthority.HEALTH), Collections.emptySet());
         User user = new DefaultUser("testUser", Set.of(role));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.HEALTH));
@@ -39,18 +39,18 @@ class DefaultAuthorizerTest {
     @Test
     void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole() {
         Role role1 =
-            new DefaultRole("firstTestRole", Set.of(DefaultAuthority.CACHE_DISPATCHER), Collections.emptySet());
+                new DefaultRole("firstTestRole", Set.of(DefaultAuthority.CACHE_DISPATCHER), Collections.emptySet());
         Role role2 =
-            new DefaultRole("secondTestRole", Set.of(DefaultAuthority.PROFILE_MANAGEMENT), Collections.emptySet());
+                new DefaultRole("secondTestRole", Set.of(DefaultAuthority.PROFILE_MANAGEMENT), Collections.emptySet());
         User user = new DefaultUser("testUser", Set.of(role1, role2));
 
         assertThatNoException()
-            .isThrownBy(() -> authorizer.authorize(
-                user, new AuthorizationRequest(Set.of(DefaultAuthority.PROFILE_MANAGEMENT))));
+                .isThrownBy(() -> authorizer.authorize(
+                        user, new AuthorizationRequest(Set.of(DefaultAuthority.PROFILE_MANAGEMENT))));
 
         assertThatNoException()
-            .isThrownBy(() -> authorizer.authorize(
-                user, new AuthorizationRequest(Set.of(DefaultAuthority.CACHE_DISPATCHER))));
+                .isThrownBy(() -> authorizer.authorize(
+                        user, new AuthorizationRequest(Set.of(DefaultAuthority.CACHE_DISPATCHER))));
     }
 
     @Test
@@ -64,12 +64,12 @@ class DefaultAuthorizerTest {
         User user = new DefaultUser("testUser", Set.of(role1, role2));
 
         assertThatNoException()
-            .isThrownBy(() -> authorizer.authorize(
-                user, new AuthorizationRequest(Set.of(DefaultAuthority.PROPERTY_MANAGEMENT))));
+                .isThrownBy(() -> authorizer.authorize(
+                        user, new AuthorizationRequest(Set.of(DefaultAuthority.PROPERTY_MANAGEMENT))));
 
         assertThatNoException()
-            .isThrownBy(() -> authorizer.authorize(
-                user, new AuthorizationRequest(Set.of(DefaultAuthority.PROFILE_MANAGEMENT))));
+                .isThrownBy(() -> authorizer.authorize(
+                        user, new AuthorizationRequest(Set.of(DefaultAuthority.PROFILE_MANAGEMENT))));
     }
 
     @Test
@@ -91,9 +91,9 @@ class DefaultAuthorizerTest {
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.METRICS));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request))
-            .isInstanceOf(AuthorizationException.class)
-            .hasMessageContaining(
-                "Access denied: missing required authorities " + Set.of(DefaultAuthority.METRICS));
+                .isInstanceOf(AuthorizationException.class)
+                .hasMessageContaining(
+                        "Access denied: missing required authorities " + Set.of(DefaultAuthority.METRICS));
     }
 
     @Test
@@ -103,8 +103,8 @@ class DefaultAuthorizerTest {
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.CACHE_DISPATCHER));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request))
-            .isInstanceOf(AuthorizationException.class)
-            .hasMessageContaining(
-                "Access denied: missing required authorities " + Set.of(DefaultAuthority.CACHE_DISPATCHER));
+                .isInstanceOf(AuthorizationException.class)
+                .hasMessageContaining(
+                        "Access denied: missing required authorities " + Set.of(DefaultAuthority.CACHE_DISPATCHER));
     }
 }
