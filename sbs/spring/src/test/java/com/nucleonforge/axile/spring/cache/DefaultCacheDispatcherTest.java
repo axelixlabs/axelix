@@ -71,7 +71,7 @@ class DefaultCacheDispatcherTest {
 
         assertThat(cache.get(keyToRemove)).isNull();
         assertThat(cache.get(keyToKeep)).isNotNull().satisfies(cacheValue -> assertThat(cacheValue.get())
-            .isEqualTo("value2"));
+                .isEqualTo("value2"));
     }
 
     @Test

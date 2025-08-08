@@ -59,9 +59,9 @@ class DefaultBeanAnalyzerTest {
             assertThat(response.beanClass().getSimpleName()).isEqualTo("MyService");
 
             assertThat(response)
-                .returns("singleton", BeanProfile::scope)
-                .returns(null, BeanProfile::definingMethod)
-                .returns(false, BeanProfile::factoryBean);
+                    .returns("singleton", BeanProfile::scope)
+                    .returns(null, BeanProfile::definingMethod)
+                    .returns(false, BeanProfile::factoryBean);
         });
     }
 
@@ -80,16 +80,16 @@ class DefaultBeanAnalyzerTest {
     @Test
     void shouldAnalyzeRepositoryBean() {
         Optional<BeanProfile> optResponse =
-            analyzer.analyze("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig.MyRepository");
+                analyzer.analyze("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig.MyRepository");
 
         assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
             assertThat(response.beanClass()).isNotNull();
             assertThat(response.beanClass().getSimpleName()).contains("JpaRepositoryFactoryBean");
 
             assertThat(response)
-                .returns("singleton", BeanProfile::scope)
-                .returns(false, BeanProfile::factoryBean)
-                .returns(null, BeanProfile::definingMethod);
+                    .returns("singleton", BeanProfile::scope)
+                    .returns(false, BeanProfile::factoryBean)
+                    .returns(null, BeanProfile::definingMethod);
         });
     }
 
@@ -104,8 +104,8 @@ class DefaultBeanAnalyzerTest {
         Optional<BeanProfile> optResponse = analyzer.analyze("defaultBeanAnalyzer");
 
         assertThat(optResponse).isPresent().hasValueSatisfying(response -> assertThat(response)
-            .returns("singleton", BeanProfile::scope)
-            .returns(true, BeanProfile::factoryBean));
+                .returns("singleton", BeanProfile::scope)
+                .returns(true, BeanProfile::factoryBean));
     }
 
     @Test
@@ -113,8 +113,8 @@ class DefaultBeanAnalyzerTest {
         Optional<BeanProfile> optResponse = analyzer.analyze("myPrototypeBean");
 
         assertThat(optResponse).isPresent().hasValueSatisfying(response -> assertThat(response)
-            .returns("prototype", BeanProfile::scope)
-            .returns(true, BeanProfile::factoryBean));
+                .returns("prototype", BeanProfile::scope)
+                .returns(true, BeanProfile::factoryBean));
     }
 
     @Test
@@ -122,8 +122,8 @@ class DefaultBeanAnalyzerTest {
         Optional<BeanProfile> optResponse = analyzer.analyze("myRequestBean");
 
         assertThat(optResponse).isPresent().hasValueSatisfying(response -> assertThat(response)
-            .returns("request", BeanProfile::scope)
-            .returns(true, BeanProfile::factoryBean));
+                .returns("request", BeanProfile::scope)
+                .returns(true, BeanProfile::factoryBean));
     }
 
     /**
@@ -134,16 +134,16 @@ class DefaultBeanAnalyzerTest {
      */
     @TestConfiguration
     @EnableJpaRepositories(
-        basePackageClasses = DefaultBeanAnalyzerTestConfig.MyRepository.class,
-        considerNestedRepositories = true)
+            basePackageClasses = DefaultBeanAnalyzerTestConfig.MyRepository.class,
+            considerNestedRepositories = true)
     @EntityScan(basePackageClasses = DefaultBeanAnalyzerTestConfig.MyEntity.class)
     public static class DefaultBeanAnalyzerTestConfig {
 
         @Bean
         public DataSource dataSource() {
             return new EmbeddedDatabaseBuilder()
-                .setType(EmbeddedDatabaseType.H2)
-                .build();
+                    .setType(EmbeddedDatabaseType.H2)
+                    .build();
         }
 
         @Bean

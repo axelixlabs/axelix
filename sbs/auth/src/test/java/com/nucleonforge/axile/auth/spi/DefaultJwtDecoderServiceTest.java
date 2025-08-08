@@ -67,14 +67,14 @@ class DefaultJwtDecoderServiceTest {
         User decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithTwoRole);
 
         Role userRole = decodedUser.roles().stream()
-            .filter(role -> role.name().equals("ROLE_USER"))
-            .findFirst()
-            .orElseThrow();
+                .filter(role -> role.name().equals("ROLE_USER"))
+                .findFirst()
+                .orElseThrow();
 
         Role engineerRole = decodedUser.roles().stream()
-            .filter(role -> role.name().equals("ROLE_ENGINEER"))
-            .findFirst()
-            .orElseThrow();
+                .filter(role -> role.name().equals("ROLE_ENGINEER"))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(userRole.authorities()).containsAll(Set.of(DefaultAuthority.ENV, DefaultAuthority.INFO));
         assertThat(engineerRole.authorities()).containsAll(Set.of(DefaultAuthority.BEANS, DefaultAuthority.HEALTH));
@@ -85,16 +85,16 @@ class DefaultJwtDecoderServiceTest {
         User decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithAdminRoleHierarchy);
 
         Role rootRole = decodedUser.roles().stream()
-            .filter(role -> role.name().equals("ROLE_ROOT"))
-            .findFirst()
-            .orElseThrow();
+                .filter(role -> role.name().equals("ROLE_ROOT"))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(rootRole.components()).hasSize(2);
 
         Role adminRole = rootRole.components().stream()
-            .filter(role -> role.name().equals("ROLE_ADMIN"))
-            .findFirst()
-            .orElseThrow();
+                .filter(role -> role.name().equals("ROLE_ADMIN"))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(adminRole.authorities()).contains(DefaultAuthority.PROFILE_MANAGEMENT);
 
@@ -109,9 +109,9 @@ class DefaultJwtDecoderServiceTest {
         assertThat(userRole.authorities()).isEqualTo(Set.of(DefaultAuthority.INFO));
 
         Role readRole = rootRole.components().stream()
-            .filter(role -> role.name().equals("ROLE_READ"))
-            .findFirst()
-            .orElseThrow();
+                .filter(role -> role.name().equals("ROLE_READ"))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(readRole.authorities()).contains(DefaultAuthority.BEANS);
     }
@@ -122,7 +122,7 @@ class DefaultJwtDecoderServiceTest {
         JwtDecoderService decoder256 = new DefaultJwtDecoderService(JwtAlgorithm.HMAC256, key256);
 
         User expectedUser = new DefaultUser(
-            "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(DefaultAuthority.MAPPINGS), Set.of())));
+                "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(DefaultAuthority.MAPPINGS), Set.of())));
 
         User decodedUser = decoder256.decodeTokenToUser(tokenWithHs256Algorithm);
 
@@ -132,11 +132,11 @@ class DefaultJwtDecoderServiceTest {
     @Test
     void shouldEncodeDecodeTokenWithHS384() {
         String key384 =
-            "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
+                "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
         JwtDecoderService decoder384 = new DefaultJwtDecoderService(JwtAlgorithm.HMAC384, key384);
 
         User expectedUser = new DefaultUser(
-            "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(DefaultAuthority.BEANS), Set.of())));
+                "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(DefaultAuthority.BEANS), Set.of())));
 
         User decodedUser = decoder384.decodeTokenToUser(tokenWithHs384Algorithm);
 
@@ -154,8 +154,8 @@ class DefaultJwtDecoderServiceTest {
     @Test
     void shouldThrowOnExpiredToken() {
         assertThatThrownBy(() -> jwtDecoderService.decodeTokenToUser(expiredToken))
-            .isInstanceOf(ExpiredJwtTokenException.class)
-            .hasMessageStartingWith("JWT token has expired");
+                .isInstanceOf(ExpiredJwtTokenException.class)
+                .hasMessageStartingWith("JWT token has expired");
     }
 
     @Test
@@ -163,15 +163,15 @@ class DefaultJwtDecoderServiceTest {
         String tamperedToken = tokenUserWithAdminRoleHierarchy + "x";
 
         assertThatThrownBy(() -> jwtDecoderService.decodeTokenToUser(tamperedToken))
-            .isInstanceOf(InvalidJwtTokenException.class)
-            .hasMessage("JWT token is invalid or tampered");
+                .isInstanceOf(InvalidJwtTokenException.class)
+                .hasMessage("JWT token is invalid or tampered");
     }
 
     @Test
     void shouldFailToDecodeTokenWithWrongSecret() {
         assertThatThrownBy(() -> jwtDecoderService.decodeTokenToUser(tokenSignedWithWrongKey))
-            .isInstanceOf(InvalidJwtTokenException.class)
-            .hasMessage("JWT token is invalid or tampered");
+                .isInstanceOf(InvalidJwtTokenException.class)
+                .hasMessage("JWT token is invalid or tampered");
     }
 
     /**
@@ -185,8 +185,8 @@ class DefaultJwtDecoderServiceTest {
 
         @Bean
         public JwtDecoderService jwtDecoderService(
-            final @Value("${axile.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-            final @Value("${axile.master.auth.jwt.signing-key}") String signingKey) {
+                final @Value("${axile.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
+                final @Value("${axile.master.auth.jwt.signing-key}") String signingKey) {
             return new DefaultJwtDecoderService(algorithm, signingKey);
         }
     }
