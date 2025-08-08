@@ -1,4 +1,5 @@
 plugins {
+    id("java")
     id("maven-publish")
     id("com.diffplug.spotless") version "7.1.0"
 }
@@ -22,11 +23,7 @@ allprojects {
 
 subprojects {
 
-    // TODO: Do we even need this check?
-    if (!name.startsWith(":sbs:") && !name.startsWith(":master:") && !name.startsWith(":common:")) {
-        return@subprojects
-    }
-
+    apply(plugin = "java")
     apply(plugin = "maven-publish")
     apply(plugin = "com.diffplug.spotless")
 

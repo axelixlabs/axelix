@@ -47,20 +47,20 @@ class KafkaConsumerIntegrationDiscovererTest {
         Set<KafkaConsumerIntegration> integrations = discoverer.discoverIntegrations();
 
         KafkaConsumerIntegration integration = integrations.stream()
-            .filter(i -> i.networkAddress().contains("first-listener-id"))
-            .findFirst()
-            .orElseThrow();
+                .filter(i -> i.networkAddress().contains("first-listener-id"))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(integration)
-            .isNotNull()
-            .returns("Kafka TCP Binary", KafkaConsumerIntegration::protocol)
-            .returns("first-group", KafkaConsumerIntegration::getGroupId)
-            .returns(true, KafkaConsumerIntegration::isBatchListener)
-            .returns(false, KafkaConsumerIntegration::isAutoStartup)
-            .returns(3, KafkaConsumerIntegration::getConcurrency)
-            .returns(ContainerProperties.AckMode.BATCH, KafkaConsumerIntegration::getAckMode)
-            .returns(false, KafkaConsumerIntegration::isRunning)
-            .returns(false, KafkaConsumerIntegration::isPaused);
+                .isNotNull()
+                .returns("Kafka TCP Binary", KafkaConsumerIntegration::protocol)
+                .returns("first-group", KafkaConsumerIntegration::getGroupId)
+                .returns(true, KafkaConsumerIntegration::isBatchListener)
+                .returns(false, KafkaConsumerIntegration::isAutoStartup)
+                .returns(3, KafkaConsumerIntegration::getConcurrency)
+                .returns(ContainerProperties.AckMode.BATCH, KafkaConsumerIntegration::getAckMode)
+                .returns(false, KafkaConsumerIntegration::isRunning)
+                .returns(false, KafkaConsumerIntegration::isPaused);
         assertThat(integration.getTopics()).containsExactlyInAnyOrder("topic-1", "topic-2");
         assertThat(integration.getAssignedPartitions()).isNotNull();
     }
@@ -70,20 +70,20 @@ class KafkaConsumerIntegrationDiscovererTest {
         Set<KafkaConsumerIntegration> integrations = discoverer.discoverIntegrations();
 
         KafkaConsumerIntegration integration = integrations.stream()
-            .filter(i -> i.networkAddress().contains("second-listener-id"))
-            .findFirst()
-            .orElseThrow();
+                .filter(i -> i.networkAddress().contains("second-listener-id"))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(integration)
-            .isNotNull()
-            .returns("Kafka TCP Binary", KafkaConsumerIntegration::protocol)
-            .returns("second-group", KafkaConsumerIntegration::getGroupId)
-            .returns(false, KafkaConsumerIntegration::isBatchListener)
-            .returns(true, KafkaConsumerIntegration::isAutoStartup)
-            .returns(1, KafkaConsumerIntegration::getConcurrency)
-            .returns(ContainerProperties.AckMode.BATCH, KafkaConsumerIntegration::getAckMode)
-            .returns(true, KafkaConsumerIntegration::isRunning)
-            .returns(false, KafkaConsumerIntegration::isPaused);
+                .isNotNull()
+                .returns("Kafka TCP Binary", KafkaConsumerIntegration::protocol)
+                .returns("second-group", KafkaConsumerIntegration::getGroupId)
+                .returns(false, KafkaConsumerIntegration::isBatchListener)
+                .returns(true, KafkaConsumerIntegration::isAutoStartup)
+                .returns(1, KafkaConsumerIntegration::getConcurrency)
+                .returns(ContainerProperties.AckMode.BATCH, KafkaConsumerIntegration::getAckMode)
+                .returns(true, KafkaConsumerIntegration::isRunning)
+                .returns(false, KafkaConsumerIntegration::isPaused);
         assertThat(integration.getTopics()).containsExactlyInAnyOrder("topic-3", "topic-4");
         assertThat(integration.getAssignedPartitions()).isNotNull();
     }
@@ -93,18 +93,18 @@ class KafkaConsumerIntegrationDiscovererTest {
         Set<KafkaConsumerIntegration> integrations = discoverer.discoverIntegrations();
 
         Map<String, List<KafkaConsumerIntegration>> groupedByEntity =
-            integrations.stream().collect(Collectors.groupingBy(KafkaConsumerIntegration::getGroupId));
+                integrations.stream().collect(Collectors.groupingBy(KafkaConsumerIntegration::getGroupId));
 
         assertThat(groupedByEntity.get("first-group"))
-            .isNotNull()
-            .extracting(KafkaConsumerIntegration::networkAddress)
-            .contains("kafka://first-listener-id")
-            .contains("kafka://third-listener-id");
+                .isNotNull()
+                .extracting(KafkaConsumerIntegration::networkAddress)
+                .contains("kafka://first-listener-id")
+                .contains("kafka://third-listener-id");
 
         assertThat(groupedByEntity.get("second-group"))
-            .isNotNull()
-            .extracting(KafkaConsumerIntegration::networkAddress)
-            .contains("kafka://second-listener-id");
+                .isNotNull()
+                .extracting(KafkaConsumerIntegration::networkAddress)
+                .contains("kafka://second-listener-id");
     }
 
     @Test
@@ -112,24 +112,24 @@ class KafkaConsumerIntegrationDiscovererTest {
         Set<KafkaConsumerIntegration> integrations = discoverer.discoverIntegrations();
 
         KafkaConsumerIntegration integration1 = integrations.stream()
-            .filter(i -> i.networkAddress().contains("first-multi-listener-id"))
-            .findFirst()
-            .orElseThrow();
+                .filter(i -> i.networkAddress().contains("first-multi-listener-id"))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(integration1)
-            .isNotNull()
-            .returns("Kafka TCP Binary", KafkaConsumerIntegration::protocol)
-            .returns("first-group-multi-listener", KafkaConsumerIntegration::getGroupId);
+                .isNotNull()
+                .returns("Kafka TCP Binary", KafkaConsumerIntegration::protocol)
+                .returns("first-group-multi-listener", KafkaConsumerIntegration::getGroupId);
 
         KafkaConsumerIntegration integration2 = integrations.stream()
-            .filter(i -> i.networkAddress().contains("second-multi-listener-id"))
-            .findFirst()
-            .orElseThrow();
+                .filter(i -> i.networkAddress().contains("second-multi-listener-id"))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(integration2)
-            .isNotNull()
-            .returns("Kafka TCP Binary", KafkaConsumerIntegration::protocol)
-            .returns("second-group-multi-listener", KafkaConsumerIntegration::getGroupId);
+                .isNotNull()
+                .returns("Kafka TCP Binary", KafkaConsumerIntegration::protocol)
+                .returns("second-group-multi-listener", KafkaConsumerIntegration::getGroupId);
     }
 
     @Test
@@ -137,29 +137,29 @@ class KafkaConsumerIntegrationDiscovererTest {
         Set<KafkaConsumerIntegration> integrations = discoverer.discoverIntegrations();
 
         assertThat(integrations)
-            .extracting(KafkaConsumerIntegration::getGroupId)
-            .contains("first-group", "second-group", "first-group-multi-listener", "second-group-multi-listener");
+                .extracting(KafkaConsumerIntegration::getGroupId)
+                .contains("first-group", "second-group", "first-group-multi-listener", "second-group-multi-listener");
     }
 
     public static class FirstTestKafkaListener {
 
         @KafkaListener(
-            id = "first-listener-id",
-            topics = {"topic-1", "topic-2"},
-            groupId = "first-group",
-            containerFactory = "batchKafkaListenerContainerFactory",
-            autoStartup = "false",
-            concurrency = "3")
+                id = "first-listener-id",
+                topics = {"topic-1", "topic-2"},
+                groupId = "first-group",
+                containerFactory = "batchKafkaListenerContainerFactory",
+                autoStartup = "false",
+                concurrency = "3")
         public void listen(String message) {}
     }
 
     public static class SecondTestKafkaListener {
 
         @KafkaListener(
-            id = "second-listener-id",
-            topics = {"topic-3", "topic-4"},
-            groupId = "second-group",
-            autoStartup = "true")
+                id = "second-listener-id",
+                topics = {"topic-3", "topic-4"},
+                groupId = "second-group",
+                autoStartup = "true")
         public void listen(String message) {}
     }
 
@@ -172,15 +172,15 @@ class KafkaConsumerIntegrationDiscovererTest {
     public static class MultiKafkaListener {
 
         @KafkaListener(
-            id = "first-multi-listener-id",
-            topics = "multi-listener-topic-1",
-            groupId = "first-group-multi-listener")
+                id = "first-multi-listener-id",
+                topics = "multi-listener-topic-1",
+                groupId = "first-group-multi-listener")
         public void listen1(String message) {}
 
         @KafkaListener(
-            id = "second-multi-listener-id",
-            topics = "multi-listener-topic-2",
-            groupId = "second-group-multi-listener")
+                id = "second-multi-listener-id",
+                topics = "multi-listener-topic-2",
+                groupId = "second-group-multi-listener")
         public void listen2(String message) {}
     }
 
@@ -223,10 +223,10 @@ class KafkaConsumerIntegrationDiscovererTest {
 
         @Bean
         public ConcurrentKafkaListenerContainerFactory<String, String> batchKafkaListenerContainerFactory(
-            ConsumerFactory<String, String> consumerFactory) {
+                ConsumerFactory<String, String> consumerFactory) {
 
             ConcurrentKafkaListenerContainerFactory<String, String> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
+                    new ConcurrentKafkaListenerContainerFactory<>();
             factory.setConsumerFactory(consumerFactory);
             factory.setBatchListener(true);
             return factory;
@@ -235,7 +235,7 @@ class KafkaConsumerIntegrationDiscovererTest {
         @Bean
         @ConditionalOnBean(KafkaListenerEndpointRegistry.class)
         public IntegrationComponentDiscoverer<KafkaConsumerIntegration> kafkaConsumerIntegrationDiscoverer(
-            KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry) {
+                KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry) {
             return new KafkaConsumerIntegrationDiscoverer(kafkaListenerEndpointRegistry);
         }
     }

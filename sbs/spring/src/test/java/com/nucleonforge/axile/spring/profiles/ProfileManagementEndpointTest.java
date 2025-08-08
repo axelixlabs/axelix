@@ -43,11 +43,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestExecutionListeners(
-    listeners = {
-        DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        ContextKeepAliveTestListener.class
-    })
+        listeners = {
+            DependencyInjectionTestExecutionListener.class,
+            DirtiesContextTestExecutionListener.class,
+            ContextKeepAliveTestListener.class
+        })
 @Import({
     TestFeatureServiceConfigs.PremiumFeatureService.class,
     TestFeatureServiceConfigs.PremiumFeatureServiceConfig.class
@@ -74,9 +74,9 @@ class ProfileManagementEndpointTest {
     @Test
     void shouldReplace_ActiveProfilesDynamically() throws InterruptedException {
         String basicService = "basicFeatureService",
-            premiumService = "premiumFeatureService",
-            advancedService = "advancedFeatureService",
-            legacyService = "legacyFeatureService";
+                premiumService = "premiumFeatureService",
+                advancedService = "advancedFeatureService",
+                legacyService = "legacyFeatureService";
 
         checkNoActiveProfilesAndNoBeans(basicService, premiumService);
 
@@ -123,7 +123,7 @@ class ProfileManagementEndpointTest {
     @Test
     void replaceProfiles_shouldReturnBadRequest() {
         ResponseEntity<ProfileMutationResponse> response =
-            restTemplate.postForEntity(path(""), defaultEntity(), ProfileMutationResponse.class);
+                restTemplate.postForEntity(path(""), defaultEntity(), ProfileMutationResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
@@ -136,15 +136,15 @@ class ProfileManagementEndpointTest {
      */
     private void activateProfiles(String profiles) throws InterruptedException {
         ResponseEntity<ProfileMutationResponse> response =
-            restTemplate.postForEntity(path("/" + profiles), defaultEntity(), ProfileMutationResponse.class);
+                restTemplate.postForEntity(path("/" + profiles), defaultEntity(), ProfileMutationResponse.class);
 
         TimeUnit.SECONDS.sleep(7); // wait for context update
         assertThat(response)
-            .isNotNull()
-            .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
-            .extracting(ResponseEntity::getBody)
-            .isNotNull()
-            .returns(true, ProfileMutationResponse::updated);
+                .isNotNull()
+                .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
+                .extracting(ResponseEntity::getBody)
+                .isNotNull()
+                .returns(true, ProfileMutationResponse::updated);
 
         String[] expectedProfiles = profiles.isBlank() ? new String[0] : profiles.split(",");
         checkActiveProfiles(expectedProfiles);

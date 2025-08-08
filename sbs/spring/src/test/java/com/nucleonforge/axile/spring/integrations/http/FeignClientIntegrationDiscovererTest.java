@@ -30,14 +30,14 @@ class FeignClientIntegrationDiscovererTest {
         Set<HttpIntegration> integrations = discoverer.discoverIntegrations();
 
         HttpIntegration serviceIntegration = integrations.stream()
-            .filter(integration -> "Service1".equals(integration.entityType()))
-            .findFirst()
-            .orElseThrow();
+                .filter(integration -> "Service1".equals(integration.entityType()))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(serviceIntegration)
-            .returns("Service1", HttpIntegration::entityType)
-            .returns("http://service1-api", HttpIntegration::networkAddress)
-            .returns(HttpVersion.V1_1.getDisplay(), HttpIntegration::protocol);
+                .returns("Service1", HttpIntegration::entityType)
+                .returns("http://service1-api", HttpIntegration::networkAddress)
+                .returns(HttpVersion.V1_1.getDisplay(), HttpIntegration::protocol);
     }
 
     @Test
@@ -45,14 +45,14 @@ class FeignClientIntegrationDiscovererTest {
         Set<HttpIntegration> integrations = discoverer.discoverIntegrations();
 
         HttpIntegration serviceIntegration = integrations.stream()
-            .filter(integration -> "Service2".equals(integration.entityType()))
-            .findFirst()
-            .orElseThrow();
+                .filter(integration -> "Service2".equals(integration.entityType()))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(serviceIntegration)
-            .returns("Service2", HttpIntegration::entityType)
-            .returns("discovered://Service2", HttpIntegration::networkAddress)
-            .returns(HttpVersion.V1_1.getDisplay(), HttpIntegration::protocol);
+                .returns("Service2", HttpIntegration::entityType)
+                .returns("discovered://Service2", HttpIntegration::networkAddress)
+                .returns(HttpVersion.V1_1.getDisplay(), HttpIntegration::protocol);
     }
 
     @Test
@@ -60,9 +60,9 @@ class FeignClientIntegrationDiscovererTest {
         Set<HttpIntegration> integrations = discoverer.discoverIntegrations();
 
         assertThat(integrations)
-            .hasSize(2)
-            .extracting(HttpIntegration::entityType)
-            .containsExactlyInAnyOrder("Service1", "Service2");
+                .hasSize(2)
+                .extracting(HttpIntegration::entityType)
+                .containsExactlyInAnyOrder("Service1", "Service2");
     }
 
     @FeignClient(name = "Service1", url = "http://service1-api")

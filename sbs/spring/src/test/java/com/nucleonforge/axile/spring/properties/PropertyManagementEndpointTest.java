@@ -42,14 +42,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestExecutionListeners(
-    listeners = {
-        DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        ContextKeepAliveTestListener.class
-    })
+        listeners = {
+            DependencyInjectionTestExecutionListener.class,
+            DirtiesContextTestExecutionListener.class,
+            ContextKeepAliveTestListener.class
+        })
 @TestPropertySource(
-    properties = {"myEmpty.property= ", "notEmpty.property=not-empty", "management.endpoint.env.show-values=always"
-    })
+        properties = {"myEmpty.property= ", "notEmpty.property=not-empty", "management.endpoint.env.show-values=always"
+        })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class PropertyManagementEndpointTest {
 
@@ -61,11 +61,11 @@ class PropertyManagementEndpointTest {
         Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/myEmpty.property", Map.class);
 
         assertThat(initialResponse)
-            .isNotNull()
-            .extracting("property")
-            .isInstanceOf(Map.class)
-            .extracting("value")
-            .isEqualTo("");
+                .isNotNull()
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("");
 
         String newValue = "new-value";
         mutateProperty("myEmpty.property", newValue);
@@ -73,52 +73,52 @@ class PropertyManagementEndpointTest {
         Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/myEmpty.property", Map.class);
 
         assertThat(updatedResponse)
-            .isNotNull()
-            .extracting("property")
-            .isInstanceOf(Map.class)
-            .extracting("value")
-            .isEqualTo("new-value");
+                .isNotNull()
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("new-value");
     }
 
     @Test
     void mutate_shouldNotMutate_whenPropertyNameIsBlank() {
         ResponseEntity<MutationResponse> blankNameResponse =
-            restTemplate.postForEntity(path("/ \t?newValue=value"), defaultEntity(), MutationResponse.class);
+                restTemplate.postForEntity(path("/ \t?newValue=value"), defaultEntity(), MutationResponse.class);
         assertThat(blankNameResponse)
-            .isNotNull()
-            .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
-            .extracting(ResponseEntity::getBody)
-            .isNotNull()
-            .returns(false, MutationResponse::mutated)
-            .returns("Property name is required", MutationResponse::reason);
+                .isNotNull()
+                .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
+                .extracting(ResponseEntity::getBody)
+                .isNotNull()
+                .returns(false, MutationResponse::mutated)
+                .returns("Property name is required", MutationResponse::reason);
     }
 
     @Test
     void mutate_shouldMutate_whenNewValueIsEmpty() throws InterruptedException {
         Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/notEmpty.property", Map.class);
         assertThat(initialResponse)
-            .isNotNull()
-            .extracting("property")
-            .isInstanceOf(Map.class)
-            .extracting("value")
-            .isEqualTo("not-empty");
+                .isNotNull()
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("not-empty");
 
         mutateProperty("notEmpty.property", " ");
 
         Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/notEmpty.property", Map.class);
         assertThat(updatedResponse)
-            .isNotNull()
-            .extracting("property")
-            .isInstanceOf(Map.class)
-            .extracting("value")
-            .isInstanceOf(String.class)
-            .isEqualTo(" ");
+                .isNotNull()
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isInstanceOf(String.class)
+                .isEqualTo(" ");
     }
 
     @Test
     void mutate_shouldReturnError_whenPropertyNameIsEmpty() {
         ResponseEntity<MutationResponse> response =
-            restTemplate.postForEntity(path("/"), defaultEntity(), MutationResponse.class);
+                restTemplate.postForEntity(path("/"), defaultEntity(), MutationResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
@@ -131,15 +131,15 @@ class PropertyManagementEndpointTest {
      */
     private void mutateProperty(String propertyName, String newValue) throws InterruptedException {
         ResponseEntity<MutationResponse> response = restTemplate.postForEntity(
-            path("/" + propertyName + "?newValue=" + newValue), defaultEntity(), MutationResponse.class);
+                path("/" + propertyName + "?newValue=" + newValue), defaultEntity(), MutationResponse.class);
 
         TimeUnit.SECONDS.sleep(7); // wait for context update
         assertThat(response)
-            .isNotNull()
-            .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
-            .extracting(ResponseEntity::getBody)
-            .isNotNull()
-            .returns(true, MutationResponse::mutated);
+                .isNotNull()
+                .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
+                .extracting(ResponseEntity::getBody)
+                .isNotNull()
+                .returns(true, MutationResponse::mutated);
     }
 
     private HttpEntity<Void> defaultEntity() {

@@ -55,7 +55,7 @@ class CacheDispatcherEndpointTest {
         assertThat(cache.get(key)).isNotNull();
 
         CacheClearResponse response = testRestTemplate.postForObject(
-            path("/cacheManager/cache?key=key"), defaultEntity(), CacheClearResponse.class);
+                path("/cacheManager/cache?key=key"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache.get(key)).isNull();
@@ -73,7 +73,7 @@ class CacheDispatcherEndpointTest {
         assertThat(cache.get(key2)).isNotNull();
 
         CacheClearResponse response = testRestTemplate.postForObject(
-            path("/cacheManager/cache?key=key2"), defaultEntity(), CacheClearResponse.class);
+                path("/cacheManager/cache?key=key2"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache.get(key2)).isNull();
@@ -90,7 +90,7 @@ class CacheDispatcherEndpointTest {
         assertThat(cache.get(key)).isNotNull();
 
         CacheClearResponse response =
-            testRestTemplate.postForObject(path("/cacheManager/cache"), defaultEntity(), CacheClearResponse.class);
+                testRestTemplate.postForObject(path("/cacheManager/cache"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache.get(key)).isNull();
@@ -103,7 +103,7 @@ class CacheDispatcherEndpointTest {
         assertThat(cache.get("nonExistingKey")).isNull();
 
         CacheClearResponse response = testRestTemplate.postForObject(
-            path("/cacheManager/cache?key=nonExistingKey"), defaultEntity(), CacheClearResponse.class);
+                path("/cacheManager/cache?key=nonExistingKey"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response).isNotNull().returns(false, CacheClearResponse::cleared);
     }
@@ -111,7 +111,7 @@ class CacheDispatcherEndpointTest {
     @Test
     void clear_shouldReturnFalse_cacheDoesNotExist() {
         CacheClearResponse response = testRestTemplate.postForObject(
-            path("/cacheManager/nonExistentCache"), defaultEntity(), CacheClearResponse.class);
+                path("/cacheManager/nonExistentCache"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response).isNotNull().returns(false, CacheClearResponse::cleared);
     }
@@ -130,7 +130,7 @@ class CacheDispatcherEndpointTest {
         assertThat(cache2.get(key2)).isNotNull();
 
         CacheClearResponse response =
-            testRestTemplate.postForObject(path("/cacheManager"), defaultEntity(), CacheClearResponse.class);
+                testRestTemplate.postForObject(path("/cacheManager"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache1.get(key1)).isNull();
@@ -140,19 +140,16 @@ class CacheDispatcherEndpointTest {
     @Test
     void clearAll_shouldReturnFalse_cacheManagerDoesNotExist() {
         CacheClearResponse response =
-            testRestTemplate.postForObject(path("/nonExistentManager"), defaultEntity(), CacheClearResponse.class);
+                testRestTemplate.postForObject(path("/nonExistentManager"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response.cleared()).isFalse();
-
     }
 
     @Test
     void invalidPath_shouldReturn404() {
         ResponseEntity<String> response =
-            testRestTemplate.postForEntity("/actuator/cache-dispatch", defaultEntity(), String.class);
-        assertThat(response)
-            .isNotNull()
-            .returns(HttpStatus.NOT_FOUND, ResponseEntity::getStatusCode);
+                testRestTemplate.postForEntity("/actuator/cache-dispatch", defaultEntity(), String.class);
+        assertThat(response).isNotNull().returns(HttpStatus.NOT_FOUND, ResponseEntity::getStatusCode);
     }
 
     private HttpEntity<Void> defaultEntity() {
