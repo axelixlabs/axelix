@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.nucleonforge.axile.spring.properties.PropertyNotFoundException;
+import com.nucleonforge.axile.spring.spel.SpelException;
 
 /**
  * Global exception handler for Spring Boot Actuator endpoints.
@@ -21,6 +22,14 @@ public class ActuatorExceptionHandler {
 
     @ExceptionHandler(PropertyNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleEndpointException(PropertyNotFoundException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(SpelException.class)
+    public ResponseEntity<Map<String, String>> handleEndpointException(SpelException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("message", ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage());
 
