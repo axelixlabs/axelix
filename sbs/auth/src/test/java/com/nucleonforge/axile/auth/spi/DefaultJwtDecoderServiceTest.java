@@ -65,6 +65,9 @@ class DefaultJwtDecoderServiceTest {
     @Value("${test-tokens.token-user-with-unrecognized-authorities}")
     private String tokenUserWithUnrecognizedAuthorities;
 
+    @Value("${test-tokens.token-with-spel-eval-authority}")
+    private String tokenWithSpelEvalAuthority;
+
     @Test
     void shouldDecodeValidJwtToken() {
         User decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithTwoRole);
@@ -144,6 +147,18 @@ class DefaultJwtDecoderServiceTest {
         User decodedUser = decoder384.decodeTokenToUser(tokenWithHs384Algorithm);
 
         assertThat(decodedUser).usingRecursiveComparison().isEqualTo(expectedUser);
+    }
+
+    @Test
+    void shouldDecodeValidJwtToken_WhenUserWithSpelEvalAuthority() {
+        User decodedUser = jwtDecoderService.decodeTokenToUser(tokenWithSpelEvalAuthority);
+
+        Role rootRole = decodedUser.roles().stream()
+                .filter(role -> role.name().equals("ROLE_USER"))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(rootRole.authorities()).isNotNull().containsAll(Set.of(DefaultAuthority.SPEL_EVAL));
     }
 
     @Test

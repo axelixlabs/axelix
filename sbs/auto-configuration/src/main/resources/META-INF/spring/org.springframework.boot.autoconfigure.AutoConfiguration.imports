@@ -6,3 +6,4 @@ com.nucleonforge.axile.autoconfiguration.spring.PropertyManagementAutoConfigurat
 com.nucleonforge.axile.autoconfiguration.spring.ProfileManagementAutoConfiguration
 com.nucleonforge.axile.autoconfiguration.spring.KafkaIntegrationAutoConfiguration
 com.nucleonforge.axile.autoconfiguration.auth.JwtAuthAutoConfiguration
+com.nucleonforge.axile.autoconfiguration.spring.SpelEvaluationAutoConfiguration

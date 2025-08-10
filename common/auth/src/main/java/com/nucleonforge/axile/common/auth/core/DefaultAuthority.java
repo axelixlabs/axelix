@@ -33,6 +33,13 @@ public enum DefaultAuthority implements Authority {
     PROPERTY_MANAGEMENT,
 
     /**
+     * Grants access to SpEL (Spring Expression Language) evaluation operations.
+     * <p>Allows evaluation of SpEL expressions through a dedicated endpoint. </p>
+     * <p>Implemented by custom actuator endpoint: {@code SpelEvalEndpoint}.</p>
+     */
+    SPEL_EVAL,
+
+    /**
      * Grants authority to view all registered Spring beans.
      */
     BEANS,
