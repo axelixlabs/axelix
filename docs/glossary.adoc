@@ -1,0 +1,15 @@
+[[global_glossary]]
+== Glossary
+
+This file contains the common glossary of terms that we use in the documentation both internally and externally.
+
+.Abbreviations
+[cols="1,3", options="header"]
+|===
+| Term | Definition
+| *Axile* | The name of the project. Also, it can be seen as some kind an "umbrella" term by which we refer to a system as a whole.
+| *Axile Spring Boot Starter* | The starter that is included in every Spring Boot application in order for the Axile to work. It provides the necessary capabilities that are later called by the _Axile Master_.
+| *ASBS (Axile SBS)* | Axile Spring Boot Starter. It is the starter that is included in every Spring Boot application in order for the Axile to work
+| *Axile Master* | An independent application that is deployed separately and which provides the UI for the Axile and also which interacts with the _managed services_
+| *Managed Service* | By "managed service" we mean an abstract Java application that Axile Master is aware about.
+|===

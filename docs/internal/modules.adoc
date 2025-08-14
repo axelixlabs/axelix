@@ -1,0 +1,89 @@
+:SPI: https://en.wikipedia.org/wiki/Service_provider_interface[SPI]
+
+= Modules Structure
+
+The Axile Spring Boot Starter is broken out into modules. The visual map can be found below.
+
+== Visualization
+
+[#modules_diagram]
+[plantuml]
+....
+@startuml
+component [auto-configuration]
+component [metrics]
+component [integration]
+component [postgres]
+component [kafka]
+component [spring]
+component [common]
+
+[auto-configuration] --> [postgres] : compile only
+[auto-configuration] --> [kafka] : compile only
+[auto-configuration] --> [spring] : compile only
+spring --> [integration] : depends on
+spring --> [metrics]  : depends on
+kafka --> [integration] : depends on
+postgres --> [integration] : depends on
+kafka --> [metrics] : depends on
+postgres --> [metrics] : depends on
+metrics --> [common] : depends on
+integration --> [common] : depends on
+@enduml
+....
+
+Let's break them one by one. *It is absolutely essential to not let the circular dependencies between modules to occur*. The
+module dependencies graph is supposed to be DAG (directed acyclic graph).
+
+== Common
+
+This module contains the functionality that is common among all modules, such as `StringUtils`, `FieldUtils` etc.
+
+== Integration
+
+Contains the core processing code for _integrations_. By '_integrations_' we mean other entities that are present somewhere
+over the network (or maybe even on the same host), that this particular process communicates with.
+
+In the context of modern backend development, these are typically entities such as:
+
+- Relational Databases
+- Other HTTP/Rest Services
+- Message Brokers and so on
+
+This module mostly contain the corresponding {SPI} interfaces that are supposed to be implemented by other modules in the system, that can actually
+recognize and contribute the integrations.
+
+== Metrics
+
+Contains the core processing code for _metrics_. The typical backend application uses a lot of external libraries or integrates with a lot of other services.
+The idea is that these libraries and integrations can provide some context-specific metrics to the overall application's metrics, such as
+
+- JVM heap size
+- CPU usage
+- Load Average etc.
+
+These are metrics that are present in essentially every Java application, they are not context specific. On the other hand, the:
+
+- Postgres SQL Prepared Statement Cache Size
+- Spring Beans Count
+- Kafka Average Listener Processing Time etc.
+
+Are metrics that are specific to particular technologies. So the goal of Axile is to
+
+1. Recognize what technologies are present in the classpath
+2. Scratch and contribute the metrics for these technologies to the overall metrics
+
+[#tech-modules]
+== Technology Modules
+
+These are modules that contain functionality that handles the particular technology in the classpath.
+As can be seen in the <<modules_diagram, modules diagram>>, every technology related module depends on
+`metrics` and `integration` modules. Therefore, each tech. module is responsible for the following:
+
+- Detect the integrations that it is responsible to handle
+- Provide metrics for such integrations
+- And, what is more importantly, *provide the ways to tackle this integration at runtime*
+
+Examples of integration modules are: `postgres` and `spring`.
+
+

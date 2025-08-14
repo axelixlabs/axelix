@@ -1,0 +1,118 @@
+= Development Practises
+
+This documentation outlines the development practises that we exercise in the project.
+
+== General
+
+The development https://github.com/Nucleon-Forge/axile[happens in the Monorepo]. This monorepo contains the code base for all the services master, starter, ui, the documentation that you're reading right now etc.
+
+== Versioning
+
+We use the SemVer as the versioning strategy of the Axile product in general. That essentially means that any artifact produced by the build system has the SemVer version associated with it. This includes the
+
+- Spring Boot Starter Jar
+- Master Jar
+- Master Helm Chart
+- Annotation Processor Jar etc.
+
+Because of the development inside the monorepo, *all the artifacts produced by the single build have the exact same version, by design*.
+
+[#issues]
+== Issues
+
+Our issue tracker is https://github.com/Nucleon-Forge/axile/issues[the monorepo-s GitHub issue tracker]. For any problem, discussion or other unresolved issues we submit tickets into the GitHub issue tracker.
+
+[#branching]
+== Branching
+
+The branches are divided into the categories:
+
+- master branch
+- feature branches
+- _potentially_ release branches
+
+We have _master_ as the main train that contains release-ready code base, that is tested and ready for production.
+
+We also have _feature_ branches where we:
+
+- Develop new functionalities
+- Fix bugs
+- Apply security fixes etc.
+
+For each "feature" branch we need to have a ticket in the xref:#issues[issue tracker]. In other words, any given feature branch is **always** tied to a particular problem it tries to solve or feature it aims to implement.
+
+IMPORTANT: The feature branch _typically_ originates from _master_, and is merged back to _master_ as well, but it is not always the case. See the xref:git_strategy_and_release_branches[_release_ branches section].
+
+The naming convention is very simple: the `GH-` prefix followed by the issue number in the GitHub issue tracker. So for https://github.com/Nucleon-Forge/axile/issues/20[this GitHub ticket] the name of the branch is supposed to be `GH-20`, because the number of the issue is 20.
+
+== Release Process
+
+When we make the decision that the time comes for us to create a new version of the product, we create a new git tag with the version of the product, like: `v1.0.4`. After that, the build pipeline runs and produces a bunch of build artifacts that are deployed into GitHub private package registry.
+
+[#git_strategy_and_release_branches]
+== Git Strategy and _release_ Branches
+
+This development process somehow resembles the https://trunkbaseddevelopment.com/[trunk based development (TBD)], *but it is not quite that*. We need to realize that at any given point in time we have multiple clients that work with different and potentially incompatible versions of the Axile project. And we need to be able to submit security patches or bugfixes for a very specific version for very specific client.
+
+*That is why, we _may_ have long-lived _release_ branches that are created from the corresponding git tags*. These branches are not supposed to be merged into _master_. That is why we do not suffer from the merge hell as it is prescribed in TBD.
+
+Thus, in case we need to tune a very specific version, we first create a _release_ branch from the git tag, and then the _feature_ branch that delivers the actual fix is created from the corresponding _release_ branch and merged back into the same _release_ branch.
+
+== Commits
+
+As can be derived from xref:git_strategy_and_release_branches[here] and xref:branching[here], every commit occurs first in the feature branch. *We do not push directly to _master_ or _feature_ branch unless absolutely necessary*.
+
+Each git commit should have the commit message of the following pattern;
+
+[source,text]
+----
+GH-<issue> Short Message
+
+Extended git commit message
+----
+
+The example is:
+
+[source,text]
+----
+GH-1136 Introduced caching of authorities
+
+When the given authorities of the user are resolved...
+----
+
+It is important to specify the targeted issue reference in the commit message so we can later associate commits with the tickets on GitHub.
+
+=== Refactoring Commits
+
+Another important consideration is that *each GihHub issue should ideally be solved in one commit.*
+
+NOTE: It might be that the commit becomes too large for the given GitHub ticket, this implies that the ticket itself should be split into multiple sub-tasks.
+
+However, in case you want to apply some refactoring in your feature branch, *and this refactoring does not directly relate to solving the actual issue*, then the refactoring commit *must* be separated from the commit that delivers the actual feature. The message of the "refactoring" commit should be as follows:
+
+[source,text]
+----
+Polishing: <short_description>
+
+<long_description>
+----
+
+a good example is the following:
+
+[source,text]
+----
+Polishing: extracted the authorities mapping into a separate class
+
+Anything that you thing you want to add goes here
+----
+
+That is _very_ important, because if we would want to be able to revert a specific feature later on, we _would not_ want to revert the refactoring that we've done.
+
+=== Merge Commits
+
+And the last thing that is very important: *We do not do merge commits at all. All the merges that happen are only fast-forward.* It essentially means, that every commit that is in the _master_ branch, it is either:
+
+- Polishing/Refactoring Commit
+- Feature Commit
+
+And that's it. Nothing more.

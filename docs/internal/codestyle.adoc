@@ -1,0 +1,28 @@
+= Code Style
+
+This document outlines the code style that we use for all Axile projects.
+
+== Lombok usage
+
+It is *strictly disallowed* to use Lombok, because:
+
+* It complicates the navigation in IDEs, since code components are generated only
+  during annotation processing.
+
+* The codegen by definition removes from us the certain degree of understanding of how
+  our code would look like in production.
+
+* Modern IDEs can generate a significant portion of the code that Lombok
+  tries to generate.
+
+* Lombok generated via APT. It means that it can potentially be a problem
+  during build phase with some other tools or other APTs.
+
+* IDEs such as IntelliJ sometimes exert wired behavior because the Lombok being used.
+  Often it leads to IDE cache invalidation and re-index of the project.
+
+The main point is that using Lombok we loose some portion of understanding of how our code would finally
+look like in production for basically nothing.
+
+Having just more code in the code base that (_arguably!_) taxes a tiny bit more cognitive efforts is a trade-off for having less problems in IDEs, during build time
+and in production.

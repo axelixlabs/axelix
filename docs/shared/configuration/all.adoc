@@ -1,0 +1,15 @@
+:configure_regular_Spring_Boot_apps: https://docs.spring.io/spring-boot/reference/features/external-config.html[configure regular Spring Boot apps]
+
+= Auth Configuration
+
+include::../../glossary_link.adoc[leveloffset=+1]
+
+This section of documentation described the properties that are being used for
+
+== Axile Master
+
+This page summarized all the settings that can be configured for the Axile Master. Theses
+
+NOTE: Because the Axile Master heavily relies on Spring Boot as well, the means to configure the Axile Master are *exactly the same* that you use to {configure_regular_Spring_Boot_apps}.
+
+== Axile Spring Boot Starter

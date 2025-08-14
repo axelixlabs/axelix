@@ -1,0 +1,34 @@
+= Axile Spring Boot Starter
+
+This is the starter for the Spring Boot applications that integrate with the Axile UI.
+
+It is intended to be included in the end-user's application
+runtime class-path via dependency, for instance, for Maven:
+
+.Example. Maven Dependency
+----
+<dependency>
+  <dependency>
+    <groupId>com.nucleon-forge.axile</groupId>
+    <artifactId>axile-spring-boot-starter</artifactId>
+    <version>${version}</version>
+  </dependency>
+</dependency>
+----
+
+The same can be done in Gradle:
+
+.Example. Gradle Dependency
+----
+implementation("com.nucleon-forge.axile:axile-spring-boot-starter:${version}")
+----
+
+IMPORTANT: Although the starter itself is broken into modules internally, by design, the end users needs to include *only one dependency above*, nothing else.
+
+== Just Spring is not Enough
+
+The starter itself is written with heavy reliance on Spring Boot, and it's Auto Configuration mechanisms. So we require Spring Boot
+autoconfiguration to be in place. Check the xref:../versions.adoc#compatibility_matrix[Compatibility Matrix] for more information.
+
+
+

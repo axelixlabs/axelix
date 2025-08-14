@@ -1,0 +1,20 @@
+[#compatibility_matrix]
+== Compatibility Matrix
+
+As mentioned here, we rely on Spring Boot heavily. Therefore, it is important to understand
+the compatibility between Spring Boot versions, and the Axile versions:
+
+.Table Spring Boot Compatibility Matrix
+|===
+|Axile Spring Boot Starter  Version |Spring Boot Version| Spring Cloud Version
+
+|1.x.x+
+|3.0.13+
+|2022.0.4
+
+|===
+
+Obviously, the Axile SBS has functionally related to
+As a general rule of thumb, when the Axile Spring Boot Starter major version is changed, you can expect that the Spring
+Boot major version that the Axile SBS expects would be bumped as well.
+
