@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.api.iam.request;
+package com.nucleonforge.axile.master.api.request;
 
 /**
  * Request for login.

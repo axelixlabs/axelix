@@ -24,4 +24,11 @@ public final class ApiPaths {
 
         public static final String SINGLE = "/single/{name}";
     }
+
+    public static final class BeansApi {
+
+        public static final String MAIN = "/beans";
+
+        public static final String FEED = "/feed/{instanceId}";
+    }
 }
