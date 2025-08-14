@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.api.iam;
+package com.nucleonforge.axile.master.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nucleonforge.axile.master.api.ApiPaths;
-import com.nucleonforge.axile.master.api.iam.request.LoginRequest;
-import com.nucleonforge.axile.master.api.iam.response.UserProfileResponse;
+import com.nucleonforge.axile.master.api.request.LoginRequest;
+import com.nucleonforge.axile.master.api.response.UserProfileResponse;
 
 /**
  * The API for working with users.

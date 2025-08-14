@@ -1,17 +1,19 @@
-package com.nucleonforge.axile.master.api.app;
+package com.nucleonforge.axile.master.api;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.nucleonforge.axile.master.api.ApiPaths;
-import com.nucleonforge.axile.master.api.app.response.ApplicationGridResponse;
+import com.nucleonforge.axile.master.api.response.ApplicationGridResponse;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * The API for managing applications.
  *
  * @since 19.07.2025
  * @author Mikhail Polivakha
  */
+@RestController
 @RequestMapping(path = ApiPaths.ApplicationApi.MAIN)
 public class ApplicationsApi {
 

@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.api.app.response;
+package com.nucleonforge.axile.master.api.response;
 
 import java.util.Set;
 
