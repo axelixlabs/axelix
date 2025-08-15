@@ -13,4 +13,5 @@ dependencies {
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
     testImplementation(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudDependenciesVersion"))
     implementation("org.jspecify:jspecify:$jspecifyVersion")
+    implementation("org.slf4j:slf4j-api")
 }
