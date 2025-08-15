@@ -14,6 +14,7 @@ build/
 .idea/misc.xml
 .idea/vcs.xml
 .idea/uiDesigner.xml
+.idea/workspace.xml
 *.iws
 *.iml
 *.ipr
