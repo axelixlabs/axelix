@@ -3,7 +3,7 @@ package com.nucleonforge.axile.master.service;
 import java.util.Optional;
 import java.util.Set;
 
-import com.nucleonforge.axile.master.domain.Instance;
+import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
 import com.nucleonforge.axile.master.exception.NoSuchInstanceException;
 

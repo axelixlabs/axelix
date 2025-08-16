@@ -9,6 +9,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.jspecify:jspecify:1.0.0")
     implementation("org.slf4j:slf4j-api")
+    implementation(project(":common:domain"))
+
     runtimeOnly("ch.qos.logback:logback-classic")
 
     // Test

@@ -32,8 +32,8 @@ integration --> [common] : depends on
 @enduml
 ....
 
-Let's break them one by one. *It is absolutely essential to not let the circular dependencies between modules to occur*. The
-module dependencies graph is supposed to be DAG (directed acyclic graph).
+Let's break them one by one. *It is absolutely essential to not let the circular classPath between modules to occur*. The
+module classPath graph is supposed to be DAG (directed acyclic graph).
 
 == Common
 

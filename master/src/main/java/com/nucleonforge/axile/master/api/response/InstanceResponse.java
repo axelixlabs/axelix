@@ -1,6 +1,6 @@
 package com.nucleonforge.axile.master.api.response;
 
-import com.nucleonforge.axile.master.domain.Instance;
+import com.nucleonforge.axile.common.domain.Instance;
 
 /**
  * The instance of the given application.

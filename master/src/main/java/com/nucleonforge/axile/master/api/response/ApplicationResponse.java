@@ -2,7 +2,7 @@ package com.nucleonforge.axile.master.api.response;
 
 import java.util.Set;
 
-import com.nucleonforge.axile.master.domain.Application;
+import com.nucleonforge.axile.common.domain.Application;
 
 /**
  * Abstract application deployment

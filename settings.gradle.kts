@@ -8,11 +8,13 @@ include(
     ":master",
     ":sbs",
     ":sbs:auth",
+    ":sbs:k8s",
     ":sbs:auto-configuration",
     ":sbs:hotspot",
     ":sbs:metrics",
     ":sbs:postgres",
     ":sbs:spring",
     ":common",
-    ":common:api"
+    ":common:api",
+    ":common:domain"
 )

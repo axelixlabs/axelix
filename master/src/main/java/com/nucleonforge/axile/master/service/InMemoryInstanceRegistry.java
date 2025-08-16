@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.jspecify.annotations.NullMarked;
 
-import com.nucleonforge.axile.master.domain.Instance;
+import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
 import com.nucleonforge.axile.master.exception.NoSuchInstanceException;
 

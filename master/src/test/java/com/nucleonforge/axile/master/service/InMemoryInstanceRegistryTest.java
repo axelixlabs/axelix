@@ -6,18 +6,18 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.master.domain.BuildInfo;
-import com.nucleonforge.axile.master.domain.CommitInfo;
-import com.nucleonforge.axile.master.domain.Dependencies;
-import com.nucleonforge.axile.master.domain.Dependency;
-import com.nucleonforge.axile.master.domain.Instance;
-import com.nucleonforge.axile.master.domain.JvmNonStandardOption;
-import com.nucleonforge.axile.master.domain.JvmNonStandardOptions;
-import com.nucleonforge.axile.master.domain.JvmProperties;
-import com.nucleonforge.axile.master.domain.JvmProperty;
-import com.nucleonforge.axile.master.domain.LaunchDetails;
-import com.nucleonforge.axile.master.domain.LoadedClass;
-import com.nucleonforge.axile.master.domain.LoadedClasses;
+import com.nucleonforge.axile.common.domain.BuildInfo;
+import com.nucleonforge.axile.common.domain.ClassPath;
+import com.nucleonforge.axile.common.domain.CommitInfo;
+import com.nucleonforge.axile.common.domain.Instance;
+import com.nucleonforge.axile.common.domain.JarClassPathEntry;
+import com.nucleonforge.axile.common.domain.JvmNonStandardOption;
+import com.nucleonforge.axile.common.domain.JvmNonStandardOptions;
+import com.nucleonforge.axile.common.domain.JvmProperties;
+import com.nucleonforge.axile.common.domain.JvmProperty;
+import com.nucleonforge.axile.common.domain.LaunchDetails;
+import com.nucleonforge.axile.common.domain.LoadedClass;
+import com.nucleonforge.axile.common.domain.LoadedClasses;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
 import com.nucleonforge.axile.master.exception.NoSuchInstanceException;
 
@@ -115,8 +115,9 @@ class InMemoryInstanceRegistryTest {
         CommitInfo commitInfo =
                 new CommitInfo("commitShaShort", "commitSha", Instant.now(), "authorName", "example@email.com");
 
-        Dependency dependency = new Dependency("testGroupId", "testArtifactId", "testVersion", null, Set.of());
-        Dependencies dependencies = new Dependencies(Set.of(dependency));
+        JarClassPathEntry dependency =
+                new JarClassPathEntry("testGroupId", "testArtifactId", "testVersion", null, Set.of());
+        ClassPath dependencies = new ClassPath(Set.of(dependency));
         BuildInfo buildInfo = new BuildInfo(commitInfo, dependencies);
 
         LoadedClass loadedClass =
