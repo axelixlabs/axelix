@@ -2,7 +2,7 @@
 
 = Auth Configuration
 
-include::../../glossary_link.adoc[leveloffset=+1]
+include::../glossary_link.adoc[leveloffset=+1]
 
 This section of documentation described the properties that are being used for
 

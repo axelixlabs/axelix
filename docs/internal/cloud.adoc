@@ -1,0 +1,9 @@
+== Cloud
+
+Currently, we have the testing environment https://console.yandex.cloud/cloud/b1gerj1hj56rikcrdl9n[in the Yandex Cloud]. The testing environment consists of the K8S cluster with various applications deployed in it, in particular
+
+- Spring Pet Clinic application fork
+- Our own playground application
+- Jet Brain's feature tracker application fork
+
+The primary purpose of this environment is to serve as the sandbox, where we test new features before release or just in general.

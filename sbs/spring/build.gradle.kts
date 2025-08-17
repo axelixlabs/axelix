@@ -15,6 +15,9 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("com.h2database:h2")
 
+    // Self
+    implementation(project(":common:domain"))
+
     //
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")
     compileOnly("org.springframework.boot:spring-boot-starter-web")

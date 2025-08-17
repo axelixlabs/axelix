@@ -1,0 +1,75 @@
+== Registration
+
+This document outlines the properties that participate or affect the registration process of the managed service in the Axile master.
+
+include::../../glossary_link.adoc[leveloffset=+1]
+
+=== Overview
+
+When the Spring Boot application that has Axile Spring Boot Starter bootstraps, it tries to register itself in the Axile Master. Thus, the Axile SBS must provide certain information to the Axile SBS about itself. Some of this information may be inferred, but some needs to be explicitly set.
+
+include::../common.adoc[leveloffset=+1]
+
+=== Properties
+
+[cols="2,1,2,3,2", options="header"]
+|===
+| Property Key | Mandatory | Property Default Value | Description | Example
+| *axile.sbs.register.instance-id*
+| Yes
+| Default value discovery is the multistage process that involves several checks. The checks are specified in the order of their precedence.
+
+If K8S environment is detected, then K8S pod ID.
+
+| This is the unique id of this exact Spring Boot application instance. Note that one K8S deployment may consist of 3 pods, where each pod represents the same _application_ but not the same _instance_.
+
+*Manually specified value takes precedence over any other means of inferring the `instance-id`*.
+
+| my-app-9bcf36fe-48579744
+
+| *axile.sbs.register.master-url*
+| Yes
+| Must be set manually
+| This is the URL by which this Spring Boot application instance can reach the master . *Note that the URL includes the schema.* The Axile SBS reaches the Master via HTTP, so the schema must be either http or https. It mea
+|
+- http://axile-master (Assumed the default port)
+
+- https://axile-master:5505 (Explicitly specified port)
+
+| *axile.sbs.register.self-url*
+| Yes
+| Must be set manually
+| This is the URL by which the Axile Master should reach out to this Spring Boot instance. As with `master-url`, this URL should contain the schema, *AND* the port.
+|
+- https://my-app:8080
+
+- http://my-another-app:7000
+|===
+
+== Usage Sample
+
+YAML configuration example usage:
+
+[source,yaml]
+----
+axile:
+  sbs:
+    register:
+      instance-id: my-app-9bcf36fe-48579744
+      master-url: http://master
+      self-url: http://my-app:7075
+----
+
+The equivalent example for Java properties file:
+
+[source,properties]
+----
+# The explicitly specified ID of that instance
+axile.sbs.register.instance-id=my-app-9bcf36fe-48579744
+
+# Master URL. Default port applied.
+axile.sbs.register.master-url=http://master
+
+# This service discoverable URL.
+axile.sbs.register.self-url=http://my-app:7075
+----

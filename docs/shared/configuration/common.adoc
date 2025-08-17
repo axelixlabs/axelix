@@ -1,0 +1,7 @@
+== General Properties Rules
+
+As a general rule of thumb, all the properties that configure the Axile SBS start with `axile.sbs` prefix. The properties that configure the Master on the other hand start with `axile.master`. So keep that in mind.
+
+Apart from that, *manually specified value takes precedence over any other means of inferring the default value*. That is always the case. If you provide a value for a property manually, the Axile Master, Axile SBS or any other module won't try to resolve the value by itself.
+
+The last piece, if the property is set to be mandatory and is not specified and also cannot be inferred, *the application would fail to start*.

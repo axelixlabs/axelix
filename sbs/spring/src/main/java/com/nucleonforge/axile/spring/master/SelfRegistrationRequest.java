@@ -1,3 +1,6 @@
 package com.nucleonforge.axile.spring.master;
 
-public class SelfRegistrationRequest {}
+public class SelfRegistrationRequest {
+
+    private String instanceId;
+}
