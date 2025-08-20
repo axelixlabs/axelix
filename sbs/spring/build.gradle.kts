@@ -24,3 +24,23 @@ dependencies {
     compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
     compileOnly("org.springframework.kafka:spring-kafka")
 }
+
+tasks {
+    val nonStandardVmOptionsTest by registering(Test::class) {
+        useJUnitPlatform {
+            include("**/DefaultNonStandardVMOptionsDiscovererTest.class")
+        }
+        jvmArgs = listOf(
+            "-Xms256m",
+            "-Xmx512m",
+            "-XX:+UseG1GC"
+        )
+    }
+
+    test {
+        useJUnitPlatform {
+            exclude("**/DefaultNonStandardVMOptionsDiscovererTest.class")
+        }
+        dependsOn(nonStandardVmOptionsTest)
+    }
+}
