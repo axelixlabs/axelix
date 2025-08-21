@@ -5,6 +5,7 @@ plugins {
     id("maven-publish")
     id("com.diffplug.spotless") version "7.1.0"
     id("org.asciidoctor.jvm.convert") version "4.0.4"
+    id("pmd")
 }
 
 allprojects {
@@ -29,6 +30,7 @@ subprojects {
     apply(plugin = "java")
     apply(plugin = "maven-publish")
     apply(plugin = "com.diffplug.spotless")
+    apply(plugin = "pmd")
 
     plugins.withType<JavaPlugin> {
         tasks.withType<Test>().configureEach {
@@ -76,8 +78,19 @@ subprojects {
         }
     }
 
+    pmd {
+        isIgnoreFailures = false
+        isConsoleOutput = true
+        toolVersion = "7.16.0"
+        ruleSetFiles = files("${rootDir}/pmd.ruleset.xml")
+    }
+
     tasks.named("build") {
         dependsOn(":buildAllDocs")
+    }
+
+    tasks.named("check") {
+        dependsOn("pmdMain","pmdTest")
     }
 }
 
