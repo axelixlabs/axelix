@@ -4,8 +4,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.nucleonforge.axile.common.domain.Instance;
+import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
-import com.nucleonforge.axile.master.exception.NoSuchInstanceException;
+import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 
 /**
  * Central registry of all the {@link Instance instances} that this Axile Master instance is aware about.
@@ -31,9 +32,9 @@ public interface InstanceRegistry {
      * Deregister the {@link Instance} by the instanceId.
      *
      * @param instanceId the id of the instance that is supposed to be deregistered.
-     * @throws NoSuchInstanceException in case such an {@link Instance} is not found.
+     * @throws InstanceNotFoundException in case such an {@link Instance} is not found.
      */
-    void deRegister(String instanceId) throws NoSuchInstanceException;
+    void deRegister(InstanceId instanceId) throws InstanceNotFoundException;
 
     /**
      * Get {@link Instance} by its id.
@@ -42,7 +43,7 @@ public interface InstanceRegistry {
      * @return Optional wrapping an {@link Instance} that is identified by
      *         given {@code instanceId} an empty {@link Optional} otherwise.
      */
-    Optional<Instance> get(String instanceId);
+    Optional<Instance> get(InstanceId instanceId);
 
     /**
      * Get all instances that are managed by this registry.

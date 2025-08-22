@@ -10,6 +10,7 @@ import com.nucleonforge.axile.common.domain.BuildInfo;
 import com.nucleonforge.axile.common.domain.ClassPath;
 import com.nucleonforge.axile.common.domain.CommitInfo;
 import com.nucleonforge.axile.common.domain.Instance;
+import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.JarClassPathEntry;
 import com.nucleonforge.axile.common.domain.JvmNonStandardOption;
 import com.nucleonforge.axile.common.domain.JvmNonStandardOptions;
@@ -19,7 +20,7 @@ import com.nucleonforge.axile.common.domain.LaunchDetails;
 import com.nucleonforge.axile.common.domain.LoadedClass;
 import com.nucleonforge.axile.common.domain.LoadedClasses;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
-import com.nucleonforge.axile.master.exception.NoSuchInstanceException;
+import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class InMemoryInstanceRegistryTest {
 
-    private InMemoryInstanceRegistry registry = new InMemoryInstanceRegistry();
+    private final InMemoryInstanceRegistry registry = new InMemoryInstanceRegistry();
 
     @Test
     void shouldRegisterAndRetrieveInstance() {
@@ -43,7 +44,7 @@ class InMemoryInstanceRegistryTest {
 
         registry.register(instance);
 
-        Optional<Instance> optionalInstance = registry.get("id-1");
+        Optional<Instance> optionalInstance = registry.get(InstanceId.of("id-1"));
         assertTrue(optionalInstance.isPresent());
         assertEquals(optionalInstance.get(), instance);
     }
@@ -65,12 +66,12 @@ class InMemoryInstanceRegistryTest {
 
         assertDoesNotThrow(() -> registry.register(instance));
 
-        Optional<Instance> optionalInstance = registry.get("id-3");
+        Optional<Instance> optionalInstance = registry.get(InstanceId.of("id-3"));
         assertTrue(optionalInstance.isPresent());
 
-        registry.deRegister("id-3");
+        registry.deRegister(InstanceId.of("id-3"));
 
-        Optional<Instance> result = registry.get("id-3");
+        Optional<Instance> result = registry.get(InstanceId.of("id-3"));
         assertFalse(result.isPresent());
     }
 
@@ -80,11 +81,11 @@ class InMemoryInstanceRegistryTest {
 
         registry.register(instance);
 
-        Optional<Instance> optionalInstance = registry.get("id-4");
+        Optional<Instance> optionalInstance = registry.get(InstanceId.of("id-4"));
         assertTrue(optionalInstance.isPresent());
 
-        registry.deRegister("id-4");
-        assertThrows(NoSuchInstanceException.class, () -> registry.deRegister("id-4"));
+        registry.deRegister(InstanceId.of("id-4"));
+        assertThrows(InstanceNotFoundException.class, () -> registry.deRegister(InstanceId.of("id-4")));
     }
 
     @Test
@@ -103,12 +104,12 @@ class InMemoryInstanceRegistryTest {
 
     @Test
     void shouldThrowIfInstanceToDeregisterNotFound() {
-        assertThrows(NoSuchInstanceException.class, () -> registry.deRegister("not-existing"));
+        assertThrows(InstanceNotFoundException.class, () -> registry.deRegister(InstanceId.of("not-existing")));
     }
 
     @Test
     void shouldThrowIfInstanceToDeregisterNotFound1() {
-        assertFalse(registry.get("not-existing").isPresent());
+        assertFalse(registry.get(InstanceId.of("not-existing")).isPresent());
     }
 
     private Instance createInstance(String id) {
@@ -133,6 +134,6 @@ class InMemoryInstanceRegistryTest {
                 new JvmNonStandardOption("secondJvmNonStandardOpt")));
         LaunchDetails launchDetails = new LaunchDetails(jvmProperties, jvmNonStandardOptions);
 
-        return new Instance(id, buildInfo, loadedClasses, launchDetails);
+        return new Instance(new InstanceId(id), buildInfo, loadedClasses, launchDetails, "http://example.com");
     }
 }

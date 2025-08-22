@@ -9,8 +9,9 @@ import java.util.concurrent.ConcurrentMap;
 import org.jspecify.annotations.NullMarked;
 
 import com.nucleonforge.axile.common.domain.Instance;
+import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
-import com.nucleonforge.axile.master.exception.NoSuchInstanceException;
+import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 
 /**
  * Implementation of the {@link InstanceRegistry} that holds the data in the process memory.
@@ -20,7 +21,7 @@ import com.nucleonforge.axile.master.exception.NoSuchInstanceException;
 @NullMarked
 public class InMemoryInstanceRegistry implements InstanceRegistry {
 
-    private final ConcurrentMap<String, Instance> source;
+    private final ConcurrentMap<InstanceId, Instance> source;
 
     public InMemoryInstanceRegistry() {
         this.source = new ConcurrentHashMap<>();
@@ -36,16 +37,16 @@ public class InMemoryInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public void deRegister(String instanceId) throws NoSuchInstanceException {
+    public void deRegister(InstanceId instanceId) throws InstanceNotFoundException {
         Instance oldValue = source.remove(instanceId);
 
         if (oldValue == null) {
-            throw new NoSuchInstanceException();
+            throw new InstanceNotFoundException();
         }
     }
 
     @Override
-    public Optional<Instance> get(String instanceId) {
+    public Optional<Instance> get(InstanceId instanceId) {
         return Optional.ofNullable(source.get(instanceId));
     }
 
