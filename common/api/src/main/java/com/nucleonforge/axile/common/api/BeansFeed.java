@@ -1,8 +1,12 @@
 package com.nucleonforge.axile.common.api;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
@@ -14,14 +18,16 @@ import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
  */
 public class BeansFeed {
 
-    private Map<String, Context> context;
+    private Map<String, Context> contexts;
 
-    public Map<String, Context> getContext() {
-        return context;
+    @JsonProperty("contexts")
+    public Map<String, Context> getContexts() {
+        return contexts;
     }
 
-    public BeansFeed setContext(Map<String, Context> context) {
-        this.context = context;
+    @JsonProperty("contexts")
+    public BeansFeed setContexts(Map<String, Context> contexts) {
+        this.contexts = contexts;
         return this;
     }
 
@@ -60,11 +66,17 @@ public class BeansFeed {
             return aliases;
         }
 
+        @JsonSetter("aliases")
         public Bean setAliases(Set<String> aliases) {
-            this.aliases = aliases;
+            if (aliases != null) {
+                this.aliases = aliases;
+            } else {
+                this.aliases = new HashSet<>();
+            }
             return this;
         }
 
+        @JsonIgnore
         public Bean setAliases(String... aliases) {
             this.aliases = Set.of(aliases);
             return this;
@@ -92,11 +104,17 @@ public class BeansFeed {
             return dependencies;
         }
 
+        @JsonSetter("dependencies")
         public Bean setDependencies(Set<String> dependencies) {
-            this.dependencies = dependencies;
+            if (dependencies == null) {
+                this.dependencies = new HashSet<>();
+            } else {
+                this.dependencies = dependencies;
+            }
             return this;
         }
 
+        @JsonIgnore
         public Bean setDependencies(String... dependencies) {
             this.dependencies = Set.of(dependencies);
             return this;

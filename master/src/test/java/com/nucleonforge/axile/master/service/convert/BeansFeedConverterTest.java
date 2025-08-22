@@ -24,7 +24,7 @@ class BeansFeedConverterTest {
     void testConvertHappyPath() {
         // when.
         BeansFeedResponse beansFeedResponse = subject.convertInternal(
-            new BeansFeed().setContext(Map.of("main", new BeansFeed.Context().setBeans(beansMap())))
+            new BeansFeed().setContexts(Map.of("main", new BeansFeed.Context().setBeans(beansMap())))
         );
 
         // then.

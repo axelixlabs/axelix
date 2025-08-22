@@ -20,7 +20,7 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
     public @NonNull BeansFeedResponse convertInternal(@NonNull BeansFeed source) {
 
         BeansFeed.Context context =
-                source.getContext().values().stream().findFirst().orElse(null);
+                source.getContexts().values().stream().findFirst().orElse(null);
 
         BeansFeedResponse beansFeedResponse = new BeansFeedResponse();
 

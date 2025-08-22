@@ -3,8 +3,6 @@ package com.nucleonforge.axile.master.api.response;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Short profile of a given bean.
  *

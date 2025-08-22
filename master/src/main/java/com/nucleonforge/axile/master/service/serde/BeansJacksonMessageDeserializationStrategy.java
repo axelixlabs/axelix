@@ -1,6 +1,7 @@
 package com.nucleonforge.axile.master.service.serde;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nucleonforge.axile.common.api.BeansFeed;
 import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
@@ -12,17 +13,16 @@ import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
  *
  * @author Mikhail Polivakha
  */
-// TODO: tests
 @Component
 public class BeansJacksonMessageDeserializationStrategy
-        extends JacksonMessageDeserializationStrategy<BeansFeedResponse> {
+        extends JacksonMessageDeserializationStrategy<BeansFeed> {
 
     public BeansJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
     @Override
-    public @NonNull Class<BeansFeedResponse> supported() {
-        return BeansFeedResponse.class;
+    public @NonNull Class<BeansFeed> supported() {
+        return BeansFeed.class;
     }
 }
