@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.convert;
+package com.nucleonforge.axile.master.service.serde;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

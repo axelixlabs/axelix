@@ -10,6 +10,7 @@ dependencies {
     implementation("org.jspecify:jspecify:1.0.0")
     implementation("org.slf4j:slf4j-api")
     implementation(project(":common:domain"))
+    implementation(project(":common:api"))
 
     runtimeOnly("ch.qos.logback:logback-classic")
 

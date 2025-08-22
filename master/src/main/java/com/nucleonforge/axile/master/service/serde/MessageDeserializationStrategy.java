@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.convert;
+package com.nucleonforge.axile.master.service.serde;
 
 import org.jspecify.annotations.NonNull;
 

@@ -21,6 +21,7 @@ import com.nucleonforge.axile.common.domain.LoadedClass;
 import com.nucleonforge.axile.common.domain.LoadedClasses;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axile.master.service.state.InMemoryInstanceRegistry;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;

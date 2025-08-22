@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.common.domain.convert;
+package com.nucleonforge.axile.master.service.convert;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,8 +15,16 @@ import org.jspecify.annotations.Nullable;
  */
 public interface Converter<S, T> {
 
-    @Nullable
-    T convert(@Nullable S source);
+    default @Nullable T convert(@Nullable S source) {
+        if (source == null) {
+            return null;
+        }
+
+        return convertInternal(source);
+    }
+
+    @NonNull
+    T convertInternal(@NonNull S source);
 
     default @NonNull Collection<@Nullable T> convertAll(@NonNull Collection<@Nullable S> sources) {
         List<T> result = new ArrayList<>();

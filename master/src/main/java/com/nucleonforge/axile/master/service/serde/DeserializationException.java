@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.convert;
+package com.nucleonforge.axile.master.service.serde;
 
 /**
  * The exception that occurred during deserialization.

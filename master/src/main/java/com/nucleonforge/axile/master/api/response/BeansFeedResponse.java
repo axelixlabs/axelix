@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.master.api.response;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,5 +10,18 @@ import java.util.List;
  */
 public class BeansFeedResponse {
 
-    private List<BeanShortProfile> beans;
+    private final List<BeanShortProfile> beans;
+
+    public BeansFeedResponse() {
+        this.beans = new ArrayList<>();
+    }
+
+    public List<BeanShortProfile> getBeans() {
+        return beans;
+    }
+
+    public BeansFeedResponse addBean(BeanShortProfile beanShortProfile) {
+        this.beans.add(beanShortProfile);
+        return this;
+    }
 }
