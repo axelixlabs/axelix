@@ -8,8 +8,13 @@ import java.util.Set;
 import com.nucleonforge.axile.common.domain.http.HttpMethod;
 
 /**
- * Represents all possible {@link ActuatorEndpoint actuator endpoints} that are being used in the system,
- * both custom and Spring Boot built-in.
+ * Represents all possible {@link ActuatorEndpoint actuator endpoints} that are being used in the system:
+ * <ul>
+ *     <li>Custom</li>
+ *     <li>Spring Boot</li>
+ *     <li>Spring Cloud Config</li>
+ *     <li>Spring Cloud Gateway etc.</li>
+ * </ul>
  *
  * @apiNote <a href="https://docs.spring.io/spring-boot/reference/actuator/endpoints.html">Actuator Documentation</a>
  * @author Mikhail Polivakha
