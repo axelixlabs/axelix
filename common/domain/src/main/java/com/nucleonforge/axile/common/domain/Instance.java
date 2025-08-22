@@ -2,13 +2,17 @@ package com.nucleonforge.axile.common.domain;
 
 import java.util.Objects;
 
+import org.jspecify.annotations.NonNull;
+
+import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
+
 public class Instance {
 
     /**
      * The id of the instance. This id must be unique among all the other instances that are
      * managed by this Axile Master.
      */
-    private final String id;
+    private final InstanceId id;
 
     /**
      * Build information of the given Instance.
@@ -25,14 +29,26 @@ public class Instance {
      */
     private final LaunchDetails launchDetails;
 
-    public Instance(String id, BuildInfo buildInfo, LoadedClasses loadedClasses, LaunchDetails launchDetails) {
+    /**
+     * The URL of the actuator root, e.g. {@code https://my-app:6061/actuator}
+     */
+    @NonNull
+    private final String actuatorUrl;
+
+    public Instance(
+            InstanceId id,
+            BuildInfo buildInfo,
+            LoadedClasses loadedClasses,
+            LaunchDetails launchDetails,
+            @NonNull String actuatorUrl) {
         this.id = id;
         this.buildInfo = buildInfo;
         this.loadedClasses = loadedClasses;
         this.launchDetails = launchDetails;
+        this.actuatorUrl = actuatorUrl;
     }
 
-    public String getId() {
+    public InstanceId getId() {
         return id;
     }
 
@@ -46,6 +62,10 @@ public class Instance {
 
     public LaunchDetails getLaunchDetails() {
         return launchDetails;
+    }
+
+    public String urlForEndpoint(ActuatorEndpoint endpoint) {
+        return this.actuatorUrl + endpoint.path();
     }
 
     @Override
