@@ -20,8 +20,9 @@ public class BeansFeed {
         return context;
     }
 
-    public void setContext(Map<String, Context> context) {
+    public BeansFeed setContext(Map<String, Context> context) {
         this.context = context;
+        return this;
     }
 
     public static class Context {
@@ -33,16 +34,18 @@ public class BeansFeed {
             return parentId;
         }
 
-        public void setParentId(String parentId) {
+        public Context setParentId(String parentId) {
             this.parentId = parentId;
+            return this;
         }
 
         public Map<String, Bean> getBeans() {
             return beans;
         }
 
-        public void setBeans(Map<String, Bean> beans) {
+        public Context setBeans(Map<String, Bean> beans) {
             this.beans = beans;
+            return this;
         }
     }
 
@@ -57,32 +60,46 @@ public class BeansFeed {
             return aliases;
         }
 
-        public void setAliases(Set<String> aliases) {
+        public Bean setAliases(Set<String> aliases) {
             this.aliases = aliases;
+            return this;
+        }
+
+        public Bean setAliases(String... aliases) {
+            this.aliases = Set.of(aliases);
+            return this;
         }
 
         public String getScope() {
             return scope;
         }
 
-        public void setScope(String scope) {
+        public Bean setScope(String scope) {
             this.scope = scope;
+            return this;
         }
 
         public String getType() {
             return type;
         }
 
-        public void setType(String type) {
+        public Bean setType(String type) {
             this.type = type;
+            return this;
         }
 
         public Set<String> getDependencies() {
             return dependencies;
         }
 
-        public void setDependencies(Set<String> dependencies) {
+        public Bean setDependencies(Set<String> dependencies) {
             this.dependencies = dependencies;
+            return this;
+        }
+
+        public Bean setDependencies(String... dependencies) {
+            this.dependencies = Set.of(dependencies);
+            return this;
         }
     }
 }

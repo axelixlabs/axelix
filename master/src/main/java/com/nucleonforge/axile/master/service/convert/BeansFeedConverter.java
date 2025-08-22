@@ -13,7 +13,6 @@ import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
  *
  * @author Mikhail Polivakha
  */
-// TODO: Unit tests
 @Service
 public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedResponse> {
 
