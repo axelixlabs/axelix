@@ -1,11 +1,11 @@
 package com.nucleonforge.axile.master.service.serde;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nucleonforge.axile.common.api.BeansFeed;
 import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
+import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
 
 /**
@@ -14,8 +14,7 @@ import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
  * @author Mikhail Polivakha
  */
 @Component
-public class BeansJacksonMessageDeserializationStrategy
-        extends JacksonMessageDeserializationStrategy<BeansFeed> {
+public class BeansJacksonMessageDeserializationStrategy extends JacksonMessageDeserializationStrategy<BeansFeed> {
 
     public BeansJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
         super(objectMapper);
