@@ -71,6 +71,9 @@ class JwtAuthorizationFilterTest {
     @Value("${test-tokens.token-signed-with-wrong-key}")
     private String tokenSignedWithWrongKey;
 
+    @Value("${test-tokens.token-with-null-name-roles}")
+    private String tokenWithNullNameRoles;
+
     @Test
     void shouldAllowAccess_UserHasSingleRoleWithRequiredAuthorities() {
         HttpEntity<Void> entity = defaultEntity(tokenUserWithTwoRole);
@@ -196,6 +199,16 @@ class JwtAuthorizationFilterTest {
         assertThat(response)
                 .returns(HttpStatus.FORBIDDEN, ResponseEntity::getStatusCode)
                 .returns("Authorization token is missing", ResponseEntity::getBody);
+    }
+
+    @Test
+    void shouldReturnForbidden_TokenWithNullNameRoles() {
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/actuator/beans", HttpMethod.GET, defaultEntity(tokenWithNullNameRoles), String.class);
+
+        assertThat(response)
+                .returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode)
+                .returns("Role name is null in JWT token", ResponseEntity::getBody);
     }
 
     private HttpEntity<Void> defaultEntity(String token) {

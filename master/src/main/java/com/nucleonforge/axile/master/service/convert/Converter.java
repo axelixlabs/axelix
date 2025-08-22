@@ -27,7 +27,7 @@ public interface Converter<S, T> {
     T convertInternal(@NonNull S source);
 
     default @NonNull Collection<@Nullable T> convertAll(@NonNull Collection<@Nullable S> sources) {
-        List<T> result = new ArrayList<>();
+        List<@Nullable T> result = new ArrayList<>();
 
         for (S source : sources) {
             result.add(convert(source));

@@ -26,7 +26,7 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
     private final MessageDeserializationStrategy<O> messageDeserializationStrategy;
     private final HttpClient httpClient;
 
-    public AbstractEndpointProber(
+    protected AbstractEndpointProber(
             InstanceRegistry instanceRegistry, MessageDeserializationStrategy<O> messageDeserializationStrategy) {
         this.instanceRegistry = instanceRegistry;
         this.messageDeserializationStrategy = messageDeserializationStrategy;

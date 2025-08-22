@@ -1,5 +1,7 @@
 package com.nucleonforge.axile.spring.properties;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
@@ -19,23 +21,22 @@ public class DefaultPropertyDiscoverer implements PropertyDiscoverer {
     }
 
     @Override
+    @Nullable
     public Property discover(String propertyName) {
-
-        Property property = new Property(propertyName);
-
         MutablePropertySources propertySources = environment.getPropertySources();
+
+        Property property = null;
 
         for (PropertySource<?> propertySource : propertySources) {
             if (propertySource.containsProperty(propertyName)) {
-
-                property.addHoldingPropertySource(propertySource);
-
-                if (property.getProviderSource() == null) {
+                if (property == null) {
+                    property = new Property(propertyName);
                     property.setProviderSource(propertySource);
 
                     Object value = propertySource.getProperty(propertyName);
                     property.setValue(value != null ? value.toString() : null);
                 }
+                property.addHoldingPropertySource(propertySource);
             }
         }
 

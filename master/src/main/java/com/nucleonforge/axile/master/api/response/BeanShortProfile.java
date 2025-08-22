@@ -1,6 +1,5 @@
 package com.nucleonforge.axile.master.api.response;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -21,19 +20,28 @@ public class BeanShortProfile {
     private String scope;
 
     /**
-     * The aliases of the given bean.
-     */
-    private Set<String> aliases = new HashSet<>();
-
-    /**
      * The fully qualified class named of the bean.
      */
     private String className;
 
     /**
+     * The aliases of the given bean.
+     */
+    private Set<String> aliases;
+
+    /**
      * The list of dependencies of this bean (i.e. other beans that this bean depends on).
      */
-    private Set<String> dependencies = new HashSet<>();
+    private Set<String> dependencies;
+
+    public BeanShortProfile(
+            String beanName, String scope, String className, Set<String> aliases, Set<String> dependencies) {
+        this.beanName = beanName;
+        this.scope = scope;
+        this.className = className;
+        this.aliases = aliases;
+        this.dependencies = dependencies;
+    }
 
     public String getBeanName() {
         return beanName;

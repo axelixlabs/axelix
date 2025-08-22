@@ -18,6 +18,7 @@ public class JwtSigningStrategyFactory {
 
     private JwtSigningStrategyFactory() {}
 
+    @SuppressWarnings("NullAway")
     public static JwtSigningStrategy createSigningStrategy(JwtAlgorithm algorithm) {
         String algorithmName = Objects.requireNonNull(algorithm.getAlgorithmName(), "Algorithm name cannot be null");
 

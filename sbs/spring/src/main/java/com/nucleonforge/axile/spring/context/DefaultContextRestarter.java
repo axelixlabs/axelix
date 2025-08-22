@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -26,13 +28,13 @@ public class DefaultContextRestarter implements ContextRestarter, ApplicationLis
 
     private static final Log logger = LogFactory.getLog(DefaultContextRestarter.class);
 
+    @Nullable
     private ConfigurableApplicationContext context;
 
+    @Nullable
     private SpringApplication application;
 
-    private String[] args;
-
-    private ApplicationSnapshotEvent snapshot;
+    private String[] args = new String[0];
 
     @Override
     public void restartContext() {
@@ -42,34 +44,30 @@ public class DefaultContextRestarter implements ContextRestarter, ApplicationLis
     }
 
     @Override
-    public void onApplicationEvent(ApplicationSnapshotEvent event) {
-        this.snapshot = event;
-
+    public void onApplicationEvent(@NonNull ApplicationSnapshotEvent event) {
         if (this.context == null) {
-            this.context = this.snapshot.getApplicationContext();
-            this.args = this.snapshot.getArgs();
-            this.application = this.snapshot.getSpringApplication();
+            this.context = event.getApplicationContext();
+            this.args = event.getArgs();
+            this.application = event.getSpringApplication();
             this.application.addInitializers(new PostProcessorInitializer());
         }
     }
 
-    private Boolean restartSafely() {
+    private void restartSafely() {
         try {
             doRestart();
-            return true;
         } catch (Exception e) {
             logger.info("Could not doRestart", e);
-            return false;
         }
     }
 
     public synchronized void doRestart() {
-        if (this.context != null) {
+        if (this.context != null && this.application != null) {
             logger.info("Initiating ApplicationContext restart...");
             this.application.setEnvironment(this.context.getEnvironment());
             close();
             // If running in a webapp then the context classloader is probably going to
-            // die so we need to revert to a safe place before starting again
+            // die, so we need to revert to a safe place before starting again
             overrideClassLoaderForRestart();
             this.context = this.application.run(this.args);
             logger.info("ApplicationContext restarted successfully.");
@@ -91,7 +89,10 @@ public class DefaultContextRestarter implements ContextRestarter, ApplicationLis
     }
 
     private void overrideClassLoaderForRestart() {
-        ClassUtils.overrideThreadContextClassLoader(this.application.getClass().getClassLoader());
+        if (this.application != null) {
+            ClassUtils.overrideThreadContextClassLoader(
+                    this.application.getClass().getClassLoader());
+        }
     }
 
     class PostProcessorInitializer implements ApplicationContextInitializer<GenericApplicationContext> {
@@ -105,7 +106,8 @@ public class DefaultContextRestarter implements ContextRestarter, ApplicationLis
     class RetainExistingBeanPostProcessor implements BeanPostProcessor {
 
         @Override
-        public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        public Object postProcessBeforeInitialization(@NonNull Object bean, @NonNull String beanName)
+                throws BeansException {
             if (bean instanceof DefaultContextRestarter) {
                 return DefaultContextRestarter.this;
             }

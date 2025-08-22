@@ -14,7 +14,7 @@ public abstract class JacksonMessageDeserializationStrategy<T> implements Messag
 
     private final ObjectMapper objectMapper;
 
-    public JacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
+    protected JacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

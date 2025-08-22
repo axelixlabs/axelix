@@ -95,6 +95,7 @@ public class JdbcUserProvider implements UserProvider {
                         jdbcAuthConfig.getAuthorityTable());
     }
 
+    @SuppressWarnings("NullAway") // Suppress because ID fields in our DB schema can never be null.
     private void extractRolesFromRows(
             List<Map<String, Object>> rows,
             Map<Integer, RoleBuilder> roleBuilders,
@@ -165,6 +166,7 @@ public class JdbcUserProvider implements UserProvider {
         }
     }
 
+    @SuppressWarnings("NullAway")
     private DefaultAuthority safeAuthoritiesFromString(String name) {
         try {
             return DefaultAuthority.valueOf(name);

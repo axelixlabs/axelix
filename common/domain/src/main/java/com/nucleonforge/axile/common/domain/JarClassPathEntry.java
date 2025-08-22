@@ -2,6 +2,9 @@ package com.nucleonforge.axile.common.domain;
 
 import java.util.Set;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a dependency JAR that the app relies upon.
  *
@@ -31,6 +34,7 @@ public class JarClassPathEntry implements ClassPathEntry {
      * <p>
      * Might be null
      */
+    @Nullable
     private JarClassPathEntry broughtBy;
 
     /**
@@ -38,14 +42,15 @@ public class JarClassPathEntry implements ClassPathEntry {
      * <p>
      * Might be empty, never null
      */
+    @NonNull
     private Set<JarClassPathEntry> dependsOn;
 
     public JarClassPathEntry(
             String groupId,
             String artifactId,
             String version,
-            JarClassPathEntry broughtBy,
-            Set<JarClassPathEntry> dependsOn) {
+            @Nullable JarClassPathEntry broughtBy,
+            @NonNull Set<JarClassPathEntry> dependsOn) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;

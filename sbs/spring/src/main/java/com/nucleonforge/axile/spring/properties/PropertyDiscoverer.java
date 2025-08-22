@@ -1,5 +1,7 @@
 package com.nucleonforge.axile.spring.properties;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The interface that can discover the {@link Property properties} by their names
  *
@@ -12,7 +14,8 @@ public interface PropertyDiscoverer {
      * Actual discovery method
      *
      * @param propertyName the name of the property to be discovered
-     * @return discovered {@link Property}
+     * @return discovered {@link Property}, or {@code null} if no property with the given name exists
      */
+    @Nullable
     Property discover(String propertyName);
 }

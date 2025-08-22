@@ -81,19 +81,6 @@ class PropertyManagementEndpointTest {
     }
 
     @Test
-    void mutate_shouldNotMutate_whenPropertyNameIsBlank() {
-        ResponseEntity<MutationResponse> blankNameResponse =
-                restTemplate.postForEntity(path("/ \t?newValue=value"), defaultEntity(), MutationResponse.class);
-        assertThat(blankNameResponse)
-                .isNotNull()
-                .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .isNotNull()
-                .returns(false, MutationResponse::mutated)
-                .returns("Property name is required", MutationResponse::reason);
-    }
-
-    @Test
     void mutate_shouldMutate_whenNewValueIsEmpty() throws InterruptedException {
         Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/notEmpty.property", Map.class);
         assertThat(initialResponse)
@@ -118,9 +105,43 @@ class PropertyManagementEndpointTest {
     @Test
     void mutate_shouldReturnError_whenPropertyNameIsEmpty() {
         ResponseEntity<MutationResponse> response =
-                restTemplate.postForEntity(path("/"), defaultEntity(), MutationResponse.class);
+                restTemplate.postForEntity(path(""), defaultEntity(), MutationResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void mutate_shouldNotMutate_whenPropertyNameIsBlank() {
+        String propertyName = " \t";
+        ResponseEntity<PropertyNotFoundException> blankNameResponse =
+                restTemplate.postForEntity(path(propertyName), defaultEntity(), PropertyNotFoundException.class);
+        assertThat(blankNameResponse)
+                .isNotNull()
+                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
+                .extracting(ResponseEntity::getBody)
+                .isNotNull()
+                .satisfies(exception -> {
+                    assertThat(exception).isInstanceOf(PropertyNotFoundException.class);
+                });
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenPropertyDoesNotExist() {
+        String propertyName = "nonExistentProperty.property";
+
+        ResponseEntity<PropertyNotFoundException> response = restTemplate.postForEntity(
+                path(propertyName + "?newValue=" + "newValue"), defaultEntity(), PropertyNotFoundException.class);
+
+        assertThat(response)
+                .isNotNull()
+                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
+                .extracting(ResponseEntity::getBody)
+                .isNotNull()
+                .satisfies(exception -> {
+                    assertThat(exception)
+                            .isInstanceOf(PropertyNotFoundException.class)
+                            .hasMessageContaining("Property '" + propertyName + "' not found");
+                });
     }
 
     /**
@@ -130,16 +151,11 @@ class PropertyManagementEndpointTest {
      * @param newValue     new value to set (can be blank or non-blank)
      */
     private void mutateProperty(String propertyName, String newValue) throws InterruptedException {
-        ResponseEntity<MutationResponse> response = restTemplate.postForEntity(
-                path("/" + propertyName + "?newValue=" + newValue), defaultEntity(), MutationResponse.class);
+        ResponseEntity<Void> response =
+                restTemplate.postForEntity(path(propertyName + "?newValue=" + newValue), defaultEntity(), Void.class);
 
         TimeUnit.SECONDS.sleep(7); // wait for context update
-        assertThat(response)
-                .isNotNull()
-                .returns(HttpStatus.OK, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .isNotNull()
-                .returns(true, MutationResponse::mutated);
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
 
     private HttpEntity<Void> defaultEntity() {
@@ -149,6 +165,6 @@ class PropertyManagementEndpointTest {
     }
 
     private String path(String relative) {
-        return "/actuator/property-management" + relative;
+        return "/actuator/property-management/" + relative;
     }
 }

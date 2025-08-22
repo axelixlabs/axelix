@@ -29,12 +29,8 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
         }
 
         context.getBeans().forEach((beanName, bean) -> {
-            BeanShortProfile profile = new BeanShortProfile()
-                    .setBeanName(beanName)
-                    .setClassName(bean.getType())
-                    .setScope(bean.getScope())
-                    .setAliases(bean.getAliases())
-                    .setDependencies(bean.getDependencies());
+            BeanShortProfile profile = new BeanShortProfile(
+                    beanName, bean.getScope(), bean.getType(), bean.getAliases(), bean.getDependencies());
 
             beansFeedResponse.addBean(profile);
         });

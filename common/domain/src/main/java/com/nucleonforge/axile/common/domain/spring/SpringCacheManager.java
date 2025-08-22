@@ -20,4 +20,10 @@ public class SpringCacheManager {
      * The information of the {@link java.lang.Class} from which the given CacheManager was created
      */
     private LoadedClass classInfo;
+
+    public SpringCacheManager(String name, Set<String> caches, LoadedClass classInfo) {
+        this.name = name;
+        this.caches = caches;
+        this.classInfo = classInfo;
+    }
 }
