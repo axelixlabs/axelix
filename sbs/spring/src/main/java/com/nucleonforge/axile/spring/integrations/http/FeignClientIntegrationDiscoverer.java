@@ -46,11 +46,15 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
         Class<?> beanClass = bean.getClass();
 
         FeignClient annotation = beanClass.getAnnotation(FeignClient.class);
-        if (annotation != null) return annotation;
+        if (annotation != null) {
+            return annotation;
+        }
 
         for (Class<?> aClass : beanClass.getInterfaces()) {
             annotation = aClass.getAnnotation(FeignClient.class);
-            if (annotation != null) return annotation;
+            if (annotation != null) {
+                return annotation;
+            }
         }
 
         return null;

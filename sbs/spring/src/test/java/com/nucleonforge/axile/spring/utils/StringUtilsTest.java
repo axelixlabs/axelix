@@ -17,12 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class StringUtilsTest {
 
     @ParameterizedTest
-    @MethodSource(value = "source_containsIgnoreCase")
+    @MethodSource(value = "sourceContainsIgnoreCase")
     void test_containsIgnoreCase(String source, String dest, boolean result) {
         assertThat(StringUtils.containsIgnoreCase(source, dest)).isEqualTo(result);
     }
 
-    static Stream<Arguments> source_containsIgnoreCase() {
+    static Stream<Arguments> sourceContainsIgnoreCase() {
         return Stream.of(
                 Arguments.of(null, null, true),
                 Arguments.of("Non null string", null, false),

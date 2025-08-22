@@ -50,8 +50,12 @@ public class Instance {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Instance instance)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Instance instance)) {
+            return false;
+        }
         return Objects.equals(id, instance.id)
                 && Objects.equals(buildInfo, instance.buildInfo)
                 && Objects.equals(loadedClasses, instance.loadedClasses)

@@ -34,7 +34,9 @@ public class DefaultBeanAnalyzer implements BeanAnalyzer {
 
     @Override
     public Optional<BeanProfile> analyze(String beanName) {
-        if (!beanFactory.containsBeanDefinition(beanName)) return Optional.empty();
+        if (!beanFactory.containsBeanDefinition(beanName)) {
+            return Optional.empty();
+        }
 
         BeanDefinition def = beanFactory.getBeanDefinition(beanName);
 
