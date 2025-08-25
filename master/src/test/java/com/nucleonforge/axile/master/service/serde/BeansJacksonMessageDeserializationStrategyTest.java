@@ -3,13 +3,12 @@ package com.nucleonforge.axile.master.service.serde;
 import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nucleonforge.axile.common.api.BeansFeed.Bean;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
+import com.nucleonforge.axile.common.api.BeansFeed.Bean;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Unit tests for {@link BeansJacksonMessageDeserializationStrategy}. The json for deserialization was taken from
