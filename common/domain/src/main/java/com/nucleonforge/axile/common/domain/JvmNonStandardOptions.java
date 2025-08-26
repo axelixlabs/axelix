@@ -9,9 +9,13 @@ import java.util.Set;
  */
 public class JvmNonStandardOptions {
 
-    private Set<JvmNonStandardOption> nonStandardOptions;
+    private final Set<JvmNonStandardOption> nonStandardOptions;
 
     public JvmNonStandardOptions(Set<JvmNonStandardOption> nonStandardOptions) {
         this.nonStandardOptions = nonStandardOptions;
+    }
+
+    public Set<JvmNonStandardOption> getNonStandardOptions() {
+        return nonStandardOptions;
     }
 }
