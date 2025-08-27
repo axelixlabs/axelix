@@ -4,6 +4,7 @@ plugins {
 
 val testcontainersVersion = "1.21.3"
 val jsonwebtokenVersion = "0.12.6"
+val jsonUnitAssertJVersion = "4.1.1"
 
 dependencies {
     // BOMs
@@ -41,6 +42,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
     testImplementation("org.postgresql:postgresql")
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:$jsonUnitAssertJVersion")
 }
 
 configurations.all {

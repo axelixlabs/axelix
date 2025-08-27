@@ -2,17 +2,13 @@ package com.nucleonforge.axile.master.auth.spi.jwt;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axile.common.auth.core.DefaultRole;
@@ -35,10 +30,11 @@ import com.nucleonforge.axile.master.auth.spi.jwt.service.DefaultJwtEncoderServi
 import com.nucleonforge.axile.master.auth.spi.jwt.service.JwtEncoderService;
 import com.nucleonforge.axile.master.auth.spi.jwt.service.JwtTokenGenerationException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_EXTRA_FIELDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Integration tests for {@link JwtEncoderService}, verifying correct JWT generation logic.
@@ -54,55 +50,37 @@ class DefaultJwtEncoderServiceTest {
     @Autowired
     private JwtEncoderService jwtEncoderService;
 
-    @Value("${axile.master.auth.jwt.signing_key}")
-    private String signingKey;
-
     @Value("${axile.master.auth.jwt.lifespan}")
     private Duration lifespan;
 
     @Test
-    void shouldGenerateTokenWithRequiredClaims() {
-        User user = new DefaultUser("testUser", Collections.emptySet());
-        String token = jwtEncoderService.generateToken(user);
-
-        Jws<Claims> claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
-                .build()
-                .parseSignedClaims(token);
-
-        assertEquals("testUser", claims.getPayload().getSubject());
-        assertNotNull(claims.getPayload().getExpiration());
-        assertNotNull(claims.getPayload().getIssuedAt());
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
     void shouldGenerateValidJwtToken() {
         Role role = new DefaultRole(
                 "testRole", Set.of(DefaultAuthority.ENV, DefaultAuthority.BEANS), Collections.emptySet());
         User user = new DefaultUser("testUser", Set.of(role));
 
         String token = jwtEncoderService.generateToken(user);
+        String responsePayload = getPayload(token);
 
-        Claims claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        // language=json
+        String expectedPayload =
+                """
+            {
+              "sub": "testUser",
+              "roles": [{
+                "name": "testRole",
+                "authorities": ["ENV", "BEANS"],
+                "components": []
+              }]
+            }
+            """;
 
-        assertEquals("testUser", claims.getSubject());
-
-        List<Map<String, Object>> roles = claims.get("roles", List.class);
-        assertNotNull(roles);
-        assertEquals(1, roles.size());
-
-        Set<String> authorities = new HashSet<>((List<String>) roles.get(0).get("authorities"));
-        assertTrue(authorities.contains("ENV"));
-        assertTrue(authorities.contains("BEANS"));
+        assertThatJson(responsePayload)
+                .when(IGNORING_ARRAY_ORDER, IGNORING_EXTRA_FIELDS)
+                .isEqualTo(expectedPayload);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void shouldGenerateValidJwtTokenMultipleRoles() {
         Role role1 = new DefaultRole(
                 "firstTestRole", Set.of(DefaultAuthority.HEALTH, DefaultAuthority.INFO), Collections.emptySet());
@@ -111,190 +89,180 @@ class DefaultJwtEncoderServiceTest {
         User user = new DefaultUser("multiRoleUser", Set.of(role1, role2));
 
         String token = jwtEncoderService.generateToken(user);
+        String responsePayload = getPayload(token);
 
-        Claims claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        // language=json
+        String expectedPayload =
+                """
+            {
+              "sub": "multiRoleUser",
+              "roles": [
+                {
+                  "name": "firstTestRole",
+                  "authorities": ["HEALTH", "INFO"],
+                  "components": []
+                },
+                {
+                  "name": "secondTestRole",
+                  "authorities": ["BEANS"],
+                  "components": []
+                }
+              ]
+            }
+            """;
 
-        List<Map<String, Object>> roles = claims.get("roles", List.class);
-        assertEquals(2, roles.size());
-
-        Set<String> allAuthorities = roles.stream()
-                .flatMap(r -> ((List<String>) r.get("authorities")).stream())
-                .collect(Collectors.toSet());
-
-        assertEquals(3, allAuthorities.size());
-        assertTrue(allAuthorities.contains("BEANS"));
-        assertTrue(allAuthorities.contains("HEALTH"));
-        assertTrue(allAuthorities.contains("INFO"));
+        assertThatJson(responsePayload)
+                .when(IGNORING_ARRAY_ORDER, IGNORING_EXTRA_FIELDS)
+                .isEqualTo(expectedPayload);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void shouldGenerateValidJwtToken_WithRoleHierarchy() {
+    void shouldGenerateValidJwtTokenWithRoleHierarchy() {
         Role adminRole = createAdminRoleHierarchy();
         Role rootRole = new DefaultRole("rootRole", Set.of(DefaultAuthority.HEALTH), Set.of(adminRole));
         User user = new DefaultUser("multiRoleUser", Set.of(rootRole));
 
         String token = jwtEncoderService.generateToken(user);
+        String responsePayload = getPayload(token);
 
-        Claims claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        // language=json
+        String expectedPayload =
+                """
+            {
+              "sub": "multiRoleUser",
+              "roles": [
+                {
+                  "name": "rootRole",
+                  "authorities": ["HEALTH"],
+                  "components": [
+                    {
+                      "name": "admin",
+                      "authorities": ["PROFILE_MANAGEMENT"],
+                      "components": [
+                        {
+                          "name": "engineer",
+                          "authorities": ["ENV"],
+                          "components": [
+                            {
+                              "name": "user",
+                              "authorities": ["INFO"],
+                              "components": []
+                            }
+                          ]
+                        },
+                        {
+                          "name": "cacheDispatcherRole",
+                          "authorities": ["CACHE_DISPATCHER"],
+                          "components": [
+                            {
+                              "name": "cacheAccessRole",
+                              "authorities": ["CACHES"],
+                              "components": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
 
-        List<Map<String, Object>> roles = claims.get("roles", List.class);
-        assertEquals(1, roles.size());
-
-        Map<String, Object> rootRoleMap = roles.get(0);
-        assertEquals("rootRole", rootRoleMap.get("name"));
-        assertTrue(((List<String>) rootRoleMap.get("authorities")).contains("HEALTH"));
-
-        // root -> admin
-        List<Map<String, Object>> adminComponents = (List<Map<String, Object>>) rootRoleMap.get("components");
-        assertEquals(1, adminComponents.size());
-
-        Map<String, Object> adminRoleMap = adminComponents.get(0);
-        assertEquals("admin", adminRoleMap.get("name"));
-        assertTrue(((List<String>) adminRoleMap.get("authorities")).contains("PROFILE_MANAGEMENT"));
-
-        // admin -> engineer, cacheDispatcher
-        List<Map<String, Object>> adminSubComponents = (List<Map<String, Object>>) adminRoleMap.get("components");
-        assertEquals(2, adminSubComponents.size());
-
-        // admin -> engineer -> user
-        Map<String, Object> engineerRoleMap = adminSubComponents.stream()
-                .filter(m -> m.get("name").equals("engineer"))
-                .findFirst()
-                .orElseThrow();
-        assertTrue(((List<String>) engineerRoleMap.get("authorities")).contains("ENV"));
-
-        List<Map<String, Object>> engineerComponents = (List<Map<String, Object>>) engineerRoleMap.get("components");
-        assertEquals(1, engineerComponents.size());
-
-        Map<String, Object> userRoleMap = engineerComponents.get(0);
-        assertEquals("user", userRoleMap.get("name"));
-        assertTrue(((List<String>) userRoleMap.get("authorities")).contains("INFO"));
-
-        // admin -> cacheDispatcher -> cacheManager
-        Map<String, Object> cacheDispatcherMap = adminSubComponents.stream()
-                .filter(m -> m.get("name").equals("cacheDispatcherRole"))
-                .findFirst()
-                .orElseThrow();
-        assertTrue(((List<String>) cacheDispatcherMap.get("authorities")).contains("CACHE_DISPATCHER"));
-
-        List<Map<String, Object>> dispatcherComponents =
-                (List<Map<String, Object>>) cacheDispatcherMap.get("components");
-        assertEquals(1, dispatcherComponents.size());
-
-        Map<String, Object> cacheManagerMap = dispatcherComponents.get(0);
-        assertEquals("cacheAccessRole", cacheManagerMap.get("name"));
-        assertTrue(((List<String>) cacheManagerMap.get("authorities")).contains("CACHES"));
+        assertThatJson(responsePayload)
+                .when(IGNORING_ARRAY_ORDER, IGNORING_EXTRA_FIELDS)
+                .isEqualTo(expectedPayload);
     }
 
     @Test
-    void shouldContainCorrectExpirationTime() {
+    void shouldContainCorrectExpirationTime() throws JsonProcessingException {
         User user = new DefaultUser("expUser", Set.of());
 
         String token = jwtEncoderService.generateToken(user);
+        String payload = getPayload(token);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.readTree(payload);
 
-        Claims claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        long actualExpiration = node.get("exp").asLong() - node.get("iat").asLong();
 
-        long actualExpiration =
-                claims.getExpiration().getTime() - claims.getIssuedAt().getTime();
-        assertTrue(actualExpiration > 0 && actualExpiration <= lifespan.toMillis());
+        assertThat(actualExpiration).isGreaterThan(0).isLessThanOrEqualTo(lifespan.toMillis());
     }
 
     @Test
     void shouldHandleNullUser() {
-        JwtTokenGenerationException exception =
-                assertThrows(JwtTokenGenerationException.class, () -> jwtEncoderService.generateToken(null));
-
-        assertEquals("User cannot be null", exception.getMessage());
+        assertThatThrownBy(() -> jwtEncoderService.generateToken(null))
+                .isInstanceOf(JwtTokenGenerationException.class)
+                .hasMessage("User cannot be null");
     }
 
     @Test
     void shouldThrowWhenUsernameIsNull() {
         User user = new DefaultUser(null, Set.of());
 
-        JwtTokenGenerationException exception =
-                assertThrows(JwtTokenGenerationException.class, () -> jwtEncoderService.generateToken(user));
-
-        assertEquals("Username cannot be null or empty", exception.getMessage());
+        assertThatThrownBy(() -> jwtEncoderService.generateToken(user))
+                .isInstanceOf(JwtTokenGenerationException.class)
+                .hasMessage("Username cannot be null or empty");
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void shouldGenerateTokenForUserWithoutRoles() {
         User user = new DefaultUser("userWithoutRoles", null);
 
         String token = jwtEncoderService.generateToken(user);
+        String responsePayload = getPayload(token);
 
-        Claims claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        // language=json
+        String expectedPayload =
+                """
+            {
+              "sub": "userWithoutRoles",
+              "roles": []
+            }
+            """;
 
-        assertEquals("userWithoutRoles", claims.getSubject());
-
-        List<Map<String, Object>> roles = claims.get("roles", List.class);
-        assertNotNull(roles);
-        assertTrue(roles.isEmpty());
+        assertThatJson(responsePayload).when(IGNORING_EXTRA_FIELDS).isEqualTo(expectedPayload);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void shouldGenerateTokenForUserWithRoleThatHasNoAuthorities() {
+    void shouldGenerateTokenForUserWithRoleThatHasNoAuthoritiesAndNoComponents() {
         Role roleWithoutAuthorities =
                 new DefaultRole("roleWithoutAuthorities", Collections.emptySet(), Collections.emptySet());
         User user = new DefaultUser("userWithEmptyAuthorities", Set.of(roleWithoutAuthorities));
 
         String token = jwtEncoderService.generateToken(user);
+        String responsePayload = getPayload(token);
 
-        Claims claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes()))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        // language=json
+        String expectedPayload =
+                """
+            {
+            "sub": "userWithEmptyAuthorities",
+            "roles": [{
+              "name": "roleWithoutAuthorities",
+              "authorities": [],
+              "components": []
+            }]
+            }
+            """;
 
-        assertEquals("userWithEmptyAuthorities", claims.getSubject());
-
-        List<Map<String, Object>> roles = claims.get("roles", List.class);
-        assertNotNull(roles);
-        assertEquals(1, roles.size());
-
-        List<String> authorities = (List<String>) roles.get(0).get("authorities");
-        assertNotNull(authorities);
-        assertTrue(authorities.isEmpty());
+        assertThatJson(responsePayload).when(IGNORING_EXTRA_FIELDS).isEqualTo(expectedPayload);
     }
 
     @Test
     void shouldFailWithInvalidSecretKey() {
         String shortSecretKey = "shortKey";
         JwtAlgorithm jwtAlgorithm = JwtAlgorithm.HMAC256;
-        DefaultJwtEncoderService invalidService =
-                new DefaultJwtEncoderService(jwtAlgorithm, shortSecretKey, Duration.ofDays(3));
-        ReflectionTestUtils.setField(invalidService, "signingKey", shortSecretKey);
-        ReflectionTestUtils.setField(invalidService, "lifespan", lifespan);
+        DefaultJwtEncoderService invalidService = new DefaultJwtEncoderService(jwtAlgorithm, shortSecretKey, lifespan);
 
         User user = new DefaultUser("invalidKeyUser", Set.of());
 
-        JwtTokenGenerationException exception =
-                assertThrows(JwtTokenGenerationException.class, () -> invalidService.generateToken(user));
+        String messageException = String.format(
+                "The secret key is too weak for %s algorithm. It must be at least %d bytes.",
+                jwtAlgorithm.getAlgorithmName(), jwtAlgorithm.getMinKeyLength());
 
-        System.out.println(exception.getMessage());
-        assertTrue(exception
-                .getMessage()
-                .contains("The secret key is too weak for " + jwtAlgorithm.getAlgorithmName()
-                        + " algorithm. It must be at least " + jwtAlgorithm.getMinKeyLength() + " bytes."));
+        assertThatThrownBy(() -> invalidService.generateToken(user))
+                .isInstanceOf(JwtTokenGenerationException.class)
+                .hasMessage(messageException);
     }
 
     @Test
@@ -303,19 +271,37 @@ class DefaultJwtEncoderServiceTest {
         JwtAlgorithm algorithm = JwtAlgorithm.HMAC256;
         JwtEncoderService encoder = new DefaultJwtEncoderService(algorithm, hs256Key, lifespan);
 
-        User user = new DefaultUser("hs256User", Set.of());
+        Role role = new DefaultRole("role", Set.of(DefaultAuthority.HEALTH, DefaultAuthority.INFO), null);
+        User user = new DefaultUser("hs256User", Set.of(role));
 
         String token = encoder.generateToken(user);
+        String responseHeader = getHeader(token);
+        String responsePayload = getPayload(token);
 
-        Claims claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(hs256Key.getBytes(StandardCharsets.UTF_8)))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        // language=json
+        String expectedHeader = """
+            {
+              "alg": "HS256"
+            }
+            """;
 
-        assertEquals("hs256User", claims.getSubject());
-        assertNotNull(claims.getIssuedAt());
-        assertNotNull(claims.getExpiration());
+        // language=json
+        String expectedPayload =
+                """
+            {
+              "sub": "hs256User",
+              "roles": [{
+                "name": "role",
+                "authorities": ["HEALTH", "INFO"],
+                "components": []
+              }]
+            }
+            """;
+
+        assertThatJson(responseHeader).isEqualTo(expectedHeader);
+        assertThatJson(responsePayload)
+                .when(IGNORING_EXTRA_FIELDS, IGNORING_ARRAY_ORDER)
+                .isEqualTo(expectedPayload);
     }
 
     @Test
@@ -328,16 +314,26 @@ class DefaultJwtEncoderServiceTest {
         User user = new DefaultUser("hs384User", Set.of());
 
         String token = encoder.generateToken(user);
+        String responseHeader = getHeader(token);
+        String responsePayload = getPayload(token);
 
-        Claims claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(hs384Key.getBytes(StandardCharsets.UTF_8)))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        // language=json
+        String expectedHeader = """
+            {
+              "alg": "HS384"
+            }
+            """;
+        // language=json
+        String expectedPayload =
+                """
+            {
+              "sub": "hs384User",
+              "roles": []
+            }
+            """;
 
-        assertEquals("hs384User", claims.getSubject());
-        assertNotNull(claims.getIssuedAt());
-        assertNotNull(claims.getExpiration());
+        assertThatJson(responseHeader).isEqualTo(expectedHeader);
+        assertThatJson(responsePayload).when(IGNORING_EXTRA_FIELDS).isEqualTo(expectedPayload);
     }
 
     @Test
@@ -345,8 +341,7 @@ class DefaultJwtEncoderServiceTest {
         User user = new DefaultUser("formatTest", Set.of());
         String token = jwtEncoderService.generateToken(user);
 
-        String[] parts = token.split("\\.");
-        assertEquals(3, parts.length);
+        assertThat(token.split("\\.")).hasSize(3);
     }
 
     private Role createAdminRoleHierarchy() {
@@ -358,6 +353,16 @@ class DefaultJwtEncoderServiceTest {
         Role engineerRole = new DefaultRole("engineer", Set.of(DefaultAuthority.ENV), Set.of(userRole));
         return new DefaultRole(
                 "admin", Set.of(DefaultAuthority.PROFILE_MANAGEMENT), Set.of(engineerRole, cacheDispatcherRole));
+    }
+
+    private String getPayload(String token) {
+        String[] parts = token.split("\\.");
+        return new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+    }
+
+    private String getHeader(String token) {
+        String[] parts = token.split("\\.");
+        return new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
     }
 
     /**
