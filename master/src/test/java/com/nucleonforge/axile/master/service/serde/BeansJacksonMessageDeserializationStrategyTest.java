@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class BeansJacksonMessageDeserializationStrategyTest {
 
-    private BeansJacksonMessageDeserializationStrategy subject =
+    private final BeansJacksonMessageDeserializationStrategy subject =
             new BeansJacksonMessageDeserializationStrategy(new ObjectMapper());
 
     @Test
