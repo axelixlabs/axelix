@@ -10,14 +10,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.http.HttpHeaders;
-import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.nucleonforge.axile.auth.AuthorizationException;
 import com.nucleonforge.axile.auth.spi.Authorizer;
 import com.nucleonforge.axile.auth.spi.jwt.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axile.auth.spi.jwt.exception.InvalidJwtTokenException;
+import com.nucleonforge.axile.auth.spi.jwt.exception.JwtParsingException;
 import com.nucleonforge.axile.auth.spi.jwt.exception.JwtTokenDecodingException;
 import com.nucleonforge.axile.auth.spi.jwt.service.JwtDecoderService;
 import com.nucleonforge.axile.common.auth.core.Authority;
@@ -33,6 +36,7 @@ import com.nucleonforge.axile.common.auth.core.User;
  * @author Nikita Kirillov
  * @since 29.07.2025
  */
+@SuppressWarnings("NullAway") // TODO: Pending issue GH-42 – introduce exception translator and refactor this filter
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtDecoderService jwtDecoderService;
@@ -75,15 +79,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
 
+        } catch (JwtParsingException | ExpiredJwtTokenException | InvalidJwtTokenException e) {
+            respondWith(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } catch (AuthorizationException e) {
             respondWith(response, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
-        } catch (ExpiredJwtTokenException | InvalidJwtTokenException e) {
-            respondWith(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } catch (JwtTokenDecodingException e) {
             respondWith(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
+    @Nullable
     private String resolveToken(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header != null && header.startsWith("Bearer ")) {

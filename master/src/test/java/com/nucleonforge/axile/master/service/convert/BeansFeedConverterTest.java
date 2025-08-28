@@ -24,8 +24,8 @@ class BeansFeedConverterTest {
     @Test
     void testConvertHappyPath() {
         // when.
-        BeansFeedResponse beansFeedResponse = subject.convertInternal(
-                new BeansFeed().setContexts(Map.of("main", new BeansFeed.Context().setBeans(beansMap()))));
+        BeansFeedResponse beansFeedResponse =
+                subject.convertInternal(new BeansFeed(Map.of("main", new BeansFeed.Context("parentId", beansMap()))));
 
         // then.
         assertThat(beansFeedResponse).extracting(BeansFeedResponse::getBeans).satisfies(beanShortProfiles -> {
@@ -76,20 +76,10 @@ class BeansFeedConverterTest {
     private static Map<String, BeansFeed.Bean> beansMap() {
         return Map.of(
                 "bean1",
-                new BeansFeed.Bean()
-                        .setScope("singleton")
-                        .setType("java.lang.String")
-                        .setDependencies(Set.of()),
+                new BeansFeed.Bean("singleton", "java.lang.String", Set.of(), Set.of()),
                 "bean2",
-                new BeansFeed.Bean()
-                        .setScope("session")
-                        .setType("java.lang.Integer")
-                        .setAliases(Set.of())
-                        .setDependencies("dep1", "dep2"),
+                new BeansFeed.Bean("session", "java.lang.Integer", Set.of(), Set.of("dep1", "dep2")),
                 "bean3",
-                new BeansFeed.Bean()
-                        .setScope("prototype")
-                        .setType("java.util.Date")
-                        .setAliases("abc", "bcd"));
+                new BeansFeed.Bean("prototype", "java.util.Date", Set.of("abc", "bcd"), Set.of()));
     }
 }

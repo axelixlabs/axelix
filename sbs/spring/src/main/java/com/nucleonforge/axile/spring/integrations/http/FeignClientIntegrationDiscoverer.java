@@ -41,6 +41,7 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
         return integrations;
     }
 
+    @SuppressWarnings("NullAway") // Suppress NullAway because the FeignClient annotation cannot be null here.
     private FeignClient extractFeignClientAnnotation(String beanName) {
         Object bean = context.getBean(beanName);
         Class<?> beanClass = bean.getClass();

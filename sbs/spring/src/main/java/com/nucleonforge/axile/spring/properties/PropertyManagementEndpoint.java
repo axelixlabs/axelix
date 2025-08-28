@@ -1,9 +1,10 @@
 package com.nucleonforge.axile.spring.properties;
 
+import org.jspecify.annotations.NonNull;
+
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
-import org.springframework.lang.NonNull;
 
 /**
  * Custom Spring Boot Actuator endpoint
@@ -34,12 +35,12 @@ public class PropertyManagementEndpoint {
     }
 
     @WriteOperation
-    public MutationResponse mutate(@Selector @NonNull String propertyName, String newValue) {
-        if (propertyName.isBlank()) {
-            return new MutationResponse(false, "Property name is required");
-        }
-
+    public void mutate(@Selector @NonNull String propertyName, String newValue) {
         Property property = propertyDiscoverer.discover(propertyName);
-        return propertyMutator.mutate(property, newValue);
+
+        if (property == null) {
+            throw new PropertyNotFoundException("Property '" + propertyName + "' not found");
+        }
+        propertyMutator.mutate(property, newValue);
     }
 }

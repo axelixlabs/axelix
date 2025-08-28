@@ -3,6 +3,8 @@ package com.nucleonforge.axile.spring.beans;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -48,6 +50,7 @@ public class DefaultBeanAnalyzer implements BeanAnalyzer {
                 isCreatedByFactoryBean(def)));
     }
 
+    @SuppressWarnings("NullAway") // Technically, the class name of a bean cannot be null at runtime.
     private Class<?> resolveBeanClass(BeanDefinition def, String beanName) {
         if (def instanceof AbstractBeanDefinition abd && abd.getBeanClassName() != null) {
             try {
@@ -71,6 +74,7 @@ public class DefaultBeanAnalyzer implements BeanAnalyzer {
         }
     }
 
+    @Nullable
     private Method resolveDefiningMethod(BeanDefinition def) {
         if (def.getSource() instanceof StandardMethodMetadata metadata) {
             return metadata.getIntrospectedMethod();

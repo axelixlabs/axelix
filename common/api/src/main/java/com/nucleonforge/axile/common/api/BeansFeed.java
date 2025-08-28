@@ -2,8 +2,10 @@ package com.nucleonforge.axile.common.api;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -21,6 +23,11 @@ public class BeansFeed {
 
     private Map<String, Context> contexts;
 
+    @JsonCreator
+    public BeansFeed(@JsonProperty("contexts") Map<String, Context> contexts) {
+        this.contexts = contexts;
+    }
+
     @JsonProperty("contexts")
     public Map<String, Context> getContexts() {
         return contexts;
@@ -36,6 +43,12 @@ public class BeansFeed {
 
         private String parentId;
         private Map<String, Bean> beans;
+
+        @JsonCreator
+        public Context(@JsonProperty("parentId") String parentId, @JsonProperty("beans") Map<String, Bean> beans) {
+            this.parentId = parentId;
+            this.beans = beans;
+        }
 
         public String getParentId() {
             return parentId;
@@ -58,10 +71,22 @@ public class BeansFeed {
 
     public static class Bean {
 
-        private Set<String> aliases;
         private String scope;
         private String type;
+        private Set<String> aliases;
         private Set<String> dependencies;
+
+        @JsonCreator
+        public Bean(
+                @JsonProperty("scope") String scope,
+                @JsonProperty("type") String type,
+                @JsonProperty("aliases") Set<String> aliases,
+                @JsonProperty("dependencies") Set<String> dependencies) {
+            this.scope = scope;
+            this.type = type;
+            this.aliases = aliases;
+            this.dependencies = dependencies;
+        }
 
         public Set<String> getAliases() {
             return aliases;
@@ -69,11 +94,7 @@ public class BeansFeed {
 
         @JsonSetter("aliases")
         public Bean setAliases(Set<String> aliases) {
-            if (aliases != null) {
-                this.aliases = aliases;
-            } else {
-                this.aliases = new HashSet<>();
-            }
+            this.aliases = Objects.requireNonNullElseGet(aliases, HashSet::new);
             return this;
         }
 
@@ -107,11 +128,7 @@ public class BeansFeed {
 
         @JsonSetter("dependencies")
         public Bean setDependencies(Set<String> dependencies) {
-            if (dependencies == null) {
-                this.dependencies = new HashSet<>();
-            } else {
-                this.dependencies = dependencies;
-            }
+            this.dependencies = Objects.requireNonNullElseGet(dependencies, HashSet::new);
             return this;
         }
 

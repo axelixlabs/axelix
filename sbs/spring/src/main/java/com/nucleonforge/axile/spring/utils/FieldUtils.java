@@ -11,7 +11,7 @@ import org.springframework.util.ReflectionUtils;
  */
 public class FieldUtils {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "NullAway"})
     public static <T> T getField(String name, Object onObject) {
         try {
             Field field = ReflectionUtils.findField(onObject.getClass(), name);

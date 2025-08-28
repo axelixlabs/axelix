@@ -1,3 +1,5 @@
+import net.ltgt.gradle.errorprone.CheckSeverity
+import net.ltgt.gradle.errorprone.errorprone
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
 
 plugins {
@@ -6,6 +8,7 @@ plugins {
     id("com.diffplug.spotless") version "7.1.0"
     id("org.asciidoctor.jvm.convert") version "4.0.4"
     id("pmd")
+    id("net.ltgt.errorprone") version "4.2.0"
 }
 
 allprojects {
@@ -31,6 +34,12 @@ subprojects {
     apply(plugin = "maven-publish")
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "pmd")
+    apply(plugin = "net.ltgt.errorprone")
+
+    dependencies {
+        errorprone("com.google.errorprone:error_prone_core:2.41.0")
+        errorprone("com.uber.nullaway:nullaway:0.12.9")
+    }
 
     plugins.withType<JavaPlugin> {
         tasks.withType<Test>().configureEach {
@@ -91,6 +100,23 @@ subprojects {
 
     tasks.named("check") {
         dependsOn("pmdMain","pmdTest")
+    }
+
+    tasks.named<JavaCompile>("compileJava") {
+        options.errorprone {
+            // TODO Consider enable compilation warnings on first milestone release
+            disableAllChecks = true
+
+            check("NullAway", CheckSeverity.ERROR)
+            option("NullAway:AnnotatedPackages", "com.nucleonforge.axile")
+            option("NullAway:JSpecifyMode", true)
+            option("NullAway:CheckOptionalEmptiness", true)
+        }
+    }
+    tasks.named<JavaCompile>("compileTestJava") { // disable NullAway on test classes
+        options.errorprone {
+            disableAllChecks = true
+        }
     }
 }
 

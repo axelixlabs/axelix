@@ -3,6 +3,8 @@ package com.nucleonforge.axile.spring.properties;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.PropertySource;
 
@@ -23,17 +25,22 @@ public class Property {
     /**
      * String representation of the property's value
      */
+    @Nullable
     private String value;
 
     /**
      * Spring's {@link PropertySource PropertySources} that contain this property.
      */
-    private Set<PropertySource<?>> holdingPropertySources;
+    private final Set<PropertySource<?>> holdingPropertySources = new HashSet<>();
 
     /**
      * Spring's {@link PropertySource} that won, meaning, the property source from which
-     * the property is actually derived at runtime
+     * the property is actually derived at runtime.
+     * <p>
+     * By design, {@link Property} is guaranteed to exist in at least one Spring
+     * {@link PropertySource}, so this providerSource is never null.
      */
+    @SuppressWarnings("NullAway")
     private PropertySource<?> providerSource;
 
     public Property(String name) {
@@ -41,10 +48,6 @@ public class Property {
     }
 
     public void addHoldingPropertySource(PropertySource<?> propertySource) {
-        if (holdingPropertySources == null) {
-            holdingPropertySources = new HashSet<>();
-        }
-
         holdingPropertySources.add(propertySource);
     }
 
@@ -60,11 +63,12 @@ public class Property {
         this.providerSource = providerSource;
     }
 
+    @Nullable
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(@Nullable String value) {
         this.value = value;
     }
 

@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.kafka.common.TopicPartition;
 
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
@@ -27,6 +29,8 @@ import com.nucleonforge.axile.spring.integrations.IntegrationComponentDiscoverer
  * @author Nikita Kirillov
  */
 public class KafkaConsumerIntegrationDiscoverer implements IntegrationComponentDiscoverer<KafkaConsumerIntegration> {
+
+    private static final Log logger = LogFactory.getLog(KafkaConsumerIntegrationDiscoverer.class);
 
     private final KafkaListenerEndpointRegistry registry;
 
@@ -51,12 +55,15 @@ public class KafkaConsumerIntegrationDiscoverer implements IntegrationComponentD
             Set<TopicPartition> assignedPartitions = resolveAssignedPartitions(container);
             Set<String> topics = resolveTopics(props);
 
+            if (groupId == null || groupId.isEmpty()) {
+                logger.warn("Kafka listener " + listenerId + " has no group.id configured");
+                continue;
+            }
+
             KafkaConsumerIntegration integration = new KafkaConsumerIntegration(
-                            listenerId, "Kafka TCP Binary", "Apache Kafka")
-                    .setGroupId(groupId)
+                            listenerId, "Kafka TCP Binary", "Apache Kafka", groupId, ackMode)
                     .setAutoStartup(autoStartup)
                     .setConcurrency(concurrency)
-                    .setAckMode(ackMode)
                     .setBatchListener(batchListener)
                     .setRunning(running)
                     .setPaused(paused)

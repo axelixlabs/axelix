@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.metrics;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -13,9 +14,11 @@ public class AbstractMetric<T> implements MetricValue<T> {
     private final T value;
     private final String display;
     private final boolean alarmValue;
+
+    @Nullable
     private final String alarmDescription;
 
-    AbstractMetric(T value, String display, String alarmDescription) {
+    AbstractMetric(T value, String display, @NonNull String alarmDescription) {
         this.value = value;
         this.display = display;
         this.alarmValue = true;

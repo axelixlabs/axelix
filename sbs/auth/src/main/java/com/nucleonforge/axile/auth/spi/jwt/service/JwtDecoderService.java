@@ -2,6 +2,7 @@ package com.nucleonforge.axile.auth.spi.jwt.service;
 
 import com.nucleonforge.axile.auth.spi.jwt.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axile.auth.spi.jwt.exception.InvalidJwtTokenException;
+import com.nucleonforge.axile.auth.spi.jwt.exception.JwtParsingException;
 import com.nucleonforge.axile.auth.spi.jwt.exception.JwtTokenDecodingException;
 import com.nucleonforge.axile.common.auth.core.User;
 
@@ -21,7 +22,8 @@ public interface JwtDecoderService {
      * @throws ExpiredJwtTokenException if the JWT token has expired
      * @throws InvalidJwtTokenException if the JWT token is invalid or tampered with
      * @throws JwtTokenDecodingException if an unexpected error occurs during token decoding
+     * @throws JwtParsingException if the token cannot be parsed or contains insufficient data
      */
     User decodeTokenToUser(String token)
-            throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtTokenDecodingException;
+            throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtTokenDecodingException, JwtParsingException;
 }

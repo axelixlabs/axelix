@@ -19,4 +19,9 @@ public class Application {
      * Instances of the given application, e.g. K8S pods.
      */
     private Set<Instance> instances;
+
+    public Application(String name, Set<Instance> instances) {
+        this.name = name;
+        this.instances = instances;
+    }
 }

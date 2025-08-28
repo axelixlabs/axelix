@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.spring.integrations.kafka;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.kafka.common.TopicPartition;
@@ -54,20 +55,22 @@ public class KafkaConsumerIntegration extends AbstractIntegration {
     /**
      * Set of topic names that this consumer subscribes to.
      */
-    private Set<String> topics;
+    private Set<String> topics = new HashSet<>();
 
     /**
      * Set of assigned Kafka topic partitions for this consumer.
      */
-    private Set<TopicPartition> assignedPartitions;
+    private Set<TopicPartition> assignedPartitions = new HashSet<>();
 
-    public KafkaConsumerIntegration(String listenerId, String protocol, String entityType) {
+    public KafkaConsumerIntegration(
+            String listenerId,
+            String protocol,
+            String entityType,
+            String groupId,
+            ContainerProperties.AckMode ackMode) {
         super("kafka://" + listenerId, protocol, entityType);
-    }
-
-    public KafkaConsumerIntegration setGroupId(String groupId) {
         this.groupId = groupId;
-        return this;
+        this.ackMode = ackMode;
     }
 
     public KafkaConsumerIntegration setAutoStartup(boolean autoStartup) {
@@ -77,11 +80,6 @@ public class KafkaConsumerIntegration extends AbstractIntegration {
 
     public KafkaConsumerIntegration setConcurrency(int concurrency) {
         this.concurrency = concurrency;
-        return this;
-    }
-
-    public KafkaConsumerIntegration setAckMode(ContainerProperties.AckMode ackMode) {
-        this.ackMode = ackMode;
         return this;
     }
 

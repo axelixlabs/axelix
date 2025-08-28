@@ -22,6 +22,7 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
+import com.nucleonforge.axile.spring.integrations.AbstractIntegration;
 import com.nucleonforge.axile.spring.integrations.IntegrationComponentDiscoverer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,8 +32,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * that Kafka consumer endpoints annotated with {@link org.springframework.kafka.annotation.KafkaListener}
  * are correctly discovered and mapped into {@link KafkaConsumerIntegration} instances.
  *
- * @since 24.07.2025
  * @author Nikita Kirillov
+ * @since 24.07.2025
  */
 @SpringBootTest
 @EnableKafka
@@ -141,6 +142,22 @@ class KafkaConsumerIntegrationDiscovererTest {
                 .contains("first-group", "second-group", "first-group-multi-listener", "second-group-multi-listener");
     }
 
+    @Test
+    void shouldDiscoverNullGroupIdKafkaListener() {
+        Set<KafkaConsumerIntegration> integrations = discoverer.discoverIntegrations();
+
+        KafkaConsumerIntegration integration = integrations.stream()
+                .filter(i -> i.networkAddress().contains("null-groupId-listener-id"))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(integration)
+                .isNotNull()
+                .returns("Kafka TCP Binary", KafkaConsumerIntegration::protocol)
+                .returns("kafka://null-groupId-listener-id", AbstractIntegration::networkAddress)
+                .returns("null-groupId-listener-id", KafkaConsumerIntegration::getGroupId);
+    }
+
     public static class FirstTestKafkaListener {
 
         @KafkaListener(
@@ -184,6 +201,12 @@ class KafkaConsumerIntegrationDiscovererTest {
         public void listen2(String message) {}
     }
 
+    public static class NullGroupIdKafkaListener {
+
+        @KafkaListener(id = "null-groupId-listener-id", topics = "null-groupId-listener-topic-1")
+        public void listen(String message) {}
+    }
+
     /**
      * Test configuration for KafkaConsumerIntegrationDiscoverer tests.
      *
@@ -219,6 +242,11 @@ class KafkaConsumerIntegrationDiscovererTest {
         @Bean
         public MultiKafkaListener multiKafkaListener() {
             return new MultiKafkaListener();
+        }
+
+        @Bean
+        public NullGroupIdKafkaListener nullGroupIdKafkaListener() {
+            return new NullGroupIdKafkaListener();
         }
 
         @Bean

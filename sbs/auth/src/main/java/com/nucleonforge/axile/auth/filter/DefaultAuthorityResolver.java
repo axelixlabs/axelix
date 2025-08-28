@@ -35,6 +35,7 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 
+    @Override
     public Optional<Authority> resolve(String path) {
         return pathAuthoritiesMap.entrySet().stream()
                 .filter(entry -> matcher.match(entry.getKey(), path))

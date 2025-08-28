@@ -1,5 +1,7 @@
 package com.nucleonforge.axile.spring.properties;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
@@ -28,6 +30,7 @@ public class DefaultPropertySourceDescriber implements PropertySourceDescriber {
                 propertySource.getName(), origin, propertySource.getClass(), propertiesFileName);
     }
 
+    @Nullable
     private String determineFileName(PropertySourceOrigin origin, PropertySource<?> propertySource) {
         if (PropertySourceOrigin.PROPERTIES_FILE.equals(origin)
                 && propertySource instanceof ResourcePropertySource rps) {

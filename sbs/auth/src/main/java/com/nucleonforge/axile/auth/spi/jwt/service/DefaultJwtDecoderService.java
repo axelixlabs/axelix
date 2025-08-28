@@ -11,9 +11,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
+import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axile.auth.spi.jwt.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axile.auth.spi.jwt.exception.InvalidJwtTokenException;
+import com.nucleonforge.axile.auth.spi.jwt.exception.JwtParsingException;
 import com.nucleonforge.axile.auth.spi.jwt.exception.JwtTokenDecodingException;
 import com.nucleonforge.axile.auth.spi.jwt.verification.JwtVerificationStrategy;
 import com.nucleonforge.axile.auth.spi.jwt.verification.JwtVerificationStrategyFactory;
@@ -45,11 +47,13 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
 
     @Override
     public User decodeTokenToUser(String token)
-            throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtTokenDecodingException {
+            throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtTokenDecodingException, JwtParsingException {
 
         try {
             Claims claims = parseClaims(token).getPayload();
             return new DefaultUser(claims.getSubject(), extractRoles(claims));
+        } catch (JwtParsingException e) {
+            throw e;
         } catch (ExpiredJwtException e) {
             throw new ExpiredJwtTokenException("JWT token has expired", e);
         } catch (JwtException e) {
@@ -75,6 +79,10 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
     private Role mapToRole(Map<String, Object> roleMap) {
         String roleName = (String) roleMap.get(TokenClaim.ROLE_NAME.getEncoding());
 
+        if (roleName == null) {
+            throw new JwtParsingException("Role name is null in JWT token");
+        }
+
         @SuppressWarnings("unchecked")
         List<String> authoritiesList =
                 (List<String>) roleMap.getOrDefault(TokenClaim.AUTHORITIES.getEncoding(), List.of());
@@ -93,6 +101,7 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
         return new DefaultRole(roleName, authorities, componentRoles);
     }
 
+    @Nullable
     private DefaultAuthority safeAuthoritiesFromString(String name) {
         try {
             return DefaultAuthority.valueOf(name);

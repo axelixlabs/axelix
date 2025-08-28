@@ -21,4 +21,9 @@ public class ApplicationResponse {
      * Instances of the given application, e.g. K8S pods.
      */
     private Set<InstanceResponse> instances;
+
+    public ApplicationResponse(String name, Set<InstanceResponse> instances) {
+        this.name = name;
+        this.instances = instances;
+    }
 }

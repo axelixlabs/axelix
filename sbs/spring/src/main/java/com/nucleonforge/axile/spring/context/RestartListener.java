@@ -1,5 +1,8 @@
 package com.nucleonforge.axile.spring.context;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -16,8 +19,10 @@ import org.springframework.context.event.SmartApplicationListener;
  */
 public class RestartListener implements SmartApplicationListener {
 
+    @Nullable
     private ConfigurableApplicationContext context;
 
+    @Nullable
     private ApplicationSnapshotEvent snapshot;
 
     @Override
@@ -26,14 +31,14 @@ public class RestartListener implements SmartApplicationListener {
     }
 
     @Override
-    public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
+    public boolean supportsEventType(@NonNull Class<? extends ApplicationEvent> eventType) {
         return ApplicationPreparedEvent.class.isAssignableFrom(eventType)
                 || ContextRefreshedEvent.class.isAssignableFrom(eventType)
                 || ContextClosedEvent.class.isAssignableFrom(eventType);
     }
 
     @Override
-    public void onApplicationEvent(ApplicationEvent input) {
+    public void onApplicationEvent(@NonNull ApplicationEvent input) {
         if (input instanceof ApplicationPreparedEvent applicationPreparedEvent) {
             this.snapshot = new ApplicationSnapshotEvent(
                     applicationPreparedEvent.getApplicationContext(),
