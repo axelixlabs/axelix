@@ -12,6 +12,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.nucleonforge.axile.auth.spi.jwt.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axile.auth.spi.jwt.exception.InvalidJwtTokenException;
@@ -35,6 +37,8 @@ import com.nucleonforge.axile.common.auth.spi.jwt.TokenClaim;
  * @author Nikita Kirillov
  */
 public class DefaultJwtDecoderService implements JwtDecoderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultJwtDecoderService.class);
 
     private final JwtVerificationStrategy verificationStrategy;
 
@@ -106,6 +110,11 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
         try {
             return DefaultAuthority.valueOf(name);
         } catch (IllegalArgumentException ignored) {
+            logger.warn(
+                    "Authority '{}' is not recognized and cannot be parsed. "
+                            + "This may happen due to either manual interventions while creating a new token, "
+                            + "or because of incompatible starter and master usage.",
+                    name);
             return null;
         }
     }
