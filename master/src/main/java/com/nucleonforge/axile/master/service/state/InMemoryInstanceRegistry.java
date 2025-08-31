@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.jspecify.annotations.NullMarked;
 
+import org.springframework.stereotype.Component;
+
 import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
@@ -19,6 +21,7 @@ import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
  * @author Mikhail Polivakha
  */
 @NullMarked
+@Component
 public class InMemoryInstanceRegistry implements InstanceRegistry {
 
     private final ConcurrentMap<InstanceId, Instance> source;

@@ -1,3 +1,10 @@
+spring:
+  application:
+    name: axile
+  mvc:
+    servlet:
+      path: /${spring.application.name}/api
+
 axile:
   config:
     auth:

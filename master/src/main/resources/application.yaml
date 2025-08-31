@@ -3,4 +3,4 @@ spring:
     name: axile
   mvc:
     servlet:
-      path: ${spring.application.name}/api
+      path: /${spring.application.name}/api
