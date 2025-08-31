@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.common.domain.InstanceId;
+import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.transport.BeansEndpointProber;
@@ -32,7 +33,7 @@ public class BeansApi {
 
     @RequestMapping(path = ApiPaths.BeansApi.FEED)
     public BeansFeedResponse getBeansProfile(@PathVariable("instanceId") String instanceId) {
-        BeansFeed result = beansEndpointProber.invoke(InstanceId.of(instanceId));
+        BeansFeed result = beansEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(converter.convert(result));
     }
 }

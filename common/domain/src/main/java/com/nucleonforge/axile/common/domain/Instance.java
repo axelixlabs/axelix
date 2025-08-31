@@ -4,8 +4,6 @@ import java.util.Objects;
 
 import org.jspecify.annotations.NonNull;
 
-import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
-
 public class Instance {
 
     /**
@@ -64,10 +62,6 @@ public class Instance {
         return launchDetails;
     }
 
-    public String urlForEndpoint(ActuatorEndpoint endpoint) {
-        return this.actuatorUrl + endpoint.path();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -85,5 +79,9 @@ public class Instance {
     @Override
     public int hashCode() {
         return Objects.hash(id, buildInfo, loadedClasses, launchDetails);
+    }
+
+    public @NonNull String getActuatorUrl() {
+        return actuatorUrl;
     }
 }

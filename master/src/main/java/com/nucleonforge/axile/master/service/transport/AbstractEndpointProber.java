@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 
 import org.jspecify.annotations.NonNull;
 
 import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.InstanceId;
+import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
@@ -34,20 +37,14 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
     }
 
     @Override
-    public @NonNull O invoke(@NonNull InstanceId instanceId)
+    public @NonNull O invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
             throws EndpointInvocationException, InstanceNotFoundException {
-        Instance instance =
-                instanceRegistry.get(instanceId).orElseThrow(() -> new InstanceNotFoundException(instanceId));
+
         ActuatorEndpoint endpoint = supports();
-        String targetUrl = instance.urlForEndpoint(endpoint);
 
         try {
             HttpResponse<byte[]> response = httpClient.send(
-                    HttpRequest.newBuilder()
-                            .method(endpoint.httpMethod().name(), HttpRequest.BodyPublishers.noBody())
-                            .uri(URI.create(targetUrl))
-                            .build(),
-                    HttpResponse.BodyHandlers.ofByteArray());
+                    buildHttpRequest(endpoint, instanceId, httpPayload), HttpResponse.BodyHandlers.ofByteArray());
 
             int statusCode = response.statusCode();
 
@@ -61,6 +58,30 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
         } catch (IOException | InterruptedException e) {
             throw new EndpointInvocationException(e);
         }
+    }
+
+    private HttpRequest buildHttpRequest(ActuatorEndpoint endpoint, InstanceId instanceId, HttpPayload httpPayload) {
+        Instance instance =
+                instanceRegistry.get(instanceId).orElseThrow(() -> new InstanceNotFoundException(instanceId));
+
+        BodyPublisher bodyPublisher =
+                httpPayload.hasBody() ? BodyPublishers.ofByteArray(httpPayload.requestBody()) : BodyPublishers.noBody();
+
+        HttpRequest.Builder builder =
+                HttpRequest.newBuilder().method(endpoint.httpMethod().name(), bodyPublisher);
+
+        if (httpPayload.hasHeaders()) {
+            for (var header : httpPayload.headers()) {
+                builder.header(header.name(), header.valueAsString());
+            }
+        }
+
+        return builder.uri(buildUrl(endpoint, httpPayload, instance)).build();
+    }
+
+    private static URI buildUrl(ActuatorEndpoint endpoint, HttpPayload httpPayload, Instance instance) {
+        return URI.create(instance.getActuatorUrl()
+                + endpoint.path().expand(httpPayload.pathVariableValues(), httpPayload.queryParameters()));
     }
 
     private static String unexpectedStatusCode(InstanceId instanceId, ActuatorEndpoint endpoint, int statusCode) {

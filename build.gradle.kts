@@ -63,6 +63,7 @@ subprojects {
             removeUnusedImports()
             removeWildcardImports()
             trimTrailingWhitespace()
+            toggleOffOn()
         }
     }
 
