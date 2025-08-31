@@ -14,7 +14,7 @@ public interface PropertyDiscoverer {
      * Actual discovery method
      *
      * @param propertyName the name of the property to be discovered
-     * @return discovered {@link Property}, or {@code null} if no property with the given name exists
+     * @return discovered {@link Property}, or {@code null} if no property with the given name is not found
      */
     @Nullable
     Property discover(String propertyName);
