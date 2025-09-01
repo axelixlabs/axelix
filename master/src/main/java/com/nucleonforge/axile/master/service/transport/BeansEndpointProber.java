@@ -15,7 +15,6 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
  *
  * @author Mikhail Polivakha
  */
-// TODO: tests for the Prober.
 @Service
 public class BeansEndpointProber extends AbstractEndpointProber<BeansFeed> {
 

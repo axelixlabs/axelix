@@ -21,7 +21,7 @@ public class JacksonMessageSerializationStrategy implements MessageSerialization
     }
 
     @Override
-    public @NonNull byte[] serialize(@NonNull Object object) throws SerializationException {
+    public byte @NonNull [] serialize(@NonNull Object object) throws SerializationException {
         try {
             return objectMapper.writeValueAsBytes(object);
         } catch (JsonProcessingException e) {

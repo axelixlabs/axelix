@@ -18,7 +18,6 @@ import com.nucleonforge.axile.master.service.transport.BeansEndpointProber;
  *
  * @author Mikhail Polivakha
  */
-// TODO: tests for the API layer
 @RestController
 @RequestMapping(path = ApiPaths.BeansApi.MAIN)
 public class BeansApi {
