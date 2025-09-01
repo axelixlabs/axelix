@@ -62,6 +62,9 @@ class DefaultJwtDecoderServiceTest {
     @Value("${test-tokens.token-signed-with-wrong-key}")
     private String tokenSignedWithWrongKey;
 
+    @Value("${test-tokens.token-user-with-unrecognized-authorities}")
+    private String tokenUserWithUnrecognizedAuthorities;
+
     @Test
     void shouldDecodeValidJwtToken() {
         User decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithTwoRole);
@@ -141,6 +144,15 @@ class DefaultJwtDecoderServiceTest {
         User decodedUser = decoder384.decodeTokenToUser(tokenWithHs384Algorithm);
 
         assertThat(decodedUser).usingRecursiveComparison().isEqualTo(expectedUser);
+    }
+
+    @Test
+    void shouldOmitInvalidAuthority() {
+        User decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithUnrecognizedAuthorities);
+
+        assertThat(decodedUser.roles())
+                .first()
+                .satisfies(role -> assertThat(role.authorities()).hasSize(1).containsOnly(DefaultAuthority.ENV));
     }
 
     @Test
