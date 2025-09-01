@@ -32,43 +32,43 @@ class BeansFeedConverterTest {
             assertThat(beanShortProfiles).hasSize(3);
 
             BeanShortProfile bean1 = getBeanByName(beansFeedResponse, "bean1");
-            assertThat(bean1).extracting(BeanShortProfile::getBeanName).isEqualTo("bean1");
-            assertThat(bean1).extracting(BeanShortProfile::getClassName).isEqualTo("java.lang.String");
-            assertThat(bean1).extracting(BeanShortProfile::getScope).isEqualTo("singleton");
+            assertThat(bean1).extracting(BeanShortProfile::beanName).isEqualTo("bean1");
+            assertThat(bean1).extracting(BeanShortProfile::className).isEqualTo("java.lang.String");
+            assertThat(bean1).extracting(BeanShortProfile::scope).isEqualTo("singleton");
             assertThat(bean1)
-                    .extracting(BeanShortProfile::getAliases, InstanceOfAssertFactories.COLLECTION)
+                    .extracting(BeanShortProfile::aliases, InstanceOfAssertFactories.COLLECTION)
                     .hasSize(0);
             assertThat(bean1)
-                    .extracting(BeanShortProfile::getDependencies, InstanceOfAssertFactories.COLLECTION)
+                    .extracting(BeanShortProfile::dependencies, InstanceOfAssertFactories.COLLECTION)
                     .hasSize(0);
 
             BeanShortProfile bean2 = getBeanByName(beansFeedResponse, "bean2");
-            assertThat(bean2).extracting(BeanShortProfile::getBeanName).isEqualTo("bean2");
-            assertThat(bean2).extracting(BeanShortProfile::getClassName).isEqualTo("java.lang.Integer");
-            assertThat(bean2).extracting(BeanShortProfile::getScope).isEqualTo("session");
+            assertThat(bean2).extracting(BeanShortProfile::beanName).isEqualTo("bean2");
+            assertThat(bean2).extracting(BeanShortProfile::className).isEqualTo("java.lang.Integer");
+            assertThat(bean2).extracting(BeanShortProfile::scope).isEqualTo("session");
             assertThat(bean2)
-                    .extracting(BeanShortProfile::getAliases, InstanceOfAssertFactories.COLLECTION)
+                    .extracting(BeanShortProfile::aliases, InstanceOfAssertFactories.COLLECTION)
                     .hasSize(0);
             assertThat(bean2)
-                    .extracting(BeanShortProfile::getDependencies, InstanceOfAssertFactories.COLLECTION)
+                    .extracting(BeanShortProfile::dependencies, InstanceOfAssertFactories.COLLECTION)
                     .containsOnly("dep1", "dep2");
 
             BeanShortProfile bean3 = getBeanByName(beansFeedResponse, "bean3");
-            assertThat(bean3).extracting(BeanShortProfile::getBeanName).isEqualTo("bean3");
-            assertThat(bean3).extracting(BeanShortProfile::getClassName).isEqualTo("java.util.Date");
-            assertThat(bean3).extracting(BeanShortProfile::getScope).isEqualTo("prototype");
+            assertThat(bean3).extracting(BeanShortProfile::beanName).isEqualTo("bean3");
+            assertThat(bean3).extracting(BeanShortProfile::className).isEqualTo("java.util.Date");
+            assertThat(bean3).extracting(BeanShortProfile::scope).isEqualTo("prototype");
             assertThat(bean3)
-                    .extracting(BeanShortProfile::getAliases, InstanceOfAssertFactories.COLLECTION)
+                    .extracting(BeanShortProfile::aliases, InstanceOfAssertFactories.COLLECTION)
                     .containsOnly("abc", "bcd");
             assertThat(bean3)
-                    .extracting(BeanShortProfile::getDependencies, InstanceOfAssertFactories.COLLECTION)
+                    .extracting(BeanShortProfile::dependencies, InstanceOfAssertFactories.COLLECTION)
                     .hasSize(0);
         });
     }
 
     private static BeanShortProfile getBeanByName(BeansFeedResponse beansFeedResponse, String beanName) {
         return beansFeedResponse.getBeans().stream()
-                .filter(profile -> profile.getBeanName().equals(beanName))
+                .filter(profile -> profile.beanName().equals(beanName))
                 .findFirst()
                 .get();
     }

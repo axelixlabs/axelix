@@ -16,6 +16,5 @@ public interface MessageSerializationStrategy {
      * @throws SerializationException in case the error happened during serialization.
      * @return the serialized version of an object.
      */
-    @NonNull
-    byte[] serialize(@NonNull Object object) throws SerializationException;
+    byte @NonNull [] serialize(@NonNull Object object) throws SerializationException;
 }

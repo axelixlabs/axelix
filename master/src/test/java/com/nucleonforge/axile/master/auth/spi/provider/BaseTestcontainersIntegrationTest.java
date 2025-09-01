@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
-import com.nucleonforge.axile.master.auth.Main;
+import com.nucleonforge.axile.master.Main;
 
 /**
  * Base abstract class for integration tests using Testcontainers with a PostgreSQL database.
