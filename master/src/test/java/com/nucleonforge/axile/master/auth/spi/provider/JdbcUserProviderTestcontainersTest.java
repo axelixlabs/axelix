@@ -18,11 +18,8 @@ import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Integration tests for {@link JdbcUserProvider} using Testcontainers with PostgreSQL.
@@ -39,82 +36,89 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
 
     @Test
     void shouldLoadAdminUserWithRolesAndAuthorities() {
-        User user = userProvider.load("adminUser");
-        assertNotNull(user);
-        assertEquals("adminUser", user.username());
+        String adminUser = "adminUser";
+        User user = userProvider.load(adminUser);
+        assertThat(user.username()).isNotNull().isEqualTo(adminUser);
+        assertThat(user.roles()).hasSize(1);
 
-        assertEquals(1, user.roles().size());
-        Role adminRole = user.roles().iterator().next();
-        assertEquals("ROLE_ADMIN", adminRole.name());
-        assertEquals(Set.of(DefaultAuthority.PROFILE_MANAGEMENT), adminRole.authorities());
+        assertThat(user.roles())
+                .filteredOn(role -> role.name().equals("ROLE_ADMIN"))
+                .hasSize(1)
+                .first()
+                .satisfies(role ->
+                        assertThat(role.authorities()).hasSize(1).containsOnly(DefaultAuthority.PROFILE_MANAGEMENT));
 
         // ROLE_ADMIN -> ROLE_ENGINEER, ROLE_CACHE_DISPATCHER
+        Role adminRole = user.roles().iterator().next();
         Set<Role> adminComponents = adminRole.components();
-        assertEquals(2, adminComponents.size());
 
+        String roleEngineer = "ROLE_ENGINEER";
+        String roleCacheDispatcher = "ROLE_CACHE_DISPATCHER";
+
+        assertThat(adminComponents).hasSize(2).extracting(Role::name).containsOnly(roleEngineer, roleCacheDispatcher);
+
+        // ROLE_ADMIN -> ROLE_ENGINEER
         Role engineerRole = adminComponents.stream()
-                .filter(r -> r.name().equals("ROLE_ENGINEER"))
+                .filter(role -> role.name().equals(roleEngineer))
                 .findFirst()
                 .orElseThrow();
-        assertEquals(Set.of(DefaultAuthority.ENV), engineerRole.authorities());
 
-        Role cacheDispatcherRole = adminComponents.stream()
-                .filter(r -> r.name().equals("ROLE_CACHE_DISPATCHER"))
-                .findFirst()
-                .orElseThrow();
-        assertEquals(Set.of(DefaultAuthority.CACHE_DISPATCHER), cacheDispatcherRole.authorities());
+        assertThat(engineerRole.authorities()).hasSize(1).containsOnly(DefaultAuthority.ENV);
 
         // ROLE_ADMIN -> ROLE_ENGINEER -> ROLE_USER
-        Set<Role> engineerComponents = engineerRole.components();
-        assertEquals(1, engineerComponents.size());
+        assertThat(engineerRole.components())
+                .filteredOn(role -> role.name().equals("ROLE_USER"))
+                .hasSize(1)
+                .first()
+                .satisfies(role -> assertThat(role.authorities()).hasSize(1).containsOnly(DefaultAuthority.INFO))
+                .satisfies(role -> assertThat(role.components()).isEmpty());
 
-        Role userRole = engineerComponents.iterator().next();
-        assertEquals("ROLE_USER", userRole.name());
-        assertEquals(Set.of(DefaultAuthority.INFO), userRole.authorities());
-        assertTrue(userRole.components().isEmpty());
+        // ROLE_ADMIN -> ROLE_CACHE_DISPATCHER
+        Role cacheDispatcherRole = adminComponents.stream()
+                .filter(role -> role.name().equals(roleCacheDispatcher))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(cacheDispatcherRole.authorities()).hasSize(1).containsOnly(DefaultAuthority.CACHE_DISPATCHER);
 
         // ROLE_ADMIN -> ROLE_CACHE_DISPATCHER -> ROLE_CACHE_ACCESS
-        Set<Role> cacheDispatcherComponents = cacheDispatcherRole.components();
-        assertEquals(1, cacheDispatcherComponents.size());
-
-        Role cacheAccessRole = cacheDispatcherComponents.iterator().next();
-        assertEquals("ROLE_CACHE_ACCESS", cacheAccessRole.name());
-        assertEquals(Set.of(DefaultAuthority.CACHES), cacheAccessRole.authorities());
-        assertTrue(cacheAccessRole.components().isEmpty());
+        assertThat(cacheDispatcherRole.components())
+                .filteredOn(role -> role.name().equals("ROLE_CACHE_ACCESS"))
+                .hasSize(1)
+                .first()
+                .satisfies(role -> assertThat(role.authorities()).hasSize(1).containsOnly(DefaultAuthority.CACHES))
+                .satisfies(role -> assertThat(role.components()).isEmpty());
     }
 
     @Test
     void shouldLoadBasicUserWithRolesAndAuthorities() {
-        User user = userProvider.load("basicUser");
+        String basicUser = "basicUser";
+        User user = userProvider.load(basicUser);
 
-        assertNotNull(user);
-        assertEquals("basicUser", user.username());
-        assertEquals(1, user.roles().size());
-
-        Role role = user.roles().iterator().next();
-        assertEquals(1, role.authorities().size());
-        assertTrue(role.authorities().stream().anyMatch(a -> a.getName().equals("BEANS")));
-        assertFalse(role.authorities().stream().anyMatch(a -> a.getName().equals("ENV")));
+        assertThat(user.username()).isNotNull().isEqualTo(basicUser);
+        assertThat(user.roles())
+                .hasSize(1)
+                .filteredOn(role -> role.name().equals("ROLE_BEANS_ACCESS"))
+                .first()
+                .satisfies(role -> assertThat(role.authorities()).containsOnly(DefaultAuthority.BEANS));
     }
 
     @Test
     void shouldLoadUserWithNonexistentAuthoritiesOnly() {
-        User user = userProvider.load("nonexistentAuthorityUser");
-        assertNotNull(user);
-        assertEquals("nonexistentAuthorityUser", user.username());
-        assertEquals(1, user.roles().size());
+        String nonexistentAuthorityUser = "nonexistentAuthorityUser";
+        User user = userProvider.load(nonexistentAuthorityUser);
 
-        Role role = user.roles().iterator().next();
-        assertEquals("ROLE_WITH_NONEXISTENT_AUTHORITY", role.name());
-        assertTrue(role.authorities().isEmpty());
+        assertThat(user.username()).isNotNull().isEqualTo(nonexistentAuthorityUser);
+        assertThat(user.roles())
+                .hasSize(1)
+                .filteredOn(role -> role.name().equals("ROLE_WITH_NONEXISTENT_AUTHORITY"))
+                .first()
+                .satisfies(role -> assertThat(role.authorities()).isEmpty());
     }
 
     @Test
     void shouldThrowUserNotFoundExceptionWhenUserNotExists() {
-        assertThrows(
-                UserNotFoundException.class,
-                () -> userProvider.load("nonexistent"),
-                "User not found: " + "nonexistent");
+        assertThatThrownBy(() -> userProvider.load("nonexistent")).isInstanceOf(UserNotFoundException.class);
     }
 
     /**

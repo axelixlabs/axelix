@@ -1,7 +1,6 @@
 package com.nucleonforge.axile.master.service;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -23,11 +22,9 @@ import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredExceptio
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.service.state.InMemoryInstanceRegistry;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * Unit tests for {@link InMemoryInstanceRegistry}.
@@ -41,52 +38,47 @@ class InMemoryInstanceRegistryTest {
 
     @Test
     void shouldRegisterAndRetrieveInstance() {
-        Instance instance = createInstance("id-1");
-
+        String id = "id-1";
+        Instance instance = createInstance(id);
         registry.register(instance);
 
-        Optional<Instance> optionalInstance = registry.get(InstanceId.of("id-1"));
-        assertTrue(optionalInstance.isPresent());
-        assertEquals(optionalInstance.get(), instance);
+        assertThat(registry.get(InstanceId.of(id))).isPresent().contains(instance);
     }
 
     @Test
     void shouldThrowWhenRegisteringInstanceWithDuplicate() {
         Instance instance = createInstance("id-2");
-
         registry.register(instance);
 
-        assertThrows(InstanceAlreadyRegisteredException.class, () -> {
-            registry.register(instance);
-        });
+        assertThatExceptionOfType(InstanceAlreadyRegisteredException.class)
+                .isThrownBy(() -> registry.register(instance));
     }
 
     @Test
     void shouldDeregisterInstance() {
-        Instance instance = createInstance("id-3");
+        String id = "id-3";
+        Instance instance = createInstance(id);
 
-        assertDoesNotThrow(() -> registry.register(instance));
+        assertThatCode(() -> registry.register(instance)).doesNotThrowAnyException();
+        assertThat(registry.get(InstanceId.of(id))).isPresent();
 
-        Optional<Instance> optionalInstance = registry.get(InstanceId.of("id-3"));
-        assertTrue(optionalInstance.isPresent());
+        registry.deRegister(InstanceId.of(id));
 
-        registry.deRegister(InstanceId.of("id-3"));
-
-        Optional<Instance> result = registry.get(InstanceId.of("id-3"));
-        assertFalse(result.isPresent());
+        assertThat(registry.get(InstanceId.of(id))).isNotPresent();
     }
 
     @Test
     void shouldThrowWhenDeregisterInstanceDoesNotExist() {
-        Instance instance = createInstance("id-4");
-
+        String id = "id-4";
+        Instance instance = createInstance(id);
         registry.register(instance);
 
-        Optional<Instance> optionalInstance = registry.get(InstanceId.of("id-4"));
-        assertTrue(optionalInstance.isPresent());
+        assertThat(registry.get(InstanceId.of(id))).isPresent();
 
-        registry.deRegister(InstanceId.of("id-4"));
-        assertThrows(InstanceNotFoundException.class, () -> registry.deRegister(InstanceId.of("id-4")));
+        registry.deRegister(InstanceId.of(id));
+
+        assertThatExceptionOfType(InstanceNotFoundException.class)
+                .isThrownBy(() -> registry.deRegister(InstanceId.of(id)));
     }
 
     @Test
@@ -97,20 +89,18 @@ class InMemoryInstanceRegistryTest {
         registry.register(instance1);
         registry.register(instance2);
 
-        Set<Instance> instances = registry.getAll();
-
-        assertTrue(instances.contains(instance1));
-        assertTrue(instances.contains(instance2));
+        assertThat(registry.getAll()).containsOnly(instance1, instance2);
     }
 
     @Test
     void shouldThrowIfInstanceToDeregisterNotFound() {
-        assertThrows(InstanceNotFoundException.class, () -> registry.deRegister(InstanceId.of("not-existing")));
+        assertThatExceptionOfType(InstanceNotFoundException.class)
+                .isThrownBy(() -> registry.deRegister(InstanceId.of("not-existing")));
     }
 
     @Test
     void shouldThrowIfInstanceToDeregisterNotFound1() {
-        assertFalse(registry.get(InstanceId.of("not-existing")).isPresent());
+        assertThat(registry.get(InstanceId.of("not-existing"))).isEmpty();
     }
 
     private Instance createInstance(String id) {
