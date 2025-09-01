@@ -31,6 +31,11 @@ public class DefaultPropertyDiscoverer implements PropertyDiscoverer {
             if (propertySource.containsProperty(propertyName)) {
                 if (property == null) {
                     property = new Property(propertyName);
+
+                    // TODO:
+                    //  Is this correct? I mean, if the given property source contains the
+                    //  property, it does not mean that this property source is a 'provider source',
+                    //  see javadoc of Property
                     property.setProviderSource(propertySource);
 
                     Object value = propertySource.getProperty(propertyName);
