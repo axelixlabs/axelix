@@ -31,7 +31,8 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
             Map.entry("/actuator/heapdump", DefaultAuthority.HEAP_DUMP),
             Map.entry("/actuator/threaddump", DefaultAuthority.THREAD_DUMP),
             Map.entry("/actuator/metrics/**", DefaultAuthority.METRICS),
-            Map.entry("/actuator/mappings", DefaultAuthority.MAPPINGS));
+            Map.entry("/actuator/mappings", DefaultAuthority.MAPPINGS),
+            Map.entry("/actuator/spel-eval", DefaultAuthority.SPEL_EVAL));
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 

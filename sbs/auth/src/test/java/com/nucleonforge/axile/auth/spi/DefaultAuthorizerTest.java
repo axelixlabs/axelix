@@ -84,6 +84,16 @@ class DefaultAuthorizerTest {
     }
 
     @Test
+    void shouldAuthorize_UserWithSpelEvalAuthority() {
+        Role role = new DefaultRole("testRole", Set.of(DefaultAuthority.SPEL_EVAL), Collections.emptySet());
+        User user = new DefaultUser("testUser", Set.of(role));
+
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.SPEL_EVAL));
+
+        assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
+    }
+
+    @Test
     void shouldThrowAuthorizationException_UserWithoutRequiredAuthorities() {
         Role role = new DefaultRole("testRole", Set.of(DefaultAuthority.BEANS), Set.of());
         User user = new DefaultUser("testUser", Set.of(role));
