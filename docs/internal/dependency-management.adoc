@@ -1,0 +1,55 @@
+= Dependency management Structure
+
+== Overview
+
+This document describes the Gradle plugin structure used in the project,
+with a focus on centralized dependency management. The goal is to keep
+dependency versions consistent across all modules, avoid "jar hell",
+and ensure stable artifacts.
+
+== Plugins Diagram
+[plantuml]
+----
+@startuml
+skinparam style strict
+component [shared.gradle.kts]
+component [sbs.gradle.kts]
+component [common.gradle.kts]
+component ["master (build.gradle.kts)"]
+
+rectangle "common modules" as commonModules
+rectangle "sbs modules" as sbsModules
+
+[shared.gradle.kts] <-- [common.gradle.kts]  : plugins {id("shared")}
+[shared.gradle.kts] <-- [sbs.gradle.kts] : plugins {id("shared")}
+[shared.gradle.kts] <-- ["master (build.gradle.kts)"]  : plugins {id("shared")}
+
+[common.gradle.kts] <-- commonModules : plugins {id("common")}
+[sbs.gradle.kts] <-- sbsModules : plugins {id("sbs")}
+@enduml
+----
+== Plugins
+
+=== shared.gradle.kts
+* Applied in all modules (`common`, `sbs`, and `master`).
+* Defines dependency management for:
+** Spring Boot BOM (`org.springframework.boot:spring-boot-dependencies`)
+** Spring Cloud BOM (`org.springframework.cloud:spring-cloud-dependencies`)
+** Other shared libraries (e.g., JSpecify).
+* Guarantees consistent and compatible versions across all the components.
+
+=== common.gradle.kts
+* Applied in all `common` modules.
+* Extends the `shared` plugin.
+* Contains configurations specific to common modules.
+
+=== sbs.gradle.kts
+* Applied in Spring Boot Starter (`sbs`) modules.
+* Extends the `shared` plugin.
+* Adds additional dependencies required for starter modules.
+
+=== master (build.gradle.kts)
+* Belongs to the root `master` module (not split into submodules).
+* Also applies the `shared.gradle.kts` plugin to ensure consistent dependency management.
+
+
