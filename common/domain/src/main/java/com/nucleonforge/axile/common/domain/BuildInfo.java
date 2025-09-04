@@ -21,4 +21,12 @@ public class BuildInfo {
         this.commitInfo = commitInfo;
         this.classPath = classPath;
     }
+
+    public CommitInfo getCommitInfo() {
+        return commitInfo;
+    }
+
+    public ClassPath getClassPath() {
+        return classPath;
+    }
 }

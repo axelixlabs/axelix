@@ -13,20 +13,8 @@ import org.jspecify.annotations.Nullable;
  */
 public class JarClassPathEntry implements ClassPathEntry {
 
-    /**
-     * Group ID of the dependency
-     */
-    private String groupId;
-
-    /**
-     * Artifact ID of the dependency
-     */
-    private String artifactId;
-
-    /**
-     * Version of the dependency
-     */
-    private String version;
+    @NonNull
+    private final GavCoordinates gavCoordinates;
 
     /**
      * In case this dependency is transitive, the link to dependency that brought
@@ -51,10 +39,38 @@ public class JarClassPathEntry implements ClassPathEntry {
             String version,
             @Nullable JarClassPathEntry broughtBy,
             @NonNull Set<JarClassPathEntry> dependsOn) {
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
+        this.gavCoordinates = new GavCoordinates(groupId, artifactId, version);
         this.broughtBy = broughtBy;
         this.dependsOn = dependsOn;
+    }
+
+    public String getGroupId() {
+        return gavCoordinates.groupId();
+    }
+
+    public String getArtifactId() {
+        return gavCoordinates.artifactId();
+    }
+
+    public String getVersion() {
+        return gavCoordinates.version();
+    }
+
+    public @Nullable JarClassPathEntry getBroughtBy() {
+        return broughtBy;
+    }
+
+    public JarClassPathEntry setBroughtBy(@Nullable JarClassPathEntry broughtBy) {
+        this.broughtBy = broughtBy;
+        return this;
+    }
+
+    public @NonNull Set<JarClassPathEntry> getDependsOn() {
+        return dependsOn;
+    }
+
+    public JarClassPathEntry setDependsOn(@NonNull Set<JarClassPathEntry> dependsOn) {
+        this.dependsOn = dependsOn;
+        return this;
     }
 }
