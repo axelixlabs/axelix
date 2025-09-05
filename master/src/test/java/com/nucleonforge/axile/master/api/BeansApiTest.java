@@ -1,9 +1,13 @@
 package com.nucleonforge.axile.master.api;
 
 import java.io.IOException;
+import java.util.UUID;
 
+import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +27,7 @@ import com.nucleonforge.axile.master.Main;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
+import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -81,6 +86,8 @@ class BeansApiTest {
               ]
             }
             """;
+
+    private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
 
@@ -141,20 +148,30 @@ class BeansApiTest {
             }
             """;
 
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(jsonResponse)
-                .addHeader("Content-Type", "application/vnd.spring-boot.actuator.v3+json"));
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String path = request.getPath();
+                assert path != null;
+
+                if (path.equals("/" + activeInstanceId + "/beans")) {
+                    return new MockResponse()
+                            .setBody(jsonResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else {
+                    return new MockResponse().setResponseCode(404);
+                }
+            }
+        });
     }
 
     @Test
     void shouldReturnJSONBeansFeed() {
-        String instanceId = "test-instance-id";
-
-        registry.register(
-                createInstanceWithUrl(instanceId, mockWebServer.url("/").toString()));
+        registry.register(createInstanceWithUrl(
+                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/axile/api/beans/feed/{instanceId}", String.class, instanceId);
+                restTemplate.getForEntity("/axile/api/beans/feed/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
