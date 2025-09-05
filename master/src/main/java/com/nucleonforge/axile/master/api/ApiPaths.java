@@ -27,8 +27,32 @@ public final class ApiPaths {
 
     public static final class BeansApi {
 
+        /**
+         * Base path for all beans APIs.
+         */
         public static final String MAIN = "/beans";
 
+        /**
+         * The Beans Feed used in the single instance
+         */
         public static final String FEED = "/feed/{instanceId}";
+    }
+
+    public static final class SoftwareApi {
+
+        /**
+         * Base path for all software APIs.
+         */
+        public static final String MAIN = "/software";
+
+        /**
+         * Core software components used in the entire deployment.
+         */
+        public static final String CORE_SUMMARY = "/core/summary";
+
+        /**
+         * Core software components used in the application.
+         */
+        public static final String CORE = "/core/{instanceId}";
     }
 }

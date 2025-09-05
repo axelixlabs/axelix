@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.common.domain;
 
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Set;
  * @since 19.07.2025
  * @author Mikhail Polivakha
  */
-public class ClassPath {
+public class ClassPath implements Iterable<ClassPathEntry> {
 
     private final Set<ClassPathEntry> classPathEntries;
 
@@ -19,5 +20,14 @@ public class ClassPath {
     public ClassPath addClassPathEntry(ClassPathEntry classPathEntry) {
         this.classPathEntries.add(classPathEntry);
         return this;
+    }
+
+    public Set<ClassPathEntry> getClassPathEntries() {
+        return classPathEntries;
+    }
+
+    @Override
+    public Iterator<ClassPathEntry> iterator() {
+        return classPathEntries.iterator();
     }
 }
