@@ -21,6 +21,7 @@
     </rule>
 
     <rule ref="category/java/codestyle.xml/ClassNamingConventions"/>
+    <rule ref="category/java/codestyle.xml/PackageCase"/>
 
     <rule ref="category/java/codestyle.xml/MethodNamingConventions">
         <properties>
