@@ -183,7 +183,7 @@ public class InfoEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/info")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/info")) {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

@@ -1,5 +1,8 @@
+import net.ltgt.gradle.errorprone.errorprone
+
 plugins {
     id("shared")
+    id("org.graalvm.buildtools.native") version "0.11.0"
     id("org.springframework.boot") version Dependencies.springBootVersion
 }
 
@@ -36,6 +39,43 @@ dependencies {
     testImplementation("org.instancio:instancio-core:${instancioVersion}")
 }
 
+tasks.named("nativeCompile") {
+    dependsOn("processAot")
+}
+
+// Disable PMD checks for AOT and native-image related tasks
+tasks.withType<Pmd>().configureEach {
+    if (name.contains("aot", ignoreCase = true) ||
+        name.contains("native", ignoreCase = true)) {
+        println("Disabling PMD for task: $name")
+        enabled = false
+    }
+}
+
+// Disable ErrorProne (NullAway) for AOT and native-image related tasks
+tasks.withType<JavaCompile>().configureEach {
+    if (name.contains("aot", ignoreCase = true) ||
+        name.contains("native", ignoreCase = true)) {
+
+        println("Disabling ErrorProne for task: $name")
+        options.errorprone.isEnabled = false
+    }
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            mainClass.set("com.nucleonforge.axile.master.ApplicationEntrypoint")
+            imageName.set("master")                                         // Output binary name
+            sharedLibrary.set(false)                                        // Build executable (not shared library)
+            verbose.set(true)                                               // Print detailed build logs
+            fallback.set(false)                                             // Disable fallback mode
+            buildArgs.add("--enable-http")
+            buildArgs.add("--enable-https")
+        }
+    }
+}
+
 configurations.all {
     exclude(group = "org.apache.logging.log4j", module = "log4j-api")
     exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
@@ -43,7 +83,14 @@ configurations.all {
 
 // We do not want to generate a regular JAR produced by the "jar" task, Spring Boot plugin will generate what we need
 tasks.jar {
-    enabled = false
+    enabled = project.findProperty("enableJar") == "true"
+}
+
+// Enable JAR only for native-image builds
+gradle.taskGraph.whenReady {
+    if (allTasks.any { it.name == "nativeCompile" }) {
+        tasks.jar.get().enabled = true
+    }
 }
 
 tasks.bootJar {

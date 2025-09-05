@@ -10,9 +10,13 @@ import java.util.Set;
  */
 public class JvmProperties {
 
-    private Set<JvmProperty> jvmProperties;
+    private final Set<JvmProperty> jvmProperties;
 
     public JvmProperties(Set<JvmProperty> jvmProperties) {
         this.jvmProperties = jvmProperties;
+    }
+
+    public Set<JvmProperty> getJvmProperties() {
+        return jvmProperties;
     }
 }

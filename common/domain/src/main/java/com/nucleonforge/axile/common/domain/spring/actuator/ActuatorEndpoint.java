@@ -13,8 +13,10 @@ import com.nucleonforge.axile.common.domain.http.HttpUrl;
  */
 public record ActuatorEndpoint(HttpUrl path, HttpMethod httpMethod) {
 
+    private static final String ACTUATOR_PREFIX = "/actuator";
+
     public static ActuatorEndpoint of(String path, HttpMethod httpMethod) {
-        HttpUrl httpUrl = new HttpUrl(path);
+        HttpUrl httpUrl = new HttpUrl(ACTUATOR_PREFIX + path);
         return new ActuatorEndpoint(httpUrl, httpMethod);
     }
 }

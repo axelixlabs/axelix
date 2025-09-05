@@ -99,7 +99,7 @@ class EnvironmentPropertyEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/env/java.vendor")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/env/java.vendor")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

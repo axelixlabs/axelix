@@ -20,7 +20,7 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
     public @NonNull BeansFeedResponse convertInternal(@NonNull BeansFeed source) {
 
         BeansFeed.Context context =
-                source.getContexts().values().stream().findFirst().orElse(null);
+                source.contexts().values().stream().findFirst().orElse(null);
 
         BeansFeedResponse beansFeedResponse = new BeansFeedResponse();
 
@@ -28,9 +28,9 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
             return beansFeedResponse;
         }
 
-        context.getBeans().forEach((beanName, bean) -> {
-            BeanShortProfile profile = new BeanShortProfile(
-                    beanName, bean.getScope(), bean.getType(), bean.getAliases(), bean.getDependencies());
+        context.beans().forEach((beanName, bean) -> {
+            BeanShortProfile profile =
+                    new BeanShortProfile(beanName, bean.scope(), bean.type(), bean.aliases(), bean.dependencies());
 
             beansFeedResponse.addBean(profile);
         });

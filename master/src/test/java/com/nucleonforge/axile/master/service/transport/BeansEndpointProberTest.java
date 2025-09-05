@@ -103,7 +103,7 @@ class BeansEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/beans")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/beans")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -122,30 +122,29 @@ class BeansEndpointProberTest {
         BeansFeed feed = beansEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
         assertThat(feed).isNotNull();
-        assertThat(feed.getContexts()).containsKey("application");
+        assertThat(feed.contexts()).containsKey("application");
 
-        BeansFeed.Context ctx = feed.getContexts().get("application");
-        Map<String, BeansFeed.Bean> beans = ctx.getBeans();
+        BeansFeed.Context ctx = feed.contexts().get("application");
+        Map<String, BeansFeed.Bean> beans = ctx.beans();
         assertThat(beans).hasSize(3);
 
         BeansFeed.Bean jmxEndpoint = beans.get("jmxEndpointProperties");
-        assertThat(jmxEndpoint.getScope()).isEqualTo("singleton");
-        assertThat(jmxEndpoint.getType()).isEqualTo("JmxEndpointProperties");
-        assertThat(jmxEndpoint.getAliases()).isEmpty();
-        assertThat(jmxEndpoint.getDependencies()).isEmpty();
+        assertThat(jmxEndpoint.scope()).isEqualTo("singleton");
+        assertThat(jmxEndpoint.type()).isEqualTo("JmxEndpointProperties");
+        assertThat(jmxEndpoint.aliases()).isEmpty();
+        assertThat(jmxEndpoint.dependencies()).isEmpty();
 
         BeansFeed.Bean jacksonBuilder = beans.get("jacksonObjectMapperBuilder");
-        assertThat(jacksonBuilder.getScope()).isEqualTo("prototype");
-        assertThat(jacksonBuilder.getType()).isEqualTo("Jackson2ObjectMapperBuilder");
-        assertThat(jacksonBuilder.getAliases()).isEmpty();
-        assertThat(jacksonBuilder.getDependencies())
-                .containsExactlyInAnyOrder("JacksonObjectMapperBuilderConfiguration");
+        assertThat(jacksonBuilder.scope()).isEqualTo("prototype");
+        assertThat(jacksonBuilder.type()).isEqualTo("Jackson2ObjectMapperBuilder");
+        assertThat(jacksonBuilder.aliases()).isEmpty();
+        assertThat(jacksonBuilder.dependencies()).containsExactlyInAnyOrder("JacksonObjectMapperBuilderConfiguration");
 
         BeansFeed.Bean testSessionBean = beans.get("testSessionBean");
-        assertThat(testSessionBean.getScope()).isEqualTo("session");
-        assertThat(testSessionBean.getType()).isEqualTo("TestSessionBean");
-        assertThat(testSessionBean.getAliases()).containsExactly("sessionBeanForProberTest");
-        assertThat(testSessionBean.getDependencies()).isEmpty();
+        assertThat(testSessionBean.scope()).isEqualTo("session");
+        assertThat(testSessionBean.type()).isEqualTo("TestSessionBean");
+        assertThat(testSessionBean.aliases()).containsExactly("sessionBeanForProberTest");
+        assertThat(testSessionBean.dependencies()).isEmpty();
     }
 
     @Test

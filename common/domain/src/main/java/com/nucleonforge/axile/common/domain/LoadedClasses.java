@@ -9,9 +9,13 @@ import java.util.Set;
  */
 public class LoadedClasses {
 
-    private Set<LoadedClass> loadedClass;
+    private final Set<LoadedClass> loadedClass;
 
     public LoadedClasses(Set<LoadedClass> loadedClass) {
         this.loadedClass = loadedClass;
+    }
+
+    public Set<LoadedClass> getLoadedClass() {
+        return loadedClass;
     }
 }
