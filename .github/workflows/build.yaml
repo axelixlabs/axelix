@@ -1,4 +1,4 @@
-name: Build and Format Check
+name: Build
 
 on:
   push:
@@ -26,9 +26,6 @@ jobs:
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x gradlew
-
-      - name: Run Spotless check
-        run: ./gradlew spotlessCheck
 
       - name: Build with Gradle
         run: ./gradlew build
