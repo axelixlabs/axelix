@@ -7,15 +7,15 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import com.nucleonforge.axile.master.service.discovery.DiscoveryConfig;
 
 /**
- * Minimal Spring Boot application used exclusively for testing this application.
+ * The master entrypoint.
  *
- * @since 17.07.2025
- * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootApplication
 @EnableConfigurationProperties(DiscoveryConfig.class)
-public class Main {
+public class ApplicationEntrypoint {
+
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
+        SpringApplication.run(ApplicationEntrypoint.class, args);
     }
 }

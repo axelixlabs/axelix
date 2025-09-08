@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
-import com.nucleonforge.axile.master.Main;
+import com.nucleonforge.axile.master.ApplicationEntrypoint;
 
 /**
  * Base abstract class for integration tests using Testcontainers with a PostgreSQL database.
@@ -17,7 +17,7 @@ import com.nucleonforge.axile.master.Main;
  * @author Nikita Kirillov
  */
 @Testcontainers
-@SpringBootTest(classes = Main.class)
+@SpringBootTest(classes = ApplicationEntrypoint.class)
 public abstract class BaseTestcontainersIntegrationTest {
 
     private static final String POSTGRES_IMAGE = "postgres:16.4";

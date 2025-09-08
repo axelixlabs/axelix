@@ -1,5 +1,6 @@
 plugins {
     id("shared")
+    id("org.springframework.boot") version Dependencies.springBootVersion
 }
 
 val testcontainersVersion = "1.21.3"

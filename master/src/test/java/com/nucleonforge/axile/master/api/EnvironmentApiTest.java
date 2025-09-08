@@ -25,7 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.common.domain.InstanceId;
-import com.nucleonforge.axile.master.Main;
+import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
@@ -42,7 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 28.08.2025
  * @author Nikita Kirillov
  */
-@SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 class EnvironmentApiTest {
 

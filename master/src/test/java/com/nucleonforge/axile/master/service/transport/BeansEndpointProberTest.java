@@ -22,7 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
-import com.nucleonforge.axile.master.Main;
+import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 29.08.2025
  * @author Nikita Kirillov
  */
-@SpringBootTest(classes = Main.class)
+@SpringBootTest(classes = ApplicationEntrypoint.class)
 @EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 class BeansEndpointProberTest {
 
