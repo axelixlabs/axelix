@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +33,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @SpringBootTest
 @Import(DefaultJwtDecoderServiceTest.JwtDecoderServiceConfig.class)
-@EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 class DefaultJwtDecoderServiceTest {
 
     @Autowired

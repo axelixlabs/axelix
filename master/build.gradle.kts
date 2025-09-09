@@ -15,7 +15,7 @@ dependencies {
     implementation(project(":common_auth"))
 
     // Impl
-    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework:spring-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.slf4j:slf4j-api")
     implementation("io.jsonwebtoken:jjwt-api:$jsonwebtokenVersion")
@@ -39,4 +39,13 @@ dependencies {
 configurations.all {
     exclude(group = "org.apache.logging.log4j", module = "log4j-api")
     exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
+}
+
+// We do not want to generate a regular JAR produced by the "jar" task, Spring Boot plugin will generate what we need
+tasks.jar {
+    enabled = false
+}
+
+tasks.bootJar {
+    archiveFileName = "master.jar"
 }

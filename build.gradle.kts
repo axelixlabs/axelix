@@ -13,7 +13,7 @@ plugins {
 
 allprojects {
     group = "com.nucleonforge.axile"
-    version = "1.0.O-SNAPSHOT"
+    version = "1.0.0-SNAPSHOT"
 
     repositories {
         maven {

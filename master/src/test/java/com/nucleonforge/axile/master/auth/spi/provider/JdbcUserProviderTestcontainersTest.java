@@ -7,11 +7,13 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.test.context.jdbc.Sql;
 
 import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
@@ -28,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 17.07.2025
  */
 @Sql(scripts = {"/db/jdbc-user-provider-test-schema.sql", "/db/jdbc-user-provider-test-data.sql"})
-@Import(JdbcUserProviderTestcontainersTest.JdbcAuthTestConfig.class)
+@Import({JdbcUserProviderTestcontainersTest.JdbcAuthTestConfig.class})
 class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTest {
 
     @Autowired
@@ -145,6 +147,14 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
         @ConfigurationProperties(prefix = "axile.config.auth.tables")
         public JdbcAuthConfig authTablesConfig() {
             return new JdbcAuthConfig();
+        }
+
+        @Bean
+        public DataSource dataSource(DataSourceProperties dataSourceProperties) {
+            return new DriverManagerDataSource(
+                    dataSourceProperties.getUrl(),
+                    dataSourceProperties.getUsername(),
+                    dataSourceProperties.getPassword());
         }
 
         @Bean
