@@ -30,6 +30,12 @@ jobs:
       - name: Gradle build
         run: ./gradlew build
 
+      - name: Stage JAR file
+        uses: actions/upload-artifact@v4
+        with:
+          name: master-jar
+          path: master/build/libs/master.jar
+
   test-deploy:
     name: Deploy Master application to Yandex Cloud
     runs-on: ubuntu-latest
@@ -42,8 +48,12 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-docker-action@v4
 
-      - name: Set up Docker
-        working-directory: master
+      - name: Download staged jar
+        uses: actions/download-artifact@v5
+        with:
+          name: master-jar
+
+      - name: Build Docker Image
         # TODO: extract version from gradle.properties file later on. For now hardcoded is fine
         run: |
-          docker build --tag master:1.0.0-SNAPSHOT  --file docker/Dockerfile .
+          docker build --tag master:1.0.0-SNAPSHOT  --file master/docker/Dockerfile .
