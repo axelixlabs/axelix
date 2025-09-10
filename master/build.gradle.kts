@@ -7,6 +7,7 @@ val testcontainersVersion = "1.21.3"
 val jsonwebtokenVersion = "0.12.6"
 val jsonUnitAssertJVersion = "3.5.0"
 val instancioVersion = "5.5.1"
+val springDocSwaggerVersion = "2.0.4"
 
 dependencies {
     // Self
@@ -24,6 +25,9 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:$jsonwebtokenVersion")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jsonwebtokenVersion")
     runtimeOnly("ch.qos.logback:logback-classic")
+
+    // Swagger(OpenAPI)
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocSwaggerVersion")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")

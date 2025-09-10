@@ -3,6 +3,15 @@ package com.nucleonforge.axile.master.api;
 import java.util.Map;
 import java.util.Objects;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.links.Link;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +35,9 @@ import com.nucleonforge.axile.master.service.transport.EnvironmentPropertyEndpoi
  * @since 27.08.2025
  * @author Nikita Kirillov
  */
+@Tag(
+        name = "Environment API Controller",
+        description = "The env endpoint provides information about the application’s Environment.")
 @RestController
 @RequestMapping(path = ApiPaths.EnvironmentApi.MAIN)
 public class EnvironmentApi {
@@ -46,12 +58,53 @@ public class EnvironmentApi {
         this.envPropertyConverter = envPropertyConverter;
     }
 
+    @Operation(
+            summary = "Returns information about the application’s Environment.",
+            responses = {
+                @ApiResponse(
+                        description = "OK",
+                        responseCode = "200",
+                        links = {
+                            @Link(
+                                    name = "Spring Boot / Actuator / Environment (env)",
+                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/env.html")
+                        },
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = EnvironmentFeedResponse.class))),
+                @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            })
+    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.EnvironmentApi.FEED)
     public EnvironmentFeedResponse getEnvironment(@PathVariable("instanceId") String instanceId) {
         EnvironmentFeed result = environmentEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(envConverter.convert(result));
     }
 
+    @Operation(
+            summary = "Returns a specific property of an instance",
+            responses = {
+                @ApiResponse(
+                        description = "OK",
+                        responseCode = "200",
+                        links = {
+                            @Link(
+                                    name = "Actuator/Environment(env)",
+                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/env.html")
+                        },
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = EnvironmentPropertyResponse.class))),
+                @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            })
+    @Parameters({
+        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
+        @Parameter(name = "propertyName", description = "Name of the environment property", required = true)
+    })
     @GetMapping(path = ApiPaths.EnvironmentApi.PROPERTY)
     public EnvironmentPropertyResponse getProperty(
             @PathVariable("instanceId") String instanceId, @PathVariable("propertyName") String propertyName) {

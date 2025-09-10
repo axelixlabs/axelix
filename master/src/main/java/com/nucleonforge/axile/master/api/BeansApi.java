@@ -2,6 +2,14 @@ package com.nucleonforge.axile.master.api;
 
 import java.util.Objects;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.links.Link;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +27,9 @@ import com.nucleonforge.axile.master.service.transport.BeansEndpointProber;
  *
  * @author Mikhail Polivakha
  */
+@Tag(
+        name = "Beans API Controller",
+        description = "The beans endpoint provides information about the application’s beans.")
 @RestController
 @RequestMapping(path = ApiPaths.BeansApi.MAIN)
 public class BeansApi {
@@ -31,6 +42,25 @@ public class BeansApi {
         this.converter = converter;
     }
 
+    @Operation(
+            summary = "Returns all application beans.",
+            responses = {
+                @ApiResponse(
+                        description = "OK",
+                        responseCode = "200",
+                        links = {
+                            @Link(
+                                    name = "Actuator/Beans",
+                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/beans.html")
+                        },
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = BeansFeedResponse.class))),
+                @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            })
+    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.BeansApi.FEED)
     public BeansFeedResponse getBeansProfile(@PathVariable("instanceId") String instanceId) {
         BeansFeed result = beansEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
