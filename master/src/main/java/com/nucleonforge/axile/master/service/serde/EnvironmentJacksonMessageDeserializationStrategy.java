@@ -6,10 +6,9 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for {@link EnvironmentFeedResponse}.
+ * {@link JacksonMessageDeserializationStrategy} for {@link EnvironmentFeed}.
  *
  * @since 27.08.2025
  * @author Nikita Kirillov

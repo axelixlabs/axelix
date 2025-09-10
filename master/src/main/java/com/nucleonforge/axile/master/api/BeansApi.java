@@ -2,6 +2,7 @@ package com.nucleonforge.axile.master.api;
 
 import java.util.Objects;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +31,7 @@ public class BeansApi {
         this.converter = converter;
     }
 
-    @RequestMapping(path = ApiPaths.BeansApi.FEED)
+    @GetMapping(path = ApiPaths.BeansApi.FEED)
     public BeansFeedResponse getBeansProfile(@PathVariable("instanceId") String instanceId) {
         BeansFeed result = beansEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(converter.convert(result));

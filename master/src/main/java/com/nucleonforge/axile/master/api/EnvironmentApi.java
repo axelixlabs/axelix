@@ -3,6 +3,7 @@ package com.nucleonforge.axile.master.api;
 import java.util.Map;
 import java.util.Objects;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,13 +46,13 @@ public class EnvironmentApi {
         this.envPropertyConverter = envPropertyConverter;
     }
 
-    @RequestMapping(path = ApiPaths.EnvironmentApi.FEED)
+    @GetMapping(path = ApiPaths.EnvironmentApi.FEED)
     public EnvironmentFeedResponse getEnvironment(@PathVariable("instanceId") String instanceId) {
         EnvironmentFeed result = environmentEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(envConverter.convert(result));
     }
 
-    @RequestMapping(path = ApiPaths.EnvironmentApi.PROPERTY)
+    @GetMapping(path = ApiPaths.EnvironmentApi.PROPERTY)
     public EnvironmentPropertyResponse getProperty(
             @PathVariable("instanceId") String instanceId, @PathVariable("propertyName") String propertyName) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("property.name", propertyName));

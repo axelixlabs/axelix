@@ -73,4 +73,16 @@ public final class ApiPaths {
          */
         public static final String CORE = "/core/{instanceId}";
     }
+
+    public static final class InfoApi {
+
+        /**
+         * Base path for info APIs.
+         */
+        public static final String MAIN = "/info";
+        /**
+         * Info endpoint with instance ID
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+    }
 }

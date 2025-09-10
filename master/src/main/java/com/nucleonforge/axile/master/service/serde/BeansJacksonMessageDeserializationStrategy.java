@@ -6,10 +6,9 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for {@link BeansFeedResponse}.
+ * {@link JacksonMessageDeserializationStrategy} for {@link BeansFeed}.
  *
  * @author Mikhail Polivakha
  */
