@@ -10,15 +10,35 @@ import java.time.Instant;
  */
 public class CommitInfo {
 
-    private String commitShaShort;
+    private final String commitShaShort;
 
-    private String commitSha;
+    private final String commitSha;
 
-    private Instant commitTimestamp;
+    private final Instant commitTimestamp;
 
-    private String commitAuthorName;
+    private final String commitAuthorName;
 
-    private String commitAuthorEmail;
+    private final String commitAuthorEmail;
+
+    public String getCommitShaShort() {
+        return commitShaShort;
+    }
+
+    public String getCommitSha() {
+        return commitSha;
+    }
+
+    public Instant getCommitTimestamp() {
+        return commitTimestamp;
+    }
+
+    public String getCommitAuthorName() {
+        return commitAuthorName;
+    }
+
+    public String getCommitAuthorEmail() {
+        return commitAuthorEmail;
+    }
 
     public CommitInfo(
             String commitShaShort,

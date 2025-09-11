@@ -7,12 +7,20 @@ package com.nucleonforge.axile.common.domain;
  */
 public class LaunchDetails {
 
-    private JvmProperties jvmProperties;
+    private final JvmProperties jvmProperties;
 
-    private JvmNonStandardOptions jvmNonStandardOptions;
+    private final JvmNonStandardOptions jvmNonStandardOptions;
 
     public LaunchDetails(JvmProperties jvmProperties, JvmNonStandardOptions jvmNonStandardOptions) {
         this.jvmProperties = jvmProperties;
         this.jvmNonStandardOptions = jvmNonStandardOptions;
+    }
+
+    public JvmProperties getJvmProperties() {
+        return jvmProperties;
+    }
+
+    public JvmNonStandardOptions getJvmNonStandardOptions() {
+        return jvmNonStandardOptions;
     }
 }

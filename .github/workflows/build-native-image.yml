@@ -1,0 +1,27 @@
+name: Native Image Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  native:
+    name: Build with GraalVM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up GraalVM 17
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '17'
+          distribution: 'liberica'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x gradlew
+
+      - name: Compile native image
+        run: ./gradlew :master:nativeCompile

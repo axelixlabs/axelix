@@ -192,11 +192,11 @@ class EnvironmentApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/env")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/env")) {
                     return new MockResponse()
                             .setBody(jsonEnvResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/env/sun.management.compiler")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/env/sun.management.compiler")) {
                     return new MockResponse()
                             .setBody(jsonEnvPropertyResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
