@@ -4,13 +4,13 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Short profile of a given bean.
+ * Short profile of a given beans.
  *
- * @param beanName     The name of the bean.
- * @param scope        The scope of the bean.
- * @param className    The fully qualified class name of the bean.
- * @param aliases      The aliases of the given bean.
- * @param dependencies The list of dependencies of this bean (i.e. other beans that this bean depends on).
+ * @param beanName     The name of the beans.
+ * @param scope        The scope of the beans.
+ * @param className    The fully qualified class name of the beans.
+ * @param aliases      The aliases of the given beans.
+ * @param dependencies The list of dependencies of this beans (i.e. other beans that this beans depends on).
  *
  * @author Mikhail Polivakha
  */
