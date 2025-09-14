@@ -76,7 +76,7 @@ jobs:
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
     name: Deploy the Helm Chart to Yandex Cloud test cluster
     runs-on: ubuntu-latest
-    needs: build-image
+#    needs: build-image
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: Checkout source code
@@ -87,9 +87,11 @@ jobs:
         with:
           version: v3.14.0
 
-      - name: Deploy master to K8S
-        working-directory: master/chart
-        run: |
-          echo "$KUBE_CONFIG_BASE64" | base63 --decode > ~/.kube/config
-          chmod 600 ~/.kube/config
-          helm upgrade --install master . -f values.yaml
+#      - name: Deploy master to K8S
+#        working-directory: master/chart
+#        run: |
+#          mkdir -p ~/.kube
+#          touch ~/.kube/config
+#          echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
+#          chmod 600 ~/.kube/config
+#          helm upgrade --install master . -f values.yaml
