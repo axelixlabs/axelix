@@ -7,13 +7,12 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-source:
     runs-on: ubuntu-latest
-
     env:
+      # These are needed in order to publish the final build artifacts into GitHub package registry
       USERNAME: ${{ github.actor }}
       TOKEN: ${{ secrets.TOKEN }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,10 +35,12 @@ jobs:
           name: master-jar
           path: master/build/libs/master.jar
 
-  test-deploy:
-    name: Deploy Master application to Yandex Cloud
+  build-image:
+    env:
+      DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
+    name: Build Docker container for the master and deploy image to Yandex CR
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-source
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: Checkout repository
@@ -54,6 +55,41 @@ jobs:
           name: master-jar
 
       - name: Build Docker Image
-        # TODO: extract version from gradle.properties file later on. For now hardcoded is fine
+        # TODO:
+        #  1. extract version from gradle.properties file later on. For now hardcoded is fine
+        #  2. And also we need to take the repository part inside the image name from the terraform output
         run: |
-          docker build --tag master:1.0.0-SNAPSHOT  --file master/docker/Dockerfile .
+          docker build --tag cr.yandex/crp6df803tpunh81uuum/master/master:1.0.0-SNAPSHOT --file master/docker/Dockerfile .
+
+      - name: Docker login to Yandex Cloud CR
+        # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is my token
+        run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin cr.yandex
+
+      - name: Docker push to Yandex Cloud CR
+        run: docker push cr.yandex/crp6df803tpunh81uuum/master/master:1.0.0-SNAPSHOT
+
+      - name: Docker logout
+        run: docker logout
+
+  deploy-to-test:
+    env:
+      KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
+    name: Deploy the Helm Chart to Yandex Cloud test cluster
+    runs-on: ubuntu-latest
+    needs: build-image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v1.4
+        with:
+          version: v3.14.0
+
+      - name: Deploy master to K8S
+        working-directory: master/chart
+        run: |
+          echo "$KUBE_CONFIG_BASE64" | base63 --decode > ~/.kube/config
+          chmod 600 ~/.kube/config
+          helm upgrade --install master . -f values.yaml

@@ -1,6 +1,15 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: axile
   mvc:
     servlet:
       path: /${spring.application.name}/api
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: [ "health" ]

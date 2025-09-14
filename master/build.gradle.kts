@@ -18,6 +18,7 @@ dependencies {
     // Impl
     implementation("org.springframework:spring-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.slf4j:slf4j-api")
     implementation("io.jsonwebtoken:jjwt-api:$jsonwebtokenVersion")
 
