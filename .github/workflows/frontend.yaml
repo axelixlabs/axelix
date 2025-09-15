@@ -1,0 +1,74 @@
+name: Build / Deploy Front-End
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'front-end/**'
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-source:
+    runs-on: ubuntu-latest
+    name: Run tests
+    if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up NodeJS
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Npm run tests
+        working-directory: front-end
+        run: npm run test
+
+  redeploy-front-end:
+    env:
+      DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
+      CR_URL: ${{ vars.CR_URL }}
+      CR_FRONTEND_REPOSITORY: ${{ vars.CR_FRONTEND_REPOSITORY }}
+      KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
+    name: Build nginx Docker container
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+
+      - name: Build Docker Image
+        # TODO:
+        #  For now the version of package is hardcoded both in package.json and in here. We later would need to
+        #  find a way to manage it correctly.
+        run: |
+          docker build --tag $CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:1.0.0-SNAPSHOT --file front-end/Dockerfile .
+
+      - name: Docker login to Yandex Cloud CR
+        # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is my token
+        run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
+
+      - name: Docker push to Yandex Cloud CR
+        run: docker push $CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:1.0.0-SNAPSHOT
+
+      - name: Docker logout
+        run: docker logout
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4.3.0
+        with:
+          version: v3.14.0
+
+      - name: Deploy master to K8S
+        working-directory: front-end/chart
+        run: |
+          mkdir -p ~/.kube
+          touch ~/.kube/config
+          echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
+          chmod 600 ~/.kube/config
+          helm upgrade --install front-end . --set image.ref=$CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:1.0.0-SNAPSHOT -f values.yaml

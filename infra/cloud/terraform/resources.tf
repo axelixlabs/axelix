@@ -7,6 +7,10 @@ resource "yandex_container_repository" "master-repository" {
   name = "${yandex_container_registry.registry.id}/master"
 }
 
+resource "yandex_container_repository" "front-end-repository" {
+  name = "${yandex_container_registry.registry.id}/front-end"
+}
+
 resource "yandex_vpc_network" "k8s_network" {
   name = "${var.env}-k8s"
   description = "Main ${var.env} network"
