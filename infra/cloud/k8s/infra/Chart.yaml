@@ -1,0 +1,6 @@
+apiVersion: v2
+name: infra
+description: Infrastructural components that we deploy to K8S
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

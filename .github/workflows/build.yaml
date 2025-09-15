@@ -87,11 +87,11 @@ jobs:
         with:
           version: v3.14.0
 
-#      - name: Deploy master to K8S
-#        working-directory: master/chart
-#        run: |
-#          mkdir -p ~/.kube
-#          touch ~/.kube/config
-#          echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
-#          chmod 600 ~/.kube/config
-#          helm upgrade --install master . -f values.yaml
+      - name: Deploy master to K8S
+        working-directory: master/chart
+        run: |
+          mkdir -p ~/.kube
+          touch ~/.kube/config
+          echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
+          chmod 600 ~/.kube/config
+          helm upgrade --install master . -f values.yaml
