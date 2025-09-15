@@ -28,8 +28,8 @@ import com.nucleonforge.axile.master.service.transport.InfoEndpointProber;
  * @author Sergey Cherkasov
  */
 @Tag(
-        name = "Info API Controller",
-        description = "The info endpoint provides general information about the application.")
+        name = "General instance information API",
+        description = "The info endpoint provides general information about the particular Spring Boot instance")
 @RestController
 @RequestMapping(path = ApiPaths.InfoApi.MAIN)
 public class InfoApi {
@@ -43,7 +43,7 @@ public class InfoApi {
     }
 
     @Operation(
-            summary = "Returns general information about the application.",
+            summary = "Returns general information about the instance.",
             responses = {
                 @ApiResponse(
                         description = "OK",

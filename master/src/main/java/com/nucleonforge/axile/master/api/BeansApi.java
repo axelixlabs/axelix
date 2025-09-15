@@ -28,7 +28,7 @@ import com.nucleonforge.axile.master.service.transport.BeansEndpointProber;
  * @author Mikhail Polivakha
  */
 @Tag(
-        name = "Beans API Controller",
+        name = "Beans API",
         description = "The beans endpoint provides information about the application’s beans.")
 @RestController
 @RequestMapping(path = ApiPaths.BeansApi.MAIN)
@@ -43,7 +43,7 @@ public class BeansApi {
     }
 
     @Operation(
-            summary = "Returns all application beans.",
+            summary = "Returns beans feed for the given isntance",
             responses = {
                 @ApiResponse(
                         description = "OK",
