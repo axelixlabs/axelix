@@ -38,7 +38,9 @@ jobs:
   build-image:
     env:
       DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
-    name: Build Docker container for the master and deploy image to Yandex CR
+      CR_URL: ${{ vars.CR_URL }}
+      CR_REPOSITORY: ${{ vars.CR_REPOSITORY }}
+    name: Build Docker container for the master and deploy image to Container Registry
     runs-on: ubuntu-latest
     needs: build-source
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -59,14 +61,14 @@ jobs:
         #  1. extract version from gradle.properties file later on. For now hardcoded is fine
         #  2. And also we need to take the repository part inside the image name from the terraform output
         run: |
-          docker build --tag cr.yandex/crp6df803tpunh81uuum/master/master:1.0.0-SNAPSHOT --file master/docker/Dockerfile .
+          docker build --tag $CR_URL/$CR_REPOSITORY/master:1.0.0-SNAPSHOT --file master/docker/Dockerfile .
 
       - name: Docker login to Yandex Cloud CR
         # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is my token
-        run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin cr.yandex
+        run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
       - name: Docker push to Yandex Cloud CR
-        run: docker push cr.yandex/crp6df803tpunh81uuum/master/master:1.0.0-SNAPSHOT
+        run: docker push $CR_URL/$CR_REPOSITORY/master:1.0.0-SNAPSHOT
 
       - name: Docker logout
         run: docker logout
@@ -74,9 +76,9 @@ jobs:
   deploy-to-test:
     env:
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
-    name: Deploy the Helm Chart to Yandex Cloud test cluster
+    name: Deploy the Helm Chart to Cloud
     runs-on: ubuntu-latest
-#    needs: build-image
+    needs: build-image
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: Checkout source code
