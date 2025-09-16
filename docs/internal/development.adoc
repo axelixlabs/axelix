@@ -82,6 +82,7 @@ When the given authorities of the user are resolved...
 
 It is important to specify the targeted issue reference in the commit message so we can later associate commits with the tickets on GitHub.
 
+[#refactoring_commits]
 === Refactoring Commits
 
 Another important consideration is that *each GihHub issue should ideally be solved in one commit.*
@@ -107,6 +108,14 @@ Anything that you thing you want to add goes here
 ----
 
 That is _very_ important, because if we would want to be able to revert a specific feature later on, we _would not_ want to revert the refactoring that we've done.
+
+=== Code Review and Commits
+
+Most of the time the feature branch is going to contain only single commit with feature implementation itself (potentially, we also _may_ have some other xref:refactoring_commits[polishing commits]).
+
+However, during review, if the changes are requested, *these changes should be committed _in the feature branch (!)_ as a separate commit*. The reasoning for this is to ease the burden on the reviewer side, so that the reviewer does not have to re-review the entire PR again, but only the changes since the last review round.
+
+Note, that when the PR is approved, only then the commits that fix the code review issues must be squashed before merging into the _master_ branch.
 
 === Merge Commits
 
