@@ -335,7 +335,7 @@ public class ConfigpropsApiByPrefixTest {
         // when.
         String prefix = "spring.jackson";
         ResponseEntity<String> response = restTemplate.getForEntity(
-                "/axile/api/configprops/{instanceId}/beans/{prefix}", String.class, activeInstanceId, prefix);
+                "/api/axile/configprops/{instanceId}/beans/{prefix}", String.class, activeInstanceId, prefix);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -350,7 +350,7 @@ public class ConfigpropsApiByPrefixTest {
         // when.
         String prefix = "spring.web";
         ResponseEntity<String> response = restTemplate.getForEntity(
-                "/axile/api/configprops/{instanceId}/beans/{prefix}", String.class, activeInstanceId, prefix);
+                "/api/axile/configprops/{instanceId}/beans/{prefix}", String.class, activeInstanceId, prefix);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -370,7 +370,7 @@ public class ConfigpropsApiByPrefixTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<String> response = restTemplate.getForEntity(
-                "/axile/api/configprops/{instanceId}/beans/{prefix}", String.class, instanceId, prefix);
+                "/api/axile/configprops/{instanceId}/beans/{prefix}", String.class, instanceId, prefix);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -381,7 +381,7 @@ public class ConfigpropsApiByPrefixTest {
         // when.
         String instanceId = "unregistered-configprops-instance";
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/axile/api/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axile/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

@@ -385,7 +385,7 @@ public class ConfigpropsApiFeedTest {
     void shouldReturnJSONConfigpropsFeed() {
         // when.
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/axile/api/configprops/feed/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axile/configprops/feed/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -404,7 +404,7 @@ public class ConfigpropsApiFeedTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/axile/api/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axile/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -416,7 +416,7 @@ public class ConfigpropsApiFeedTest {
         String instanceId = "unregistered-configprops-instance";
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/axile/api/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axile/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

@@ -72,12 +72,12 @@ resources: {}
 liveness:
   delay: 15
   timeout: 10
-  path: /axile/api/actuator/health/liveness
+  path: /api/axile/actuator/health/liveness
 
 readiness:
   delay: 15
   timeout: 10
-  path: /axile/api/actuator/health/readiness
+  path: /api/axile/actuator/health/readiness
 
 # Additional volumes on the output Deployment definition.
 volumes: []
