@@ -302,7 +302,7 @@ public class InfoApiTest {
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/axile/api/info/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axile/info/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -320,7 +320,7 @@ public class InfoApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/axile/api/info/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axile/info/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -332,7 +332,7 @@ public class InfoApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/axile/api/info/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axile/info/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
