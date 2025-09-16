@@ -85,4 +85,20 @@ public final class ApiPaths {
          */
         public static final String INSTANCE_ID = "/{instanceId}";
     }
+
+    public static final class ConfigpropsApi {
+
+        /**
+         * Base path for configprops APIs.
+         */
+        public static final String MAIN = "/configprops";
+        /**
+         * The Configprops Feed used in the single instance
+         */
+        public static final String FEED = "/feed/{instanceId}";
+        /**
+         * Endpoint to retrieve a specific Configprops beans of an instance.
+         */
+        public static final String BEAN_BY_PREFIX = "/{instanceId}/beans/{prefix}";
+    }
 }
