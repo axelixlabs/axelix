@@ -1,12 +1,11 @@
 package com.nucleonforge.axile.master.exception;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.nucleonforge.axile.master.api.error.ApiError;
+import com.nucleonforge.axile.master.api.error.handle.ApiExceptionTranslator;
 
 /**
  * Global exception handler.
@@ -17,11 +16,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(InstanceNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleEndpointException(InstanceNotFoundException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("message", ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage());
+    private final ApiExceptionTranslator apiExceptionTranslator;
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    public GlobalExceptionHandler(ApiExceptionTranslator apiExceptionTranslator) {
+        this.apiExceptionTranslator = apiExceptionTranslator;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleEndpointException(Exception ex) {
+        return apiExceptionTranslator.translateException(ex);
     }
 }

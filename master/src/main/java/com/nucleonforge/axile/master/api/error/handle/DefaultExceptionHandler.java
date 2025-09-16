@@ -1,0 +1,29 @@
+package com.nucleonforge.axile.master.api.error.handle;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import com.nucleonforge.axile.master.api.error.ApiError;
+import com.nucleonforge.axile.master.api.error.SimpleApiError;
+
+/**
+ * The default {@link ExceptionHandler} where calls are forwarded when no specific
+ * {@link ExceptionHandler ExceptionHandlers} are found.
+ *
+ * @author Mikhail Polivakha
+ */
+public class DefaultExceptionHandler implements ExceptionHandler<Exception> {
+
+    public static final DefaultExceptionHandler INSTANCE = new DefaultExceptionHandler();
+
+    @Override
+    public ResponseEntity<ApiError> handle(Exception exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new SimpleApiError("INTERNAL_SERVER_ERROR"));
+    }
+
+    @Override
+    public Class<Exception> supported() {
+        return Exception.class;
+    }
+}

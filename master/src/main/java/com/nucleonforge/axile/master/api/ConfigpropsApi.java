@@ -22,6 +22,7 @@ import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.configprops.ConfigpropsByPrefixResponse;
 import com.nucleonforge.axile.master.api.response.configprops.ConfigpropsFeedResponse;
 import com.nucleonforge.axile.master.service.convert.Converter;
@@ -73,8 +74,20 @@ public class ConfigpropsApi {
                                 @Content(
                                         mediaType = "application/json",
                                         schema = @Schema(implementation = ConfigpropsFeedResponse.class))),
-                @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+                @ApiResponse(
+                        description = "Bad Request",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.ConfigpropsApi.FEED)
@@ -99,8 +112,20 @@ public class ConfigpropsApi {
                                 @Content(
                                         mediaType = "application/json",
                                         schema = @Schema(implementation = ConfigpropsByPrefixResponse.class))),
-                @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+                @ApiResponse(
+                        description = "Bad Request",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
             })
     @Parameters({
         @Parameter(name = "instanceId", description = "Application Instance ID", required = true),

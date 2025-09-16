@@ -185,8 +185,8 @@ class BeansApiTest {
 
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<?> response =
+                restTemplate.getForEntity("/api/axile/beans/feed/{instanceId}", Void.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }

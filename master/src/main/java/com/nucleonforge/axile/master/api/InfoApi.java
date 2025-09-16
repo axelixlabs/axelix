@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nucleonforge.axile.common.api.info.ServiceInfo;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.info.InfoResponse;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.transport.InfoEndpointProber;
@@ -57,8 +58,20 @@ public class InfoApi {
                                 @Content(
                                         mediaType = "application/json",
                                         schema = @Schema(implementation = InfoResponse.class))),
-                @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-                @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+                @ApiResponse(
+                        description = "Bad Request",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.InfoApi.INSTANCE_ID)
