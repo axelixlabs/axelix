@@ -2,12 +2,6 @@ name: Build / Deploy Front-End
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch to run on'
-        required: true
-        default: 'master'
-        type: string
   push:
     branches: [ master ]
     paths:
@@ -45,10 +39,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Checkout to target branch repository
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: git checkout ${{ github.event.inputs.branch }}
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v4
