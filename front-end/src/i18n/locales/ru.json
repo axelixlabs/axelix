@@ -1,0 +1,8 @@
+{
+  "login": "Вход",
+  "username": "Имя пользователя",
+  "enterUsername": "Введите имя пользователя",
+  "password": "Пароль",
+  "enterPassword": "Введите пароль",
+  "loginButtonText": "Войти"
+}

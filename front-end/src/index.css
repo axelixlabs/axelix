@@ -1,17 +1,11 @@
+@font-face {
+  font-family: "Golos";
+  src: url("fonts/Variable_Golos_Text.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
   --axile-first-block-margin: 73px;
 }
 
@@ -24,7 +18,7 @@
 }
 
 body {
-  margin: 0;
+  font-family: "Golos", Helvetica, Arial, sans-serif, -apple-system;
 }
 
 ul,
@@ -37,6 +31,16 @@ a {
   color: inherit;
 }
 
+.MainContainer {
+  background-color: #fff;
+  max-width: 1450px;
+  padding: 0 40px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* 
+remove in future
 .MainWrapper {
   margin-top: 73px;
-}
+} */

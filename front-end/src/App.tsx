@@ -1,27 +1,14 @@
-import { useState } from "react";
+import { Provider } from "react-redux";
 
-import {
-  emptyFilter,
-  type GridFilters,
-} from "./pages/Wallpage/Body/Grid/GridFilters";
-import { Body } from "./pages/Wallpage/Body";
-import { Header } from "./pages/Wallpage/Header";
+import { AppRoutes } from "./routes";
+import { store } from "./store";
+import "./i18n/i18n";
 
 function App() {
-  const [filter, setFilter] = useState<GridFilters>(emptyFilter());
-
   return (
-    <>
-      <Header
-        gridFilterProps={{
-          filter: filter,
-          filterSetter: setFilter,
-        }}
-      />
-      <div className="MainWrapper">
-        <Body filter={filter} />
-      </div>
-    </>
+    <Provider store={store}>
+      <AppRoutes />
+    </Provider>
   );
 }
 
