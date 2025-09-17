@@ -1,8 +1,20 @@
 {
   "login": "Login",
+  "logout": "Logout",
   "username": "Username",
   "enterUsername": "Enter username",
   "password": "Password",
   "enterPassword": "Enter password",
-  "loginButtonText": "Sign In"
+  "loginButtonText": "Sign In",
+  "dashboard": "Dashboard",
+  "wallboard": "Wallboard",
+  "insights": "Insights",
+  "details": "Details",
+  "metrics": "Metrics",
+  "environment": "Environment",
+  "configurationProperties": "Configuration Properties",
+  "scheduledTasks": "Scheduled Tasks",
+  "loggers": "Loggers",
+  "mappings": "Mappings",
+  "caches": "Caches"
 }
