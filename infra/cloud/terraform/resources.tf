@@ -11,6 +11,10 @@ resource "yandex_container_repository" "front-end-repository" {
   name = "${yandex_container_registry.registry.id}/front-end"
 }
 
+resource "yandex_container_repository" "playground-repository" {
+  name = "${yandex_container_registry.registry.id}/playground"
+}
+
 resource "yandex_vpc_network" "k8s_network" {
   name = "${var.env}-k8s"
   description = "Main ${var.env} network"
