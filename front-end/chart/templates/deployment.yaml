@@ -16,6 +16,7 @@ spec:
     spec:
       containers:
         - name: nginx
+          imagePullPolicy: Always
           image: {{ .Values.image.ref }}
           ports:
             - containerPort: 80
