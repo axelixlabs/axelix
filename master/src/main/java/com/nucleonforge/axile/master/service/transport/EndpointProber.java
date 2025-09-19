@@ -19,8 +19,8 @@ public interface EndpointProber<O> {
     /**
      * Invoke the actual {@link ActuatorEndpoint} on the managed service.
      *
-     * @param instanceId  the id of the instance on which the endpoint should be invoked.
-     * @param httpPayload
+     * @param instanceId the id of the instance on which the endpoint should be invoked.
+     * @param httpPayload the abstraction that encapsulates the http payload of the request
      * @return the result of the invocation. Guaranteed to be not null.
      * @throws InstanceNotFoundException in case the invocation to managed service did not result in successful response.
      * @throws InstanceNotFoundException in case the instance with the given ID is not present.
