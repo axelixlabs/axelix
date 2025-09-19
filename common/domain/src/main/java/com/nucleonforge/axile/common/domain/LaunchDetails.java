@@ -1,7 +1,7 @@
 package com.nucleonforge.axile.common.domain;
 
 /**
- * The details of the way the given {@link Instance} was launched.
+ * Contains information about the way a given application instance was launched.
  *
  * @author Mikhail Polivakha
  */

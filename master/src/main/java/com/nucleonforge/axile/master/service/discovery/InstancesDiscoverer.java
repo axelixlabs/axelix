@@ -4,10 +4,10 @@ import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 
-import com.nucleonforge.axile.common.domain.Instance;
+import com.nucleonforge.axile.common.domain.InstanceReference;
 
 /**
- * The SPI interface for discovering {@link Instance instances} of running applications.
+ * The SPI interface for discovering {@link InstanceReference instances} of running applications.
  *
  * <p>
  * There are, essentially, two ways to configure the deployment of the master and starters:
@@ -25,5 +25,5 @@ public interface InstancesDiscoverer {
      * Perform actual discovery.
      */
     @NonNull
-    Set<@NonNull Instance> discover();
+    Set<@NonNull InstanceReference> discover();
 }

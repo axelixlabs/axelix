@@ -10,8 +10,8 @@ import java.net.http.HttpResponse;
 
 import org.jspecify.annotations.NonNull;
 
-import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.InstanceId;
+import com.nucleonforge.axile.common.domain.InstanceReference;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
@@ -61,7 +61,7 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
     }
 
     private HttpRequest buildHttpRequest(ActuatorEndpoint endpoint, InstanceId instanceId, HttpPayload httpPayload) {
-        Instance instance =
+        InstanceReference instanceReference =
                 instanceRegistry.get(instanceId).orElseThrow(() -> new InstanceNotFoundException(instanceId));
 
         BodyPublisher bodyPublisher =
@@ -76,11 +76,12 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
             }
         }
 
-        return builder.uri(buildUrl(endpoint, httpPayload, instance)).build();
+        return builder.uri(buildUrl(endpoint, httpPayload, instanceReference)).build();
     }
 
-    private static URI buildUrl(ActuatorEndpoint endpoint, HttpPayload httpPayload, Instance instance) {
-        return URI.create(instance.getActuatorUrl()
+    private static URI buildUrl(
+            ActuatorEndpoint endpoint, HttpPayload httpPayload, InstanceReference instanceReference) {
+        return URI.create(instanceReference.actuatorUrl()
                 + endpoint.path().expand(httpPayload.pathVariableValues(), httpPayload.queryParameters()));
     }
 

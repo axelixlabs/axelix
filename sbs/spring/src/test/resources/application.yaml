@@ -14,6 +14,7 @@ management:
     web:
       exposure:
         include:
+          - axile-metadata
           - property-management
           - cache-dispatcher
           - profile-management

@@ -88,6 +88,9 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // Mappings
     public static final ActuatorEndpoint MAPPINGS = of("/mappings", HttpMethod.GET);
 
+    // Metadata
+    public static final ActuatorEndpoint METADATA = of("/axile-metadata", HttpMethod.GET);
+
     // Metric
     public static final ActuatorEndpoint METRICS = of("/metrics", HttpMethod.GET);
     public static final ActuatorEndpoint SINGLE_METRIC = of("/metrics/{metric.name}", HttpMethod.GET);

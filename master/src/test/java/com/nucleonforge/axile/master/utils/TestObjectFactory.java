@@ -6,10 +6,11 @@ import java.util.stream.Collectors;
 import org.instancio.Instancio;
 import org.instancio.Select;
 
+import com.nucleonforge.axile.common.domain.BuildInfo;
 import com.nucleonforge.axile.common.domain.ClassPath;
 import com.nucleonforge.axile.common.domain.ClassPathEntry;
-import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.InstanceId;
+import com.nucleonforge.axile.common.domain.InstanceReference;
 
 /**
  * Utility factory for creating test objects used in unit and integration tests.
@@ -23,26 +24,19 @@ public final class TestObjectFactory {
 
     private TestObjectFactory() {}
 
-    public static Instance createInstance(String id) {
-        return createInstance(id, DEFAULT_URL);
+    public static InstanceReference createInstance(String id) {
+        return createInstanceWithUrl(id, DEFAULT_URL);
     }
 
-    public static Instance createInstanceWithUrl(String id, String url) {
-        return createInstance(id, url);
+    public static InstanceReference createInstanceWithUrl(String id, String url) {
+        return new InstanceReference(InstanceId.of(id), url);
     }
 
-    public static Instance createInstance(ClassPathEntry... classPathEntries) {
-        return Instancio.of(Instance.class)
+    public static BuildInfo createBuildInfo(ClassPathEntry... classPathEntries) {
+        return Instancio.of(BuildInfo.class)
                 .set(
                         Select.fields().named("classPathEntries").declaredIn(ClassPath.class),
                         Arrays.stream(classPathEntries).collect(Collectors.toSet()))
-                .create();
-    }
-
-    private static Instance createInstance(String id, String url) {
-        return Instancio.of(Instance.class)
-                .set(Select.fields().named("id").declaredIn(Instance.class), new InstanceId(id))
-                .set(Select.fields().named("actuatorUrl").declaredIn(Instance.class), url)
                 .create();
     }
 }
