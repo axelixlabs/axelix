@@ -315,7 +315,7 @@ public class InfoApiTest {
     @Test
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError() {
-        String instanceId = "test-instance-unreachable";
+        String instanceId = UUID.randomUUID().toString();
 
         // when.
         registry.register(createInstance(instanceId));

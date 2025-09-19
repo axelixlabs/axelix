@@ -181,7 +181,7 @@ class BeansApiTest {
     @Test
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError() {
-        String instanceId = "test-instance-unreachable";
+        String instanceId = UUID.randomUUID().toString();
 
         registry.register(createInstance(instanceId));
 
