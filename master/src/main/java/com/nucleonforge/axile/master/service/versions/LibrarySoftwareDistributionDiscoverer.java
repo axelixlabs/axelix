@@ -3,8 +3,8 @@ package com.nucleonforge.axile.master.service.versions;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.nucleonforge.axile.common.domain.BuildInfo;
 import com.nucleonforge.axile.common.domain.ClassPathEntry;
-import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.JarClassPathEntry;
 import com.nucleonforge.axile.master.model.software.LibraryComponent;
 import com.nucleonforge.axile.master.model.software.SoftwareDistribution;
@@ -22,8 +22,8 @@ public abstract class LibrarySoftwareDistributionDiscoverer<T extends LibraryCom
     }
 
     @Override
-    public @Nullable SoftwareDistribution discover(@NonNull Instance instance) {
-        for (ClassPathEntry classPathEntry : instance.getBuildInfo().getClassPath()) {
+    public @Nullable SoftwareDistribution discover(@NonNull BuildInfo buildInfo) {
+        for (ClassPathEntry classPathEntry : buildInfo.getClassPath()) {
 
             if (classPathEntry instanceof JarClassPathEntry jar) {
 

@@ -5,4 +5,5 @@ com.nucleonforge.axile.autoconfiguration.spring.ContextRestarterAutoConfiguratio
 com.nucleonforge.axile.autoconfiguration.spring.PropertyManagementAutoConfiguration
 com.nucleonforge.axile.autoconfiguration.spring.ProfileManagementAutoConfiguration
 com.nucleonforge.axile.autoconfiguration.spring.KafkaIntegrationAutoConfiguration
+com.nucleonforge.axile.autoconfiguration.spring.AxileMetadataEndpointConfiguration
 com.nucleonforge.axile.autoconfiguration.auth.JwtAuthAutoConfiguration

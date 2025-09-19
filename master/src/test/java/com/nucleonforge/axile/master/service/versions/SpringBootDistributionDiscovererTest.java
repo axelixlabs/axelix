@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import com.nucleonforge.axile.common.domain.JarClassPathEntry;
 import com.nucleonforge.axile.master.model.software.SoftwareDistribution;
 
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createBuildInfo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -32,7 +32,7 @@ class SpringBootDistributionDiscovererTest {
     void testDiscoverNoSpringBoot() {
 
         // when.
-        SoftwareDistribution result = discoverer.discover(createInstance(
+        SoftwareDistribution result = discoverer.discover(createBuildInfo(
                 new JarClassPathEntry("org.hibernate", "hibernate-core", "6.1.7", null, null),
                 new JarClassPathEntry("org.jboss", "jandex", "2.4.2", null, null),
                 new JarClassPathEntry("org.jetbrains.kotlin", "kotlin-stdlib", "2.0.17", null, null)));
@@ -47,7 +47,7 @@ class SpringBootDistributionDiscovererTest {
         // when.
         String springBootVersion = "2.4.2";
 
-        SoftwareDistribution result = discoverer.discover(createInstance(
+        SoftwareDistribution result = discoverer.discover(createBuildInfo(
                 new JarClassPathEntry("org.hibernate", "hibernate-core", "6.1.7", null, null),
                 new JarClassPathEntry("org.jboss", "jandex", "2.0.6", null, null),
                 new JarClassPathEntry("org.springframework.boot", "spring-boot", springBootVersion, null, null),

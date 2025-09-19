@@ -8,8 +8,14 @@ spring:
     servlet:
       path: /api/${spring.application.name}
 
+
 management:
   endpoints:
     web:
       exposure:
         include: [ "health" ]
+axile:
+  master:
+    discovery:
+      auto: true
+      execution-environment: k8s
