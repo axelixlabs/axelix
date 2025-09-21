@@ -17,7 +17,7 @@ public record GitProfile(String branch, @Nullable Commit commit) {
     /**
      * The profile of a given commit.
      *
-     * @param id     The ID of the commit.
+     * @param id     Hash of the commit.
      * @param time   The timestamp of the commit.
      *
      * @author Sergey Cherkasov

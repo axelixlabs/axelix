@@ -10,14 +10,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axile.auth.filter.AuthorityResolver;
-import com.nucleonforge.axile.auth.filter.DefaultAuthorityResolver;
-import com.nucleonforge.axile.auth.filter.JwtAuthorizationFilter;
-import com.nucleonforge.axile.auth.spi.Authorizer;
-import com.nucleonforge.axile.auth.spi.DefaultAuthorizer;
-import com.nucleonforge.axile.auth.spi.jwt.service.DefaultJwtDecoderService;
-import com.nucleonforge.axile.auth.spi.jwt.service.JwtDecoderService;
-import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
+import com.nucleonforge.axile.common.auth.AuthorityResolver;
+import com.nucleonforge.axile.common.auth.Authorizer;
+import com.nucleonforge.axile.common.auth.DefaultAuthorizer;
+import com.nucleonforge.axile.common.auth.jwt.JwtAlgorithm;
+import com.nucleonforge.axile.common.auth.jwt.JwtAuthorizationFilter;
+import com.nucleonforge.axile.common.auth.jwt.service.DefaultJwtDecoderService;
+import com.nucleonforge.axile.common.auth.jwt.service.JwtDecoderService;
+import com.nucleonforge.axile.sbs.auth.DefaultAuthorityResolver;
 
 /**
  * {@link AutoConfiguration} for JWT-based authentication support.

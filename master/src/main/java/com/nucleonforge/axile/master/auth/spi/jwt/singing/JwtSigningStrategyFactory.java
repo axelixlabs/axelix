@@ -5,7 +5,7 @@ import java.util.Objects;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.MacAlgorithm;
 
-import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
+import com.nucleonforge.axile.common.auth.jwt.JwtAlgorithm;
 
 /**
  * Factory for creating {@link JwtSigningStrategy} instances
