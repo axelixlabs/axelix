@@ -14,8 +14,8 @@ import com.nucleonforge.axile.common.auth.core.Authority;
 import com.nucleonforge.axile.common.auth.core.JwtRole;
 import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
-import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
-import com.nucleonforge.axile.common.auth.spi.jwt.TokenClaim;
+import com.nucleonforge.axile.common.auth.jwt.JwtAlgorithm;
+import com.nucleonforge.axile.common.auth.jwt.TokenClaim;
 import com.nucleonforge.axile.master.auth.spi.jwt.singing.JwtSigningStrategy;
 import com.nucleonforge.axile.master.auth.spi.jwt.singing.JwtSigningStrategyFactory;
 
