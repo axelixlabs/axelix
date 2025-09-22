@@ -1,7 +1,6 @@
 package com.nucleonforge.axile.master.service.transport.loggers;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
@@ -23,9 +22,11 @@ import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
+import com.nucleonforge.axile.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -45,6 +46,9 @@ public class ClearForLoggerEndpointProberTest {
 
     @Autowired
     private ClearForLoggerEndpointProber clearForLoggerEndpointProber;
+
+    @Autowired
+    private JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     @BeforeAll
     static void startServer() throws IOException {
@@ -76,25 +80,25 @@ public class ClearForLoggerEndpointProberTest {
 
     @Test
     void shouldSendPostRequestToClearConfiguredLoggerLevel() throws InterruptedException {
+        // language=json
+        String jsonRequest = """
+            {}
+            """;
         String loggerName = "com.example.org";
         registry.register(createInstanceWithUrl(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
         HttpPayload payload = new DefaultHttpPayload(
-                Collections.emptyList(),
-                Collections.emptyList(),
                 Map.of("logger.name", loggerName),
-                "{}".getBytes(StandardCharsets.UTF_8));
+                jacksonMessageSerializationStrategy.serialize(Collections.emptyMap()));
 
         // when
-        Object result = clearForLoggerEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
+        clearForLoggerEndpointProber.invokeNoValue(InstanceId.of(activeInstanceId), payload);
 
         // then
-        assertThat(result).isNotNull();
-
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
         assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/loggers/" + loggerName);
-        assertThat(recordedRequest.getBody().readUtf8()).isEqualTo("{}");
+        assertThatJson(recordedRequest.getBody().readUtf8()).isEqualTo(jsonRequest);
     }
 }

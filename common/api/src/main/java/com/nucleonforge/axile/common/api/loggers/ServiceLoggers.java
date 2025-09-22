@@ -16,5 +16,5 @@ import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
  */
 public record ServiceLoggers(
         @JsonProperty("levels") List<String> levels,
-        @JsonProperty("loggers") Map<String, LoggerLoggers> loggers,
-        @JsonProperty("groups") Map<String, GroupLoggers> groups) {}
+        @JsonProperty("loggers") Map<String, LoggerLevels> loggers,
+        @JsonProperty("groups") Map<String, LoggerGroup> groups) {}

@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.api.LoggersApi;
+import com.nucleonforge.axile.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
@@ -46,6 +47,9 @@ public class LoggersApiClearLoggingLevelByLoggerNameTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     @Autowired
     private InstanceRegistry registry;
@@ -118,7 +122,6 @@ public class LoggersApiClearLoggingLevelByLoggerNameTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
-        ;
         String loggerName = "com.example";
 
         registry.register(createInstance(instanceId));

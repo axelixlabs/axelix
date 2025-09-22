@@ -4,7 +4,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axile.common.api.loggers.GroupLoggers;
+import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
@@ -17,11 +17,11 @@ import com.nucleonforge.axile.master.service.transport.AbstractEndpointProber;
  * @author Sergey Cherkasov
  */
 @Service
-public class GroupLoggersEndpointProber extends AbstractEndpointProber<GroupLoggers> {
+public class GroupLoggersEndpointProber extends AbstractEndpointProber<LoggerGroup> {
 
     public GroupLoggersEndpointProber(
             InstanceRegistry instanceRegistry,
-            MessageDeserializationStrategy<GroupLoggers> messageDeserializationStrategy) {
+            MessageDeserializationStrategy<LoggerGroup> messageDeserializationStrategy) {
         super(instanceRegistry, messageDeserializationStrategy);
     }
 

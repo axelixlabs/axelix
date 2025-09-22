@@ -7,4 +7,4 @@ package com.nucleonforge.axile.master.api.request;
  *
  * @author Sergey Cherkasov
  */
-public record LoggersRequest(String configuredLevel) {}
+public record LogLevelChangeRequest(String configuredLevel) {}

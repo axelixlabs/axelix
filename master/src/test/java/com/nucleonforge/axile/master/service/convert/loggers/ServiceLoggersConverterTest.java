@@ -6,8 +6,8 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.loggers.GroupLoggers;
-import com.nucleonforge.axile.common.api.loggers.LoggerLoggers;
+import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
+import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axile.common.api.loggers.ServiceLoggers;
 import com.nucleonforge.axile.master.api.response.loggers.GroupProfile;
 import com.nucleonforge.axile.master.api.response.loggers.LoggerProfile;
@@ -26,7 +26,7 @@ public class ServiceLoggersConverterTest {
 
     @BeforeEach
     void setUp() {
-        subject = new ServiceLoggersConverter(new GroupLoggersConverter(), new LoggerLoggersConverter());
+        subject = new ServiceLoggersConverter(new LoggerGroupConverter(), new LoggerLevelsConverter());
     }
 
     @Test
@@ -87,19 +87,19 @@ public class ServiceLoggersConverterTest {
         List<String> levels = List.of("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE");
 
         // loggers
-        Map<String, LoggerLoggers> loggers = Map.of(
+        Map<String, LoggerLevels> loggers = Map.of(
                 "ROOT",
-                new LoggerLoggers("INFO", "INFO"),
+                new LoggerLevels("INFO", "INFO"),
                 "com.example",
-                new LoggerLoggers("DEBUG", "DEBUG"),
+                new LoggerLevels("DEBUG", "DEBUG"),
                 "org",
-                new LoggerLoggers(null, "INFO"));
+                new LoggerLevels(null, "INFO"));
 
         // groups
-        Map<String, GroupLoggers> groups = Map.of(
-                "test", new GroupLoggers("INFO", List.of("test.member1", "test.member2")),
+        Map<String, LoggerGroup> groups = Map.of(
+                "test", new LoggerGroup("INFO", List.of("test.member1", "test.member2")),
                 "web",
-                        new GroupLoggers(
+                        new LoggerGroup(
                                 null,
                                 List.of(
                                         "org.springframework.core.codec",
@@ -108,7 +108,7 @@ public class ServiceLoggersConverterTest {
                                         "org.springframework.boot.actuate.endpoint.web",
                                         "org.springframework.boot.web.servlet.ServletContextInitializerBeans")),
                 "sql",
-                        new GroupLoggers(
+                        new LoggerGroup(
                                 null,
                                 List.of(
                                         "org.springframework.jdbc.core",

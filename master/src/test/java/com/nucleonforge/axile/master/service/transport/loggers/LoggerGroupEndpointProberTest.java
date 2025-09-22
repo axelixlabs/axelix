@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axile.common.api.loggers.GroupLoggers;
+import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
-public class GroupLoggersEndpointProberTest {
+public class LoggerGroupEndpointProberTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
@@ -93,7 +93,7 @@ public class GroupLoggersEndpointProberTest {
         HttpPayload payload = new DefaultHttpPayload(Map.of("group.name", groupName));
 
         // when.
-        GroupLoggers group = groupLoggersEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
+        LoggerGroup group = groupLoggersEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
 
         // then
         assertThat(group.configuredLevel()).isEqualTo("INFO");

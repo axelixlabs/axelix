@@ -6,12 +6,12 @@ import org.jspecify.annotations.Nullable;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
- * DTO that encapsulates the logger information of the given artifact.
+ * DTO that encapsulates the logging level information of the single logger.
  *
  * @see ActuatorEndpoint
  * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html">Loggers Endpoint</a>
  * @author Sergey Cherkasov
  */
-public record LoggerLoggers(
+public record LoggerLevels(
         @JsonProperty("configuredLevel") @Nullable String configuredLevel,
         @JsonProperty("effectiveLevel") String effectiveLevel) {}

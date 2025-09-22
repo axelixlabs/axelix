@@ -20,23 +20,23 @@ import com.nucleonforge.axile.master.service.convert.Converter;
  */
 @Service
 public class ServiceLoggersConverter implements Converter<ServiceLoggers, LoggersResponse> {
-    private final GroupLoggersConverter groupLoggersConverter;
-    private final LoggerLoggersConverter loggerLoggersConverter;
+    private final LoggerGroupConverter loggerGroupConverter;
+    private final LoggerLevelsConverter loggerLevelsConverter;
 
     public ServiceLoggersConverter(
-            GroupLoggersConverter groupLoggersConverter, LoggerLoggersConverter loggerLoggersConverter) {
-        this.groupLoggersConverter = groupLoggersConverter;
-        this.loggerLoggersConverter = loggerLoggersConverter;
+            LoggerGroupConverter loggerGroupConverter, LoggerLevelsConverter loggerLevelsConverter) {
+        this.loggerGroupConverter = loggerGroupConverter;
+        this.loggerLevelsConverter = loggerLevelsConverter;
     }
 
     @Override
     public @NonNull LoggersResponse convertInternal(@NonNull ServiceLoggers source) {
 
         Map<String, GroupProfile> groups = source.groups().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> groupLoggersConverter.convert(e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> loggerGroupConverter.convert(e.getValue())));
 
         Map<String, LoggerProfile> loggers = source.loggers().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> loggerLoggersConverter.convert(e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> loggerLevelsConverter.convert(e.getValue())));
 
         return new LoggersResponse(source.levels(), groups, loggers);
     }

@@ -1,6 +1,5 @@
 package com.nucleonforge.axile.master.api;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -21,19 +20,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nucleonforge.axile.common.api.loggers.GroupLoggers;
-import com.nucleonforge.axile.common.api.loggers.LoggerLoggers;
+import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
+import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axile.common.api.loggers.ServiceLoggers;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
-import com.nucleonforge.axile.master.api.request.LoggersRequest;
+import com.nucleonforge.axile.master.api.request.LogLevelChangeRequest;
 import com.nucleonforge.axile.master.api.response.loggers.GroupProfile;
 import com.nucleonforge.axile.master.api.response.loggers.LoggerProfile;
 import com.nucleonforge.axile.master.api.response.loggers.LoggersResponse;
 import com.nucleonforge.axile.master.service.convert.Converter;
+import com.nucleonforge.axile.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axile.master.service.transport.loggers.AllLoggersEndpointProber;
 import com.nucleonforge.axile.master.service.transport.loggers.ClearForLoggerEndpointProber;
 import com.nucleonforge.axile.master.service.transport.loggers.GroupLoggersEndpointProber;
@@ -61,8 +61,9 @@ public class LoggersApi {
     private final SetForLoggerGroupEndpointProber setForLoggerGroupEndpointProber;
     private final ClearForLoggerEndpointProber clearForLoggerEndpointProber;
     private final Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter;
-    private final Converter<GroupLoggers, GroupProfile> groupProfileConverter;
-    private final Converter<LoggerLoggers, LoggerProfile> loggerProfileConverter;
+    private final Converter<LoggerGroup, GroupProfile> groupProfileConverter;
+    private final Converter<LoggerLevels, LoggerProfile> loggerProfileConverter;
+    private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     public LoggersApi(
             AllLoggersEndpointProber allLoggersEndpointProber,
@@ -72,8 +73,9 @@ public class LoggersApi {
             SetForLoggerGroupEndpointProber setForLoggerGroupEndpointProber,
             ClearForLoggerEndpointProber clearForLoggerEndpointProber,
             Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter,
-            Converter<GroupLoggers, GroupProfile> groupProfileConverter,
-            Converter<LoggerLoggers, LoggerProfile> loggerProfileConverter) {
+            Converter<LoggerGroup, GroupProfile> groupProfileConverter,
+            Converter<LoggerLevels, LoggerProfile> loggerProfileConverter,
+            JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
         this.allLoggersEndpointProber = allLoggersEndpointProber;
         this.groupLoggersEndpointProber = groupLoggersEndpointProber;
         this.oneLoggerEndpointProber = oneLoggerEndpointProber;
@@ -83,6 +85,7 @@ public class LoggersApi {
         this.loggersResponseConverter = loggersResponseConverter;
         this.groupProfileConverter = groupProfileConverter;
         this.loggerProfileConverter = loggerProfileConverter;
+        this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
 
     @Operation(
@@ -119,6 +122,7 @@ public class LoggersApi {
     @GetMapping(path = ApiPaths.LoggersApi.INSTANCE_ID)
     public LoggersResponse getAllLoggers(@PathVariable("instanceId") String instanceId) {
         ServiceLoggers loggers = allLoggersEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+
         return Objects.requireNonNull(loggersResponseConverter.convert(loggers));
     }
 
@@ -160,7 +164,8 @@ public class LoggersApi {
     public GroupProfile getGroupByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("groupName") String groupName) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("group.name", groupName));
-        GroupLoggers group = groupLoggersEndpointProber.invoke(InstanceId.of(instanceId), payload);
+        LoggerGroup group = groupLoggersEndpointProber.invoke(InstanceId.of(instanceId), payload);
+
         return Objects.requireNonNull(groupProfileConverter.convert(group));
     }
 
@@ -202,14 +207,16 @@ public class LoggersApi {
     public LoggerProfile getLoggerByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("logger.name", loggerName));
-        LoggerLoggers logger = oneLoggerEndpointProber.invoke(InstanceId.of(instanceId), payload);
+        LoggerLevels logger = oneLoggerEndpointProber.invoke(InstanceId.of(instanceId), payload);
+
         return Objects.requireNonNull(loggerProfileConverter.convert(logger));
     }
 
     @Operation(
             summary =
                     "The request specifies the desired logging level for a logger by its name and returns the result of the request.",
-            description = "Logging levels: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE",
+            description =
+                    "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE",
             responses = {
                 @ApiResponse(
                         description = "OK",
@@ -247,21 +254,20 @@ public class LoggersApi {
     public LoggerProfile setLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("loggerName") String loggerName,
-            @RequestBody LoggersRequest loggingLevel) {
-        String requestBody = "{\"configuredLevel\":\"%s\"}".formatted(loggingLevel.configuredLevel());
+            @RequestBody LogLevelChangeRequest loggingLevel) {
+
         HttpPayload payload = new DefaultHttpPayload(
-                Collections.emptyList(),
-                Collections.emptyList(),
-                Map.of("logger.name", loggerName),
-                requestBody.getBytes(StandardCharsets.UTF_8));
-        setOneLoggerEndpointProber.invoke(InstanceId.of(instanceId), payload);
+                Map.of("logger.name", loggerName), jacksonMessageSerializationStrategy.serialize(loggingLevel));
+        setOneLoggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
+
         return getLoggerByName(instanceId, loggerName);
     }
 
     @Operation(
             summary =
                     "The request specifies the desired logging level for a logger group by its name and returns the result of the request.",
-            description = "Logging levels: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE",
+            description =
+                    "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE",
             responses = {
                 @ApiResponse(
                         description = "OK",
@@ -299,14 +305,12 @@ public class LoggersApi {
     public GroupProfile setLoggingLevelByGroupName(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("groupName") String groupName,
-            @RequestBody LoggersRequest loggingLevel) {
-        String requestBody = "{\"configuredLevel\":\"%s\"}".formatted(loggingLevel.configuredLevel());
+            @RequestBody LogLevelChangeRequest loggingLevel) {
+
         HttpPayload payload = new DefaultHttpPayload(
-                Collections.emptyList(),
-                Collections.emptyList(),
-                Map.of("group.name", groupName),
-                requestBody.getBytes(StandardCharsets.UTF_8));
-        setForLoggerGroupEndpointProber.invoke(InstanceId.of(instanceId), payload);
+                Map.of("group.name", groupName), jacksonMessageSerializationStrategy.serialize(loggingLevel));
+        setForLoggerGroupEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
+
         return getGroupByName(instanceId, groupName);
     }
 
@@ -348,12 +352,12 @@ public class LoggersApi {
     @PostMapping(path = ApiPaths.LoggersApi.CLEAR_FOR_LOGGER)
     public LoggerProfile clearLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
+
         HttpPayload payload = new DefaultHttpPayload(
-                Collections.emptyList(),
-                Collections.emptyList(),
                 Map.of("logger.name", loggerName),
-                "{}".getBytes(StandardCharsets.UTF_8));
-        clearForLoggerEndpointProber.invoke(InstanceId.of(instanceId), payload);
+                jacksonMessageSerializationStrategy.serialize(Collections.emptyMap()));
+        clearForLoggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
+
         return getLoggerByName(instanceId, loggerName);
     }
 }

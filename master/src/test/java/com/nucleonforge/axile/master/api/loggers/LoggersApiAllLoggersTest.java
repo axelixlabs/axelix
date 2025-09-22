@@ -41,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LoggersApiAllLoggersTest {
     // language=json
-    String EXPECTED_LOGGERS_JSON =
+    private static final String EXPECTED_LOGGERS_JSON =
             """
 
         {
@@ -190,7 +190,6 @@ public class LoggersApiAllLoggersTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
-        ;
 
         registry.register(createInstance(instanceId));
 

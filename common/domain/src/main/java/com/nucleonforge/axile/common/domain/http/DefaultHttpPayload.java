@@ -20,4 +20,8 @@ public record DefaultHttpPayload(
     public DefaultHttpPayload(Map<String, String> pathVariableValues) {
         this(Collections.emptyList(), Collections.emptyList(), pathVariableValues, new byte[0]);
     }
+
+    public DefaultHttpPayload(Map<String, String> pathVariableValues, byte[] requestBody) {
+        this(Collections.emptyList(), Collections.emptyList(), pathVariableValues, requestBody);
+    }
 }

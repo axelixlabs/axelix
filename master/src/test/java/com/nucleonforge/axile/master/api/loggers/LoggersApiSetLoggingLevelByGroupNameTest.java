@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.api.LoggersApi;
-import com.nucleonforge.axile.master.api.request.LoggersRequest;
+import com.nucleonforge.axile.master.api.request.LogLevelChangeRequest;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
@@ -101,7 +101,7 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
             """;
 
         String groupName = "test";
-        LoggersRequest requestBody = new LoggersRequest("INFO");
+        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
 
         registry.register(createInstanceWithUrl(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
@@ -124,7 +124,7 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
         String groupName = "test";
-        LoggersRequest requestBody = new LoggersRequest("INFO");
+        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
 
         registry.register(createInstance(instanceId));
 
@@ -140,7 +140,7 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = "unregistered-loggers-group-instance";
         String groupName = "test";
-        LoggersRequest requestBody = new LoggersRequest("INFO");
+        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(

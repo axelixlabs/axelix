@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axile.common.api.loggers.LoggerLoggers;
+import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
@@ -92,7 +92,7 @@ public class OneLoggerEndpointProberTest {
         HttpPayload payload = new DefaultHttpPayload(Map.of("logger.name", groupName));
 
         // when.
-        LoggerLoggers logger = oneLoggerEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
+        LoggerLevels logger = oneLoggerEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
 
         // then
         assertThat(logger.configuredLevel()).isEqualTo("DEBUG");
