@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.AxileMetadata;
+import com.nucleonforge.axile.common.api.ManagedServiceMetadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,20 +21,16 @@ class MetadataJacksonMessageDeserializationStrategyTest {
 
     @Test
     void shouldDeserializeMetadata() {
-        // when.
         // language=json
-        String response =
-                """
-    {
-      "groupId": "com.nucleonforge.axile",
-      "version": "1.0.0-SNAPSHOT"
-     }
-    """;
+        String response = """
+           {
+             "version": "1.0.0-SNAPSHOT"
+           }
+           """;
 
-        AxileMetadata metadata = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
+        ManagedServiceMetadata metadata = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         assertThat(metadata).isNotNull();
         assertThat(metadata.version()).isEqualTo("1.0.0-SNAPSHOT");
-        assertThat(metadata.groupId()).isEqualTo("com.nucleonforge.axile");
     }
 }

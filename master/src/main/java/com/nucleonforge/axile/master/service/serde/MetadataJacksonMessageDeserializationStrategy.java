@@ -5,24 +5,24 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.AxileMetadata;
+import com.nucleonforge.axile.common.api.ManagedServiceMetadata;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for {@link AxileMetadata}.
+ * {@link JacksonMessageDeserializationStrategy} for {@link ManagedServiceMetadata}.
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
  */
 @Component
 public class MetadataJacksonMessageDeserializationStrategy
-        extends JacksonMessageDeserializationStrategy<AxileMetadata> {
+        extends JacksonMessageDeserializationStrategy<ManagedServiceMetadata> {
 
     public MetadataJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
     @Override
-    public @NonNull Class<AxileMetadata> supported() {
-        return AxileMetadata.class;
+    public @NonNull Class<ManagedServiceMetadata> supported() {
+        return ManagedServiceMetadata.class;
     }
 }

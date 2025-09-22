@@ -7,6 +7,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
 
@@ -53,6 +55,31 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
                 return messageDeserializationStrategy.deserialize(responseBody);
             } else {
                 throw new EndpointInvocationException(unexpectedStatusCode(instanceId, endpoint, statusCode));
+            }
+
+        } catch (IOException | InterruptedException e) {
+            throw new EndpointInvocationException(e);
+        }
+    }
+
+    @Override
+    public @NonNull O invoke(@NonNull String baseUrl, HttpPayload httpPayload) throws EndpointInvocationException {
+        String path = supports().path().expand(Map.of(), List.of());
+
+        String url = baseUrl + path;
+
+        HttpRequest request =
+                HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+
+        try {
+            HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+            int statusCode = response.statusCode();
+            if (statusCode >= 200 && statusCode < 300) {
+                return messageDeserializationStrategy.deserialize(response.body());
+            } else {
+                throw new EndpointInvocationException("Endpoint '%s' on instance '%s' responded with %d"
+                        .formatted(supports().path(), baseUrl, statusCode));
             }
 
         } catch (IOException | InterruptedException e) {

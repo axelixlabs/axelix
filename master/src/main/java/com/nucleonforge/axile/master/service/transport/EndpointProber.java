@@ -30,6 +30,17 @@ public interface EndpointProber<O> {
             throws EndpointInvocationException, InstanceNotFoundException;
 
     /**
+     * Invoke the actual {@link ActuatorEndpoint} using the given base url.
+     *
+     * @param baseUrl the base url of the request
+     * @param httpPayload the abstraction that encapsulates the http payload of the request
+     * @return the result of the invocation. Guaranteed to be not null.
+     * @throws EndpointInvocationException in case the invocation to managed service did not result in successful response.
+     */
+    @NonNull
+    O invoke(@NonNull String baseUrl, HttpPayload httpPayload) throws EndpointInvocationException;
+
+    /**
      * @return the {@link ActuatorEndpoint} that this prober supports
      */
     @NonNull

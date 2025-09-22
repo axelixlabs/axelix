@@ -5,7 +5,7 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
 /**
  * Custom Spring Boot Actuator endpoint. Provides access to basic build information
- * such as the application group and version.
+ * such as the application version.
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
@@ -13,8 +13,8 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 @Endpoint(id = "axile-metadata")
 public class AxileMetadataEndpoint {
 
-    @ReadOperation // TODO currently hardcoded - is ok.
-    public AxileMetadataResponse getMetadata() {
-        return new AxileMetadataResponse("com.nucleonforge.axile", "1.0.0-SNAPSHOT");
+    @ReadOperation // TODO: currently hardcoded - is ok, waiting for issue #88 to be implemented
+    public MetadataResponse getMetadata() {
+        return new MetadataResponse("1.0.0-SNAPSHOT");
     }
 }

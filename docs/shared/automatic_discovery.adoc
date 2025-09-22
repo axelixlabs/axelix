@@ -1,0 +1,29 @@
+== Automatic Discovery
+
+The Axile Master supports automatic discovery of managed Spring Boot service instances.
+Currently, this is only supported in Kubernetes environments.
+
+This behavior is controlled by the following configuration properties:
+
+[cols="2,1,2,4,2", options="header"]
+|===
+| Property Key | Mandatory | Property Default Value | Description | Example
+
+| *axile.master.discovery.auto*
+| No
+| false
+| Enables automatic discovery of managed service instances. If set to `true`, Axile Master will attempt to discover and register services automatically at startup.
+| true
+
+| *axile.master.discovery.execution-environment*
+| Yes (if `axile.master.discovery.auto=true`), Otherwise - No
+| N/A
+| Defines the execution environment in which the Axile Master runs. Determines which discovery strategy is applied. Currently, only `k8s` is supported.
+| k8s
+|===
+
+When both `auto=true` and `execution-environment=k8s` are configured:
+
+* The Axile Master scans the Kubernetes environment for candidate service instances.
+* Identifies and logs the discovered services.
+* Automatically registers only those services that are equipped with the ASBS (Axile Spring Boot Starter) for management.

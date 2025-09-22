@@ -16,7 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axile.common.api.AxileMetadata;
+import com.nucleonforge.axile.common.api.ManagedServiceMetadata;
+import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -24,20 +25,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Integration tests for {@link DefaultMetadataEndpointProber}.
+ * Integration tests for {@link ManagedServiceMetadataEndpointProber}.
  *
- * @since 29.09.2025
+ * @since 19.09.2025
  * @author Nikita Kirillov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
-class DefaultMetadataEndpointProberTest {
+class ManagedServiceMetadataEndpointProberTest {
 
     private static final String activeInstanceUrl = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private DefaultMetadataEndpointProber metadataEndpointProber;
+    private ManagedServiceMetadataEndpointProber metadataEndpointProber;
 
     @BeforeAll
     static void startServer() throws IOException {
@@ -53,10 +54,8 @@ class DefaultMetadataEndpointProberTest {
     @BeforeEach
     void setUp() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
             {
-              "groupId": "com.nucleonforge.axile",
               "version": "1.0.0-SNAPSHOT"
             }
             """;
@@ -81,10 +80,10 @@ class DefaultMetadataEndpointProberTest {
     @Test
     void shouldReturnMetadata() throws EndpointInvocationException {
         String instanceUrl = mockWebServer.url(activeInstanceUrl).toString();
-        AxileMetadata metadata = metadataEndpointProber.invoke(instanceUrl + "/actuator");
+        ManagedServiceMetadata metadata =
+                metadataEndpointProber.invoke(instanceUrl + "/actuator", NoHttpPayload.INSTANCE);
 
         assertThat(metadata).isNotNull();
-        assertThat(metadata.groupId()).isEqualTo("com.nucleonforge.axile");
         assertThat(metadata.version()).isEqualTo("1.0.0-SNAPSHOT");
     }
 
@@ -98,7 +97,7 @@ class DefaultMetadataEndpointProberTest {
         });
 
         String instanceUrl = mockWebServer.url(activeInstanceUrl).toString();
-        assertThatThrownBy(() -> metadataEndpointProber.invoke(instanceUrl))
+        assertThatThrownBy(() -> metadataEndpointProber.invoke(instanceUrl, NoHttpPayload.INSTANCE))
                 .isInstanceOf(EndpointInvocationException.class);
     }
 
@@ -106,7 +105,7 @@ class DefaultMetadataEndpointProberTest {
     void shouldThrowExceptionWhenInstanceUrlIsInvalid() {
         String invalidUrl = "http://localhost:0/non-existent";
 
-        assertThatThrownBy(() -> metadataEndpointProber.invoke(invalidUrl))
+        assertThatThrownBy(() -> metadataEndpointProber.invoke(invalidUrl, NoHttpPayload.INSTANCE))
                 .isInstanceOf(EndpointInvocationException.class);
     }
 }

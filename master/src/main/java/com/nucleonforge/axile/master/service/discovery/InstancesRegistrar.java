@@ -40,7 +40,7 @@ public class InstancesRegistrar {
             for (InstanceReference instanceReference : discovered) {
                 instanceRegistry.register(instanceReference);
             }
-        } /*else { //todo
+        } /*else {  // TODO: intentionally commented out, waiting for issue #86 to be implemented
               log.info("Automatic discovery of services is not enabled, assuming the services will register themselves");
           }*/
     }

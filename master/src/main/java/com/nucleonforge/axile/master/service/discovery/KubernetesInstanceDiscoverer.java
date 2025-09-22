@@ -16,11 +16,12 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.nucleonforge.axile.common.api.AxileMetadata;
+import com.nucleonforge.axile.common.api.ManagedServiceMetadata;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.InstanceReference;
+import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
-import com.nucleonforge.axile.master.service.transport.MetadataEndpointProber;
+import com.nucleonforge.axile.master.service.transport.ManagedServiceMetadataEndpointProber;
 
 /**
  * Kubernetes implementation of {@link InstancesDiscoverer}.
@@ -36,12 +37,13 @@ public class KubernetesInstanceDiscoverer implements InstancesDiscoverer {
     private static final Logger log = LoggerFactory.getLogger(KubernetesInstanceDiscoverer.class);
 
     private final DiscoveryClient discoveryClient;
-    private final MetadataEndpointProber metadataEndpointProber;
+    private final ManagedServiceMetadataEndpointProber managedServiceProber;
 
     public KubernetesInstanceDiscoverer(
-            DiscoveryClient discoveryClient, MetadataEndpointProber metadataEndpointProber) {
+            DiscoveryClient discoveryClient,
+            ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber) {
         this.discoveryClient = discoveryClient;
-        this.metadataEndpointProber = metadataEndpointProber;
+        this.managedServiceProber = managedServiceMetadataEndpointProber;
     }
 
     @Override
@@ -78,15 +80,15 @@ public class KubernetesInstanceDiscoverer implements InstancesDiscoverer {
     private boolean isManagedInstance(ServiceInstance serviceInstance) {
         String actuatorUrl = serviceInstance.getUri().toString() + "/actuator";
         try {
-            AxileMetadata metadata = metadataEndpointProber.invoke(actuatorUrl);
+            ManagedServiceMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
             return isCompatibleVersion(serviceInstance, metadata);
         } catch (EndpointInvocationException ignored) {
             return false;
         }
     }
 
-    // TODO currently hardcoded - is ok.
-    private boolean isCompatibleVersion(ServiceInstance serviceInstance, AxileMetadata metadata) {
+    private boolean isCompatibleVersion(ServiceInstance serviceInstance, ManagedServiceMetadata metadata) {
+        // TODO: currently version hardcoded - is ok, waiting for issue #88 to be implemented
         if (metadata.version().equals("1.0.0-SNAPSHOT")) {
             return true;
         } else {
