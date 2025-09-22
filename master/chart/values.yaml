@@ -23,9 +23,7 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations: 
-  helm.sh/hook-time: "{{ now | quote }}"
-
+podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
