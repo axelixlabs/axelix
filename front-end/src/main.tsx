@@ -1,12 +1,12 @@
 import { StrictMode } from "react";
+import { ConfigProvider } from "antd";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { ConfigProvider } from "antd";
 
 const theme = {
   token: {
-    colorPrimary: "#55BD34",
+    colorPrimary: "#00AB55",
     fontFamily: "'Golos', sans-serif",
   },
 };
