@@ -7,7 +7,14 @@ spring:
   mvc:
     servlet:
       path: /api/${spring.application.name}
-
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: true
+        discovery-server-url: https://kubernetes.default.svc
+        all-namespaces: false
+      client:
+        trust-certs: true
 
 management:
   endpoints:
