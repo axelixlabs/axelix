@@ -4,18 +4,18 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.loggers.GroupLoggers;
+import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axile.master.api.response.loggers.GroupProfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link GroupLoggersConverter}
+ * Unit tests for {@link LoggerGroupConverter}
  *
  * @author Sergey Cherkasov
  */
-public class GroupLoggersConverterTest {
-    private final GroupLoggersConverter subject = new GroupLoggersConverter();
+public class LoggerGroupConverterTest {
+    private final LoggerGroupConverter subject = new LoggerGroupConverter();
 
     @Test
     void testConvertHappyPath() {
@@ -25,7 +25,7 @@ public class GroupLoggersConverterTest {
                 "org.springframework.web",
                 "org.springframework.boot.actuate.endpoint.web",
                 "org.springframework.boot.web.servlet.ServletContextInitializerBeans");
-        GroupLoggers group = new GroupLoggers("web", members);
+        LoggerGroup group = new LoggerGroup("web", members);
 
         // when.
         GroupProfile request = subject.convertInternal(group);

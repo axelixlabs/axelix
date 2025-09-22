@@ -17,8 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axile.common.api.loggers.GroupLoggers;
-import com.nucleonforge.axile.common.api.loggers.LoggerLoggers;
+import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
+import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axile.common.api.loggers.ServiceLoggers;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
@@ -125,7 +125,7 @@ public class AllLoggersEndpointProberTest {
                 .containsExactlyInAnyOrder("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE");
 
         // logger
-        Map<String, LoggerLoggers> logger = loggers.loggers();
+        Map<String, LoggerLevels> logger = loggers.loggers();
         assertThat(logger).hasSize(3);
 
         // logger -> "ROOT"
@@ -141,7 +141,7 @@ public class AllLoggersEndpointProberTest {
         assertThat(logger.get("org").effectiveLevel()).isEqualTo("INFO");
 
         // group
-        Map<String, GroupLoggers> group = loggers.groups();
+        Map<String, LoggerGroup> group = loggers.groups();
         assertThat(group).hasSize(3);
 
         // group -> "test"

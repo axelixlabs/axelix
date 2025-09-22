@@ -1,7 +1,6 @@
 package com.nucleonforge.axile.master.service.transport.loggers;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
@@ -23,9 +22,12 @@ import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
+import com.nucleonforge.axile.master.api.request.LogLevelChangeRequest;
+import com.nucleonforge.axile.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -44,6 +46,9 @@ public class SetForLoggerGroupEndpointProberTest {
 
     @Autowired
     private SetForLoggerGroupEndpointProber setForLoggerGroupEndpointProber;
+
+    @Autowired
+    private JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     @BeforeAll
     static void startServer() throws IOException {
@@ -75,6 +80,12 @@ public class SetForLoggerGroupEndpointProberTest {
 
     @Test
     void shouldSendPostRequestToSetLoggerGroupLevel() throws InterruptedException {
+        // language=json
+        String jsonRequest = """
+            {
+              "configuredLevel" : "DEBUG"
+            }
+            """;
         String groupName = "com";
         registry.register(createInstanceWithUrl(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
@@ -83,17 +94,15 @@ public class SetForLoggerGroupEndpointProberTest {
                 Collections.emptyList(),
                 Collections.emptyList(),
                 Map.of("group.name", groupName),
-                "{\"configuredLevel\":\"DEBUG\"}".getBytes(StandardCharsets.UTF_8));
+                jacksonMessageSerializationStrategy.serialize(new LogLevelChangeRequest("DEBUG")));
 
         // when
-        Object result = setForLoggerGroupEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
+        setForLoggerGroupEndpointProber.invokeNoValue(InstanceId.of(activeInstanceId), payload);
 
         // then
-        assertThat(result).isNotNull();
-
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
         assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/loggers/" + groupName);
-        assertThat(recordedRequest.getBody().readUtf8()).isEqualTo("{\"configuredLevel\":\"DEBUG\"}");
+        assertThatJson(recordedRequest.getBody().readUtf8()).isEqualTo(jsonRequest);
     }
 }

@@ -2,23 +2,23 @@ package com.nucleonforge.axile.master.service.convert.loggers;
 
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.loggers.LoggerLoggers;
+import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axile.master.api.response.loggers.LoggerProfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link LoggerLoggersConverter}
+ * Unit tests for {@link LoggerLevelsConverter}
  *
  * @author Sergey Cherkasov
  */
-public class LoggerLoggersConverterTest {
-    private final LoggerLoggersConverter subject = new LoggerLoggersConverter();
+public class LoggerLevelsConverterTest {
+    private final LoggerLevelsConverter subject = new LoggerLevelsConverter();
 
     @Test
     void testConvertHappyPath() {
-        LoggerLoggers loggersInfo = new LoggerLoggers(null, "INFO");
-        LoggerLoggers loggersDebug = new LoggerLoggers("DEBUG", "DEBUG");
+        LoggerLevels loggersInfo = new LoggerLevels(null, "INFO");
+        LoggerLevels loggersDebug = new LoggerLevels("DEBUG", "DEBUG");
 
         // when.
         LoggerProfile infoResponse = subject.convertInternal(loggersInfo);

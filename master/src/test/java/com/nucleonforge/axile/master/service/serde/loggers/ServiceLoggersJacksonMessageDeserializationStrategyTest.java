@@ -6,20 +6,20 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.loggers.GroupLoggers;
-import com.nucleonforge.axile.common.api.loggers.LoggerLoggers;
+import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
+import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axile.common.api.loggers.ServiceLoggers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link LoggersJacksonMessageDeserializationStrategy}.
+ * Unit tests for {@link ServiceLoggersJacksonMessageDeserializationStrategy}.
  *
  * @author Sergey Cherkasov
  */
-public class LoggersJacksonMessageDeserializationStrategyTest {
-    private final LoggersJacksonMessageDeserializationStrategy subject =
-            new LoggersJacksonMessageDeserializationStrategy(new ObjectMapper());
+public class ServiceLoggersJacksonMessageDeserializationStrategyTest {
+    private final ServiceLoggersJacksonMessageDeserializationStrategy subject =
+            new ServiceLoggersJacksonMessageDeserializationStrategy(new ObjectMapper());
 
     @Test
     void shouldDeserializeServiceLoggers() {
@@ -65,7 +65,7 @@ public class LoggersJacksonMessageDeserializationStrategyTest {
                 .containsExactlyInAnyOrder("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE");
 
         // logger
-        Map<String, LoggerLoggers> logger = loggers.loggers();
+        Map<String, LoggerLevels> logger = loggers.loggers();
         assertThat(logger).hasSize(3);
 
         // logger -> "ROOT"
@@ -81,7 +81,7 @@ public class LoggersJacksonMessageDeserializationStrategyTest {
         assertThat(logger.get("org").effectiveLevel()).isEqualTo("INFO");
 
         // group
-        Map<String, GroupLoggers> group = loggers.groups();
+        Map<String, LoggerGroup> group = loggers.groups();
         assertThat(group).hasSize(3);
 
         // group -> "test"

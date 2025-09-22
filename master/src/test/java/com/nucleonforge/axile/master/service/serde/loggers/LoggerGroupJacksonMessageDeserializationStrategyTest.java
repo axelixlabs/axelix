@@ -5,18 +5,18 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.loggers.GroupLoggers;
+import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link GroupLoggersJacksonMessageDeserializationStrategy}.
+ * Unit tests for {@link LoggerGroupJacksonMessageDeserializationStrategy}.
  *
  * @author Sergey Cherkasov
  */
-public class GroupLoggersJacksonMessageDeserializationStrategyTest {
-    private final GroupLoggersJacksonMessageDeserializationStrategy subject =
-            new GroupLoggersJacksonMessageDeserializationStrategy(new ObjectMapper());
+public class LoggerGroupJacksonMessageDeserializationStrategyTest {
+    private final LoggerGroupJacksonMessageDeserializationStrategy subject =
+            new LoggerGroupJacksonMessageDeserializationStrategy(new ObjectMapper());
 
     @Test
     void shouldDeserializeGroupLoggers() {
@@ -38,8 +38,8 @@ public class GroupLoggersJacksonMessageDeserializationStrategyTest {
         """;
 
         // when.
-        GroupLoggers groupTest = subject.deserialize(responseGroupTest.getBytes(StandardCharsets.UTF_8));
-        GroupLoggers groupSql = subject.deserialize(responseGroupSql.getBytes(StandardCharsets.UTF_8));
+        LoggerGroup groupTest = subject.deserialize(responseGroupTest.getBytes(StandardCharsets.UTF_8));
+        LoggerGroup groupSql = subject.deserialize(responseGroupSql.getBytes(StandardCharsets.UTF_8));
 
         // groupTest
         assertThat(groupTest.configuredLevel()).isEqualTo("INFO");

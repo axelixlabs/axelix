@@ -14,10 +14,10 @@ import com.nucleonforge.axile.master.service.serde.JacksonMessageDeserialization
  * @author Sergey Cherkasov
  */
 @Component
-public class LoggersJacksonMessageDeserializationStrategy
+public class ServiceLoggersJacksonMessageDeserializationStrategy
         extends JacksonMessageDeserializationStrategy<ServiceLoggers> {
 
-    public LoggersJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
+    public ServiceLoggersJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
