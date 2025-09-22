@@ -1,8 +1,20 @@
 {
   "login": "Вход",
+  "logout": "Выйти",
   "username": "Имя пользователя",
   "enterUsername": "Введите имя пользователя",
   "password": "Пароль",
   "enterPassword": "Введите пароль",
-  "loginButtonText": "Войти"
+  "loginButtonText": "Войти",
+  "dashboard": "Дашборд",
+  "wallboard": "Панель",
+  "insights": "Аналитика",
+  "details": "Детали",
+  "metrics": "Метрики",
+  "environment": "Окружение",
+  "configurationProperties": "Свойства конфигурации",
+  "scheduledTasks": "Запланированные задачи",
+  "loggers": "Логгеры",
+  "mappings": "Сопоставления",
+  "caches": "Кэши"
 }

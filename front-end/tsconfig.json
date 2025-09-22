@@ -1,7 +1,9 @@
 {
   "files": [],
+  "exclude": ["node_modules", "cypress"],
   "references": [
     { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.cypress.json" }
   ]
 }

@@ -1,9 +1,12 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { DashboardLayout } from "../layout/DashboardLayout";
 
 export const MainRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<>1</>} />
+      <Route path="/" element={<DashboardLayout />}>
+        <Route index element={<>1</>} />
+      </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
