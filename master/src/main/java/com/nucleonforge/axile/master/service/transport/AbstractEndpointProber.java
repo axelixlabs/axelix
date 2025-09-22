@@ -7,8 +7,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
 
 import org.jspecify.annotations.NonNull;
 
@@ -35,7 +34,8 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
             InstanceRegistry instanceRegistry, MessageDeserializationStrategy<O> messageDeserializationStrategy) {
         this.instanceRegistry = instanceRegistry;
         this.messageDeserializationStrategy = messageDeserializationStrategy;
-        this.httpClient = HttpClient.newBuilder().build();
+        this.httpClient =
+                HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
     }
 
     @Override
@@ -44,9 +44,13 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
 
         ActuatorEndpoint endpoint = supports();
 
+        InstanceReference instanceReference =
+                instanceRegistry.get(instanceId).orElseThrow(() -> new InstanceNotFoundException(instanceId));
+
+        HttpRequest request = buildHttpRequest(supports(), httpPayload, instanceReference.actuatorUrl());
+
         try {
-            HttpResponse<byte[]> response = httpClient.send(
-                    buildHttpRequest(endpoint, instanceId, httpPayload), HttpResponse.BodyHandlers.ofByteArray());
+            HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
             int statusCode = response.statusCode();
 
@@ -64,12 +68,8 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
 
     @Override
     public @NonNull O invoke(@NonNull String baseUrl, HttpPayload httpPayload) throws EndpointInvocationException {
-        String path = supports().path().expand(Map.of(), List.of());
 
-        String url = baseUrl + path;
-
-        HttpRequest request =
-                HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+        HttpRequest request = buildHttpRequest(supports(), httpPayload, baseUrl);
 
         try {
             HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
@@ -87,15 +87,18 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
         }
     }
 
-    private HttpRequest buildHttpRequest(ActuatorEndpoint endpoint, InstanceId instanceId, HttpPayload httpPayload) {
-        InstanceReference instanceReference =
-                instanceRegistry.get(instanceId).orElseThrow(() -> new InstanceNotFoundException(instanceId));
+    private HttpRequest buildHttpRequest(ActuatorEndpoint endpoint, HttpPayload httpPayload, String baseOrActuatorUrl) {
+
+        String url = baseOrActuatorUrl
+                + endpoint.path().expand(httpPayload.pathVariableValues(), httpPayload.queryParameters());
 
         BodyPublisher bodyPublisher =
                 httpPayload.hasBody() ? BodyPublishers.ofByteArray(httpPayload.requestBody()) : BodyPublishers.noBody();
 
-        HttpRequest.Builder builder =
-                HttpRequest.newBuilder().method(endpoint.httpMethod().name(), bodyPublisher);
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .timeout(Duration.ofSeconds(5))
+                .method(endpoint.httpMethod().name(), bodyPublisher)
+                .uri(URI.create(url));
 
         if (httpPayload.hasHeaders()) {
             for (var header : httpPayload.headers()) {
@@ -103,13 +106,7 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
             }
         }
 
-        return builder.uri(buildUrl(endpoint, httpPayload, instanceReference)).build();
-    }
-
-    private static URI buildUrl(
-            ActuatorEndpoint endpoint, HttpPayload httpPayload, InstanceReference instanceReference) {
-        return URI.create(instanceReference.actuatorUrl()
-                + endpoint.path().expand(httpPayload.pathVariableValues(), httpPayload.queryParameters()));
+        return builder.build();
     }
 
     private static String unexpectedStatusCode(InstanceId instanceId, ActuatorEndpoint endpoint, int statusCode) {

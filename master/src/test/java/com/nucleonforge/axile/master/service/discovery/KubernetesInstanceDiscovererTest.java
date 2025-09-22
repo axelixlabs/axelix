@@ -99,7 +99,7 @@ class KubernetesInstanceDiscovererTest {
     }
 
     @Test
-    void shouldRegisterInstanceAfterInitialIncompatibleVersion() {
+    void shouldRegisterOnlyCompatibleInstance() {
         String firstServiceId = UUID.randomUUID().toString();
         String firstServiceInstanceBadVersionId = UUID.randomUUID().toString();
         String firstServiceInstanceGoodVersionId = UUID.randomUUID().toString();
@@ -173,13 +173,9 @@ class KubernetesInstanceDiscovererTest {
 
         Set<InstanceReference> instances = discoverer.discover();
 
-        assertThat(instances).hasSize(2);
-        assertThat(instances).anySatisfy(instance -> assertThat(instance.id().instanceId())
-                .isEqualTo(firstServiceInstanceGoodVersionId));
-        assertThat(instances).anySatisfy(instance -> assertThat(instance.id().instanceId())
-                .isEqualTo(secondServiceInstanceGoodVersionId));
-        assertThat(instances).noneSatisfy(instance -> assertThat(instance.id().instanceId())
-                .isEqualTo(firstServiceInstanceBadVersionId));
+        assertThat(instances)
+                .extracting(instance -> instance.id().instanceId())
+                .containsOnly(firstServiceInstanceGoodVersionId, secondServiceInstanceGoodVersionId);
     }
 
     @Test
@@ -189,5 +185,147 @@ class KubernetesInstanceDiscovererTest {
         Set<InstanceReference> instances = discoverer.discover();
 
         assertThat(instances).isEmpty();
+    }
+
+    @Test
+    void shouldIgnoreInstanceWhen404() {
+        String activeInstanceId = UUID.randomUUID().toString();
+        String failingInstanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String response = """
+        {
+          "version": "1.0.0-SNAPSHOT"
+        }
+        """;
+
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String path = request.getPath();
+                assert path != null;
+
+                if (path.equals("/" + activeInstanceId + "/actuator/axile-metadata")) {
+                    return new MockResponse()
+                            .setBody(response)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else {
+                    return new MockResponse().setResponseCode(404);
+                }
+            }
+        });
+
+        ServiceInstance healthy = Mockito.mock(ServiceInstance.class);
+        Mockito.when(healthy.getInstanceId()).thenReturn(activeInstanceId);
+        Mockito.when(healthy.getUri())
+                .thenReturn(mockWebServer.url(activeInstanceId).uri());
+
+        ServiceInstance failing = Mockito.mock(ServiceInstance.class);
+        Mockito.when(failing.getInstanceId()).thenReturn(failingInstanceId);
+        Mockito.when(failing.getUri())
+                .thenReturn(mockWebServer.url(failingInstanceId).uri());
+
+        Mockito.when(discoveryClient.getServices()).thenReturn(List.of("test-service"));
+        Mockito.when(discoveryClient.getInstances("test-service")).thenReturn(List.of(healthy, failing));
+
+        Set<InstanceReference> instances = discoverer.discover();
+
+        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(activeInstanceId);
+    }
+
+    @Test
+    void shouldIgnoreInstanceWhenConnectionTimedOut() {
+        String activeInstanceId = UUID.randomUUID().toString();
+        String timeoutInstanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String response = """
+        {
+          "version": "1.0.0-SNAPSHOT"
+        }
+        """;
+
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String path = request.getPath();
+                assert path != null;
+
+                if (path.equals("/" + activeInstanceId + "/actuator/axile-metadata")) {
+                    return new MockResponse()
+                            .setBody(response)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + timeoutInstanceId + "/actuator/axile-metadata")) {
+                    // simulate a timeout
+                    try {
+                        Thread.sleep(6000);
+                    } catch (InterruptedException ignored) {
+                    }
+                    return new MockResponse().setResponseCode(200);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        });
+
+        ServiceInstance healthy = Mockito.mock(ServiceInstance.class);
+        Mockito.when(healthy.getInstanceId()).thenReturn(activeInstanceId);
+        Mockito.when(healthy.getUri())
+                .thenReturn(mockWebServer.url(activeInstanceId).uri());
+
+        ServiceInstance slow = Mockito.mock(ServiceInstance.class);
+        Mockito.when(slow.getInstanceId()).thenReturn(timeoutInstanceId);
+        Mockito.when(slow.getUri())
+                .thenReturn(mockWebServer.url(timeoutInstanceId).uri());
+
+        Mockito.when(discoveryClient.getServices()).thenReturn(List.of("test-service"));
+        Mockito.when(discoveryClient.getInstances("test-service")).thenReturn(List.of(healthy, slow));
+
+        Set<InstanceReference> instances = discoverer.discover();
+
+        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(activeInstanceId);
+    }
+
+    @Test
+    void shouldIgnoreInstanceWhenConnectionRefused() {
+        String activeInstanceId = UUID.randomUUID().toString();
+        String nonExistentInstanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String response = """
+        {
+          "version": "1.0.0-SNAPSHOT"
+        }
+        """;
+
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String path = request.getPath();
+                assert path != null;
+
+                if (path.equals("/" + activeInstanceId + "/actuator/axile-metadata")) {
+                    return new MockResponse()
+                            .setBody(response)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        });
+
+        ServiceInstance healthy = Mockito.mock(ServiceInstance.class);
+        Mockito.when(healthy.getInstanceId()).thenReturn(activeInstanceId);
+        Mockito.when(healthy.getUri())
+                .thenReturn(mockWebServer.url(activeInstanceId).uri());
+
+        ServiceInstance failing = Mockito.mock(ServiceInstance.class);
+        Mockito.when(failing.getInstanceId()).thenReturn(nonExistentInstanceId);
+        Mockito.when(failing.getUri()).thenReturn(URI.create("http://localhost:59999")); // non-existent URL
+
+        Mockito.when(discoveryClient.getServices()).thenReturn(List.of("test-service"));
+        Mockito.when(discoveryClient.getInstances("test-service")).thenReturn(List.of(healthy, failing));
+
+        Set<InstanceReference> instances = discoverer.discover();
+
+        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(activeInstanceId);
     }
 }
