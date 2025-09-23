@@ -4,8 +4,9 @@ import { Header } from "antd/es/layout/layout";
 import { useTranslation } from "react-i18next";
 import { UserOutlined } from "@ant-design/icons";
 
-import { LanguageSwitcher } from "components/LanguageSwitcher/LanguageSwitcher";
+import { LanguageSwitcher } from "components";
 import Logo from "assets/icons/logo.png";
+
 import type { MenuProps } from "antd";
 
 import styles from "./styles.module.css";

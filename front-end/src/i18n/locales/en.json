@@ -1,6 +1,7 @@
 {
   "login": "Login",
   "logout": "Logout",
+  "search": "Search",
   "username": "Username",
   "enterUsername": "Enter username",
   "password": "Password",
