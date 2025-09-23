@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { login } from "../../services/auth";
+import { login } from "services/auth";
 
-import type { ILoginSubmitValue, ILoginThunkInitialState } from "../../models";
+import type { ILoginSubmitValue, ILoginThunkInitialState } from "models";
 
 const initialState: ILoginThunkInitialState = {
   loading: false,

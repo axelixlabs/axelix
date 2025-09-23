@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { DashboardLayout } from "../layout/DashboardLayout";
+import { DashboardLayout } from "layout/DashboardLayout";
 
 export const MainRoutes = () => {
   return (
