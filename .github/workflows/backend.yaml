@@ -32,11 +32,20 @@ jobs:
           distribution: 'liberica'
           java-version: '17'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          # Configuration Cache in ecrypted with this key
+          cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
+          # See https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#using-the-cache-read-only
+          cache-read-only: false
+
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x gradlew
 
+      # TODO: We probably would want here to not use build-cache for releases of production artifacts
       - name: Gradle build
-        run: ./gradlew build
+        run: ./gradlew build --configuration-cache --build-cache
 
       - name: Stage JAR file
         uses: actions/upload-artifact@v4
