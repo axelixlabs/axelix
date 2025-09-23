@@ -6,6 +6,10 @@ plugins {
     id("java")
     id("maven-publish")
     id("com.diffplug.spotless") version "7.1.0"
+
+    // TODO:
+    //  Migrate to a non-alpha 5 major version of assciidoc plugin.
+    //  See https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/564
     id("org.asciidoctor.jvm.convert") version "4.0.4"
     id("pmd")
     id("net.ltgt.errorprone") version "4.2.0"
@@ -95,9 +99,11 @@ subprojects {
         ruleSetFiles = files("${rootDir}/pmd.ruleset.xml")
     }
 
-    tasks.named("build") {
-        dependsOn(":buildAllDocs")
-    }
+    // TODO: we need to re-visit when we build the docs I think.
+    //  I think we need a separate workflow for deploying it actually
+//    tasks.named("build") {
+//        dependsOn(":buildAllDocs")
+//    }
 
     tasks.named("check") {
         dependsOn("pmdMain","pmdTest")
