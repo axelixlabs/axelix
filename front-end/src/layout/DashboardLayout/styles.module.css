@@ -1,0 +1,21 @@
+.MainWrapper {
+  min-height: 100vh;
+}
+
+.Sider {
+  background-color: #fff;
+}
+
+.Menu {
+  margin-top: 24px;
+}
+
+.Content {
+  padding: 24px;
+  margin: 0px;
+  background: #fff;
+}
+
+.ContentLayout {
+  padding: 24px;
+}

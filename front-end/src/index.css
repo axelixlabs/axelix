@@ -6,7 +6,7 @@
 }
 
 :root {
-  --axile-first-block-margin: 73px;
+  --axile-header-height: 65px;
 }
 
 *,
@@ -38,9 +38,3 @@ a {
   width: 100%;
   margin: 0 auto;
 }
-
-/* 
-remove in future
-.MainWrapper {
-  margin-top: 73px;
-} */

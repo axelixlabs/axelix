@@ -1,0 +1,40 @@
+.Header {
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--axile-header-height);
+}
+
+.Logo {
+  width: 140px;
+  cursor: pointer;
+}
+
+.LinksAndAvatarWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.Link {
+  transition: all 0.3s;
+  align-self: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.Link:last-child {
+  margin-right: 0;
+}
+
+.Link:hover {
+  color: #00ab55;
+  background-color: #00ab551a;
+}
+
+.Avatar {
+  margin-inline: 30px 20px;
+  background-color: #00ab55;
+  cursor: pointer;
+}
