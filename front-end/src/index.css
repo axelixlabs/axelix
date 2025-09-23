@@ -7,6 +7,9 @@
 
 :root {
   --axile-header-height: 65px;
+  --axile-primary-grey: #00ab55;
+  --color-primary-light: #00ab551a;
+  --axile-light-gray: #f5f5f5;
 }
 
 *,

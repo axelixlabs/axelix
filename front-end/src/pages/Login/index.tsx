@@ -2,8 +2,8 @@ import { Form, Input, Button } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { useAppDispatch, useAppSelector } from "../../hooks";
-import { loginThunk } from "../../store/slices/login";
 import type { ILoginSubmitValue } from "../../models";
+import { loginThunk } from "../../store/slices";
 
 import styles from "./styles.module.css";
 
@@ -11,8 +11,8 @@ export const Login = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
-  const loading = useAppSelector((store) => store.adminLogin.loading);
-  const error = useAppSelector((store) => store.adminLogin.error);
+  const loading = useAppSelector((store) => store.login.loading);
+  const error = useAppSelector((store) => store.login.error);
 
   const onFinish = (values: ILoginSubmitValue): void => {
     const { username, password } = values;
