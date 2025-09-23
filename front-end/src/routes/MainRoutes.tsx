@@ -1,18 +1,21 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { DashboardLayout } from "layout/DashboardLayout";
+
+import { DashboardLayout } from "layout";
+import { Environmant } from "pages";
 
 export const MainRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<DashboardLayout />}>
         <Route index element={<>1</>} />
+        <Route path="environment" element={<Environmant />} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };
 
-// this part of code is needed in future
+// this part of code is needed to be remove in future
 
 // import {
 //   emptyFilter,

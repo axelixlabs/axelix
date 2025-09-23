@@ -1,9 +1,7 @@
 import axios from "axios";
 
-export const API_URL = "http://158.160.200.59/api/axile/"; // todo replace this in future to correct url
-
 const apiFetch = axios.create({
-  baseURL: API_URL,
+  baseURL: import.meta.env.VITE_APP_API_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

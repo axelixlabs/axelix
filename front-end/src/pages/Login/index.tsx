@@ -11,8 +11,8 @@ export const Login = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
-  const loading = useAppSelector((store) => store.adminLogin.loading);
-  const error = useAppSelector((store) => store.adminLogin.error);
+  const loading = useAppSelector((store) => store.login.loading);
+  const error = useAppSelector((store) => store.login.error);
 
   const onFinish = (values: ILoginSubmitValue): void => {
     const { username, password } = values;
