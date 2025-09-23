@@ -1,6 +1,6 @@
 import { BrowserRouter } from "react-router-dom";
 
-import { useAppSelector } from "../hooks";
+import { useAppSelector } from "hooks";
 
 import { AuthRoutes } from "./AuthRoutes";
 import { MainRoutes } from "./MainRoutes";
