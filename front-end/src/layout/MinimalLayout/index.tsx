@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
-import { LanguageSwitcher } from "../../components/LanguageSwitcher/LanguageSwitcher";
+import { LanguageSwitcher } from "components/LanguageSwitcher/LanguageSwitcher";
 
-import Logo from "../../../src/assets/icons/logo.png";
+import Logo from "src/assets/icons/logo.png";
 
 import styles from "./styles.module.css";
 

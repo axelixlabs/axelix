@@ -1,9 +1,9 @@
 import { Form, Input, Button } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { loginThunk } from "../../store/slices/login";
-import type { ILoginSubmitValue } from "../../models";
+import { useAppDispatch, useAppSelector } from "hooks";
+import { loginThunk } from "store/slices/login";
+import type { ILoginSubmitValue } from "models";
 
 import styles from "./styles.module.css";
 
