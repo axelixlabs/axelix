@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       annotations:
-        helm.sh/hook-time: "{{ now | quote }}"
+        helm.sh/hook-time: {{ now | quote }}
       labels:
         app: front-end
     spec:
