@@ -35,7 +35,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          # Configuration Cache in ecrypted with this key
+          # Configuration Cache in encrypted with this key
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
           # See https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#using-the-cache-read-only
           cache-read-only: false

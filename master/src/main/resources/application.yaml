@@ -11,10 +11,11 @@ spring:
     kubernetes:
       discovery:
         enabled: true
-        discovery-server-url: https://kubernetes.default.svc
+        discovery-server-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}
         all-namespaces: false
-      client:
-        trust-certs: true
+      sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
+      # TODO: we should not do that, at least we need to make that configurable
+      # See the doc https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/
 
 management:
   endpoints:
