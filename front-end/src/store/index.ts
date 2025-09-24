@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import { LoginSlice, EnvironmantSlice } from "./slices";
+import { LoginSlice, EnvironmentSlice } from "./slices";
 
 export const store = configureStore({
   reducer: {
     login: LoginSlice.reducer,
-    environmant: EnvironmantSlice.reducer,
+    environment: EnvironmentSlice.reducer,
   },
 });
 

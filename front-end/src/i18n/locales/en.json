@@ -17,5 +17,8 @@
   "scheduledTasks": "Scheduled Tasks",
   "loggers": "Loggers",
   "mappings": "Mappings",
-  "caches": "Caches"
+  "caches": "Caches",
+  "addActiveProfile": "Add an active profile",
+  "cancel": "Cancel",
+  "save": "Save"
 }

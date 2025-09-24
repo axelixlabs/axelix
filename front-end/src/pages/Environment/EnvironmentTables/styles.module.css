@@ -3,12 +3,12 @@
   margin-bottom: 30px;
 }
 
-.EnvironmantTable {
+.EnvironmentTable {
   margin-bottom: 40px;
   border: 1px solid var(--axile-light-gray);
 }
 
-.EnvironmantTable:last-child {
+.EnvironmentTable:last-child {
   margin-bottom: 0;
 }
 

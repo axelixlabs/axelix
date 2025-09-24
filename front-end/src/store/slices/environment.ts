@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import type { IEnvironmantData, IEnvironmantSliceState } from "../../models";
+import type { IEnvironmentData, IEnvironmentSliceState } from "../../models";
 
-const initialState: IEnvironmantSliceState = {
+const initialState: IEnvironmentSliceState = {
   loading: false,
   error: "",
   data: {
@@ -17,8 +17,8 @@ export const environmentThunk = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       // fix this after creating the endpoint
-      // const response = await getEnvironmantData(id);
-      const response: { data: IEnvironmantData } = await new Promise(
+      // const response = await getEnvironmentData(id);
+      const response: { data: IEnvironmentData } = await new Promise(
         (resolve) => {
           setTimeout(() => {
             resolve({
@@ -76,8 +76,8 @@ export const environmentThunk = createAsyncThunk(
   }
 );
 
-export const EnvironmantSlice = createSlice({
-  name: "environmant",
+export const EnvironmentSlice = createSlice({
+  name: "environment",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -93,6 +93,7 @@ export const EnvironmantSlice = createSlice({
 
       state.loading = false;
       if (status >= 400 && status < 500) {
+        // todo translate this in future
         state.error = "Неизвестная ошибка";
       } else {
         state.error = "Произошла внутренняя ошибка сервиса";
@@ -101,4 +102,4 @@ export const EnvironmantSlice = createSlice({
   },
 });
 
-export default EnvironmantSlice.reducer;
+export default EnvironmentSlice.reducer;

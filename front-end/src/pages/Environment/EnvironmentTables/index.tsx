@@ -3,17 +3,17 @@ import { useTranslation } from "react-i18next";
 import type { ColumnsType } from "antd/es/table";
 
 import type {
-  IEnvironmantProperty,
-  IEnvironmantPropertySource,
+  IEnvironmentProperty,
+  IEnvironmentPropertySource,
   TableData,
-} from "../../../models";
+} from "models";
 
 import styles from "./styles.module.css";
 
 const createTableData = (
-  environmantProperies: IEnvironmantProperty[]
+  environmentProperies: IEnvironmentProperty[]
 ): TableData[] => {
-  return environmantProperies.map(({ key, value }) => ({
+  return environmentProperies.map(({ key, value }) => ({
     key,
     value,
     name: key,
@@ -38,10 +38,14 @@ const createTableColumns = (title: string): ColumnsType<TableData> => {
 };
 
 interface IProps {
-  propertySources: IEnvironmantPropertySource[];
+  /**
+   *   The array of property sources (named-entities that hold a bundle of properties)
+   *   that are available inside the given Spring Boot application
+   */
+  propertySources: IEnvironmentPropertySource[];
 }
 
-export const EnvironmantTables = ({ propertySources }: IProps) => {
+export const EnvironmentTables = ({ propertySources }: IProps) => {
   const { t } = useTranslation();
 
   return (
@@ -52,7 +56,7 @@ export const EnvironmantTables = ({ propertySources }: IProps) => {
           columns={createTableColumns(name)}
           dataSource={createTableData(properties)}
           pagination={false}
-          className={styles.EnvironmantTable}
+          className={styles.EnvironmentTable}
         />
       ))}
     </div>

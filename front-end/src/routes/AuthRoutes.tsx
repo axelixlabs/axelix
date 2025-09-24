@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
-import { MinimalLayout } from "../layout";
-import { Login } from "../pages";
+import { MinimalLayout } from "layout";
+import { Login } from "pages";
 
 export const AuthRoutes = () => {
   return (

@@ -17,5 +17,8 @@
   "scheduledTasks": "Запланированные задачи",
   "loggers": "Логгеры",
   "mappings": "Сопоставления",
-  "caches": "Кэши"
+  "caches": "Кэши",
+  "addActiveProfile": "Добавить активный профиль",
+  "cancel": "Отмена",
+  "save": "Сохранить"
 }

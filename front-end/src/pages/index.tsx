@@ -1,2 +1,2 @@
 export { Login } from "./Login";
-export { Environmant } from "./Environmant";
+export { Environment } from "./Environment";

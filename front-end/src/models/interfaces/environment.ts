@@ -1,25 +1,25 @@
-export interface TableData extends IEnvironmantProperty {
+export interface TableData extends IEnvironmentProperty {
   name: string;
 }
 
-export interface IEnvironmantProperty {
+export interface IEnvironmentProperty {
   key: string;
   value: string;
 }
 
-export interface IEnvironmantPropertySource {
+export interface IEnvironmentPropertySource {
   name: string;
-  properties: IEnvironmantProperty[];
+  properties: IEnvironmentProperty[];
 }
 
-export interface IEnvironmantData {
+export interface IEnvironmentData {
   activeProfiles: string[];
   defaultProfiles: string[];
-  propertySources: IEnvironmantPropertySource[];
+  propertySources: IEnvironmentPropertySource[];
 }
 
-export interface IEnvironmantSliceState {
+export interface IEnvironmentSliceState {
   loading: boolean;
-  data: IEnvironmantData;
+  data: IEnvironmentData;
   error: string;
 }

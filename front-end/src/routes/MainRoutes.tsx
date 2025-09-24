@@ -1,14 +1,14 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { DashboardLayout } from "layout";
-import { Environmant } from "pages";
+import { Environment } from "pages";
 
 export const MainRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<DashboardLayout />}>
         <Route index element={<>1</>} />
-        <Route path="environment" element={<Environmant />} />
+        <Route path="environment" element={<Environment />} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

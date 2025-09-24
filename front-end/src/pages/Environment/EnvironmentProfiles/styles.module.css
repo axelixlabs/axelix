@@ -33,7 +33,8 @@
   padding: 8px;
 }
 
-.ProfilesActionButtons {
-  display: flex;
-  gap: 8px;
+.DeleteActiveProfileIcon {
+  margin-left: 8px;
+  cursor: pointer;
+  color: red;
 }
