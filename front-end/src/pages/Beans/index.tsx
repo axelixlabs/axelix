@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { filterBeans, getBeansThunk } from "store/slices/beans";
 import { useAppDispatch, useAppSelector } from "hooks";
 import { BeansCollapse } from "./BeansCollapse";
+import { Loader } from "components";
 
 import styles from "./styles.module.css";
 
@@ -21,8 +22,7 @@ export const Beans = () => {
   }, [dispatch]);
 
   if (loading) {
-    // todo create component for loading in future
-    return "Loading...";
+    return <Loader />;
   }
 
   if (error) {
