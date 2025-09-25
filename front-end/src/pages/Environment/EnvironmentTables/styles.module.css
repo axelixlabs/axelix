@@ -1,0 +1,20 @@
+.Search {
+  max-width: 300px;
+  margin-bottom: 20px;
+}
+
+.EnvironmentTable {
+  margin-bottom: 40px;
+  border: 1px solid var(--axile-light-gray);
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+}
+
+.EnvironmentTable:last-child {
+  margin-bottom: 0;
+}
+
+.TableRow {
+  display: inline-block;
+  width: 50%;
+}

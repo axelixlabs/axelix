@@ -1,6 +1,7 @@
 {
   "login": "Вход",
   "logout": "Выйти",
+  "search": "Поиск",
   "username": "Имя пользователя",
   "enterUsername": "Введите имя пользователя",
   "password": "Пароль",
@@ -16,5 +17,7 @@
   "scheduledTasks": "Запланированные задачи",
   "loggers": "Логгеры",
   "mappings": "Сопоставления",
-  "caches": "Кэши"
+  "caches": "Кэши",
+  "save": "Сохранить",
+  "activeProfiles": "Профили"
 }

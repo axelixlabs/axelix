@@ -1,6 +1,6 @@
-import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Layout, Menu, type MenuProps } from "antd";
+import { Outlet, useNavigate } from "react-router-dom";
 
 import { AdminHeader } from "./AdminHeader";
 
@@ -12,6 +12,7 @@ type MenuItem = Required<MenuProps>["items"][number];
 
 export const DashboardLayout = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const items: MenuItem[] = [
     {
@@ -59,6 +60,7 @@ export const DashboardLayout = () => {
           <Menu
             mode="inline"
             items={items}
+            onClick={({ key }) => navigate(key)}
             className={styles.Menu}
             // todo do this in future
             // onClick={onClick}

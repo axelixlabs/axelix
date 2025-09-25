@@ -1,6 +1,7 @@
 {
   "login": "Login",
   "logout": "Logout",
+  "search": "Search",
   "username": "Username",
   "enterUsername": "Enter username",
   "password": "Password",
@@ -16,5 +17,7 @@
   "scheduledTasks": "Scheduled Tasks",
   "loggers": "Loggers",
   "mappings": "Mappings",
-  "caches": "Caches"
+  "caches": "Caches",
+  "save": "Save",
+  "activeProfiles": "Profiles"
 }

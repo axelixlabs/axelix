@@ -3,7 +3,7 @@ export interface ILoginSubmitValue {
   password: string;
 }
 
-export interface ILoginThunkInitialState {
+export interface ILoginSliceState {
   loading: boolean;
   accessToken: string | null;
   error: string;

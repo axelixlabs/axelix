@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { login } from "services/auth";
 
-import type { ILoginSubmitValue, ILoginThunkInitialState } from "models";
+import type { ILoginSubmitValue, ILoginSliceState } from "models";
 
-const initialState: ILoginThunkInitialState = {
+const initialState: ILoginSliceState = {
   loading: false,
   accessToken: localStorage.getItem("accessToken"),
   error: "",
