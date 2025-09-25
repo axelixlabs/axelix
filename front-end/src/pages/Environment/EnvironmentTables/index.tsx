@@ -2,34 +2,22 @@ import { Input, Table } from "antd";
 import { useTranslation } from "react-i18next";
 import type { ColumnsType } from "antd/es/table";
 
-import type {
-  IEnvironmentProperty,
-  IEnvironmentPropertySource,
-  TableData,
-} from "models";
+import type { IEnvironmentProperty, IEnvironmentPropertySource } from "models";
 
 import styles from "./styles.module.css";
 
-const createTableData = (
-  environmentProperies: IEnvironmentProperty[]
-): TableData[] => {
-  return environmentProperies.map(({ key, value }) => ({
-    key,
-    value,
-    name: key,
-  }));
-};
-
-const createTableColumns = (title: string): ColumnsType<TableData> => {
+const createTableColumns = (
+  title: string
+): ColumnsType<IEnvironmentProperty> => {
   return [
     {
       title,
       onHeaderCell: () => ({
         style: { backgroundColor: "#00AB551A" },
       }),
-      render: (_, { name, value }) => (
+      render: (_, { key, value }) => (
         <>
-          <span className={styles.TableRow}>{name}</span>
+          <span className={styles.TableRow}>{key}</span>
           <span className={styles.TableRow}>{value}</span>
         </>
       ),
@@ -51,14 +39,17 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
   return (
     <div className={styles.MainWrapper}>
       <Input placeholder={t("search")} className={styles.Search} />
-      {propertySources.map(({ name, properties }) => (
-        <Table
-          columns={createTableColumns(name)}
-          dataSource={createTableData(properties)}
-          pagination={false}
-          className={styles.EnvironmentTable}
-        />
-      ))}
+      {propertySources.map(({ name, properties }) => {
+        return (
+          <Table
+            columns={createTableColumns(name)}
+            dataSource={properties}
+            pagination={false}
+            className={styles.EnvironmentTable}
+            key={name}
+          />
+        );
+      })}
     </div>
   );
 };

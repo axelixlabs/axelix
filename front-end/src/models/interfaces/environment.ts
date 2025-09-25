@@ -1,7 +1,3 @@
-export interface TableData extends IEnvironmentProperty {
-  name: string;
-}
-
 export interface IEnvironmentProperty {
   key: string;
   value: string;
