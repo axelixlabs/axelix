@@ -101,4 +101,28 @@ public final class ApiPaths {
          */
         public static final String BEAN_BY_PREFIX = "/{instanceId}/beans/{prefix}";
     }
+
+    public static final class LoggersApi {
+
+        /**
+         * Base path for loggers APIs.
+         */
+        public static final String MAIN = "/loggers";
+        /**
+         * Loggers endpoint with instance ID.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+        /**
+         * Endpoint to retrieve a specific logger by name from an instance.
+         */
+        public static final String LOGGER_NAME = "/{instanceId}/logger/{loggerName}";
+        /**
+         * Endpoint to retrieve a specific logger group by name from an instance.
+         */
+        public static final String GROUP_NAME = "/{instanceId}/group/{groupName}";
+        /**
+         * Endpoint to clear the logging level of a logger by its name from an instance.
+         */
+        public static final String CLEAR_FOR_LOGGER = "/{instanceId}/logger/{loggerName}/clear";
+    }
 }
