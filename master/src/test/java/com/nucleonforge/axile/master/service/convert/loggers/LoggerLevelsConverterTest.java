@@ -3,7 +3,7 @@ package com.nucleonforge.axile.master.service.convert.loggers;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
-import com.nucleonforge.axile.master.api.response.loggers.LoggerProfile;
+import com.nucleonforge.axile.master.api.response.loggers.LoggerProfileResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,8 +21,8 @@ public class LoggerLevelsConverterTest {
         LoggerLevels loggersDebug = new LoggerLevels("DEBUG", "DEBUG");
 
         // when.
-        LoggerProfile infoResponse = subject.convertInternal(loggersInfo);
-        LoggerProfile debugResponse = subject.convertInternal(loggersDebug);
+        LoggerProfileResponse infoResponse = subject.convertInternal(loggersInfo);
+        LoggerProfileResponse debugResponse = subject.convertInternal(loggersDebug);
 
         // info
         assertThat(infoResponse.configuredLevel()).isNull();

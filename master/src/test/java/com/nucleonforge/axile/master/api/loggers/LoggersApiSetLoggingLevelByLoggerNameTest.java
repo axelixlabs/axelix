@@ -26,11 +26,8 @@ import com.nucleonforge.axile.master.api.request.LogLevelChangeRequest;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
-import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
-import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -63,15 +60,6 @@ public class LoggersApiSetLoggingLevelByLoggerNameTest {
 
     @BeforeEach
     void prepare() {
-        // language=json
-        String jsonResponse =
-                """
-            {
-              "configuredLevel" : "DEBUG",
-              "effectiveLevel" : "DEBUG"
-            }
-            """;
-
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
@@ -79,9 +67,7 @@ public class LoggersApiSetLoggingLevelByLoggerNameTest {
                 assert path != null;
 
                 if (path.equals("/" + activeInstanceId + "/loggers/com.example")) {
-                    return new MockResponse()
-                            .setBody(jsonResponse)
-                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                    return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
@@ -91,15 +77,6 @@ public class LoggersApiSetLoggingLevelByLoggerNameTest {
 
     @Test
     void shouldSetLoggingLevelByLoggerName() {
-        // language=json
-        String expectedJson =
-                """
-            {
-              "configuredLevel" : "DEBUG",
-              "effectiveLevel" : "DEBUG"
-            }
-            """;
-
         String loggerName = "com.example";
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG");
 
@@ -116,7 +93,6 @@ public class LoggersApiSetLoggingLevelByLoggerNameTest {
 
         // then.
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThatJson(body.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedJson);
     }
 
     @Test

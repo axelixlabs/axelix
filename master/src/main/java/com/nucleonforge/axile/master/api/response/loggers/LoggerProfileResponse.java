@@ -12,4 +12,4 @@ import org.jspecify.annotations.Nullable;
  * @author Sergey Cherkasov
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record LoggerProfile(@Nullable String configuredLevel, String effectiveLevel) {}
+public record LoggerProfileResponse(@Nullable String configuredLevel, String effectiveLevel) {}

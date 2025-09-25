@@ -29,8 +29,8 @@ import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.request.LogLevelChangeRequest;
-import com.nucleonforge.axile.master.api.response.loggers.GroupProfile;
-import com.nucleonforge.axile.master.api.response.loggers.LoggerProfile;
+import com.nucleonforge.axile.master.api.response.loggers.GroupProfileResponse;
+import com.nucleonforge.axile.master.api.response.loggers.LoggerProfileResponse;
 import com.nucleonforge.axile.master.api.response.loggers.LoggersResponse;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.serde.JacksonMessageSerializationStrategy;
@@ -61,8 +61,8 @@ public class LoggersApi {
     private final SetForLoggerGroupEndpointProber setForLoggerGroupEndpointProber;
     private final ClearForLoggerEndpointProber clearForLoggerEndpointProber;
     private final Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter;
-    private final Converter<LoggerGroup, GroupProfile> groupProfileConverter;
-    private final Converter<LoggerLevels, LoggerProfile> loggerProfileConverter;
+    private final Converter<LoggerGroup, GroupProfileResponse> groupProfileConverter;
+    private final Converter<LoggerLevels, LoggerProfileResponse> loggerProfileConverter;
     private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     public LoggersApi(
@@ -73,8 +73,8 @@ public class LoggersApi {
             SetForLoggerGroupEndpointProber setForLoggerGroupEndpointProber,
             ClearForLoggerEndpointProber clearForLoggerEndpointProber,
             Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter,
-            Converter<LoggerGroup, GroupProfile> groupProfileConverter,
-            Converter<LoggerLevels, LoggerProfile> loggerProfileConverter,
+            Converter<LoggerGroup, GroupProfileResponse> groupProfileConverter,
+            Converter<LoggerLevels, LoggerProfileResponse> loggerProfileConverter,
             JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
         this.allLoggersEndpointProber = allLoggersEndpointProber;
         this.groupLoggersEndpointProber = groupLoggersEndpointProber;
@@ -140,7 +140,7 @@ public class LoggersApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        schema = @Schema(implementation = GroupProfile.class))),
+                                        schema = @Schema(implementation = GroupProfileResponse.class))),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -161,7 +161,7 @@ public class LoggersApi {
         @Parameter(name = "groupName", description = "The name of the logger group to find", required = true)
     })
     @GetMapping(path = ApiPaths.LoggersApi.GROUP_NAME)
-    public GroupProfile getGroupByName(
+    public GroupProfileResponse getGroupByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("groupName") String groupName) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("group.name", groupName));
         LoggerGroup group = groupLoggersEndpointProber.invoke(InstanceId.of(instanceId), payload);
@@ -183,7 +183,7 @@ public class LoggersApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        schema = @Schema(implementation = LoggerProfile.class))),
+                                        schema = @Schema(implementation = LoggerProfileResponse.class))),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -204,7 +204,7 @@ public class LoggersApi {
         @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
     })
     @GetMapping(path = ApiPaths.LoggersApi.LOGGER_NAME)
-    public LoggerProfile getLoggerByName(
+    public LoggerProfileResponse getLoggerByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("logger.name", loggerName));
         LoggerLevels logger = oneLoggerEndpointProber.invoke(InstanceId.of(instanceId), payload);
@@ -225,11 +225,7 @@ public class LoggersApi {
                             @Link(
                                     name = "Actuator/Loggers",
                                     description = "https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = LoggerProfile.class))),
+                        }),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -251,7 +247,7 @@ public class LoggersApi {
         @Parameter(name = "loggingLevel", description = "The logging level to be set", required = true)
     })
     @PostMapping(path = ApiPaths.LoggersApi.LOGGER_NAME)
-    public LoggerProfile setLoggingLevelByLoggerName(
+    public void setLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("loggerName") String loggerName,
             @RequestBody LogLevelChangeRequest loggingLevel) {
@@ -259,8 +255,6 @@ public class LoggersApi {
         HttpPayload payload = new DefaultHttpPayload(
                 Map.of("logger.name", loggerName), jacksonMessageSerializationStrategy.serialize(loggingLevel));
         setOneLoggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
-
-        return getLoggerByName(instanceId, loggerName);
     }
 
     @Operation(
@@ -276,11 +270,7 @@ public class LoggersApi {
                             @Link(
                                     name = "Actuator/Loggers",
                                     description = "https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = GroupProfile.class))),
+                        }),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -302,7 +292,7 @@ public class LoggersApi {
         @Parameter(name = "loggingLevel", description = "The logging level to be set", required = true)
     })
     @PostMapping(path = ApiPaths.LoggersApi.GROUP_NAME)
-    public GroupProfile setLoggingLevelByGroupName(
+    public void setLoggingLevelByGroupName(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("groupName") String groupName,
             @RequestBody LogLevelChangeRequest loggingLevel) {
@@ -310,8 +300,6 @@ public class LoggersApi {
         HttpPayload payload = new DefaultHttpPayload(
                 Map.of("group.name", groupName), jacksonMessageSerializationStrategy.serialize(loggingLevel));
         setForLoggerGroupEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
-
-        return getGroupByName(instanceId, groupName);
     }
 
     @Operation(
@@ -325,11 +313,7 @@ public class LoggersApi {
                             @Link(
                                     name = "Actuator/Loggers",
                                     description = "https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = LoggerProfile.class))),
+                        }),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -350,14 +334,12 @@ public class LoggersApi {
         @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
     })
     @PostMapping(path = ApiPaths.LoggersApi.CLEAR_FOR_LOGGER)
-    public LoggerProfile clearLoggingLevelByLoggerName(
+    public void clearLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
 
         HttpPayload payload = new DefaultHttpPayload(
                 Map.of("logger.name", loggerName),
                 jacksonMessageSerializationStrategy.serialize(Collections.emptyMap()));
         clearForLoggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
-
-        return getLoggerByName(instanceId, loggerName);
     }
 }

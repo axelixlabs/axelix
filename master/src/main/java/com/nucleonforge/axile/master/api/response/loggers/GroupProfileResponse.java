@@ -14,4 +14,4 @@ import org.jspecify.annotations.Nullable;
  * @author Sergey Cherkasov
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record GroupProfile(@Nullable String configuredLevel, List<String> members) {}
+public record GroupProfileResponse(@Nullable String configuredLevel, List<String> members) {}

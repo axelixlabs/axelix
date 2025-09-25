@@ -26,11 +26,8 @@ import com.nucleonforge.axile.master.service.serde.JacksonMessageSerializationSt
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
-import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
-import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -67,13 +64,6 @@ public class LoggersApiClearLoggingLevelByLoggerNameTest {
 
     @BeforeEach
     void prepare() {
-        // language=json
-        String jsonResponse = """
-            {
-              "effectiveLevel" : "INFO"
-            }
-            """;
-
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
@@ -81,9 +71,7 @@ public class LoggersApiClearLoggingLevelByLoggerNameTest {
                 assert path != null;
 
                 if (path.equals("/" + activeInstanceId + "/loggers/com.example")) {
-                    return new MockResponse()
-                            .setBody(jsonResponse)
-                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                    return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
@@ -93,13 +81,6 @@ public class LoggersApiClearLoggingLevelByLoggerNameTest {
 
     @Test
     void shouldClearLoggingLevelByLoggerName() {
-        // language=json
-        String expectedJson = """
-        {
-          "effectiveLevel" : "INFO"
-        }
-        """;
-
         String loggerName = "com.example";
 
         registry.register(createInstanceWithUrl(
@@ -115,7 +96,6 @@ public class LoggersApiClearLoggingLevelByLoggerNameTest {
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedJson);
     }
 
     @Test

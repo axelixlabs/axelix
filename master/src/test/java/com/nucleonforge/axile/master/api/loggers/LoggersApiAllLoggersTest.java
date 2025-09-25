@@ -43,56 +43,61 @@ public class LoggersApiAllLoggersTest {
     // language=json
     private static final String EXPECTED_LOGGERS_JSON =
             """
-
-        {
-      "levels": [
-        "OFF",
-        "FATAL",
-        "ERROR",
-        "WARN",
-        "INFO",
-        "DEBUG",
-        "TRACE"
-      ],
-      "groups": {
-        "test": {
-          "configuredLevel": "INFO",
-          "members": [
-            "test.member1",
-            "test.member2"
-          ]
-        },
-        "web": {
-          "members": [
-            "org.springframework.core.codec",
-            "org.springframework.http",
-            "org.springframework.web",
-            "org.springframework.boot.actuate.endpoint.web",
-            "org.springframework.boot.web.servlet.ServletContextInitializerBeans"
-          ]
-        },
-        "sql": {
-          "members": [
-            "org.springframework.jdbc.core",
-            "org.hibernate.SQL",
-            "org.jooq.tools.LoggerListener"
-          ]
-        }
-      },
-      "loggers": {
-        "ROOT": {
-          "configuredLevel": "INFO",
-          "effectiveLevel": "INFO"
-        },
-        "com.example": {
-          "configuredLevel": "DEBUG",
-          "effectiveLevel": "DEBUG"
-        },
-        "com.example.two": {
-          "effectiveLevel": "INFO"
-        }
-      }
-    }
+            {
+              "levels": [
+                "OFF",
+                "FATAL",
+                "ERROR",
+                "WARN",
+                "INFO",
+                "DEBUG",
+                "TRACE"
+              ],
+              "groups": [
+                {
+                  "name": "test",
+                  "configuredLevel": "INFO",
+                  "members": [
+                    "test.member1",
+                    "test.member2"
+                  ]
+                },
+                {
+                  "name": "web",
+                  "members": [
+                    "org.springframework.core.codec",
+                    "org.springframework.http",
+                    "org.springframework.web",
+                    "org.springframework.boot.actuate.endpoint.web",
+                    "org.springframework.boot.web.servlet.ServletContextInitializerBeans"
+                  ]
+                },
+                {
+                  "name": "sql",
+                  "members": [
+                    "org.springframework.jdbc.core",
+                    "org.hibernate.SQL",
+                    "org.jooq.tools.LoggerListener"
+                  ]
+                }
+              ],
+              "loggers": [
+                {
+                  "name": "ROOT",
+                  "configuredLevel": "INFO",
+                  "effectiveLevel": "INFO"
+                },
+                {
+                  "name": "com.example",
+                  "configuredLevel": "DEBUG",
+                  "effectiveLevel": "DEBUG"
+                },
+                {
+                  "name": "com.example.two",
+                  "effectiveLevel": "INFO"
+                }
+              ]
+            }
     """;
 
     private static final String activeInstanceId = UUID.randomUUID().toString();

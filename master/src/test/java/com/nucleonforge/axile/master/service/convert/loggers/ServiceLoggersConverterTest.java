@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axile.common.api.loggers.ServiceLoggers;
-import com.nucleonforge.axile.master.api.response.loggers.GroupProfile;
-import com.nucleonforge.axile.master.api.response.loggers.LoggerProfile;
 import com.nucleonforge.axile.master.api.response.loggers.LoggersResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +24,7 @@ public class ServiceLoggersConverterTest {
 
     @BeforeEach
     void setUp() {
-        subject = new ServiceLoggersConverter(new LoggerGroupConverter(), new LoggerLevelsConverter());
+        subject = new ServiceLoggersConverter();
     }
 
     @Test
@@ -43,43 +41,62 @@ public class ServiceLoggersConverterTest {
 
         // loggers
         assertThat(response.loggers()).hasSize(3);
-        Map<String, LoggerProfile> loggers = response.loggers();
+        List<LoggersResponse.Logger> loggers = response.loggers();
 
         // loggers -> "ROOT"
-        assertThat(loggers.get("ROOT").configuredLevel()).isEqualTo("INFO");
-        assertThat(loggers.get("ROOT").effectiveLevel()).isEqualTo("INFO");
+        assertThat(loggers)
+                .filteredOn(logger -> logger.name().equals("ROOT"))
+                .first()
+                .satisfies(logger -> assertThat(logger.configuredLevel()).isEqualTo("INFO"))
+                .satisfies(logger -> assertThat(logger.effectiveLevel()).isEqualTo("INFO"));
 
         // loggers -> "com.example"
-        assertThat(loggers.get("com.example").configuredLevel()).isEqualTo("DEBUG");
-        assertThat(loggers.get("com.example").effectiveLevel()).isEqualTo("DEBUG");
+        assertThat(loggers)
+                .filteredOn(logger -> logger.name().equals("com.example"))
+                .first()
+                .satisfies(logger -> assertThat(logger.configuredLevel()).isEqualTo("DEBUG"))
+                .satisfies(logger -> assertThat(logger.effectiveLevel()).isEqualTo("DEBUG"));
 
         // loggers ->
-        assertThat(loggers.get("org").configuredLevel()).isNull();
-        assertThat(loggers.get("org").effectiveLevel()).isEqualTo("INFO");
+        assertThat(loggers)
+                .filteredOn(logger -> logger.name().equals("org"))
+                .first()
+                .satisfies(logger -> assertThat(logger.configuredLevel()).isNull())
+                .satisfies(logger -> assertThat(logger.effectiveLevel()).isEqualTo("INFO"));
 
         // groups
         assertThat(response.groups()).hasSize(3);
-        Map<String, GroupProfile> groups = response.groups();
+        List<LoggersResponse.Group> groups = response.groups();
 
         // groups -> "test"
-        assertThat(groups.get("test").configuredLevel()).isEqualTo("INFO");
-        assertThat(groups.get("test").members()).containsExactlyInAnyOrder("test.member1", "test.member2");
+        assertThat(groups)
+                .filteredOn(group -> group.name().equals("test"))
+                .first()
+                .satisfies(group -> assertThat(group.configuredLevel()).isEqualTo("INFO"))
+                .satisfies(
+                        group -> assertThat(group.members()).containsExactlyInAnyOrder("test.member1", "test.member2"));
 
         // groups -> "web"
-        assertThat(groups.get("web").configuredLevel()).isNull();
-        assertThat(groups.get("web").members())
-                .containsExactlyInAnyOrder(
-                        "org.springframework.core.codec",
-                        "org.springframework.http",
-                        "org.springframework.web",
-                        "org.springframework.boot.actuate.endpoint.web",
-                        "org.springframework.boot.web.servlet.ServletContextInitializerBeans");
+        assertThat(groups)
+                .filteredOn(group -> group.name().equals("web"))
+                .first()
+                .satisfies(group -> assertThat(group.configuredLevel()).isNull())
+                .satisfies(group -> assertThat(group.members())
+                        .containsExactlyInAnyOrder(
+                                "org.springframework.core.codec",
+                                "org.springframework.http",
+                                "org.springframework.web",
+                                "org.springframework.boot.actuate.endpoint.web",
+                                "org.springframework.boot.web.servlet.ServletContextInitializerBeans"));
 
         // groups -> "sql"
-        assertThat(groups.get("sql").configuredLevel()).isNull();
-        assertThat(groups.get("sql").members())
-                .containsExactlyInAnyOrder(
-                        "org.springframework.jdbc.core", "org.hibernate.SQL", "org.jooq.tools.LoggerListener");
+        assertThat(groups)
+                .filteredOn(group -> group.name().equals("sql"))
+                .first()
+                .satisfies(group -> assertThat(group.configuredLevel()).isNull())
+                .satisfies(group -> assertThat(group.members())
+                        .containsExactlyInAnyOrder(
+                                "org.springframework.jdbc.core", "org.hibernate.SQL", "org.jooq.tools.LoggerListener"));
     }
 
     private static ServiceLoggers getLoggers() {

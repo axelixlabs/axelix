@@ -26,11 +26,8 @@ import com.nucleonforge.axile.master.api.request.LogLevelChangeRequest;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
-import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
-import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -63,15 +60,6 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
 
     @BeforeEach
     void prepare() {
-        // language=json
-        String jsonResponse =
-                """
-             {
-                "configuredLevel" : "INFO",
-                "members" : [ "test.member1", "test.member2" ]
-             }
-            """;
-
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
@@ -79,9 +67,7 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
                 assert path != null;
 
                 if (path.equals("/" + activeInstanceId + "/loggers/test")) {
-                    return new MockResponse()
-                            .setBody(jsonResponse)
-                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                    return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
@@ -91,15 +77,6 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
 
     @Test
     void shouldSetLoggingLevelByGroupName() {
-        // language=json
-        String expectedJson =
-                """
-             {
-                "configuredLevel" : "INFO",
-                "members" : [ "test.member1", "test.member2" ]
-             }
-            """;
-
         String groupName = "test";
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
 
@@ -116,7 +93,6 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
 
         // then.
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThatJson(body.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedJson);
     }
 
     @Test

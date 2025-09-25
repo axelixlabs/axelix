@@ -5,7 +5,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
-import com.nucleonforge.axile.master.api.response.loggers.GroupProfile;
+import com.nucleonforge.axile.master.api.response.loggers.GroupProfileResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,7 @@ public class LoggerGroupConverterTest {
         LoggerGroup group = new LoggerGroup("web", members);
 
         // when.
-        GroupProfile request = subject.convertInternal(group);
+        GroupProfileResponse request = subject.convertInternal(group);
 
         // then.
         assertThat(request.configuredLevel()).isEqualTo("web");
