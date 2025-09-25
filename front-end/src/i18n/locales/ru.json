@@ -18,7 +18,6 @@
   "loggers": "Логгеры",
   "mappings": "Сопоставления",
   "caches": "Кэши",
-  "addActiveProfile": "Добавить активный профиль",
-  "cancel": "Отмена",
-  "save": "Сохранить"
+  "save": "Сохранить",
+  "activeProfiles": "Профили"
 }

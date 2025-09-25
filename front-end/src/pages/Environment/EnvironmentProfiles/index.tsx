@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Button, Input, Modal } from "antd";
+import { Button, Input } from "antd";
 import { useTranslation } from "react-i18next";
-import { PlusOutlined, DeleteFilled } from "@ant-design/icons";
+import { PlusOutlined, DeleteFilled, CheckOutlined } from "@ant-design/icons";
 
 import styles from "./styles.module.css";
 
@@ -15,44 +15,38 @@ interface IProps {
 export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
   const { t } = useTranslation();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    // todo in future write logic for saving active profile data
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
+  const [createProfile, setCreateProfile] = useState(false);
 
   return (
     <div className={styles.MainWrapper}>
       <div className={styles.ProfilesWrapper}>
+        <div className={styles.ProfileTitle}>{t("activeProfiles")}</div>
         {activeProfiles.map((activeProfile) => (
           <div className={styles.ProfileWrapper} key={activeProfile}>
-            <div className={styles.ProfileTitle}>Profile</div>
             <div className={styles.ProfileValue}>
               {activeProfile}
               <DeleteFilled className={styles.DeleteActiveProfileIcon} />
             </div>
           </div>
         ))}
-        <Button icon={<PlusOutlined />} type="primary" onClick={showModal} />
-        <Modal
-          title={t("addActiveProfile")}
-          open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
-          okText={t("save")}
-          cancelText={t("cancel")}
-        >
-          <Input />
-        </Modal>
+        <div>
+          {createProfile ? (
+            <div className={styles.CreateProfileWrapper}>
+              <Input className={styles.CreateProfileInput} />
+              <Button
+                icon={<CheckOutlined />}
+                type="primary"
+                className={styles.CreateProfileActionsButton}
+              />
+            </div>
+          ) : (
+            <Button
+              icon={<PlusOutlined />}
+              type="primary"
+              onClick={() => setCreateProfile(true)}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

@@ -18,7 +18,6 @@
   "loggers": "Loggers",
   "mappings": "Mappings",
   "caches": "Caches",
-  "addActiveProfile": "Add an active profile",
-  "cancel": "Cancel",
-  "save": "Save"
+  "save": "Save",
+  "activeProfiles": "Profiles"
 }
