@@ -1,0 +1,50 @@
+.CollapseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  scroll-margin-top: 150px;
+}
+
+.CollapseBody {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  row-gap: 20px;
+}
+
+.ScopeWrapper {
+  border-radius: 4px;
+  padding: 8px;
+  background-color: var(--axile-gray);
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0%;
+}
+
+.Dependency {
+  cursor: pointer;
+}
+
+.Dependency:hover {
+  /*todo In future set color via css variables */
+  color: #00ab55;
+}
+
+.Divider {
+  margin-block: 5px;
+}
+
+.CollapseBodyChunkTitle {
+  font-weight: 600;
+}
+
+.CollapseBodyChunkList {
+  border-bottom: 1px solid var(--axile-gray);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+}
+
+.CollapseBodyChunkList:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}

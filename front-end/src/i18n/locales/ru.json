@@ -19,5 +19,8 @@
   "mappings": "Сопоставления",
   "caches": "Кэши",
   "save": "Сохранить",
-  "activeProfiles": "Профили"
+  "activeProfiles": "Профили",
+  "noData": "Нет данных",
+  "dependencies": "Зависимости",
+  "aliases": "Псевдонимы"
 }
