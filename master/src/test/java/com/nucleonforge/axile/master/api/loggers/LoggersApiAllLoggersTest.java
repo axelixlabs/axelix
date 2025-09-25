@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.api;
+package com.nucleonforge.axile.master.api.loggers;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
+import com.nucleonforge.axile.master.api.LoggersApi;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
@@ -33,56 +34,71 @@ import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link BeansApi}.
+ * Integration tests for {@link LoggersApi}.
  *
- * @since 28.08.2025
- * author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class BeansApiTest {
-
-    private static final String EXPECTED_BEANS_JSON =
-            // language=json
+public class LoggersApiAllLoggersTest {
+    // language=json
+    private static final String EXPECTED_LOGGERS_JSON =
             """
             {
-              "beans": [
+              "levels": [
+                "OFF",
+                "FATAL",
+                "ERROR",
+                "WARN",
+                "INFO",
+                "DEBUG",
+                "TRACE"
+              ],
+              "groups": [
                 {
-                  "beanName": "dispatcherServletRegistrationConfiguration",
-                  "scope": "singleton",
-                  "className": "DispatcherServletRegistrationConfiguration",
-                  "aliases": [],
-                  "dependencies": []
-                },
-                {
-                  "beanName": "propertyPlaceholderAutoConfiguration",
-                  "scope": "prototype",
-                  "className": "PropertyPlaceholderAutoConfiguration",
-                  "aliases": [],
-                  "dependencies": []
-                },
-                {
-                  "beanName": "dispatcherServletAutoConfiguration",
-                  "scope": "session",
-                  "className": "DispatcherServletAutoConfiguration",
-                  "aliases": [],
-                  "dependencies": []
-                },
-                {
-                  "beanName": "discoveryClientHealthIndicator",
-                  "scope": "request",
-                  "className": "DiscoveryClientHealthIndicator",
-                  "aliases": [
-                    "clientHealthIndicator",
-                    "healthIndicator"
-                  ],
-                  "dependencies": [
-                    "DiscoveryLoadBalancerConfiguration",
-                    "DiscoveryClientHealthIndicatorProperties"
+                  "name": "test",
+                  "configuredLevel": "INFO",
+                  "members": [
+                    "test.member1",
+                    "test.member2"
                   ]
+                },
+                {
+                  "name": "web",
+                  "members": [
+                    "org.springframework.core.codec",
+                    "org.springframework.http",
+                    "org.springframework.web",
+                    "org.springframework.boot.actuate.endpoint.web",
+                    "org.springframework.boot.web.servlet.ServletContextInitializerBeans"
+                  ]
+                },
+                {
+                  "name": "sql",
+                  "members": [
+                    "org.springframework.jdbc.core",
+                    "org.hibernate.SQL",
+                    "org.jooq.tools.LoggerListener"
+                  ]
+                }
+              ],
+              "loggers": [
+                {
+                  "name": "ROOT",
+                  "configuredLevel": "INFO",
+                  "effectiveLevel": "INFO"
+                },
+                {
+                  "name": "com.example",
+                  "configuredLevel": "DEBUG",
+                  "effectiveLevel": "DEBUG"
+                },
+                {
+                  "name": "com.example.two",
+                  "effectiveLevel": "INFO"
                 }
               ]
             }
-            """;
+    """;
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
@@ -110,40 +126,36 @@ class BeansApiTest {
         // language=json
         String jsonResponse =
                 """
-            {
-              "contexts" : {
-                "application" : {
-                  "beans" : {
-                    "dispatcherServletRegistrationConfiguration" : {
-                      "scope" : "singleton",
-                      "type" : "DispatcherServletRegistrationConfiguration",
-                      "aliases" : [ ],
-                      "dependencies" : [ ]
-                    },
-                    "propertyPlaceholderAutoConfiguration" : {
-                      "scope" : "prototype",
-                      "type" : "PropertyPlaceholderAutoConfiguration",
-                      "aliases" : [ ],
-                      "dependencies" : [ ]
-                    },
-                    "dispatcherServletAutoConfiguration" : {
-                      "scope" : "session",
-                      "type" : "DispatcherServletAutoConfiguration",
-                      "aliases" : [ ],
-                      "dependencies" : [ ]
-                    },
-                    "discoveryClientHealthIndicator": {
-                      "scope": "request",
-                      "type": "DiscoveryClientHealthIndicator",
-                      "resource": "class path resource [org/springframework/cloud/client/CommonsClientAutoConfiguration$DiscoveryLoadBalancerConfiguration.class]",
-                      "aliases": ["clientHealthIndicator", "healthIndicator"],
-                      "dependencies": ["DiscoveryLoadBalancerConfiguration", "DiscoveryClientHealthIndicatorProperties"]
-                    }
-                  }
-                }
-              }
-            }
-            """;
+
+                {
+           "levels" : [ "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" ],
+           "loggers" : {
+             "ROOT" : {
+               "configuredLevel" : "INFO",
+               "effectiveLevel" : "INFO"
+             },
+             "com.example" : {
+               "configuredLevel" : "DEBUG",
+               "effectiveLevel" : "DEBUG"
+             },
+             "com.example.two" : {
+               "effectiveLevel" : "INFO"
+             }
+           },
+           "groups" : {
+             "test" : {
+               "configuredLevel" : "INFO",
+               "members" : [ "test.member1", "test.member2" ]
+             },
+             "web" : {
+               "members" : [ "org.springframework.core.codec", "org.springframework.http", "org.springframework.web", "org.springframework.boot.actuate.endpoint.web", "org.springframework.boot.web.servlet.ServletContextInitializerBeans" ]
+             },
+             "sql" : {
+               "members" : [ "org.springframework.jdbc.core", "org.hibernate.SQL", "org.jooq.tools.LoggerListener" ]
+             }
+           }
+         }
+        """;
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -151,7 +163,7 @@ class BeansApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/beans")) {
+                if (path.equals("/" + activeInstanceId + "/loggers")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -163,19 +175,20 @@ class BeansApiTest {
     }
 
     @Test
-    void shouldReturnJSONBeansFeed() {
+    void shouldReturnJSONServiceLoggers() {
         registry.register(createInstanceWithUrl(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
+        // when
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/beans/feed/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axile/loggers/{instanceId}", String.class, activeInstanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
         String body = response.getBody();
-
-        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_BEANS_JSON);
+        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_LOGGERS_JSON);
     }
 
     @Test
@@ -185,19 +198,23 @@ class BeansApiTest {
 
         registry.register(createInstance(instanceId));
 
+        // when.
         ResponseEntity<?> response =
-                restTemplate.getForEntity("/api/axile/beans/feed/{instanceId}", Void.class, instanceId);
+                restTemplate.getForEntity("/api/axile/loggers/{instanceId}", Void.class, instanceId);
 
+        // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     void shouldReturnBadRequestForUnregisteredInstance() {
-        String instanceId = "unregistered-beans-instance";
+        String instanceId = "unregistered-loggers-instance";
 
+        // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axile/loggers/{instanceId}", EndpointInvocationException.class, instanceId);
 
+        // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }
