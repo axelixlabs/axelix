@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "hooks";
 import { EnvironmentProfiles } from "./EnvironmentProfiles";
 import { EnvironmentTables } from "./EnvironmentTables";
 import { environmentThunk } from "store/slices";
+import { Loader } from "components";
 
 export const Environment = () => {
   const dispatch = useAppDispatch();
@@ -15,8 +16,7 @@ export const Environment = () => {
   }, [dispatch]);
 
   if (loading) {
-    // todo create component for loading in future
-    return "Loading...";
+    return <Loader />;
   }
 
   if (error) {
