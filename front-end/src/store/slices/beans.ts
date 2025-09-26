@@ -303,4 +303,4 @@ export const BeansSlice = createSlice({
 
 export const { filterBeans } = BeansSlice.actions;
 
-export default BeansSlice.reducer;
+export default BeansSlice;

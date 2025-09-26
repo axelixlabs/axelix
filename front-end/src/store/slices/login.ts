@@ -62,4 +62,4 @@ export const LoginSlice = createSlice({
   },
 });
 
-export default LoginSlice.reducer;
+export default LoginSlice;

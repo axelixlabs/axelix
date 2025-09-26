@@ -15,6 +15,7 @@ const initialState: IEnvironmentSliceState = {
 
 export const environmentThunk = createAsyncThunk(
   "environment",
+  // todo fix this after creating the endpoint
   async (id: string, { rejectWithValue }) => {
     try {
       // fix this after creating the endpoint
@@ -103,4 +104,4 @@ export const EnvironmentSlice = createSlice({
   },
 });
 
-export default EnvironmentSlice.reducer;
+export default EnvironmentSlice;

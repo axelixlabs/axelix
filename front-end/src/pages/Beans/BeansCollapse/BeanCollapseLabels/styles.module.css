@@ -13,3 +13,7 @@
   line-height: 16px;
   letter-spacing: 0%;
 }
+
+.ClassName {
+  color: var(--axile-text-grey);
+}
