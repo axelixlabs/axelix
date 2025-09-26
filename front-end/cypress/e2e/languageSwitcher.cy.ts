@@ -1,4 +1,10 @@
 interface ITranslationItem {
+  // todo В будущем определить где будут содержаться интерфейси тестов
+
+  /**
+   * Data used to find specific elements on a page and check whether they have been translated.
+   * Depending on the selected language, an attempt will be made to find the translatable text.
+   */
   locator: string;
   ruText: string;
   enText: string;

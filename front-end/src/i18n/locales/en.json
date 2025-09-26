@@ -19,5 +19,8 @@
   "mappings": "Mappings",
   "caches": "Caches",
   "save": "Save",
-  "activeProfiles": "Profiles"
+  "activeProfiles": "Profiles",
+  "noData": "No data",
+  "dependencies": "Dependencies",
+  "aliases": "Aliases"
 }
