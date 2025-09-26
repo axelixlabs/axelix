@@ -33,4 +33,19 @@ class StringUtilsTest {
                 Arguments.of("head_case_IGNORED_tail", "CASE_Ig", true),
                 Arguments.of("Letter_missin", "Letter_missing", false));
     }
+
+    @ParameterizedTest
+    @MethodSource("source_defaultIfBlank")
+    void test_defaultIfBlank(String value, String defaultValue, String expected) {
+        assertThat(StringUtils.defaultIfBlank(value, defaultValue)).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> source_defaultIfBlank() {
+        return Stream.of(
+                Arguments.of(null, "default", "default"),
+                Arguments.of("", "default", "default"),
+                Arguments.of("   ", "default", "default"),
+                Arguments.of("actual", "default", "actual"),
+                Arguments.of("  text  ", "default", "  text  "));
+    }
 }

@@ -7,6 +7,8 @@ package com.nucleonforge.axile.spring.utils;
  */
 public class StringUtils {
 
+    private StringUtils() {}
+
     public static boolean containsIgnoreCase(String source, String destination) {
 
         if (source == null) {
@@ -36,5 +38,9 @@ public class StringUtils {
         }
 
         return false;
+    }
+
+    public static String defaultIfBlank(String value, String defaultValue) {
+        return value != null && !value.isBlank() ? value : defaultValue;
     }
 }
