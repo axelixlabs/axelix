@@ -10,7 +10,7 @@ export const MainRoutes = () => {
         <Route index element={<>1</>} />
         <Route path="environment" element={<Environment />} />
         <Route path="beans" element={<Beans />} />
-        <Route path="configuration-properties" element={<ConfigProps />} />
+        <Route path="config-props" element={<ConfigProps />} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

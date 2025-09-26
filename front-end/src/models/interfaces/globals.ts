@@ -9,10 +9,10 @@ export interface ICommonSliceState {
   error: string;
 }
 
+/**
+ * A common reusable interface for describing objects that consist of key and value pair.
+ */
 export interface IKeyValuePair {
-  /**
-   * A common reusable interface for describing objects that contain key and value properties.
-   * */
   key: string;
   value: string;
 }

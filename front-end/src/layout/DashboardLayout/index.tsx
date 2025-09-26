@@ -36,7 +36,7 @@ export const DashboardLayout = () => {
           label: "Beans",
         },
         {
-          key: "configuration-properties",
+          key: "config-props",
           label: t("configurationProperties"),
         },
         {
