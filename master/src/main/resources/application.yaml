@@ -1,6 +1,7 @@
 server:
   port: 8080
 
+# TODO: @e need to think about the design of properties in general
 spring:
   application:
     name: axile
@@ -11,11 +12,10 @@ spring:
     kubernetes:
       discovery:
         enabled: true
-        discovery-server-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}
-        all-namespaces: false
-      sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
-      # TODO: we should not do that, at least we need to make that configurable
+        discovery-server-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}/apis
+        namespaces: default
       # See the doc https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/
+      sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
 
 management:
   endpoints:

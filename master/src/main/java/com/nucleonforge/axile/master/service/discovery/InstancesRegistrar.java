@@ -27,6 +27,10 @@ public class InstancesRegistrar {
             DiscoveryConfig discoveryConfig,
             InstancesDiscoverer instancesDiscoverer,
             InstanceRegistry instanceRegistry) {
+        log.info(
+                "Using {} as the primary instances auto-discovery mechanism",
+                instancesDiscoverer.getClass().getName());
+
         this.discoveryConfig = discoveryConfig;
         this.instancesDiscoverer = instancesDiscoverer;
         this.instanceRegistry = instanceRegistry;
@@ -35,10 +39,20 @@ public class InstancesRegistrar {
     @EventListener(ApplicationReadyEvent.class)
     public void register() {
         if (discoveryConfig.auto()) {
-            Set<InstanceReference> discovered = instancesDiscoverer.discover();
-            log.info("Discovered {} services. Their ids are : {}", discovered.size(), getServiceIds(discovered));
-            for (InstanceReference instanceReference : discovered) {
-                instanceRegistry.register(instanceReference);
+            Set<InstanceReference> discovered = instancesDiscoverer.discoverSafely();
+
+            if (discovered.isEmpty()) {
+                log.error(
+                        """
+                Despite the auto-discovery was enabled, the {} did not found any result.
+                That is almost certainly not the intended behavior. Please, revisit your configuration
+                """,
+                        this.getClass().getSimpleName());
+            } else {
+                log.info("Discovered {} services. Their ids are : {}", discovered.size(), getServiceIds(discovered));
+                for (InstanceReference instanceReference : discovered) {
+                    instanceRegistry.register(instanceReference);
+                }
             }
         } /*else {  // TODO: intentionally commented out, waiting for issue #86 to be implemented
               log.info("Automatic discovery of services is not enabled, assuming the services will register themselves");

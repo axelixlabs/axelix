@@ -51,12 +51,6 @@ public class KubernetesInstanceDiscoverer implements InstancesDiscoverer {
         List<String> serviceIds = discoveryClient.getServices();
 
         if (CollectionUtils.isEmpty(serviceIds)) {
-            log.error(
-                    """
-                Despite the auto-discovery was enabled, the {} did not found any result.
-                That is almost certainly not the intended behavior. Please, revisit your configuration
-                """,
-                    this.getClass().getSimpleName());
             return Set.of();
         }
 
