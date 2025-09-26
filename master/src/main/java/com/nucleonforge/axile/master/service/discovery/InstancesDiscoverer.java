@@ -26,4 +26,18 @@ public interface InstancesDiscoverer {
      */
     @NonNull
     Set<@NonNull InstanceReference> discover();
+
+    /**
+     * Return the discovered {@link Set} of {@link InstanceReference instance references}.
+     * Safe variation of {@link #discover()}.
+     */
+    @NonNull
+    default Set<@NonNull InstanceReference> discoverSafely() {
+        try {
+            return discover();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return Set.of();
+        }
+    }
 }

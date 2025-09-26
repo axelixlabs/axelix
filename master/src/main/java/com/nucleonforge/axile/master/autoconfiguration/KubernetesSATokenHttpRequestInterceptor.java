@@ -46,7 +46,7 @@ public class KubernetesSATokenHttpRequestInterceptor implements ClientHttpReques
 
         HttpHeaders headers = request.getHeaders();
 
-        headers.replace(HttpHeaders.AUTHORIZATION, List.of(accessToken));
+        headers.compute(HttpHeaders.AUTHORIZATION, (k, v) -> List.of(accessToken));
 
         return execution.execute(request, body);
     }

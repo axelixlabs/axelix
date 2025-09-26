@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnCloudPlatform;
 import org.springframework.boot.cloud.CloudPlatform;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.kubernetes.discovery.KubernetesDiscoveryClient;
@@ -25,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @AutoConfiguration(before = KubernetesDiscoveryClientAutoConfiguration.class)
 @ConditionalOnCloudPlatform(CloudPlatform.KUBERNETES)
+@EnableConfigurationProperties(KubernetesDiscoveryClientProperties.class)
 public class KubernetesAutoConfiguration {
 
     @Bean
@@ -45,7 +47,9 @@ public class KubernetesAutoConfiguration {
     @K8SRestTemplate
     public RestTemplate k8sRestTemplate(@Value("${spring.cloud.kubernetes.sa-token-path}") String saTokenPath) {
         return new RestTemplateBuilder()
-                .interceptors(new KubernetesSATokenHttpRequestInterceptor(saTokenPath))
+                .interceptors(
+                        new KubernetesSATokenHttpRequestInterceptor(saTokenPath),
+                        new ControlPlainHttpRequestsLoggingInterceptor())
                 .build();
     }
 
