@@ -62,10 +62,6 @@ export const DashboardLayout = () => {
             items={items}
             onClick={({ key }) => navigate(key)}
             className={styles.Menu}
-            // todo do this in future
-            // onClick={onClick}
-            // onOpenChange={onOpenChange}
-            // selectedKeys={[pathnameMainPart]}
           />
         </Sider>
 

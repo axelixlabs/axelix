@@ -4,9 +4,9 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 
-import type { IBean, IBeansSliceData } from "models";
+import type { IBean, IBeansSliceState } from "models";
 
-const initialState: IBeansSliceData = {
+const initialState: IBeansSliceState = {
   loading: false,
   error: "",
   beans: [],
