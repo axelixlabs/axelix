@@ -1,15 +1,4 @@
-import type { ICommonSliceState } from "./globals";
-
-export interface IEnvironmentProperty {
-  /**
-   * Environment single propery key
-   */
-  key: string;
-  /**
-   * Environment single propery value
-   */
-  value: string;
-}
+import type { ICommonSliceState, IKeyValuePair } from "./globals";
 
 export interface IEnvironmentPropertySource {
   /**
@@ -19,7 +8,7 @@ export interface IEnvironmentPropertySource {
   /**
    * Environment properies list
    */
-  properties: IEnvironmentProperty[];
+  properties: IKeyValuePair[];
 }
 
 export interface IEnvironmentData {

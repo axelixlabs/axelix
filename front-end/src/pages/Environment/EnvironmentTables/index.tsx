@@ -2,13 +2,11 @@ import { Input, Table } from "antd";
 import { useTranslation } from "react-i18next";
 import type { ColumnsType } from "antd/es/table";
 
-import type { IEnvironmentProperty, IEnvironmentPropertySource } from "models";
+import type { IEnvironmentPropertySource, IKeyValuePair } from "models";
 
 import styles from "./styles.module.css";
 
-const createTableColumns = (
-  title: string
-): ColumnsType<IEnvironmentProperty> => {
+const createTableColumns = (title: string): ColumnsType<IKeyValuePair> => {
   return [
     {
       title,
@@ -37,7 +35,7 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
   const { t } = useTranslation();
 
   return (
-    <div className={styles.MainWrapper}>
+    <>
       <Input placeholder={t("search")} className={styles.Search} />
       {propertySources.map(({ name, properties }) => {
         return (
@@ -45,11 +43,11 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
             columns={createTableColumns(name)}
             dataSource={properties}
             pagination={false}
-            className={styles.EnvironmentTable}
             key={name}
+            className={styles.EnvironmentTable}
           />
         );
       })}
-    </div>
+    </>
   );
 };
