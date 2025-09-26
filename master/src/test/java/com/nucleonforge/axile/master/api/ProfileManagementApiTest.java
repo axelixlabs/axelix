@@ -1,6 +1,7 @@
 package com.nucleonforge.axile.master.api;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -17,11 +18,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
+import com.nucleonforge.axile.master.api.request.ProfileUpdatedRequest;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
@@ -87,7 +91,7 @@ class ProfileManagementApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/profile-management/postgres")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/profile-management")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -100,22 +104,23 @@ class ProfileManagementApiTest {
 
     @Test
     void shouldReturnProfileUpdateResponse() {
-        String profile = "postgres";
+        List<String> profiles = List.of("postgres");
+        ProfileUpdatedRequest request = new ProfileUpdatedRequest(profiles);
 
         registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
-
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axile/profile-management/{instanceId}/profiles/{profiles}",
-                String.class,
                 activeInstanceId,
-                profile);
+                mockWebServer.url(activeInstanceId + "/actuator").toString()));
+
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                "/api/axile/profile-management/{instanceId}/profiles",
+                defaultEntity(request),
+                String.class,
+                activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
         String body = response.getBody();
-
         assertThatJson(body).isEqualTo(EXPECTED_JSON);
     }
 
@@ -123,14 +128,15 @@ class ProfileManagementApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError when replacing profiles")
     void shouldReturnInternalServerErrorOnProfileManagement() {
         String instanceId = UUID.randomUUID().toString();
+        ProfileUpdatedRequest request = new ProfileUpdatedRequest(List.of("test-profile"));
 
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/profile-management/{instanceId}/profiles/{profiles}",
+        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
+                "/api/axile/profile-management/{instanceId}/profiles",
+                defaultEntity(request),
                 EndpointInvocationException.class,
-                instanceId,
-                "test-profile");
+                instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -138,13 +144,21 @@ class ProfileManagementApiTest {
     @Test
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = UUID.randomUUID().toString();
+        ProfileUpdatedRequest request = new ProfileUpdatedRequest(List.of("test-profile"));
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/profile-management/{instanceId}/profiles/{profiles}",
+        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
+                "/api/axile/profile-management/{instanceId}/profiles",
+                request,
                 EndpointInvocationException.class,
-                instanceId,
-                "test-profile");
+                instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    private HttpEntity<ProfileUpdatedRequest> defaultEntity(ProfileUpdatedRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new HttpEntity<>(request, headers);
     }
 }

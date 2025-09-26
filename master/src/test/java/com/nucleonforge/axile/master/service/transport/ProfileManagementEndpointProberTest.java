@@ -1,6 +1,7 @@
 package com.nucleonforge.axile.master.service.transport;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,13 +14,17 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 
 import com.nucleonforge.axile.common.api.ProfileMutationResult;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
+import com.nucleonforge.axile.common.domain.http.HttpHeader;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
@@ -79,7 +84,7 @@ class ProfileManagementEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/profile-management/postgres")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/profile-management")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -91,13 +96,16 @@ class ProfileManagementEndpointProberTest {
     }
 
     @Test
-    void shouldReturnProfileMutationResult() {
-        String profile = "postgres";
-
+    void shouldReturnProfileMutationResult() throws JsonProcessingException {
         registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+                activeInstanceId,
+                mockWebServer.url(activeInstanceId + "/actuator").toString()));
 
-        HttpPayload payload = new DefaultHttpPayload(Map.of("profiles", profile));
+        byte[] profile = new ObjectMapper().writeValueAsBytes("postgres");
+        HttpHeader header = new HttpHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        List<HttpHeader> headers = List.of(header);
+        HttpPayload payload = new DefaultHttpPayload(headers, profile);
+
         ProfileMutationResult result = profileManagementEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
 
         assertThat(result).isNotNull();

@@ -28,6 +28,7 @@ class DefaultNonStandardVMOptionsDiscovererTest {
                 .map(JvmNonStandardOption::option)
                 .collect(Collectors.toSet());
 
-        assertThat(actualOptions).containsOnly("-Xms256m", "-Xmx512m", "-XX:+UseG1GC");
+        // Use `contains` instead of `containsOnly` because Gradle may add extra JVM options during the build.
+        assertThat(actualOptions).contains("-Xms256m", "-Xmx512m", "-XX:+UseG1GC");
     }
 }
