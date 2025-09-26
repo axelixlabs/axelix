@@ -5,6 +5,7 @@ import type { IEnvironmentData, IEnvironmentSliceState } from "../../models";
 const initialState: IEnvironmentSliceState = {
   loading: false,
   error: "",
+  // todo remove data field in future
   data: {
     activeProfiles: [],
     defaultProfiles: [],
