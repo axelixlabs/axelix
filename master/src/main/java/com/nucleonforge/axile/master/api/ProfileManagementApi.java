@@ -3,8 +3,6 @@ package com.nucleonforge.axile.master.api;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -28,8 +26,8 @@ import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.request.ProfileUpdatedRequest;
 import com.nucleonforge.axile.master.api.response.ProfileUpdateResponse;
-import com.nucleonforge.axile.master.exception.ProfileSerializationException;
 import com.nucleonforge.axile.master.service.convert.Converter;
+import com.nucleonforge.axile.master.service.serde.MessageSerializationStrategy;
 import com.nucleonforge.axile.master.service.transport.ProfileManagementEndpointProber;
 
 /**
@@ -47,12 +45,15 @@ public class ProfileManagementApi {
 
     private final ProfileManagementEndpointProber profileManagementEndpointProber;
     private final Converter<ProfileMutationResult, ProfileUpdateResponse> converter;
+    private final MessageSerializationStrategy messageSerializationStrategy;
 
     public ProfileManagementApi(
             ProfileManagementEndpointProber profileManagementEndpointProber,
-            Converter<ProfileMutationResult, ProfileUpdateResponse> converter) {
+            Converter<ProfileMutationResult, ProfileUpdateResponse> converter,
+            MessageSerializationStrategy messageSerializationStrategy) {
         this.profileManagementEndpointProber = profileManagementEndpointProber;
         this.converter = converter;
+        this.messageSerializationStrategy = messageSerializationStrategy;
     }
 
     @Operation(
@@ -89,17 +90,9 @@ public class ProfileManagementApi {
             @PathVariable("instanceId") String instanceId, @RequestBody ProfileUpdatedRequest request) {
         HttpHeader header = new HttpHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         List<HttpHeader> headers = List.of(header);
-        HttpPayload payload = new DefaultHttpPayload(headers, serializeToBytes(request));
+        HttpPayload payload = new DefaultHttpPayload(headers, messageSerializationStrategy.serialize(request));
 
         ProfileMutationResult result = profileManagementEndpointProber.invoke(InstanceId.of(instanceId), payload);
         return Objects.requireNonNull(converter.convert(result));
-    }
-
-    private byte[] serializeToBytes(ProfileUpdatedRequest request) {
-        try {
-            return new ObjectMapper().writeValueAsBytes(request);
-        } catch (JsonProcessingException e) {
-            throw new ProfileSerializationException("Failed to serialize profile mutation request", e);
-        }
     }
 }
