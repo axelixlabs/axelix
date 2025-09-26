@@ -36,11 +36,11 @@ export const DashboardLayout = () => {
           label: "Beans",
         },
         {
-          key: "configurationProperties",
+          key: "config-props",
           label: t("configurationProperties"),
         },
         {
-          key: "scheduledTasks",
+          key: "scheduled-tasks",
           label: t("scheduledTasks"),
         },
       ],

@@ -29,7 +29,7 @@ export const BeanCollapseLabels = ({
     >
       <div>
         <p>{beanName}</p>
-        <p>{className}</p>
+        <p className={styles.ClassName}>{className}</p>
       </div>
       <div className={styles.ScopeWrapper}>{scope}</div>
     </div>
