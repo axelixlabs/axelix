@@ -1,29 +1,18 @@
 package com.nucleonforge.axile.spring.properties;
 
-import org.jspecify.annotations.NonNull;
-
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.Selector;
-import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * Custom Spring Boot Actuator endpoint
  * that exposes operations for managing application properties at runtime.
  *
- * <p>This endpoint delegates property discovery and mutation operations to the
- * {@link PropertyDiscoverer} and {@link PropertyMutator} implementations.</p>
- *
- * <p>All operations are exposed via HTTP POST requests under the {@code /actuator/property-management} path.</p>
- *
- * <p>Supported operation:</p>
- * <ul>
- *     <li>{@code mutate(propertyName, newValue)} — updates the specified property to a new value.</li>
- * </ul>
- *
  * @since 10.07.2025
  * @author Nikita Kirillov
  */
-@Endpoint(id = "property-management")
+@RestControllerEndpoint(id = "property-management")
 public class PropertyManagementEndpoint {
 
     private final PropertyDiscoverer propertyDiscoverer;
@@ -34,13 +23,14 @@ public class PropertyManagementEndpoint {
         this.propertyMutator = propertyMutator;
     }
 
-    @WriteOperation
-    public void mutate(@Selector @NonNull String propertyName, String newValue) {
-        Property property = propertyDiscoverer.discover(propertyName);
+    @PostMapping
+    public ResponseEntity<Void> mutate(@RequestBody PropertyMutationRequest request) {
+        Property property = propertyDiscoverer.discover(request.propertyName());
 
         if (property == null) {
-            throw new PropertyNotFoundException("Property '" + propertyName + "' not found");
+            throw new PropertyNotFoundException("Property '" + request.propertyName() + "' not found");
         }
-        propertyMutator.mutate(property, newValue);
+        propertyMutator.mutate(property, request.newValue());
+        return ResponseEntity.noContent().build();
     }
 }

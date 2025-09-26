@@ -31,7 +31,7 @@ public class ContextReloadingPropertyMutator implements PropertyMutator {
     }
 
     @Override
-    public MutationResponse mutate(Property property, String newValue) {
+    public void mutate(Property property, String newValue) {
         MutablePropertySources propertySources = configurableEnvironment.getPropertySources();
 
         PropertySource<?> potentiallyAxilePropertySource = propertySources.get(AXILE_PROPERTY_SOURCE_NAME);
@@ -46,7 +46,5 @@ public class ContextReloadingPropertyMutator implements PropertyMutator {
         }
 
         contextRestarter.restartContext();
-
-        return new MutationResponse(true, null);
     }
 }

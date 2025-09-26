@@ -27,22 +27,23 @@ public class DefaultPropertyDiscoverer implements PropertyDiscoverer {
 
         Property property = null;
 
+        // We rely on the ordering of PropertySources: the first source containing the property
+        // is chosen as providerSource
         for (PropertySource<?> propertySource : propertySources) {
-            if (propertySource.containsProperty(propertyName)) {
-                if (property == null) {
-                    property = new Property(propertyName);
-
-                    // TODO:
-                    //  Is this correct? I mean, if the given property source contains the
-                    //  property, it does not mean that this property source is a 'provider source',
-                    //  see javadoc of Property
-                    property.setProviderSource(propertySource);
-
-                    Object value = propertySource.getProperty(propertyName);
-                    property.setValue(value != null ? value.toString() : null);
-                }
-                property.addHoldingPropertySource(propertySource);
+            if (!propertySource.containsProperty(propertyName)) {
+                continue;
             }
+
+            if (property == null) {
+                property = new Property(propertyName);
+                Object value = propertySource.getProperty(propertyName);
+                property.setValue(value != null ? value.toString() : null);
+                if (value != null) {
+                    property.setProviderSource(propertySource);
+                }
+            }
+
+            property.addHoldingPropertySource(propertySource);
         }
 
         return property;

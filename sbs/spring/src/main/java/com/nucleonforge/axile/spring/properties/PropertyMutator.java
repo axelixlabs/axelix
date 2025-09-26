@@ -17,7 +17,6 @@ public interface PropertyMutator {
      *
      * @param property the property to be mutated
      * @param newValue the new value of the property
-     * @return the result of the mutation
      */
-    MutationResponse mutate(Property property, String newValue);
+    void mutate(Property property, String newValue);
 }

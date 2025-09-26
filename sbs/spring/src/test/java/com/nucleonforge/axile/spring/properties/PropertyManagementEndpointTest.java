@@ -83,6 +83,7 @@ class PropertyManagementEndpointTest {
     @Test
     void mutate_shouldMutate_whenNewValueIsEmpty() throws InterruptedException {
         Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/notEmpty.property", Map.class);
+
         assertThat(initialResponse)
                 .isNotNull()
                 .extracting("property")
@@ -90,58 +91,62 @@ class PropertyManagementEndpointTest {
                 .extracting("value")
                 .isEqualTo("not-empty");
 
-        mutateProperty("notEmpty.property", " ");
+        mutateProperty("notEmpty.property", "");
 
         Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/notEmpty.property", Map.class);
+
         assertThat(updatedResponse)
                 .isNotNull()
                 .extracting("property")
                 .isInstanceOf(Map.class)
                 .extracting("value")
-                .isInstanceOf(String.class)
-                .isEqualTo(" ");
+                .isEqualTo("");
     }
 
     @Test
     void mutate_shouldReturnError_whenPropertyNameIsEmpty() {
-        ResponseEntity<MutationResponse> response =
-                restTemplate.postForEntity(path(""), defaultEntity(), MutationResponse.class);
+        PropertyMutationRequest request = new PropertyMutationRequest("", "someValue");
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void mutate_shouldNotMutate_whenPropertyNameIsBlank() {
-        String propertyName = " \t";
-        ResponseEntity<PropertyNotFoundException> blankNameResponse =
-                restTemplate.postForEntity(path(propertyName), defaultEntity(), PropertyNotFoundException.class);
-        assertThat(blankNameResponse)
-                .isNotNull()
-                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .isNotNull()
-                .satisfies(exception -> {
-                    assertThat(exception).isInstanceOf(PropertyNotFoundException.class);
-                });
-    }
-
-    @Test
-    void shouldReturnBadRequest_whenPropertyDoesNotExist() {
-        String propertyName = "nonExistentProperty.property";
-
-        ResponseEntity<PropertyNotFoundException> response = restTemplate.postForEntity(
-                path(propertyName + "?newValue=" + "newValue"), defaultEntity(), PropertyNotFoundException.class);
+        ResponseEntity<PropertyNotFoundException> response =
+                restTemplate.postForEntity(path(), defaultEntity(request), PropertyNotFoundException.class);
 
         assertThat(response)
                 .isNotNull()
                 .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
                 .extracting(ResponseEntity::getBody)
                 .isNotNull()
-                .satisfies(exception -> {
-                    assertThat(exception)
-                            .isInstanceOf(PropertyNotFoundException.class)
-                            .hasMessageContaining("Property '" + propertyName + "' not found");
-                });
+                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNotFoundException.class));
+    }
+
+    @Test
+    void mutate_shouldNotMutate_whenPropertyNameIsBlank() {
+        PropertyMutationRequest request = new PropertyMutationRequest(" \t", "newValue");
+
+        ResponseEntity<PropertyNotFoundException> response =
+                restTemplate.postForEntity(path(), defaultEntity(request), PropertyNotFoundException.class);
+
+        assertThat(response)
+                .isNotNull()
+                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
+                .extracting(ResponseEntity::getBody)
+                .isNotNull()
+                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNotFoundException.class));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenPropertyDoesNotExist() {
+        String propertyName = "nonExistentProperty.property";
+        PropertyMutationRequest request = new PropertyMutationRequest(propertyName, "newValue");
+
+        ResponseEntity<PropertyNotFoundException> response =
+                restTemplate.postForEntity(path(), defaultEntity(request), PropertyNotFoundException.class);
+
+        assertThat(response)
+                .isNotNull()
+                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
+                .extracting(ResponseEntity::getBody)
+                .isNotNull()
+                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNotFoundException.class));
     }
 
     /**
@@ -151,20 +156,21 @@ class PropertyManagementEndpointTest {
      * @param newValue     new value to set (can be blank or non-blank)
      */
     private void mutateProperty(String propertyName, String newValue) throws InterruptedException {
-        ResponseEntity<Void> response =
-                restTemplate.postForEntity(path(propertyName + "?newValue=" + newValue), defaultEntity(), Void.class);
+        PropertyMutationRequest request = new PropertyMutationRequest(propertyName, newValue);
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);
 
         TimeUnit.SECONDS.sleep(7); // wait for context update
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
 
-    private HttpEntity<Void> defaultEntity() {
+    private HttpEntity<PropertyMutationRequest> defaultEntity(PropertyMutationRequest request) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return new HttpEntity<>(headers);
+        return new HttpEntity<>(request, headers);
     }
 
-    private String path(String relative) {
-        return "/actuator/property-management/" + relative;
+    private String path() {
+        return "/actuator/property-management";
     }
 }

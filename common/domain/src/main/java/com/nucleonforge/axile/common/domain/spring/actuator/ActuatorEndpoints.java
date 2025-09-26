@@ -101,6 +101,9 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // Prometheus
     public static final ActuatorEndpoint PROMETHEUS = of("/prometheus", HttpMethod.GET);
 
+    // PropertyManagement
+    public static final ActuatorEndpoint PROPERTY_MANAGEMENT = of("/property-management", HttpMethod.POST);
+
     // Quartz
     // TODO: there are more of them
     public static final ActuatorEndpoint QUARTZ = of("/quartz", HttpMethod.GET);
