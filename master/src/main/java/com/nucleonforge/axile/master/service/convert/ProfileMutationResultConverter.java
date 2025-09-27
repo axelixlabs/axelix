@@ -14,8 +14,7 @@ import com.nucleonforge.axile.master.api.response.ProfileUpdateResponse;
  * @author Nikita Kirillov
  */
 @Service
-// TODO: mb rename
-public class ProfileMutationConverter implements Converter<ProfileMutationResult, ProfileUpdateResponse> {
+public class ProfileMutationResultConverter implements Converter<ProfileMutationResult, ProfileUpdateResponse> {
 
     @Override
     public @NonNull ProfileUpdateResponse convertInternal(@NonNull ProfileMutationResult profileMutationResult) {

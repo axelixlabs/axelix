@@ -8,14 +8,14 @@ import com.nucleonforge.axile.master.api.response.ProfileUpdateResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link ProfileMutationConverter}
+ * Unit tests for {@link ProfileMutationResultConverter}
  *
  * @since 25.09.2025
  * @author Nikita Kirillov
  */
-class ProfileMutationConverterTest {
+class ProfileMutationResultConverterTest {
 
-    private final ProfileMutationConverter subject = new ProfileMutationConverter();
+    private final ProfileMutationResultConverter subject = new ProfileMutationResultConverter();
 
     @Test
     void testConvertHappyPath() {
