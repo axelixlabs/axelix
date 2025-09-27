@@ -39,7 +39,7 @@ class KubernetesInstanceDiscovererTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private KubernetesInstanceDiscoverer discoverer;
+    private KubernetesInstanceDiscoverer subject;
 
     @MockBean
     private DiscoveryClient discoveryClient;
@@ -89,7 +89,7 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(activeInstanceId));
         Mockito.when(discoveryClient.getInstances(activeInstanceId)).thenReturn(List.of(serviceInstance));
 
-        Set<InstanceReference> instances = discoverer.discover();
+        Set<InstanceReference> instances = subject.discover();
 
         assertThat(instances).hasSize(1);
         InstanceReference instanceReference = instances.iterator().next();
@@ -171,7 +171,7 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(discoveryClient.getInstances(secondServiceId)).thenReturn(List.of(secondServiceGoodVersion));
         // spotless:on
 
-        Set<InstanceReference> instances = discoverer.discover();
+        Set<InstanceReference> instances = subject.discover();
 
         assertThat(instances)
                 .extracting(instance -> instance.id().instanceId())
@@ -182,15 +182,15 @@ class KubernetesInstanceDiscovererTest {
     void shouldIgnoreWhenDiscoveryClientReturnsEmpty() {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of());
 
-        Set<InstanceReference> instances = discoverer.discover();
+        Set<InstanceReference> instances = subject.discover();
 
         assertThat(instances).isEmpty();
     }
 
     @Test
     void shouldIgnoreInstanceWhen404() {
-        String activeInstanceId = UUID.randomUUID().toString();
-        String failingInstanceId = UUID.randomUUID().toString();
+        String okResponseInstanceId = UUID.randomUUID().toString();
+        String notFoundInstanceId = UUID.randomUUID().toString();
 
         // language=json
         String response = """
@@ -205,7 +205,7 @@ class KubernetesInstanceDiscovererTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axile-metadata")) {
+                if (path.equals("/" + okResponseInstanceId + "/actuator/axile-metadata")) {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -215,27 +215,27 @@ class KubernetesInstanceDiscovererTest {
             }
         });
 
-        ServiceInstance healthy = Mockito.mock(ServiceInstance.class);
-        Mockito.when(healthy.getInstanceId()).thenReturn(activeInstanceId);
-        Mockito.when(healthy.getUri())
-                .thenReturn(mockWebServer.url(activeInstanceId).uri());
+        ServiceInstance okResponse = Mockito.mock(ServiceInstance.class);
+        Mockito.when(okResponse.getInstanceId()).thenReturn(okResponseInstanceId);
+        Mockito.when(okResponse.getUri())
+                .thenReturn(mockWebServer.url(okResponseInstanceId).uri());
 
-        ServiceInstance failing = Mockito.mock(ServiceInstance.class);
-        Mockito.when(failing.getInstanceId()).thenReturn(failingInstanceId);
-        Mockito.when(failing.getUri())
-                .thenReturn(mockWebServer.url(failingInstanceId).uri());
+        ServiceInstance notFoundResponse = Mockito.mock(ServiceInstance.class);
+        Mockito.when(notFoundResponse.getInstanceId()).thenReturn(notFoundInstanceId);
+        Mockito.when(notFoundResponse.getUri())
+                .thenReturn(mockWebServer.url(notFoundInstanceId).uri());
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of("test-service"));
-        Mockito.when(discoveryClient.getInstances("test-service")).thenReturn(List.of(healthy, failing));
+        Mockito.when(discoveryClient.getInstances("test-service")).thenReturn(List.of(okResponse, notFoundResponse));
 
-        Set<InstanceReference> instances = discoverer.discover();
+        Set<InstanceReference> instances = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(activeInstanceId);
+        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(okResponseInstanceId);
     }
 
     @Test
     void shouldIgnoreInstanceWhenConnectionTimedOut() {
-        String activeInstanceId = UUID.randomUUID().toString();
+        String healthyInstanceId = UUID.randomUUID().toString();
         String timeoutInstanceId = UUID.randomUUID().toString();
 
         // language=json
@@ -251,44 +251,46 @@ class KubernetesInstanceDiscovererTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axile-metadata")) {
+                if (path.equals("/" + healthyInstanceId + "/actuator/axile-metadata")) {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
                 } else if (path.equals("/" + timeoutInstanceId + "/actuator/axile-metadata")) {
-                    // simulate a timeout
                     try {
+                        // Yeah, that sucks, but, we cannot just set timeout on the MockResponse, because
+                        // of this OpenJDK HttpClient limitation https://bugs.openjdk.org/browse/JDK-8258397
                         Thread.sleep(6000);
-                    } catch (InterruptedException ignored) {
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
-                    return new MockResponse().setResponseCode(200);
+                    return new MockResponse().setBody(response);
                 }
                 return new MockResponse().setResponseCode(404);
             }
         });
 
         ServiceInstance healthy = Mockito.mock(ServiceInstance.class);
-        Mockito.when(healthy.getInstanceId()).thenReturn(activeInstanceId);
+        Mockito.when(healthy.getInstanceId()).thenReturn(healthyInstanceId);
         Mockito.when(healthy.getUri())
-                .thenReturn(mockWebServer.url(activeInstanceId).uri());
+                .thenReturn(mockWebServer.url(healthyInstanceId).uri());
 
-        ServiceInstance slow = Mockito.mock(ServiceInstance.class);
-        Mockito.when(slow.getInstanceId()).thenReturn(timeoutInstanceId);
-        Mockito.when(slow.getUri())
+        ServiceInstance timedOut = Mockito.mock(ServiceInstance.class);
+        Mockito.when(timedOut.getInstanceId()).thenReturn(timeoutInstanceId);
+        Mockito.when(timedOut.getUri())
                 .thenReturn(mockWebServer.url(timeoutInstanceId).uri());
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of("test-service"));
-        Mockito.when(discoveryClient.getInstances("test-service")).thenReturn(List.of(healthy, slow));
+        Mockito.when(discoveryClient.getInstances("test-service")).thenReturn(List.of(healthy, timedOut));
 
-        Set<InstanceReference> instances = discoverer.discover();
+        Set<InstanceReference> instances = subject.discover();
 
-        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(activeInstanceId);
+        assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(healthyInstanceId);
     }
 
     @Test
     void shouldIgnoreInstanceWhenConnectionRefused() {
         String activeInstanceId = UUID.randomUUID().toString();
-        String nonExistentInstanceId = UUID.randomUUID().toString();
+        String connectionRefusedInstanceId = UUID.randomUUID().toString();
 
         // language=json
         String response = """
@@ -317,14 +319,15 @@ class KubernetesInstanceDiscovererTest {
         Mockito.when(healthy.getUri())
                 .thenReturn(mockWebServer.url(activeInstanceId).uri());
 
-        ServiceInstance failing = Mockito.mock(ServiceInstance.class);
-        Mockito.when(failing.getInstanceId()).thenReturn(nonExistentInstanceId);
-        Mockito.when(failing.getUri()).thenReturn(URI.create("http://localhost:59999")); // non-existent URL
+        ServiceInstance connectionRefused = Mockito.mock(ServiceInstance.class);
+        Mockito.when(connectionRefused.getInstanceId()).thenReturn(connectionRefusedInstanceId);
+        // the assumption is that ports under 1024 cannot be allocated by mockwebserver (require root privileges)
+        Mockito.when(connectionRefused.getUri()).thenReturn(URI.create("http://localhost:10"));
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of("test-service"));
-        Mockito.when(discoveryClient.getInstances("test-service")).thenReturn(List.of(healthy, failing));
+        Mockito.when(discoveryClient.getInstances("test-service")).thenReturn(List.of(healthy, connectionRefused));
 
-        Set<InstanceReference> instances = discoverer.discover();
+        Set<InstanceReference> instances = subject.discover();
 
         assertThat(instances).extracting(instance -> instance.id().instanceId()).containsOnly(activeInstanceId);
     }

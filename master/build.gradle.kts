@@ -19,7 +19,7 @@ dependencies {
     implementation("org.springframework:spring-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.cloud:spring-cloud-kubernetes-discovery")
+    implementation("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.slf4j:slf4j-api")
     implementation("io.jsonwebtoken:jjwt-api:$jsonwebtokenVersion")
 
