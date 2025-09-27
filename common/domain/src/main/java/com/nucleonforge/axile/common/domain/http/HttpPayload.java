@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.common.domain.http;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -38,5 +39,11 @@ public interface HttpPayload {
         byte[] bytes = requestBody();
 
         return bytes.length != 0;
+    }
+
+    static HttpPayload json(byte[] requestBody) {
+        HttpHeader contentType = new HttpHeader("Content-Type", "application/json");
+        return new DefaultHttpPayload(
+                List.of(contentType), Collections.emptyList(), Collections.emptyMap(), requestBody);
     }
 }

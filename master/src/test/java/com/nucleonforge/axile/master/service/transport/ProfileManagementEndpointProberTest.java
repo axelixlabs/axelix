@@ -1,7 +1,6 @@
 package com.nucleonforge.axile.master.service.transport;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,12 +18,10 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 
 import com.nucleonforge.axile.common.api.ProfileMutationResult;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
-import com.nucleonforge.axile.common.domain.http.HttpHeader;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
@@ -102,9 +99,7 @@ class ProfileManagementEndpointProberTest {
                 mockWebServer.url(activeInstanceId + "/actuator").toString()));
 
         byte[] profile = new ObjectMapper().writeValueAsBytes("postgres");
-        HttpHeader header = new HttpHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        List<HttpHeader> headers = List.of(header);
-        HttpPayload payload = new DefaultHttpPayload(headers, profile);
+        HttpPayload payload = HttpPayload.json(profile);
 
         ProfileMutationResult result = profileManagementEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
 
