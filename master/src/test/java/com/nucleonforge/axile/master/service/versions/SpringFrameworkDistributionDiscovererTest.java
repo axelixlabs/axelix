@@ -6,11 +6,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.domain.Instance;
+import com.nucleonforge.axile.common.domain.BuildInfo;
 import com.nucleonforge.axile.common.domain.JarClassPathEntry;
 import com.nucleonforge.axile.master.model.software.SoftwareDistribution;
 
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createBuildInfo;
 
 /**
  * Unit test for {@link SpringFrameworkDistributionDiscoverer}.
@@ -33,7 +33,7 @@ class SpringFrameworkDistributionDiscovererTest {
     @Test
     void testDiscoverNoSpringFramework() {
         // given.
-        Instance instance = createInstance(
+        BuildInfo instance = createBuildInfo(
                 new JarClassPathEntry("org.hibernate", "hibernate-core", "6.1.7", null, null),
                 new JarClassPathEntry("org.jboss", "jandex", "2.4.2", null, null),
                 new JarClassPathEntry("org.jetbrains.kotlin", "kotlin-stdlib", "2.0.17", null, null));
@@ -49,7 +49,7 @@ class SpringFrameworkDistributionDiscovererTest {
     void testDiscoverHappyPath() {
         // given.
         String springVersion = "6.1.2";
-        Instance instance = createInstance(
+        BuildInfo instance = createBuildInfo(
                 new JarClassPathEntry("org.hibernate", "hibernate-core", "6.1.7", null, Set.of()),
                 new JarClassPathEntry("org.jboss", "jandex", "2.4.2", null, Set.of()),
                 new JarClassPathEntry("org.springframework", "spring-core", springVersion, null, Set.of()),

@@ -1,15 +1,34 @@
 server:
   port: 8080
 
+# TODO: we need to think about the design of properties in general
 spring:
   application:
     name: axile
   mvc:
     servlet:
       path: /api/${spring.application.name}
+  cloud:
+    discovery:
+      enabled: true
+      blocking:
+        enabled: true
+    kubernetes:
+      discovery:
+        enabled: true
+        discovery-server-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}
+        namespaces: default
+      # See the doc https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/
+      sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
+      ca-cert-path: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
 management:
   endpoints:
     web:
       exposure:
         include: [ "health" ]
+axile:
+  master:
+    discovery:
+      auto: true
+      execution-environment: k8s

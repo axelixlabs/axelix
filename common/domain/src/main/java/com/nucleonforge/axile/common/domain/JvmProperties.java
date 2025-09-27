@@ -3,8 +3,7 @@ package com.nucleonforge.axile.common.domain;
 import java.util.Set;
 
 /**
- * Holder for the given {@link JvmProperty properties} being used during any given
- * {@link Instance} launch.
+ * Contains JVM properties used during the launch of an application instance.
  *
  * @author Mikhail Polivakha
  */

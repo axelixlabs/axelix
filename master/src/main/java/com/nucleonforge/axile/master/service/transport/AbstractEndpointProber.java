@@ -7,11 +7,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 import org.jspecify.annotations.NonNull;
 
-import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.InstanceId;
+import com.nucleonforge.axile.common.domain.InstanceReference;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
@@ -33,26 +34,37 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
             InstanceRegistry instanceRegistry, MessageDeserializationStrategy<O> messageDeserializationStrategy) {
         this.instanceRegistry = instanceRegistry;
         this.messageDeserializationStrategy = messageDeserializationStrategy;
-        this.httpClient = HttpClient.newBuilder().build();
+        this.httpClient =
+                HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
     }
 
     @Override
     public @NonNull O invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
             throws EndpointInvocationException, InstanceNotFoundException {
+        InstanceReference instanceReference =
+                instanceRegistry.get(instanceId).orElseThrow(() -> new InstanceNotFoundException(instanceId));
 
-        ActuatorEndpoint endpoint = supports();
+        HttpRequest request = buildHttpRequest(supports(), httpPayload, instanceReference.actuatorUrl());
 
+        return invokeInternal(instanceId.instanceId(), request);
+    }
+
+    @Override
+    public @NonNull O invoke(@NonNull String baseUrl, HttpPayload httpPayload) throws EndpointInvocationException {
+        HttpRequest request = buildHttpRequest(supports(), httpPayload, baseUrl);
+        return invokeInternal(baseUrl, request);
+    }
+
+    private O invokeInternal(String instanceIdentity, HttpRequest request) {
         try {
-            HttpResponse<byte[]> response = httpClient.send(
-                    buildHttpRequest(endpoint, instanceId, httpPayload), HttpResponse.BodyHandlers.ofByteArray());
+            HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
             int statusCode = response.statusCode();
-
             if (statusCode >= 200 && statusCode < 300) {
-                byte[] responseBody = response.body();
-                return messageDeserializationStrategy.deserialize(responseBody);
+                return messageDeserializationStrategy.deserialize(response.body());
             } else {
-                throw new EndpointInvocationException(unexpectedStatusCode(instanceId, endpoint, statusCode));
+                throw new EndpointInvocationException("Endpoint '%s' on instance identified by '%s' responded with %d"
+                        .formatted(supports(), instanceIdentity, statusCode));
             }
 
         } catch (IOException | InterruptedException e) {
@@ -60,15 +72,18 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
         }
     }
 
-    private HttpRequest buildHttpRequest(ActuatorEndpoint endpoint, InstanceId instanceId, HttpPayload httpPayload) {
-        Instance instance =
-                instanceRegistry.get(instanceId).orElseThrow(() -> new InstanceNotFoundException(instanceId));
+    private HttpRequest buildHttpRequest(ActuatorEndpoint endpoint, HttpPayload httpPayload, String baseOrActuatorUrl) {
+
+        String url = baseOrActuatorUrl
+                + endpoint.path().expand(httpPayload.pathVariableValues(), httpPayload.queryParameters());
 
         BodyPublisher bodyPublisher =
                 httpPayload.hasBody() ? BodyPublishers.ofByteArray(httpPayload.requestBody()) : BodyPublishers.noBody();
 
-        HttpRequest.Builder builder =
-                HttpRequest.newBuilder().method(endpoint.httpMethod().name(), bodyPublisher);
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .timeout(Duration.ofSeconds(5))
+                .method(endpoint.httpMethod().name(), bodyPublisher)
+                .uri(URI.create(url));
 
         if (httpPayload.hasHeaders()) {
             for (var header : httpPayload.headers()) {
@@ -76,16 +91,6 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
             }
         }
 
-        return builder.uri(buildUrl(endpoint, httpPayload, instance)).build();
-    }
-
-    private static URI buildUrl(ActuatorEndpoint endpoint, HttpPayload httpPayload, Instance instance) {
-        return URI.create(instance.getActuatorUrl()
-                + endpoint.path().expand(httpPayload.pathVariableValues(), httpPayload.queryParameters()));
-    }
-
-    private static String unexpectedStatusCode(InstanceId instanceId, ActuatorEndpoint endpoint, int statusCode) {
-        return "Endpoint '%s' when invoked on instance '%s' did not respond with 2xx response, but with %d"
-                .formatted(endpoint.path(), instanceId.instanceId(), statusCode);
+        return builder.build();
     }
 }

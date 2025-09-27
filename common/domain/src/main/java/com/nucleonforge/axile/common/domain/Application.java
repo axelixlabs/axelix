@@ -18,10 +18,10 @@ public class Application {
     /**
      * Instances of the given application, e.g. K8S pods.
      */
-    private Set<Instance> instances;
+    private Set<InstanceReference> instanceReferences;
 
-    public Application(String name, Set<Instance> instances) {
+    public Application(String name, Set<InstanceReference> instanceReferences) {
         this.name = name;
-        this.instances = instances;
+        this.instanceReferences = instanceReferences;
     }
 }
