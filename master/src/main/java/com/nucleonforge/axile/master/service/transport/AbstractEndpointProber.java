@@ -41,36 +41,21 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
     @Override
     public @NonNull O invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
             throws EndpointInvocationException, InstanceNotFoundException {
-
-        ActuatorEndpoint endpoint = supports();
-
         InstanceReference instanceReference =
                 instanceRegistry.get(instanceId).orElseThrow(() -> new InstanceNotFoundException(instanceId));
 
         HttpRequest request = buildHttpRequest(supports(), httpPayload, instanceReference.actuatorUrl());
 
-        try {
-            HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
-
-            int statusCode = response.statusCode();
-
-            if (statusCode >= 200 && statusCode < 300) {
-                byte[] responseBody = response.body();
-                return messageDeserializationStrategy.deserialize(responseBody);
-            } else {
-                throw new EndpointInvocationException(unexpectedStatusCode(instanceId, endpoint, statusCode));
-            }
-
-        } catch (IOException | InterruptedException e) {
-            throw new EndpointInvocationException(e);
-        }
+        return invokeInternal(instanceId.instanceId(), request);
     }
 
     @Override
     public @NonNull O invoke(@NonNull String baseUrl, HttpPayload httpPayload) throws EndpointInvocationException {
-
         HttpRequest request = buildHttpRequest(supports(), httpPayload, baseUrl);
+        return invokeInternal(baseUrl, request);
+    }
 
+    private O invokeInternal(String instanceIdentity, HttpRequest request) {
         try {
             HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
@@ -78,8 +63,8 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
             if (statusCode >= 200 && statusCode < 300) {
                 return messageDeserializationStrategy.deserialize(response.body());
             } else {
-                throw new EndpointInvocationException("Endpoint '%s' on instance '%s' responded with %d"
-                        .formatted(supports().path(), baseUrl, statusCode));
+                throw new EndpointInvocationException("Endpoint '%s' on instance identified by '%s' responded with %d"
+                        .formatted(supports(), instanceIdentity, statusCode));
             }
 
         } catch (IOException | InterruptedException e) {
@@ -107,10 +92,5 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
         }
 
         return builder.build();
-    }
-
-    private static String unexpectedStatusCode(InstanceId instanceId, ActuatorEndpoint endpoint, int statusCode) {
-        return "Endpoint '%s' when invoked on instance '%s' did not respond with 2xx response, but with %d"
-                .formatted(endpoint.path(), instanceId.instanceId(), statusCode);
     }
 }

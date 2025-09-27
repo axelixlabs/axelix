@@ -76,7 +76,11 @@ public class KubernetesInstanceDiscoverer implements InstancesDiscoverer {
         try {
             ManagedServiceMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
             return isCompatibleVersion(serviceInstance, metadata);
-        } catch (EndpointInvocationException ignored) {
+        } catch (EndpointInvocationException error) {
+            log.warn(
+                    "Unable to reach the managed service with id : {}. Skipping instance registration",
+                    serviceInstance.getInstanceId(),
+                    error);
             return false;
         }
     }
