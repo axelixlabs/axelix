@@ -24,4 +24,8 @@ public record DefaultHttpPayload(
     public DefaultHttpPayload(Map<String, String> pathVariableValues, byte[] requestBody) {
         this(Collections.emptyList(), Collections.emptyList(), pathVariableValues, requestBody);
     }
+
+    public DefaultHttpPayload(List<HttpHeader> headers, byte[] requestBody) {
+        this(headers, Collections.emptyList(), Collections.emptyMap(), requestBody);
+    }
 }

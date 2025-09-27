@@ -125,4 +125,17 @@ public final class ApiPaths {
          */
         public static final String CLEAR_FOR_LOGGER = "/{instanceId}/logger/{loggerName}/clear";
     }
+
+    public static final class ProfileManagementApi {
+
+        /**
+         * Base path for profile management APIs.
+         */
+        public static final String MAIN = "/profile-management";
+
+        /**
+         * Endpoint to replace the active Spring profiles of a given application instance.
+         */
+        public static final String REPLACE = "/{instanceId}/profiles";
+    }
 }

@@ -25,6 +25,10 @@ dependencies {
     testImplementation("com.h2database:h2")
 }
 
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
+}
+
 tasks {
     val nonStandardVmOptionsTest by registering(Test::class) {
         useJUnitPlatform {

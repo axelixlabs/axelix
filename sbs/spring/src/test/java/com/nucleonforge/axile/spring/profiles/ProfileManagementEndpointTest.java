@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.spring.profiles;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +65,7 @@ class ProfileManagementEndpointTest {
 
         checkNoActiveProfilesAndNoBeans(premiumService);
 
-        activateProfiles("profile-premium");
+        activateProfiles(new ProfileMutationRequest(List.of("profile-premium")));
 
         // Verify bean after activating profile
         Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
@@ -80,7 +81,7 @@ class ProfileManagementEndpointTest {
 
         checkNoActiveProfilesAndNoBeans(basicService, premiumService);
 
-        activateProfiles("profile-premium,profile-basic");
+        activateProfiles(new ProfileMutationRequest(List.of("profile-premium", "profile-basic")));
 
         // Verify beans after activating profiles
         Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
@@ -88,7 +89,7 @@ class ProfileManagementEndpointTest {
         assertThat(containsBean(updatedBeans, premiumService)).isTrue();
 
         // Replace profiles
-        activateProfiles("profile-legacy,profile-advanced");
+        activateProfiles(new ProfileMutationRequest(List.of("profile-advanced", "profile-legacy")));
 
         // Verify beans after replacing profiles
         updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
@@ -104,7 +105,7 @@ class ProfileManagementEndpointTest {
 
         checkNoActiveProfilesAndNoBeans(advancedService, legacyService);
 
-        activateProfiles("profile-advanced,profile-legacy");
+        activateProfiles(new ProfileMutationRequest(List.of("profile-advanced", "profile-legacy")));
 
         // Verify beans after activating profiles
         Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
@@ -112,7 +113,7 @@ class ProfileManagementEndpointTest {
         assertThat(containsBean(updatedBeans, legacyService)).isTrue();
 
         // Disable all profiles
-        activateProfiles(" ");
+        activateProfiles(new ProfileMutationRequest(Collections.emptyList()));
 
         // Verify beans after disabling all profiles
         updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
@@ -120,23 +121,15 @@ class ProfileManagementEndpointTest {
         assertThat(containsBean(updatedBeans, legacyService)).isFalse();
     }
 
-    @Test
-    void replaceProfiles_shouldReturnBadRequest() {
-        ResponseEntity<ProfileMutationResponse> response =
-                restTemplate.postForEntity(path(""), defaultEntity(), ProfileMutationResponse.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
     /**
-     * Activates the given comma-separated list of Spring profiles via the custom Actuator endpoint.
+     * Activates the given list of Spring profiles via the custom Actuator endpoint.
      * Verifies the activation and pauses to allow context reload.
      *
-     * @param profiles comma-separated string of profiles to activate (use blank to clear all profiles)
+     * @param request the request object containing the list of profiles to activate (an empty list will clear all active profiles)
      */
-    private void activateProfiles(String profiles) throws InterruptedException {
+    private void activateProfiles(ProfileMutationRequest request) throws InterruptedException {
         ResponseEntity<ProfileMutationResponse> response =
-                restTemplate.postForEntity(path("/" + profiles), defaultEntity(), ProfileMutationResponse.class);
+                restTemplate.postForEntity(path(), defaultEntity(request), ProfileMutationResponse.class);
 
         TimeUnit.SECONDS.sleep(7); // wait for context update
         assertThat(response)
@@ -146,20 +139,21 @@ class ProfileManagementEndpointTest {
                 .isNotNull()
                 .returns(true, ProfileMutationResponse::updated);
 
-        String[] expectedProfiles = profiles.isBlank() ? new String[0] : profiles.split(",");
-        checkActiveProfiles(expectedProfiles);
+        checkActiveProfiles(request);
     }
 
     /**
      * Checks that the given profiles are currently active by calling the Actuator /env endpoint.
      *
-     * @param expectedProfiles the expected list of active profiles
+     * @param request contains the expected list of active profiles
      */
     @SuppressWarnings("unchecked")
-    private void checkActiveProfiles(String... expectedProfiles) {
+    private void checkActiveProfiles(ProfileMutationRequest request) {
+        List<String> expectedProfiles = request.effectiveProfiles();
+
         Map<?, ?> env = restTemplate.getForObject("/actuator/env", Map.class);
         List<String> activeProfiles = (List<String>) env.get("activeProfiles");
-        assertThat(activeProfiles).hasSize(expectedProfiles.length);
+        assertThat(activeProfiles).hasSize(expectedProfiles.size());
 
         for (String profile : expectedProfiles) {
             assertThat(activeProfiles).contains(profile);
@@ -183,9 +177,6 @@ class ProfileManagementEndpointTest {
         }
     }
 
-    /**
-     * Helper to check if a given bean exists in the /actuator/beans response.
-     */
     @SuppressWarnings("unchecked")
     private boolean containsBean(Map<?, ?> beansResponse, String expectedBeanName) {
         Map<String, Object> contexts = (Map<String, Object>) beansResponse.get("contexts");
@@ -199,20 +190,14 @@ class ProfileManagementEndpointTest {
         return false;
     }
 
-    /**
-     * Helper to creates a default HttpEntity with application/json headers and no body.
-     */
-    private HttpEntity<Void> defaultEntity() {
+    private HttpEntity<ProfileMutationRequest> defaultEntity(ProfileMutationRequest request) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        return new HttpEntity<>(headers);
+        return new HttpEntity<>(request, headers);
     }
 
-    /**
-     * Helper to construct a relative path to the profile-management actuator endpoint.
-     */
-    private String path(String relative) {
-        return "/actuator/profile-management" + relative;
+    private String path() {
+        return "/actuator/profile-management";
     }
 }
