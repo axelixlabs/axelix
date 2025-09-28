@@ -9,6 +9,7 @@ const theme = {
   token: {
     colorPrimary: "#00AB55",
     fontFamily: "'Golos', sans-serif",
+    fontSize: 15,
   },
 };
 
