@@ -7,4 +7,5 @@ COPY master.jar /app/master.jar
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "/app/master.jar"]
+# TODO: for now we do not validate certificates, we need to fix it later
+CMD ["java", "-Dkubernetes.trust.certificates=true", "-jar", "/app/master.jar"]

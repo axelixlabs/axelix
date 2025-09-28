@@ -15,3 +15,8 @@ dependencies {
     implementation("org.jspecify:jspecify:${jspecifyVersion}")
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
