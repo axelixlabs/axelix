@@ -32,6 +32,13 @@ jobs:
           distribution: 'liberica'
           java-version: '17'
 
+      - uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-gradle-${{ hashFiles('buildSrc/**/*.kt', '**/gradle-wrapper.properties') }}
+          path: |
+            ./g/build
+            ./buildSrc/build
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
