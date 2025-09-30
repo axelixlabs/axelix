@@ -1,11 +1,13 @@
 package com.nucleonforge.axile.autoconfiguration.spring;
 
+import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axile.spring.beans.BeanAnalyzer;
+import com.nucleonforge.axile.spring.beans.BeansEndpointExtension;
 import com.nucleonforge.axile.spring.beans.DefaultBeanAnalyzer;
 
 /**
@@ -27,5 +29,11 @@ public class BeanAnalyzerAutoConfiguration {
     @ConditionalOnMissingBean
     public BeanAnalyzer beanAnalyzer(ApplicationContext context) {
         return new DefaultBeanAnalyzer(context);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public BeansEndpointExtension beansEndpointExtension(BeansEndpoint beansEndpoint, BeanAnalyzer beanAnalyzer) {
+        return new BeansEndpointExtension(beansEndpoint, beanAnalyzer);
     }
 }
