@@ -48,6 +48,7 @@ jobs:
         run: ./gradlew build --configuration-cache --build-cache
 
       - name: Stage JAR file
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v4
         with:
           name: master-jar
