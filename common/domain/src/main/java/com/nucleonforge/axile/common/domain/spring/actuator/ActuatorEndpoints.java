@@ -95,7 +95,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint METRICS = of("/metrics", HttpMethod.GET);
     public static final ActuatorEndpoint SINGLE_METRIC = of("/metrics/{metric.name}", HttpMethod.GET);
 
-    //ProfileManagement
+    // ProfileManagement
     public static final ActuatorEndpoint PROFILE_MANAGEMENT = of("/profile-management", HttpMethod.POST);
 
     // Prometheus
