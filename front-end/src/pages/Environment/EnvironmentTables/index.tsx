@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { ColumnsType } from "antd/es/table";
 
 import { useAppDispatch, useAppSelector } from "hooks";
-import { filterEnvironments } from "store/slices";
+import { filterProperties } from "store/slices";
 import type { IKeyValuePair } from "models";
 
 import styles from "./styles.module.css";
@@ -30,23 +30,23 @@ export const EnvironmentTables = () => {
 
   const dispatch = useAppDispatch();
 
-  const { propertySources, filteredEnvironments, environmentSearchText } =
+  const { propertySources, filteredPropertySources, environmentSearchText } =
     useAppSelector((store) => store.environment);
 
-  const propertySourcesList = filteredEnvironments.length
-    ? filteredEnvironments
+  const propertySourcesList = filteredPropertySources.length
+    ? filteredPropertySources
     : propertySources;
 
   return (
     <>
       <Input
         placeholder={t("search")}
-        onChange={(e) => dispatch(filterEnvironments(e.target.value))}
+        onChange={(e) => dispatch(filterProperties(e.target.value))}
         className={styles.Search}
       />
 
       {/* todo - replace this in future in EmptyHandler component*/}
-      {environmentSearchText && !filteredEnvironments.length ? (
+      {environmentSearchText && !filteredPropertySources.length ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={<p>{t("noData")}</p>}

@@ -30,5 +30,5 @@ export interface IEnvironmentSliceState
   extends ICommonSliceState,
     IEnvironmentData {
   environmentSearchText: string;
-  filteredEnvironments: IEnvironmentPropertySource[];
+  filteredPropertySources: IEnvironmentPropertySource[];
 }

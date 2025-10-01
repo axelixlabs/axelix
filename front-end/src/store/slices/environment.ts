@@ -4,7 +4,7 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 
-import type { IEnvironmentData, IEnvironmentSliceState } from "../../models";
+import type { IEnvironmentData, IEnvironmentSliceState } from "models";
 
 const initialState: IEnvironmentSliceState = {
   loading: false,
@@ -14,7 +14,7 @@ const initialState: IEnvironmentSliceState = {
   defaultProfiles: [],
   propertySources: [],
   environmentSearchText: "",
-  filteredEnvironments: [],
+  filteredPropertySources: [],
 };
 
 export const environmentThunk = createAsyncThunk(
@@ -86,11 +86,11 @@ export const EnvironmentSlice = createSlice({
   name: "environment",
   initialState,
   reducers: {
-    filterEnvironments: (state, action: PayloadAction<string>) => {
+    filterProperties: (state, action: PayloadAction<string>) => {
       const searchText = action.payload.toLowerCase().trim();
       state.environmentSearchText = searchText;
 
-      state.filteredEnvironments = state.propertySources.filter(
+      state.filteredPropertySources = state.propertySources.filter(
         ({ name, properties }) => {
           const filterByPropertySourcesName = name
             .toLowerCase()
@@ -127,6 +127,6 @@ export const EnvironmentSlice = createSlice({
   },
 });
 
-export const { filterEnvironments } = EnvironmentSlice.actions;
+export const { filterProperties } = EnvironmentSlice.actions;
 
 export default EnvironmentSlice;
