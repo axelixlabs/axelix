@@ -1,7 +1,6 @@
 package com.nucleonforge.axile.master.api.response;
 
 import java.util.List;
-import java.util.Map;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
 
@@ -14,7 +13,7 @@ import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
  *
  * @see EnvironmentFeed
  * @since 27.08.2025
- * author Nikita Kirillov
+ * @author Nikita Kirillov
  */
 public record EnvironmentFeedResponse(
         List<String> activeProfiles, List<String> defaultProfiles, List<PropertySourceShortProfile> propertySources) {
@@ -25,5 +24,5 @@ public record EnvironmentFeedResponse(
      * @param name       the sourceName of the property source
      * @param properties the map of property names to their string values
      */
-    public record PropertySourceShortProfile(String name, Map<String, String> properties) {}
+    public record PropertySourceShortProfile(String name, List<KeyValue> properties) {}
 }

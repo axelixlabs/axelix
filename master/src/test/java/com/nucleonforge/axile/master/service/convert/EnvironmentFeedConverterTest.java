@@ -39,32 +39,51 @@ class EnvironmentFeedConverterTest {
                 .satisfies(defaultProfiles ->
                         assertThat(defaultProfiles).hasSize(2).containsOnly("default", "development"));
 
-        EnvironmentFeedResponse.PropertySourceShortProfile propertySourceShortProfile1 =
+        EnvironmentFeedResponse.PropertySourceShortProfile propertySource1 =
                 getPropertySourceProfileByName(environmentFeedResponse, "systemProperties");
-        assertThat(propertySourceShortProfile1.properties())
+        assertThat(propertySource1.properties())
                 .hasSize(2)
-                .containsEntry("java.vm.vendor", "Amazon.com Inc.")
-                .containsEntry("org.jboss.logging.provider", "slf4j");
+                .anySatisfy(kv -> {
+                    assertThat(kv.key()).isEqualTo("java.vm.vendor");
+                    assertThat(kv.value()).isEqualTo("Amazon.com Inc.");
+                })
+                .anySatisfy(kv -> {
+                    assertThat(kv.key()).isEqualTo("org.jboss.logging.provider");
+                    assertThat(kv.value()).isEqualTo("slf4j");
+                });
 
-        EnvironmentFeedResponse.PropertySourceShortProfile propertySourceShortProfile2 =
+        EnvironmentFeedResponse.PropertySourceShortProfile propertySource2 =
                 getPropertySourceProfileByName(environmentFeedResponse, "systemEnvironment");
-        assertThat(propertySourceShortProfile2.properties())
-                .hasSize(1)
-                .containsEntry("JAVA_HOME", ".jdks\\corretto-17.0.16");
+        assertThat(propertySource2.properties()).hasSize(1).anySatisfy(kv -> {
+            assertThat(kv.key()).isEqualTo("JAVA_HOME");
+            assertThat(kv.value()).isEqualTo(".jdks\\corretto-17.0.16");
+        });
 
-        EnvironmentFeedResponse.PropertySourceShortProfile propertySourceShortProfile3 = getPropertySourceProfileByName(
+        EnvironmentFeedResponse.PropertySourceShortProfile propertySource3 = getPropertySourceProfileByName(
                 environmentFeedResponse, "Config resource class path resource [application.yaml]");
-        assertThat(propertySourceShortProfile3.properties())
+        assertThat(propertySource3.properties())
                 .hasSize(2)
-                .containsEntry("spring.datasource.driver-class-sourceName", "org.h2.Driver")
-                .containsEntry("spring.jpa.hibernate.ddl-auto", "create-drop");
+                .anySatisfy(kv -> {
+                    assertThat(kv.key()).isEqualTo("spring.datasource.driver-class-sourceName");
+                    assertThat(kv.value()).isEqualTo("org.h2.Driver");
+                })
+                .anySatisfy(kv -> {
+                    assertThat(kv.key()).isEqualTo("spring.jpa.hibernate.ddl-auto");
+                    assertThat(kv.value()).isEqualTo("create-drop");
+                });
 
-        EnvironmentFeedResponse.PropertySourceShortProfile propertySourceShortProfile4 =
+        EnvironmentFeedResponse.PropertySourceShortProfile propertySource4 =
                 getPropertySourceProfileByName(environmentFeedResponse, "springCloudClientHostInfo");
-        assertThat(propertySourceShortProfile4.properties())
+        assertThat(propertySource4.properties())
                 .hasSize(2)
-                .containsEntry("spring.cloud.client.hostname", "DESKTOP-111")
-                .containsEntry("spring.cloud.client.ip-address", "192.0.0.0");
+                .anySatisfy(kv -> {
+                    assertThat(kv.key()).isEqualTo("spring.cloud.client.hostname");
+                    assertThat(kv.value()).isEqualTo("DESKTOP-111");
+                })
+                .anySatisfy(kv -> {
+                    assertThat(kv.key()).isEqualTo("spring.cloud.client.ip-address");
+                    assertThat(kv.value()).isEqualTo("192.0.0.0");
+                });
     }
 
     private static EnvironmentFeedResponse.PropertySourceShortProfile getPropertySourceProfileByName(

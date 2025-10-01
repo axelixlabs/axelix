@@ -52,16 +52,25 @@ class EnvironmentApiTest {
           "propertySources": [
             {
               "name": "systemProperties",
-              "properties": {
-                "java.vm.vendor": "BellSoft",
-                "java.specification.version": "17"
-              }
+              "properties": [
+                {
+                  "key": "java.vm.vendor",
+                  "value": "BellSoft"
+                },
+                {
+                  "key": "java.specification.version",
+                  "value": "17"
+                }
+              ]
             },
             {
               "name": "systemEnvironment",
-              "properties": {
-                "JAVA_HOME": "/opt/hostedtoolcache/Java_Liberica_jdk/17.0.16-12/x64"
-              }
+              "properties": [
+                {
+                  "key": "JAVA_HOME",
+                  "value": "/opt/hostedtoolcache/Java_Liberica_jdk/17.0.16-12/x64"
+                }
+              ]
             }
           ]
         }
