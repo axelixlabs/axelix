@@ -1,26 +1,21 @@
 package com.nucleonforge.axile.master.service.discovery;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.time.DateTimeException;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.kubernetes.commons.discovery.KubernetesServiceInstance;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
-import com.nucleonforge.axile.common.api.ManagedServiceMetadata;
+import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.InstanceId;
-import com.nucleonforge.axile.common.domain.InstanceReference;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
-import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axile.master.service.transport.ManagedServiceMetadataEndpointProber;
 
 /**
@@ -32,71 +27,91 @@ import com.nucleonforge.axile.master.service.transport.ManagedServiceMetadataEnd
  */
 @Service
 @ConditionalOnProperty(prefix = "axile.master.discovery", name = "execution-environment", havingValue = "k8s")
-public class KubernetesInstanceDiscoverer implements InstancesDiscoverer {
+public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
 
     private static final Logger log = LoggerFactory.getLogger(KubernetesInstanceDiscoverer.class);
 
-    private final DiscoveryClient discoveryClient;
-    private final ManagedServiceMetadataEndpointProber managedServiceProber;
+    /**
+     * The string key in K8S pod's metadata that signifies the pod's name.
+     */
+    public static final String POD_NAME = "name";
+
+    /**
+     * The string key that represent the pod's creation timestamp.
+     */
+    public static final String POD_CREATION_TIMESTAMP = "creationTimestamp";
 
     public KubernetesInstanceDiscoverer(
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber) {
-        this.discoveryClient = discoveryClient;
-        this.managedServiceProber = managedServiceMetadataEndpointProber;
+        super(log, discoveryClient, managedServiceMetadataEndpointProber);
     }
 
     @Override
-    public @NonNull Set<@NonNull InstanceReference> discover() {
-        List<String> serviceIds = discoveryClient.getServices();
+    @SuppressWarnings("NullAway")
+    protected Instance toDomainInstance(InstanceIntermediateProfile profile) throws IllegalArgumentException {
+        ServiceInstance serviceInstance = profile.serviceInstance();
 
-        if (CollectionUtils.isEmpty(serviceIds)) {
-            return Set.of();
-        }
+        if (serviceInstance instanceof KubernetesServiceInstance k8sInstance) {
 
-        Set<InstanceReference> result = new HashSet<>();
-
-        for (String serviceId : serviceIds) {
-            List<ServiceInstance> instances = discoveryClient.getInstances(serviceId);
-
-            if (!CollectionUtils.isEmpty(instances)) {
-                result.addAll(instances.stream()
-                        .filter(Objects::nonNull)
-                        .filter(this::isManagedInstance)
-                        .map(this::toDomainInstance)
-                        .collect(Collectors.toSet()));
+            if (k8sInstance.getMetadata() == null) {
+                throw new IllegalArgumentException(
+                        "Unable to register K8S pod '%s' as a managed instance - no metadata present on the pod"
+                                .formatted(serviceInstance.getInstanceId()));
             }
-        }
 
-        return result;
-    }
+            String podName = k8sInstance.getMetadata().get(POD_NAME);
+            Instant deployedAt = extractPodDeployTimestamp(k8sInstance);
 
-    private boolean isManagedInstance(ServiceInstance serviceInstance) {
-        String actuatorUrl = serviceInstance.getUri().toString() + "/actuator";
-        try {
-            ManagedServiceMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
-            return isCompatibleVersion(serviceInstance, metadata);
-        } catch (EndpointInvocationException error) {
-            log.warn(
-                    "Unable to reach the managed service with id : {}. Skipping instance registration",
-                    serviceInstance.getInstanceId(),
-                    error);
-            return false;
-        }
-    }
-
-    private boolean isCompatibleVersion(ServiceInstance serviceInstance, ManagedServiceMetadata metadata) {
-        // TODO: currently version hardcoded - is ok, waiting for issue #88 to be implemented
-        if (metadata.version().equals("1.0.0-SNAPSHOT")) {
-            return true;
+            return new Instance(
+                    InstanceId.of(k8sInstance.getInstanceId()),
+                    podName,
+                    profile.metadata().serviceVersion(),
+                    profile.metadata().javaVersion(),
+                    profile.metadata().springBootVersion(),
+                    profile.metadata().commitShortSha(),
+                    deployedAt,
+                    switch (profile.metadata().healthStatus()) {
+                        case UP -> Instance.InstanceStatus.UP;
+                        case DOWN -> Instance.InstanceStatus.DOWN;
+                        case UNKNOWN -> Instance.InstanceStatus.UNKNOWN;
+                    },
+                    serviceInstance.getUri().toString() + "/actuator");
         } else {
-            log.warn("Service: {} have not a valid version", serviceInstance.getServiceId());
-            return false;
+            throw new IllegalArgumentException(buildErrorMessage(serviceInstance));
         }
     }
 
-    public InstanceReference toDomainInstance(ServiceInstance instance) {
-        return new InstanceReference(
-                InstanceId.of(instance.getInstanceId()), instance.getUri().toString() + "/actuator");
+    @SuppressWarnings("NullAway")
+    private static Instant extractPodDeployTimestamp(KubernetesServiceInstance k8sInstance) {
+        String deployedAtAsString = k8sInstance.getMetadata().get(POD_CREATION_TIMESTAMP);
+
+        try {
+            if (deployedAtAsString == null) {
+                throw new DateTimeException("The K8S pod's %s %s filed in metadata is null"
+                        .formatted(k8sInstance.getInstanceId(), POD_CREATION_TIMESTAMP));
+            }
+            TemporalAccessor temporal =
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.Z").parse(deployedAtAsString);
+            return Instant.from(temporal);
+        } catch (DateTimeException e) {
+            log.warn(
+                    """
+                Unable to parse the deployment timestamp of the pod : {}.
+                That will affect the corresponding service on the wallboard UI
+                """,
+                    k8sInstance.getInstanceId(),
+                    e);
+            return null;
+        }
+    }
+
+    private static String buildErrorMessage(ServiceInstance serviceInstance) {
+        return "Unable to register K8S pod '%s' as a managed instance - expected %s to be an instance of %s, but actually is %s"
+                .formatted(
+                        serviceInstance.getInstanceId(),
+                        ServiceInstance.class.getSimpleName(),
+                        KubernetesServiceInstance.class.getName(),
+                        serviceInstance.getClass().getName());
     }
 }

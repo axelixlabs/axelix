@@ -1,6 +1,7 @@
 import Dependencies.jspecifyVersion
 import Dependencies.springBootVersion
 import Dependencies.springCloudDependenciesVersion
+import Dependencies.jsonUnitAssertJVersion
 
 plugins {
     id("java-library")
@@ -12,6 +13,7 @@ dependencies {
 
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
     testImplementation(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudDependenciesVersion"))
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:$jsonUnitAssertJVersion")
     implementation("org.jspecify:jspecify:${jspecifyVersion}")
 }
 

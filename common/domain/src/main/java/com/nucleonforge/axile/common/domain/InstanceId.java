@@ -3,7 +3,7 @@ package com.nucleonforge.axile.common.domain;
 import org.jspecify.annotations.NonNull;
 
 /**
- * The wrapper class around the value that represents the ID of the given {@link InstanceReference}.
+ * The wrapper class around the value that represents the ID of the given {@link Instance}.
  *
  * @author Mikhail Polivakha
  */

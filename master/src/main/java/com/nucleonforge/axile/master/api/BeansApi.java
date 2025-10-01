@@ -42,7 +42,7 @@ public class BeansApi {
     }
 
     @Operation(
-            summary = "Returns beans feed for the given isntance",
+            summary = "Returns beans feed for the given instance",
             responses = {
                 @ApiResponse(
                         description = "OK",
