@@ -1,7 +1,7 @@
 package com.nucleonforge.axile.master.api.response;
 
 /**
- * Represents a single key-value pair in a response.
+ * Represents an abstract key-value pair.
  *
  * @since 01.10.2025
  * @author Nikita Kirillov
