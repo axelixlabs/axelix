@@ -22,5 +22,7 @@
   "activeProfiles": "Профили",
   "noData": "Нет данных",
   "dependencies": "Зависимости",
-  "aliases": "Алиасы"
+  "aliases": "Алиасы",
+  "copied": "Скопировано",
+  "reset": "Сбросить"
 }

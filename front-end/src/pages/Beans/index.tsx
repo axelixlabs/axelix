@@ -1,11 +1,11 @@
+import { Input } from "antd";
 import { useEffect } from "react";
-import { Empty, Input } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { filterBeans, getBeansThunk } from "store/slices/beans";
 import { useAppDispatch, useAppSelector } from "hooks";
+import { Loader, EmptyHandler } from "components";
 import { BeansCollapse } from "./BeansCollapse";
-import { Loader } from "components";
 
 import styles from "./styles.module.css";
 
@@ -30,6 +30,8 @@ export const Beans = () => {
     return error;
   }
 
+  const noDataAfterSearch = !!beansSearchText && !filteredBeans.length;
+
   return (
     <>
       <Input
@@ -38,14 +40,9 @@ export const Beans = () => {
         className={styles.Search}
       />
 
-      {beansSearchText && !filteredBeans.length ? (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={<p>{t("noData")}</p>}
-        />
-      ) : (
+      <EmptyHandler isEmpty={noDataAfterSearch}>
         <BeansCollapse beans={filteredBeans.length ? filteredBeans : beans} />
-      )}
+      </EmptyHandler>
     </>
   );
 };

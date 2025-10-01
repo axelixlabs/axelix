@@ -1,0 +1,29 @@
+.MainWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 20px;
+  padding-block: 12px;
+}
+
+.Reset {
+  color: red;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-family: "Golos Text", sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 22px;
+  letter-spacing: 0%;
+}
+
+.LoggerValuesWrapper {
+  display: flex;
+  column-gap: 8px;
+}
+
+.RadioGroup {
+  display: flex;
+  flex-wrap: nowrap;
+}

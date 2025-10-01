@@ -1,12 +1,12 @@
-import { useEffect, type ChangeEvent } from "react";
-import { Empty, Input, Table } from "antd";
+import { Input, Table } from "antd";
 import { useTranslation } from "react-i18next";
+import { useEffect, type ChangeEvent } from "react";
 
 import { filterConfigProps, getConfigPropsThunk } from "store/slices";
 import { useAppDispatch, useAppSelector } from "hooks";
+import { Loader, EmptyHandler } from "components";
 import type { ColumnsType } from "antd/es/table";
 import type { IKeyValuePair } from "models";
-import { Loader } from "components";
 
 import styles from "./styles.module.css";
 
@@ -60,6 +60,8 @@ export const ConfigProps = () => {
     dispatch(filterConfigProps(e.target.value));
   };
 
+  const noDataAfterSearch = !!configPropsSearchText && !filteredBeans.length;
+
   return (
     <>
       <Input
@@ -68,15 +70,8 @@ export const ConfigProps = () => {
         className={styles.Search}
       />
 
-      {configPropsSearchText && !filteredBeans.length ? (
-        // todo В будущем, в зависимости от возможности переиспользования,
-        // сделать один универсальный компонент Empty
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={<p>{t("noData")}</p>}
-        />
-      ) : (
-        configProps.map(({ beanName, prefix, properties }) => {
+      <EmptyHandler isEmpty={noDataAfterSearch}>
+        {configProps.map(({ beanName, prefix, properties }) => {
           return (
             // todo В будущем, в зависимости от возможности переиспользования,
             // сделать один универсальный компонент Table
@@ -88,8 +83,8 @@ export const ConfigProps = () => {
               className={styles.ConfigPropsTable}
             />
           );
-        })
-      )}
+        })}
+      </EmptyHandler>
     </>
   );
 };
