@@ -26,9 +26,9 @@ export interface IEnvironmentData {
   propertySources: IEnvironmentPropertySource[];
 }
 
-export interface IEnvironmentSliceState extends ICommonSliceState {
-  /**
-   * Environment data received from backend
-   */
-  data: IEnvironmentData;
+export interface IEnvironmentSliceState
+  extends ICommonSliceState,
+    IEnvironmentData {
+  environmentSearchText: string;
+  filteredEnvironments: IEnvironmentPropertySource[];
 }
