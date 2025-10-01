@@ -4,8 +4,11 @@ plugins {
 }
 
 val testcontainersVersion = "1.21.3"
+
+// TODO: the JWT version also ideally needs to be extracted
 val jsonwebtokenVersion = "0.12.6"
-val jsonUnitAssertJVersion = "3.5.0"
+
+// TODO: instancio is 100% candidate for being extracted to 'shared'
 val instancioVersion = "5.5.1"
 val springDocSwaggerVersion = "2.0.4"
 
@@ -36,7 +39,6 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
     testImplementation("org.postgresql:postgresql")
-    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:$jsonUnitAssertJVersion")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
     testImplementation("org.instancio:instancio-core:${instancioVersion}")

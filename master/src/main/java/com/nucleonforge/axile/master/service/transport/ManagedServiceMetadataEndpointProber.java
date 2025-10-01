@@ -4,7 +4,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axile.common.api.ManagedServiceMetadata;
+import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
@@ -17,11 +17,11 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
  * @author Nikita Kirillov
  */
 @Service
-public class ManagedServiceMetadataEndpointProber extends AbstractEndpointProber<ManagedServiceMetadata> {
+public class ManagedServiceMetadataEndpointProber extends AbstractEndpointProber<ServiceMetadata> {
 
     public ManagedServiceMetadataEndpointProber(
             InstanceRegistry instanceRegistry,
-            MessageDeserializationStrategy<ManagedServiceMetadata> messageDeserializationStrategy) {
+            MessageDeserializationStrategy<ServiceMetadata> messageDeserializationStrategy) {
         super(instanceRegistry, messageDeserializationStrategy);
     }
 

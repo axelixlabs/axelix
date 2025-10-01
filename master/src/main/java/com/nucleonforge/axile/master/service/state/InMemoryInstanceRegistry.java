@@ -10,8 +10,8 @@ import org.jspecify.annotations.NullMarked;
 
 import org.springframework.stereotype.Component;
 
+import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.InstanceId;
-import com.nucleonforge.axile.common.domain.InstanceReference;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 
@@ -24,15 +24,15 @@ import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 @Component
 public class InMemoryInstanceRegistry implements InstanceRegistry {
 
-    private final ConcurrentMap<InstanceId, InstanceReference> source;
+    private final ConcurrentMap<InstanceId, Instance> source;
 
     public InMemoryInstanceRegistry() {
         this.source = new ConcurrentHashMap<>();
     }
 
     @Override
-    public void register(InstanceReference instanceReference) throws InstanceAlreadyRegisteredException {
-        InstanceReference peer = this.source.putIfAbsent(instanceReference.id(), instanceReference);
+    public void register(Instance instance) throws InstanceAlreadyRegisteredException {
+        Instance peer = this.source.putIfAbsent(instance.id(), instance);
 
         if (peer != null) {
             throw new InstanceAlreadyRegisteredException();
@@ -41,7 +41,7 @@ public class InMemoryInstanceRegistry implements InstanceRegistry {
 
     @Override
     public void deRegister(InstanceId instanceId) throws InstanceNotFoundException {
-        InstanceReference oldValue = source.remove(instanceId);
+        Instance oldValue = source.remove(instanceId);
 
         if (oldValue == null) {
             throw new InstanceNotFoundException();
@@ -49,12 +49,12 @@ public class InMemoryInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public Optional<InstanceReference> get(InstanceId instanceId) {
+    public Optional<Instance> get(InstanceId instanceId) {
         return Optional.ofNullable(source.get(instanceId));
     }
 
     @Override
-    public Set<InstanceReference> getAll() {
+    public Set<Instance> getAll() {
         // TODO: Is this thread safe?
         return new HashSet<>(source.values());
     }

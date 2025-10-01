@@ -1,10 +1,18 @@
 package com.nucleonforge.axile.autoconfiguration.spring;
 
+import java.util.List;
+
+import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axile.spring.master.AxileMetadataEndpoint;
+import com.nucleonforge.axile.spring.master.DefaultServiceMetadataAssembler;
+import com.nucleonforge.axile.spring.master.GitInformationProvider;
+import com.nucleonforge.axile.spring.master.LibraryDiscoverer;
+import com.nucleonforge.axile.spring.master.ServiceMetadataAssembler;
+import com.nucleonforge.axile.spring.master.ShortBuildInfoProvider;
 
 /**
  * Auto-configuration for the {@link AxileMetadataEndpoint}.
@@ -17,8 +25,18 @@ import com.nucleonforge.axile.spring.master.AxileMetadataEndpoint;
 public class AxileMetadataEndpointConfiguration {
 
     @Bean
+    ServiceMetadataAssembler serviceMetadataAssembler(
+            HealthEndpoint healthEndpoint,
+            LibraryDiscoverer libraryDiscoverer,
+            List<GitInformationProvider> gitInformationProviders,
+            List<ShortBuildInfoProvider> shortBuildInfoProviders) {
+        return new DefaultServiceMetadataAssembler(
+                healthEndpoint, libraryDiscoverer, gitInformationProviders, shortBuildInfoProviders);
+    }
+
+    @Bean
     @ConditionalOnMissingBean
-    public AxileMetadataEndpoint axileMetadataEndpoint() {
-        return new AxileMetadataEndpoint();
+    public AxileMetadataEndpoint axileMetadataEndpoint(ServiceMetadataAssembler serviceMetadataAssembler) {
+        return new AxileMetadataEndpoint(serviceMetadataAssembler);
     }
 }

@@ -11,8 +11,8 @@ import java.time.Duration;
 
 import org.jspecify.annotations.NonNull;
 
+import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.InstanceId;
-import com.nucleonforge.axile.common.domain.InstanceReference;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
@@ -41,10 +41,10 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
     @Override
     public @NonNull O invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
             throws EndpointInvocationException, InstanceNotFoundException {
-        InstanceReference instanceReference =
+        Instance instance =
                 instanceRegistry.get(instanceId).orElseThrow(() -> new InstanceNotFoundException(instanceId));
 
-        HttpRequest request = buildHttpRequest(supports(), httpPayload, instanceReference.actuatorUrl());
+        HttpRequest request = buildHttpRequest(supports(), httpPayload, instance.actuatorUrl());
 
         return invokeInternal(instanceId.instanceId(), request);
     }

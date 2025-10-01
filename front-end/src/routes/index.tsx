@@ -7,7 +7,7 @@ import { MainRoutes } from "./MainRoutes";
 
 export const AppRoutes = () => {
   const token = useAppSelector((state) => {
-    return state.login.accessToken;
+    return state.login.accessToken ?? " ";
   });
 
   return (
