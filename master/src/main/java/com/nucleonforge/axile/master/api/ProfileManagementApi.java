@@ -77,10 +77,7 @@ public class ProfileManagementApi {
                                         mediaType = "application/json",
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
-    @Parameters({
-        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "profiles", description = "Comma-separated list of profiles to activate", required = true)
-    })
+    @Parameters(@Parameter(name = "instanceId", description = "Application Instance ID", required = true))
     @PostMapping(path = ApiPaths.ProfileManagementApi.REPLACE)
     public ProfileUpdateResponse replaceProfile(
             @PathVariable("instanceId") String instanceId, @RequestBody ProfileUpdatedRequest request) {
