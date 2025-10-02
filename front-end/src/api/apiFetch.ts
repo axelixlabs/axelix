@@ -19,7 +19,7 @@ apiFetch.interceptors.request.use(async (config) => {
 });
 
 apiFetch.interceptors.response.use(
-  (response) => response.data,
+  (response) => response,
 
   async (err) => {
     if (err.response?.status === 401) {

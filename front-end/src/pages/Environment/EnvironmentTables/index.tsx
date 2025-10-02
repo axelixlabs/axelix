@@ -12,6 +12,7 @@ const createTableColumns = (title: string): ColumnsType<IKeyValuePair> => {
   return [
     {
       title,
+      key: title,
       onHeaderCell: () => ({
         style: { backgroundColor: "#00AB551A" },
       }),
