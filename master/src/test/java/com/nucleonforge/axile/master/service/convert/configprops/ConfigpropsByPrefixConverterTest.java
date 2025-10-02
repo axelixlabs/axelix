@@ -7,6 +7,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.ConfigpropsFeed;
+import com.nucleonforge.axile.master.api.response.KeyValue;
 import com.nucleonforge.axile.master.api.response.configprops.ConfigpropsByPrefixResponse;
 import com.nucleonforge.axile.master.api.response.configprops.ConfigpropsProfile;
 
@@ -21,7 +22,6 @@ public class ConfigpropsByPrefixConverterTest {
     private final ConfigpropsByPrefixConverter subject = new ConfigpropsByPrefixConverter();
 
     @Test
-    @SuppressWarnings("unchecked")
     void testConvertHappyPath() {
         // when.
         ConfigpropsByPrefixResponse response = subject.convertInternal(new ConfigpropsFeed(Map.of(
@@ -45,40 +45,32 @@ public class ConfigpropsByPrefixConverterTest {
         assertThat(bean1.prefix()).isEqualTo("spring.jackson");
 
         // application1 -> bean1 ->  properties
-        assertThat(bean1.properties().get("serialization1")).isEqualTo(Map.of("INDENT_OUTPUT", true));
-        assertThat(bean1.properties().get("defaultPropertyInclusion1")).isEqualTo("NON_NULL");
-        assertThat(bean1.properties().get("visibility1")).isEqualTo(Map.of());
-        assertThat(bean1.properties().get("parser1")).isEqualTo(Map.of());
-        assertThat(bean1.properties().get("deserialization1")).isEqualTo(Map.of());
-        assertThat(bean1.properties().get("generator1")).isEqualTo(Map.of());
-        assertThat(bean1.properties().get("mapper1")).isEqualTo(Map.of());
+        assertThat(bean1.properties())
+                .containsOnly(
+                        new KeyValue("serialization1.INDENT_OUTPUT", "true"),
+                        new KeyValue("defaultPropertyInclusion1", "NON_NULL"),
+                        new KeyValue("visibility1", null),
+                        new KeyValue("parser1", null),
+                        new KeyValue("deserialization1", null),
+                        new KeyValue("generator1", null),
+                        new KeyValue("mapper1", null));
 
         // application1 -> bean1 -> inputs
-        assertThat(bean1.inputs().get("visibility1")).isEqualTo(Map.of());
-        assertThat(bean1.inputs().get("parser1")).isEqualTo(Map.of());
-        assertThat(bean1.inputs().get("deserialization1")).isEqualTo(Map.of());
-        assertThat(bean1.inputs().get("generator1")).isEqualTo(Map.of());
-        assertThat(bean1.inputs().get("mapper1")).isEqualTo(Map.of());
-
-        // application1 -> bean1 -> inputs -> "serialization"
-        Map<String, Object> beans1InputsSerialization =
-                (Map<String, Object>) bean1.inputs().get("serialization1");
-        assertThat(beans1InputsSerialization)
-                .containsEntry(
-                        "INDENT_OUTPUT",
-                        Map.of(
-                                "value", "true",
-                                "origin",
-                                        "\"spring.jackson.serialization.indent_output\" from property source \"Inlined Test Properties\""));
-
-        // application1 -> bean1 -> inputs -> "defaultPropertyInclusion"
-        Map<String, Object> Beans1InputsDefaultPropertyInclusion =
-                (Map<String, Object>) bean1.inputs().get("defaultPropertyInclusion1");
-        assertThat(Beans1InputsDefaultPropertyInclusion).containsEntry("value", "non_null");
-        assertThat(Beans1InputsDefaultPropertyInclusion)
-                .containsEntry(
-                        "origin",
-                        "\"spring.jackson.default-property-inclusion\" from property source \"Inlined Test Properties\"");
+        assertThat(bean1.inputs())
+                .containsOnly(
+                        new KeyValue("visibility1", null),
+                        new KeyValue("parser1", null),
+                        new KeyValue("deserialization1", null),
+                        new KeyValue("generator1", null),
+                        new KeyValue("mapper1", null),
+                        new KeyValue("serialization1.INDENT_OUTPUT.value", "true"),
+                        new KeyValue(
+                                "serialization1.INDENT_OUTPUT.origin",
+                                "\"spring.jackson.serialization.indent_output\" from property source \"Inlined Test Properties\""),
+                        new KeyValue("defaultPropertyInclusion1.value", "non_null"),
+                        new KeyValue(
+                                "defaultPropertyInclusion1.origin",
+                                "\"spring.jackson.default-property-inclusion\" from property source \"Inlined Test Properties\""));
 
         // application2 -> bean2
         ConfigpropsProfile bean2 = beans.get(0);
@@ -88,20 +80,18 @@ public class ConfigpropsByPrefixConverterTest {
         assertThat(bean2.prefix()).isEqualTo("spring.jackson");
 
         // application2 -> bean2 ->  properties
-        assertThat(bean2.properties().get("serialization2")).isEqualTo(Map.of("INDENT_OUTPUT", false));
-        assertThat(bean2.properties().get("defaultPropertyInclusion2")).isEqualTo("NON_NULL");
+        assertThat(bean2.properties())
+                .containsOnly(
+                        new KeyValue("serialization2.INDENT_OUTPUT", "false"),
+                        new KeyValue("defaultPropertyInclusion2", "NON_NULL"));
 
-        // application2 -> bean2 -> inputs -> "serialization"
-        Map<String, Object> bean2InputsSerialization =
-                (Map<String, Object>) bean2.inputs().get("serialization2");
-        assertThat(bean2InputsSerialization)
-                .containsEntry("INDENT_OUTPUT", Map.of("value", "true", "origin", Map.of()));
-
-        // application2 -> bean2 -> inputs -> "defaultPropertyInclusion"
-        Map<String, Object> bean2InputsDefaultPropertyInclusion =
-                (Map<String, Object>) bean2.inputs().get("defaultPropertyInclusion2");
-        assertThat(bean2InputsDefaultPropertyInclusion).containsEntry("value", "non_null");
-        assertThat(bean2InputsDefaultPropertyInclusion).containsEntry("origin", Map.of());
+        // application2 -> bean2 -> inputs
+        assertThat(bean2.inputs())
+                .containsOnly(
+                        new KeyValue("serialization2.INDENT_OUTPUT.value", "true"),
+                        new KeyValue("serialization2.INDENT_OUTPUT.origin", null),
+                        new KeyValue("defaultPropertyInclusion2.value", "non_null"),
+                        new KeyValue("defaultPropertyInclusion2.origin", null));
     }
 
     private static Map<String, ConfigpropsFeed.Bean> beansMapContext1() {

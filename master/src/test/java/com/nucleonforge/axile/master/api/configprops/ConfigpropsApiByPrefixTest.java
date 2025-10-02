@@ -45,116 +45,93 @@ public class ConfigpropsApiByPrefixTest {
     // language=json
     private static final String EXPECTED_BEAN_BY_PREFIX_JSON =
             """
-                {
-                  "beans": [
-                    {
-                      "beanName": "spring.jackson-org.springframework.boot.autoconfigure.jackson.JacksonProperties",
-                      "prefix": "spring.jackson",
-                      "properties": {
-                        "serialization": {
-                          "INDENT_OUTPUT": true
-                        },
-                        "defaultPropertyInclusion": "NON_NULL",
-                        "visibility": {},
-                        "parser": {},
-                        "deserialization": {},
-                        "generator": {},
-                        "mapper": {}
-                      },
-                      "inputs": {
-                        "serialization": {
-                          "INDENT_OUTPUT": {
-                            "value": "true",
-                            "origin": "\\"spring.jackson.serialization.indent_output\\" from property source \\"Inlined Test Properties\\""
-                          }
-                        },
-                        "defaultPropertyInclusion": {
-                          "value": "non_null",
-                          "origin": "\\"spring.jackson.default-property-inclusion\\" from property source \\"Inlined Test Properties\\""
-                        },
-                        "visibility": {},
-                        "parser": {},
-                        "deserialization": {},
-                        "generator": {},
-                        "mapper": {}
-                      }
-                    }
-                  ]
-                }
-            """;
+        {
+          "beans": [
+            {
+              "beanName": "spring.jackson-org.springframework.boot.autoconfigure.jackson.JacksonProperties",
+              "prefix": "spring.jackson",
+              "properties": [
+                { "key": "serialization.INDENT_OUTPUT", "value": "true" },
+                { "key": "defaultPropertyInclusion", "value": "NON_NULL" },
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
+              ],
+              "inputs": [
+                { "key": "serialization.INDENT_OUTPUT.value", "value": "true" },
+                { "key": "serialization.INDENT_OUTPUT.origin", "value": "\\"spring.jackson.serialization.indent_output\\" from property source \\"Inlined Test Properties\\"" },
+                { "key": "defaultPropertyInclusion.value", "value": "non_null" },
+                { "key": "defaultPropertyInclusion.origin", "value": "\\"spring.jackson.default-property-inclusion\\" from property source \\"Inlined Test Properties\\"" },
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
+              ]
+            }
+          ]
+        }
+        """;
 
     // language=json
     private static final String EXPECTED_DOUBLE_CONTEXT_BEAN_BY_PREFIX_JSON =
             """
-                {
-                  "beans": [
-                    {
-                      "beanName": "spring.web-org.springframework.boot.autoconfigure.web.WebProperties",
-                      "prefix": "spring.web",
-                      "properties": {
-                        "serialization": {
-                          "INDENT_OUTPUT": true
-                        },
-                        "defaultPropertyInclusion": "NON_NULL",
-                        "visibility": {},
-                        "parser": {},
-                        "deserialization": {},
-                        "generator": {},
-                        "mapper": {}
-                      },
-                      "inputs": {
-                        "serialization": {
-                          "INDENT_OUTPUT": {
-                            "value": "true",
-                            "origin": "\\"spring.jackson.serialization.indent_output\\" from property source \\"Inlined Test Properties\\""
-                          }
-                        },
-                        "defaultPropertyInclusion": {
-                          "value": "non_null",
-                          "origin": "\\"spring.jackson.default-property-inclusion\\" from property source \\"Inlined Test Properties\\""
-                        },
-                        "visibility": {},
-                        "parser": {},
-                        "deserialization": {},
-                        "generator": {},
-                        "mapper": {}
-                      }
-                    },
-                    {
-                      "beanName": "spring.web-org.springframework.boot.autoconfigure.web.WebProperties",
-                      "prefix": "spring.web",
-                      "properties": {
-                        "serialization": {
-                          "INDENT_OUTPUT": true
-                        },
-                        "defaultPropertyInclusion": "NON_NULL",
-                        "visibility": {},
-                        "parser": {},
-                        "deserialization": {},
-                        "generator": {},
-                        "mapper": {}
-                      },
-                      "inputs": {
-                        "serialization": {
-                          "INDENT_OUTPUT": {
-                            "value": "true",
-                            "origin": "\\"spring.jackson.serialization.indent_output\\" from property source \\"Inlined Test Properties\\""
-                          }
-                        },
-                        "defaultPropertyInclusion": {
-                          "value": "non_null",
-                          "origin": "\\"spring.jackson.default-property-inclusion\\" from property source \\"Inlined Test Properties\\""
-                        },
-                        "visibility": {},
-                        "parser": {},
-                        "deserialization": {},
-                        "generator": {},
-                        "mapper": {}
-                      }
-                    }
-                  ]
-                }
-            """;
+        {
+          "beans": [
+            {
+              "beanName": "spring.web-org.springframework.boot.autoconfigure.web.WebProperties",
+              "prefix": "spring.web",
+              "properties": [
+                { "key": "serialization.INDENT_OUTPUT", "value": "true" },
+                { "key": "defaultPropertyInclusion", "value": "NON_NULL" },
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
+              ],
+              "inputs": [
+                { "key": "serialization.INDENT_OUTPUT.value", "value": "true" },
+                { "key": "serialization.INDENT_OUTPUT.origin", "value": "\\"spring.jackson.serialization.indent_output\\" from property source \\"Inlined Test Properties\\"" },
+                { "key": "defaultPropertyInclusion.value", "value": "non_null" },
+                { "key": "defaultPropertyInclusion.origin", "value": "\\"spring.jackson.default-property-inclusion\\" from property source \\"Inlined Test Properties\\"" },
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
+              ]
+            },
+            {
+              "beanName": "spring.web-org.springframework.boot.autoconfigure.web.WebProperties",
+              "prefix": "spring.web",
+              "properties": [
+                { "key": "serialization.INDENT_OUTPUT", "value": "true" },
+                { "key": "defaultPropertyInclusion", "value": "NON_NULL" },
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
+              ],
+              "inputs": [
+                { "key": "serialization.INDENT_OUTPUT.value", "value": "true" },
+                { "key": "serialization.INDENT_OUTPUT.origin", "value": "\\"spring.jackson.serialization.indent_output\\" from property source \\"Inlined Test Properties\\"" },
+                { "key": "defaultPropertyInclusion.value", "value": "non_null" },
+                { "key": "defaultPropertyInclusion.origin", "value": "\\"spring.jackson.default-property-inclusion\\" from property source \\"Inlined Test Properties\\"" },
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
+          ]
+            }
+          ]
+        }
+        """;
+
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
@@ -365,7 +342,7 @@ public class ConfigpropsApiByPrefixTest {
     void shouldReturnInternalServerErrorOnBeanByPrefix() {
         // when.
         String prefix = "spring.jackson";
-        String instanceId = "test-instance-unreachable1";
+        String instanceId = UUID.randomUUID().toString();
 
         registry.register(createInstance(instanceId));
 
@@ -379,7 +356,7 @@ public class ConfigpropsApiByPrefixTest {
     @Test
     void shouldReturnBadRequestForUnregisteredInstance() {
         // when.
-        String instanceId = "unregistered-configprops-instance";
+        String instanceId = UUID.randomUUID().toString();
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
                 "/api/axile/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
