@@ -23,11 +23,14 @@ export interface IBean {
   dependencies: string[];
 }
 
-export interface IBeansSliceState extends ICommonSliceState {
+export interface IBeansData {
   /**
    * Full list of beans
    */
   beans: IBean[];
+}
+
+export interface IBeansSliceState extends ICommonSliceState, IBeansData {
   /**
    * Search text used for filtering beans
    */
