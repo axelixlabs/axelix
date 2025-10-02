@@ -17,8 +17,8 @@ export const Beans = () => {
     useAppSelector((store) => store.beans);
 
   useEffect(() => {
-    // todo remove this "1" in future
-    dispatch(getBeansThunk("1"));
+      // todo В будущем вместо hard code-а вставить динамический id.
+    dispatch(getBeansThunk("56019718-3b84-4ecd-9b84-287754dbd7d4"));
   }, [dispatch]);
 
   if (loading) {
