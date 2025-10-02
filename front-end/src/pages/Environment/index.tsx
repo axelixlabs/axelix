@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "hooks";
 import { EnvironmentProfiles } from "./EnvironmentProfiles";
 import { EnvironmentTables } from "./EnvironmentTables";
-import { getEnvironmentsThunk } from "store/slices";
+import { getEnvironmentThunk } from "store/slices";
 import { Loader } from "components";
 
 export const Environment = () => {
@@ -12,7 +12,8 @@ export const Environment = () => {
   const { loading, error } = useAppSelector((store) => store.environment);
 
   useEffect(() => {
-    dispatch(getEnvironmentsThunk("56019718-3b84-4ecd-9b84-287754dbd7d4"));
+      // todo В будущем вместо hard code-а вставить динамический id.
+    dispatch(getEnvironmentThunk("56019718-3b84-4ecd-9b84-287754dbd7d4"));
   }, [dispatch]);
 
   if (loading) {

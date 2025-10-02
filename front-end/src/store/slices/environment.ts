@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice, type PayloadAction,} from "@reduxjs/toolkit";
 
 import type {IEnvironmentData, IEnvironmentSliceState} from "models";
-import {getEnvironmentsData} from "services/environment";
+import {getEnvironmentData} from "services/environment";
 
 const initialState: IEnvironmentSliceState = {
     loading: false,
@@ -13,11 +13,11 @@ const initialState: IEnvironmentSliceState = {
     filteredPropertySources: [],
 };
 
-export const getEnvironmentsThunk = createAsyncThunk<IEnvironmentData, string, { rejectValue: any }>(
-    "getEnvironmentsThunk",
+export const getEnvironmentThunk = createAsyncThunk<IEnvironmentData, string, { rejectValue: any }>(
+    "getEnvironmentThunk",
     async (id: string, {rejectWithValue}) => {
         try {
-            const response = await getEnvironmentsData(id);
+            const response = await getEnvironmentData(id);
 
             return response.data;
 
@@ -51,16 +51,16 @@ export const EnvironmentSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(getEnvironmentsThunk.pending, (state) => {
+        builder.addCase(getEnvironmentThunk.pending, (state) => {
             state.loading = true;
         });
-        builder.addCase(getEnvironmentsThunk.fulfilled, (state, {payload}) => {
+        builder.addCase(getEnvironmentThunk.fulfilled, (state, {payload}) => {
             state.loading = false;
             state.activeProfiles = payload.activeProfiles;
             state.defaultProfiles = payload.defaultProfiles;
             state.propertySources = payload.propertySources;
         });
-        builder.addCase(getEnvironmentsThunk.rejected, (state, {payload}) => {
+        builder.addCase(getEnvironmentThunk.rejected, (state, {payload}) => {
             const {status} = payload;
 
             state.loading = false;
