@@ -9,7 +9,7 @@ import { Loader } from "components";
 export const Environment = () => {
   const dispatch = useAppDispatch();
 
-  const { data, loading, error } = useAppSelector((store) => store.environment);
+  const { loading, error } = useAppSelector((store) => store.environment);
 
   useEffect(() => {
     dispatch(environmentThunk("1"));
@@ -26,8 +26,8 @@ export const Environment = () => {
 
   return (
     <>
-      <EnvironmentProfiles activeProfiles={data.activeProfiles} />
-      <EnvironmentTables propertySources={data.propertySources} />
+      <EnvironmentProfiles />
+      <EnvironmentTables />
     </>
   );
 };
