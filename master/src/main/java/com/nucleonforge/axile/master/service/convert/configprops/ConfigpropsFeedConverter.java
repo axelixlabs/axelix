@@ -1,6 +1,6 @@
 package com.nucleonforge.axile.master.service.convert.configprops;
 
-import org.jspecify.annotations.NonNull;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -15,18 +15,11 @@ import com.nucleonforge.axile.master.service.convert.Converter;
  * @author Sergey Cherkasov
  */
 @Service
-public class ConfigpropsFeedConverter implements Converter<ConfigpropsFeed, ConfigpropsFeedResponse> {
-
+public class ConfigpropsFeedConverter extends AbstractConfigpropsConverter<ConfigpropsFeedResponse> {
     @Override
-    public @NonNull ConfigpropsFeedResponse convertInternal(@NonNull ConfigpropsFeed source) {
-        ConfigpropsFeedResponse configpropsFeedResponse = new ConfigpropsFeedResponse();
-
-        source.contexts().values().forEach(context -> context.beans().forEach((beanName, bean) -> {
-            ConfigpropsProfile profile =
-                    new ConfigpropsProfile(beanName, bean.prefix(), bean.properties(), bean.inputs());
-            configpropsFeedResponse.addBean(profile);
-        }));
-
-        return configpropsFeedResponse;
+    protected ConfigpropsFeedResponse convertBeans(List<ConfigpropsProfile> beans) {
+        ConfigpropsFeedResponse response = new ConfigpropsFeedResponse();
+        beans.forEach(response::addBean);
+        return response;
     }
 }

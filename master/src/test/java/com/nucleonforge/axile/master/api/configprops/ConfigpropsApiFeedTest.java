@@ -9,7 +9,6 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.api.ConfigpropsApi;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
@@ -45,153 +43,102 @@ public class ConfigpropsApiFeedTest {
     // language=json
     private static final String EXPECTED_BEANS_FEED_JSON =
             """
-
             {
           "beans": [
             {
               "beanName": "management.endpoints.web.cors-org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
               "prefix": "management.endpoints.web.cors",
-              "properties": {
-                "allowedOrigins": [],
-                "maxAge": "PT30M",
-                "exposedHeaders": [],
-                "allowedOriginPatterns": [],
-                "allowedHeaders": [],
-                "allowedMethods": []
-              },
-              "inputs": {
-                "allowedOrigins": [],
-                "maxAge": {},
-                "exposedHeaders": [],
-                "allowedOriginPatterns": [],
-                "allowedHeaders": [],
-                "allowedMethods": []
-              }
+              "properties": [
+                { "key": "allowedOrigins", "value": [] },
+                { "key": "maxAge", "value": "PT30M" },
+                { "key": "exposedHeaders", "value": [] },
+                { "key": "allowedOriginPatterns", "value": [] },
+                { "key": "allowedHeaders", "value": [] },
+                { "key": "allowedMethods", "value": [] }
+              ],
+              "inputs": [
+                { "key": "allowedOrigins", "value": [] },
+                { "key": "maxAge", "value": {} },
+                { "key": "exposedHeaders", "value": [] },
+                { "key": "allowedOriginPatterns", "value": [] },
+                { "key": "allowedHeaders", "value": [] },
+                { "key": "allowedMethods", "value": [] }
+              ]
             },
             {
               "beanName": "management.endpoints.web.cors-org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
               "prefix": "management.endpoints.web.cors",
-              "properties": {
-                "allowedOrigins": [],
-                "maxAge": "PT30M",
-                "exposedHeaders": [],
-                "allowedOriginPatterns": [],
-                "allowedHeaders": [],
-                "allowedMethods": []
-              },
-              "inputs": {
-                "allowedOrigins": [],
-                "maxAge": {},
-                "exposedHeaders": [],
-                "allowedOriginPatterns": [],
-                "allowedHeaders": [],
-                "allowedMethods": []
-              }
+              "properties": [
+                { "key": "allowedOrigins", "value": [] },
+                { "key": "maxAge", "value": "PT30M" },
+                { "key": "exposedHeaders", "value": [] },
+                { "key": "allowedOriginPatterns", "value": [] },
+                { "key": "allowedHeaders", "value": [] },
+                { "key": "allowedMethods", "value": [] }
+              ],
+              "inputs": [
+                { "key": "allowedOrigins", "value": [] },
+                { "key": "maxAge", "value": {} },
+                { "key": "exposedHeaders", "value": [] },
+                { "key": "allowedOriginPatterns", "value": [] },
+                { "key": "allowedHeaders", "value": [] },
+                { "key": "allowedMethods", "value": [] }
+              ]
             },
             {
               "beanName": "management.endpoints.web-org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties",
               "prefix": "management.endpoints.web",
-              "properties": {
-                "pathMapping": {},
-                "exposure": {
-                  "include": [
-                    "*"
-                  ],
-                  "exclude": []
-                },
-                "basePath": "/actuator",
-                "discovery": {
-                  "enabled": true
-                }
-              },
-              "inputs": {
-                "pathMapping": {},
-                "exposure": {
-                  "include": [
-                    {
-                      "value": "*",
-                      "origin": "\\"management.endpoints.web.exposure.include\\" from property source \\"Inlined Test Properties\\""
-                    }
-                  ],
-                  "exclude": []
-                },
-                "basePath": {},
-                "discovery": {
-                  "enabled": {}
-                }
-              }
+              "properties": [
+                { "key": "pathMapping", "value": {} },
+                { "key": "exposure.include[0]", "value": "*" },
+                { "key": "exposure.exclude", "value": [] },
+                { "key": "basePath", "value": "/actuator" },
+                { "key": "discovery.enabled", "value": true }
+              ],
+              "inputs": [
+                { "key": "pathMapping", "value": {} },
+                { "key": "exposure.include[0].value", "value": "*" },
+                { "key": "exposure.include[0].origin", "value": "\\"management.endpoints.web.exposure.include\\" from property source \\"Inlined Test Properties\\"" },
+                { "key": "exposure.exclude", "value": [] },
+                { "key": "basePath", "value": {} },
+                { "key": "discovery.enabled", "value": {} }
+              ]
             },
             {
               "beanName": "spring.web-org.springframework.boot.autoconfigure.web.WebProperties",
               "prefix": "spring.web",
-              "properties": {
-                "localeResolver": "ACCEPT_HEADER",
-                "resources": {
-                  "staticLocations": [
-                    "classpath:/META-INF/resources/",
-                    "classpath:/resources/",
-                    "classpath:/static/",
-                    "classpath:/public/"
-                  ],
-                  "addMappings": true,
-                  "chain": {
-                    "cache": true,
-                    "compressed": false,
-                    "strategy": {
-                      "fixed": {
-                        "enabled": false,
-                        "paths": [
-                          "/**"
-                        ]
-                      },
-                      "content": {
-                        "enabled": false,
-                        "paths": [
-                          "/**"
-                        ]
-                      }
-                    }
-                  },
-                  "cache": {
-                    "cachecontrol": {},
-                    "useLastModified": true
-                  }
-                }
-              },
-              "inputs": {
-                "localeResolver": {},
-                "resources": {
-                  "staticLocations": [
-                    {},
-                    {},
-                    {},
-                    {}
-                  ],
-                  "addMappings": {},
-                  "chain": {
-                    "cache": {},
-                    "compressed": {},
-                    "strategy": {
-                      "fixed": {
-                        "enabled": {},
-                        "paths": [
-                          {}
-                        ]
-                      },
-                      "content": {
-                        "enabled": {},
-                        "paths": [
-                          {}
-                        ]
-                      }
-                    }
-                  },
-                  "cache": {
-                    "cachecontrol": {},
-                    "useLastModified": {}
-                  }
-                }
-              }
+              "properties": [
+                { "key": "localeResolver", "value": "ACCEPT_HEADER" },
+                { "key": "resources.staticLocations[0]", "value": "classpath:/META-INF/resources/" },
+                { "key": "resources.staticLocations[1]", "value": "classpath:/resources/" },
+                { "key": "resources.staticLocations[2]", "value": "classpath:/static/" },
+                { "key": "resources.staticLocations[3]", "value": "classpath:/public/" },
+                { "key": "resources.addMappings", "value": true },
+                { "key": "resources.chain.cache", "value": true },
+                { "key": "resources.chain.compressed", "value": false },
+                { "key": "resources.chain.strategy.fixed.enabled", "value": false },
+                { "key": "resources.chain.strategy.fixed.paths[0]", "value": "/**" },
+                { "key": "resources.chain.strategy.content.enabled", "value": false },
+                { "key": "resources.chain.strategy.content.paths[0]", "value": "/**" },
+                { "key": "resources.cache.cachecontrol", "value": {} },
+                { "key": "resources.cache.useLastModified", "value": true }
+              ],
+              "inputs": [
+                { "key": "localeResolver", "value": {} },
+                { "key": "resources.staticLocations[0]", "value": {} },
+                { "key": "resources.staticLocations[1]", "value": {} },
+                { "key": "resources.staticLocations[2]", "value": {} },
+                { "key": "resources.staticLocations[3]", "value": {} },
+                { "key": "resources.addMappings", "value": {} },
+                { "key": "resources.chain.cache", "value": {} },
+                { "key": "resources.chain.compressed", "value": {} },
+                { "key": "resources.chain.strategy.fixed.enabled", "value": {} },
+                { "key": "resources.chain.strategy.fixed.paths[0]", "value": {} },
+                { "key": "resources.chain.strategy.content.enabled", "value": {} },
+                { "key": "resources.chain.strategy.content.paths[0]", "value": {} },
+                { "key": "resources.cache.cachecontrol", "value": {} },
+                { "key": "resources.cache.useLastModified", "value": {} }
+              ]
             }
           ]
         }
@@ -371,18 +318,13 @@ public class ConfigpropsApiFeedTest {
                 }
             }
         });
-
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
-    }
-
-    @AfterEach
-    void cleanup() {
-        registry.deRegister(InstanceId.of(activeInstanceId));
     }
 
     @Test
     void shouldReturnJSONConfigpropsFeed() {
+        registry.register(createInstanceWithUrl(
+                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+
         // when.
         ResponseEntity<String> response =
                 restTemplate.getForEntity("/api/axile/configprops/feed/{instanceId}", String.class, activeInstanceId);
@@ -399,7 +341,7 @@ public class ConfigpropsApiFeedTest {
     @DisplayName("Should return 500 on EndpointInvocationError when calling beans feed")
     void shouldReturnInternalServerErrorOnConfigpropsFeed() {
         // when.
-        String instanceId = "test-instance-unreachable2";
+        String instanceId = UUID.randomUUID().toString();
 
         registry.register(createInstance(instanceId));
 
@@ -413,7 +355,7 @@ public class ConfigpropsApiFeedTest {
     @Test
     void shouldReturnBadRequestForUnregisteredInstance() {
         // when.
-        String instanceId = "unregistered-configprops-instance";
+        String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
                 "/api/axile/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);

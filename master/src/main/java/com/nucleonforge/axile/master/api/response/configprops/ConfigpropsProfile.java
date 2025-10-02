@@ -1,7 +1,9 @@
 package com.nucleonforge.axile.master.api.response.configprops;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
+
+import com.nucleonforge.axile.master.api.response.KeyValue;
 
 /**
  * The profile of a given @ConfigurationProperties bean.
@@ -13,15 +15,14 @@ import java.util.Map;
  *
  * @author Sergey Cherkasov
  */
-public record ConfigpropsProfile(
-        String beanName, String prefix, Map<String, Object> properties, Map<String, Object> inputs) {
+public record ConfigpropsProfile(String beanName, String prefix, List<KeyValue> properties, List<KeyValue> inputs) {
 
     public ConfigpropsProfile {
         if (properties == null) {
-            properties = Collections.emptyMap();
+            properties = Collections.emptyList();
         }
         if (inputs == null) {
-            inputs = Collections.emptyMap();
+            inputs = Collections.emptyList();
         }
     }
 }

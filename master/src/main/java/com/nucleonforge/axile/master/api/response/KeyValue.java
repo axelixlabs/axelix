@@ -6,4 +6,4 @@ package com.nucleonforge.axile.master.api.response;
  * @since 01.10.2025
  * @author Nikita Kirillov
  */
-public record KeyValue(String key, String value) {}
+public record KeyValue(String key, Object value) {}
