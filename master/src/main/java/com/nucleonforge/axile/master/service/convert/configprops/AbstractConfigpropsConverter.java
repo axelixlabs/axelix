@@ -30,8 +30,8 @@ public abstract class AbstractConfigpropsConverter<R> implements Converter<Confi
                 .map(entry -> {
                     String beanName = entry.getKey();
                     ConfigpropsFeed.Bean bean = entry.getValue();
-                    List<KeyValue> properties = flatten(bean.properties(), "");
-                    List<KeyValue> inputs = flatten(bean.inputs(), "");
+                    List<KeyValue> properties = flatten("", bean.properties());
+                    List<KeyValue> inputs = flatten("", bean.inputs());
                     return new ConfigpropsProfile(beanName, bean.prefix(), properties, inputs);
                 })
                 .toList());
@@ -39,13 +39,13 @@ public abstract class AbstractConfigpropsConverter<R> implements Converter<Confi
 
     protected abstract R convertBeans(List<ConfigpropsProfile> beans);
 
-    private List<KeyValue> flatten(Map<String, Object> map, String parentKey) {
+    private List<KeyValue> flatten(String key, Map<String, Object> map) {
         if (map == null || map.isEmpty()) {
             return List.of();
         }
         List<KeyValue> result = new ArrayList<>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String fullKey = parentKey.isEmpty() ? entry.getKey() : parentKey + "." + entry.getKey();
+            String fullKey = key.isEmpty() ? entry.getKey() : key + "." + entry.getKey();
             result.addAll(flattenEntry(fullKey, entry.getValue()));
         }
         return result;
@@ -59,19 +59,19 @@ public abstract class AbstractConfigpropsConverter<R> implements Converter<Confi
         if (value instanceof List<?> list) {
             return flattenList(key, list);
         }
-        return List.of(new KeyValue(key, value));
+        return List.of(new KeyValue(key, value.toString()));
     }
 
     private List<KeyValue> flattenMap(String key, Map<String, Object> map) {
         if (map.isEmpty()) {
-            return List.of(new KeyValue(key, new HashMap<>()));
+            return List.of(new KeyValue(key, String.valueOf(new HashMap<>())));
         }
-        return flatten(map, key);
+        return flatten(key, map);
     }
 
     private List<KeyValue> flattenList(String key, List<?> list) {
         if (list.isEmpty()) {
-            return List.of(new KeyValue(key, new ArrayList<>()));
+            return List.of(new KeyValue(key, String.valueOf(new ArrayList<>())));
         }
         List<KeyValue> result = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
