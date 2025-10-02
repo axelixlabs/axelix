@@ -49,20 +49,20 @@ public class ConfigpropsByPrefixConverterTest {
                 .containsOnly(
                         new KeyValue("serialization1.INDENT_OUTPUT", "true"),
                         new KeyValue("defaultPropertyInclusion1", "NON_NULL"),
-                        new KeyValue("visibility1", "{}"),
-                        new KeyValue("parser1", "{}"),
-                        new KeyValue("deserialization1", "{}"),
-                        new KeyValue("generator1", "{}"),
-                        new KeyValue("mapper1", "{}"));
+                        new KeyValue("visibility1", null),
+                        new KeyValue("parser1", null),
+                        new KeyValue("deserialization1", null),
+                        new KeyValue("generator1", null),
+                        new KeyValue("mapper1", null));
 
         // application1 -> bean1 -> inputs
         assertThat(bean1.inputs())
                 .containsOnly(
-                        new KeyValue("visibility1", "{}"),
-                        new KeyValue("parser1", "{}"),
-                        new KeyValue("deserialization1", "{}"),
-                        new KeyValue("generator1", "{}"),
-                        new KeyValue("mapper1", "{}"),
+                        new KeyValue("visibility1", null),
+                        new KeyValue("parser1", null),
+                        new KeyValue("deserialization1", null),
+                        new KeyValue("generator1", null),
+                        new KeyValue("mapper1", null),
                         new KeyValue("serialization1.INDENT_OUTPUT.value", "true"),
                         new KeyValue(
                                 "serialization1.INDENT_OUTPUT.origin",
@@ -89,9 +89,9 @@ public class ConfigpropsByPrefixConverterTest {
         assertThat(bean2.inputs())
                 .containsOnly(
                         new KeyValue("serialization2.INDENT_OUTPUT.value", "true"),
-                        new KeyValue("serialization2.INDENT_OUTPUT.origin", "{}"),
+                        new KeyValue("serialization2.INDENT_OUTPUT.origin", null),
                         new KeyValue("defaultPropertyInclusion2.value", "non_null"),
-                        new KeyValue("defaultPropertyInclusion2.origin", "{}"));
+                        new KeyValue("defaultPropertyInclusion2.origin", null));
     }
 
     private static Map<String, ConfigpropsFeed.Bean> beansMapContext1() {

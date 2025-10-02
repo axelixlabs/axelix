@@ -1,7 +1,6 @@
 package com.nucleonforge.axile.master.service.convert.configprops;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,14 +63,14 @@ public abstract class AbstractConfigpropsConverter<R> implements Converter<Confi
 
     private List<KeyValue> flattenMap(String key, Map<String, Object> map) {
         if (map.isEmpty()) {
-            return List.of(new KeyValue(key, String.valueOf(new HashMap<>())));
+            return List.of(new KeyValue(key, null));
         }
         return flatten(key, map);
     }
 
     private List<KeyValue> flattenList(String key, List<?> list) {
         if (list.isEmpty()) {
-            return List.of(new KeyValue(key, String.valueOf(new ArrayList<>())));
+            return List.of(new KeyValue(key, null));
         }
         List<KeyValue> result = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {

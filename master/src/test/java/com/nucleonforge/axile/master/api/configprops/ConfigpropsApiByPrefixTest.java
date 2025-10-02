@@ -53,22 +53,22 @@ public class ConfigpropsApiByPrefixTest {
               "properties": [
                 { "key": "serialization.INDENT_OUTPUT", "value": "true" },
                 { "key": "defaultPropertyInclusion", "value": "NON_NULL" },
-                { "key": "visibility", "value": "{}" },
-                { "key": "parser", "value": "{}" },
-                { "key": "deserialization", "value": "{}" },
-                { "key": "generator", "value": "{}" },
-                { "key": "mapper", "value": "{}" }
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
               ],
               "inputs": [
                 { "key": "serialization.INDENT_OUTPUT.value", "value": "true" },
                 { "key": "serialization.INDENT_OUTPUT.origin", "value": "\\"spring.jackson.serialization.indent_output\\" from property source \\"Inlined Test Properties\\"" },
                 { "key": "defaultPropertyInclusion.value", "value": "non_null" },
                 { "key": "defaultPropertyInclusion.origin", "value": "\\"spring.jackson.default-property-inclusion\\" from property source \\"Inlined Test Properties\\"" },
-                { "key": "visibility", "value": "{}" },
-                { "key": "parser", "value": "{}" },
-                { "key": "deserialization", "value": "{}" },
-                { "key": "generator", "value": "{}" },
-                { "key": "mapper", "value": "{}" }
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
               ]
             }
           ]
@@ -86,22 +86,22 @@ public class ConfigpropsApiByPrefixTest {
               "properties": [
                 { "key": "serialization.INDENT_OUTPUT", "value": "true" },
                 { "key": "defaultPropertyInclusion", "value": "NON_NULL" },
-                { "key": "visibility", "value": "{}" },
-                { "key": "parser", "value": "{}" },
-                { "key": "deserialization", "value": "{}" },
-                { "key": "generator", "value": "{}" },
-                { "key": "mapper", "value": "{}" }
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
               ],
               "inputs": [
                 { "key": "serialization.INDENT_OUTPUT.value", "value": "true" },
                 { "key": "serialization.INDENT_OUTPUT.origin", "value": "\\"spring.jackson.serialization.indent_output\\" from property source \\"Inlined Test Properties\\"" },
                 { "key": "defaultPropertyInclusion.value", "value": "non_null" },
                 { "key": "defaultPropertyInclusion.origin", "value": "\\"spring.jackson.default-property-inclusion\\" from property source \\"Inlined Test Properties\\"" },
-                { "key": "visibility", "value": "{}" },
-                { "key": "parser", "value": "{}" },
-                { "key": "deserialization", "value": "{}" },
-                { "key": "generator", "value": "{}" },
-                { "key": "mapper", "value": "{}" }
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
               ]
             },
             {
@@ -110,22 +110,22 @@ public class ConfigpropsApiByPrefixTest {
               "properties": [
                 { "key": "serialization.INDENT_OUTPUT", "value": "true" },
                 { "key": "defaultPropertyInclusion", "value": "NON_NULL" },
-                { "key": "visibility", "value": "{}" },
-                { "key": "parser", "value": "{}" },
-                { "key": "deserialization", "value": "{}" },
-                { "key": "generator", "value": "{}" },
-                { "key": "mapper", "value": "{}" }
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
               ],
               "inputs": [
                 { "key": "serialization.INDENT_OUTPUT.value", "value": "true" },
                 { "key": "serialization.INDENT_OUTPUT.origin", "value": "\\"spring.jackson.serialization.indent_output\\" from property source \\"Inlined Test Properties\\"" },
                 { "key": "defaultPropertyInclusion.value", "value": "non_null" },
                 { "key": "defaultPropertyInclusion.origin", "value": "\\"spring.jackson.default-property-inclusion\\" from property source \\"Inlined Test Properties\\"" },
-                { "key": "visibility", "value": "{}" },
-                { "key": "parser", "value": "{}" },
-                { "key": "deserialization", "value": "{}" },
-                { "key": "generator", "value": "{}" },
-                { "key": "mapper", "value": "{}" }
+                { "key": "visibility", "value": null },
+                { "key": "parser", "value": null },
+                { "key": "deserialization", "value": null },
+                { "key": "generator", "value": null },
+                { "key": "mapper", "value": null }
           ]
             }
           ]
