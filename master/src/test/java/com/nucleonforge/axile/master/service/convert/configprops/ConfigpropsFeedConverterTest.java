@@ -40,22 +40,22 @@ public class ConfigpropsFeedConverterTest {
         // bean1 -> properties
         assertThat(beanProfile1.properties())
                 .containsOnly(
-                        new KeyValue("allowedOrigins", List.of()),
+                        new KeyValue("allowedOrigins", "[]"),
                         new KeyValue("maxAge", "PT30M"),
-                        new KeyValue("exposedHeaders", List.of()),
-                        new KeyValue("allowedOriginPatterns", List.of()),
-                        new KeyValue("allowedHeaders", List.of()),
-                        new KeyValue("allowedMethods", List.of()));
+                        new KeyValue("exposedHeaders", "[]"),
+                        new KeyValue("allowedOriginPatterns", "[]"),
+                        new KeyValue("allowedHeaders", "[]"),
+                        new KeyValue("allowedMethods", "[]"));
 
         // bean1 -> inputs
         assertThat(beanProfile1.inputs())
                 .containsOnly(
-                        new KeyValue("allowedOrigins", List.of()),
-                        new KeyValue("maxAge", Map.of()),
-                        new KeyValue("exposedHeaders", List.of()),
-                        new KeyValue("allowedOriginPatterns", List.of()),
-                        new KeyValue("allowedHeaders", List.of()),
-                        new KeyValue("allowedMethods", List.of()));
+                        new KeyValue("allowedOrigins", "[]"),
+                        new KeyValue("maxAge", "{}"),
+                        new KeyValue("exposedHeaders", "[]"),
+                        new KeyValue("allowedOriginPatterns", "[]"),
+                        new KeyValue("allowedHeaders", "[]"),
+                        new KeyValue("allowedMethods", "[]"));
 
         // bean2
         ConfigpropsProfile beanProfile2 = getBeanByName(configpropsFeedResponse, "bean2");
@@ -67,23 +67,23 @@ public class ConfigpropsFeedConverterTest {
         // bean2 -> properties
         assertThat(beanProfile2.properties())
                 .containsOnly(
-                        new KeyValue("pathMapping", Map.of()),
+                        new KeyValue("pathMapping", "{}"),
                         new KeyValue("basePath", "/actuator"),
-                        new KeyValue("discovery.enabled", true),
+                        new KeyValue("discovery.enabled", "true"),
                         new KeyValue("exposure.include[0]", "*"),
-                        new KeyValue("exposure.exclude", List.of()));
+                        new KeyValue("exposure.exclude", "[]"));
 
         // bean2 -> inputs
         assertThat(beanProfile2.inputs())
                 .containsOnly(
-                        new KeyValue("pathMapping", Map.of()),
-                        new KeyValue("basePath", Map.of()),
-                        new KeyValue("discovery.enabled", Map.of()),
+                        new KeyValue("pathMapping", "{}"),
+                        new KeyValue("basePath", "{}"),
+                        new KeyValue("discovery.enabled", "{}"),
                         new KeyValue("exposure.include[0].value", "*"),
                         new KeyValue(
                                 "exposure.include[0].origin",
                                 "\"management.endpoints.web.exposure.include\" from property source \"Inlined Test Properties\""),
-                        new KeyValue("exposure.exclude", List.of()));
+                        new KeyValue("exposure.exclude", "[]"));
 
         // bean3
         ConfigpropsProfile beanProfile3 = getBeanByName(configpropsFeedResponse, "bean3");
@@ -95,16 +95,16 @@ public class ConfigpropsFeedConverterTest {
         // application2 -> bean3 ->  properties
         assertThat(beanProfile3.properties())
                 .containsOnly(
-                        new KeyValue("serialization2.INDENT_OUTPUT", false),
+                        new KeyValue("serialization2.INDENT_OUTPUT", "false"),
                         new KeyValue("defaultPropertyInclusion2", "NON_NULL"));
 
         // application2 -> bean3 -> inputs
         assertThat(beanProfile3.inputs())
                 .containsOnly(
                         new KeyValue("serialization2.INDENT_OUTPUT.value", "true"),
-                        new KeyValue("serialization2.INDENT_OUTPUT.origin", Map.of()),
+                        new KeyValue("serialization2.INDENT_OUTPUT.origin", "{}"),
                         new KeyValue("defaultPropertyInclusion2.value", "non_null"),
-                        new KeyValue("defaultPropertyInclusion2.origin", Map.of()));
+                        new KeyValue("defaultPropertyInclusion2.origin", "{}"));
     }
 
     private static ConfigpropsProfile getBeanByName(ConfigpropsFeedResponse configpropsFeedResponse, String beanName) {

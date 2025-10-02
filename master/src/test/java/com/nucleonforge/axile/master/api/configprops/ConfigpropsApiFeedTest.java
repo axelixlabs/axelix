@@ -49,59 +49,59 @@ public class ConfigpropsApiFeedTest {
               "beanName": "management.endpoints.web.cors-org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
               "prefix": "management.endpoints.web.cors",
               "properties": [
-                { "key": "allowedOrigins", "value": [] },
+                { "key": "allowedOrigins", "value": "[]" },
                 { "key": "maxAge", "value": "PT30M" },
-                { "key": "exposedHeaders", "value": [] },
-                { "key": "allowedOriginPatterns", "value": [] },
-                { "key": "allowedHeaders", "value": [] },
-                { "key": "allowedMethods", "value": [] }
+                { "key": "exposedHeaders", "value": "[]" },
+                { "key": "allowedOriginPatterns", "value": "[]" },
+                { "key": "allowedHeaders", "value": "[]" },
+                { "key": "allowedMethods", "value": "[]" }
               ],
               "inputs": [
-                { "key": "allowedOrigins", "value": [] },
-                { "key": "maxAge", "value": {} },
-                { "key": "exposedHeaders", "value": [] },
-                { "key": "allowedOriginPatterns", "value": [] },
-                { "key": "allowedHeaders", "value": [] },
-                { "key": "allowedMethods", "value": [] }
+                { "key": "allowedOrigins", "value": "[]" },
+                { "key": "maxAge", "value": "{}" },
+                { "key": "exposedHeaders", "value": "[]" },
+                { "key": "allowedOriginPatterns", "value": "[]" },
+                { "key": "allowedHeaders", "value": "[]" },
+                { "key": "allowedMethods", "value": "[]" }
               ]
             },
             {
               "beanName": "management.endpoints.web.cors-org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
               "prefix": "management.endpoints.web.cors",
               "properties": [
-                { "key": "allowedOrigins", "value": [] },
+                { "key": "allowedOrigins", "value": "[]" },
                 { "key": "maxAge", "value": "PT30M" },
-                { "key": "exposedHeaders", "value": [] },
-                { "key": "allowedOriginPatterns", "value": [] },
-                { "key": "allowedHeaders", "value": [] },
-                { "key": "allowedMethods", "value": [] }
+                { "key": "exposedHeaders", "value": "[]" },
+                { "key": "allowedOriginPatterns", "value": "[]" },
+                { "key": "allowedHeaders", "value": "[]" },
+                { "key": "allowedMethods", "value": "[]" }
               ],
               "inputs": [
-                { "key": "allowedOrigins", "value": [] },
-                { "key": "maxAge", "value": {} },
-                { "key": "exposedHeaders", "value": [] },
-                { "key": "allowedOriginPatterns", "value": [] },
-                { "key": "allowedHeaders", "value": [] },
-                { "key": "allowedMethods", "value": [] }
+                { "key": "allowedOrigins", "value": "[]" },
+                { "key": "maxAge", "value": "{}" },
+                { "key": "exposedHeaders", "value": "[]" },
+                { "key": "allowedOriginPatterns", "value": "[]" },
+                { "key": "allowedHeaders", "value": "[]" },
+                { "key": "allowedMethods", "value": "[]" }
               ]
             },
             {
               "beanName": "management.endpoints.web-org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties",
               "prefix": "management.endpoints.web",
               "properties": [
-                { "key": "pathMapping", "value": {} },
+                { "key": "pathMapping", "value": "{}" },
                 { "key": "exposure.include[0]", "value": "*" },
-                { "key": "exposure.exclude", "value": [] },
+                { "key": "exposure.exclude", "value": "[]" },
                 { "key": "basePath", "value": "/actuator" },
-                { "key": "discovery.enabled", "value": true }
+                { "key": "discovery.enabled", "value": "true" }
               ],
               "inputs": [
-                { "key": "pathMapping", "value": {} },
+                { "key": "pathMapping", "value": "{}" },
                 { "key": "exposure.include[0].value", "value": "*" },
                 { "key": "exposure.include[0].origin", "value": "\\"management.endpoints.web.exposure.include\\" from property source \\"Inlined Test Properties\\"" },
-                { "key": "exposure.exclude", "value": [] },
-                { "key": "basePath", "value": {} },
-                { "key": "discovery.enabled", "value": {} }
+                { "key": "exposure.exclude", "value": "[]" },
+                { "key": "basePath", "value": "{}" },
+                { "key": "discovery.enabled", "value": "{}" }
               ]
             },
             {
@@ -113,31 +113,31 @@ public class ConfigpropsApiFeedTest {
                 { "key": "resources.staticLocations[1]", "value": "classpath:/resources/" },
                 { "key": "resources.staticLocations[2]", "value": "classpath:/static/" },
                 { "key": "resources.staticLocations[3]", "value": "classpath:/public/" },
-                { "key": "resources.addMappings", "value": true },
-                { "key": "resources.chain.cache", "value": true },
-                { "key": "resources.chain.compressed", "value": false },
-                { "key": "resources.chain.strategy.fixed.enabled", "value": false },
+                { "key": "resources.addMappings", "value": "true" },
+                { "key": "resources.chain.cache", "value": "true" },
+                { "key": "resources.chain.compressed", "value": "false" },
+                { "key": "resources.chain.strategy.fixed.enabled", "value": "false" },
                 { "key": "resources.chain.strategy.fixed.paths[0]", "value": "/**" },
-                { "key": "resources.chain.strategy.content.enabled", "value": false },
+                { "key": "resources.chain.strategy.content.enabled", "value": "false" },
                 { "key": "resources.chain.strategy.content.paths[0]", "value": "/**" },
-                { "key": "resources.cache.cachecontrol", "value": {} },
-                { "key": "resources.cache.useLastModified", "value": true }
+                { "key": "resources.cache.cachecontrol", "value": "{}" },
+                { "key": "resources.cache.useLastModified", "value": "true" }
               ],
               "inputs": [
-                { "key": "localeResolver", "value": {} },
-                { "key": "resources.staticLocations[0]", "value": {} },
-                { "key": "resources.staticLocations[1]", "value": {} },
-                { "key": "resources.staticLocations[2]", "value": {} },
-                { "key": "resources.staticLocations[3]", "value": {} },
-                { "key": "resources.addMappings", "value": {} },
-                { "key": "resources.chain.cache", "value": {} },
-                { "key": "resources.chain.compressed", "value": {} },
-                { "key": "resources.chain.strategy.fixed.enabled", "value": {} },
-                { "key": "resources.chain.strategy.fixed.paths[0]", "value": {} },
-                { "key": "resources.chain.strategy.content.enabled", "value": {} },
-                { "key": "resources.chain.strategy.content.paths[0]", "value": {} },
-                { "key": "resources.cache.cachecontrol", "value": {} },
-                { "key": "resources.cache.useLastModified", "value": {} }
+                { "key": "localeResolver", "value": "{}" },
+                { "key": "resources.staticLocations[0]", "value": "{}" },
+                { "key": "resources.staticLocations[1]", "value": "{}" },
+                { "key": "resources.staticLocations[2]", "value": "{}" },
+                { "key": "resources.staticLocations[3]", "value": "{}" },
+                { "key": "resources.addMappings", "value": "{}" },
+                { "key": "resources.chain.cache", "value": "{}" },
+                { "key": "resources.chain.compressed", "value": "{}" },
+                { "key": "resources.chain.strategy.fixed.enabled", "value": "{}" },
+                { "key": "resources.chain.strategy.fixed.paths[0]", "value": "{}" },
+                { "key": "resources.chain.strategy.content.enabled", "value": "{}" },
+                { "key": "resources.chain.strategy.content.paths[0]", "value": "{}" },
+                { "key": "resources.cache.cachecontrol", "value": "{}" },
+                { "key": "resources.cache.useLastModified", "value": "{}" }
               ]
             }
           ]
