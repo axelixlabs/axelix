@@ -1,18 +1,17 @@
 import { message, Tooltip } from "antd";
+import { useTranslation } from "react-i18next";
 import { CopyOutlined } from "@ant-design/icons";
 
 import styles from "./styles.module.css";
-import { useTranslation } from "react-i18next";
-import type { ILogger } from "models";
 
 interface IProps {
   /**
-   * Single logger
+   * Single logger name
    */
-  logger: ILogger;
+  name: string;
 }
 
-export const LoggerTruncat = ({ logger }: IProps) => {
+export const LoggerName = ({ name }: IProps) => {
   const { t } = useTranslation();
 
   const handleCopy = (copyText: string): void => {
@@ -23,7 +22,7 @@ export const LoggerTruncat = ({ logger }: IProps) => {
   return (
     <div className={styles.TruncatWrapper}>
       <Tooltip
-        title={logger.name}
+        title={name}
         styles={{
           root: {
             maxWidth: 600,
@@ -32,10 +31,10 @@ export const LoggerTruncat = ({ logger }: IProps) => {
         }}
         className={styles.Truncat}
       >
-        {logger.name}
+        {name}
       </Tooltip>
       <CopyOutlined
-        onClick={() => handleCopy(logger.name)}
+        onClick={() => handleCopy(name)}
         className={styles.CopyIcon}
       />
     </div>

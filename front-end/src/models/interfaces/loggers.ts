@@ -2,13 +2,13 @@ import type { ICommonSliceState } from "./globals";
 
 export interface ILogger {
   /**
-   * Single logger name
+   * Logger name
    */
   name: string;
   /**
-   * Single logger configured level
+   * Explicitly configured level for logger, if any 
    */
-  configuredLevel: string;
+  configuredLevel?: string;
   /**
    * Single logger current level
    */

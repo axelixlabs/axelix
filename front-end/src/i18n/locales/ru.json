@@ -24,5 +24,6 @@
   "dependencies": "Зависимости",
   "aliases": "Алиасы",
   "copied": "Скопировано",
-  "reset": "Сбросить"
+  "reset": "Сбросить",
+  "configuredExplicitly": "Задан явно"
 }
