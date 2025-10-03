@@ -29,12 +29,12 @@
 }
 
 .Link:hover {
-  color: var(--axile-primary-grey);
+  color: var(--axile-primary-green);
   background-color: var(--color-primary-light);
 }
 
 .Avatar {
   margin-inline: 30px 20px;
-  background-color: var(--axile-primary-grey);
+  background-color: var(--axile-primary-green);
   cursor: pointer;
 }
