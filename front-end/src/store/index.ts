@@ -5,6 +5,7 @@ import {
   EnvironmentSlice,
   BeansSlice,
   ConfigPropsSlice,
+  LoggersSlice,
 } from "./slices";
 
 export const store = configureStore({
@@ -13,6 +14,7 @@ export const store = configureStore({
     environment: EnvironmentSlice.reducer,
     beans: BeansSlice.reducer,
     configProps: ConfigPropsSlice.reducer,
+    loggers: LoggersSlice.reducer,
   },
 });
 
