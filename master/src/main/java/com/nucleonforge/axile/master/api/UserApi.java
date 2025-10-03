@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -72,7 +73,10 @@ public class UserApi {
     @Parameter(name = "loginRequest", description = "Request for login", required = true)
     @PostMapping(path = ApiPaths.UsersApi.LOGIN)
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        throw new UnsupportedOperationException();
+        // TODO: handle login logic later
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer TOKEN")
+                .build();
     }
 
     /**
