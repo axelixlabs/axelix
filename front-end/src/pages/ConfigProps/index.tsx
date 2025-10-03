@@ -2,7 +2,7 @@ import { useEffect, type ChangeEvent } from "react";
 import { Empty, Input, Table } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { filterConfigProps, getConfigProps } from "store/slices";
+import { filterConfigProps, getConfigPropsThunk } from "store/slices";
 import { useAppDispatch, useAppSelector } from "hooks";
 import type { ColumnsType } from "antd/es/table";
 import type { IKeyValuePair } from "models";
@@ -39,11 +39,11 @@ export const ConfigProps = () => {
   const { t } = useTranslation();
 
   const dispatch = useAppDispatch();
-  const { beans, filteredConfigProps, configPropsSearchText, loading, error } =
-    useAppSelector((store) => store.configProps);
+  const { beans, filteredBeans, configPropsSearchText, loading, error } = useAppSelector((store) => store.configProps);
 
   useEffect(() => {
-    dispatch(getConfigProps(""));
+    // todo В будущем вместо hard code-а вставить динамический id.
+    dispatch(getConfigPropsThunk("56019718-3b84-4ecd-9b84-287754dbd7d4"));
   }, [dispatch]);
 
   if (loading) {
@@ -54,7 +54,7 @@ export const ConfigProps = () => {
     return error;
   }
 
-  const configProps = filteredConfigProps.length ? filteredConfigProps : beans;
+  const configProps = filteredBeans.length ? filteredBeans : beans;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     dispatch(filterConfigProps(e.target.value));
@@ -68,7 +68,7 @@ export const ConfigProps = () => {
         className={styles.Search}
       />
 
-      {configPropsSearchText && !filteredConfigProps.length ? (
+      {configPropsSearchText && !filteredBeans.length ? (
         // todo В будущем, в зависимости от возможности переиспользования,
         // сделать один универсальный компонент Empty
         <Empty
