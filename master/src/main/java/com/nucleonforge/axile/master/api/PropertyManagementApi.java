@@ -65,7 +65,7 @@ public class PropertyManagementApi {
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
     @Parameters({@Parameter(name = "instanceId", description = "Application Instance ID", required = true)})
-    @PostMapping(path = ApiPaths.PropertyManagementApi.UPDATE)
+    @PostMapping(path = ApiPaths.PropertyManagementApi.INSTANCE_ID)
     public ResponseEntity<Void> replaceProfile(
             @PathVariable("instanceId") String instanceId, @RequestBody PropertyUpdatedRequest request) {
 

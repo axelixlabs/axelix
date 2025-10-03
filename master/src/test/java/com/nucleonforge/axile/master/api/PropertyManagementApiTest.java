@@ -91,10 +91,7 @@ class PropertyManagementApiTest {
                 mockWebServer.url(activeInstanceId + "/actuator").toString()));
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axile/property-management/{instanceId}/property",
-                defaultEntity(request),
-                Void.class,
-                activeInstanceId);
+                "/api/axile/property-management/{instanceId}", defaultEntity(request), Void.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
@@ -108,7 +105,7 @@ class PropertyManagementApiTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/property-management/{instanceId}/property",
+                "/api/axile/property-management/{instanceId}",
                 defaultEntity(request),
                 EndpointInvocationException.class,
                 instanceId);
@@ -122,10 +119,7 @@ class PropertyManagementApiTest {
         PropertyUpdatedRequest request = new PropertyUpdatedRequest("property.enabled", "false");
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/property-management/{instanceId}/property",
-                request,
-                EndpointInvocationException.class,
-                instanceId);
+                "/api/axile/property-management/{instanceId}", request, EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

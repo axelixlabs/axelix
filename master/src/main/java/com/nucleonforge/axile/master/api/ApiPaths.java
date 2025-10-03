@@ -149,6 +149,6 @@ public final class ApiPaths {
         /**
          * Endpoint to update property of a given application instance.
          */
-        public static final String UPDATE = "/{instanceId}/property";
+        public static final String INSTANCE_ID = "/{instanceId}";
     }
 }
