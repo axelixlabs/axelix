@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.master.api;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -330,8 +331,9 @@ public class LoggersApi {
     @PostMapping(path = ApiPaths.LoggersApi.CLEAR_FOR_LOGGER)
     public void clearLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
-
-        HttpPayload payload = HttpPayload.json(Map.of("logger.name", loggerName));
+        HttpPayload payload = HttpPayload.json(
+                Map.of("logger.name", loggerName),
+                jacksonMessageSerializationStrategy.serialize(Collections.emptyMap()));
         clearForLoggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
     }
 }
