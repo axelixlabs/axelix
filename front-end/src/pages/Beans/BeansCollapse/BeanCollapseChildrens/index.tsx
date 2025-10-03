@@ -50,27 +50,53 @@ export const BeanCollapseChildrens = ({
 
   return (
     <div className={styles.CollapseBody}>
+
       <div className={styles.CollapseBodyChunkTitle}>{t("dependencies")}:</div>
       <div>
-        {bean.dependencies.map((dependency) => (
-          <div key={dependency} className={styles.CollapseBodyChunkList}>
-            <span
-              onClick={() => handleDependencyClick(dependency)}
-              className={styles.Dependency}
-            >
-              {dependency}
-            </span>
-          </div>
-        ))}
+        {
+            bean.dependencies.length > 0
+                ? buildDependencies(bean, handleDependencyClick)
+                : emptyList()
+        }
       </div>
+
       <div className={styles.CollapseBodyChunkTitle}>{t("aliases")}:</div>
       <div>
-        {bean.aliases.map((aliase) => (
-          <div key={aliase} className={styles.CollapseBodyChunkList}>
-            {aliase}
-          </div>
-        ))}
+        {
+            bean.aliases.length > 0
+                ? buildAliases(bean)
+                : emptyList()
+        }
       </div>
     </div>
   );
 };
+
+function emptyList() {
+    return <div>-</div>;
+}
+
+function buildDependencies(
+    bean : IBean,
+    handleDependencyClick: (dependency: string) => void
+) {
+    return bean.dependencies.map((dependency) => {
+        return <div key={dependency} className={styles.CollapseBodyChunkList}>
+            <span
+                onClick={() => handleDependencyClick(dependency)}
+                className={styles.Dependency}
+            >
+                {dependency}
+            </span>
+        </div>
+    })
+}
+
+function buildAliases(bean: IBean) {
+    return bean.aliases.map((aliase) => (
+        <div key={aliase} className={styles.CollapseBodyChunkList}>
+            {aliase}
+        </div>
+    ));
+}
+

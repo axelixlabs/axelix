@@ -19,7 +19,9 @@ const createTableColumns = (
       title: (
         <>
           <div>{title}</div>
-          <div className={styles.Prefix}>{prefix}</div>
+          <br/>
+          <span className={styles.Prefix}>Prefix: </span>
+          <span className={styles.PrefixValue}>{prefix}</span>
         </>
       ),
       onHeaderCell: () => ({

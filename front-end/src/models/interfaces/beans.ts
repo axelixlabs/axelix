@@ -1,24 +1,29 @@
 import type { ICommonSliceState } from "./globals";
 
 export interface IBean {
+
   /**
    * Name of single bean
    */
   beanName: string;
+
   /**
    * Name of single bean scope
    */
   scope: string;
+
   /**
    * Name of single bean classname
    */
   className: string;
+
   /**
    * Bean aliases list
    */
   aliases: string[];
+
   /**
-   * Bean dependecies
+   * Bean dependencies
    */
   dependencies: string[];
 }
