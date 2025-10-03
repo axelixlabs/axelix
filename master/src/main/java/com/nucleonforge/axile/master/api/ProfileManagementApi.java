@@ -78,7 +78,7 @@ public class ProfileManagementApi {
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
     @Parameters(@Parameter(name = "instanceId", description = "Application Instance ID", required = true))
-    @PostMapping(path = ApiPaths.ProfileManagementApi.REPLACE)
+    @PostMapping(path = ApiPaths.ProfileManagementApi.INSTANCE_ID)
     public ProfileUpdateResponse replaceProfile(
             @PathVariable("instanceId") String instanceId, @RequestBody ProfileUpdatedRequest request) {
 
