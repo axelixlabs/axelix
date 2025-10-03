@@ -21,6 +21,7 @@ public record ServiceCaches(@JsonProperty("cacheManagers") Map<String, CacheMana
     }
 
     public record CacheManagers(@JsonProperty("caches") Map<String, Caches> caches) {
+
         public record Caches(@JsonProperty("target") String target) {}
     }
 }

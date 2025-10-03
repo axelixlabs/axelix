@@ -10,6 +10,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
+import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.api.CachesApi;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
@@ -31,7 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CachesApiEvictCacheByNameTest {
+public class CachesApiDeleteEndpointsTest {
+
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
@@ -61,19 +64,37 @@ public class CachesApiEvictCacheByNameTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/caches/cities?cacheManager=cacheManager")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/caches")) {
+                    return new MockResponse();
+                } else if (path.equals("/" + activeInstanceId + "/actuator/caches/cities?cacheManager=cacheManager")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
             }
         });
+
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+    }
+
+    @AfterEach
+    void cleanup() {
+        registry.deRegister(InstanceId.of(activeInstanceId));
+    }
+
+    @Test
+    void shouldEvictAllCaches() throws InterruptedException {
+        // when
+        restTemplate.delete("/api/axile/caches/{instanceId}", activeInstanceId);
+
+        // then.
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/actuator/caches");
     }
 
     @Test
     void shouldEvictCacheByNameWithParameter() throws InterruptedException {
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
         String cacheName = "cities";
 
         // when
@@ -84,6 +105,6 @@ public class CachesApiEvictCacheByNameTest {
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
         assertThat(recordedRequest.getPath())
-                .isEqualTo("/" + activeInstanceId + "/caches/cities?cacheManager=cacheManager");
+                .isEqualTo("/" + activeInstanceId + "/actuator/caches/cities?cacheManager=cacheManager");
     }
 }

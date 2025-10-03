@@ -181,9 +181,7 @@ public class CachesApi {
                                         mediaType = "application/json",
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
-    @Parameters({
-        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-    })
+    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @DeleteMapping(path = ApiPaths.CachesApi.INSTANCE_ID)
     public void evictAllCaches(@PathVariable("instanceId") String instanceId) {
         evictAllCachesEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
