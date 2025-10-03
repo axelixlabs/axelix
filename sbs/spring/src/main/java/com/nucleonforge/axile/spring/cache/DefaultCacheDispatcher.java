@@ -9,10 +9,6 @@ import org.springframework.cache.CacheManager;
  * Central component responsible for dispatching
  * cache-related operations to the appropriate {@link CacheManager} based on its name.
  *
- * <p>It maintains a map of available CacheManager, each associated with a unique name.
- * The dispatcher provides methods to clear entire caches, remove specific entries,
- * or clear all caches for a given CacheManager.
- *
  * @since 26.06.2025
  * @author Nikita Kirillov
  */

@@ -27,20 +27,20 @@ public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
     }
 
     @Override
-    public boolean clearAll() {
-        boolean anyCacheCleared = false;
-        for (String cacheName : cacheManager.getCacheNames()) {
-            anyCacheCleared |= clear(cacheName);
-        }
-        return anyCacheCleared;
-    }
-
-    @Override
     public boolean clear(String cacheName, Object key) {
         Cache cache = cacheManager.getCache(cacheName);
         if (cache != null && cache.get(key) != null) {
             return cache.evictIfPresent(key);
         }
         return false;
+    }
+
+    @Override
+    public boolean clearAll() {
+        boolean anyCacheCleared = false;
+        for (String cacheName : cacheManager.getCacheNames()) {
+            anyCacheCleared |= clear(cacheName);
+        }
+        return anyCacheCleared;
     }
 }
