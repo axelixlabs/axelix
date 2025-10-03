@@ -136,6 +136,6 @@ public final class ApiPaths {
         /**
          * Endpoint to replace the active Spring profiles of a given application instance.
          */
-        public static final String REPLACE = "/{instanceId}/profiles";
+        public static final String INSTANCE_ID = "/{instanceId}";
     }
 }
