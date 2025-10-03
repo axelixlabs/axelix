@@ -16,11 +16,14 @@ export interface IConfigPropsBean {
   properties: IKeyValuePair[];
 }
 
-export interface IConfigPropsSliceState extends ICommonSliceState {
+export interface IConfigPropsBeanData {
   /**
-   * List of configuration properties beans
+   * Full list of configuration properties beans
    */
   beans: IConfigPropsBean[];
+}
+
+export interface IConfigPropsSliceState extends ICommonSliceState, IConfigPropsBeanData {
   /**
    * Search text used for filtering configuration properties beans
    */
@@ -28,5 +31,5 @@ export interface IConfigPropsSliceState extends ICommonSliceState {
   /**
    * Filtered configuration properties beans after searching
    */
-  filteredConfigProps: IConfigPropsBean[];
+  filteredBeans: IConfigPropsBean[];
 }
