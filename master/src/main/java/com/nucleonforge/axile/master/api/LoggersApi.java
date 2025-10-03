@@ -1,6 +1,5 @@
 package com.nucleonforge.axile.master.api;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -213,8 +212,7 @@ public class LoggersApi {
     }
 
     @Operation(
-            summary =
-                    "The request specifies the desired logging level for a logger by its name.",
+            summary = "The request specifies the desired logging level for a logger by its name.",
             description =
                     "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE",
             responses = {
@@ -252,13 +250,12 @@ public class LoggersApi {
             @RequestBody LogLevelChangeRequest request) {
 
         HttpPayload payload = HttpPayload.json(
-            Map.of("logger.name", loggerName), jacksonMessageSerializationStrategy.serialize(request));
+                Map.of("logger.name", loggerName), jacksonMessageSerializationStrategy.serialize(request));
         setOneLoggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
     }
 
     @Operation(
-            summary =
-                    "The request specifies the desired logging level for a logger group by its name.",
+            summary = "The request specifies the desired logging level for a logger group by its name.",
             description =
                     "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE",
             responses = {
@@ -296,13 +293,12 @@ public class LoggersApi {
             @RequestBody LogLevelChangeRequest request) {
 
         HttpPayload payload = HttpPayload.json(
-            Map.of("group.name", groupName), jacksonMessageSerializationStrategy.serialize(request));
+                Map.of("group.name", groupName), jacksonMessageSerializationStrategy.serialize(request));
         setForLoggerGroupEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
     }
 
     @Operation(
-            summary =
-                    "Clears the configured logging level of a logger, reverting it to the global/default setting.",
+            summary = "Clears the configured logging level of a logger, reverting it to the global/default setting.",
             responses = {
                 @ApiResponse(
                         description = "OK",
