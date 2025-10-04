@@ -25,5 +25,6 @@
   "aliases": "Алиасы",
   "copied": "Скопировано",
   "reset": "Сбросить",
-  "configuredExplicitly": "Задан явно"
+  "configuredExplicitly": "Задан явно",
+  "loggerLevelUpdated": "Уровень логгера изменён"
 }

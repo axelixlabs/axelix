@@ -11,7 +11,7 @@ export const LoggersList = () => {
   return (
     <>
       {loggersData.map((logger) => {
-        return <Logger logger={logger} levels={levels} />;
+        return <Logger logger={logger} levels={levels} key={logger.name} />;
       })}
     </>
   );
