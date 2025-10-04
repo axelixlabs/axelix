@@ -213,8 +213,7 @@ public class LoggersApi {
     }
 
     @Operation(
-            summary =
-                    "The request specifies the desired logging level for a logger by its name and returns the result of the request.",
+            summary = "The request specifies the desired logging level for a logger by its name.",
             description =
                     "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE",
             responses = {
@@ -243,23 +242,21 @@ public class LoggersApi {
             })
     @Parameters({
         @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "loggerName", description = "The name of the logger to find", required = true),
-        @Parameter(name = "loggingLevel", description = "The logging level to be set", required = true)
+        @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
     })
     @PostMapping(path = ApiPaths.LoggersApi.LOGGER_NAME)
     public void setLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("loggerName") String loggerName,
-            @RequestBody LogLevelChangeRequest loggingLevel) {
+            @RequestBody LogLevelChangeRequest request) {
 
-        HttpPayload payload = new DefaultHttpPayload(
-                Map.of("logger.name", loggerName), jacksonMessageSerializationStrategy.serialize(loggingLevel));
+        HttpPayload payload = HttpPayload.json(
+                Map.of("logger.name", loggerName), jacksonMessageSerializationStrategy.serialize(request));
         setOneLoggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
     }
 
     @Operation(
-            summary =
-                    "The request specifies the desired logging level for a logger group by its name and returns the result of the request.",
+            summary = "The request specifies the desired logging level for a logger group by its name.",
             description =
                     "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE",
             responses = {
@@ -288,23 +285,21 @@ public class LoggersApi {
             })
     @Parameters({
         @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "groupName", description = "The name of the logger group to find", required = true),
-        @Parameter(name = "loggingLevel", description = "The logging level to be set", required = true)
+        @Parameter(name = "groupName", description = "The name of the logger group to find", required = true)
     })
     @PostMapping(path = ApiPaths.LoggersApi.GROUP_NAME)
     public void setLoggingLevelByGroupName(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("groupName") String groupName,
-            @RequestBody LogLevelChangeRequest loggingLevel) {
+            @RequestBody LogLevelChangeRequest request) {
 
-        HttpPayload payload = new DefaultHttpPayload(
-                Map.of("group.name", groupName), jacksonMessageSerializationStrategy.serialize(loggingLevel));
+        HttpPayload payload = HttpPayload.json(
+                Map.of("group.name", groupName), jacksonMessageSerializationStrategy.serialize(request));
         setForLoggerGroupEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
     }
 
     @Operation(
-            summary =
-                    "Clears the configured logging level of a logger, reverting it to the global/default setting, and returns the result of the request.",
+            summary = "Clears the configured logging level of a logger, reverting it to the global/default setting.",
             responses = {
                 @ApiResponse(
                         description = "OK",
@@ -336,8 +331,7 @@ public class LoggersApi {
     @PostMapping(path = ApiPaths.LoggersApi.CLEAR_FOR_LOGGER)
     public void clearLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
-
-        HttpPayload payload = new DefaultHttpPayload(
+        HttpPayload payload = HttpPayload.json(
                 Map.of("logger.name", loggerName),
                 jacksonMessageSerializationStrategy.serialize(Collections.emptyMap()));
         clearForLoggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);

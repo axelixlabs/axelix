@@ -46,4 +46,9 @@ public interface HttpPayload {
         return new DefaultHttpPayload(
                 List.of(contentType), Collections.emptyList(), Collections.emptyMap(), requestBody);
     }
+
+    static HttpPayload json(Map<String, String> pathVariables, byte[] requestBody) {
+        HttpHeader contentType = new HttpHeader("Content-Type", "application/json");
+        return new DefaultHttpPayload(List.of(contentType), Collections.emptyList(), pathVariables, requestBody);
+    }
 }
