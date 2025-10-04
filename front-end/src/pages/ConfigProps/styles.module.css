@@ -2,23 +2,3 @@
   max-width: 400px;
   margin-bottom: 20px;
 }
-
-.TableRow {
-  display: inline-block;
-  width: 50%;
-}
-
-.ConfigPropsTable {
-  margin-bottom: 40px;
-  border: 1px solid var(--axile-light-gray);
-  border-top-right-radius: 8px;
-  border-top-left-radius: 8px;
-}
-
-.ConfigPropsTable:last-child {
-  margin-bottom: 0;
-}
-
-.Prefix {
-  color: var(--axile-text-grey);
-}

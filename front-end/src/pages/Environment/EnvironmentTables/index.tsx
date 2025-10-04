@@ -1,30 +1,11 @@
-import { Empty, Input, Table } from "antd";
+import { Input } from "antd";
 import { useTranslation } from "react-i18next";
-import type { ColumnsType } from "antd/es/table";
 
 import { useAppDispatch, useAppSelector } from "hooks";
+import { EmptyHandler, TableData } from "components";
 import { filterProperties } from "store/slices";
-import type { IKeyValuePair } from "models";
 
 import styles from "./styles.module.css";
-
-const createTableColumns = (title: string): ColumnsType<IKeyValuePair> => {
-  return [
-    {
-      title,
-      key: title,
-      onHeaderCell: () => ({
-        style: { backgroundColor: "#00AB551A" },
-      }),
-      render: (_, { key, value }) => (
-        <>
-          <span className={styles.TableRow}>{key}</span>
-          <span className={styles.TableRow}>{value}</span>
-        </>
-      ),
-    },
-  ];
-};
 
 export const EnvironmentTables = () => {
   const { t } = useTranslation();
@@ -38,6 +19,8 @@ export const EnvironmentTables = () => {
     ? filteredPropertySources
     : propertySources;
 
+  const noDataAfterSearch = !!environmentSearchText && !filteredPropertySources.length
+
   return (
     <>
       <Input
@@ -46,25 +29,15 @@ export const EnvironmentTables = () => {
         className={styles.Search}
       />
 
-      {/* todo - replace this in future in EmptyHandler component*/}
-      {environmentSearchText && !filteredPropertySources.length ? (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={<p>{t("noData")}</p>}
-        />
-      ) : (
-        propertySourcesList.map(({ name, properties }) => {
-          return (
-            <Table
-              columns={createTableColumns(name)}
-              dataSource={properties}
-              pagination={false}
-              key={name}
-              className={styles.EnvironmentTable}
-            />
-          );
-        })
-      )}
+      <EmptyHandler isEmpty={noDataAfterSearch}>
+        {propertySourcesList.map(({ name, properties }) => (
+          <TableData
+            name={name}
+            properties={properties}
+            key={name}
+          />
+        ))}
+      </EmptyHandler>
     </>
   );
 };

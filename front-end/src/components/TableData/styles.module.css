@@ -1,0 +1,35 @@
+.Table {
+    margin-bottom: 40px;
+    border: 1px solid var(--axile-light-gray);
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+}
+
+.Table:last-child {
+    margin-bottom: 0;
+}
+
+.TableRow {
+    display: flex;
+    column-gap: 20px;
+    width: 100%;
+}
+
+.RowChunk {
+    width: 50%;
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.RowChunk:last-child {
+    word-break: break-all;
+}
+
+.Prefix {
+    color: var(--axile-text-grey);
+    margin-top: 8px;
+}
+
+.PrefixTitle {
+    color: var(--axile-primary-green);
+}

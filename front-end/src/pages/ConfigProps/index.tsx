@@ -1,39 +1,12 @@
-import { Input, Table } from "antd";
+import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { useEffect, type ChangeEvent } from "react";
 
 import { filterConfigProps, getConfigPropsThunk } from "store/slices";
 import { useAppDispatch, useAppSelector } from "hooks";
-import { Loader, EmptyHandler } from "components";
-import type { ColumnsType } from "antd/es/table";
-import type { IKeyValuePair } from "models";
+import { Loader, EmptyHandler, TableData } from "components";
 
 import styles from "./styles.module.css";
-
-const createTableColumns = (
-  title: string,
-  prefix: string
-): ColumnsType<IKeyValuePair> => {
-  return [
-    {
-      title: (
-        <>
-          <div>{title}</div>
-          <div className={styles.Prefix}>{prefix}</div>
-        </>
-      ),
-      onHeaderCell: () => ({
-        style: { backgroundColor: "#00AB551A" },
-      }),
-      render: (_, { key, value }) => (
-        <>
-          <span className={styles.TableRow}>{key}</span>
-          <span className={styles.TableRow}>{value}</span>
-        </>
-      ),
-    },
-  ];
-};
 
 export const ConfigProps = () => {
   const { t } = useTranslation();
@@ -71,19 +44,13 @@ export const ConfigProps = () => {
       />
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
-        {configProps.map(({ beanName, prefix, properties }) => {
-          return (
-            // todo В будущем, в зависимости от возможности переиспользования,
-            // сделать один универсальный компонент Table
-            <Table
-              columns={createTableColumns(beanName, prefix)}
-              dataSource={properties}
-              pagination={false}
-              key={beanName}
-              className={styles.ConfigPropsTable}
-            />
-          );
-        })}
+        {configProps.map(({ beanName, prefix, properties }) => (
+          <TableData
+            name={beanName}
+            properties={properties}
+            prefix={prefix}
+          />
+        ))}
       </EmptyHandler>
     </>
   );

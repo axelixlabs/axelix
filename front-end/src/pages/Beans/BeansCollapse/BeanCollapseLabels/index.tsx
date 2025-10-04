@@ -1,6 +1,8 @@
 import type { JSX, RefObject } from "react";
 import type { IBean, IBeansCollapseHeaderRefs } from "models";
 
+import { TooltipWithCopy } from "components";
+
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -22,14 +24,16 @@ export const BeanCollapseLabels = ({
 
   return (
     <div
-      className={styles.CollapseHeader}
       ref={(el) => {
         headerRefs.current[beanName] = el;
       }}
+      className={styles.CollapseHeader}
     >
       <div>
-        <p>{beanName}</p>
-        <p className={styles.ClassName}>{className}</p>
+        <TooltipWithCopy text={beanName} />
+        <div className={styles.ClassName}>
+          <TooltipWithCopy text={className} />
+        </div>
       </div>
       <div className={styles.ScopeWrapper}>{scope}</div>
     </div>
