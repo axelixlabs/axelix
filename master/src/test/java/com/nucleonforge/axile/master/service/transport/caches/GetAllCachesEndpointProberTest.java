@@ -28,12 +28,12 @@ import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstan
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link CachesAllEndpointProber}.
+ * Integration tests for {@link GetAllCachesEndpointProber}.
  *
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
-public class CachesAllEndpointProberTest {
+public class GetAllCachesEndpointProberTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
@@ -43,7 +43,7 @@ public class CachesAllEndpointProberTest {
     private InstanceRegistry registry;
 
     @Autowired
-    private CachesAllEndpointProber cachesAllEndpointProber;
+    private GetAllCachesEndpointProber getAllCachesEndpointProber;
 
     @BeforeAll
     static void startServer() throws IOException {
@@ -107,7 +107,8 @@ public class CachesAllEndpointProberTest {
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
         // when.
-        ServiceCaches caches = cachesAllEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
+        ServiceCaches caches =
+                getAllCachesEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
         // ServiceCaches -> CacheManagers
         Map<String, ServiceCaches.CacheManagers> cacheManagers = caches.cacheManagers();

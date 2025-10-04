@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
-import com.nucleonforge.axile.master.api.CachesApi;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -31,12 +30,13 @@ import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link CachesApi}.
+ * Integration test for {@link CachesApiGetEndpoints}.
+ * In particular, it handles the edge case of complete absence of any cache managers inside the given managed service
  *
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CachesApiEmptyResponseTest {
+public class CachesApiGetEndpointsEmptyResponseTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 

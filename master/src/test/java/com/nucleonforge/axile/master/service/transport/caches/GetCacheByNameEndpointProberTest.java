@@ -32,12 +32,12 @@ import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstan
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link CacheByNameEndpointProber}.
+ * Integration tests for {@link GetCacheByNameEndpointProber}.
  *
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
-public class CacheByNameEndpointProberTest {
+public class GetCacheByNameEndpointProberTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
@@ -47,7 +47,7 @@ public class CacheByNameEndpointProberTest {
     private InstanceRegistry registry;
 
     @Autowired
-    private CacheByNameEndpointProber cacheByNameEndpointProber;
+    private GetCacheByNameEndpointProber getCacheByNameEndpointProber;
 
     @BeforeAll
     static void startServer() throws IOException {
@@ -117,7 +117,7 @@ public class CacheByNameEndpointProberTest {
         HttpPayload payload = new DefaultHttpPayload(Map.of("name", cacheName));
 
         // when.
-        SingleCache cache = cacheByNameEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
+        SingleCache cache = getCacheByNameEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
 
         // then
         assertThat(cache.name()).isEqualTo("cities");
@@ -126,13 +126,13 @@ public class CacheByNameEndpointProberTest {
     }
 
     @Test
-    void shouldReturnSingleCacheWithParameter() {
+    void shouldReturnSingleCacheWithQueryParameter() {
         String cacheName = "countries";
         HttpPayload payload = new DefaultHttpPayload(
                 List.of(new SingleValueQueryParameter("cacheManager", "cacheManager")), Map.of("name", cacheName));
 
         // when.
-        SingleCache cache = cacheByNameEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
+        SingleCache cache = getCacheByNameEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
 
         // then
         assertThat(cache.name()).isEqualTo("countries");
