@@ -10,18 +10,19 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.DiscardingAbstractEndpointProber;
 
 /**
- * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#EVICT_ALL_CACHES /caches} endpoint.
+ * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#CLEAR_SINGLE_CACHES /caches/{name}} endpoint.
  *
  * @author Sergey Cherkasov
  */
 @Service
-public class EvictAllCachesEndpointProber extends DiscardingAbstractEndpointProber {
-    public EvictAllCachesEndpointProber(InstanceRegistry instanceRegistry) {
+public class ClearCacheByNameEndpointProber extends DiscardingAbstractEndpointProber {
+
+    public ClearCacheByNameEndpointProber(InstanceRegistry instanceRegistry) {
         super(instanceRegistry);
     }
 
     @Override
     public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.EVICT_ALL_CACHES;
+        return ActuatorEndpoints.CLEAR_SINGLE_CACHES;
     }
 }

@@ -24,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
-import com.nucleonforge.axile.master.api.CachesApi;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
@@ -36,12 +35,12 @@ import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link CachesApi}.
+ * Integration tests of {@link CachesApiGetEndpoints} common cases for retrieving single cache or multiple caches.
  *
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CachesApiGetEndpointsTest {
+public class CachesApiGetEndpointsGetEndpointsTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
