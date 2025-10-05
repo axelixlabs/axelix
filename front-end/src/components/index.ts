@@ -1,5 +1,5 @@
 export { LanguageSwitcher } from "./LanguageSwitcher";
-export { TooltipWithCopy } from './TooltipWithCopy'
+export { TooltipWithCopy } from './TooltipWithCopy';
+export { TableSection  } from './TableSection';
 export { EmptyHandler } from "./EmptyHandler";
-export { TableData } from './TableData'
 export { Loader } from "./Loader";

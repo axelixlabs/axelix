@@ -1,9 +1,11 @@
 import { Table } from 'antd';
+import type { PropsWithChildren } from 'react';
 
-import styles from './styles.module.css'
 import { TooltipWithCopy } from 'components/TooltipWithCopy';
 import type { ColumnsType } from 'antd/es/table';
 import type { IKeyValuePair } from 'models';
+
+import styles from './styles.module.css'
 
 interface IProps {
     /**
@@ -14,13 +16,9 @@ interface IProps {
      * Table key value data
      */
     properties: IKeyValuePair[];
-    /**
-     * Config props prefix
-     */
-    prefix?: string
 }
 
-export const TableData = ({ name, properties, prefix }: IProps) => {
+export const TableSection = ({ name, properties, children }: PropsWithChildren<IProps>) => {
 
     const createTableColumns = (): ColumnsType<IKeyValuePair> => {
         return [
@@ -29,11 +27,7 @@ export const TableData = ({ name, properties, prefix }: IProps) => {
                 title: (
                     <>
                         <div>{name}</div>
-                        {prefix && (
-                            <div className={styles.Prefix}>
-                                <span className={styles.PrefixTitle}>Prefix:</span> {prefix}
-                            </div>
-                        )}
+                        {children}
                     </>
                 ),
                 onHeaderCell: () => ({

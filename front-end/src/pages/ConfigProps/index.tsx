@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useEffect, type ChangeEvent } from "react";
 
 import { filterConfigProps, getConfigPropsThunk } from "store/slices";
+import { Loader, EmptyHandler, TableSection } from "components";
 import { useAppDispatch, useAppSelector } from "hooks";
-import { Loader, EmptyHandler, TableData } from "components";
 
 import styles from "./styles.module.css";
 
@@ -45,11 +45,16 @@ export const ConfigProps = () => {
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         {configProps.map(({ beanName, prefix, properties }) => (
-          <TableData
+          <TableSection
             name={beanName}
             properties={properties}
-            prefix={prefix}
-          />
+          >
+            {prefix && (
+              <div className={styles.Prefix}>
+                <span className={styles.PrefixTitle}>Prefix:</span> {prefix}
+              </div>
+            )}
+          </TableSection>
         ))}
       </EmptyHandler>
     </>

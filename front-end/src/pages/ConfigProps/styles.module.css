@@ -2,3 +2,12 @@
   max-width: 400px;
   margin-bottom: 20px;
 }
+
+.Prefix {
+  color: var(--axile-text-grey);
+  margin-top: 8px;
+}
+
+.PrefixTitle {
+  color: var(--axile-primary-green);
+}

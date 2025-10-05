@@ -1,8 +1,8 @@
 import { Input } from "antd";
 import { useTranslation } from "react-i18next";
 
+import { EmptyHandler, TableSection } from "components";
 import { useAppDispatch, useAppSelector } from "hooks";
-import { EmptyHandler, TableData } from "components";
 import { filterProperties } from "store/slices";
 
 import styles from "./styles.module.css";
@@ -31,7 +31,7 @@ export const EnvironmentTables = () => {
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         {propertySourcesList.map(({ name, properties }) => (
-          <TableData
+          <TableSection
             name={name}
             properties={properties}
             key={name}

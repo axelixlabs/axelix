@@ -24,12 +24,3 @@
 .RowChunk:last-child {
     word-break: break-all;
 }
-
-.Prefix {
-    color: var(--axile-text-grey);
-    margin-top: 8px;
-}
-
-.PrefixTitle {
-    color: var(--axile-primary-green);
-}
