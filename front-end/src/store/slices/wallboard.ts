@@ -7,8 +7,8 @@ import type { IServiceCardsData, IWallboardSliceState } from "models";
 const initialState: IWallboardSliceState = {
   loading: false,
   error: "",
-  serviceCards: [],
-  filteredServiceCards: [],
+  instances: [],
+  filteredInstances: [],
   serviceCardsSearchText: "",
 };
 
@@ -30,6 +30,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "123axile-api-feature-service-petclinic",
             serviceVersion: "1.32.14 SNAPSHOT",
             commitHash: "K2357",
+            deployedAt: "2h 32m",
           },
           {
             springBootVersion: "12.5.1",
@@ -38,6 +39,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "345axile-api-feature-service-petclinic-petclinic",
             serviceVersion: "1.32.12",
             commitHash: "K2347",
+            deployedAt: "2h 32m",
           },
           {
             springBootVersion: "12.5.1",
@@ -46,6 +48,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "678axile-api-feature-service-petclinic-petclinic",
             serviceVersion: "1.32.12",
             commitHash: "K2347",
+            deployedAt: "2h 32m",
           },
           {
             springBootVersion: "12.5.1",
@@ -54,6 +57,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "123axile-api-feature-service-petclinic-asdzcx",
             serviceVersion: "1.32.12",
             commitHash: "K2347",
+            deployedAt: "2h 32m",
           },
           {
             springBootVersion: "12.5.1",
@@ -62,6 +66,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "123axile-api-feature-service-petclinic-vcv",
             serviceVersion: "1.32.12",
             commitHash: "K2347",
+            deployedAt: "22h 32m",
           },
           {
             springBootVersion: "12.5.1",
@@ -70,6 +75,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "555axile-api-feature-service-petclinic-petclinic",
             serviceVersion: "1.32.12",
             commitHash: "K2347",
+            deployedAt: "2h 32m",
           },
           {
             springBootVersion: "12.5.1",
@@ -78,6 +84,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "555axile-api-feature",
             serviceVersion: "1.32.12",
             commitHash: "K2347",
+            deployedAt: "2h 32m",
           },
           {
             springBootVersion: "12.5.1",
@@ -86,6 +93,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "555ppppaxile-api-feature-service-petclinic-petclinic",
             serviceVersion: "1.32.12",
             commitHash: "K2347",
+            deployedAt: "2h 32m",
           },
           {
             springBootVersion: "12.5.1",
@@ -94,6 +102,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "667axile-api-feature-service-petclinic-petclinic",
             serviceVersion: "1.32.12",
             commitHash: "K2347",
+            deployedAt: "2h 32m",
           },
           {
             springBootVersion: "12.5.1",
@@ -102,6 +111,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "555axile-api-feature1",
             serviceVersion: "1.32.12",
             commitHash: "K2347",
+            deployedAt: "2h 32m",
           },
           {
             springBootVersion: "12.5.1",
@@ -110,6 +120,7 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
             serviceName: "555axile-api.feature.service.petclinic.petclinic",
             serviceVersion: "1.32.12",
             commitHash: "K2347",
+            deployedAt: "2h 32m",
           },
         ],
       };
@@ -128,7 +139,7 @@ export const WallboardSlice = createSlice({
       const searchText = action.payload.toLowerCase().trim();
       state.serviceCardsSearchText = searchText;
 
-      state.filteredServiceCards = state.serviceCards.filter(
+      state.filteredInstances = state.instances.filter(
         ({ serviceName }) => {
           return serviceName.toLowerCase().includes(searchText);
         }
@@ -141,7 +152,7 @@ export const WallboardSlice = createSlice({
     });
     builder.addCase(getWallboardDataThunk.fulfilled, (state, { payload }) => {
       state.loading = false;
-      state.serviceCards = payload.applications;
+      state.instances = payload.applications;
     });
     builder.addCase(getWallboardDataThunk.rejected, (state, { payload }: any) => {
       const { status } = payload;

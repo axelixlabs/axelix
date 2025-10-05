@@ -1,12 +1,16 @@
-import type { IServiceCard } from 'models';
+import type { IInstanceCard  } from 'models';
 
 import styles from './styles.module.css'
 
 interface IProps {
-  data: IServiceCard
+  /**
+   * Wallboard instance card data
+   */
+  data: IInstanceCard
 }
 
 export const WallboardCard = ({ data }: IProps) => {
+  
   return (
     <div className={`${styles.Card} ${styles[`Card${data.status}`]}`}>
       <div className={`${styles.CardHeader} ${styles[`CardHeader${data.status}`]}`}>
@@ -18,8 +22,7 @@ export const WallboardCard = ({ data }: IProps) => {
         <div>Java: {data.javaVersion}</div>
         <div className={styles.HashAndTimeWrapper}>
           <span>{data.commitHash}</span>
-          {/* todo use this in future */}
-          {/* <span>wdasda</span> */}
+          <span>{data.deployedAt}</span>
         </div>
       </div>
     </div>

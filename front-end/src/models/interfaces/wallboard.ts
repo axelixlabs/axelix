@@ -1,20 +1,21 @@
 import type { ICommonSliceState } from "./globals";
 
-export interface IServiceCard {
+export interface IInstanceCard  {
     springBootVersion: string;
     javaVersion: string;
     status: string;
     serviceName: string; 
     serviceVersion: string;
     commitHash: string;
+    deployedAt: string
 }
 
 export interface IServiceCardsData {
-    applications: IServiceCard[];
+    applications: IInstanceCard[];
 }
 
 export interface IWallboardSliceState extends ICommonSliceState {
-  serviceCards: IServiceCard[];
-  filteredServiceCards: IServiceCard[];
+  instances: IInstanceCard[];
+  filteredInstances: IInstanceCard[];
   serviceCardsSearchText: string
 }

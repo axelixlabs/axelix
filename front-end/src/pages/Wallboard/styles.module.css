@@ -3,18 +3,26 @@
     margin-bottom: 30px;
 }
 
-.CardsResponsiveWrapper,
-.CardsCommonWrapper {
+.CardsResponsiveWrapper {
     display: grid;
+    grid-template-columns: repeat(6, minmax(220px, 1fr));
     gap: 15px;
 }
 
-.CardsResponsiveWrapper{
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    justify-content: center;
+@media all and (max-width: 1490px) {
+    .CardsResponsiveWrapper {
+        grid-template-columns: repeat(5, minmax(220px, 1fr));
+    }
 }
 
-.CardsCommonWrapper{ 
-    grid-template-columns: repeat(auto-fit, 225px);
-    justify-content: start;
+@media all and (max-width: 1270px) {
+    .CardsResponsiveWrapper {
+        grid-template-columns: repeat(4, minmax(220px, 1fr));
+    }
+}
+
+@media all and (max-width: 1030px) {
+    .CardsResponsiveWrapper {
+        grid-template-columns: repeat(3, minmax(220px, 1fr));
+    }
 }
