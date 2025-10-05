@@ -1,13 +1,13 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  type PayloadAction,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-import type { ILoggersSliceState } from "models";
+import type { ILoggerData, ILoggersSliceState, ISetLoggerLevelRequestData } from "models";
+import { getLoggersData, setLoggerLevel } from "services/loggers";
+
+
 
 const initialState: ILoggersSliceState = {
   loading: false,
+  updateLoggerSuccess: false,
   levels: [],
   loggers: [],
   loggersSearchText: "",
@@ -15,18 +15,13 @@ const initialState: ILoggersSliceState = {
   error: "",
 };
 
-export const setLoggerLevelThunk = createAsyncThunk(
+// todo fix any in future for rejectValue
+export const setLoggerLevelThunk = createAsyncThunk<void, ISetLoggerLevelRequestData, { rejectValue: any }>(
   "setLoggerLevelThunk",
-  // todo Удалить _ и заменить реальными параметрами в будущем, когда будет выполнен запрос с реальными данными.
-  async (_: any, { dispatch, rejectWithValue }) => {
+  async ({ instanceId, loggerName, loggingLevel }, { dispatch, rejectWithValue }) => {
     try {
-      // искусственная задержка вместо реального запроса
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      dispatch(getLoggersThunk(""));
-
-      // todo fix this in future
-      return {};
+      await setLoggerLevel(instanceId, loggerName, loggingLevel)
+      dispatch(getLoggersThunk("56019718-3b84-4ecd-9b84-287754dbd7d4"));
     } catch (error: any) {
       return rejectWithValue({
         status: error.response?.status,
@@ -35,81 +30,12 @@ export const setLoggerLevelThunk = createAsyncThunk(
   }
 );
 
-export const getLoggersThunk = createAsyncThunk(
+// todo fix any in future for rejectValue
+export const getLoggersThunk = createAsyncThunk<ILoggerData, string, { rejectValue: any }>(
   "getLoggersThunk",
-  // todo Удалить _ и заменить реальными параметрами в будущем, когда будет выполнен запрос с реальными данными.
-  async (_: any, { rejectWithValue }) => {
+  async (instanceId, { rejectWithValue }) => {
     try {
-      // fix this after creating the endpoint
-      // const response = await getEnvironmentData(id);
-      // todo Удалить any и заменить реальными типами в будущем.
-      const response: any = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: {
-              levels: ["OFF", "ERROR", "WARN", "INFO", "DEBUG", "TRACE"],
-              loggers: [
-                {
-                  name: "ROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOTROOT",
-                  configuredLevel: "OFF",
-                  effectiveLevel: "OFF",
-                },
-                { name: "vtik", configuredLevel: "", effectiveLevel: "OFF" },
-                {
-                  name: "hvgck",
-                  configuredLevel: "WARN",
-                  effectiveLevel: "WARN",
-                },
-                {
-                  name: "nzr.rhpg.fgji",
-                  configuredLevel: "",
-                  effectiveLevel: "WARN",
-                },
-                {
-                  name: "uyrgdo.ffxsxv.hzhc",
-                  configuredLevel: "ERROR",
-                  effectiveLevel: "ERROR",
-                },
-                {
-                  name: "odau",
-                  configuredLevel: "",
-                  effectiveLevel: "ERROR",
-                },
-                {
-                  name: "suh.zur",
-                  configuredLevel: "INFO",
-                  effectiveLevel: "INFO",
-                },
-                {
-                  name: "clco",
-                  configuredLevel: "",
-                  effectiveLevel: "INFO",
-                },
-                {
-                  name: "pubw.wzq.phawiu",
-                  configuredLevel: "DEBUG",
-                  effectiveLevel: "DEBUG",
-                },
-                {
-                  name: "pubw.wzq.phawiu",
-                  configuredLevel: "",
-                  effectiveLevel: "DEBUG",
-                },
-                {
-                  name: "pubw.wzq.phawiu",
-                  configuredLevel: "TRACE",
-                  effectiveLevel: "TRACE",
-                },
-                {
-                  name: "pubw.wzq.phawiu",
-                  configuredLevel: "",
-                  effectiveLevel: "TRACE",
-                },
-              ],
-            },
-          });
-        }, 500);
-      });
+      const response = await getLoggersData(instanceId);
 
       return response.data;
     } catch (error: any) {
@@ -121,7 +47,7 @@ export const getLoggersThunk = createAsyncThunk(
 );
 
 export const LoggersSlice = createSlice({
-  name: "loggers",
+  name: "loggersSlice",
   initialState,
   reducers: {
     filterLoggers: (state, action: PayloadAction<string>) => {
@@ -156,13 +82,16 @@ export const LoggersSlice = createSlice({
 
     builder.addCase(setLoggerLevelThunk.pending, (state) => {
       state.loading = true;
+      state.updateLoggerSuccess = false;
     });
     builder.addCase(setLoggerLevelThunk.fulfilled, (state) => {
       state.loading = false;
+      state.updateLoggerSuccess = true
     });
-    // fix this in future
+    // todo fix this in future
     builder.addCase(setLoggerLevelThunk.rejected, (state, { payload }: any) => {
       const { status } = payload;
+      state.updateLoggerSuccess = false;
       state.loading = false;
 
       if (status >= 400 && status < 500) {

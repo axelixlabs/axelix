@@ -15,15 +15,18 @@ export interface ILogger {
   effectiveLevel: string;
 }
 
-export interface ILoggersSliceState extends ICommonSliceState {
+export interface ILoggerData {
   /**
-   * Levels for all loggers
-   */
+     * All possible logging levels that are supported by the logging system inside the instance
+     */
   levels: string[];
   /**
    * All loggers
    */
   loggers: ILogger[];
+}
+
+export interface ILoggersSliceState extends ICommonSliceState, ILoggerData {
   /**
    * Text for searching loggers
    */
@@ -32,6 +35,22 @@ export interface ILoggersSliceState extends ICommonSliceState {
    * Filtered loggers after searching
    */
   filteredLoggers: ILogger[];
+  updateLoggerSuccess: boolean
+}
+
+export interface ISetLoggerLevelRequestData {
+  /**
+   * Instance id
+   */
+  instanceId: string;
+  /**
+   * Logger name
+   */
+  loggerName: string;
+  /**
+   * Selected level
+   */
+  loggingLevel: string
 }
 
 // todo use this in future

@@ -1,4 +1,4 @@
-import { Input } from "antd";
+import { Input, message } from "antd";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -13,13 +13,25 @@ export const Loggers = () => {
   const { t } = useTranslation();
 
   const dispatch = useAppDispatch();
-  const { loading, error, loggers, filteredLoggers, loggersSearchText } =
-    useAppSelector((store) => store.loggers);
+  const {
+    loading,
+    updateLoggerSuccess,
+    error,
+    loggers,
+    filteredLoggers,
+    loggersSearchText
+  } = useAppSelector((store) => store.loggers);
 
   useEffect(() => {
-    // todo remove "" in future
-    dispatch(getLoggersThunk(""));
+    // todo В будущем вместо hard code-а вставить динамический id.
+    dispatch(getLoggersThunk("56019718-3b84-4ecd-9b84-287754dbd7d4"));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (updateLoggerSuccess) {
+      message.success(t("loggerLevelUpdated"))
+    }
+  }, [updateLoggerSuccess])
 
   if (loading) {
     return <Loader />;
@@ -31,9 +43,8 @@ export const Loggers = () => {
 
   const noDataAfterSearch = !!loggersSearchText && !filteredLoggers.length;
 
-  const loggersCount = `${
-    loggersSearchText ? filteredLoggers.length : loggers.length
-  } / ${loggers.length}`;
+  const loggersCount = `${loggersSearchText ? filteredLoggers.length : loggers.length
+    } / ${loggers.length}`;
 
   return (
     <>

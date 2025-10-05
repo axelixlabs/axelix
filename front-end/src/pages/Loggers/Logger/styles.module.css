@@ -4,6 +4,11 @@
   align-items: center;
   column-gap: 20px;
   padding-block: 12px;
+  border-bottom: 1px solid var(--axile-gray);
+}
+
+.MainWrapper:last-child {
+  border-bottom: none;
 }
 
 .LoggerValuesWrapper {

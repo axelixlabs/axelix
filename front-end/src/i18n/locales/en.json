@@ -25,5 +25,6 @@
   "aliases": "Aliases",
   "copied": "Copied",
   "reset": "Reset",
-  "configuredExplicitly": "Configured explicitly"
+  "configuredExplicitly": "Configured explicitly",
+  "loggerLevelUpdated": "Level has been changed"
 }

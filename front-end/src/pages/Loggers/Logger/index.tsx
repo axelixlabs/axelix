@@ -13,7 +13,7 @@ import styles from "./styles.module.css";
 
 interface IProps {
   /**
-   * Levels for all loggers
+   * All possible logging levels that are supported by the logging system inside the instance
   */
   levels: string[];
   /**
@@ -32,7 +32,11 @@ export const Logger = ({ levels, logger }: IProps) => {
       return
     }
 
-    dispatch(setLoggerLevelThunk(level));
+    dispatch(setLoggerLevelThunk({
+      instanceId: "56019718-3b84-4ecd-9b84-287754dbd7d4",
+      loggerName: logger.name,
+      loggingLevel: level
+    }));
   };
 
   return (
@@ -46,11 +50,9 @@ export const Logger = ({ levels, logger }: IProps) => {
             const color = statePalette[level] || statePalette.DEFAULT;
 
             return (
-              <div className={styles.RadioGroupWrapper}>
+              <div className={styles.RadioGroupWrapper} key={level}>
                 <label
-                  key={level}
                   className={`${styles.RadioButton} ${effectiveLevel === level ? styles.Selected : ""}`}
-                  onClick={() => handleChange(level)}
                   style={{
                     "--color-primary": color.colorPrimary,
                     "--color-primary-hover": color.colorPrimaryHover,
@@ -61,6 +63,7 @@ export const Logger = ({ levels, logger }: IProps) => {
                     type="radio"
                     value={level}
                     checked={effectiveLevel === level}
+                    onChange={() => handleChange(level)}
                   />
                   {level}
                 </label>
