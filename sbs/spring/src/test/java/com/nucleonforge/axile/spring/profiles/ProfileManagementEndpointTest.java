@@ -22,6 +22,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 import com.nucleonforge.axile.Main;
+import com.nucleonforge.axile.spring.context.DefaultContextRestarter;
 import com.nucleonforge.axile.spring.utils.ContextKeepAliveTestListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +52,10 @@ import static org.assertj.core.api.Assertions.assertThat;
         })
 @Import({
     TestFeatureServiceConfigs.PremiumFeatureService.class,
-    TestFeatureServiceConfigs.PremiumFeatureServiceConfig.class
+    TestFeatureServiceConfigs.PremiumFeatureServiceConfig.class,
+    ProfileManagementEndpoint.class,
+    ContextReloadingProfileMutator.class,
+    DefaultContextRestarter.class
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ProfileManagementEndpointTest {
