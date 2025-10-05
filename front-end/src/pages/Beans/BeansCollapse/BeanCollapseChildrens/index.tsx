@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { RefObject, SetStateAction, Dispatch } from "react";
 
 import type { IBean, IBeansCollapseHeaderRefs } from "models";
+import { TooltipWithCopy } from "components";
 
 import styles from "./styles.module.css";
 
@@ -54,12 +55,9 @@ export const BeanCollapseChildrens = ({
       <div>
         {bean.dependencies.map((dependency) => (
           <div key={dependency} className={styles.CollapseBodyChunkList}>
-            <span
-              onClick={() => handleDependencyClick(dependency)}
-              className={styles.Dependency}
-            >
-              {dependency}
-            </span>
+            <div className={styles.Dependency}>
+              <TooltipWithCopy text={dependency} onClick={() => handleDependencyClick(dependency)} />
+            </div>
           </div>
         ))}
       </div>

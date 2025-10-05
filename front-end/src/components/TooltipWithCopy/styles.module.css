@@ -1,14 +1,14 @@
-.TruncatWrapper {
+.TextWrapper {
   display: flex;
   column-gap: 8px;
   min-width: 0;
-  width: min(450px, 100%);
 }
 
-.Truncat {
+.Text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 450px;
 }
 
 .CopyIcon {

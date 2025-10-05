@@ -2,7 +2,7 @@ import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { setLoggerLevelThunk } from "store/slices";
-import { LoggerName } from "./LoggerName";
+import { TooltipWithCopy } from "components";
 import { useAppDispatch } from "hooks";
 import type { ILogger } from "models";
 import { statePalette } from "utils";
@@ -37,7 +37,7 @@ export const Logger = ({ levels, logger }: IProps) => {
 
   return (
     <div className={styles.MainWrapper}>
-      <LoggerName name={logger.name} />
+      <TooltipWithCopy text={logger.name} />
 
       <div className={styles.LoggerValuesWrapper}>
         <div className={styles.LevelsWrapper}>
@@ -66,7 +66,7 @@ export const Logger = ({ levels, logger }: IProps) => {
                 </label>
                 {configuredLevel === level && (
                   <Tooltip title={t("configuredExplicitly")} className={styles.Tooltip}>
-                    <img src={TargetIcon} alt="" className={styles.TargetIcon} />
+                    <img src={TargetIcon} alt="Target icon" className={styles.TargetIcon} />
                   </Tooltip>
                 )}
               </div>
