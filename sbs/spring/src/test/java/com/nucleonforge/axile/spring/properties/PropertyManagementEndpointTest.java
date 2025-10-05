@@ -3,7 +3,6 @@ package com.nucleonforge.axile.spring.properties;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.nucleonforge.axile.spring.context.RestartListener;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 import com.nucleonforge.axile.spring.context.DefaultContextRestarter;
+import com.nucleonforge.axile.spring.context.RestartListener;
 import com.nucleonforge.axile.spring.utils.ContextKeepAliveTestListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
