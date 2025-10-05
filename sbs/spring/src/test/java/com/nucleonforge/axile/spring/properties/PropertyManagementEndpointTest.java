@@ -3,11 +3,13 @@ package com.nucleonforge.axile.spring.properties;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.nucleonforge.axile.spring.context.RestartListener;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
+import com.nucleonforge.axile.spring.context.DefaultContextRestarter;
 import com.nucleonforge.axile.spring.utils.ContextKeepAliveTestListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,9 +51,21 @@ import static org.assertj.core.api.Assertions.assertThat;
             ContextKeepAliveTestListener.class
         })
 @TestPropertySource(
-        properties = {"myEmpty.property= ", "notEmpty.property=not-empty", "management.endpoint.env.show-values=always"
+        // spotless:off
+        properties = {
+            "myEmpty.property= ",
+            "notEmpty.property=not-empty",
+            "management.endpoint.env.show-values=always"
         })
+        // spotless:on
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Import({
+    PropertyManagementEndpoint.class,
+    ContextReloadingPropertyMutator.class,
+    DefaultPropertyDiscoverer.class,
+    DefaultContextRestarter.class,
+    RestartListener.class
+})
 class PropertyManagementEndpointTest {
 
     @Autowired

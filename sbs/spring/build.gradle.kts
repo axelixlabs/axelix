@@ -5,7 +5,6 @@ plugins {
 dependencies {
     // Self
     implementation(project(":common:domain"))
-    testImplementation(project(":sbs:auto-configuration"))
 
     // Compile
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")
