@@ -18,9 +18,9 @@ const initialState: ILoggersSliceState = {
 // todo fix any in future for rejectValue
 export const setLoggerLevelThunk = createAsyncThunk<void, ISetLoggerLevelRequestData, { rejectValue: any }>(
   "setLoggerLevelThunk",
-  async ({ id, loggerName, loggingLevel }, { dispatch, rejectWithValue }) => {
+  async ({ instanceId, loggerName, loggingLevel }, { dispatch, rejectWithValue }) => {
     try {
-      await setLoggerLevel(id, loggerName, loggingLevel)
+      await setLoggerLevel(instanceId, loggerName, loggingLevel)
       dispatch(getLoggersThunk("56019718-3b84-4ecd-9b84-287754dbd7d4"));
     } catch (error: any) {
       return rejectWithValue({

@@ -17,7 +17,7 @@ export interface ILogger {
 
 export interface ILoggerData {
   /**
-     * Levels for all loggers
+     * All possible logging levels that are supported by the logging system inside the instance
      */
   levels: string[];
   /**
@@ -40,9 +40,9 @@ export interface ILoggersSliceState extends ICommonSliceState, ILoggerData {
 
 export interface ISetLoggerLevelRequestData {
   /**
-   * Service id
+   * Instance id
    */
-  id: string;
+  instanceId: string;
   /**
    * Logger name
    */

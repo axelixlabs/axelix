@@ -13,7 +13,7 @@ import styles from "./styles.module.css";
 
 interface IProps {
   /**
-   * Levels for all loggers
+   * All possible logging levels that are supported by the logging system inside the instance
   */
   levels: string[];
   /**
@@ -33,7 +33,7 @@ export const Logger = ({ levels, logger }: IProps) => {
     }
 
     dispatch(setLoggerLevelThunk({
-      id: "56019718-3b84-4ecd-9b84-287754dbd7d4",
+      instanceId: "56019718-3b84-4ecd-9b84-287754dbd7d4",
       loggerName: logger.name,
       loggingLevel: level
     }));
