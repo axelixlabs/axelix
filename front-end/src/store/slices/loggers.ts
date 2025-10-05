@@ -33,9 +33,9 @@ export const setLoggerLevelThunk = createAsyncThunk<void, ISetLoggerLevelRequest
 // todo fix any in future for rejectValue
 export const getLoggersThunk = createAsyncThunk<ILoggerData, string, { rejectValue: any }>(
   "getLoggersThunk",
-  async (id, { rejectWithValue }) => {
+  async (instanceId, { rejectWithValue }) => {
     try {
-      const response = await getLoggersData(id);
+      const response = await getLoggersData(instanceId);
 
       return response.data;
     } catch (error: any) {
