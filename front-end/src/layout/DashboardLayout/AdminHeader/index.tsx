@@ -29,7 +29,7 @@ export const AdminHeader = () => {
           <Link to="#" className={styles.Link}>
             {t("dashboard")}
           </Link>
-          <Link to="#" className={styles.Link}>
+          <Link to="/wallboard" className={styles.Link}>
             {t("wallboard")}
           </Link>
         </nav>

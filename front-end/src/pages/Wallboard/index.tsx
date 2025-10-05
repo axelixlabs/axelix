@@ -1,0 +1,48 @@
+import { Input } from 'antd';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { filterServiceCards, getWallboardDataThunk } from 'store/slices';
+import { useAppDispatch, useAppSelector } from 'hooks';
+import { EmptyHandler, Loader } from 'components';
+import { WallboardCard } from './WallboardCard';
+
+import styles from './styles.module.css'
+
+export const Wallboard = () => {
+    const { t } = useTranslation()
+    const dispatch = useAppDispatch()
+    const { serviceCards, filteredServiceCards, serviceCardsSearchText, loading, error } = useAppSelector(state => state.wallboard)
+
+    useEffect(() => {
+        dispatch(getWallboardDataThunk())
+    }, [dispatch])
+
+    if (loading) {
+        return <Loader />
+    }
+
+    // todo fix this in future
+    if (error) {
+        return error
+    }
+
+    const serviceCardsData = filteredServiceCards.length ? filteredServiceCards : serviceCards;
+    const noDataAfterSearch = !!serviceCardsSearchText && !filteredServiceCards.length;
+
+    return (
+        <>
+            <Input
+                placeholder={t("search")}
+                onChange={(e) => dispatch(filterServiceCards(e.target.value))}
+                className={styles.Search}
+            />
+
+            <EmptyHandler isEmpty={noDataAfterSearch}>
+                <div className={`${styles.CardsResponsiveWrapper} ${serviceCardsData.length <= 4 ? styles.CardsCommonWrapper : ""}`}>
+                    {serviceCardsData.map(data => <WallboardCard data={data} key={data.serviceName} />)}
+                </div>
+            </EmptyHandler>
+        </>
+    )
+};
