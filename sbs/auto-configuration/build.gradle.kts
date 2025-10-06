@@ -6,10 +6,10 @@ val jsonwebtokenVersion = "0.12.6"
 
 dependencies {
     // Self
-    implementation(project(":common_auth"))
-    implementation(project(":sbs:auth"))
-    implementation(project(":sbs:postgres"))
-    implementation(project(":sbs:spring"))
+    api(project(":common_auth"))
+    api(project(":sbs:auth"))
+    api(project(":sbs:postgres"))
+    api(project(":sbs:spring"))
 
     // Compile
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")

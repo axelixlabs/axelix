@@ -9,7 +9,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Mikhail Polivakha
  */
-public record InstancesGridResponse(Collection<InstanceShortProfile> profiles) {
+public record InstancesGridResponse(Collection<InstanceShortProfile> instances) {
 
     /**
      * The short profile of the particular Instance, managed by this master deployment.
