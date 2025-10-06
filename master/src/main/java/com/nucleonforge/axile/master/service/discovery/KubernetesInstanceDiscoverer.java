@@ -61,7 +61,7 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
                                 .formatted(serviceInstance.getInstanceId()));
             }
 
-            String podName = k8sInstance.getMetadata().get(POD_NAME);
+            String podName = k8sInstance.getMetadata().get("app.kubernetes.io/name");
             Instant deployedAt = extractPodDeployTimestamp(k8sInstance);
 
             return new Instance(
