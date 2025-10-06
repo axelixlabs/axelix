@@ -138,4 +138,17 @@ public final class ApiPaths {
          */
         public static final String INSTANCE_ID = "/{instanceId}";
     }
+
+    public static final class PropertyManagementApi {
+
+        /**
+         * Base path for property management APIs.
+         */
+        public static final String MAIN = "/property-management";
+
+        /**
+         * Endpoint to update property of a given application instance.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+    }
 }
