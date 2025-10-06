@@ -12,7 +12,7 @@ export const Environment = () => {
   const { loading, error } = useAppSelector((store) => store.environment);
 
   useEffect(() => {
-      // todo В будущем вместо hard code-а вставить динамический id.
+    // todo В будущем вместо hard code-а вставить динамический id.
     dispatch(getEnvironmentThunk("56019718-3b84-4ecd-9b84-287754dbd7d4"));
     // The dispatch passed as a dependency to useEffect does not affect its execution, since the dispatch function is never recreated.
     // There are two common approaches: either include dispatch in the dependencies or omit it. 
@@ -35,3 +35,5 @@ export const Environment = () => {
     </>
   );
 };
+
+export default Environment;

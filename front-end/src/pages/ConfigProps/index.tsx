@@ -63,3 +63,5 @@ export const ConfigProps = () => {
     </>
   );
 };
+
+export default ConfigProps;

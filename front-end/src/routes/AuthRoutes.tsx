@@ -1,7 +1,10 @@
+import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { MinimalLayout } from "layout";
-import { Login } from "pages";
+import Loadable from "components";
+
+const Login = Loadable(lazy(() => import('pages/Login')))
 
 export const AuthRoutes = () => {
   return (
