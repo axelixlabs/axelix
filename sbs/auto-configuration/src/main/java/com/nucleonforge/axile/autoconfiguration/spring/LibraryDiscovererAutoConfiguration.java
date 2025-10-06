@@ -64,8 +64,8 @@ public class LibraryDiscovererAutoConfiguration {
 
     static class ConditionOnCycloneDx extends AnyNestedCondition {
 
-        public ConditionOnCycloneDx(ConfigurationPhase configurationPhase) {
-            super(configurationPhase);
+        public ConditionOnCycloneDx() {
+            super(ConfigurationPhase.REGISTER_BEAN);
         }
 
         @ConditionalOnResource(resources = "classpath:META-INF/sbom/application.cdx.json")

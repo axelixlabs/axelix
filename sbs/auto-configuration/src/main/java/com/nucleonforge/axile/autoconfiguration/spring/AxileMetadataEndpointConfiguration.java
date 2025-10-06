@@ -2,12 +2,15 @@ package com.nucleonforge.axile.autoconfiguration.spring;
 
 import java.util.List;
 
+import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axile.spring.master.AxileMetadataEndpoint;
+import com.nucleonforge.axile.spring.master.CommitIdPluginGitInformationProvider;
+import com.nucleonforge.axile.spring.master.CommitIdPluginShortBuildInfoProvider;
 import com.nucleonforge.axile.spring.master.DefaultServiceMetadataAssembler;
 import com.nucleonforge.axile.spring.master.GitInformationProvider;
 import com.nucleonforge.axile.spring.master.LibraryDiscoverer;
@@ -21,7 +24,13 @@ import com.nucleonforge.axile.spring.master.ShortBuildInfoProvider;
  * @since 18.09.2025
  * @author Nikita Kirillov
  */
-@AutoConfiguration
+@AutoConfiguration(
+        after = {
+            HealthEndpointAutoConfiguration.class,
+            CommitIdPluginGitInformationProvider.class,
+            CommitIdPluginShortBuildInfoProvider.class,
+            LibraryDiscovererAutoConfiguration.class
+        })
 public class AxileMetadataEndpointConfiguration {
 
     @Bean
