@@ -1,2 +1,2 @@
-export { DashboardLayout } from "./DashboardLayout";
 export { MinimalLayout } from "./MinimalLayout";
+export { MainLayout } from "./MainLayout";

@@ -10,7 +10,14 @@ const { Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>["items"][number];
 
-export const DashboardLayout = () => {
+interface IProps {
+  /**
+   * If hideSider is true, the sider will not be displayed.
+  */
+  hideSider?: boolean;
+}
+
+export const MainLayout = ({ hideSider }: IProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -56,14 +63,14 @@ export const DashboardLayout = () => {
       <AdminHeader />
 
       <Layout>
-        <Sider width={270} className={styles.Sider}>
+        {hideSider || <Sider width={270} className={styles.Sider}>
           <Menu
             mode="inline"
             items={items}
             onClick={({ key }) => navigate(key)}
             className={styles.Menu}
           />
-        </Sider>
+        </Sider>}
 
         <Layout className={styles.ContentLayout}>
           <Content className={styles.Content}>

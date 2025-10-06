@@ -1,0 +1,62 @@
+.Card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+}
+
+.CardHeader{
+    display: grid;
+    place-items: center;
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    font-weight: 500;
+    border-radius: 8px;
+    word-break: break-all;
+}
+
+.CardUP {
+    border: 1px solid var(--axile-primary-green);
+}
+
+.CardHeaderUP {
+    background-color: var(--axile-primary-light-green);
+    outline: 1px solid var(--axile-primary-green);
+}
+
+.CardDOWN {
+    border: 1px solid var(--axile-primary-red)
+}
+
+.CardHeaderDOWN {
+    background-color: var(--axile-primary-light-red);
+    outline: 1px solid var(--axile-primary-red)
+}
+
+.CardUNKNOWN {
+    border: 1px solid var(--axile-bold-grey)
+}
+
+.CardHeaderUNKNOWN {
+    background-color: var(--axile-gray);
+    outline: 1px solid var(--axile-bold-grey)
+}
+
+.CardBody{
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+    padding: 8px;
+}
+
+.CardBodyChunk{
+    display: flex;
+    column-gap: 8px;
+}
+
+.HashAndTimeWrapper {
+    display: flex;
+    justify-content: space-between;
+}

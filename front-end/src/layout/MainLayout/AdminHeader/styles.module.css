@@ -30,7 +30,7 @@
 
 .Link:hover {
   color: var(--axile-primary-green);
-  background-color: var(--color-primary-light);
+  background-color: var(--axile-primary-light-green);
 }
 
 .Avatar {
