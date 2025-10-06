@@ -49,3 +49,5 @@ export const Wallboard = () => {
         </>
     )
 };
+
+export default Wallboard;

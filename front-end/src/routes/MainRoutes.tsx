@@ -1,7 +1,14 @@
+import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
-import { ConfigProps, Environment, Beans, Loggers, Wallboard } from "pages";
 import { MainLayout } from "layout";
+import Loadable from "components";
+
+const Environment = Loadable(lazy(() => import('pages/Environment')))
+const ConfigProps = Loadable(lazy(() => import('pages/ConfigProps')))
+const Wallboard = Loadable(lazy(() => import('pages/Wallboard')))
+const Loggers = Loadable(lazy(() => import('pages/Loggers')))
+const Beans = Loadable(lazy(() => import('pages/Beans')))
 
 export const MainRoutes = () => {
   return (

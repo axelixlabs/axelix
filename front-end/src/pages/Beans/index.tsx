@@ -49,3 +49,5 @@ export const Beans = () => {
     </>
   );
 };
+
+export default Beans;
