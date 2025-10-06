@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiFetch = axios.create({
-  baseURL: import.meta.env.VITE_APP_API_URL,
+  baseURL: `${import.meta.env.VITE_APP_API_URL}/api/axile`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
