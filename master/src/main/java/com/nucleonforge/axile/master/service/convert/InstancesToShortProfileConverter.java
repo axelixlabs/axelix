@@ -24,6 +24,7 @@ public class InstancesToShortProfileConverter implements Converter<Instance, Ins
     @Override
     public @NonNull InstanceShortProfile convertInternal(@NonNull Instance instance) {
         return new InstanceShortProfile(
+                instance.id().instanceId(),
                 instance.name(),
                 instance.serviceVersion(),
                 instance.commitShaShort(),

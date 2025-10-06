@@ -19,6 +19,7 @@ public record InstancesGridResponse(Collection<InstanceShortProfile> instances) 
      * @author Mikhail Polivakha
      */
     public record InstanceShortProfile(
+            String instanceId,
             String name,
             String serviceVersion,
             String commitShaShort,
