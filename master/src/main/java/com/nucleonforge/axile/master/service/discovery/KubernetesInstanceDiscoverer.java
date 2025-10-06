@@ -4,6 +4,7 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,13 +56,28 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
 
         if (serviceInstance instanceof KubernetesServiceInstance k8sInstance) {
 
+            Map<String, Map<String, String>> podMetadata = k8sInstance.podMetadata();
+
+            if (podMetadata != null && !podMetadata.isEmpty()) {
+                for (Map.Entry<String, Map<String, String>> podEntry : podMetadata.entrySet()) {
+                    log.info("Pod Entry Key: '{}'", podEntry.getKey());
+                    Map<String, String> innerMetadata = podEntry.getValue();
+                    log.info("Inner metadata map size: {}", innerMetadata.size());
+                    for (Map.Entry<String, String> metadataEntry : innerMetadata.entrySet()) {
+                        log.info("  {} = '{}'", metadataEntry.getKey(), metadataEntry.getValue());
+                    }
+                }
+            } else {
+                log.info("Pod Metadata is NULL or EMPTY");
+            }
+
             if (k8sInstance.getMetadata() == null) {
                 throw new IllegalArgumentException(
                         "Unable to register K8S pod '%s' as a managed instance - no metadata present on the pod"
                                 .formatted(serviceInstance.getInstanceId()));
             }
 
-            String podName = k8sInstance.getMetadata().get(POD_NAME);
+            String podName = extractPodName(podMetadata);
             Instant deployedAt = extractPodDeployTimestamp(k8sInstance);
 
             return new Instance(
@@ -95,7 +111,11 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
 
     @SuppressWarnings("NullAway")
     private static Instant extractPodDeployTimestamp(KubernetesServiceInstance k8sInstance) {
-        String deployedAtAsString = k8sInstance.getMetadata().get(POD_CREATION_TIMESTAMP);
+        Map.Entry<String, Map<String, String>> podEntry =
+                k8sInstance.podMetadata().entrySet().iterator().next();
+        Map<String, String> metadata = podEntry.getValue();
+
+        String deployedAtAsString = metadata.get(POD_CREATION_TIMESTAMP);
 
         try {
             if (deployedAtAsString == null) {
@@ -127,5 +147,14 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
                         ServiceInstance.class.getSimpleName(),
                         KubernetesServiceInstance.class.getName(),
                         serviceInstance.getClass().getName());
+    }
+
+    @SuppressWarnings("NullAway")
+    private String extractPodName(Map<String, Map<String, String>> podMetadata) {
+        Map.Entry<String, Map<String, String>> podEntry =
+                podMetadata.entrySet().iterator().next();
+        Map<String, String> metadata = podEntry.getValue();
+
+        return metadata.get(POD_NAME);
     }
 }
