@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axile.common.api.ManagedServiceMetadata;
+import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 
@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Nikita Kirillov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
-class ManagedServiceMetadataEndpointProberTest {
+class ServiceMetadataEndpointProberTest {
 
     private static final String activeInstanceUrl = UUID.randomUUID().toString();
 
@@ -54,9 +54,15 @@ class ManagedServiceMetadataEndpointProberTest {
     @BeforeEach
     void setUp() {
         // language=json
-        String jsonResponse = """
+        String jsonResponse =
+                """
             {
-              "version": "1.0.0-SNAPSHOT"
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "a8b0929",
+              "javaVersion" : "17.0.14u",
+              "springBootVersion" : "3.5.0",
+              "healthStatus" : "UP"
             }
             """;
 
@@ -80,11 +86,15 @@ class ManagedServiceMetadataEndpointProberTest {
     @Test
     void shouldReturnMetadata() throws EndpointInvocationException {
         String instanceUrl = mockWebServer.url(activeInstanceUrl).toString();
-        ManagedServiceMetadata metadata =
-                metadataEndpointProber.invoke(instanceUrl + "/actuator", NoHttpPayload.INSTANCE);
+        ServiceMetadata metadata = metadataEndpointProber.invoke(instanceUrl + "/actuator", NoHttpPayload.INSTANCE);
 
         assertThat(metadata).isNotNull();
         assertThat(metadata.version()).isEqualTo("1.0.0-SNAPSHOT");
+        assertThat(metadata.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
+        assertThat(metadata.commitShortSha()).isEqualTo("a8b0929");
+        assertThat(metadata.javaVersion()).isEqualTo("17.0.14u");
+        assertThat(metadata.springBootVersion()).isEqualTo("3.5.0");
+        assertThat(metadata.healthStatus()).isEqualTo(ServiceMetadata.HealthStatus.UP);
     }
 
     @Test

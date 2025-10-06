@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.ManagedServiceMetadata;
+import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,7 @@ class MetadataJacksonMessageDeserializationStrategyTest {
            }
            """;
 
-        ManagedServiceMetadata metadata = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
+        ServiceMetadata metadata = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         assertThat(metadata).isNotNull();
         assertThat(metadata.version()).isEqualTo("1.0.0-SNAPSHOT");

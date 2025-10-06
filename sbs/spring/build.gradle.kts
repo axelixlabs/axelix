@@ -5,6 +5,8 @@ plugins {
 dependencies {
     // Self
     implementation(project(":common:domain"))
+    implementation(project(":common:api"))
+    implementation("com.jayway.jsonpath:json-path") // version comes from spring-boot-dependencies
 
     // Compile
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")

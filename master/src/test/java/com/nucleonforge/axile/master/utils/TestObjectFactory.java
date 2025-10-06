@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.master.utils;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -9,8 +10,8 @@ import org.instancio.Select;
 import com.nucleonforge.axile.common.domain.BuildInfo;
 import com.nucleonforge.axile.common.domain.ClassPath;
 import com.nucleonforge.axile.common.domain.ClassPathEntry;
+import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.InstanceId;
-import com.nucleonforge.axile.common.domain.InstanceReference;
 
 /**
  * Utility factory for creating test objects used in unit and integration tests.
@@ -24,12 +25,22 @@ public final class TestObjectFactory {
 
     private TestObjectFactory() {}
 
-    public static InstanceReference createInstance(String id) {
+    public static Instance createInstance(String id) {
         return createInstanceWithUrl(id, DEFAULT_URL);
     }
 
-    public static InstanceReference createInstanceWithUrl(String id, String url) {
-        return new InstanceReference(InstanceId.of(id), url);
+    // TODO:
+    public static Instance createInstanceWithUrl(String id, String url) {
+        return new Instance(
+                InstanceId.of(id),
+                "test-object-factory-instance",
+                "1.2.3-classifer-test",
+                "17.0.14",
+                "3.5.0",
+                "df027cf",
+                Instant.now(),
+                Instance.InstanceStatus.UP,
+                url);
     }
 
     public static BuildInfo createBuildInfo(ClassPathEntry... classPathEntries) {

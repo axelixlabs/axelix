@@ -11,7 +11,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.domain.InstanceReference;
+import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 @Component
@@ -39,7 +39,7 @@ public class InstancesRegistrar {
     @EventListener(ApplicationReadyEvent.class)
     public void register() {
         if (discoveryConfig.auto()) {
-            Set<InstanceReference> discovered = instancesDiscoverer.discoverSafely();
+            Set<Instance> discovered = instancesDiscoverer.discoverSafely();
 
             if (discovered.isEmpty()) {
                 log.error(
@@ -50,8 +50,8 @@ public class InstancesRegistrar {
                         this.getClass().getSimpleName());
             } else {
                 log.info("Discovered {} services. Their ids are : {}", discovered.size(), getServiceIds(discovered));
-                for (InstanceReference instanceReference : discovered) {
-                    instanceRegistry.register(instanceReference);
+                for (Instance instance : discovered) {
+                    instanceRegistry.register(instance);
                 }
             }
         } /*else {  // TODO: intentionally commented out, waiting for issue #86 to be implemented
@@ -59,7 +59,7 @@ public class InstancesRegistrar {
           }*/
     }
 
-    private static Set<String> getServiceIds(Set<InstanceReference> discovered) {
+    private static Set<String> getServiceIds(Set<Instance> discovered) {
         return discovered.stream().map(instance -> instance.id().instanceId()).collect(Collectors.toSet());
     }
 }
