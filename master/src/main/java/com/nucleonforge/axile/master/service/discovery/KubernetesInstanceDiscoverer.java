@@ -14,6 +14,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.kubernetes.commons.discovery.KubernetesServiceInstance;
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.master.service.transport.ManagedServiceMetadataEndpointProber;
@@ -71,15 +72,25 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
                     profile.metadata().springBootVersion(),
                     profile.metadata().commitShortSha(),
                     deployedAt,
-                    switch (profile.metadata().healthStatus()) {
-                        case UP -> Instance.InstanceStatus.UP;
-                        case DOWN -> Instance.InstanceStatus.DOWN;
-                        case UNKNOWN -> Instance.InstanceStatus.UNKNOWN;
-                    },
+                    mapStatus(profile),
                     serviceInstance.getUri().toString() + "/actuator");
         } else {
             throw new IllegalArgumentException(buildErrorMessage(serviceInstance));
         }
+    }
+
+    private static Instance.InstanceStatus mapStatus(InstanceIntermediateProfile profile) {
+        ServiceMetadata.HealthStatus healthStatus = profile.metadata().healthStatus();
+
+        if (healthStatus == null) {
+            return Instance.InstanceStatus.UNKNOWN;
+        }
+
+        return switch (healthStatus) {
+            case UP -> Instance.InstanceStatus.UP;
+            case DOWN -> Instance.InstanceStatus.DOWN;
+            case UNKNOWN -> Instance.InstanceStatus.UNKNOWN;
+        };
     }
 
     @SuppressWarnings("NullAway")
@@ -88,8 +99,11 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
 
         try {
             if (deployedAtAsString == null) {
-                throw new DateTimeException("The K8S pod's %s %s filed in metadata is null"
-                        .formatted(k8sInstance.getInstanceId(), POD_CREATION_TIMESTAMP));
+                log.warn(
+                        "The K8S pod's {} {} filed in metadata is null",
+                        k8sInstance.getInstanceId(),
+                        POD_CREATION_TIMESTAMP);
+                return null;
             }
             TemporalAccessor temporal =
                     DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.Z").parse(deployedAtAsString);
