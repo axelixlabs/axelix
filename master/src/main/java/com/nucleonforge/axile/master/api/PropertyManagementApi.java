@@ -29,7 +29,7 @@ import com.nucleonforge.axile.master.service.transport.PropertyManagementEndpoin
  * @author Nikita Kirillov
  */
 @Tag(
-        name = "Profile Management API",
+        name = "Property Management API",
         description = "Provides operations for managing Spring properties of application instances.")
 @RestController
 @RequestMapping(path = ApiPaths.PropertyManagementApi.MAIN)
@@ -66,7 +66,7 @@ public class PropertyManagementApi {
             })
     @Parameters({@Parameter(name = "instanceId", description = "Application Instance ID", required = true)})
     @PostMapping(path = ApiPaths.PropertyManagementApi.INSTANCE_ID)
-    public ResponseEntity<Void> replaceProfile(
+    public ResponseEntity<Void> changePropertyValue(
             @PathVariable("instanceId") String instanceId, @RequestBody PropertyUpdatedRequest request) {
 
         HttpPayload payload = HttpPayload.json(messageSerializationStrategy.serialize(request));
