@@ -1,12 +1,12 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { ConfigProps, Environment, Beans, Loggers, Wallboard } from "pages";
-import { DashboardLayout } from "layout";
+import { MainLayout } from "layout";
 
 export const MainRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<DashboardLayout />}>
+      <Route path="/" element={<MainLayout />}>
         <Route index element={<>1</>} />
         <Route path="environment" element={<Environment />} />
         <Route path="beans" element={<Beans />} />
@@ -14,7 +14,7 @@ export const MainRoutes = () => {
         <Route path="loggers" element={<Loggers />} />
       </Route>
 
-      <Route path="/wallboard" element={<DashboardLayout hideSider/>}>
+      <Route path="/wallboard" element={<MainLayout hideSider/>}>
         <Route index element={<Wallboard />} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />

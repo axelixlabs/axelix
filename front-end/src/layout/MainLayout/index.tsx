@@ -17,7 +17,7 @@ interface IProps {
   hideSider?: boolean;
 }
 
-export const DashboardLayout = ({ hideSider }: IProps) => {
+export const MainLayout = ({ hideSider }: IProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
