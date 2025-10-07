@@ -5,8 +5,7 @@ import { filterProperties } from "store/slices";
 export const EnvironmentTables = () => {
   const dispatch = useAppDispatch();
 
-  const { propertySources, filteredPropertySources, environmentSearchText } =
-    useAppSelector((store) => store.environment);
+  const { propertySources, filteredPropertySources, environmentSearchText } = useAppSelector((store) => store.environment);
 
   const propertySourcesList = filteredPropertySources.length
     ? filteredPropertySources
@@ -23,6 +22,7 @@ export const EnvironmentTables = () => {
           <TableSection
             name={name}
             properties={properties}
+            editableProperty
             key={name}
           />
         ))}
