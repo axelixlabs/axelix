@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.master.service.convert;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,6 +36,11 @@ class BeansFeedConverterTest {
             assertThat(bean1).extracting(BeanShortProfile::beanName).isEqualTo("bean1");
             assertThat(bean1).extracting(BeanShortProfile::className).isEqualTo("java.lang.String");
             assertThat(bean1).extracting(BeanShortProfile::scope).isEqualTo("singleton");
+            assertThat(bean1).extracting(BeanShortProfile::isPrimary).isEqualTo(false);
+            assertThat(bean1).extracting(BeanShortProfile::isLazyInit).isEqualTo(false);
+            assertThat(bean1)
+                    .extracting(BeanShortProfile::qualifiers, InstanceOfAssertFactories.COLLECTION)
+                    .isEmpty();
             assertThat(bean1)
                     .extracting(BeanShortProfile::aliases, InstanceOfAssertFactories.COLLECTION)
                     .hasSize(0);
@@ -46,6 +52,12 @@ class BeansFeedConverterTest {
             assertThat(bean2).extracting(BeanShortProfile::beanName).isEqualTo("bean2");
             assertThat(bean2).extracting(BeanShortProfile::className).isEqualTo("java.lang.Integer");
             assertThat(bean2).extracting(BeanShortProfile::scope).isEqualTo("session");
+            assertThat(bean2).extracting(BeanShortProfile::isPrimary).isEqualTo(true);
+            assertThat(bean2).extracting(BeanShortProfile::isLazyInit).isEqualTo(false);
+            assertThat(bean2)
+                    .extracting(BeanShortProfile::qualifiers, InstanceOfAssertFactories.COLLECTION)
+                    .containsOnly("first");
+
             assertThat(bean2)
                     .extracting(BeanShortProfile::aliases, InstanceOfAssertFactories.COLLECTION)
                     .hasSize(0);
@@ -63,6 +75,11 @@ class BeansFeedConverterTest {
             assertThat(bean3)
                     .extracting(BeanShortProfile::dependencies, InstanceOfAssertFactories.COLLECTION)
                     .hasSize(0);
+            assertThat(bean3).extracting(BeanShortProfile::isPrimary).isEqualTo(true);
+            assertThat(bean3).extracting(BeanShortProfile::isLazyInit).isEqualTo(true);
+            assertThat(bean3)
+                    .extracting(BeanShortProfile::qualifiers, InstanceOfAssertFactories.COLLECTION)
+                    .containsOnly("one", "two");
         });
     }
 
@@ -76,10 +93,24 @@ class BeansFeedConverterTest {
     private static Map<String, BeansFeed.Bean> beansMap() {
         return Map.of(
                 "bean1",
-                new BeansFeed.Bean("singleton", "java.lang.String", Set.of(), Set.of()),
+                new BeansFeed.Bean("singleton", "java.lang.String", Set.of(), Set.of(), false, false, List.of()),
                 "bean2",
-                new BeansFeed.Bean("session", "java.lang.Integer", Set.of(), Set.of("dep1", "dep2")),
+                new BeansFeed.Bean(
+                        "session",
+                        "java.lang.Integer",
+                        Set.of(),
+                        Set.of("dep1", "dep2"),
+                        true,
+                        false,
+                        List.of("first")),
                 "bean3",
-                new BeansFeed.Bean("prototype", "java.util.Date", Set.of("abc", "bcd"), Set.of()));
+                new BeansFeed.Bean(
+                        "prototype",
+                        "java.util.Date",
+                        Set.of("abc", "bcd"),
+                        Set.of(),
+                        true,
+                        true,
+                        List.of("one", "two")));
     }
 }
