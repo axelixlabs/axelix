@@ -1,5 +1,5 @@
 import { Layout } from "antd";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { AdminHeader } from "./AdminHeader";
 import { SiderMenu } from "./SiderMenu";
@@ -8,10 +8,14 @@ import styles from "./styles.module.css";
 
 const { Content, Sider } = Layout;
 
-export const MainLayout = () => {
-  const location = useLocation();
-  const hideSider = location.pathname === "/wallboard";
+interface IProps {
+  /**
+   * When hideSider is true, sider will be hidden.
+   */
+  hideSider?: boolean;
+}
 
+export const MainLayout = ({ hideSider }: IProps) => {
   return (
     <Layout className={styles.MainWrapper}>
       <AdminHeader />
