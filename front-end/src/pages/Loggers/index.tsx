@@ -1,5 +1,6 @@
-import { Input, message } from "antd";
 import { useEffect } from "react";
+import { Input, message } from "antd";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { filterLoggers, getLoggersThunk } from "store/slices";
@@ -11,6 +12,7 @@ import styles from "./styles.module.css";
 
 export const Loggers = () => {
   const { t } = useTranslation();
+  const { instanceId } = useParams();
 
   const dispatch = useAppDispatch();
   const {
@@ -23,8 +25,9 @@ export const Loggers = () => {
   } = useAppSelector((store) => store.loggers);
 
   useEffect(() => {
-    // todo В будущем вместо hard code-а вставить динамический id.
-    dispatch(getLoggersThunk("56019718-3b84-4ecd-9b84-287754dbd7d4"));
+    if (instanceId) {
+      dispatch(getLoggersThunk(instanceId));
+    }
     // The dispatch passed as a dependency to useEffect does not affect its execution, since the dispatch function is never recreated.
     // There are two common approaches: either include dispatch in the dependencies or omit it. 
     // Both approaches are considered correct.

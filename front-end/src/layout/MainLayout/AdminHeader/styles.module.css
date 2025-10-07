@@ -16,23 +16,6 @@
   align-items: center;
 }
 
-.Link {
-  transition: all 0.3s;
-  align-self: center;
-  padding: 8px 12px;
-  border-radius: 4px;
-  margin-right: 8px;
-}
-
-.Link:last-child {
-  margin-right: 0;
-}
-
-.Link:hover {
-  color: var(--axile-primary-green);
-  background-color: var(--axile-primary-light-green);
-}
-
 .Avatar {
   margin-inline: 30px 20px;
   background-color: var(--axile-primary-green);

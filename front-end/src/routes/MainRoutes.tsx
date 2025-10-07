@@ -14,17 +14,16 @@ export const MainRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>
-        <Route index element={<>1</>} />
-        <Route path="environment" element={<Environment />} />
-        <Route path="beans" element={<Beans />} />
-        <Route path="config-props" element={<ConfigProps />} />
-        <Route path="loggers" element={<Loggers />} />
-      </Route>
+        <Route index element={<Navigate to="wallboard" replace/>} />
 
-      <Route path="/wallboard" element={<MainLayout hideSider/>}>
-        <Route index element={<Wallboard />} />
+        <Route path="instance/:instanceId/environment" element={<Environment />} />
+        <Route path="instance/:instanceId/beans" element={<Beans />} />
+        <Route path="instance/:instanceId/config-props" element={<ConfigProps />} />
+        <Route path="instance/:instanceId/loggers" element={<Loggers />} />
+
+        <Route path="wallboard" element={<Wallboard />} />
+        <Route path="*" element={<Navigate to="/wallboard" replace/>} />
       </Route>
-      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };
