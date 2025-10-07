@@ -73,7 +73,7 @@ public class UserApi {
     @Parameter(name = "loginRequest", description = "Request for login", required = true)
     @PostMapping(path = ApiPaths.UsersApi.LOGIN)
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        // TODO: handle login logic later
+        // TODO: handle login logiclater
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer TOKEN")
                 .build();
