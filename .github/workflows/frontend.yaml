@@ -8,6 +8,9 @@ on:
       - 'front-end/**'
   pull_request:
     branches: [ master ]
+    paths:
+      - 'front-end/**'
+      - '.github/workflows/frontend.yaml'
 
 jobs:
   build-source:
