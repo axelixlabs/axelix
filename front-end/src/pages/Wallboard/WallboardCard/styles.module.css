@@ -6,7 +6,16 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
 }
 
-.CardHeader{
+.Card:hover {
+    cursor: pointer;
+    color: inherit;
+}
+
+.Card:hover > .CardHeader {
+    color: var(--axile-primary-green);
+}
+
+.CardHeader {
     display: grid;
     place-items: center;
     flex: 1;
@@ -15,6 +24,7 @@
     font-weight: 500;
     border-radius: 8px;
     word-break: break-all;
+    transition: color 0.3s ease;
 }
 
 .CardUP {
@@ -44,14 +54,14 @@
     outline: 1px solid var(--axile-bold-grey)
 }
 
-.CardBody{
+.CardBody {
     display: flex;
     flex-direction: column;
     row-gap: 8px;
     padding: 8px;
 }
 
-.CardBodyChunk{
+.CardBodyChunk {
     display: flex;
     column-gap: 8px;
 }

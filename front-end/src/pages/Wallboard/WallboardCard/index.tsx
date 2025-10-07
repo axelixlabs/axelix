@@ -1,4 +1,6 @@
-import type { IInstanceCard  } from 'models';
+import { Link } from 'react-router-dom';
+
+import type { IInstanceCard } from 'models';
 
 import styles from './styles.module.css'
 
@@ -10,9 +12,12 @@ interface IProps {
 }
 
 export const WallboardCard = ({ data }: IProps) => {
-  
+
   return (
-    <div className={`${styles.Card} ${styles[`Card${data.status}`]}`}>
+    <Link
+      to={`/beans/${data.instanceId}`}
+      className={`${styles.Card} ${styles[`Card${data.status}`]}`}
+    >
       <div className={`${styles.CardHeader} ${styles[`CardHeader${data.status}`]}`}>
         {data.name}
       </div>
@@ -25,6 +30,6 @@ export const WallboardCard = ({ data }: IProps) => {
           <span>{data.deployedFor}</span>
         </div>
       </div>
-    </div>
+    </Link>
   )
 };
