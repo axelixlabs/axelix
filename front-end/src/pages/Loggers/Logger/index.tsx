@@ -1,4 +1,5 @@
 import { Tooltip } from "antd";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { setLoggerLevelThunk } from "store/slices";
@@ -26,17 +27,20 @@ export const Logger = ({ levels, logger }: IProps) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { effectiveLevel, configuredLevel } = logger
+  const { instanceId } = useParams();
 
   const handleChange = (level: string): void => {
     if (configuredLevel === level) {
       return
     }
 
-    dispatch(setLoggerLevelThunk({
-      instanceId: "56019718-3b84-4ecd-9b84-287754dbd7d4",
-      loggerName: logger.name,
-      loggingLevel: level
-    }));
+    if (instanceId) {
+      dispatch(setLoggerLevelThunk({
+        instanceId,
+        loggerName: logger.name,
+        loggingLevel: level
+      }));
+    }
   };
 
   return (

@@ -1,23 +1,23 @@
 import type { MenuItem } from "models";
 import type { TFunction } from "i18next";
 
-export const getItems = (id: string | undefined, t: TFunction): MenuItem[] => {
+export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
     return ([
         {
             key: "insights",
             label: t("insights"),
             children: [
-                { key: `/details/${id}`, label: t("details") },
-                { key: `/metrics/${id}`, label: t("metrics") },
-                { key: `/environment/${id}`, label: t("environment") },
-                { key: `/beans/${id}`, label: "Beans" },
-                { key: `/config-props/${id}`, label: t("configurationProperties") },
-                { key: `/scheduled-tasks/${id}`, label: t("scheduledTasks") },
+                { key: `/instance/${instanceId}/details`, label: t("details") },
+                { key: `/instance/${instanceId}/metrics`, label: t("metrics") },
+                { key: `/instance/${instanceId}/environment`, label: t("environment") },
+                { key: `/instance/${instanceId}/beans`, label: "Beans" },
+                { key: `/instance/${instanceId}/config-props`, label: t("configurationProperties") },
+                { key: `/instance/${instanceId}/scheduled-tasks`, label: t("scheduledTasks") },
             ],
         },
-        { key: `/loggers/${id}`, label: t("loggers") },
-        { key: `/jvm/${id}`, label: "JVM" },
-        { key: `/mappings/${id}`, label: t("mappings") },
-        { key: `/caches/${id}`, label: t("caches") },
+        { key: `/instance/${instanceId}/loggers`, label: t("loggers") },
+        { key: `/instance/${instanceId}/jvm`, label: "JVM" },
+        { key: `/instance/${instanceId}/mappings`, label: t("mappings") },
+        { key: `/instance/${instanceId}/caches`, label: t("caches") },
     ])
 }

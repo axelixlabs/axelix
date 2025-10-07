@@ -12,15 +12,15 @@ export const SiderMenu = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const { id } = useParams();
+    const { instanceId } = useParams();
 
     return (
         <Menu
             mode="inline"
-            items={getItems(id, t)}
+            items={getItems(instanceId!, t)}
             onClick={({ key }) => navigate(key)}
             selectedKeys={[location.pathname]}
-            defaultOpenKeys={findOpenKeys(getItems(id, t), location.pathname)}
+            defaultOpenKeys={findOpenKeys(getItems(instanceId!, t), location.pathname)}
             className={styles.Menu}
         />
     );

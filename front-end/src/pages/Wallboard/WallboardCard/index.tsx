@@ -15,7 +15,7 @@ export const WallboardCard = ({ data }: IProps) => {
 
   return (
     <Link
-      to={`/beans/${data.instanceId}`}
+      to={`/instance/${data.instanceId}/beans`}
       className={`${styles.Card} ${styles[`Card${data.status}`]}`}
     >
       <div className={`${styles.CardHeader} ${styles[`CardHeader${data.status}`]}`}>

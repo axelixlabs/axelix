@@ -6,4 +6,4 @@ export * from "./interfaces/loggers";
 export * from "./interfaces/beans";
 export * from "./interfaces/auth";
 
-export * from './types/antdMenu'
+export * from './types/antd'
