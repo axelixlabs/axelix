@@ -12,7 +12,7 @@ import styles from './styles.module.css'
 export const Wallboard = () => {
     const { t } = useTranslation()
     const dispatch = useAppDispatch()
-    const { instances, filteredInstances, serviceCardsSearchText, loading, error } = useAppSelector(state => state.wallboard)
+    const { instances, filteredInstances, instancesSearchText, loading, error } = useAppSelector(state => state.wallboard)
 
     useEffect(() => {
         dispatch(getWallboardDataThunk())
@@ -31,7 +31,7 @@ export const Wallboard = () => {
     }
 
     const serviceCardsData = filteredInstances.length ? filteredInstances : instances;
-    const noDataAfterSearch = !!serviceCardsSearchText && !filteredInstances.length;
+    const noDataAfterSearch = !!instancesSearchText && !filteredInstances.length;
 
     return (
         <>
@@ -43,7 +43,7 @@ export const Wallboard = () => {
 
             <EmptyHandler isEmpty={noDataAfterSearch}>
                 <div className={styles.CardsResponsiveWrapper}>
-                    {serviceCardsData.map(data => <WallboardCard data={data} key={data.serviceName} />)}
+                    {serviceCardsData.map(data => <WallboardCard data={data} key={data.instanceId} />)}
                 </div>
             </EmptyHandler>
         </>
