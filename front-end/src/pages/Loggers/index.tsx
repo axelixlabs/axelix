@@ -26,10 +26,7 @@ export const Loggers = () => {
     if (instanceId) {
       dispatch(getLoggersThunk(instanceId));
     }
-    // The dispatch passed as a dependency to useEffect does not affect its execution, since the dispatch function is never recreated.
-    // There are two common approaches: either include dispatch in the dependencies or omit it. 
-    // Both approaches are considered correct.
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     if (updateLoggerSuccess) {
