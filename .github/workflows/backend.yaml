@@ -15,8 +15,8 @@ on:
   pull_request:
     branches: [ master ]
     paths-ignore:
-      - 'master/**'
-      - 'sbs/**'
+      - 'front-end/**'
+      - '.github/workflows/frontend.yaml'
 
 jobs:
   build-source:
