@@ -8,6 +8,11 @@ on:
       - 'front-end/**'
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - 'master/**'
+      - 'sbs/**'
+      - '.editorconfig'
+      - '.gitignore'
 
 jobs:
   build-source:
