@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.UnknownBean;
 import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
 
 /**
@@ -30,7 +31,15 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
 
         context.getBeans().forEach((beanName, bean) -> {
             BeanShortProfile profile = new BeanShortProfile(
-                    beanName, bean.getScope(), bean.getType(), bean.getAliases(), bean.getDependencies());
+                    beanName,
+                    bean.getScope(),
+                    bean.getType(),
+                    bean.getAliases(),
+                    bean.getDependencies(),
+                    bean.isPrimary(),
+                    bean.isLazyInit(),
+                    bean.getQualifiers(),
+                    new UnknownBean());
 
             beansFeedResponse.addBean(profile);
         });

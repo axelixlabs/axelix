@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.common.api;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,17 +55,26 @@ public class BeansFeed {
         private final String type;
         private final Set<String> aliases;
         private final Set<String> dependencies;
+        private final boolean isPrimary;
+        private final boolean isLazyInit;
+        private final List<String> qualifiers;
 
         @JsonCreator
         public Bean(
                 @JsonProperty("scope") String scope,
                 @JsonProperty("type") String type,
                 @JsonProperty("aliases") Set<String> aliases,
-                @JsonProperty("dependencies") Set<String> dependencies) {
+                @JsonProperty("dependencies") Set<String> dependencies,
+                @JsonProperty("isPrimary") boolean isPrimary,
+                @JsonProperty("isLazyInit") boolean isLazyInit,
+                @JsonProperty("qualifiers") List<String> qualifiers) {
             this.scope = scope;
             this.type = type;
             this.aliases = aliases;
             this.dependencies = dependencies;
+            this.isPrimary = isPrimary;
+            this.isLazyInit = isLazyInit;
+            this.qualifiers = qualifiers;
         }
 
         public Set<String> getAliases() {
@@ -82,5 +92,24 @@ public class BeansFeed {
         public Set<String> getDependencies() {
             return dependencies;
         }
+
+        public boolean isPrimary() {
+            return isPrimary;
+        }
+
+        public boolean isLazyInit() {
+            return isLazyInit;
+        }
+
+        public List<String> getQualifiers() {
+            return qualifiers;
+        }
+    }
+
+    public enum BeanOrigin {
+        COMPONENT_ANNOTATION,
+        BEAN_METHOD,
+        FACTORY_BEAN,
+        UNKNOWN
     }
 }
