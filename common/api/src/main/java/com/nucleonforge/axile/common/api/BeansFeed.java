@@ -12,55 +12,31 @@ import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 /**
  * The response to beans actuator endpoint.
  *
- * @see ActuatorEndpoint
- * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/beans.html">Beans Endpoint</a>
  * @author Mikhail Polivakha
+ * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/beans.html">Beans Endpoint</a>
+ * @see ActuatorEndpoint
  */
-public class BeansFeed {
-
-    private final Map<String, Context> contexts;
+public record BeansFeed(Map<String, Context> contexts) {
 
     @JsonCreator
     public BeansFeed(@JsonProperty("contexts") Map<String, Context> contexts) {
         this.contexts = contexts;
     }
 
-    public Map<String, Context> getContexts() {
-        return contexts;
-    }
+    public record Context(String parentId, Map<String, Bean> beans) {
 
-    public static class Context {
-
-        private final String parentId;
-        private final Map<String, Bean> beans;
-
-        @JsonCreator
-        public Context(@JsonProperty("parentId") String parentId, @JsonProperty("beans") Map<String, Bean> beans) {
-            this.parentId = parentId;
-            this.beans = beans;
+            @JsonCreator
+            public Context(@JsonProperty("parentId") String parentId, @JsonProperty("beans") Map<String, Bean> beans) {
+                this.parentId = parentId;
+                this.beans = beans;
+            }
         }
 
-        public String getParentId() {
-            return parentId;
-        }
+    public record Bean(String scope, String type, Set<String> aliases, Set<String> dependencies, boolean isPrimary,
+                       boolean isLazyInit, List<String> qualifiers) {
 
-        public Map<String, Bean> getBeans() {
-            return beans;
-        }
-    }
-
-    public static class Bean {
-
-        private final String scope;
-        private final String type;
-        private final Set<String> aliases;
-        private final Set<String> dependencies;
-        private final boolean isPrimary;
-        private final boolean isLazyInit;
-        private final List<String> qualifiers;
-
-        @JsonCreator
-        public Bean(
+            @JsonCreator
+            public Bean(
                 @JsonProperty("scope") String scope,
                 @JsonProperty("type") String type,
                 @JsonProperty("aliases") Set<String> aliases,
@@ -68,43 +44,15 @@ public class BeansFeed {
                 @JsonProperty("isPrimary") boolean isPrimary,
                 @JsonProperty("isLazyInit") boolean isLazyInit,
                 @JsonProperty("qualifiers") List<String> qualifiers) {
-            this.scope = scope;
-            this.type = type;
-            this.aliases = aliases;
-            this.dependencies = dependencies;
-            this.isPrimary = isPrimary;
-            this.isLazyInit = isLazyInit;
-            this.qualifiers = qualifiers;
+                this.scope = scope;
+                this.type = type;
+                this.aliases = aliases;
+                this.dependencies = dependencies;
+                this.isPrimary = isPrimary;
+                this.isLazyInit = isLazyInit;
+                this.qualifiers = qualifiers;
+            }
         }
-
-        public Set<String> getAliases() {
-            return aliases;
-        }
-
-        public String getScope() {
-            return scope;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public Set<String> getDependencies() {
-            return dependencies;
-        }
-
-        public boolean isPrimary() {
-            return isPrimary;
-        }
-
-        public boolean isLazyInit() {
-            return isLazyInit;
-        }
-
-        public List<String> getQualifiers() {
-            return qualifiers;
-        }
-    }
 
     public enum BeanOrigin {
         COMPONENT_ANNOTATION,

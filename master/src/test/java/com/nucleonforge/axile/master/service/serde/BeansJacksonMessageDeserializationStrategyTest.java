@@ -56,33 +56,33 @@ class BeansJacksonMessageDeserializationStrategyTest {
 
         BeansFeed beansFeed = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
-        assertThat(beansFeed.getContexts()).hasEntrySatisfying("application", context -> {
-            assertThat(context.getBeans()).hasSize(3);
+        assertThat(beansFeed.contexts()).hasEntrySatisfying("application", context -> {
+            assertThat(context.beans()).hasSize(3);
 
-            Bean first = context.getBeans()
+            Bean first = context.beans()
                     .get(
                             "org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration$DispatcherServletRegistrationConfiguration");
-            assertThat(first.getAliases()).containsOnly("abc", "bcd");
-            assertThat(first.getDependencies()).isEmpty();
-            assertThat(first.getScope()).isEqualTo("singleton");
-            assertThat(first.getType())
+            assertThat(first.aliases()).containsOnly("abc", "bcd");
+            assertThat(first.dependencies()).isEmpty();
+            assertThat(first.scope()).isEqualTo("singleton");
+            assertThat(first.type())
                     .isEqualTo(
                             "org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration$DispatcherServletRegistrationConfiguration");
 
-            Bean second = context.getBeans()
+            Bean second = context.beans()
                     .get("org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration");
-            assertThat(second.getAliases()).isEmpty();
-            assertThat(second.getDependencies()).containsOnly("123", "321");
-            assertThat(second.getScope()).isEqualTo("singleton");
-            assertThat(second.getType())
+            assertThat(second.aliases()).isEmpty();
+            assertThat(second.dependencies()).containsOnly("123", "321");
+            assertThat(second.scope()).isEqualTo("singleton");
+            assertThat(second.type())
                     .isEqualTo("org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration");
 
-            Bean third = context.getBeans()
+            Bean third = context.beans()
                     .get("org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration");
-            assertThat(third.getAliases()).isEmpty();
-            assertThat(third.getDependencies()).isEmpty();
-            assertThat(third.getScope()).isEqualTo("singleton");
-            assertThat(third.getType())
+            assertThat(third.aliases()).isEmpty();
+            assertThat(third.dependencies()).isEmpty();
+            assertThat(third.scope()).isEqualTo("singleton");
+            assertThat(third.type())
                     .isEqualTo("org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration");
         });
     }
