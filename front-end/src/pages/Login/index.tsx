@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { Form, Input, Button } from "antd";
 import { useTranslation } from "react-i18next";
 
@@ -27,7 +28,7 @@ export const Login = () => {
 
   return (
     <div className={styles.LoginFormWrapper}>
-      <h1 className={styles.LoginTitle}>{t("login")}</h1>
+      <h1 className={classNames('MediumTitle', styles.LoginTitle)}>{t("login")}</h1>
       <Form layout="vertical" onFinish={onFinish} autoComplete="off">
         <Form.Item
           key={t("username")}

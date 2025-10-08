@@ -1,16 +1,13 @@
-import { Input } from 'antd';
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { filterServiceCards, getWallboardDataThunk } from 'store/slices';
+import { EmptyHandler, Loader, PageSearch } from 'components';
 import { useAppDispatch, useAppSelector } from 'hooks';
-import { EmptyHandler, Loader } from 'components';
 import { WallboardCard } from './WallboardCard';
 
 import styles from './styles.module.css'
 
 export const Wallboard = () => {
-    const { t } = useTranslation()
     const dispatch = useAppDispatch()
     const { instances, filteredInstances, instancesSearchText, loading, error } = useAppSelector(state => state.wallboard)
 
@@ -35,11 +32,7 @@ export const Wallboard = () => {
 
     return (
         <>
-            <Input
-                placeholder={t("search")}
-                onChange={(e) => dispatch(filterServiceCards(e.target.value))}
-                className={styles.Search}
-            />
+            <PageSearch onChange={(value) => dispatch(filterServiceCards(value))} />
 
             <EmptyHandler isEmpty={noDataAfterSearch}>
                 <div className={styles.CardsResponsiveWrapper}>

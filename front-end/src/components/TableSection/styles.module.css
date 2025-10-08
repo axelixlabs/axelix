@@ -1,8 +1,5 @@
 .Table {
     margin-bottom: 40px;
-    border: 1px solid var(--axile-light-gray);
-    border-top-right-radius: 8px;
-    border-top-left-radius: 8px;
 }
 
 .Table:last-child {
