@@ -1,0 +1,222 @@
+components:
+  schemas:
+    InfoResponse:
+      type: object
+      properties:
+        git:
+          $ref: '#/components/schemas/GitProfile'
+        build:
+          $ref: '#/components/schemas/BuildProfile'
+        os:
+          $ref: '#/components/schemas/OSProfile'
+        process:
+          $ref: '#/components/schemas/ProcessProfile'
+        java:
+          $ref: '#/components/schemas/JavaProfile'
+        ssl:
+          $ref: '#/components/schemas/SSLProfile'
+    BuildProfile:
+      type: object
+      properties:
+        artifact:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        group:
+          type: string
+        time:
+          type: string
+    Bundles:
+      type: object
+      properties:
+        name:
+          type: string
+        certificateChains:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/CertificateChains'
+    CertificateChains:
+      type: object
+      properties:
+        alias:
+          type: string
+        certificates:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Certificates'
+    Certificates:
+      type: object
+      properties:
+        version:
+          type: string
+        issuer:
+          type: string
+        validity:
+          $ref: '#/components/schemas/Validity'
+        subject:
+          type: string
+        serialNumber:
+          type: string
+        signatureAlgorithmName:
+          type: string
+        validityStarts:
+          type: string
+        validityEnds:
+          type: string
+    Commit:
+      type: object
+      properties:
+        id:
+          type: string
+        time:
+          type: string
+    GarbageCollectors:
+      type: object
+      properties:
+        name:
+          type: string
+        collectionCount:
+          type: integer
+          format: int32
+    GitProfile:
+      type: object
+      properties:
+        branch:
+          type: string
+        commit:
+          $ref: '#/components/schemas/Commit'
+    Heap:
+      type: object
+      properties:
+        max:
+          type: integer
+          format: int64
+        used:
+          type: integer
+          format: int64
+        committed:
+          type: integer
+          format: int64
+        init:
+          type: integer
+          format: int64
+    JVM:
+      type: object
+      properties:
+        name:
+          type: string
+        vendor:
+          type: string
+        version:
+          type: string
+    JavaProfile:
+      type: object
+      properties:
+        version:
+          type: string
+        vendor:
+          $ref: '#/components/schemas/Vendor'
+        runtime:
+          $ref: '#/components/schemas/Runtime'
+        jvm:
+          $ref: '#/components/schemas/JVM'
+    Memory:
+      type: object
+      properties:
+        heap:
+          $ref: '#/components/schemas/Heap'
+        nonHeap:
+          $ref: '#/components/schemas/NonHeap'
+        garbageCollectors:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/GarbageCollectors'
+    NonHeap:
+      type: object
+      properties:
+        max:
+          type: integer
+          format: int64
+        used:
+          type: integer
+          format: int64
+        committed:
+          type: integer
+          format: int64
+        init:
+          type: integer
+          format: int64
+    OSProfile:
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        arch:
+          type: string
+    ProcessProfile:
+      type: object
+      properties:
+        pid:
+          type: integer
+          format: int64
+        parentPid:
+          type: integer
+          format: int64
+        owner:
+          type: string
+        memory:
+          $ref: '#/components/schemas/Memory'
+        virtualThreads:
+          $ref: '#/components/schemas/VirtualThreads'
+        cpus:
+          type: integer
+          format: int32
+    Runtime:
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+    SSLProfile:
+      type: object
+      properties:
+        bundles:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Bundles'
+    Validity:
+      type: object
+      properties:
+        status:
+          type: string
+    Vendor:
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+    VirtualThreads:
+      type: object
+      properties:
+        mounted:
+          type: integer
+          format: int64
+        queued:
+          type: integer
+          format: int64
+        parallelism:
+          type: integer
+          format: int64
+        poolSize:
+          type: integer
+          format: int64

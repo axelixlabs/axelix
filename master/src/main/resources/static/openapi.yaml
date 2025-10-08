@@ -34,9 +34,8 @@ tags:
   - name: API for working with Users
     description: The beans endpoint provides information about the application’s beans.
 
-
 paths:
-######### API for working with Users #########
+######### Users API -> /response/user.yaml -> LoginRequest #########
   /users/login:
     post:
       tags:
@@ -52,7 +51,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: './response/user.yaml#/components/schemas/LoginRequest'
         required: true
       responses:
         '200':
@@ -69,15 +68,15 @@ paths:
               schema:
                 type: object
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized"
+          $ref: "./response/error.yaml#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden"
+          $ref: "./response/error.yaml#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalError"
+          $ref: "./response/error.yaml#/components/responses/InternalError"
 
-######### Wallboard API #########
+######### Wallboard API -> /response/wallboard.yaml -> InstancesGridResponse #########
   /applications/grid:
     get:
       tags:
@@ -90,14 +89,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InstancesGridResponse'
+                $ref: './response/wallboard.yaml#/components/schemas/InstancesGridResponse'
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
         "500":
-          $ref: "#/components/responses/InternalError"
+          $ref: "./response/error.yaml#/components/responses/InternalError"
 
-######### Beans API #########
-  '/beans/feed/{instanceId}':
+######### Beans API -> /response/beans.yaml -> BeansFeedResponse #########
+  /beans/feed/{instanceId}:
     get:
       tags:
         - Beans API
@@ -116,119 +115,118 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BeansFeedResponse'
+                $ref: './response/beans.yaml#/components/schemas/BeansFeedResponse'
           links:
             Actuator/Beans:
               description: 'https://docs.spring.io/spring-boot/api/rest/actuator/beans.html'
         "400":
-          $ref: "#/components/responses/BadRequest"
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
         "500":
-          $ref: "#/components/responses/InternalError"
+          $ref: "./response/error.yaml#/components/responses/InternalError"
 
-
-components:
-  responses:
-######### ERROR #########
-    Unauthorized:
-      description: Unauthorized. Most likely the credentials pair username/password is wrong
-      content:
-        '*/*':
+######### Environment API -> /response/environment.yaml -> EnvironmentFeedResponse #########
+  /env/feed/{instanceId}:
+    get:
+      tags:
+        - Environment API Controller
+      summary: Returns information about the application’s Environment.
+      operationId: getEnvironment
+      parameters:
+        - name: instanceId
+          in: path
+          description: Application Instance ID
+          required: true
           schema:
-            type: object
-    Forbidden:
-      description: Forbidden. The access into the system is forbidden
-      content:
-        '*/*':
-          schema:
-            type: object
-    BadRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/SimpleApiError"
-    InternalError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/SimpleApiError"
-
-
-  schemas:
-######### SimpleApiError #########
-    SimpleApiError:
-      type: object
-      properties:
-        code:
-          type: string
-
-######### API for working with Users -> LoginRequest #########
-    LoginRequest:
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-      description: Request for login
-
-######### Wallboard API -> InstancesGridResponse #########
-    InstanceShortProfile:
-      type: object
-      properties:
-        instanceId:
-          type: string
-        name:
-          type: string
-        serviceVersion:
-          type: string
-        commitShaShort:
-          type: string
-        status:
-          type: string
-          enum:
-            - UP
-            - DOWN
-            - UNKNOWN
-        deployedFor:
-          type: string
-        javaVersion:
-          type: string
-        springBootVersion:
-          type: string
-    InstancesGridResponse:
-      type: object
-      properties:
-        instances:
-          type: array
-          items:
-            $ref: '#/components/schemas/InstanceShortProfile'
-
-######### Beans API -> BeansFeedResponse #########
-    BeanShortProfile:
-      type: object
-      properties:
-        beanName:
-          type: string
-        scope:
-          type: string
-        className:
-          type: string
-        aliases:
-          uniqueItems: true
-          type: array
-          items:
             type: string
-        dependencies:
-          uniqueItems: true
-          type: array
-          items:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './response/environment.yaml#/components/schemas/EnvironmentFeedResponse'
+          links:
+            Spring Boot / Actuator / Environment (env):
+              description: 'https://docs.spring.io/spring-boot/api/rest/actuator/env.html'
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+######### Environment API -> /response/environment.yaml -> EnvironmentPropertyResponse #########
+  /env/{instanceId}/property/{propertyName}:
+    get:
+      tags:
+        - Environment API Controller
+      summary: Returns a specific property of an instance
+      operationId: getProperty
+      parameters:
+        - name: instanceId
+          in: path
+          description: Application Instance ID
+          required: true
+          schema:
             type: string
-    BeansFeedResponse:
-      type: object
-      properties:
-        beans:
-          type: array
-          items:
-            $ref: '#/components/schemas/BeanShortProfile'
+        - name: propertyName
+          in: path
+          description: Name of the environment property
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './response/environment.yaml#/components/schemas/EnvironmentPropertyResponse'
+          links:
+            Actuator/Environment(env):
+              description: 'https://docs.spring.io/spring-boot/api/rest/actuator/env.html'
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+######### Info API -> /response/info.yaml -> InfoResponse #########
+  /info/{instanceId}:
+    get:
+      tags:
+        - General instance information API
+      summary: Returns general information about the instance.
+      operationId: getInfoResponse
+      parameters:
+        - name: instanceId
+          in: path
+          description: Application Instance ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './response/info.yaml#/components/schemas/InfoResponse'
+          links:
+            Actuator/Info:
+              description: 'https://docs.spring.io/spring-boot/api/rest/actuator/info.html'
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+######### Software API -> /response/software.yaml -> InfoResponse #########
+  /software/core/summary:
+    get:
+      tags:
+        - software-api
+      operationId: getCoreDistributionGrid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: './response/software.yaml#/components/schemas/DistributionSummaryResponse'

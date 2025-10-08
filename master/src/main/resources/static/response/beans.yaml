@@ -1,0 +1,28 @@
+components:
+  schemas:
+    BeanShortProfile:
+      type: object
+      properties:
+        beanName:
+          type: string
+        scope:
+          type: string
+        className:
+          type: string
+        aliases:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        dependencies:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+    BeansFeedResponse:
+      type: object
+      properties:
+        beans:
+          type: array
+          items:
+            $ref: '#/components/schemas/BeanShortProfile'

@@ -1,0 +1,35 @@
+components:
+  schemas:
+    $ref: './software.yaml#/components/schemas'
+    ######### SimpleApiError #########
+    SimpleApiError:
+      type: object
+      properties:
+        code:
+          type: string
+
+  responses:
+    Unauthorized:
+      description: Unauthorized. Most likely the credentials pair username/password is wrong
+      content:
+        '*/*':
+          schema:
+            type: object
+    Forbidden:
+      description: Forbidden. The access into the system is forbidden
+      content:
+        '*/*':
+          schema:
+            type: object
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SimpleApiError"
+    InternalError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SimpleApiError"
