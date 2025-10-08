@@ -1,0 +1,234 @@
+openapi: 3.0.1
+info:
+  title: Nucleon Forge Axile
+  version: 1.0.0
+
+tags:
+  - name: Loggers API Controller
+    description: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+
+  - name: Wallboard API
+    description: The endpoints related to wallboard grid rendering
+
+  - name: Beans API
+    description: The beans endpoint provides information about the application’s beans.
+
+  - name: Configprops API Controller
+    description: The configprops endpoint provides information about the application’s @ConfigurationProperties beans.
+
+  - name: General instance information API
+    description: The info endpoint provides general information about the particular Spring Boot instance
+
+  - name: Property Management API
+    description: Provides operations for managing Spring properties of application instances.
+
+  - name: Environment API Controller
+    description: The env endpoint provides information about the application’s Environment.
+
+  - name: Profile Management API
+    description: Provides operations for managing Spring profiles of application instances.
+
+  - name: Caches API Controller
+    description: The caches endpoint provides access to the application’s caches.
+
+  - name: API for working with Users
+    description: The beans endpoint provides information about the application’s beans.
+
+
+paths:
+######### API for working with Users #########
+  /users/login:
+    post:
+      tags:
+        - API for working with Users
+      summary: Log-in by the username/password combination
+      operationId: login
+      parameters:
+        - name: loginRequest
+          in: query
+          description: Request for login
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Authorization:
+              description: The JWT token that should be subsequently used for auth purposes
+              required: true
+              style: simple
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+######### Wallboard API #########
+  /applications/grid:
+    get:
+      tags:
+        - Wallboard API
+      summary: Returns all instances that are managed by this Axile deployment
+      operationId: getInstancesGrid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstancesGridResponse'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+######### Beans API #########
+  '/beans/feed/{instanceId}':
+    get:
+      tags:
+        - Beans API
+      summary: Returns beans feed for the given instance
+      operationId: getBeansProfile
+      parameters:
+        - name: instanceId
+          in: path
+          description: Application Instance ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeansFeedResponse'
+          links:
+            Actuator/Beans:
+              description: 'https://docs.spring.io/spring-boot/api/rest/actuator/beans.html'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+
+components:
+  responses:
+######### ERROR #########
+    Unauthorized:
+      description: Unauthorized. Most likely the credentials pair username/password is wrong
+      content:
+        '*/*':
+          schema:
+            type: object
+    Forbidden:
+      description: Forbidden. The access into the system is forbidden
+      content:
+        '*/*':
+          schema:
+            type: object
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SimpleApiError"
+    InternalError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SimpleApiError"
+
+
+  schemas:
+######### SimpleApiError #########
+    SimpleApiError:
+      type: object
+      properties:
+        code:
+          type: string
+
+######### API for working with Users -> LoginRequest #########
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      description: Request for login
+
+######### Wallboard API -> InstancesGridResponse #########
+    InstanceShortProfile:
+      type: object
+      properties:
+        instanceId:
+          type: string
+        name:
+          type: string
+        serviceVersion:
+          type: string
+        commitShaShort:
+          type: string
+        status:
+          type: string
+          enum:
+            - UP
+            - DOWN
+            - UNKNOWN
+        deployedFor:
+          type: string
+        javaVersion:
+          type: string
+        springBootVersion:
+          type: string
+    InstancesGridResponse:
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/InstanceShortProfile'
+
+######### Beans API -> BeansFeedResponse #########
+    BeanShortProfile:
+      type: object
+      properties:
+        beanName:
+          type: string
+        scope:
+          type: string
+        className:
+          type: string
+        aliases:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        dependencies:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+    BeansFeedResponse:
+      type: object
+      properties:
+        beans:
+          type: array
+          items:
+            $ref: '#/components/schemas/BeanShortProfile'
