@@ -28,9 +28,11 @@ class StringUtilsTest {
                 Arguments.of("Non null string", null, false),
                 Arguments.of("", null, false),
                 Arguments.of("exact_match", "exact_match", true),
+                Arguments.of("non_non_exact", "non_exact", true),
                 Arguments.of("it_is_non_exact_match_but_still_contains", "non_exact_match", true),
                 Arguments.of("case_IgnoreD", "CASE_iGNOREd", true),
                 Arguments.of("head_case_IGNORED_tail", "CASE_Ig", true),
-                Arguments.of("Letter_missin", "Letter_missing", false));
+                Arguments.of("less_characters", "more_characters_in_dest", false),
+                Arguments.of("Letter_missing", "Letter_mssing", false));
     }
 }
