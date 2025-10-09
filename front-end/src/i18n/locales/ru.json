@@ -26,5 +26,8 @@
   "reset": "Сбросить",
   "configuredExplicitly": "Задан явно",
   "loggerLevelUpdated": "Уровень логгера изменён",
-  "saved": "Сохранено"
+  "propertyChangedSuccessfully": "Свойство Изменено",
+  "clearAllCaches": "Очистить все кэши",
+  "target": "Цель",
+  "cleared": "Очищено"
 }
