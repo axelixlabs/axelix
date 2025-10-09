@@ -47,6 +47,8 @@ paths:
           in: query
           description: Request for login
           required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -103,12 +105,7 @@ paths:
       summary: Returns beans feed for the given instance
       operationId: getBeansProfile
       parameters:
-        - name: instanceId
-          in: path
-          description: Application Instance ID
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/InstanceIdParam"
       responses:
         '200':
           description: OK
@@ -132,12 +129,7 @@ paths:
       summary: Returns information about the application’s Environment.
       operationId: getEnvironment
       parameters:
-        - name: instanceId
-          in: path
-          description: Application Instance ID
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/InstanceIdParam"
       responses:
         '200':
           description: OK
@@ -161,12 +153,7 @@ paths:
       summary: Returns a specific property of an instance
       operationId: getProperty
       parameters:
-        - name: instanceId
-          in: path
-          description: Application Instance ID
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/InstanceIdParam"
         - name: propertyName
           in: path
           description: Name of the environment property
@@ -196,12 +183,7 @@ paths:
       summary: Returns general information about the instance.
       operationId: getInfoResponse
       parameters:
-        - name: instanceId
-          in: path
-          description: Application Instance ID
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/InstanceIdParam"
       responses:
         '200':
           description: OK
@@ -230,3 +212,272 @@ paths:
             '*/*':
               schema:
                 $ref: './response/software.yaml#/components/schemas/DistributionSummaryResponse'
+
+######### Loggers API - GET -> /response/loggers.yaml -> LoggersResponse #########
+  '/loggers/{instanceId}':
+    get:
+      tags:
+        - Loggers API Controller
+      summary: Returns details of the application’s loggers.
+      operationId: getAllLoggers
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './response/loggers.yaml#/components/schemas/LoggersResponse'
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+######### Loggers API - GET -> /response/loggers.yaml -> LoggerProfileResponse #########
+  '/loggers/{instanceId}/logger/{loggerName}':
+    get:
+      tags:
+        - Loggers API Controller
+      summary: Returns the details of the requested logger.
+      operationId: getLoggerByName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: loggerName
+          in: path
+          description: The name of the logger to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './response/loggers.yaml#/components/schemas/LoggerProfileResponse'
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+######### Loggers API - POST -> No response #########
+    post:
+      tags:
+        - Loggers API Controller
+      summary: The request specifies the desired logging level for a logger by its name.
+      description: >-
+        Suggested logging levels that the user can select to configure the
+        logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+      operationId: setLoggingLevelByLoggerName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: loggerName
+          in: path
+          description: The name of the logger to find
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: './response/loggers.yaml#/components/schemas/LogLevelChangeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+  ######### Loggers API - POST -> No response #########
+  '/loggers/{instanceId}/logger/{loggerName}/clear':
+    post:
+      tags:
+        - Loggers API Controller
+      summary: Clears the configured logging level of a logger, reverting it to the global/default setting.
+      operationId: clearLoggingLevelByLoggerName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: loggerName
+          in: path
+          description: The name of the logger to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+######### Loggers API - GET -> /response/loggers.yaml -> GroupProfileResponse #########
+  '/loggers/{instanceId}/group/{groupName}':
+    get:
+      tags:
+        - Loggers API Controller
+      summary: Returns details of the requested logger group.
+      operationId: getGroupByName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: groupName
+          in: path
+          description: The name of the logger group to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './response/loggers.yaml#/components/schemas/GroupProfileResponse'
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+######### Loggers API - POST -> No response #########
+    post:
+      tags:
+        - Loggers API Controller
+      summary: The request specifies the desired logging level for a logger group by its name.
+      description: >-
+        Suggested logging levels that the user can select to configure the
+        logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+      operationId: setLoggingLevelByGroupName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: groupName
+          in: path
+          description: The name of the logger group to find
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: './response/loggers.yaml#/components/schemas/LogLevelChangeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+######### Profile Management API - POST -> /response/profile-management.yaml -> ProfileUpdateResponse #########
+  '/profile-management/{instanceId}':
+    post:
+      tags:
+        - Profile Management API
+      summary: Replaces active profiles for the given application instance.
+      operationId: replaceProfile
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: './response/profile-management.yaml#/components/schemas/ProfileUpdatedRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './response/profile-management.yaml#/components/schemas/ProfileUpdateResponse'
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+######### Configprops API  -> /response/configprops.yaml -> ConfigpropsFeedResponse #########
+  '/configprops/feed/{instanceId}':
+    get:
+      tags:
+        - Configprops API Controller
+      summary: Returns all @ConfigurationProperties beans of the application.
+      operationId: getBeansFeedProfile
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './response/configprops.yaml#/components/schemas/ConfigpropsFeedResponse'
+          links:
+            Actuator/Configuration Properties:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/configprops.html
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+######### Configprops API  -> /response/configprops.yaml -> ConfigpropsByPrefixResponse #########
+  '/configprops/{instanceId}/beans/{prefix}':
+    get:
+      tags:
+        - Configprops API Controller
+      summary: Returns the @ConfigurationProperties beans of a given instance with given prefix
+      operationId: getBeanByPrefixProfile
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: prefix
+          in: path
+          description: The prefix of @ConfigurationProperties beans to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './response/configprops.yaml#/components/schemas/ConfigpropsByPrefixResponse'
+          links:
+            Actuator/Configuration Properties:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/configprops.html
+        "400":
+          $ref: "./response/error.yaml#/components/responses/BadRequest"
+        "500":
+          $ref: "./response/error.yaml#/components/responses/InternalError"
+
+components:
+  parameters:
+    InstanceIdParam:
+      name: instanceId
+      in: path
+      description: Application Instance ID
+      required: true
+      schema:
+        type: string

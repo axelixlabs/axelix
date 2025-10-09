@@ -1,13 +1,4 @@
 components:
-  schemas:
-    $ref: './software.yaml#/components/schemas'
-    ######### SimpleApiError #########
-    SimpleApiError:
-      type: object
-      properties:
-        code:
-          type: string
-
   responses:
     Unauthorized:
       description: Unauthorized. Most likely the credentials pair username/password is wrong
@@ -33,3 +24,11 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/SimpleApiError"
+
+######### SimpleApiError #########
+  schemas:
+    SimpleApiError:
+      type: object
+      properties:
+        code:
+          type: string

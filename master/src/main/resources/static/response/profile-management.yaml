@@ -1,0 +1,27 @@
+components:
+  schemas:
+    ProfileUpdateResponse:
+      type: object
+      properties:
+        updated:
+          type: boolean
+          description: Indicates whether the profiles were successfully updated
+          example: true
+        reason:
+          type: string
+          description: >-
+            The reason describing why the update was applied or skipped (may be
+            null)
+          nullable: true
+          example: Profiles replaced successfully
+    ProfileUpdatedRequest:
+      type: object
+      properties:
+        effectiveProfiles:
+          type: array
+          description: >-
+            Array of effective profiles. To remove all active profiles in
+            instance, the array must be empty
+          items:
+            type: string
+            example: '["profile1","profile2"]'

@@ -1,0 +1,59 @@
+components:
+  schemas:
+    Group:
+      type: object
+      properties:
+        name:
+          type: string
+        configuredLevel:
+          type: string
+        members:
+          type: array
+          items:
+            type: string
+    Logger:
+      type: object
+      properties:
+        name:
+          type: string
+        configuredLevel:
+          type: string
+        effectiveLevel:
+          type: string
+    LoggersResponse:
+      type: object
+      properties:
+        levels:
+          type: array
+          items:
+            type: string
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        loggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Logger'
+    LoggerProfileResponse:
+      type: object
+      properties:
+        configuredLevel:
+          type: string
+        effectiveLevel:
+          type: string
+    GroupProfileResponse:
+      type: object
+      properties:
+        configuredLevel:
+          type: string
+        members:
+          type: array
+          items:
+            type: string
+
+    LogLevelChangeRequest:
+      type: object
+      properties:
+        configuredLevel:
+          type: string
