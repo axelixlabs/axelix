@@ -14,14 +14,12 @@ import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
-import org.springframework.stereotype.Component;
 
 /**
  * The {@link BeanFactoryPostProcessor} that constructs the internal {@link DefaultQualifiersRegistry}.
  *
  * @author Mikhail Polivakha
  */
-@Component
 public class QualifiersPersistencePostProcessor implements BeanFactoryPostProcessor, Ordered {
 
     @Override

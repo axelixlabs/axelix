@@ -44,45 +44,66 @@ class BeansApiTest {
     private static final String EXPECTED_BEANS_JSON =
             // language=json
             """
+        {
+          "beans": [
             {
-              "beans": [
-                {
-                  "beanName": "dispatcherServletRegistrationConfiguration",
-                  "scope": "singleton",
-                  "className": "DispatcherServletRegistrationConfiguration",
-                  "aliases": [],
-                  "dependencies": []
-                },
-                {
-                  "beanName": "propertyPlaceholderAutoConfiguration",
-                  "scope": "prototype",
-                  "className": "PropertyPlaceholderAutoConfiguration",
-                  "aliases": [],
-                  "dependencies": []
-                },
-                {
-                  "beanName": "dispatcherServletAutoConfiguration",
-                  "scope": "session",
-                  "className": "DispatcherServletAutoConfiguration",
-                  "aliases": [],
-                  "dependencies": []
-                },
-                {
-                  "beanName": "discoveryClientHealthIndicator",
-                  "scope": "request",
-                  "className": "DiscoveryClientHealthIndicator",
-                  "aliases": [
-                    "clientHealthIndicator",
-                    "healthIndicator"
-                  ],
-                  "dependencies": [
-                    "DiscoveryLoadBalancerConfiguration",
-                    "DiscoveryClientHealthIndicatorProperties"
-                  ]
-                }
-              ]
+              "beanName": "dispatcherServletRegistrationConfiguration",
+              "scope": "singleton",
+              "className": "DispatcherServletRegistrationConfiguration",
+              "aliases": [],
+              "dependencies": [],
+              "isPrimary": false,
+              "isLazyInit": false,
+              "qualifiers": [],
+              "beanSource": {}
+            },
+            {
+              "beanName": "propertyPlaceholderAutoConfiguration",
+              "scope": "prototype",
+              "className": "PropertyPlaceholderAutoConfiguration",
+              "aliases": [],
+              "dependencies": [],
+              "isPrimary": true,
+              "isLazyInit": true,
+              "qualifiers": ["propertyConfig"],
+              "beanSource": {
+                "enclosingClassName": "com.example.PropertyConfig",
+                "methodName": "propertyPlaceholderConfig"
+              }
+            },
+            {
+              "beanName": "dispatcherServletAutoConfiguration",
+              "scope": "session",
+              "className": "DispatcherServletAutoConfiguration",
+              "aliases": [],
+              "dependencies": [],
+              "isPrimary": false,
+              "isLazyInit": false,
+              "qualifiers": [],
+              "beanSource": {
+                "factoryBeanName": "servletFactoryBean"
+              }
+            },
+            {
+              "beanName": "discoveryClientHealthIndicator",
+              "scope": "request",
+              "className": "DiscoveryClientHealthIndicator",
+              "aliases": [
+                "healthIndicator",
+                "clientHealthIndicator"
+              ],
+              "dependencies": [
+                "DiscoveryLoadBalancerConfiguration",
+                "DiscoveryClientHealthIndicatorProperties"
+              ],
+              "isPrimary": false,
+              "isLazyInit": false,
+              "qualifiers": ["healthCheck"],
+              "beanSource": {}
             }
-            """;
+          ]
+        }
+        """;
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
@@ -110,40 +131,65 @@ class BeansApiTest {
         // language=json
         String jsonResponse =
                 """
-            {
-              "contexts" : {
-                "application" : {
-                  "beans" : {
-                    "dispatcherServletRegistrationConfiguration" : {
-                      "scope" : "singleton",
-                      "type" : "DispatcherServletRegistrationConfiguration",
-                      "aliases" : [ ],
-                      "dependencies" : [ ]
-                    },
-                    "propertyPlaceholderAutoConfiguration" : {
-                      "scope" : "prototype",
-                      "type" : "PropertyPlaceholderAutoConfiguration",
-                      "aliases" : [ ],
-                      "dependencies" : [ ]
-                    },
-                    "dispatcherServletAutoConfiguration" : {
-                      "scope" : "session",
-                      "type" : "DispatcherServletAutoConfiguration",
-                      "aliases" : [ ],
-                      "dependencies" : [ ]
-                    },
-                    "discoveryClientHealthIndicator": {
-                      "scope": "request",
-                      "type": "DiscoveryClientHealthIndicator",
-                      "resource": "class path resource [org/springframework/cloud/client/CommonsClientAutoConfiguration$DiscoveryLoadBalancerConfiguration.class]",
-                      "aliases": ["clientHealthIndicator", "healthIndicator"],
-                      "dependencies": ["DiscoveryLoadBalancerConfiguration", "DiscoveryClientHealthIndicatorProperties"]
-                    }
-                  }
+        {
+          "contexts" : {
+            "application" : {
+              "parentId": null,
+              "beans" : {
+                "dispatcherServletRegistrationConfiguration" : {
+                  "scope" : "singleton",
+                  "type" : "DispatcherServletRegistrationConfiguration",
+                  "aliases" : [ ],
+                  "dependencies" : [ ],
+                  "isLazyInit": false,
+                  "isPrimary": false,
+                  "qualifiers": [],
+                  "enclosingClassName": null,
+                  "methodName": null,
+                  "factoryBeanName": null
+                },
+                "propertyPlaceholderAutoConfiguration" : {
+                  "scope" : "prototype",
+                  "type" : "PropertyPlaceholderAutoConfiguration",
+                  "aliases" : [ ],
+                  "dependencies" : [ ],
+                  "isLazyInit": true,
+                  "isPrimary": true,
+                  "qualifiers": ["propertyConfig"],
+                  "enclosingClassName": "com.example.PropertyConfig",
+                  "methodName": "propertyPlaceholderConfig",
+                  "factoryBeanName": null
+                },
+                "dispatcherServletAutoConfiguration" : {
+                  "scope" : "session",
+                  "type" : "DispatcherServletAutoConfiguration",
+                  "aliases" : [ ],
+                  "dependencies" : [ ],
+                  "isLazyInit": false,
+                  "isPrimary": false,
+                  "qualifiers": [],
+                  "enclosingClassName": null,
+                  "methodName": null,
+                  "factoryBeanName": "servletFactoryBean"
+                },
+                "discoveryClientHealthIndicator": {
+                  "scope": "request",
+                  "type": "DiscoveryClientHealthIndicator",
+                  "resource": "class path resource [org/springframework/cloud/client/CommonsClientAutoConfiguration$DiscoveryLoadBalancerConfiguration.class]",
+                  "aliases": ["clientHealthIndicator", "healthIndicator"],
+                  "dependencies": ["DiscoveryLoadBalancerConfiguration", "DiscoveryClientHealthIndicatorProperties"],
+                  "isLazyInit": false,
+                  "isPrimary": false,
+                  "qualifiers": ["healthCheck"],
+                  "enclosingClassName": null,
+                  "methodName": null,
+                  "factoryBeanName": null
                 }
               }
             }
-            """;
+          }
+        }
+        """;
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -151,7 +197,7 @@ class BeansApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/beans")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/beans")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -164,8 +210,7 @@ class BeansApiTest {
 
     @Test
     void shouldReturnJSONBeansFeed() {
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         ResponseEntity<String> response =
                 restTemplate.getForEntity("/api/axile/beans/feed/{instanceId}", String.class, activeInstanceId);
@@ -193,7 +238,7 @@ class BeansApiTest {
 
     @Test
     void shouldReturnBadRequestForUnregisteredInstance() {
-        String instanceId = "unregistered-beans-instance";
+        String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
                 "/api/axile/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);

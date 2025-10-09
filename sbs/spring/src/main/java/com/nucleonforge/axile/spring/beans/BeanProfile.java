@@ -1,20 +1,27 @@
 package com.nucleonforge.axile.spring.beans;
 
-import java.lang.reflect.Method;
+import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
 /**
  * Response wrapper containing metadata about a Spring bean definition.
  *
- * @param beanName         the name of the bean in the context
- * @param beanClass        the resolved runtime class of the bean (may be a proxy class)
- * @param definingMethod   the method that defined the bean, if any (e.g., @Bean method or factory method), might be null
- * @param scope            the scope of the bean (e.g., {@code singleton}, {@code prototype})
- * @param factoryBean      {@code true} if the bean was created via a factory bean, {@code false} otherwise
+ * @param isLazyInit indicates if the bean is configured for lazy initialization
+ * @param isPrimary indicates if the bean is marked as primary candidate for autowiring
+ * @param qualifiers list of qualifier annotations associated with the bean
+ * @param enclosingClassName the name of the class that defines this bean (configuration class for @Bean methods,
+ *                          bean class for component-scanned beans, factory bean class for factory-created beans)
+ * @param methodName the name of the method that created the bean (@Bean methods or factory methods)
+ * @param factoryBeanName the name of the factory bean that produced this bean
  *
  * @since 04.07.2025
  * @author Nikita Kirillov
  */
 public record BeanProfile(
-        String beanName, Class<?> beanClass, @Nullable Method definingMethod, String scope, boolean factoryBean) {}
+        boolean isLazyInit,
+        boolean isPrimary,
+        List<String> qualifiers,
+        @Nullable String enclosingClassName,
+        @Nullable String methodName,
+        @Nullable String factoryBeanName) {}

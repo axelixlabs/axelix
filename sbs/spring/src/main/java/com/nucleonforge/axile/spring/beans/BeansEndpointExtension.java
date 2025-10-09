@@ -8,6 +8,13 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
 import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
 
+/**
+ * Web extension for Spring Boot Beans Actuator endpoint.
+ * Extends standard beans response with additional bean metadata.
+ *
+ * @since 08.10.2025
+ * @author Nikita Kirillov
+ */
 @EndpointWebExtension(endpoint = BeansEndpoint.class)
 public class BeansEndpointExtension {
 
@@ -41,14 +48,13 @@ public class BeansEndpointExtension {
                 beanInfo.put("resource", beanDescriptor.getResource());
                 beanInfo.put("dependencies", beanDescriptor.getDependencies());
 
-                // Here I add fields
                 analyzer.analyze(beanName).ifPresent(profile -> {
-                    beanInfo.put(
-                            "definingMethod",
-                            profile.definingMethod() != null
-                                    ? profile.definingMethod().toString()
-                                    : "unknown");
-                    beanInfo.put("factoryBean", profile.factoryBean());
+                    beanInfo.put("isLazyInit", profile.isLazyInit());
+                    beanInfo.put("isPrimary", profile.isPrimary());
+                    beanInfo.put("qualifiers", profile.qualifiers());
+                    beanInfo.put("enclosingClassName", profile.enclosingClassName());
+                    beanInfo.put("methodName", profile.methodName());
+                    beanInfo.put("factoryBeanName", profile.factoryBeanName());
                 });
 
                 beans.put(beanName, beanInfo);

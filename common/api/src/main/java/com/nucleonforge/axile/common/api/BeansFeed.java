@@ -1,11 +1,13 @@
 package com.nucleonforge.axile.common.api;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 
@@ -25,39 +27,46 @@ public record BeansFeed(Map<String, Context> contexts) {
 
     public record Context(String parentId, Map<String, Bean> beans) {
 
-            @JsonCreator
-            public Context(@JsonProperty("parentId") String parentId, @JsonProperty("beans") Map<String, Bean> beans) {
-                this.parentId = parentId;
-                this.beans = beans;
-            }
+        @JsonCreator
+        public Context(@JsonProperty("parentId") String parentId, @JsonProperty("beans") Map<String, Bean> beans) {
+            this.parentId = parentId;
+            this.beans = beans;
         }
+    }
 
-    public record Bean(String scope, String type, Set<String> aliases, Set<String> dependencies, boolean isPrimary,
-                       boolean isLazyInit, List<String> qualifiers) {
-
-            @JsonCreator
-            public Bean(
+    public record Bean(
+            String scope,
+            String type,
+            Set<String> aliases,
+            Set<String> dependencies,
+            boolean isLazyInit,
+            boolean isPrimary,
+            List<String> qualifiers,
+            @Nullable String enclosingClassName,
+            @Nullable String methodName,
+            @Nullable String factoryBeanName) {
+        @JsonCreator
+        public Bean(
                 @JsonProperty("scope") String scope,
                 @JsonProperty("type") String type,
                 @JsonProperty("aliases") Set<String> aliases,
                 @JsonProperty("dependencies") Set<String> dependencies,
-                @JsonProperty("isPrimary") boolean isPrimary,
                 @JsonProperty("isLazyInit") boolean isLazyInit,
-                @JsonProperty("qualifiers") List<String> qualifiers) {
-                this.scope = scope;
-                this.type = type;
-                this.aliases = aliases;
-                this.dependencies = dependencies;
-                this.isPrimary = isPrimary;
-                this.isLazyInit = isLazyInit;
-                this.qualifiers = qualifiers;
-            }
+                @JsonProperty("isPrimary") boolean isPrimary,
+                @JsonProperty("qualifiers") List<String> qualifiers,
+                @JsonProperty("enclosingClassName") @Nullable String enclosingClassName,
+                @JsonProperty("methodName") @Nullable String methodName,
+                @JsonProperty("factoryBeanName") @Nullable String factoryBeanName) {
+            this.scope = scope;
+            this.type = type;
+            this.aliases = aliases != null ? aliases : Collections.emptySet();
+            this.dependencies = dependencies != null ? dependencies : Collections.emptySet();
+            this.isLazyInit = isLazyInit;
+            this.isPrimary = isPrimary;
+            this.qualifiers = qualifiers != null ? qualifiers : Collections.emptyList();
+            this.enclosingClassName = enclosingClassName;
+            this.methodName = methodName;
+            this.factoryBeanName = factoryBeanName;
         }
-
-    public enum BeanOrigin {
-        COMPONENT_ANNOTATION,
-        BEAN_METHOD,
-        FACTORY_BEAN,
-        UNKNOWN
     }
 }

@@ -19,7 +19,7 @@ public class DefaultQualifiersRegistry {
 
     private final ConcurrentMap<String, List<String>> cache;
 
-    public DefaultQualifiersRegistry() {
+    private DefaultQualifiersRegistry() {
         this.cache = new ConcurrentHashMap<>(32);
     }
 
@@ -28,8 +28,8 @@ public class DefaultQualifiersRegistry {
         return Optional.ofNullable(cache.get(beanName)).orElse(new ArrayList<>());
     }
 
-    public void registerQualifiers(@NonNull String beanNames, @NonNull List<String> qualifiers) {
-        cache.compute(beanNames, (s, existingQualifiers) -> {
+    public void registerQualifiers(@NonNull String beanName, @NonNull List<String> qualifiers) {
+        cache.compute(beanName, (s, existingQualifiers) -> {
             if (existingQualifiers == null || existingQualifiers.isEmpty()) {
                 existingQualifiers = new ArrayList<>();
             }

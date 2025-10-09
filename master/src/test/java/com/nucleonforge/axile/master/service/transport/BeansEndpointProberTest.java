@@ -65,37 +65,56 @@ class BeansEndpointProberTest {
         // language=json
         String jsonResponse =
                 """
-            {
-              "contexts": {
-                "application": {
-                  "beans": {
-                    "jmxEndpointProperties": {
-                      "scope": "singleton",
-                      "type": "JmxEndpointProperties",
-                      "aliases": [],
-                      "dependencies": []
-                    },
-                    "jacksonObjectMapperBuilder": {
-                      "scope": "prototype",
-                      "type": "Jackson2ObjectMapperBuilder",
-                      "resource": "class path resource JacksonObjectMapperBuilderConfiguration.class]",
-                      "aliases": [],
-                      "dependencies": [
-                      "JacksonObjectMapperBuilderConfiguration"
-                      ]
-                    },
-                    "testSessionBean": {
-                      "scope": "session",
-                      "type": "TestSessionBean",
-                      "resource": "class path resource [org.example.com]",
-                      "aliases": ["sessionBeanForProberTest"],
-                      "dependencies": []
-                    }
-                  }
+        {
+          "contexts": {
+            "application": {
+              "parentId": null,
+              "beans": {
+                "jmxEndpointProperties": {
+                  "scope": "singleton",
+                  "type": "JmxEndpointProperties",
+                  "aliases": [],
+                  "dependencies": [],
+                  "isLazyInit": false,
+                  "isPrimary": false,
+                  "qualifiers": [],
+                  "enclosingClassName": null,
+                  "methodName": null,
+                  "factoryBeanName": null
+                },
+                "jacksonObjectMapperBuilder": {
+                  "scope": "prototype",
+                  "type": "Jackson2ObjectMapperBuilder",
+                  "resource": "class path resource JacksonObjectMapperBuilderConfiguration.class",
+                  "aliases": [],
+                  "dependencies": [
+                    "JacksonObjectMapperBuilderConfiguration"
+                  ],
+                  "isLazyInit": true,
+                  "isPrimary": true,
+                  "qualifiers": ["primaryMapper"],
+                  "enclosingClassName": "com.example.JacksonConfig",
+                  "methodName": "jacksonObjectMapperBuilder",
+                  "factoryBeanName": null
+                },
+                "testSessionBean": {
+                  "scope": "session",
+                  "type": "TestSessionBean",
+                  "resource": "class path resource [org.example.com]",
+                  "aliases": ["sessionBeanForProberTest"],
+                  "dependencies": [],
+                  "isLazyInit": false,
+                  "isPrimary": false,
+                  "qualifiers": [],
+                  "enclosingClassName": null,
+                  "methodName": null,
+                  "factoryBeanName": "sessionBeanFactory"
                 }
               }
             }
-            """;
+          }
+        }
+        """;
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -103,7 +122,7 @@ class BeansEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/beans")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/beans")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -116,8 +135,7 @@ class BeansEndpointProberTest {
 
     @Test
     void shouldReturnBeansFeed() {
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         BeansFeed feed = beansEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
@@ -125,6 +143,8 @@ class BeansEndpointProberTest {
         assertThat(feed.contexts()).containsKey("application");
 
         BeansFeed.Context ctx = feed.contexts().get("application");
+        assertThat(ctx.parentId()).isNull();
+
         Map<String, BeansFeed.Bean> beans = ctx.beans();
         assertThat(beans).hasSize(3);
 
@@ -133,24 +153,41 @@ class BeansEndpointProberTest {
         assertThat(jmxEndpoint.type()).isEqualTo("JmxEndpointProperties");
         assertThat(jmxEndpoint.aliases()).isEmpty();
         assertThat(jmxEndpoint.dependencies()).isEmpty();
+        assertThat(jmxEndpoint.isLazyInit()).isFalse();
+        assertThat(jmxEndpoint.isPrimary()).isFalse();
+        assertThat(jmxEndpoint.qualifiers()).isEmpty();
+        assertThat(jmxEndpoint.enclosingClassName()).isNull();
+        assertThat(jmxEndpoint.methodName()).isNull();
+        assertThat(jmxEndpoint.factoryBeanName()).isNull();
 
         BeansFeed.Bean jacksonBuilder = beans.get("jacksonObjectMapperBuilder");
         assertThat(jacksonBuilder.scope()).isEqualTo("prototype");
         assertThat(jacksonBuilder.type()).isEqualTo("Jackson2ObjectMapperBuilder");
         assertThat(jacksonBuilder.aliases()).isEmpty();
-        assertThat(jacksonBuilder.dependencies())
-                .containsExactlyInAnyOrder("JacksonObjectMapperBuilderConfiguration");
+        assertThat(jacksonBuilder.dependencies()).containsExactlyInAnyOrder("JacksonObjectMapperBuilderConfiguration");
+        assertThat(jacksonBuilder.isLazyInit()).isTrue();
+        assertThat(jacksonBuilder.isPrimary()).isTrue();
+        assertThat(jacksonBuilder.qualifiers()).containsExactly("primaryMapper");
+        assertThat(jacksonBuilder.enclosingClassName()).isEqualTo("com.example.JacksonConfig");
+        assertThat(jacksonBuilder.methodName()).isEqualTo("jacksonObjectMapperBuilder");
+        assertThat(jacksonBuilder.factoryBeanName()).isNull();
 
         BeansFeed.Bean testSessionBean = beans.get("testSessionBean");
         assertThat(testSessionBean.scope()).isEqualTo("session");
         assertThat(testSessionBean.type()).isEqualTo("TestSessionBean");
         assertThat(testSessionBean.aliases()).containsExactly("sessionBeanForProberTest");
         assertThat(testSessionBean.dependencies()).isEmpty();
+        assertThat(testSessionBean.isLazyInit()).isFalse();
+        assertThat(testSessionBean.isPrimary()).isFalse();
+        assertThat(testSessionBean.qualifiers()).isEmpty();
+        assertThat(testSessionBean.enclosingClassName()).isNull();
+        assertThat(testSessionBean.methodName()).isNull();
+        assertThat(testSessionBean.factoryBeanName()).isEqualTo("sessionBeanFactory");
     }
 
     @Test
     void shouldThrowExceptionWhenInstanceUrlIsUnreachable() {
-        String instanceId = "test-instance-unreachable";
+        String instanceId = UUID.randomUUID().toString();
 
         registry.register(createInstance(instanceId));
 
@@ -160,7 +197,7 @@ class BeansEndpointProberTest {
 
     @Test
     void shouldThrowExceptionForUnregisteredInstance() {
-        String instanceId = "unregistered-instance";
+        String instanceId = UUID.randomUUID().toString();
 
         assertThatThrownBy(() -> beansEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE))
                 .isInstanceOf(InstanceNotFoundException.class);

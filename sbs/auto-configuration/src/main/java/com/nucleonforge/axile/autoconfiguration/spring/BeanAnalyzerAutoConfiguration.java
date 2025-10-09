@@ -9,15 +9,10 @@ import org.springframework.context.annotation.Bean;
 import com.nucleonforge.axile.spring.beans.BeanAnalyzer;
 import com.nucleonforge.axile.spring.beans.BeansEndpointExtension;
 import com.nucleonforge.axile.spring.beans.DefaultBeanAnalyzer;
+import com.nucleonforge.axile.spring.beans.QualifiersPersistencePostProcessor;
 
 /**
  * {@code BeanAnalyzerAutoConfiguration} auto-configuration class for {@link BeanAnalyzer} bean.
- *
- * <p>Provides a default {@link DefaultBeanAnalyzer} bean if no other
- * {@link BeanAnalyzer} bean is already defined in the Spring application context.</p>
- *
- * <p>Intended for automatic registration of the {@link BeanAnalyzer} implementation
- * to simplify configuration in Spring Boot applications.</p>
  *
  * @since 07.07.2025
  * @author Nikita Kirillov
@@ -35,5 +30,11 @@ public class BeanAnalyzerAutoConfiguration {
     @ConditionalOnMissingBean
     public BeansEndpointExtension beansEndpointExtension(BeansEndpoint beansEndpoint, BeanAnalyzer beanAnalyzer) {
         return new BeansEndpointExtension(beansEndpoint, beanAnalyzer);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
+        return new QualifiersPersistencePostProcessor();
     }
 }

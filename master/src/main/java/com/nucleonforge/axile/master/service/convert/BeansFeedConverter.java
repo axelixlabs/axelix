@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile;
-import com.nucleonforge.axile.master.api.response.BeanShortProfile.UnknownBean;
 import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
 
 /**
@@ -19,31 +18,38 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
 
     @Override
     public @NonNull BeansFeedResponse convertInternal(@NonNull BeansFeed source) {
-
-        BeansFeed.Context context =
-                source.contexts().values().stream().findFirst().orElse(null);
-
         BeansFeedResponse beansFeedResponse = new BeansFeedResponse();
 
-        if (context == null) {
-            return beansFeedResponse;
-        }
-
-        context.beans().forEach((beanName, bean) -> {
-            BeanShortProfile profile = new BeanShortProfile(
-                    beanName,
-                    bean.scope(),
-                    bean.type(),
-                    bean.aliases(),
-                    bean.dependencies(),
-                    bean.isPrimary(),
-                    bean.isLazyInit(),
-                    bean.qualifiers(),
-                    new UnknownBean());
-
-            beansFeedResponse.addBean(profile);
+        source.contexts().values().forEach(context -> {
+            if (context != null && context.beans() != null) {
+                context.beans().forEach((beanName, bean) -> {
+                    BeanShortProfile profile = new BeanShortProfile(
+                            beanName,
+                            bean.scope(),
+                            bean.type(),
+                            bean.aliases(),
+                            bean.dependencies(),
+                            bean.isPrimary(),
+                            bean.isLazyInit(),
+                            bean.qualifiers(),
+                            toBeanSource(bean));
+                    beansFeedResponse.addBean(profile);
+                });
+            }
         });
 
         return beansFeedResponse;
+    }
+
+    private BeanShortProfile.BeanSource toBeanSource(BeansFeed.Bean bean) {
+        if (bean.enclosingClassName() != null && bean.methodName() != null) {
+            return new BeanShortProfile.BeanMethod(bean.enclosingClassName(), bean.methodName());
+        } else if (bean.factoryBeanName() != null) {
+            return new BeanShortProfile.FactoryBean(bean.factoryBeanName());
+        } else if (bean.type() != null && !bean.type().isEmpty()) {
+            return new BeanShortProfile.ComponentVariant();
+        } else {
+            return new BeanShortProfile.UnknownBean();
+        }
     }
 }

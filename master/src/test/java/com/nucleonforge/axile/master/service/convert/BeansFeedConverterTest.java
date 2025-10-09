@@ -47,6 +47,9 @@ class BeansFeedConverterTest {
             assertThat(bean1)
                     .extracting(BeanShortProfile::dependencies, InstanceOfAssertFactories.COLLECTION)
                     .hasSize(0);
+            assertThat(bean1)
+                    .extracting(BeanShortProfile::beanSource)
+                    .isInstanceOf(BeanShortProfile.ComponentVariant.class);
 
             BeanShortProfile bean2 = getBeanByName(beansFeedResponse, "bean2");
             assertThat(bean2).extracting(BeanShortProfile::beanName).isEqualTo("bean2");
@@ -64,6 +67,11 @@ class BeansFeedConverterTest {
             assertThat(bean2)
                     .extracting(BeanShortProfile::dependencies, InstanceOfAssertFactories.COLLECTION)
                     .containsOnly("dep1", "dep2");
+            assertThat(bean2)
+                    .extracting(BeanShortProfile::beanSource)
+                    .isInstanceOf(BeanShortProfile.FactoryBean.class)
+                    .extracting("factoryBeanName")
+                    .isEqualTo("someFactoryBean");
 
             BeanShortProfile bean3 = getBeanByName(beansFeedResponse, "bean3");
             assertThat(bean3).extracting(BeanShortProfile::beanName).isEqualTo("bean3");
@@ -80,6 +88,14 @@ class BeansFeedConverterTest {
             assertThat(bean3)
                     .extracting(BeanShortProfile::qualifiers, InstanceOfAssertFactories.COLLECTION)
                     .containsOnly("one", "two");
+            assertThat(bean3)
+                    .extracting(BeanShortProfile::beanSource)
+                    .isInstanceOf(BeanShortProfile.BeanMethod.class)
+                    .satisfies(beanSource -> {
+                        BeanShortProfile.BeanMethod beanMethod = (BeanShortProfile.BeanMethod) beanSource;
+                        assertThat(beanMethod.enclosingClassName()).isEqualTo("com.example.Configuration");
+                        assertThat(beanMethod.methodName()).isEqualTo("createDate");
+                    });
         });
     }
 
@@ -93,16 +109,20 @@ class BeansFeedConverterTest {
     private static Map<String, BeansFeed.Bean> beansMap() {
         return Map.of(
                 "bean1",
-                new BeansFeed.Bean("singleton", "java.lang.String", Set.of(), Set.of(), false, false, List.of()),
+                new BeansFeed.Bean(
+                        "singleton", "java.lang.String", Set.of(), Set.of(), false, false, List.of(), null, null, null),
                 "bean2",
                 new BeansFeed.Bean(
                         "session",
                         "java.lang.Integer",
                         Set.of(),
                         Set.of("dep1", "dep2"),
-                        true,
                         false,
-                        List.of("first")),
+                        true,
+                        List.of("first"),
+                        null,
+                        null,
+                        "someFactoryBean"),
                 "bean3",
                 new BeansFeed.Bean(
                         "prototype",
@@ -111,6 +131,9 @@ class BeansFeedConverterTest {
                         Set.of(),
                         true,
                         true,
-                        List.of("one", "two")));
+                        List.of("one", "two"),
+                        "com.example.Configuration",
+                        "createDate",
+                        null));
     }
 }

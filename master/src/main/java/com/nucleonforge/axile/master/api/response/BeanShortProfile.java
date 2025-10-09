@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
  * @param isLazyInit   Whether the bean is lazily instantiated or eagerly.
  * @param isPrimary    Whether the bean is marked with {@link BeanDefinition#isPrimary() primary marker}.
  * @param qualifiers   The list of {@link AutowireCandidateQualifier qualifiers} that are assigned to this bean.
+ * @param beanSource   The source information describing how this bean was created and its origin type.
  *
  * @author Mikhail Polivakha
  */
@@ -41,6 +42,9 @@ public record BeanShortProfile(
         }
         if (dependencies == null) {
             dependencies = Collections.emptySet();
+        }
+        if (qualifiers == null) {
+            qualifiers = Collections.emptyList();
         }
     }
 

@@ -1,5 +1,9 @@
 package com.nucleonforge.axile.spring.beans;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Optional;
 
 import javax.sql.DataSource;
@@ -14,12 +18,14 @@ import jakarta.persistence.Table;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -28,6 +34,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -36,10 +43,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test class for verifying the functionality of {@link DefaultBeanAnalyzer}.
- * <p>
- * Uses the {@link DefaultBeanAnalyzerTestConfig} configuration which defines
- * necessary beans including JPA repository, services, and prototype/request
- * scoped beans for various scenarios.
  *
  * @since 07.07.2025
  * @author Nikita Kirillov
@@ -55,25 +58,88 @@ class DefaultBeanAnalyzerTest {
         Optional<BeanProfile> optResponse = analyzer.analyze("myService");
 
         assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
-            assertThat(response.beanClass()).isNotNull();
-            assertThat(response.beanClass().getSimpleName()).isEqualTo("MyService");
-
-            assertThat(response)
-                    .returns("singleton", BeanProfile::scope)
-                    .returns(null, BeanProfile::definingMethod)
-                    .returns(false, BeanProfile::factoryBean);
+            assertThat(response.isLazyInit()).isFalse();
+            assertThat(response.isPrimary()).isFalse();
+            assertThat(response.qualifiers()).isEmpty();
+            assertThat(response.enclosingClassName())
+                    .isEqualTo(DefaultBeanAnalyzerTestConfig.MyService.class.getName());
+            assertThat(response.methodName()).isNull();
+            assertThat(response.factoryBeanName()).isNull();
         });
     }
 
     @Test
-    void shouldAnalyzeCustomMethod() {
-        Optional<BeanProfile> optResponse = analyzer.analyze("customBean");
+    void shouldAnalyzeLazyServiceBean() {
+        Optional<BeanProfile> optResponse = analyzer.analyze("lazyService");
 
         assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
-            assertThat(response.definingMethod().getName()).isEqualTo("customBean");
-            assertThat(response.beanClass().getSimpleName()).isEqualTo("DefaultBeanAnalyzerTestConfig");
+            assertThat(response.isLazyInit()).isTrue();
+            assertThat(response.isPrimary()).isFalse();
+            assertThat(response.qualifiers()).isEmpty();
+            assertThat(response.enclosingClassName())
+                    .isEqualTo(DefaultBeanAnalyzerTestConfig.LazyService.class.getName());
+            assertThat(response.methodName()).isNull();
+            assertThat(response.factoryBeanName()).isNull();
+        });
+    }
 
-            assertThat(response).returns("singleton", BeanProfile::scope).returns(true, BeanProfile::factoryBean);
+    @Test
+    void shouldAnalyzePrimaryComponentBean() {
+        Optional<BeanProfile> optResponse = analyzer.analyze("primaryComponent");
+
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
+            assertThat(response.isLazyInit()).isFalse();
+            assertThat(response.isPrimary()).isTrue();
+            assertThat(response.qualifiers()).isEmpty();
+            assertThat(response.enclosingClassName())
+                    .isEqualTo(DefaultBeanAnalyzerTestConfig.PrimaryComponent.class.getName());
+            assertThat(response.methodName()).isNull();
+            assertThat(response.factoryBeanName()).isNull();
+        });
+    }
+
+    @Test
+    void shouldAnalyzeQualifiedServiceBean() {
+        Optional<BeanProfile> optResponse = analyzer.analyze("qualifiedService");
+
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
+            assertThat(response.isLazyInit()).isFalse();
+            assertThat(response.isPrimary()).isFalse();
+            assertThat(response.qualifiers()).contains("specialService");
+            assertThat(response.enclosingClassName())
+                    .isEqualTo(DefaultBeanAnalyzerTestConfig.QualifiedService.class.getName());
+            assertThat(response.methodName()).isNull();
+            assertThat(response.factoryBeanName()).isNull();
+        });
+    }
+
+    @Test
+    void shouldAnalyzeLazyPrimaryBeanMethod() {
+        Optional<BeanProfile> optResponse = analyzer.analyze("lazyPrimaryBean");
+
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
+            assertThat(response.isLazyInit()).isTrue();
+            assertThat(response.isPrimary()).isTrue();
+            assertThat(response.qualifiers()).isEmpty();
+            assertThat(response.enclosingClassName())
+                    .isEqualTo("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig");
+            assertThat(response.methodName()).isEqualTo("lazyPrimaryBean");
+            assertThat(response.factoryBeanName()).isEqualTo("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig");
+        });
+    }
+
+    @Test
+    void shouldAnalyzeQualifiedBeanMethod() {
+        Optional<BeanProfile> optResponse = analyzer.analyze("qualifiedBeanMethod");
+
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
+            assertThat(response.isLazyInit()).isFalse();
+            assertThat(response.isPrimary()).isFalse();
+            assertThat(response.qualifiers()).contains("customQualifier");
+            assertThat(response.enclosingClassName())
+                    .isEqualTo("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig");
+            assertThat(response.methodName()).isEqualTo("qualifiedBeanMethod");
+            assertThat(response.factoryBeanName()).isEqualTo("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig");
         });
     }
 
@@ -83,13 +149,38 @@ class DefaultBeanAnalyzerTest {
                 analyzer.analyze("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig.MyRepository");
 
         assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
-            assertThat(response.beanClass()).isNotNull();
-            assertThat(response.beanClass().getSimpleName()).contains("JpaRepositoryFactoryBean");
+            assertThat(response.isLazyInit()).isFalse();
+            assertThat(response.isPrimary()).isFalse();
+            assertThat(response.qualifiers()).isEmpty();
+            assertThat(response.enclosingClassName()).isNotNull();
+            assertThat(response.methodName()).isNull();
+            assertThat(response.factoryBeanName()).isNotNull();
+        });
+    }
 
-            assertThat(response)
-                    .returns("singleton", BeanProfile::scope)
-                    .returns(false, BeanProfile::factoryBean)
-                    .returns(null, BeanProfile::definingMethod);
+    @Test
+    void shouldAnalyzeDefaultBeanAnalyzer() {
+        Optional<BeanProfile> optResponse = analyzer.analyze("defaultBeanAnalyzer");
+
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
+            assertThat(response.isLazyInit()).isFalse();
+            assertThat(response.isPrimary()).isFalse();
+            assertThat(response.qualifiers()).isEmpty();
+            assertThat(response.enclosingClassName())
+                    .isEqualTo("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig");
+            assertThat(response.methodName()).isEqualTo("beanAnalyzer");
+            assertThat(response.factoryBeanName()).isEqualTo("defaultBeanAnalyzerTest.DefaultBeanAnalyzerTestConfig");
+        });
+    }
+
+    @Test
+    void shouldDetectCustomQualifierAnnotations() {
+        Optional<BeanProfile> optResponse = analyzer.analyze("customDatabaseService");
+
+        assertThat(optResponse).isPresent().hasValueSatisfying(response -> {
+            assertThat(response.qualifiers()).contains("customDatabase");
+            assertThat(response.enclosingClassName())
+                    .isEqualTo(DefaultBeanAnalyzerTestConfig.CustomDatabaseService.class.getName());
         });
     }
 
@@ -99,38 +190,13 @@ class DefaultBeanAnalyzerTest {
         assertThat(optResponse).isEmpty();
     }
 
-    @Test
-    void shouldAnalyzeDefaultBeanAnalyzer() {
-        Optional<BeanProfile> optResponse = analyzer.analyze("defaultBeanAnalyzer");
-
-        assertThat(optResponse).isPresent().hasValueSatisfying(response -> assertThat(response)
-                .returns("singleton", BeanProfile::scope)
-                .returns(true, BeanProfile::factoryBean));
-    }
-
-    @Test
-    void shouldAnalyzePrototypeBean() {
-        Optional<BeanProfile> optResponse = analyzer.analyze("myPrototypeBean");
-
-        assertThat(optResponse).isPresent().hasValueSatisfying(response -> assertThat(response)
-                .returns("prototype", BeanProfile::scope)
-                .returns(true, BeanProfile::factoryBean));
-    }
-
-    @Test
-    void shouldAnalyzeRequestBean() {
-        Optional<BeanProfile> optResponse = analyzer.analyze("myRequestBean");
-
-        assertThat(optResponse).isPresent().hasValueSatisfying(response -> assertThat(response)
-                .returns("request", BeanProfile::scope)
-                .returns(true, BeanProfile::factoryBean));
-    }
+    @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Qualifier("customDatabase")
+    public @interface CustomDatabaseQualifier {}
 
     /**
      * Static nested configuration class for {@link DefaultBeanAnalyzerTest}.
-     * <p>
-     * This configuration supports testing of bean analysis across different bean
-     * scopes, factory methods, and JPA repository beans.
      */
     @TestConfiguration
     @EnableJpaRepositories(
@@ -138,6 +204,11 @@ class DefaultBeanAnalyzerTest {
             considerNestedRepositories = true)
     @EntityScan(basePackageClasses = DefaultBeanAnalyzerTestConfig.MyEntity.class)
     public static class DefaultBeanAnalyzerTestConfig {
+
+        @Bean
+        public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
+            return new QualifiersPersistencePostProcessor();
+        }
 
         @Bean
         public DataSource dataSource() {
@@ -167,23 +238,6 @@ class DefaultBeanAnalyzerTest {
         @Service("myService")
         static class MyService {}
 
-        @Bean
-        public String customBean() {
-            return "customBean";
-        }
-
-        @Bean
-        @Scope("prototype")
-        public String myPrototypeBean() {
-            return "myPrototypeBean";
-        }
-
-        @Bean
-        @Scope("request")
-        public String myRequestBean() {
-            return "myRequestBean";
-        }
-
         @Bean("defaultBeanAnalyzer")
         public BeanAnalyzer beanAnalyzer(ApplicationContext context) {
             return new DefaultBeanAnalyzer(context);
@@ -199,5 +253,34 @@ class DefaultBeanAnalyzerTest {
 
         @Repository
         public interface MyRepository extends JpaRepository<MyEntity, Long> {}
+
+        @Service("lazyService")
+        @Lazy
+        static class LazyService {}
+
+        @Component("primaryComponent")
+        @Primary
+        static class PrimaryComponent {}
+
+        @Service("qualifiedService")
+        @Qualifier("specialService")
+        static class QualifiedService {}
+
+        @Bean
+        @Lazy
+        @Primary
+        public String lazyPrimaryBean() {
+            return "lazyPrimaryBean";
+        }
+
+        @Bean
+        @Qualifier("customQualifier")
+        public String qualifiedBeanMethod() {
+            return "qualifiedBeanMethod";
+        }
+
+        @Service("customDatabaseService")
+        @CustomDatabaseQualifier
+        static class CustomDatabaseService {}
     }
 }
