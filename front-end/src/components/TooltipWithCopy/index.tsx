@@ -39,7 +39,10 @@ export const TooltipWithCopy = ({ text, onClick }: IProps) => {
                 </div>
             </Tooltip>
             <CopyOutlined
-                onClick={() => handleCopy(text)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    handleCopy(text);
+                }}
                 className={styles.CopyIcon}
             />
         </div>

@@ -1,16 +1,13 @@
-import { Input } from "antd";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { useEffect, type ChangeEvent } from "react";
 
+import { Loader, EmptyHandler, TableSection, PageSearch } from "components";
 import { filterConfigProps, getConfigPropsThunk } from "store/slices";
-import { Loader, EmptyHandler, TableSection } from "components";
 import { useAppDispatch, useAppSelector } from "hooks";
 
 import styles from "./styles.module.css";
 
 export const ConfigProps = () => {
-  const { t } = useTranslation();
   const { instanceId } = useParams()
 
   const dispatch = useAppDispatch();
@@ -35,19 +32,11 @@ export const ConfigProps = () => {
 
   const configProps = filteredBeans.length ? filteredBeans : beans;
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    dispatch(filterConfigProps(e.target.value));
-  };
-
   const noDataAfterSearch = !!configPropsSearchText && !filteredBeans.length;
 
   return (
     <>
-      <Input
-        placeholder={t("search")}
-        onChange={handleChange}
-        className={styles.Search}
-      />
+      <PageSearch onChange={(value) => dispatch(filterConfigProps(value))} />
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         {configProps.map(({ beanName, prefix, properties }) => (

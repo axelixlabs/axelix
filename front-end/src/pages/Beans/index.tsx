@@ -1,17 +1,12 @@
-import { Input } from "antd";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
-import { filterBeans, getBeansThunk } from "store/slices/beans";
-import { useAppDispatch, useAppSelector } from "hooks";
-import { Loader, EmptyHandler } from "components";
 import { BeansCollapse } from "./BeansCollapse";
-
-import styles from "./styles.module.css";
+import { useAppDispatch, useAppSelector } from "hooks";
+import { filterBeans, getBeansThunk } from "store/slices";
+import { Loader, EmptyHandler, PageSearch } from "components";
 
 export const Beans = () => {
-  const { t } = useTranslation();
   const { instanceId } = useParams();
 
   const dispatch = useAppDispatch();
@@ -40,11 +35,7 @@ export const Beans = () => {
 
   return (
     <>
-      <Input
-        placeholder={t("search")}
-        onChange={(e) => dispatch(filterBeans(e.target.value))}
-        className={styles.Search}
-      />
+      <PageSearch onChange={(value) => dispatch(filterBeans(value))} />
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         <BeansCollapse beans={filteredBeans.length ? filteredBeans : beans} />

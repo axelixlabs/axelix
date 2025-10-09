@@ -1,14 +1,12 @@
 import { useEffect } from "react";
-import { Input, message } from "antd";
+import { message } from "antd";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { filterLoggers, getLoggersThunk } from "store/slices";
 import { useAppDispatch, useAppSelector } from "hooks";
-import { Loader, EmptyHandler } from "components";
+import { Loader, EmptyHandler, PageSearch } from "components";
 import { LoggersList } from "./LoggersList";
-
-import styles from "./styles.module.css";
 
 export const Loggers = () => {
   const { t } = useTranslation();
@@ -49,17 +47,11 @@ export const Loggers = () => {
 
   const noDataAfterSearch = !!loggersSearchText && !filteredLoggers.length;
 
-  const loggersCount = `${loggersSearchText ? filteredLoggers.length : loggers.length
-    } / ${loggers.length}`;
+  const loggersCount = `${loggersSearchText ? filteredLoggers.length : loggers.length} / ${loggers.length}`;
 
   return (
     <>
-      <Input
-        placeholder={t("search")}
-        onChange={(e) => dispatch(filterLoggers(e.target.value))}
-        addonAfter={loggersCount}
-        className={styles.Search}
-      />
+      <PageSearch addonAfter={loggersCount} onChange={(value) => dispatch(filterLoggers(value))} />
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         <LoggersList />
