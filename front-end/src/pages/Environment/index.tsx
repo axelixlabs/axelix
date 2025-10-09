@@ -31,7 +31,7 @@ export const Environment = () => {
   useEffect(() => {
     if (changePropertySuccess) {
       fetchEnvironment();
-      message.success(t("saved"));
+      message.success(t("propertyChangedSuccessfully"));
       dispatch(resetChangePropertySuccess());
     }
   }, [changePropertySuccess]);

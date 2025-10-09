@@ -1,0 +1,19 @@
+.CollapseHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.Target {
+    display: flex;
+    column-gap: 8px;
+}
+
+.CacheName{
+    word-break: break-all;
+}
+
+.ClearCacheButton{
+    flex-shrink: 0;
+}

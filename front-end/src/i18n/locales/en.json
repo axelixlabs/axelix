@@ -26,5 +26,8 @@
   "reset": "Reset",
   "configuredExplicitly": "Configured explicitly",
   "loggerLevelUpdated": "Level has been changed",
-  "saved": "Saved"
+  "propertyChangedSuccessfully": "Property Changed",
+  "clearAllCaches": "Clear All Caches",
+  "target": "Target",
+  "cleared": "Cleared"
 }
