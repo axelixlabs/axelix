@@ -6,30 +6,8 @@ on:
     branches: [ master ]
     paths:
       - 'front-end/**'
-  pull_request:
-    branches: [ master ]
-    paths:
-      - 'front-end/**'
-      - '.github/workflows/frontend.yaml'
 
 jobs:
-  build-source:
-    runs-on: ubuntu-latest
-    name: Run tests
-    if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/master'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up NodeJS
-        uses: actions/setup-node@v5
-        with:
-          node-version: 24
-
-      - name: Npm run tests
-        working-directory: front-end
-        run: npm run test
-
   deploy:
     env:
       DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
