@@ -151,4 +151,20 @@ public final class ApiPaths {
          */
         public static final String INSTANCE_ID = "/{instanceId}";
     }
+
+    public static final class CachesApi {
+
+        /**
+         * Base path for caches APIs.
+         */
+        public static final String MAIN = "/caches";
+        /**
+         * Caches endpoint with instance ID.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+        /**
+         * Endpoint to retrieve a specific cache by name from an instance.
+         */
+        public static final String CACHE_NAME = "/{instanceId}/cache/{cacheName}";
+    }
 }

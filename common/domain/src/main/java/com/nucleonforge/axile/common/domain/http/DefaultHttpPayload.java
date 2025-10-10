@@ -28,4 +28,8 @@ public record DefaultHttpPayload(
     public DefaultHttpPayload(List<HttpHeader> headers, byte[] requestBody) {
         this(headers, Collections.emptyList(), Collections.emptyMap(), requestBody);
     }
+
+    public DefaultHttpPayload(List<QueryParameter<?>> queryParameters, Map<String, String> pathVariableValues) {
+        this(Collections.emptyList(), queryParameters, pathVariableValues, new byte[0]);
+    }
 }
