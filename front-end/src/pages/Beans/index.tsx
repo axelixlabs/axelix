@@ -32,13 +32,15 @@ export const Beans = () => {
   }
 
   const noDataAfterSearch = !!beansSearchText && !filteredBeans.length;
+  const addonAfter = `${beansSearchText ? filteredBeans.length : beans.length} / ${beans.length}`;
+  const beansList = filteredBeans.length ? filteredBeans : beans
 
   return (
     <>
-      <PageSearch onChange={(value) => dispatch(filterBeans(value))} />
+      <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterBeans(value))} />
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
-        <BeansCollapse beans={filteredBeans.length ? filteredBeans : beans} />
+        <BeansCollapse beans={beansList} />
       </EmptyHandler>
     </>
   );

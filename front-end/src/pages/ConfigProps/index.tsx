@@ -31,12 +31,12 @@ export const ConfigProps = () => {
   }
 
   const configProps = filteredBeans.length ? filteredBeans : beans;
-
   const noDataAfterSearch = !!configPropsSearchText && !filteredBeans.length;
+  const addonAfter = `${configPropsSearchText ? filteredBeans.length : beans.length} / ${beans.length}`;
 
   return (
     <>
-      <PageSearch onChange={(value) => dispatch(filterConfigProps(value))} />
+      <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterConfigProps(value))} />
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         {configProps.map(({ beanName, prefix, properties }) => (
