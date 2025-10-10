@@ -3,10 +3,13 @@ package com.nucleonforge.axile.spring.beans;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.nucleonforge.axile.common.api.BeansFeed;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
 import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Web extension for Spring Boot Beans Actuator endpoint.
@@ -19,56 +22,50 @@ import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExten
 public class BeansEndpointExtension {
 
     private final BeansEndpoint delegate;
-    private final BeanAnalyzer analyzer;
+    private final BeanEnricher enricher;
+    private final ApplicationContext context;
 
-    public BeansEndpointExtension(BeansEndpoint delegate, BeanAnalyzer analyzer) {
+    public BeansEndpointExtension(BeansEndpoint delegate, BeanEnricher enricher, ApplicationContext context) {
         this.delegate = delegate;
-        this.analyzer = analyzer;
+        this.enricher = enricher;
+        this.context = context;
     }
 
     @ReadOperation
-    public WebEndpointResponse<Map<String, Object>> beans() {
+    public WebEndpointResponse<BeansFeed> beans() {
         BeansEndpoint.BeansDescriptor descriptor = delegate.beans();
 
-        Map<String, Object> responseBody = new HashMap<>();
-        Map<String, Object> contexts = new HashMap<>();
+        Map<String, BeansFeed.Context> contexts = new HashMap<>();
 
         descriptor.getContexts().forEach((contextId, contextDescriptor) -> {
-            Map<String, Object> beans = new HashMap<>();
+            Map<String, BeansFeed.Bean> beans = new HashMap<>();
 
             contextDescriptor.getBeans().forEach((beanName, beanDescriptor) -> {
-                Map<String, Object> beanInfo = new HashMap<>();
-                String type = beanDescriptor.getType() != null
-                        ? beanDescriptor.getType().getName()
-                        : null;
-
-                beanInfo.put("aliases", beanDescriptor.getAliases());
-                beanInfo.put("scope", beanDescriptor.getScope());
-                beanInfo.put("type", type);
-                beanInfo.put("resource", beanDescriptor.getResource());
-                beanInfo.put("dependencies", beanDescriptor.getDependencies());
-
-                analyzer.analyze(beanName).ifPresent(profile -> {
-                    beanInfo.put("isLazyInit", profile.isLazyInit());
-                    beanInfo.put("isPrimary", profile.isPrimary());
-                    beanInfo.put("qualifiers", profile.qualifiers());
-                    beanInfo.put("enclosingClassName", profile.enclosingClassName());
-                    beanInfo.put("methodName", profile.methodName());
-                    beanInfo.put("factoryBeanName", profile.factoryBeanName());
-                });
-
-                beans.put(beanName, beanInfo);
+                ApplicationContext targetContext = findContextForBean(contextId);
+                if (targetContext != null) {
+                    enricher.enrich(beanName, beanDescriptor, targetContext)
+                        .ifPresent(bean -> beans.put(beanName, bean));
+                }
             });
 
-            Map<String, Object> contextInfo = new HashMap<>();
-            contextInfo.put("beans", beans);
-            contextInfo.put("parentId", contextDescriptor.getParentId());
-
-            contexts.put(contextId, contextInfo);
+            contexts.put(contextId, new BeansFeed.Context(
+                contextDescriptor.getParentId(),
+                beans
+            ));
         });
 
-        responseBody.put("contexts", contexts);
+        return new WebEndpointResponse<>(new BeansFeed(contexts));
+    }
 
-        return new WebEndpointResponse<>(responseBody);
+    @Nullable
+    private ApplicationContext findContextForBean(String contextId) {
+        ApplicationContext current = context;
+        while (current != null) {
+            if (contextId.equals(current.getId())) {
+                return current;
+            }
+            current = current.getParent();
+        }
+        return null;
     }
 }

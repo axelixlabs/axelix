@@ -27,29 +27,18 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
                             beanName,
                             bean.scope(),
                             bean.type(),
+                            BeanShortProfile.ProxyType.valueOf(bean.proxyType().name()),
                             bean.aliases(),
                             bean.dependencies(),
                             bean.isPrimary(),
                             bean.isLazyInit(),
                             bean.qualifiers(),
-                            toBeanSource(bean));
+                            new BeanShortProfile.BeanMethod("a","a"));
                     beansFeedResponse.addBean(profile);
                 });
             }
         });
 
         return beansFeedResponse;
-    }
-
-    private BeanShortProfile.BeanSource toBeanSource(BeansFeed.Bean bean) {
-        if (bean.enclosingClassName() != null && bean.methodName() != null) {
-            return new BeanShortProfile.BeanMethod(bean.enclosingClassName(), bean.methodName());
-        } else if (bean.factoryBeanName() != null) {
-            return new BeanShortProfile.FactoryBean(bean.factoryBeanName());
-        } else if (bean.type() != null && !bean.type().isEmpty()) {
-            return new BeanShortProfile.ComponentVariant();
-        } else {
-            return new BeanShortProfile.UnknownBean();
-        }
     }
 }

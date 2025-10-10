@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -29,6 +32,7 @@ public record BeanShortProfile(
         String beanName,
         String scope,
         String className,
+        ProxyType proxyType,
         Set<String> aliases,
         Set<String> dependencies,
         boolean isPrimary,
@@ -135,5 +139,19 @@ public record BeanShortProfile(
         public BeanOrigin origin() {
             return BeanOrigin.COMPONENT_ANNOTATION;
         }
+    }
+
+    /**
+     * Enum representing the type of proxy applied to a bean.
+     */
+    public enum ProxyType {
+        /** Bean is proxied using JDK dynamic proxy */
+        JDK_PROXY,
+
+        /** Bean is proxied using CGLIB */
+        CGLIB,
+
+        /** Bean is not proxied */
+        NO_PROXYING
     }
 }

@@ -38,9 +38,9 @@ class BeansJacksonMessageDeserializationStrategyTest {
                   "isLazyInit" : false,
                   "isPrimary" : true,
                   "qualifiers" : [ "qualifier1" ],
-                  "enclosingClassName" : "com.example.Config",
-                  "methodName" : "dispatcherServletRegistration",
-                  "factoryBeanName" : null
+                  "beanSource": {
+                     "origin": "COMPONENT_ANNOTATION"
+                  }
                 },
                 "org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration" : {
                   "aliases" : [ ],
@@ -50,9 +50,11 @@ class BeansJacksonMessageDeserializationStrategyTest {
                   "isLazyInit" : true,
                   "isPrimary" : false,
                   "qualifiers" : [ ],
-                  "enclosingClassName" : null,
-                  "methodName" : null,
-                  "factoryBeanName" : "propertyPlaceholderFactory"
+                  "beanSource": {
+                    "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
+                    "methodName": "entityManagerFactoryBuilder",
+                    "origin": "BEAN_METHOD"
+                  }
                 },
                 "org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration" : {
                   "aliases" : [ ],
@@ -62,9 +64,10 @@ class BeansJacksonMessageDeserializationStrategyTest {
                   "isLazyInit" : false,
                   "isPrimary" : false,
                   "qualifiers" : [ "main", "secondary" ],
-                  "enclosingClassName" : null,
-                  "methodName" : null,
-                  "factoryBeanName" : null
+                  "beanSource": {
+                    "factoryBeanName": "org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean",
+                    "origin": "FACTORY_BEAN"
+                  }
                 }
               }
             }
@@ -90,9 +93,6 @@ class BeansJacksonMessageDeserializationStrategyTest {
             assertThat(first.isLazyInit()).isFalse();
             assertThat(first.isPrimary()).isTrue();
             assertThat(first.qualifiers()).containsOnly("qualifier1");
-            assertThat(first.enclosingClassName()).isEqualTo("com.example.Config");
-            assertThat(first.methodName()).isEqualTo("dispatcherServletRegistration");
-            assertThat(first.factoryBeanName()).isNull();
 
             BeansFeed.Bean second = context.beans()
                     .get("org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration");
@@ -104,9 +104,6 @@ class BeansJacksonMessageDeserializationStrategyTest {
             assertThat(second.isLazyInit()).isTrue();
             assertThat(second.isPrimary()).isFalse();
             assertThat(second.qualifiers()).isEmpty();
-            assertThat(second.enclosingClassName()).isNull();
-            assertThat(second.methodName()).isNull();
-            assertThat(second.factoryBeanName()).isEqualTo("propertyPlaceholderFactory");
 
             BeansFeed.Bean third = context.beans()
                     .get("org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration");
@@ -118,9 +115,6 @@ class BeansJacksonMessageDeserializationStrategyTest {
             assertThat(third.isLazyInit()).isFalse();
             assertThat(third.isPrimary()).isFalse();
             assertThat(third.qualifiers()).containsOnly("main", "secondary");
-            assertThat(third.enclosingClassName()).isNull();
-            assertThat(third.methodName()).isNull();
-            assertThat(third.factoryBeanName()).isNull();
         });
     }
 }

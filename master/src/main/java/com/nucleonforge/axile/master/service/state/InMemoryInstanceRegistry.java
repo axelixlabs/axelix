@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import jakarta.annotation.PostConstruct;
 import org.jspecify.annotations.NullMarked;
 
 import org.springframework.stereotype.Component;
@@ -28,6 +29,23 @@ public class InMemoryInstanceRegistry implements InstanceRegistry {
 
     public InMemoryInstanceRegistry() {
         this.source = new ConcurrentHashMap<>();
+    }
+
+    @PostConstruct
+    void init() {
+        String instanceId = "instanceId";
+        Instance instance = new Instance(
+            InstanceId.of(instanceId),
+            "",
+            "",
+            "",
+            "",
+            "",
+            null,
+            Instance.InstanceStatus.UP,
+            "http://localhost:8089/actuator");
+
+        this.source.putIfAbsent(InstanceId.of(instanceId), instance);
     }
 
     @Override
