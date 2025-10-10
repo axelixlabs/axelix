@@ -46,12 +46,11 @@ export const Loggers = () => {
   }
 
   const noDataAfterSearch = !!loggersSearchText && !filteredLoggers.length;
-
-  const loggersCount = `${loggersSearchText ? filteredLoggers.length : loggers.length} / ${loggers.length}`;
+  const addonAfter = `${loggersSearchText ? filteredLoggers.length : loggers.length} / ${loggers.length}`;
 
   return (
     <>
-      <PageSearch addonAfter={loggersCount} onChange={(value) => dispatch(filterLoggers(value))} />
+      <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterLoggers(value))} />
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         <LoggersList />

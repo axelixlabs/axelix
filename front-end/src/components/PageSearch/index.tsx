@@ -16,7 +16,7 @@ interface IProps {
     /**
      * Optional text to display after the search field
      */
-    addonAfter?: string
+    addonAfter: string
 }
 
 export const PageSearch = ({ onChange, addonAfter, hasBottomGutter = true }: IProps) => {

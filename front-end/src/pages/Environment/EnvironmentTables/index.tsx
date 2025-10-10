@@ -13,10 +13,11 @@ export const EnvironmentTables = () => {
     : propertySources;
 
   const noDataAfterSearch = !!environmentSearchText && !filteredPropertySources.length
+  const addonAfter = `${environmentSearchText ? filteredPropertySources.length : propertySources.length} / ${propertySources.length}`;
 
   return (
     <>
-      <PageSearch onChange={(value) => dispatch(filterProperties(value))} />
+      <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterProperties(value))} />
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         {propertySourcesList.map(({ name, properties }) => (

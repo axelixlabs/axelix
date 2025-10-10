@@ -27,16 +27,17 @@ export const Wallboard = () => {
         return error
     }
 
-    const serviceCardsData = filteredInstances.length ? filteredInstances : instances;
+    const serviceCardsList = filteredInstances.length ? filteredInstances : instances;
     const noDataAfterSearch = !!instancesSearchText && !filteredInstances.length;
+    const addonAfter = `${instancesSearchText ? filteredInstances.length : instances.length} / ${instances.length}`;
 
     return (
         <>
-            <PageSearch onChange={(value) => dispatch(filterServiceCards(value))} />
+            <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterServiceCards(value))} />
 
             <EmptyHandler isEmpty={noDataAfterSearch}>
                 <div className={styles.CardsResponsiveWrapper}>
-                    {serviceCardsData.map(data => <WallboardCard data={data} key={data.instanceId} />)}
+                    {serviceCardsList.map(data => <WallboardCard data={data} key={data.instanceId} />)}
                 </div>
             </EmptyHandler>
         </>
