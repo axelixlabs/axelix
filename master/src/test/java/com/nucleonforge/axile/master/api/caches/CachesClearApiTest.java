@@ -27,12 +27,12 @@ import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstan
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- *  Integration tests of clearing methods in {@link CachesApiGetEndpoints}
+ *  Integration tests for {@link CachesClearApi}
  *
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CachesApiGetEndpointsClearEndpointsTest {
+public class CachesClearApiTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
@@ -93,7 +93,7 @@ public class CachesApiGetEndpointsClearEndpointsTest {
     }
 
     @Test
-    void shouldClearCacheByNameWithParameter() throws InterruptedException {
+    void shouldClearSpecificCache() throws InterruptedException {
         String cacheName = "cities";
 
         // when

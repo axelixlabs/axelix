@@ -35,21 +35,21 @@ import com.nucleonforge.axile.master.service.transport.caches.GetAllCachesEndpoi
 import com.nucleonforge.axile.master.service.transport.caches.GetCacheByNameEndpointProber;
 
 /**
- * The API for managing caches, with endpoints for retrieving information about the application cache.
+ * The API for managing caches. Endpoints for retrieving information about the application caches.
  *
  * @author Sergey Cherkasov
  */
-@Tag(name = "Caches API Controller", description = "The caches endpoint provides access to the application’s caches.")
+@Tag(name = "Caches API", description = "The caches endpoint provides access to the application’s caches.")
 @RestController
 @RequestMapping(path = ApiPaths.CachesApi.MAIN)
-public class CachesApiGetEndpoints {
+public class CachesReadApi {
 
     private final GetAllCachesEndpointProber getAllCachesEndpointProber;
     private final GetCacheByNameEndpointProber getCacheByNameEndpointProber;
     private final Converter<ServiceCaches, CachesResponse> serviceCachesConverter;
     private final Converter<SingleCache, CacheProfileResponse> singleCacheConverter;
 
-    public CachesApiGetEndpoints(
+    public CachesReadApi(
             GetAllCachesEndpointProber getAllCachesEndpointProber,
             GetCacheByNameEndpointProber getCacheByNameEndpointProber,
             Converter<ServiceCaches, CachesResponse> serviceCachesConverter,

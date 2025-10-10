@@ -30,13 +30,14 @@ import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration test for {@link CachesApiGetEndpoints}.
- * In particular, it handles the edge case of complete absence of any cache managers inside the given managed service
+ * Integration test for {@link CachesReadApi}.
+ * <p>
+ * In particular, it handles the edge case of complete absence of any cache managers inside the given managed service.
  *
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CachesApiGetEndpointsEmptyResponseTest {
+public class CachesReadApiEmptyResponseTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
@@ -86,7 +87,7 @@ public class CachesApiGetEndpointsEmptyResponseTest {
     }
 
     @Test
-    void shouldReturnJSONEmptyServiceCaches() {
+    void shouldHandleEmptyCacheManagersResponse() {
         // language=json
         String expectedEmptyCaches = """
             {

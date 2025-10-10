@@ -29,18 +29,19 @@ import com.nucleonforge.axile.master.service.transport.caches.ClearAllCachesEndp
 import com.nucleonforge.axile.master.service.transport.caches.ClearCacheByNameEndpointProber;
 
 /**
- * The API for managing caches, with endpoints for clearing the application cache.
+ * The API for managing caches. Endpoints for clearing the application caches.
  *
  * @author Sergey Cherkasov
  */
-@Tag(name = "Caches API Controller", description = "The caches endpoint provides access to the application’s caches.")
+@Tag(name = "Caches API", description = "The caches endpoint provides access to the application’s caches.")
 @RestController
 @RequestMapping(path = ApiPaths.CachesApi.MAIN)
-public class CachesApiClearEndpoints {
+public class CachesClearApi {
+
     private final ClearAllCachesEndpointProber clearAllCachesEndpointProber;
     private final ClearCacheByNameEndpointProber clearCacheByNameEndpointProber;
 
-    public CachesApiClearEndpoints(
+    public CachesClearApi(
             ClearAllCachesEndpointProber clearAllCachesEndpointProber,
             ClearCacheByNameEndpointProber clearCacheByNameEndpointProber) {
         this.clearAllCachesEndpointProber = clearAllCachesEndpointProber;

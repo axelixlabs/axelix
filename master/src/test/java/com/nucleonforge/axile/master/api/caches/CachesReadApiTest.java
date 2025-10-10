@@ -9,9 +9,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
@@ -35,14 +32,12 @@ import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests of {@link CachesApiGetEndpoints} common cases for retrieving single cache or multiple caches.
+ * Integration tests of {@link CachesReadApi}.
  *
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CachesApiGetEndpointsGetEndpointsTest {
-
-    private static final String activeInstanceId = UUID.randomUUID().toString();
+public class CachesReadApiTest {
 
     private static MockWebServer mockWebServer;
 
@@ -63,10 +58,12 @@ public class CachesApiGetEndpointsGetEndpointsTest {
         mockWebServer.shutdown();
     }
 
-    @BeforeEach
-    void prepare() {
-        // language=json
-        String jsonResponseAllCaches =
+    @Test
+    void shouldReturnJSONCachesResponse() {
+        String activeInstanceId = UUID.randomUUID().toString();
+
+        String responseFromManagedService =
+                // language=json
                 """
             {
           "cacheManagers" : {
@@ -91,29 +88,15 @@ public class CachesApiGetEndpointsGetEndpointsTest {
         }
         """;
 
-        // language=json
-        String jsonResponseSingleCache =
-                """
-            {
-              "target" : "java.util.concurrent.ConcurrentHashMap",
-              "name" : "cities",
-              "cacheManager" : "cacheManager"
-            }
-            """;
-
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/caches")) {
+                if (path.equals("/actuator/caches")) {
                     return new MockResponse()
-                            .setBody(jsonResponseAllCaches)
-                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/caches/cities?cacheManager=cacheManager")) {
-                    return new MockResponse()
-                            .setBody(jsonResponseSingleCache)
+                            .setBody(responseFromManagedService)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -121,16 +104,9 @@ public class CachesApiGetEndpointsGetEndpointsTest {
             }
         });
 
-        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
-    }
+        registry.register(createInstanceWithUrl(
+                activeInstanceId, mockWebServer.url("/actuator").toString()));
 
-    @AfterEach
-    void cleanup() {
-        registry.deRegister(InstanceId.of(activeInstanceId));
-    }
-
-    @Test
-    void shouldReturnJSONCachesResponse() {
         // language=json
         String expectedAllCachesJSON =
                 """
@@ -202,30 +178,67 @@ public class CachesApiGetEndpointsGetEndpointsTest {
 
     @Test
     void shouldReturnJSONCacheProfileResponse() {
+        String activeInstanceId = UUID.randomUUID().toString();
+        String requestedCacheName = "cities";
+        String requestedCacheManagerName = "cacheManager";
+
         // language=json
-        String extendsCacheCities =
+        String responseFromStarter =
+                """
+        {
+          "target" : "java.util.concurrent.ConcurrentHashMap",
+          "name" : "%s",
+          "cacheManager" : "%s"
+        }
+        """
+                        .formatted(requestedCacheName, requestedCacheManagerName);
+
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String path = request.getPath();
+                assert path != null;
+
+                boolean expectedPath = path.equals(
+                        "/actuator/caches/%s?cacheManager=%s".formatted(requestedCacheName, requestedCacheManagerName));
+
+                if (expectedPath) {
+                    return new MockResponse()
+                            .setBody(responseFromStarter)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else {
+                    return new MockResponse().setResponseCode(404);
+                }
+            }
+        });
+
+        registry.register(createInstanceWithUrl(
+                activeInstanceId, mockWebServer.url("/actuator").toString()));
+
+        // language=json
+        String expectedResponseFromMaster =
                 """
             {
-              "name": "cities",
+              "name": "%s",
               "target": "java.util.concurrent.ConcurrentHashMap",
-              "cacheManager": "cacheManager"
+              "cacheManager": "%s"
             }
-            """;
-        String cacheName = "cities";
+            """
+                        .formatted(requestedCacheName, requestedCacheManagerName);
 
         // when.
         ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axile/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
+                "/api/axile/caches/{instanceId}/cache/{cacheName}?cacheManager=" + requestedCacheManagerName,
                 String.class,
                 activeInstanceId,
-                cacheName);
+                requestedCacheName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
         String body = response.getBody();
-        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(extendsCacheCities);
+        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedResponseFromMaster);
     }
 
     @Test
