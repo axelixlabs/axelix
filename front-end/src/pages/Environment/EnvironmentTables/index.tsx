@@ -1,15 +1,8 @@
-import { Input } from "antd";
-import { useTranslation } from "react-i18next";
-
-import { EmptyHandler, TableSection } from "components";
+import { EmptyHandler, PageSearch, TableSection } from "components";
 import { useAppDispatch, useAppSelector } from "hooks";
 import { filterProperties } from "store/slices";
 
-import styles from "./styles.module.css";
-
 export const EnvironmentTables = () => {
-  const { t } = useTranslation();
-
   const dispatch = useAppDispatch();
 
   const { propertySources, filteredPropertySources, environmentSearchText } =
@@ -20,14 +13,11 @@ export const EnvironmentTables = () => {
     : propertySources;
 
   const noDataAfterSearch = !!environmentSearchText && !filteredPropertySources.length
+  const addonAfter = `${environmentSearchText ? filteredPropertySources.length : propertySources.length} / ${propertySources.length}`;
 
   return (
     <>
-      <Input
-        placeholder={t("search")}
-        onChange={(e) => dispatch(filterProperties(e.target.value))}
-        className={styles.Search}
-      />
+      <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterProperties(value))} />
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         {propertySourcesList.map(({ name, properties }) => (

@@ -50,6 +50,7 @@ export const TableSection = ({ name, properties, children }: PropsWithChildren<I
             columns={createTableColumns()}
             dataSource={properties}
             pagination={false}
+            bordered
             className={styles.Table}
         />
     )

@@ -35,9 +35,9 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     // Caches
     public static final ActuatorEndpoint GET_ALL_CACHES = of("/caches", HttpMethod.GET);
-    public static final ActuatorEndpoint GET_SINGLE_CACHE = of("/caches/{cache.name}", HttpMethod.GET);
-    public static final ActuatorEndpoint EVICT_ALL_CACHES = of("/caches", HttpMethod.DELETE);
-    public static final ActuatorEndpoint EVICT_SINGLE_CACHES = of("/caches/{cache.name}", HttpMethod.DELETE);
+    public static final ActuatorEndpoint GET_SINGLE_CACHE = of("/caches/{name}", HttpMethod.GET);
+    public static final ActuatorEndpoint CLEAR_ALL_CACHES = of("/caches", HttpMethod.DELETE);
+    public static final ActuatorEndpoint CLEAR_SINGLE_CACHES = of("/caches/{name}", HttpMethod.DELETE);
 
     // Conditions
     public static final ActuatorEndpoint CONDITIONS = of("/conditions", HttpMethod.GET);
@@ -139,8 +139,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 BEANS,
                 GET_ALL_CACHES,
                 GET_SINGLE_CACHE,
-                EVICT_ALL_CACHES,
-                EVICT_SINGLE_CACHES,
+                CLEAR_ALL_CACHES,
+                CLEAR_SINGLE_CACHES,
                 CONDITIONS,
                 CONFIG_PROPS,
                 CONFIG_PROPS_BY_PREFIX,

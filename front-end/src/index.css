@@ -49,3 +49,8 @@ a {
   width: 100%;
   margin: 0 auto;
 }
+
+.MediumTitle {
+  font-size: 32px;
+  line-height: 1.2;
+}
