@@ -151,4 +151,17 @@ public final class ApiPaths {
          */
         public static final String INSTANCE_ID = "/{instanceId}";
     }
+
+    public static final class ScheduledTasksApi {
+
+        /**
+         * Base path for scheduledtasks APIs.
+         *
+         */
+        public static final String MAIN = "/scheduledtasks";
+        /**
+         * ScheduledTasks endpoint with instance ID.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+    }
 }
