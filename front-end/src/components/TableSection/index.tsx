@@ -2,8 +2,8 @@ import { Table } from 'antd';
 import { type PropsWithChildren } from 'react';
 
 import { TooltipWithCopy } from 'components/TooltipWithCopy';
+import { TablePropertyValue  } from './TablePropertyValue';
 import type { ColumnsType } from 'antd/es/table';
-import { TableProperty } from './TableProperty';
 import type { IKeyValuePair } from 'models';
 
 import styles from './styles.module.css'
@@ -39,7 +39,7 @@ export const TableSection = ({ headerName, properties, children }: PropsWithChil
                         <TooltipWithCopy text={key} />
                     </div>
                     <div className={styles.RowSecondChunk}>
-                        <TableProperty propertyKey={key} propertyValue={value} />
+                        <TablePropertyValue propertyKey={key} propertyValue={value} />
                     </div>
                 </div>
             ),

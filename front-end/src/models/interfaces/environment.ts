@@ -27,6 +27,12 @@ export interface IEnvironmentData {
 }
 
 export interface IEnvironmentSliceState extends ICommonSliceState, IEnvironmentData {
+  /**
+   * Filtered environment property sources list
+   */
   filteredPropertySources: IEnvironmentPropertySource[];
+  /**
+   * Environment search text
+   */
   environmentSearchText: string;
 }

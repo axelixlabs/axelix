@@ -19,7 +19,7 @@ interface IProps {
     propertyKey: string;
 }
 
-export const TableProperty = ({ propertyKey, propertyValue }: IProps) => {
+export const TablePropertyValue = ({ propertyKey, propertyValue }: IProps) => {
     const dispatch = useAppDispatch();
     const { instanceId } = useParams()
 
