@@ -15,7 +15,7 @@ export const Environment = () => {
   const { instanceId } = useParams();
 
   const { loading, error } = useAppSelector((store) => store.environment);
-  const { changePropertySuccess, changePropertyloading } = useAppSelector((store) => store.updateProperty);
+  const { changePropertySuccess } = useAppSelector((store) => store.updateProperty);
 
   const fetchEnvironment = () => {
     if (instanceId) {
@@ -36,7 +36,7 @@ export const Environment = () => {
     }
   }, [changePropertySuccess]);
 
-  if (loading || changePropertyloading) {
+  if (loading) {
     return <Loader />;
   }
 

@@ -23,12 +23,9 @@ export interface IUpdateProperty {
 }
 
 export interface IUpdatePropertySliceState extends ICommonSliceState {
+
     /**
      * Success flag for property update
      */
     changePropertySuccess: boolean;
-    /**
-     * Loading flag for property update
-     */
-    changePropertyloading: boolean;
 }
