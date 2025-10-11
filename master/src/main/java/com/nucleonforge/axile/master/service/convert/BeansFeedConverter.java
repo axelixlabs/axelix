@@ -6,6 +6,11 @@ import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanMethod;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanSource;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.ComponentVariant;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.FactoryBean;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.UnknownBean;
 import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
 
 /**
@@ -18,23 +23,42 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
 
     @Override
     public @NonNull BeansFeedResponse convertInternal(@NonNull BeansFeed source) {
-
-        BeansFeed.Context context =
-                source.getContexts().values().stream().findFirst().orElse(null);
-
         BeansFeedResponse beansFeedResponse = new BeansFeedResponse();
 
-        if (context == null) {
-            return beansFeedResponse;
-        }
-
-        context.getBeans().forEach((beanName, bean) -> {
-            BeanShortProfile profile = new BeanShortProfile(
-                    beanName, bean.getScope(), bean.getType(), bean.getAliases(), bean.getDependencies());
-
-            beansFeedResponse.addBean(profile);
+        source.contexts().values().forEach(context -> {
+            if (context != null && context.beans() != null) {
+                context.beans().forEach((beanName, bean) -> {
+                    BeanShortProfile profile = new BeanShortProfile(
+                            beanName,
+                            bean.scope(),
+                            bean.type(),
+                            BeanShortProfile.ProxyType.valueOf(bean.proxyType().name()),
+                            bean.aliases(),
+                            bean.dependencies(),
+                            bean.isPrimary(),
+                            bean.isLazyInit(),
+                            bean.qualifiers(),
+                            covertBeanSource(bean));
+                    beansFeedResponse.addBean(profile);
+                });
+            }
         });
 
         return beansFeedResponse;
+    }
+
+    private static BeanSource covertBeanSource(BeansFeed.Bean bean) {
+        BeansFeed.BeanSource beanSource = bean.beanSource();
+
+        // TODO: migrate to switch over the sealed interface on java 21
+        return switch (beanSource.origin()) {
+            case COMPONENT_ANNOTATION -> new ComponentVariant();
+            case BEAN_METHOD ->
+                new BeanMethod(
+                        ((BeansFeed.BeanMethod) beanSource).enclosingClassName(),
+                        ((BeansFeed.BeanMethod) beanSource).methodName());
+            case FACTORY_BEAN -> new FactoryBean(((BeansFeed.FactoryBean) beanSource).factoryBeanName());
+            case UNKNOWN -> new UnknownBean();
+        };
     }
 }
