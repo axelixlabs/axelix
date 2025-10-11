@@ -1,15 +1,24 @@
 package com.nucleonforge.axile.spring.beans;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.nucleonforge.axile.common.api.BeansFeed;
 import org.jspecify.annotations.Nullable;
+
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
 import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.util.ClassUtils;
+
+import com.nucleonforge.axile.common.api.BeansFeed;
+import com.nucleonforge.axile.common.api.BeansFeed.Bean;
+import com.nucleonforge.axile.common.api.BeansFeed.Context;
 
 /**
  * Web extension for Spring Boot Beans Actuator endpoint.
@@ -22,10 +31,11 @@ import org.springframework.context.ApplicationContext;
 public class BeansEndpointExtension {
 
     private final BeansEndpoint delegate;
-    private final BeanEnricher enricher;
-    private final ApplicationContext context;
+    private final BeanMetaInfoExtractor enricher;
+    private final ConfigurableApplicationContext context;
 
-    public BeansEndpointExtension(BeansEndpoint delegate, BeanEnricher enricher, ApplicationContext context) {
+    public BeansEndpointExtension(
+            BeansEndpoint delegate, BeanMetaInfoExtractor enricher, ConfigurableApplicationContext context) {
         this.delegate = delegate;
         this.enricher = enricher;
         this.context = context;
@@ -33,39 +43,57 @@ public class BeansEndpointExtension {
 
     @ReadOperation
     public WebEndpointResponse<BeansFeed> beans() {
-        BeansEndpoint.BeansDescriptor descriptor = delegate.beans();
+        BeansEndpoint.BeansDescriptor actuatorResponse = delegate.beans();
 
-        Map<String, BeansFeed.Context> contexts = new HashMap<>();
+        Map<String, Context> contexts = new HashMap<>();
 
-        descriptor.getContexts().forEach((contextId, contextDescriptor) -> {
-            Map<String, BeansFeed.Bean> beans = new HashMap<>();
+        actuatorResponse.getContexts().forEach((contextId, contextDescriptor) -> {
+            Map<String, Bean> beans = new HashMap<>();
 
             contextDescriptor.getBeans().forEach((beanName, beanDescriptor) -> {
-                ApplicationContext targetContext = findContextForBean(contextId);
+                ConfigurableApplicationContext targetContext = findConfigurableContextForBean(contextId);
+
                 if (targetContext != null) {
-                    enricher.enrich(beanName, beanDescriptor, targetContext)
-                        .ifPresent(bean -> beans.put(beanName, bean));
+                    BeanMetaInfo metaInfo = enricher.extract(beanName, targetContext.getBeanFactory());
+                    beans.put(
+                            beanName,
+                            new Bean(
+                                    beanDescriptor.getScope(),
+                                    ClassUtils.getUserClass(beanDescriptor.getType())
+                                            .getName(),
+                                    metaInfo.proxyType(),
+                                    toSet(beanDescriptor.getAliases()),
+                                    toSet(beanDescriptor.getDependencies()),
+                                    metaInfo.isLazyInit(),
+                                    metaInfo.isPrimary(),
+                                    metaInfo.qualifiers(),
+                                    metaInfo.beanSource()));
                 }
             });
 
-            contexts.put(contextId, new BeansFeed.Context(
-                contextDescriptor.getParentId(),
-                beans
-            ));
+            contexts.put(contextId, new Context(contextDescriptor.getParentId(), beans));
         });
 
         return new WebEndpointResponse<>(new BeansFeed(contexts));
     }
 
+    private static Set<String> toSet(String... strings) {
+        return Arrays.stream(strings).collect(Collectors.toSet());
+    }
+
     @Nullable
-    private ApplicationContext findContextForBean(String contextId) {
+    private ConfigurableApplicationContext findConfigurableContextForBean(String contextId) {
         ApplicationContext current = context;
+
         while (current != null) {
-            if (contextId.equals(current.getId())) {
-                return current;
+
+            if (contextId.equals(current.getId()) && current instanceof ConfigurableApplicationContext cac) {
+                return cac;
             }
+
             current = current.getParent();
         }
+
         return null;
     }
 }

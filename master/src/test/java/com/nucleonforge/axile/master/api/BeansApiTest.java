@@ -47,59 +47,51 @@ class BeansApiTest {
         {
           "beans": [
             {
-              "beanName": "dispatcherServletRegistrationConfiguration",
+              "beanName": "jmxEndpointProperties",
               "scope": "singleton",
-              "className": "DispatcherServletRegistrationConfiguration",
+              "className": "JmxEndpointProperties",
               "aliases": [],
+              "proxyType" : "CGLIB",
               "dependencies": [],
               "isPrimary": false,
               "isLazyInit": false,
               "qualifiers": [],
-              "beanSource": {}
+              "beanSource": {
+                  "origin": "COMPONENT_ANNOTATION"
+               }
             },
             {
-              "beanName": "propertyPlaceholderAutoConfiguration",
+              "beanName": "jacksonObjectMapperBuilder",
               "scope": "prototype",
-              "className": "PropertyPlaceholderAutoConfiguration",
+              "className": "Jackson2ObjectMapperBuilder",
               "aliases": [],
-              "dependencies": [],
+              "proxyType" : "JDK_PROXY",
+              "dependencies": [
+                "JacksonObjectMapperBuilderConfiguration"
+              ],
               "isPrimary": true,
               "isLazyInit": true,
-              "qualifiers": ["propertyConfig"],
+              "qualifiers": ["primaryMapper"],
               "beanSource": {
-                "enclosingClassName": "com.example.PropertyConfig",
-                "methodName": "propertyPlaceholderConfig"
+                "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
+                "methodName": "entityManagerFactoryBuilder",
+                "origin": "BEAN_METHOD"
               }
             },
             {
-              "beanName": "dispatcherServletAutoConfiguration",
+              "beanName": "testSessionBean",
               "scope": "session",
-              "className": "DispatcherServletAutoConfiguration",
-              "aliases": [],
+              "className": "TestSessionBean",
+              "proxyType" : "NO_PROXYING",
+              "aliases": ["sessionBeanForProberTest"],
               "dependencies": [],
               "isPrimary": false,
               "isLazyInit": false,
               "qualifiers": [],
               "beanSource": {
-                "factoryBeanName": "servletFactoryBean"
+                "factoryBeanName": "org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean",
+                "origin": "FACTORY_BEAN"
               }
-            },
-            {
-              "beanName": "discoveryClientHealthIndicator",
-              "scope": "request",
-              "className": "DiscoveryClientHealthIndicator",
-              "aliases": [
-                "healthIndicator",
-                "clientHealthIndicator"
-              ],
-              "dependencies": [
-                "DiscoveryLoadBalancerConfiguration",
-                "DiscoveryClientHealthIndicatorProperties"
-              ],
-              "isPrimary": false,
-              "isLazyInit": false,
-              "qualifiers": ["healthCheck"],
-              "beanSource": {}
             }
           ]
         }
@@ -132,58 +124,55 @@ class BeansApiTest {
         String jsonResponse =
                 """
         {
-          "contexts" : {
-            "application" : {
+          "contexts": {
+            "application": {
               "parentId": null,
-              "beans" : {
-                "dispatcherServletRegistrationConfiguration" : {
-                  "scope" : "singleton",
-                  "type" : "DispatcherServletRegistrationConfiguration",
-                  "aliases" : [ ],
-                  "dependencies" : [ ],
+              "beans": {
+                "jmxEndpointProperties": {
+                  "scope": "singleton",
+                  "type": "JmxEndpointProperties",
+                  "proxyType" : "CGLIB",
+                  "aliases": [],
+                  "dependencies": [],
                   "isLazyInit": false,
                   "isPrimary": false,
                   "qualifiers": [],
-                  "enclosingClassName": null,
-                  "methodName": null,
-                  "factoryBeanName": null
+                  "beanSource": {
+                     "origin": "COMPONENT_ANNOTATION"
+                  }
                 },
-                "propertyPlaceholderAutoConfiguration" : {
-                  "scope" : "prototype",
-                  "type" : "PropertyPlaceholderAutoConfiguration",
-                  "aliases" : [ ],
-                  "dependencies" : [ ],
+                "jacksonObjectMapperBuilder": {
+                  "scope": "prototype",
+                  "type": "Jackson2ObjectMapperBuilder",
+                  "proxyType" : "JDK_PROXY",
+                  "resource": "class path resource JacksonObjectMapperBuilderConfiguration.class",
+                  "aliases": [],
+                  "dependencies": [
+                    "JacksonObjectMapperBuilderConfiguration"
+                  ],
                   "isLazyInit": true,
                   "isPrimary": true,
-                  "qualifiers": ["propertyConfig"],
-                  "enclosingClassName": "com.example.PropertyConfig",
-                  "methodName": "propertyPlaceholderConfig",
-                  "factoryBeanName": null
+                  "qualifiers": ["primaryMapper"],
+                  "beanSource": {
+                    "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
+                    "methodName": "entityManagerFactoryBuilder",
+                    "origin": "BEAN_METHOD"
+                  }
                 },
-                "dispatcherServletAutoConfiguration" : {
-                  "scope" : "session",
-                  "type" : "DispatcherServletAutoConfiguration",
-                  "aliases" : [ ],
-                  "dependencies" : [ ],
+                "testSessionBean": {
+                  "scope": "session",
+                  "type": "TestSessionBean",
+                  "proxyType" : "NO_PROXYING",
+                  "resource": "class path resource [org.example.com]",
+                  "aliases": ["sessionBeanForProberTest"],
+                  "dependencies": [],
                   "isLazyInit": false,
                   "isPrimary": false,
                   "qualifiers": [],
-                  "enclosingClassName": null,
-                  "methodName": null,
-                  "factoryBeanName": "servletFactoryBean"
-                },
-                "discoveryClientHealthIndicator": {
-                  "scope": "request",
-                  "type": "DiscoveryClientHealthIndicator",
-                  "resource": "class path resource [org/springframework/cloud/client/CommonsClientAutoConfiguration$DiscoveryLoadBalancerConfiguration.class]",
-                  "aliases": ["clientHealthIndicator", "healthIndicator"],
-                  "dependencies": ["DiscoveryLoadBalancerConfiguration", "DiscoveryClientHealthIndicatorProperties"],
-                  "isLazyInit": false,
-                  "isPrimary": false,
-                  "qualifiers": ["healthCheck"],
-                  "enclosingClassName": null,
-                  "methodName": null,
-                  "factoryBeanName": null
+                  "beanSource": {
+                    "factoryBeanName": "org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean",
+                    "origin": "FACTORY_BEAN"
+                  }
                 }
               }
             }
