@@ -47,22 +47,6 @@ export const EnvironmentSlice = createSlice({
                 return filterByPropertySourcesName || filterByPropertiesName;
             }
             );
-        },
-        localeUpdateEnvProperty: (state, action: PayloadAction<IUpdatePropertyData>) => {
-            const { propertySourceName, propertyName, newValue } = action.payload;
-
-            const changePropertyValue = (propertySourcesData: WritableDraft<IEnvironmentPropertySource>[]) => {
-                const findedPropertySource = propertySourcesData.find(ps => ps.name === propertySourceName);
-                if (findedPropertySource) {
-                    const findedProperty = findedPropertySource.properties.find(p => p.key === propertyName);
-                    if (findedProperty) {
-                        findedProperty.value = newValue;
-                    }
-                }
-            }
-
-            changePropertyValue(state.propertySources)
-            changePropertyValue(state.filteredPropertySources)
         }
     },
     extraReducers: (builder) => {
@@ -89,6 +73,6 @@ export const EnvironmentSlice = createSlice({
     },
 });
 
-export const { filterProperties, localeUpdateEnvProperty } = EnvironmentSlice.actions;
+export const { filterProperties } = EnvironmentSlice.actions;
 
 export default EnvironmentSlice;

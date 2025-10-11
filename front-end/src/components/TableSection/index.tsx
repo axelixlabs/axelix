@@ -10,23 +10,23 @@ import styles from './styles.module.css'
 
 interface IProps {
     /**
-     * Table title
+     * Table header name
      */
-    name: string;
+    headerName: string;
     /**
      * Table key value data
      */
     properties: IKeyValuePair[];
 }
 
-export const TableSection = ({ name, properties, children }: PropsWithChildren<IProps>) => {
+export const TableSection = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
 
     const createTableColumns = (): ColumnsType<IKeyValuePair> => {
         return [{
-            key: name,
+            key: headerName,
             title: (
                 <>
-                    <div>{name}</div>
+                    <div>{headerName}</div>
                     {children}
                 </>
             ),
@@ -39,7 +39,7 @@ export const TableSection = ({ name, properties, children }: PropsWithChildren<I
                         <TooltipWithCopy text={key} />
                     </div>
                     <div className={styles.RowSecondChunk}>
-                        <TableProperty propertySourceName={name} propertyKey={key} value={value} />
+                        <TableProperty propertyKey={key} propertyValue={value} />
                     </div>
                 </div>
             ),

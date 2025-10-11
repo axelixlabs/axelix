@@ -13,25 +13,30 @@ export const Environment = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { instanceId } = useParams();
-  const [messageApi, contextHolder] = message.useMessage();
 
   const { loading, error } = useAppSelector((store) => store.environment);
-  const { changePropertySuccess } = useAppSelector((store) => store.updateProperty);
+  const { changePropertySuccess, changePropertyloading } = useAppSelector((store) => store.updateProperty);
 
-  useEffect(() => {
+  const fetchEnvironment = () => {
     if (instanceId) {
       dispatch(getEnvironmentThunk(instanceId));
     }
+  };
+
+  // todo So far, I haven't been able to find a way to combine the useEffects without causing an extra server request.
+  useEffect(() => {
+    fetchEnvironment()
   }, []);
 
   useEffect(() => {
     if (changePropertySuccess) {
-      messageApi.success(t('saved'))
-      dispatch(resetChangePropertySuccess())
+      fetchEnvironment();
+      message.success(t("saved"));
+      dispatch(resetChangePropertySuccess());
     }
   }, [changePropertySuccess]);
 
-  if (loading) {
+  if (loading || changePropertyloading) {
     return <Loader />;
   }
 
@@ -42,7 +47,6 @@ export const Environment = () => {
 
   return (
     <>
-      {contextHolder}
       <EnvironmentProfiles />
       <EnvironmentTables />
     </>

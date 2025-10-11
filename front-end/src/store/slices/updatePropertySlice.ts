@@ -3,8 +3,8 @@ import { createSlice, } from "@reduxjs/toolkit";
 import type { IUpdatePropertySliceState } from "models";
 import { updatePropertyThunk } from "store/thunks";
 
-const initialState: IUpdatePropertySliceState = {
-    loading: false,
+const initialState: Omit<IUpdatePropertySliceState, "loading"> = {
+    changePropertyloading: false,
     error: "",
     changePropertySuccess: false
 };
@@ -19,18 +19,18 @@ export const UpdatePropertySlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(updatePropertyThunk.pending, (state) => {
-            state.loading = true;
+            state.changePropertyloading = true;
             state.changePropertySuccess = false
         });
         builder.addCase(updatePropertyThunk.fulfilled, (state) => {
-            state.loading = false;
+            state.changePropertyloading = false;
             state.changePropertySuccess = true
         });
         builder.addCase(updatePropertyThunk.rejected, (state, { payload }) => {
             const { status } = payload;
             state.changePropertySuccess = false
 
-            state.loading = false;
+            state.changePropertyloading = false;
             if (status >= 400 && status < 500) {
                 // todo translate this in future
                 state.error = "Неизвестная ошибка";

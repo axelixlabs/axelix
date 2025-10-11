@@ -7,10 +7,7 @@ export const EnvironmentTables = () => {
 
   const { propertySources, filteredPropertySources, environmentSearchText } = useAppSelector((store) => store.environment);
 
-  const propertySourcesList = filteredPropertySources.length
-    ? filteredPropertySources
-    : propertySources;
-
+  const propertySourcesList = filteredPropertySources.length ? filteredPropertySources : propertySources;
   const noDataAfterSearch = !!environmentSearchText && !filteredPropertySources.length
 
   return (
@@ -20,7 +17,7 @@ export const EnvironmentTables = () => {
       <EmptyHandler isEmpty={noDataAfterSearch}>
         {propertySourcesList.map(({ name, properties }) => (
           <TableSection
-            name={name}
+            headerName={name}
             properties={properties}
             key={name}
           />

@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice, type PayloadAction, type WritableDraft } from "@reduxjs/toolkit";
-import type { IConfigPropsBean, IConfigPropsBeanData, IConfigPropsSliceState, IUpdatePropertyData } from "models";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { IConfigPropsBeanData, IConfigPropsSliceState } from "models";
 import { getConfigPropsData } from "services";
 
 const initialState: IConfigPropsSliceState = {
@@ -43,23 +43,6 @@ export const ConfigPropsSlice = createSlice({
 
         return filterByBeanName || filterByPrefix || filterByPropertiesName;
       });
-    },
-
-    localeUpdateConfigPropsProperty: (state, action: PayloadAction<IUpdatePropertyData>) => {
-      const { propertySourceName, propertyName, newValue } = action.payload;
-
-      const changePropertyValue = (beans: WritableDraft<IConfigPropsBean>[]) => {
-        const findedBean = beans.find(ps => ps.beanName === propertySourceName);
-        if (findedBean) {
-          const findedProperty = findedBean.properties.find(p => p.key === propertyName);
-          if (findedProperty) {
-            findedProperty.value = newValue;
-          }
-        }
-      }
-
-      changePropertyValue(state.beans)
-      changePropertyValue(state.filteredBeans)
     }
   },
   extraReducers: (builder) => {
@@ -84,6 +67,6 @@ export const ConfigPropsSlice = createSlice({
   },
 });
 
-export const { filterConfigProps, localeUpdateConfigPropsProperty } = ConfigPropsSlice.actions;
+export const { filterConfigProps } = ConfigPropsSlice.actions;
 
 export default ConfigPropsSlice;

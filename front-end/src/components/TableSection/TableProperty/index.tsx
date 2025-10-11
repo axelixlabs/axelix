@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Input } from "antd";
 import { useParams } from "react-router-dom";
 import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 import { updatePropertyThunk } from "store/thunks";
-import { useAppDispatch, useAppSelector } from "hooks";
+import { useAppDispatch } from "hooks";
 
 import styles from './styles.module.css'
 
@@ -12,41 +12,29 @@ interface IProps {
     /**
      * Property value
      */
-    value: string;
+    propertyValue: string;
     /**
      * Property key
      */
     propertyKey: string;
-    propertySourceName: string;
 }
 
-export const TableProperty = ({ propertySourceName, propertyKey, value }: IProps) => {
+export const TableProperty = ({ propertyKey, propertyValue }: IProps) => {
     const dispatch = useAppDispatch();
     const { instanceId } = useParams()
 
     const [editProperty, setEditProperty] = useState<boolean>(false);
-    const [newValue, setNewValue] = useState<string>(value)
-
-    const { loading, error } = useAppSelector((store) => store.updateProperty)
-
-    useEffect(() => {
-        // todo Do some small changes in future
-        if(error) {
-            setNewValue(value)
-        }
-    }, [error])
+    const [newPropertyValue, setNewPropertyValue] = useState<string>(propertyValue)
 
     const updatePropertyClickHandler = (): void => {
         if (instanceId) {
             dispatch(updatePropertyThunk({
                 instanceId,
-                data: {
-                    propertySourceName,
+                updatePropertyData: {
                     propertyName: propertyKey,
-                    newValue
+                    newValue: newPropertyValue,
                 }
             }))
-            setEditProperty(false)
         }
     }
 
@@ -55,8 +43,8 @@ export const TableProperty = ({ propertySourceName, propertyKey, value }: IProps
             {editProperty ? (
                 <>
                     <Input
-                        value={newValue}
-                        onChange={(e) => setNewValue(e.target.value)}
+                        value={newPropertyValue}
+                        onChange={(e) => setNewPropertyValue(e.target.value)}
                         className={styles.EditPropertyField}
                     />
 
@@ -66,7 +54,7 @@ export const TableProperty = ({ propertySourceName, propertyKey, value }: IProps
                             type="primary"
                             onClick={() => {
                                 setEditProperty(false)
-                                setNewValue(value)
+                                setNewPropertyValue(propertyValue)
                             }}
                         />
 
@@ -79,12 +67,11 @@ export const TableProperty = ({ propertySourceName, propertyKey, value }: IProps
                 </>
             ) : (
                 <>
-                    {value ?? 'null'}
+                    {propertyValue ?? 'null'}
                     <Button
                         icon={<EditOutlined />}
                         type="primary"
                         onClick={() => setEditProperty(true)}
-                        disabled={loading}
                         className={styles.EditButton}
                     />
                 </>
