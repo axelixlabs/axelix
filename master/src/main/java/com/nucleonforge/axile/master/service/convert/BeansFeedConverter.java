@@ -6,6 +6,11 @@ import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanMethod;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanSource;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.ComponentVariant;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.FactoryBean;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.UnknownBean;
 import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
 
 /**
@@ -33,12 +38,27 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
                             bean.isPrimary(),
                             bean.isLazyInit(),
                             bean.qualifiers(),
-                            new BeanShortProfile.BeanMethod("a","a"));
+                            covertBeanSource(bean));
                     beansFeedResponse.addBean(profile);
                 });
             }
         });
 
         return beansFeedResponse;
+    }
+
+    private static BeanSource covertBeanSource(BeansFeed.Bean bean) {
+        BeansFeed.BeanSource beanSource = bean.beanSource();
+
+        // TODO: migrate to switch over the sealed interface on java 21
+        return switch (beanSource.origin()) {
+            case COMPONENT_ANNOTATION -> new ComponentVariant();
+            case BEAN_METHOD ->
+                new BeanMethod(
+                        ((BeansFeed.BeanMethod) beanSource).enclosingClassName(),
+                        ((BeansFeed.BeanMethod) beanSource).methodName());
+            case FACTORY_BEAN -> new FactoryBean(((BeansFeed.FactoryBean) beanSource).factoryBeanName());
+            case UNKNOWN -> new UnknownBean();
+        };
     }
 }

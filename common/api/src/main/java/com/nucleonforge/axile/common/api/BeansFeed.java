@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 
@@ -37,35 +38,28 @@ public record BeansFeed(Map<String, Context> contexts) {
     }
 
     public record Bean(
-            String scope,
-            String type,
-            ProxyType proxyType,
-            Set<String> aliases,
-            Set<String> dependencies,
-            boolean isLazyInit,
-            boolean isPrimary,
-            List<String> qualifiers,
-            BeanSource beanSource) {
-        @JsonCreator
-        public Bean(
-                @JsonProperty("scope") String scope,
-                @JsonProperty("type") String type,
-                @JsonProperty("proxyType") ProxyType proxyType,
-                @JsonProperty("aliases") Set<String> aliases,
-                @JsonProperty("dependencies") Set<String> dependencies,
-                @JsonProperty("isLazyInit") boolean isLazyInit,
-                @JsonProperty("isPrimary") boolean isPrimary,
-                @JsonProperty("qualifiers") List<String> qualifiers,
-                @JsonDeserialize(using = BeanSourceDeserializer.class) BeanSource beanSource) {
-            this.scope = scope;
-            this.type = type;
-            this.proxyType = proxyType;
-            this.aliases = aliases != null ? aliases : Collections.emptySet();
-            this.dependencies = dependencies != null ? dependencies : Collections.emptySet();
-            this.isLazyInit = isLazyInit;
-            this.isPrimary = isPrimary;
-            this.qualifiers = qualifiers != null ? qualifiers : Collections.emptyList();
-            this.beanSource = beanSource;
+            @JsonProperty("scope") String scope,
+            @JsonProperty("type") String type,
+            @JsonProperty("proxyType") ProxyType proxyType,
+            @JsonProperty("aliases") Set<String> aliases,
+            @JsonProperty("dependencies") Set<String> dependencies,
+            @JsonProperty("isLazyInit") boolean isLazyInit,
+            @JsonProperty("isPrimary") boolean isPrimary,
+            @JsonProperty("qualifiers") List<String> qualifiers,
+            @JsonDeserialize(using = BeanSourceDeserializer.class) BeanSource beanSource) {
+
+        public Bean {
+            if (aliases == null) {
+                aliases = Collections.emptySet();
+            }
+
+            if (dependencies == null) {
+                dependencies = Collections.emptySet();
+            }
+
+            if (qualifiers == null) {
+                qualifiers = Collections.emptyList();
+            }
         }
     }
 
@@ -77,34 +71,52 @@ public record BeansFeed(Map<String, Context> contexts) {
     }
 
     public sealed interface BeanSource permits BeanMethod, ComponentVariant, FactoryBean, UnknownBean {
-        @JsonGetter("origin")
+
+        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
         BeanOrigin origin();
     }
 
-    @JsonIgnoreProperties("origin")
+    @JsonIgnoreProperties(BeanSourceDeserializer.ORIGIN_FIELD)
     public record UnknownBean() implements BeanSource {
+
         @Override
-        public BeanOrigin origin() { return BeanOrigin.UNKNOWN; }
+        public BeanOrigin origin() {
+            return BeanOrigin.UNKNOWN;
+        }
     }
 
-    @JsonIgnoreProperties("origin")
+    @JsonIgnoreProperties(BeanSourceDeserializer.ORIGIN_FIELD)
     public record FactoryBean(String factoryBeanName) implements BeanSource {
+
         @Override
-        public BeanOrigin origin() { return BeanOrigin.FACTORY_BEAN; }
+        public BeanOrigin origin() {
+            return BeanOrigin.FACTORY_BEAN;
+        }
     }
 
-    @JsonIgnoreProperties("origin")
-    public record BeanMethod(String enclosingClassName, String methodName) implements BeanSource {
+    @JsonIgnoreProperties(BeanSourceDeserializer.ORIGIN_FIELD)
+    public record BeanMethod(@Nullable String enclosingClassName, String methodName) implements BeanSource {
+
         @Override
-        public BeanOrigin origin() { return BeanOrigin.BEAN_METHOD; }
+        public BeanOrigin origin() {
+            return BeanOrigin.BEAN_METHOD;
+        }
     }
 
-    @JsonIgnoreProperties("origin")
+    @JsonIgnoreProperties(BeanSourceDeserializer.ORIGIN_FIELD)
     public record ComponentVariant() implements BeanSource {
+
         @Override
-        public BeanOrigin origin() { return BeanOrigin.COMPONENT_ANNOTATION; }
+        public BeanOrigin origin() {
+            return BeanOrigin.COMPONENT_ANNOTATION;
+        }
     }
 
+    /**
+     * The proxying approach that has been applied for the given bean.
+     *
+     * @author Nikita Kirillov
+     */
     public enum ProxyType {
         JDK_PROXY,
         CGLIB,

@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -79,6 +79,7 @@ public record BeanShortProfile(
 
     public sealed interface BeanSource permits BeanMethod, ComponentVariant, FactoryBean, UnknownBean {
 
+        @JsonGetter("origin")
         BeanOrigin origin();
     }
 
@@ -118,7 +119,7 @@ public record BeanShortProfile(
      *
      * @author Mikhail Polivakha
      */
-    public record BeanMethod(String enclosingClassName, String methodName) implements BeanSource {
+    public record BeanMethod(@Nullable String enclosingClassName, String methodName) implements BeanSource {
 
         @Override
         public BeanOrigin origin() {
