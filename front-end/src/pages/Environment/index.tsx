@@ -3,18 +3,20 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+import { getEnvironmentThunk, resetChangePropertySuccess } from "store/slices";
 import { EnvironmentProfiles } from "./EnvironmentProfiles";
 import { EnvironmentTables } from "./EnvironmentTables";
 import { useAppDispatch, useAppSelector } from "hooks";
-import { getEnvironmentThunk } from "store/slices";
 import { Loader } from "components";
 
 export const Environment = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { instanceId } = useParams();
-  const { t } = useTranslation();
+  const [messageApi, contextHolder] = message.useMessage();
 
-  const { loading, error, success } = useAppSelector((store) => store.environment);
+  const { loading, error } = useAppSelector((store) => store.environment);
+  const { changePropertySuccess } = useAppSelector((store) => store.updateProperty);
 
   useEffect(() => {
     if (instanceId) {
@@ -23,12 +25,11 @@ export const Environment = () => {
   }, []);
 
   useEffect(() => {
-    if (success) {
-      message.success(t('saved'))
-      // todo В будущем вместо hard code-а вставить динамический id.
-      dispatch(getEnvironmentThunk("2be78791-5045-4b9a-a02a-cc5a4cdd0094"));
+    if (changePropertySuccess) {
+      messageApi.success(t('saved'))
+      dispatch(resetChangePropertySuccess())
     }
-  }, [success]);
+  }, [changePropertySuccess]);
 
   if (loading) {
     return <Loader />;
@@ -41,6 +42,7 @@ export const Environment = () => {
 
   return (
     <>
+      {contextHolder}
       <EnvironmentProfiles />
       <EnvironmentTables />
     </>

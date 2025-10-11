@@ -17,13 +17,9 @@ interface IProps {
      * Table key value data
      */
     properties: IKeyValuePair[];
-    /**
-     * If editableProperty is true, the property can be edited.
-     */
-    editableProperty?: boolean;
 }
 
-export const TableSection = ({ name, properties, editableProperty, children }: PropsWithChildren<IProps>) => {
+export const TableSection = ({ name, properties, children }: PropsWithChildren<IProps>) => {
 
     const createTableColumns = (): ColumnsType<IKeyValuePair> => {
         return [{
@@ -43,7 +39,7 @@ export const TableSection = ({ name, properties, editableProperty, children }: P
                         <TooltipWithCopy text={key} />
                     </div>
                     <div className={styles.RowSecondChunk}>
-                        <TableProperty editableProperty={editableProperty} propertyKey={key} value={value} />
+                        <TableProperty propertySourceName={name} propertyKey={key} value={value} />
                     </div>
                 </div>
             ),

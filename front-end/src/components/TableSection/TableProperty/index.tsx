@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Input } from "antd";
+import { useParams } from "react-router-dom";
 import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
-import { updateEnvConfigPropertyThunk } from "store/slices";
-import { useAppDispatch } from "hooks";
+import { updatePropertyThunk } from "store/thunks";
+import { useAppDispatch, useAppSelector } from "hooks";
 
 import styles from './styles.module.css'
 
@@ -16,25 +17,46 @@ interface IProps {
      * Property key
      */
     propertyKey: string;
-    /**
-     * If editableProperty is true, the property can be edited.
-     */
-    editableProperty?: boolean;
+    propertySourceName: string;
 }
 
-export const TableProperty = ({ editableProperty, propertyKey, value }: IProps) => {
+export const TableProperty = ({ propertySourceName, propertyKey, value }: IProps) => {
     const dispatch = useAppDispatch();
+    const { instanceId } = useParams()
 
     const [editProperty, setEditProperty] = useState<boolean>(false);
-    const [editValue, setEditValue] = useState<string>(value)
+    const [newValue, setNewValue] = useState<string>(value)
+
+    const { loading, error } = useAppSelector((store) => store.updateProperty)
+
+    useEffect(() => {
+        // todo Do some small changes in future
+        if(error) {
+            setNewValue(value)
+        }
+    }, [error])
+
+    const updatePropertyClickHandler = (): void => {
+        if (instanceId) {
+            dispatch(updatePropertyThunk({
+                instanceId,
+                data: {
+                    propertySourceName,
+                    propertyName: propertyKey,
+                    newValue
+                }
+            }))
+            setEditProperty(false)
+        }
+    }
 
     return (
         <>
             {editProperty ? (
                 <>
                     <Input
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
+                        value={newValue}
+                        onChange={(e) => setNewValue(e.target.value)}
                         className={styles.EditPropertyField}
                     />
 
@@ -44,36 +66,27 @@ export const TableProperty = ({ editableProperty, propertyKey, value }: IProps) 
                             type="primary"
                             onClick={() => {
                                 setEditProperty(false)
-                                setEditValue(value)
+                                setNewValue(value)
                             }}
                         />
 
                         <Button
                             icon={<CheckOutlined />}
                             type="primary"
-                            onClick={() => {
-                                dispatch(updateEnvConfigPropertyThunk({
-                                    instanceId: "2be78791-5045-4b9a-a02a-cc5a4cdd0094",
-                                    data: {
-                                        propertyName: propertyKey,
-                                        newValue: editValue
-                                    }
-                                }))
-                            }}
+                            onClick={updatePropertyClickHandler}
                         />
                     </div>
                 </>
             ) : (
                 <>
                     {value ?? 'null'}
-                    {editableProperty && (
-                        <Button
-                            icon={<EditOutlined />}
-                            type="primary"
-                            onClick={() => setEditProperty(true)}
-                            className={styles.EditButton}
-                        />
-                    )}
+                    <Button
+                        icon={<EditOutlined />}
+                        type="primary"
+                        onClick={() => setEditProperty(true)}
+                        disabled={loading}
+                        className={styles.EditButton}
+                    />
                 </>
             )}
         </>

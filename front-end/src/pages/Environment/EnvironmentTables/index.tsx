@@ -22,7 +22,6 @@ export const EnvironmentTables = () => {
           <TableSection
             name={name}
             properties={properties}
-            editableProperty
             key={name}
           />
         ))}

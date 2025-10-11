@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice, type PayloadAction, } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction, type WritableDraft, } from "@reduxjs/toolkit";
 
-import type { IEnvironmentData, IEnvironmentSliceState, IUpdateEnvConfigProperty } from "models";
-import { getEnvironmentData, updateEnvConfigProperty } from "services";
+import type { IEnvironmentData, IEnvironmentPropertySource, IEnvironmentSliceState, IUpdatePropertyData } from "models";
+import { getEnvironmentData, updateProperty } from "services";
 
 const initialState: IEnvironmentSliceState = {
     loading: false,
@@ -11,7 +11,6 @@ const initialState: IEnvironmentSliceState = {
     propertySources: [],
     environmentSearchText: "",
     filteredPropertySources: [],
-    success: false
 };
 
 export const getEnvironmentThunk = createAsyncThunk<IEnvironmentData, string, { rejectValue: any }>(
@@ -22,24 +21,6 @@ export const getEnvironmentThunk = createAsyncThunk<IEnvironmentData, string, { 
 
             return response.data;
 
-            // todo replace any with real type in future
-        } catch (error: any) {
-            return rejectWithValue({
-                status: error.response?.status,
-            });
-        }
-    });
-
-
-// todo replace any with real type in future
-export const updateEnvConfigPropertyThunk = createAsyncThunk<void, IUpdateEnvConfigProperty, { rejectValue: any }>(
-    "updateEnvConfigPropertyThunk",
-    async ({ instanceId, data }, { rejectWithValue }) => {
-        try {
-            await updateEnvConfigProperty(instanceId, {
-                propertyName: data.propertyName,
-                newValue: data.newValue,
-            });
             // todo replace any with real type in future
         } catch (error: any) {
             return rejectWithValue({
@@ -67,11 +48,26 @@ export const EnvironmentSlice = createSlice({
             }
             );
         },
+        localeUpdateEnvProperty: (state, action: PayloadAction<IUpdatePropertyData>) => {
+            const { propertySourceName, propertyName, newValue } = action.payload;
+
+            const changePropertyValue = (propertySourcesData: WritableDraft<IEnvironmentPropertySource>[]) => {
+                const findedPropertySource = propertySourcesData.find(ps => ps.name === propertySourceName);
+                if (findedPropertySource) {
+                    const findedProperty = findedPropertySource.properties.find(p => p.key === propertyName);
+                    if (findedProperty) {
+                        findedProperty.value = newValue;
+                    }
+                }
+            }
+
+            changePropertyValue(state.propertySources)
+            changePropertyValue(state.filteredPropertySources)
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(getEnvironmentThunk.pending, (state) => {
             state.loading = true;
-            state.success = false
         });
         builder.addCase(getEnvironmentThunk.fulfilled, (state, { payload }) => {
             state.loading = false;
@@ -90,30 +86,9 @@ export const EnvironmentSlice = createSlice({
                 state.error = "Произошла внутренняя ошибка сервиса";
             }
         });
-
-        builder.addCase(updateEnvConfigPropertyThunk.pending, (state) => {
-            state.loading = true;
-            state.success = false
-        });
-        builder.addCase(updateEnvConfigPropertyThunk.fulfilled, (state) => {
-            state.loading = false;
-            state.success = true
-        });
-        builder.addCase(updateEnvConfigPropertyThunk.rejected, (state, { payload }) => {
-            const { status } = payload;
-            state.success = false
-
-            state.loading = false;
-            if (status >= 400 && status < 500) {
-                // todo translate this in future
-                state.error = "Неизвестная ошибка";
-            } else {
-                state.error = "Произошла внутренняя ошибка сервиса";
-            }
-        });
     },
 });
 
-export const { filterProperties } = EnvironmentSlice.actions;
+export const { filterProperties, localeUpdateEnvProperty } = EnvironmentSlice.actions;
 
 export default EnvironmentSlice;

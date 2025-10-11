@@ -6,7 +6,8 @@ import {
   BeansSlice,
   ConfigPropsSlice,
   LoggersSlice,
-  WallboardSlice
+  WallboardSlice,
+  UpdatePropertySlice
 } from "./slices";
 
 export const store = configureStore({
@@ -16,7 +17,8 @@ export const store = configureStore({
     beans: BeansSlice.reducer,
     configProps: ConfigPropsSlice.reducer,
     loggers: LoggersSlice.reducer,
-    wallboard: WallboardSlice.reducer
+    wallboard: WallboardSlice.reducer,
+    updateProperty: UpdatePropertySlice.reducer
   },
 });
 
