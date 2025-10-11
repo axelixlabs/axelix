@@ -14,8 +14,10 @@ export const ConfigProps = () => {
   const { instanceId } = useParams()
 
   const dispatch = useAppDispatch();
+
   const { beans, filteredBeans, configPropsSearchText, loading, error } = useAppSelector((store) => store.configProps);
-  const { changePropertySuccess, changePropertyloading } = useAppSelector((store) => store.updateProperty);
+
+  const { changePropertySuccess } = useAppSelector((store) => store.updateProperty);
 
   const fetchConfigProps = () => {
     if (instanceId) {
@@ -36,7 +38,7 @@ export const ConfigProps = () => {
     }
   }, [changePropertySuccess]);
 
-  if (loading || changePropertyloading) {
+  if (loading) {
     return <Loader />;
   }
 

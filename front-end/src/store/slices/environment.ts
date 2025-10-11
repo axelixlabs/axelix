@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice, type PayloadAction, type WritableDraft, } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-import type { IEnvironmentData, IEnvironmentPropertySource, IEnvironmentSliceState, IUpdatePropertyData } from "models";
-import { getEnvironmentData, updateProperty } from "services";
+import type { IEnvironmentData, IEnvironmentSliceState } from "models";
+import { getEnvironmentData } from "services";
 
 const initialState: IEnvironmentSliceState = {
     loading: false,

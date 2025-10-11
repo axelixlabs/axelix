@@ -7,7 +7,7 @@ import {
   ConfigPropsSlice,
   LoggersSlice,
   WallboardSlice,
-  UpdatePropertySlice
+  UpdatePropertySlice,
 } from "./slices";
 
 export const store = configureStore({
@@ -18,7 +18,7 @@ export const store = configureStore({
     configProps: ConfigPropsSlice.reducer,
     loggers: LoggersSlice.reducer,
     wallboard: WallboardSlice.reducer,
-    updateProperty: UpdatePropertySlice.reducer
+    updateProperty: UpdatePropertySlice.reducer,
   },
 });
 
