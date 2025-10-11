@@ -1,4 +1,5 @@
 import { Avatar, Dropdown } from "antd";
+import { useNavigate } from "react-router-dom";
 import { Header } from "antd/es/layout/layout";
 import { useTranslation } from "react-i18next";
 import { UserOutlined } from "@ant-design/icons";
@@ -13,6 +14,7 @@ import styles from "./styles.module.css";
 
 export const AdminHeader = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const items: MenuProps["items"] = [
     {
@@ -23,7 +25,7 @@ export const AdminHeader = () => {
 
   return (
     <Header className={styles.Header}>
-      <img src={Logo} alt="Axile logo" className={styles.Logo} />
+      <img src={Logo} alt="Axile logo" onClick={() => navigate('/')} className={styles.Logo} />
       <div className={styles.LinksAndAvatarWrapper}>
         <NavigationBar />
         <Dropdown menu={{ items }}>

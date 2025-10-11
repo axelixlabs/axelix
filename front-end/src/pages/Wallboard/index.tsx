@@ -1,16 +1,13 @@
-import { Input } from 'antd';
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { filterServiceCards, getWallboardDataThunk } from 'store/slices';
+import { EmptyHandler, Loader, PageSearch } from 'components';
 import { useAppDispatch, useAppSelector } from 'hooks';
-import { EmptyHandler, Loader } from 'components';
 import { WallboardCard } from './WallboardCard';
 
 import styles from './styles.module.css'
 
 export const Wallboard = () => {
-    const { t } = useTranslation()
     const dispatch = useAppDispatch()
     const { instances, filteredInstances, instancesSearchText, loading, error } = useAppSelector(state => state.wallboard)
 
@@ -30,20 +27,17 @@ export const Wallboard = () => {
         return error
     }
 
-    const serviceCardsData = filteredInstances.length ? filteredInstances : instances;
+    const serviceCardsList = filteredInstances.length ? filteredInstances : instances;
     const noDataAfterSearch = !!instancesSearchText && !filteredInstances.length;
+    const addonAfter = `${instancesSearchText ? filteredInstances.length : instances.length} / ${instances.length}`;
 
     return (
         <>
-            <Input
-                placeholder={t("search")}
-                onChange={(e) => dispatch(filterServiceCards(e.target.value))}
-                className={styles.Search}
-            />
+            <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterServiceCards(value))} />
 
             <EmptyHandler isEmpty={noDataAfterSearch}>
                 <div className={styles.CardsResponsiveWrapper}>
-                    {serviceCardsData.map(data => <WallboardCard data={data} key={data.instanceId} />)}
+                    {serviceCardsList.map(data => <WallboardCard data={data} key={data.instanceId} />)}
                 </div>
             </EmptyHandler>
         </>
