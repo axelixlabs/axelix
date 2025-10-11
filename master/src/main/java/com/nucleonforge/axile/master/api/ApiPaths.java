@@ -151,7 +151,7 @@ public final class ApiPaths {
          */
         public static final String INSTANCE_ID = "/{instanceId}";
     }
-  
+
     public static final class CachesApi {
 
         /**
@@ -167,7 +167,7 @@ public final class ApiPaths {
          */
         public static final String CACHE_NAME = "/{instanceId}/cache/{cacheName}";
     }
-  
+
     public static final class ScheduledTasksApi {
 
         /**
