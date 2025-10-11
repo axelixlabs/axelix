@@ -9,17 +9,19 @@ import { useAppDispatch } from "hooks";
 import styles from './styles.module.css'
 
 interface IProps {
+
     /**
      * Property value
      */
     propertyValue: string;
+
     /**
-     * Property key
+     * The name of the property.
      */
-    propertyKey: string;
+    propertyName: string;
 }
 
-export const TablePropertyValue = ({ propertyKey, propertyValue }: IProps) => {
+export const TablePropertyValue = ({ propertyName, propertyValue }: IProps) => {
     const dispatch = useAppDispatch();
     const { instanceId } = useParams()
 
@@ -31,7 +33,7 @@ export const TablePropertyValue = ({ propertyKey, propertyValue }: IProps) => {
             dispatch(updatePropertyThunk({
                 instanceId,
                 updatePropertyData: {
-                    propertyName: propertyKey,
+                    propertyName: propertyName,
                     newValue: newPropertyValue,
                 }
             }))

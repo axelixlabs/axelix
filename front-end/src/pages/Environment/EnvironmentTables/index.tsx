@@ -1,4 +1,4 @@
-import { EmptyHandler, PageSearch, TableSection } from "components";
+import { EmptyHandler, PageSearch, ModifiableTableSection } from "components";
 import { useAppDispatch, useAppSelector } from "hooks";
 import { filterProperties } from "store/slices";
 
@@ -16,9 +16,19 @@ export const EnvironmentTables = () => {
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         {propertySourcesList.map(({ name, properties }) => (
-          <TableSection
+          <ModifiableTableSection
             headerName={name}
-            properties={properties}
+            properties={
+              properties.map(
+                  (property) => (
+                      {
+                        key: property.key,
+                        displayKey: property.key,
+                        displayValue: property.value
+                      }
+                  )
+              )
+            }
             key={name}
           />
         ))}

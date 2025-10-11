@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { filterConfigProps, getConfigPropsThunk, resetChangePropertySuccess } from "store/slices";
-import { Loader, EmptyHandler, TableSection, PageSearch } from "components";
+import { Loader, EmptyHandler, ModifiableTableSection, PageSearch } from "components";
 import { useAppDispatch, useAppSelector } from "hooks";
 
 import styles from "./styles.module.css";
@@ -55,9 +55,18 @@ export const ConfigProps = () => {
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         {configProps.map(({ beanName, prefix, properties }) => (
-          <TableSection
+          <ModifiableTableSection
             headerName={beanName}
-            properties={properties}
+            properties={
+              properties.map((property) => {
+                  return {
+                      key: prefix + "." + property.key,
+                      displayValue: property.value,
+                      displayKey: property.value,
+                  }
+              })
+            }
+
             key={beanName}
           >
             {prefix && (
@@ -65,7 +74,7 @@ export const ConfigProps = () => {
                 <span className={styles.PrefixTitle}>Prefix:</span> {prefix}
               </div>
             )}
-          </TableSection>
+          </ModifiableTableSection>
         ))}
       </EmptyHandler>
     </>
