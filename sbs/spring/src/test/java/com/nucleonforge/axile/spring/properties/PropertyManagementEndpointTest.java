@@ -53,9 +53,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(
         // spotless:off
         properties = {
-            "myEmpty.property= ",
-            "notEmpty.property=not-empty",
-            "management.endpoint.env.show-values=always"
+            "my-empty.property= ",
+            "not-empty.property=not-empty",
+            "management.endpoint.env.show-values=always",
+            "non-standard.camel-case.property=old-value"
         })
         // spotless:on
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -71,9 +72,12 @@ class PropertyManagementEndpointTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private DefaultPropertyDiscoverer propertyDiscoverer;
+
     @Test
     void mutate_shouldUpdatePropertyValue() throws InterruptedException {
-        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/myEmpty.property", Map.class);
+        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/my-empty.property", Map.class);
 
         assertThat(initialResponse)
                 .isNotNull()
@@ -83,9 +87,35 @@ class PropertyManagementEndpointTest {
                 .isEqualTo("");
 
         String newValue = "new-value";
-        mutateProperty("myEmpty.property", newValue);
+        mutateProperty("my-empty.property", newValue);
 
-        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/myEmpty.property", Map.class);
+        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/my-empty.property", Map.class);
+
+        assertThat(updatedResponse)
+                .isNotNull()
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("new-value");
+    }
+
+    @Test
+    void mutate_shouldUpdateNonStandardPropertyValue() throws InterruptedException {
+        Map<?, ?> initialResponse =
+                restTemplate.getForObject("/actuator/env/non-standard.camel-case.property", Map.class);
+
+        assertThat(initialResponse)
+                .isNotNull()
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("old-value");
+
+        String newValue = "new-value";
+        mutateProperty("$&*nonStanda#rd.camelCase.property", newValue);
+
+        Map<?, ?> updatedResponse =
+                restTemplate.getForObject("/actuator/env/non-standard.camel-case.property", Map.class);
 
         assertThat(updatedResponse)
                 .isNotNull()
@@ -97,7 +127,7 @@ class PropertyManagementEndpointTest {
 
     @Test
     void mutate_shouldMutate_whenNewValueIsEmpty() throws InterruptedException {
-        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/notEmpty.property", Map.class);
+        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/not-empty.property", Map.class);
 
         assertThat(initialResponse)
                 .isNotNull()
@@ -106,9 +136,9 @@ class PropertyManagementEndpointTest {
                 .extracting("value")
                 .isEqualTo("not-empty");
 
-        mutateProperty("notEmpty.property", "");
+        mutateProperty("not-empty.property", "");
 
-        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/notEmpty.property", Map.class);
+        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/not-empty.property", Map.class);
 
         assertThat(updatedResponse)
                 .isNotNull()
@@ -150,7 +180,7 @@ class PropertyManagementEndpointTest {
 
     @Test
     void shouldReturnBadRequest_whenPropertyDoesNotExist() {
-        String propertyName = "nonExistentProperty.property";
+        String propertyName = "non-existent-property.property";
         PropertyMutationRequest request = new PropertyMutationRequest(propertyName, "newValue");
 
         ResponseEntity<PropertyNotFoundException> response =
