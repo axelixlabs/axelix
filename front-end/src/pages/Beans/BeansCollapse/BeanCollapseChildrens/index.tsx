@@ -65,7 +65,9 @@ export const BeanCollapseChildrens = ({
       <div>
         {bean.aliases.map((aliase) => (
           <div key={aliase} className={styles.CollapseBodyChunkList}>
-            {aliase}
+            <div className={styles.Aliase}>
+              {aliase}
+            </div>
           </div>
         ))}
       </div>

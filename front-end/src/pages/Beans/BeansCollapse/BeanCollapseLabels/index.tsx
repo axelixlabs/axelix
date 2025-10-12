@@ -29,7 +29,7 @@ export const BeanCollapseLabels = ({
       }}
       className={styles.CollapseHeader}
     >
-      <div>
+      <div className={styles.CollapseHeaderContent}>
         <TooltipWithCopy text={beanName} />
         <div className={styles.ClassName}>
           <TooltipWithCopy text={className} />

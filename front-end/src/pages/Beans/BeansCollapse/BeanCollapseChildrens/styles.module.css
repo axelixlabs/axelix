@@ -1,7 +1,7 @@
 .CollapseBody {
   display: grid;
-  grid-template-columns: 130px 1fr;
-  row-gap: 20px;
+  grid-template-columns: 130px 70%;
+  gap: 20px;
 }
 
 .Dependency {
@@ -18,6 +18,7 @@
 
 .CollapseBodyChunkTitle {
   font-weight: 600;
+  word-break: break-all;
 }
 
 .CollapseBodyChunkList {
@@ -30,4 +31,8 @@
   border-bottom: none;
   margin-bottom: 0;
   padding-bottom: 0;
+}
+
+.Aliase{
+  word-break: break-all;
 }

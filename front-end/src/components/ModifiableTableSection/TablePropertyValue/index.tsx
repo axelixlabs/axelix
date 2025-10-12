@@ -9,7 +9,6 @@ import { useAppDispatch } from "hooks";
 import styles from './styles.module.css'
 
 interface IProps {
-
     /**
      * Property value
      */
@@ -41,34 +40,34 @@ export const TablePropertyValue = ({ propertyName, propertyValue }: IProps) => {
     }
 
     return (
-        <>
+        <div className={styles.MainWrapper}>
             {editProperty ? (
-                <>
+                <div className={styles.EditPropertyWrapper}>
                     <Input
                         value={newPropertyValue}
                         onChange={(e) => setNewPropertyValue(e.target.value)}
                         className={styles.EditPropertyField}
                     />
 
-                    <div className={styles.ActionButtonsWrapper}>
-                        <Button
-                            icon={<CloseOutlined />}
-                            type="primary"
-                            onClick={() => {
-                                setEditProperty(false)
-                                setNewPropertyValue(propertyValue)
-                            }}
-                        />
+                    <Button
+                        icon={<CloseOutlined />}
+                        type="primary"
+                        onClick={() => {
+                            setEditProperty(false)
+                            setNewPropertyValue(propertyValue)
+                        }}
+                        className={styles.CloseButton}
+                    />
 
-                        <Button
-                            icon={<CheckOutlined />}
-                            type="primary"
-                            onClick={updatePropertyClickHandler}
-                        />
-                    </div>
-                </>
+                    <Button
+                        icon={<CheckOutlined />}
+                        type="primary"
+                        onClick={updatePropertyClickHandler}
+                        className={styles.UpdateButton}
+                    />
+                </div>
             ) : (
-                <>
+                <div className={styles.PropertyValueWrapper}>
                     {propertyValue ?? 'null'}
                     <Button
                         icon={<EditOutlined />}
@@ -76,8 +75,8 @@ export const TablePropertyValue = ({ propertyName, propertyValue }: IProps) => {
                         onClick={() => setEditProperty(true)}
                         className={styles.EditButton}
                     />
-                </>
+                </div>
             )}
-        </>
+        </div>
     )
 };

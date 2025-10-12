@@ -13,7 +13,8 @@
   --axile-gray: #d9d9d9;
   --axile-bold-grey: #838383;
   --axile-primary-red: #FF000A;
-  --axile-primary-light-red: #FF000A1A
+  --axile-primary-light-red: #FF000A1A;
+  --axile-antd-light-grey: #f0f0f0;
 }
 
 *,
