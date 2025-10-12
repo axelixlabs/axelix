@@ -5,13 +5,14 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
+import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
+
 /**
- * The response of the scheduledtasks actuator endpoint provides information about the application’s scheduled tasks.
+ * The response of the {@link ActuatorEndpoints#SCHEDULED_TASKS} actuator endpoint provides information about the application’s scheduled tasks.
  *
- * @see ScheduledTasksEndpoint
  * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/scheduledtasks.html">Scheduled Tasks Endpoint</a>
  *
- * @param cron          The list of scheduled tasks with precise execution configuration, if any.
+ * @param cron          The list of cron scheduled tasks with precise execution configuration, if any.
  * @param fixedDelay    The list of scheduled interval between tasks executions, counted from the end of the previous task execution, if any.
  * @param fixedRate     The list of scheduled interval between task executions, measured from the start of the previous task execution, if any.
  * @param custom        The list of tasks with a configured user triggers, if any.
@@ -28,8 +29,7 @@ public record ServiceScheduledTasks(
      * DTO representing a scheduled task with precise execution configuration.
      *
      * @param runnable         The target that will be executed.
-     * @param expression       The expression that allows specifying the exact time and frequency of task execution
-     *                          (e.g., "0 1 1 5 7 3" or "0 0/15 9-17 ? * MON,WED,FRI" (seconds minutes hours day_of_month month day_of_week))
+     * @param expression       The cron expression (e.g., "0 1 1 5 7 3" or "0 0/15 9-17 ? * MON,WED,FRI" (seconds minutes hours day_of_month month day_of_week))
      * @param nextExecution    The time of the next scheduled execution of this task, if known.
      * @param lastExecution    The last execution of this task, if any.
      *
@@ -117,9 +117,7 @@ public record ServiceScheduledTasks(
     }
 
     /**
-     * DTO that contains the next execution time of task.
-     *
-     * @param time  The execution time.
+     * DTO that contains the next planned execution time of task.
      *
      * @author Sergey Cherkasov
      */
@@ -128,7 +126,7 @@ public record ServiceScheduledTasks(
     /**
      * DTO that contains the target that will be executed.
      *
-     * @param target  The target for execution.
+     * @param target The target for execution.
      *
      * @author Sergey Cherkasov
      */

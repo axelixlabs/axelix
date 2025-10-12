@@ -8,10 +8,10 @@ import org.jspecify.annotations.Nullable;
 /**
  * The profile provides information about the application’s scheduled tasks.
  *
- * @param cron          The list of scheduled tasks with precise execution configuration, if any.
- * @param fixedDelay    The list of scheduled interval between tasks executions, counted from the end of the previous task execution, if any.
- * @param fixedRate     The list of scheduled interval between task executions, measured from the start of the previous task execution, if any.
- * @param custom        The list of tasks with a configured user triggers, if any.
+ * @param cron          The list of scheduled cron tasks, if any.
+ * @param fixedDelay    The list of scheduled interval with fixed-delay, if any.
+ * @param fixedRate     The list of scheduled interval with fixed-rate, if any.
+ * @param custom        The list of scheduled tasks with a custom configured user triggers, if any.
  *
  * @author Sergey Cherkasov
  */
@@ -22,8 +22,7 @@ public record ScheduledTasksResponse(
      * The profile representing a scheduled task with precise execution configuration.
      *
      * @param runnable         The target that will be executed.
-     * @param expression       The expression that allows specifying the exact time and frequency of task execution
-     *                          (e.g., "0 1 1 5 7 3" or "0 0/15 9-17 ? * MON,WED,FRI" (seconds minutes hours day_of_month month day_of_week))
+     * @param expression       The cron expression that allows specifying (e.g., "0 1 1 5 7 3" or "0 0/15 9-17 ? * MON,WED,FRI" (seconds minutes hours day_of_month month day_of_week))
      * @param nextExecution    The time of the next scheduled execution of this task, if known.
      * @param lastExecution    The last execution of this task, if any.
      *

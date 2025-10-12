@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,13 +25,13 @@ import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.transport.ScheduledTasksEndpointProber;
 
 /**
- * The API for managing scheduledtasks.
+ * The API for managing scheduled-tasks (i.e. those that are represented by {@link Scheduled @Scheduled} methods).
  *
  * @author Sergey Cherkasov
  */
 @Tag(
         name = "ScheduledTasks API Controller",
-        description = "The scheduledtasks endpoint provides information about the application’s scheduled tasks.")
+        description = "The scheduled-tasks endpoint provides information about the application’s scheduled tasks.")
 @RestController
 @RequestMapping(path = ApiPaths.ScheduledTasksApi.MAIN)
 public class ScheduledTasksApi {

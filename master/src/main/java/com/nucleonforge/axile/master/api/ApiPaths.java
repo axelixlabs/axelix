@@ -171,10 +171,10 @@ public final class ApiPaths {
     public static final class ScheduledTasksApi {
 
         /**
-         * Base path for scheduledtasks APIs.
+         * Base path for {@link com.nucleonforge.axile.master.api.ScheduledTasksApi} APIs.
          *
          */
-        public static final String MAIN = "/scheduledtasks";
+        public static final String MAIN = "/scheduled-tasks";
         /**
          * ScheduledTasks endpoint with instance ID.
          */

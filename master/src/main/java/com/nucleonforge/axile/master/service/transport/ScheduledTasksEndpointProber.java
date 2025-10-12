@@ -11,7 +11,7 @@ import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrateg
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#SCHEDULED_TASKS /scheduledtasks} endpoint.
+ * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#SCHEDULED_TASKS} endpoint.
  *
  * @author Sergey Cherkasov
  */
