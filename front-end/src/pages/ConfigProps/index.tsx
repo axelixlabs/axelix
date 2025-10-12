@@ -60,9 +60,9 @@ export const ConfigProps = () => {
             properties={
               properties.map((property) => {
                   return {
-                      key: prefix + "." + property.key,
+                      key: `${prefix}.${property.key}`,
+                      displayKey: property.key,
                       displayValue: property.value,
-                      displayKey: property.value,
                   }
               })
             }
