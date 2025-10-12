@@ -42,7 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ScheduledTasksApiTest {
 
     // language=json
-    private static final String EXPECTED_SCHEDULEDTASKS_JSON =
+    private static final String EXPECTED_MASTER_RESPONSE =
             """
         {
       "cron": [
@@ -246,14 +246,14 @@ public class ScheduledTasksApiTest {
         registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/scheduledtasks/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axile/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
         String body = response.getBody();
-        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_SCHEDULEDTASKS_JSON);
+        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_MASTER_RESPONSE);
     }
 
     @DisplayName("Should return 500 on EndpointInvocationError")
@@ -263,7 +263,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/scheduledtasks/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axile/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -275,7 +275,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/scheduledtasks/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axile/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
