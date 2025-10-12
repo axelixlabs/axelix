@@ -18,7 +18,6 @@
   "loggers": "Логгеры",
   "mappings": "Сопоставления",
   "caches": "Кэши",
-  "save": "Сохранить",
   "activeProfiles": "Профили",
   "noData": "Нет данных",
   "dependencies": "Зависимости",
@@ -26,5 +25,6 @@
   "copied": "Скопировано",
   "reset": "Сбросить",
   "configuredExplicitly": "Задан явно",
-  "loggerLevelUpdated": "Уровень логгера изменён"
+  "loggerLevelUpdated": "Уровень логгера изменён",
+  "saved": "Сохранено"
 }

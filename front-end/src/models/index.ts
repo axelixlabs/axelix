@@ -1,3 +1,4 @@
+export * from "./interfaces/updateProperty";
 export * from "./interfaces/environment";
 export * from "./interfaces/configProps";
 export * from './interfaces/wallboard';

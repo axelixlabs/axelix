@@ -13,6 +13,9 @@ export interface ICommonSliceState {
  * A common reusable interface for describing objects that consist of key and value pair.
  */
 export interface IKeyValuePair {
+
   key: string;
+
   value: string;
 }
+

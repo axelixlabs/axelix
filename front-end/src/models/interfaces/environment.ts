@@ -1,8 +1,8 @@
 import type { ICommonSliceState, IKeyValuePair } from "./globals";
 
-interface IEnvironmentPropertySource {
+export interface IEnvironmentPropertySource {
   /**
-   * Environment propery source name
+   * Environment property source name
    */
   name: string;
   /**
@@ -27,6 +27,12 @@ export interface IEnvironmentData {
 }
 
 export interface IEnvironmentSliceState extends ICommonSliceState, IEnvironmentData {
-  environmentSearchText: string;
+  /**
+   * Filtered environment property sources list
+   */
   filteredPropertySources: IEnvironmentPropertySource[];
+  /**
+   * Environment search text
+   */
+  environmentSearchText: string;
 }

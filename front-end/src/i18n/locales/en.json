@@ -18,7 +18,6 @@
   "loggers": "Loggers",
   "mappings": "Mappings",
   "caches": "Caches",
-  "save": "Save",
   "activeProfiles": "Profiles",
   "noData": "No data",
   "dependencies": "Dependencies",
@@ -26,5 +25,6 @@
   "copied": "Copied",
   "reset": "Reset",
   "configuredExplicitly": "Configured explicitly",
-  "loggerLevelUpdated": "Level has been changed"
+  "loggerLevelUpdated": "Level has been changed",
+  "saved": "Saved"
 }

@@ -1,26 +1,40 @@
+import { message } from "antd";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-import { useAppDispatch, useAppSelector } from "hooks";
+import { getEnvironmentThunk, resetChangePropertySuccess } from "store/slices";
 import { EnvironmentProfiles } from "./EnvironmentProfiles";
 import { EnvironmentTables } from "./EnvironmentTables";
-import { getEnvironmentThunk } from "store/slices";
+import { useAppDispatch, useAppSelector } from "hooks";
 import { Loader } from "components";
 
 export const Environment = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { instanceId } = useParams();
 
   const { loading, error } = useAppSelector((store) => store.environment);
+  const { changePropertySuccess } = useAppSelector((store) => store.updateProperty);
 
-  useEffect(() => {
+  const fetchEnvironment = () => {
     if (instanceId) {
       dispatch(getEnvironmentThunk(instanceId));
     }
-    // The dispatch passed as a dependency to useEffect does not affect its execution, since the dispatch function is never recreated.
-    // There are two common approaches: either include dispatch in the dependencies or omit it. 
-    // Both approaches are considered correct.
-  }, [dispatch]);
+  };
+
+  // todo So far, I haven't been able to find a way to combine the useEffects without causing an extra server request.
+  useEffect(() => {
+    fetchEnvironment()
+  }, []);
+
+  useEffect(() => {
+    if (changePropertySuccess) {
+      fetchEnvironment();
+      message.success(t("saved"));
+      dispatch(resetChangePropertySuccess());
+    }
+  }, [changePropertySuccess]);
 
   if (loading) {
     return <Loader />;

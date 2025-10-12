@@ -1,0 +1,13 @@
+.EditPropertyField {
+    max-width: 400px;
+}
+
+.ActionButtonsWrapper{
+    display: flex;
+    column-gap: 8px;
+    flex-shrink: 0;
+}
+
+.EditButton {
+    flex-shrink: 0;
+}

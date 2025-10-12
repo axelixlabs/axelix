@@ -1,17 +1,13 @@
-import { EmptyHandler, PageSearch, TableSection } from "components";
+import { EmptyHandler, PageSearch, ModifiableTableSection } from "components";
 import { useAppDispatch, useAppSelector } from "hooks";
 import { filterProperties } from "store/slices";
 
 export const EnvironmentTables = () => {
   const dispatch = useAppDispatch();
 
-  const { propertySources, filteredPropertySources, environmentSearchText } =
-    useAppSelector((store) => store.environment);
+  const { propertySources, filteredPropertySources, environmentSearchText } = useAppSelector((store) => store.environment);
 
-  const propertySourcesList = filteredPropertySources.length
-    ? filteredPropertySources
-    : propertySources;
-
+  const propertySourcesList = filteredPropertySources.length ? filteredPropertySources : propertySources;
   const noDataAfterSearch = !!environmentSearchText && !filteredPropertySources.length
   const addonAfter = `${environmentSearchText ? filteredPropertySources.length : propertySources.length} / ${propertySources.length}`;
 
@@ -21,9 +17,19 @@ export const EnvironmentTables = () => {
 
       <EmptyHandler isEmpty={noDataAfterSearch}>
         {propertySourcesList.map(({ name, properties }) => (
-          <TableSection
-            name={name}
-            properties={properties}
+          <ModifiableTableSection
+            headerName={name}
+            properties={
+              properties.map(
+                  (property) => (
+                      {
+                        key: property.key,
+                        displayKey: property.key,
+                        displayValue: property.value
+                      }
+                  )
+              )
+            }
             key={name}
           />
         ))}

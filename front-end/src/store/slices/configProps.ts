@@ -43,7 +43,7 @@ export const ConfigPropsSlice = createSlice({
 
         return filterByBeanName || filterByPrefix || filterByPropertiesName;
       });
-    },
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(getConfigPropsThunk.pending, (state) => {
