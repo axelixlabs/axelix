@@ -104,10 +104,24 @@ a good example is the following:
 ----
 Polishing: extracted the authorities mapping into a separate class
 
-Anything that you thing you want to add goes here
+Anything that you thing you want to add goes here as the extended git commit message
 ----
 
 That is _very_ important, because if we would want to be able to revert a specific feature later on, we _would not_ want to revert the refactoring that we've done.
+
+=== Polishing Branches.
+
+Over time, it also became obvious that sometimes we need to introduce some refactoring / polishing commits, but we do not have any specific feature branch. Since commiting directly to the master branch is _generally_ disallowed, we need to tackle this case as well.
+
+So, the solution is the following:
+
+1. Create a new branch that follows the naming convention: `refactor/<DETAILS>`. The `<DETAILS>` is essentially any short phase that explains what this refactoring aims to solve/improve upon.
+
+2. Introduce polishing commits in this newly created branch
+
+3. Open the PR to `master` branch
+
+After that, the procedure is the same as the one for the `feature` branches. Note that there should be no new issues created for the refactoring branches, since these branches are assumed to be very small and concise.
 
 === Code Review and Commits
 
