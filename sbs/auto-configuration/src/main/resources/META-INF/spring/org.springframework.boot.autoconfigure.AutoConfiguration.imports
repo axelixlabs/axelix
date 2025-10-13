@@ -9,4 +9,5 @@ com.nucleonforge.axile.autoconfiguration.spring.AxileMetadataEndpointConfigurati
 com.nucleonforge.axile.autoconfiguration.spring.LibraryDiscovererAutoConfiguration
 com.nucleonforge.axile.autoconfiguration.spring.ShortBuildInfoProviderAutoConfiguration
 com.nucleonforge.axile.autoconfiguration.spring.GitInformationProviderAutoConfiguration
+com.nucleonforge.axile.autoconfiguration.spring.SpringActuatorExceptionHandlerAutoConfiguration
 com.nucleonforge.axile.autoconfiguration.auth.JwtAuthAutoConfiguration

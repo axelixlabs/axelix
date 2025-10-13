@@ -23,7 +23,12 @@ public class PropertyManagementEndpoint {
 
     @PostMapping
     public ResponseEntity<Void> mutate(@RequestBody PropertyMutationRequest request) {
-        propertyMutator.mutate(request.propertyName(), request.newValue());
+        String propertyName = request.propertyName();
+        if (propertyName == null || propertyName.isBlank()) {
+            throw new PropertyNameIsNotValidException("Property name '" + propertyName + "' is not valid.");
+        }
+
+        propertyMutator.mutate(propertyName, request.newValue());
         return ResponseEntity.noContent().build();
     }
 }

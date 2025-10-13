@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.nucleonforge.axile.spring.properties.PropertyNameIsNotValidException;
 import com.nucleonforge.axile.spring.properties.PropertyNotFoundException;
 
 /**
@@ -19,8 +20,8 @@ import com.nucleonforge.axile.spring.properties.PropertyNotFoundException;
 @RestControllerAdvice
 public class ActuatorExceptionHandler {
 
-    @ExceptionHandler(PropertyNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleEndpointException(PropertyNotFoundException ex) {
+    @ExceptionHandler({PropertyNotFoundException.class, PropertyNameIsNotValidException.class})
+    public ResponseEntity<Map<String, String>> handleEndpointException(RuntimeException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("message", ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage());
 
