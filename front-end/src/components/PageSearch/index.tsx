@@ -5,18 +5,21 @@ import { useTranslation } from 'react-i18next';
 import styles from './styles.module.css'
 
 interface IProps {
+
     /**
      * Callback function when the search value changes
      */
     onChange: (value: string) => void;
+
     /**
      * Whether to add a bottom gutter to the search field
      */
     hasBottomGutter?: boolean;
+
     /**
      * Optional text to display after the search field
      */
-    addonAfter: string
+    addonAfter?: string
 }
 
 export const PageSearch = ({ onChange, addonAfter, hasBottomGutter = true }: IProps) => {
