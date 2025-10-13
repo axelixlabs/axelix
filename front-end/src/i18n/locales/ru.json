@@ -28,6 +28,7 @@
   "loggerLevelUpdated": "Уровень логгера изменён",
   "propertyChangedSuccessfully": "Свойство Изменено",
   "clearAllCaches": "Очистить все кэши",
-  "target": "Цель",
+  "cacheTarget": "Реализация",
+  "cacheName": "Имя",
   "cleared": "Очищено"
 }

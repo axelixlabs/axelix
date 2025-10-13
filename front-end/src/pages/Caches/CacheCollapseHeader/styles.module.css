@@ -10,10 +10,11 @@
     column-gap: 8px;
 }
 
-.CacheName{
+.CacheName {
     word-break: break-all;
+    font-weight: 600;
 }
 
-.ClearCacheButton{
+.ClearCacheButton {
     flex-shrink: 0;
 }

@@ -6,7 +6,7 @@ export interface IEnvironmentPropertySource {
    */
   name: string;
   /**
-   * Environment properies list
+   * Environment properties list
    */
   properties: IKeyValuePair[];
 }
@@ -16,6 +16,7 @@ export interface IEnvironmentData {
    * Environment active profiles list
    */
   activeProfiles: string[];
+
   /**
    * Environment default profiles list
    */

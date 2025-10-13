@@ -7,7 +7,7 @@ import { ReloadOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from 'hooks';
 import { clearCacheThunk } from 'store/thunks';
 import { TooltipWithCopy } from 'components';
-import type { ICacheData } from 'models';
+import {type ICacheData, IClearOperationType} from 'models';
 
 import styles from './styles.module.css'
 
@@ -27,7 +27,7 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
     const { instanceId } = useParams()
     const { t } = useTranslation()
 
-    const { clearLoading } = useAppSelector((state) => state.caches)
+    const { clearOperationLoading } = useAppSelector((state) => state.caches)
 
     const clearCacheClickHandler = (e: MouseEvent<HTMLElement>): void => {
         e.stopPropagation();
@@ -45,15 +45,16 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
     return (
         <div className={styles.CollapseHeader}>
             <div>
-                <div className={styles.CacheName}>{cache.name}</div>
+                <span>{t("cacheName")}: </span>
+                <span className={styles.CacheName}>{cache.name}</span>
                 <div className={styles.Target}>
-                    {t("target")}: <TooltipWithCopy text={cache.target} />
+                    {t("cacheTarget")}: <TooltipWithCopy text={cache.target} />
                 </div>
             </div>
             <Button
                 icon={<ReloadOutlined />}
                 type="primary"
-                loading={clearLoading === "singleCache"}
+                loading={clearOperationLoading === IClearOperationType.CLEAR_SINGLE_CACHE}
                 className={styles.ClearCacheButton}
                 onClick={clearCacheClickHandler}
             />

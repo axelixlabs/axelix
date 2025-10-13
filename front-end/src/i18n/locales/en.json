@@ -28,6 +28,7 @@
   "loggerLevelUpdated": "Level has been changed",
   "propertyChangedSuccessfully": "Property Changed",
   "clearAllCaches": "Clear All Caches",
-  "target": "Target",
+  "cacheTarget": "Target",
+  "cacheName": "Name",
   "cleared": "Cleared"
 }

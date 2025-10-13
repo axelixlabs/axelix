@@ -33,15 +33,22 @@ export interface ICachesData {
     filteredCacheManagers: ICachesManager[];
 }
 
+export enum IClearOperationType {
+    CLEAR_SINGLE_CACHE = 0 ,
+    CLEAR_ALL_CACHES = 1
+}
+
 export interface ICachesSliceState extends ICommonSliceState, ICachesData {
     /**
      * Success status for cache clear operations
      */
     success: boolean,
+
     /**
-     * Loading state for cache clear operations
+     * Optional clear cache operation that is currently in progress
      */
-    clearLoading: "" | "allCaches" | "singleCache",
+    clearOperationLoading: IClearOperationType | null,
+
     /**
      * Search text for filtering cache managers
      */

@@ -17,11 +17,6 @@ export const MainRoutes = () => {
       <Route path='/' element={<MainLayout hideSider />}>
         <Route index element={<Wallboard />} />
         <Route path="/wallboard" element={<Wallboard />} />
-        <Route path="instance/:instanceId/environment" element={<Environment />} />
-        <Route path="instance/:instanceId/beans" element={<Beans />} />
-        <Route path="instance/:instanceId/config-props" element={<ConfigProps />} />
-        <Route path="instance/:instanceId/loggers" element={<Loggers />} />
-        <Route path="instance/:instanceId/caches" element={<Caches />} />
         <Route path="*" element={<Navigate to="/wallboard" replace />} />
       </Route>
 
@@ -30,6 +25,7 @@ export const MainRoutes = () => {
         <Route path="/instance/:instanceId/beans" element={<Beans />} />
         <Route path="/instance/:instanceId/config-props" element={<ConfigProps />} />
         <Route path="/instance/:instanceId/loggers" element={<Loggers />} />
+        <Route path="/instance/:instanceId/caches" element={<Caches />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/wallboard" replace/>} />

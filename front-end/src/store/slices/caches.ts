@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 import { clearAllCachesThunk, clearCacheThunk, getCachesThunk } from "store/thunks";
-import type { ICachesSliceState } from "models";
+import {type ICachesSliceState, IClearOperationType} from "models";
 
 const initialState: ICachesSliceState = {
     cacheManagersSearchText: "",
@@ -9,7 +9,7 @@ const initialState: ICachesSliceState = {
     cacheManagers: [],
     loading: false,
     success: false,
-    clearLoading: "",
+    clearOperationLoading: null,
     error: ""
 };
 
@@ -37,7 +37,6 @@ export const CachesSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(getCachesThunk.pending, (state) => {
             state.cacheManagersSearchText = ""
-            state.clearLoading = ""
             state.success = false
             state.loading = true;
         });
@@ -60,17 +59,17 @@ export const CachesSlice = createSlice({
 
         builder.addCase(clearAllCachesThunk.pending, (state) => {
             state.success = false
-            state.clearLoading = "allCaches"
+            state.clearOperationLoading = IClearOperationType.CLEAR_ALL_CACHES
         });
         builder.addCase(clearAllCachesThunk.fulfilled, (state) => {
             state.success = true
-            state.clearLoading = ""
+            state.clearOperationLoading = null
         });
         // todo fix any type after receiving real data from backend
         builder.addCase(clearAllCachesThunk.rejected, (state, { payload }: any) => {
             const { status } = payload;
             state.success = false
-            state.clearLoading = ""
+            state.clearOperationLoading = null
 
             // todo change the logic in the future if needed, and also add a translation
             if (status >= 400 && status < 500) {
@@ -82,17 +81,16 @@ export const CachesSlice = createSlice({
 
         builder.addCase(clearCacheThunk.pending, (state) => {
             state.success = false
-            state.clearLoading = "singleCache"
+            state.clearOperationLoading = IClearOperationType.CLEAR_SINGLE_CACHE
         });
         builder.addCase(clearCacheThunk.fulfilled, (state) => {
-            state.clearLoading = ""
+            state.clearOperationLoading = null
             state.success = true
         });
-        // todo fix any type after receiving real data from backend
         builder.addCase(clearCacheThunk.rejected, (state, { payload }: any) => {
             const { status } = payload;
             state.success = false
-            state.clearLoading = ""
+            state.clearOperationLoading = null
             // todo change the logic in the future if needed, and also add a translation
             if (status >= 400 && status < 500) {
                 state.error = "Неизвестная ошибка";
