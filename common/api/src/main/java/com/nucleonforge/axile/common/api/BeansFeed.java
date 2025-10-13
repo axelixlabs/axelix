@@ -76,37 +76,41 @@ public record BeansFeed(Map<String, Context> contexts) {
         BeanOrigin origin();
     }
 
-    @JsonIgnoreProperties(BeanSourceDeserializer.ORIGIN_FIELD)
+    @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
     public record UnknownBean() implements BeanSource {
 
         @Override
+        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
         public BeanOrigin origin() {
             return BeanOrigin.UNKNOWN;
         }
     }
 
-    @JsonIgnoreProperties(BeanSourceDeserializer.ORIGIN_FIELD)
+    @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
     public record FactoryBean(String factoryBeanName) implements BeanSource {
 
         @Override
+        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
         public BeanOrigin origin() {
             return BeanOrigin.FACTORY_BEAN;
         }
     }
 
-    @JsonIgnoreProperties(BeanSourceDeserializer.ORIGIN_FIELD)
+    @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
     public record BeanMethod(@Nullable String enclosingClassName, String methodName) implements BeanSource {
 
         @Override
+        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
         public BeanOrigin origin() {
             return BeanOrigin.BEAN_METHOD;
         }
     }
 
-    @JsonIgnoreProperties(BeanSourceDeserializer.ORIGIN_FIELD)
+    @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
     public record ComponentVariant() implements BeanSource {
 
         @Override
+        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
         public BeanOrigin origin() {
             return BeanOrigin.COMPONENT_ANNOTATION;
         }
