@@ -50,7 +50,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     }
 
     private BeansFeed.ProxyType analyzeProxyType(Class<?> beanType) {
-        if (AopUtils.isCglibProxy(beanType)) {
+        if (AopUtils.isJdkDynamicProxy(beanType)) {
             return BeansFeed.ProxyType.JDK_PROXY;
         } else if (AopUtils.isCglibProxy(beanType)) {
             return BeansFeed.ProxyType.CGLIB;
