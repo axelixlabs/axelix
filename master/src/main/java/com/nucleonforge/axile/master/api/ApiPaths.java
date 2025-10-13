@@ -167,4 +167,17 @@ public final class ApiPaths {
          */
         public static final String CACHE_NAME = "/{instanceId}/cache/{cacheName}";
     }
+
+    public static final class ScheduledTasksApi {
+
+        /**
+         * Base path for {@link com.nucleonforge.axile.master.api.ScheduledTasksApi} APIs.
+         *
+         */
+        public static final String MAIN = "/scheduled-tasks";
+        /**
+         * ScheduledTasks endpoint with instance ID.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+    }
 }
