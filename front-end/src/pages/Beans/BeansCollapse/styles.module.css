@@ -1,0 +1,8 @@
+/* This is a customization of the Ant Design Collapse component. 
+Due to the specifics of the Collapse component, if we want to set a width, 
+it is also necessary to change the flex-basis value to the specified width. */
+
+.Collapse :global(.ant-collapse-header-text) {
+    flex: 0 0 calc(100% - 24px) !important;
+    max-width: calc(100% - 24px) !important;
+}

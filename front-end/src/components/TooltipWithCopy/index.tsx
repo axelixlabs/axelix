@@ -24,27 +24,27 @@ export const TooltipWithCopy = ({ text, onClick }: IProps) => {
     };
 
     return (
-        <div className={styles.TextWrapper}>
-            <Tooltip
-                title={text}
-                styles={{
-                    root: {
-                        maxWidth: 600,
-                        whiteSpace: "normal",
-                    }
-                }}
-            >
+        <Tooltip
+            title={text}
+            styles={{
+                root: {
+                    maxWidth: 600,
+                    whiteSpace: "normal",
+                }
+            }}
+        >
+            <div className={styles.TextWrapper}>
                 <div className={styles.Text} onClick={onClick}>
                     {text}
                 </div>
-            </Tooltip>
-            <CopyOutlined
-                onClick={(e) => {
-                    e.stopPropagation();
-                    handleCopy(text);
-                }}
-                className={styles.CopyIcon}
-            />
-        </div>
+                <CopyOutlined
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopy(text);
+                    }}
+                    className={styles.CopyIcon}
+                />
+            </div>
+        </Tooltip>
     );
 };

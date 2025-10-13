@@ -3,8 +3,10 @@ import { Collapse, type CollapseProps } from "antd";
 
 import type { IBean, IBeansCollapseHeaderRefs } from "models";
 
-import { BeanCollapseChildrens } from "./BeanCollapseChildrens";
+import { BeanCollapseChildren } from "./BeanCollapseChildren";
 import { BeanCollapseLabels } from "./BeanCollapseLabels";
+
+import styles from './styles.module.css'
 
 interface IProps {
   /**
@@ -23,7 +25,7 @@ export const BeansCollapse = ({ beans }: IProps) => {
       key: bean.beanName,
       label: <BeanCollapseLabels bean={bean} headerRefs={headerRefs} />,
       children: (
-        <BeanCollapseChildrens
+        <BeanCollapseChildren
           beans={beans}
           bean={bean}
           headerRefs={headerRefs}
@@ -39,6 +41,8 @@ export const BeansCollapse = ({ beans }: IProps) => {
       activeKey={activeKey}
       items={createCollapseItems(beans)}
       onChange={(key) => setActiveKey(key)}
+      bordered
+      className={styles.Collapse}
     />
   );
 };
