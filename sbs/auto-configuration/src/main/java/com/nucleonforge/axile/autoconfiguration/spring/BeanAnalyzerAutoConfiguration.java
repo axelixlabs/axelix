@@ -1,6 +1,7 @@
 package com.nucleonforge.axile.autoconfiguration.spring;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -19,6 +20,7 @@ import com.nucleonforge.axile.spring.beans.QualifiersPersistencePostProcessor;
  * @author Nikita Kirillov
  */
 @AutoConfiguration
+@ConditionalOnAvailableEndpoint(endpoint = BeansEndpoint.class)
 public class BeanAnalyzerAutoConfiguration {
 
     @Bean

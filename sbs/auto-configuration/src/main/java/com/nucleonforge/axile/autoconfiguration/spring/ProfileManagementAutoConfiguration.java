@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.autoconfiguration.spring;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ import com.nucleonforge.axile.spring.profiles.ProfileMutator;
  * @author Nikita Kirillov
  */
 @AutoConfiguration(after = ContextRestarterAutoConfiguration.class)
+@ConditionalOnAvailableEndpoint(endpoint = ProfileManagementEndpoint.class)
 public class ProfileManagementAutoConfiguration {
 
     @Bean
