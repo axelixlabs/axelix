@@ -25,7 +25,7 @@ interface IProps {
   setActiveKey: Dispatch<SetStateAction<string | string[]>>;
 }
 
-export const BeanCollapseChildrens = ({
+export const BeanCollapseChildren = ({
   beans,
   bean,
   headerRefs,
@@ -63,10 +63,10 @@ export const BeanCollapseChildrens = ({
       </div>
       <div className={styles.CollapseBodyChunkTitle}>{t("aliases")}:</div>
       <div>
-        {bean.aliases.map((aliase) => (
-          <div key={aliase} className={styles.CollapseBodyChunkList}>
-            <div className={styles.Aliase}>
-              {aliase}
+        {bean.aliases.map((alias) => (
+          <div key={alias} className={styles.CollapseBodyChunkList}>
+            <div className={styles.Alias}>
+              {alias}
             </div>
           </div>
         ))}
