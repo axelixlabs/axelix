@@ -32,6 +32,7 @@ export const TooltipWithCopy = ({ text, onClick }: IProps) => {
                     whiteSpace: "normal",
                 }
             }}
+            className={styles.Tooltip}
         >
             <div className={styles.TextWrapper}>
                 <div className={styles.Text} onClick={onClick}>
