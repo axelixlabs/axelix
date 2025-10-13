@@ -18,7 +18,7 @@ export interface IBean {
    */
   aliases: string[];
   /**
-   * Bean dependecies
+   * Bean dependencies
    */
   dependencies: string[];
 }
