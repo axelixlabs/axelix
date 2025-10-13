@@ -51,9 +51,8 @@ public class PropertyManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public PropertyManagementEndpoint propertyManagementEndpoint(
-            PropertyDiscoverer propertyDiscoverer, PropertyMutator propertyMutator) {
-        return new PropertyManagementEndpoint(propertyDiscoverer, propertyMutator);
+    public PropertyManagementEndpoint propertyManagementEndpoint(PropertyMutator propertyMutator) {
+        return new PropertyManagementEndpoint(propertyMutator);
     }
 
     @Bean

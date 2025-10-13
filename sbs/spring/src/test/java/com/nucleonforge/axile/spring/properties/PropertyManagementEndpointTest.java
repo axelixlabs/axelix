@@ -53,10 +53,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(
         // spotless:off
         properties = {
-            "my-empty.property= ",
-            "not-empty.property=not-empty",
+            "myEmpty.property= ",
+            "notEmpty.property=not-empty",
             "management.endpoint.env.show-values=always",
-            "non-standard.camel-case.property=old-value"
+            "kebab-case.property=old-value"
         })
         // spotless:on
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -77,7 +77,7 @@ class PropertyManagementEndpointTest {
 
     @Test
     void mutate_shouldUpdatePropertyValue() throws InterruptedException {
-        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/my-empty.property", Map.class);
+        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/myEmpty.property", Map.class);
 
         assertThat(initialResponse)
                 .isNotNull()
@@ -87,9 +87,9 @@ class PropertyManagementEndpointTest {
                 .isEqualTo("");
 
         String newValue = "new-value";
-        mutateProperty("my-empty.property", newValue);
+        mutateProperty("myEmpty.property", newValue);
 
-        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/my-empty.property", Map.class);
+        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/myEmpty.property", Map.class);
 
         assertThat(updatedResponse)
                 .isNotNull()
@@ -100,9 +100,8 @@ class PropertyManagementEndpointTest {
     }
 
     @Test
-    void mutate_shouldUpdateNonStandardPropertyValue() throws InterruptedException {
-        Map<?, ?> initialResponse =
-                restTemplate.getForObject("/actuator/env/non-standard.camel-case.property", Map.class);
+    void mutate_shouldUpdateStandardPropertyValue() throws InterruptedException {
+        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/kebab-case.property", Map.class);
 
         assertThat(initialResponse)
                 .isNotNull()
@@ -112,10 +111,9 @@ class PropertyManagementEndpointTest {
                 .isEqualTo("old-value");
 
         String newValue = "new-value";
-        mutateProperty("$&*nonStanda#rd.camelCase.property", newValue);
+        mutateProperty("kebab-case.property", newValue);
 
-        Map<?, ?> updatedResponse =
-                restTemplate.getForObject("/actuator/env/non-standard.camel-case.property", Map.class);
+        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/kebab-case.property", Map.class);
 
         assertThat(updatedResponse)
                 .isNotNull()
@@ -127,7 +125,7 @@ class PropertyManagementEndpointTest {
 
     @Test
     void mutate_shouldMutate_whenNewValueIsEmpty() throws InterruptedException {
-        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/not-empty.property", Map.class);
+        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/notEmpty.property", Map.class);
 
         assertThat(initialResponse)
                 .isNotNull()
@@ -136,9 +134,9 @@ class PropertyManagementEndpointTest {
                 .extracting("value")
                 .isEqualTo("not-empty");
 
-        mutateProperty("not-empty.property", "");
+        mutateProperty("notEmpty.property", "");
 
-        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/not-empty.property", Map.class);
+        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/notEmpty.property", Map.class);
 
         assertThat(updatedResponse)
                 .isNotNull()
@@ -149,49 +147,50 @@ class PropertyManagementEndpointTest {
     }
 
     @Test
-    void mutate_shouldReturnError_whenPropertyNameIsEmpty() {
+    void matate_shouldReturnNOCONTENT_whenPropertyNameIsEmpty() {
         PropertyMutationRequest request = new PropertyMutationRequest("", "someValue");
 
         ResponseEntity<PropertyNotFoundException> response =
                 restTemplate.postForEntity(path(), defaultEntity(request), PropertyNotFoundException.class);
 
-        assertThat(response)
-                .isNotNull()
-                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .isNotNull()
-                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNotFoundException.class));
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
 
     @Test
-    void mutate_shouldNotMutate_whenPropertyNameIsBlank() {
-        PropertyMutationRequest request = new PropertyMutationRequest(" \t", "newValue");
+    void matate_shouldCreateNewProperty_whenPropertyDoesNotExist() throws InterruptedException {
+        Map<?, ?> initialResponse =
+                restTemplate.getForObject("/actuator/env/non-existent-property.property", Map.class);
+        assertThat(initialResponse).isNull();
 
-        ResponseEntity<PropertyNotFoundException> response =
-                restTemplate.postForEntity(path(), defaultEntity(request), PropertyNotFoundException.class);
+        mutateProperty("non-existent-property.property", "true");
 
-        assertThat(response)
+        Map<?, ?> updatedResponse =
+                restTemplate.getForObject("/actuator/env/non-existent-property.property", Map.class);
+
+        assertThat(updatedResponse)
                 .isNotNull()
-                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .isNotNull()
-                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNotFoundException.class));
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("true");
     }
 
     @Test
-    void shouldReturnBadRequest_whenPropertyDoesNotExist() {
-        String propertyName = "non-existent-property.property";
-        PropertyMutationRequest request = new PropertyMutationRequest(propertyName, "newValue");
+    void matate_shouldCreateNewProperty_whenPropertyNameNonStandard() throws InterruptedException {
+        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/non_$tandard.property", Map.class);
 
-        ResponseEntity<PropertyNotFoundException> response =
-                restTemplate.postForEntity(path(), defaultEntity(request), PropertyNotFoundException.class);
+        assertThat(initialResponse).isNull();
 
-        assertThat(response)
+        mutateProperty("non_$tandard.property", "someValue");
+
+        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/non_$tandard.property", Map.class);
+
+        assertThat(updatedResponse)
                 .isNotNull()
-                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .isNotNull()
-                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNotFoundException.class));
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("someValue");
     }
 
     /**

@@ -15,8 +15,8 @@ public interface PropertyMutator {
     /**
      * Mutate the property
      *
-     * @param property the property to be mutated
+     * @param propertyName the property name to be mutated
      * @param newValue the new value of the property
      */
-    void mutate(Property property, String newValue);
+    void mutate(String propertyName, String newValue);
 }
