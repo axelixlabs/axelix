@@ -2,7 +2,6 @@ package com.nucleonforge.axile.autoconfiguration.spring;
 
 import java.util.Map;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -36,7 +35,6 @@ import com.nucleonforge.axile.spring.cache.DefaultCacheDispatcher;
  */
 @AutoConfiguration(after = CacheAutoConfiguration.class)
 @ConditionalOnBean(CacheManager.class)
-@ConditionalOnAvailableEndpoint(endpoint = CacheDispatcherEndpoint.class)
 public class CacheDispatcherAutoConfiguration {
 
     @Bean
