@@ -174,10 +174,18 @@ public final class ApiPaths {
          * Base path for {@link com.nucleonforge.axile.master.api.ScheduledTasksApi} APIs.
          *
          */
-        public static final String MAIN = "/scheduled-tasks";
+        public static final String MAIN = "/scheduled-tasks-management";
         /**
          * ScheduledTasks endpoint with instance ID.
          */
         public static final String INSTANCE_ID = "/{instanceId}";
+        /**
+         * Endpoint allows enabling a scheduled task.
+         */
+        public static final String ENABLE_TASK = "/{instanceId}/enable";
+        /**
+         * Endpoint allows disabling a scheduled task.
+         */
+        public static final String DISABLE_TASK = "/{instanceId}/disable";
     }
 }
