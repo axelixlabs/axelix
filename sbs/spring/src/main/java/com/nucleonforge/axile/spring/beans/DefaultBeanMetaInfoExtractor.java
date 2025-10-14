@@ -1,12 +1,12 @@
 package com.nucleonforge.axile.spring.beans;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -38,11 +38,10 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     @Override
     public BeanMetaInfo extract(String beanName, ConfigurableListableBeanFactory beanFactory) {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+        Object bean = beanFactory.getBean(beanName);
 
         return new BeanMetaInfo(
-                Optional.ofNullable(this.beanFactory.getType(beanName))
-                        .map(this::analyzeProxyType)
-                        .orElse(BeansFeed.ProxyType.NO_PROXYING),
+                analyzeProxyType(bean.getClass()),
                 beanDefinition.isLazyInit(),
                 beanDefinition.isPrimary(),
                 qualifiersRegistry.getQualifiers(beanName),
@@ -50,9 +49,9 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     }
 
     private BeansFeed.ProxyType analyzeProxyType(Class<?> beanType) {
-        if (AopUtils.isJdkDynamicProxy(beanType)) {
+        if (Proxy.isProxyClass(beanType)) {
             return BeansFeed.ProxyType.JDK_PROXY;
-        } else if (AopUtils.isCglibProxy(beanType)) {
+        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
             return BeansFeed.ProxyType.CGLIB;
         }
         return BeansFeed.ProxyType.NO_PROXYING;
