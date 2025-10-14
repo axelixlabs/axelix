@@ -1,0 +1,11 @@
+.TableRow {
+    grid-template-columns: 1fr 170px 170px 110px;
+}
+
+.CronTableRow {
+    grid-template-columns: 1fr 170px 110px;
+}
+
+.TooltipWrapperChunk {
+    min-width: 0;
+}

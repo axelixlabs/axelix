@@ -1,0 +1,8 @@
+.TaskType {
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.SectionWrapper:not(:last-child) {
+    margin-bottom: 40px;
+}
