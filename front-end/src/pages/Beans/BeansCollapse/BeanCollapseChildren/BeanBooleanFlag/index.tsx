@@ -1,6 +1,7 @@
+import { Checkbox } from "antd";
+import { useTranslation } from "react-i18next";
+
 import styles from "../styles.module.css";
-import {Checkbox} from "antd";
-import {useTranslation} from "react-i18next";
 
 interface IProps {
 
@@ -17,16 +18,13 @@ interface IProps {
   value: boolean;
 }
 
-export const BeanBooleanFlag = ( { value, valueTag } : IProps ) => {
-
+export const BeanBooleanFlag = ({ value, valueTag }: IProps) => {
   const { t } = useTranslation()
 
   return (
     <>
-      <div className={styles.CollapseBodyChunkTitle}>{t(valueTag)}:</div>
-      <div>
-        <Checkbox checked={value}></Checkbox>
-      </div>
+      <div className={styles.CollapseBodyChunkTitle}>{t(`Beans.${valueTag}`)}:</div>
+      <Checkbox checked={value} />
     </>
   );
 }

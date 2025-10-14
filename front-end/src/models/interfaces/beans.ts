@@ -1,10 +1,5 @@
+import { EBeanOrigin, EProxyType } from "models";
 import type { ICommonSliceState } from "./globals";
-
-export enum ProxyType {
-    JDK_PROXY = "JDK_PROXY",
-    CGLIB = "CGLIB",
-    NO_PROXYING = "NO_PROXYING",
-}
 
 /**
  * An interface that represents the state of the particular bean inside the Spring Boot application
@@ -30,7 +25,7 @@ export interface IBean {
    * The proxying algorithm that is used for this bean. Might be null in case
    * the backend was unable to figure it out.
    */
-  proxyType: ProxyType | null;
+  proxyType: EProxyType | null;
 
   /**
    * Qualified of this bean, if any
@@ -64,16 +59,6 @@ export interface IBean {
 }
 
 /**
- * Represents the actual algorithm of how the Spring Framework found this bean
- */
-export enum BeanOrigin {
-  BEAN_METHOD = "BEAN_METHOD",
-  COMPONENT_ANNOTATION = "COMPONENT_ANNOTATION",
-  FACTORY_BEAN = "FACTORY_BEAN",
-  UNKNOWN = "UNKNOWN",
-}
-
-/**
  * The "source" of the bean. By "source" we mean how exactly this particular {@link IBean} was discovered
  * by the Spring Framework
  */
@@ -101,9 +86,8 @@ export interface IBeanSource {
   /**
    * The actual origin
    */
-  origin: BeanOrigin;
+  origin: EBeanOrigin;
 }
-
 
 export interface IBeansData {
   /**

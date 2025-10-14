@@ -1,10 +1,12 @@
 import type { PropsWithChildren } from 'react';
 
-import { EmptyHandler, TooltipWithCopy } from 'components';
+import { EmptyHandler } from '../EmptyHandler';
 import { TablePropertyValue } from './TablePropertyValue';
+
 import type { ITableRow } from 'models';
 
 import styles from './styles.module.css'
+import { TooltipWithCopy } from 'components/TooltipWithCopy';
 
 interface IProps {
     /**
