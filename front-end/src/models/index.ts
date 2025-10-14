@@ -1,4 +1,5 @@
 export * from "./interfaces/updateProperty";
+export * from "./interfaces/scheduledTasks";
 export * from "./interfaces/environment";
 export * from "./interfaces/configProps";
 export * from './interfaces/wallboard';
@@ -8,6 +9,7 @@ export * from "./interfaces/caches";
 export * from "./interfaces/beans";
 export * from "./interfaces/auth";
 
-export * from './types/antd'
+export * from './types/scheduledTasks';
+export * from './types/antd';
 
-export * from './enums/beans'
+export * from './enums/beans';
