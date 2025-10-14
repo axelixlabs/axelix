@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './styles.module.css'
 
 interface IProps {
-
+    
     /**
      * If true, this is a table for Cron task
      */
