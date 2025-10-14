@@ -8,7 +8,7 @@ import org.jspecify.annotations.Nullable;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 
 /**
- * The response of the {@link ActuatorEndpoints#SCHEDULED_TASKS_MANAGEMENT} actuator endpoint provides information about the application’s scheduled tasks.
+ * The response of the {@link ActuatorEndpoints#SCHEDULED_TASKS} actuator endpoint provides information about the application’s scheduled tasks.
  *
  * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/scheduledtasks.html">Scheduled Tasks Endpoint</a>
  *

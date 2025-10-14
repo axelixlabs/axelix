@@ -28,6 +28,9 @@ import com.nucleonforge.axile.master.api.request.ScheduledTaskToggleRequest;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
+import static com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints.DISABLE_SCHEDULED_TASK;
+import static com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints.ENABLE_SCHEDULED_TASK;
+import static com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints.SCHEDULED_TASKS;
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
@@ -47,8 +50,7 @@ public class ScheduledTasksApiTest {
     // language=json
     private static final String EXPECTED_MASTER_RESPONSE =
             """
-
-            {
+         {
           "cron": [
             {
               "enabled": true,
@@ -173,11 +175,11 @@ public class ScheduledTasksApiTest {
                     "nextExecution": {
                       "time": "2025-10-14T06:33:49.999631800Z"
                     },
-                      "lastExecution": {
-                        "exception": null,
-                        "time": "2025-10-14T06:33:48.014578100Z",
-                        "status": "STARTED"
-                      }
+                    "lastExecution": {
+                      "exception": null,
+                      "time": "2025-10-14T06:33:48.014578100Z",
+                      "status": "STARTED"
+                    }
                   },
                   "enabled": true
                 },
@@ -191,7 +193,7 @@ public class ScheduledTasksApiTest {
                       "time": "2025-10-14T06:33:49.999631800Z"
                     }
                   },
-                    "enabled": true
+                  "enabled": true
                 },
                 {
                   "delegate": {
@@ -271,13 +273,16 @@ public class ScheduledTasksApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/scheduledtasks")) {
+                if (path.equals("/" + activeInstanceId + "/actuator"
+                        + SCHEDULED_TASKS.path().getOriginalUrl())) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/scheduledtasksmanagement/enable")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator"
+                        + ENABLE_SCHEDULED_TASK.path().getOriginalUrl())) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/actuator/scheduledtasksmanagement/disable")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator"
+                        + DISABLE_SCHEDULED_TASK.path().getOriginalUrl())) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -297,8 +302,8 @@ public class ScheduledTasksApiTest {
     void shouldReturnJSONScheduledTasksResponse() {
         // when.
 
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axile/scheduled-tasks-management/{instanceId}", String.class, activeInstanceId);
+        ResponseEntity<String> response =
+                restTemplate.getForEntity("/api/axile/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -315,10 +320,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<String> body = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks-management/{instanceId}/enable",
-                requestBody,
-                String.class,
-                activeInstanceId);
+                "/api/axile/scheduled-tasks/{instanceId}/enable", requestBody, String.class, activeInstanceId);
 
         // then
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -331,10 +333,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<String> body = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks-management/{instanceId}/disable",
-                requestBody,
-                String.class,
-                activeInstanceId);
+                "/api/axile/scheduled-tasks/{instanceId}/disable", requestBody, String.class, activeInstanceId);
 
         // then
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -348,7 +347,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/scheduled-tasks-management/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axile/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -360,7 +359,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/scheduled-tasks-management/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axile/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -377,7 +376,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks-management/{instanceId}/enable",
+                "/api/axile/scheduled-tasks/{instanceId}/enable",
                 requestBody,
                 EndpointInvocationException.class,
                 instanceId);
@@ -394,7 +393,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks-management/{instanceId}/enable",
+                "/api/axile/scheduled-tasks/{instanceId}/enable",
                 requestBody,
                 EndpointInvocationException.class,
                 instanceId);
@@ -414,7 +413,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks-management/{instanceId}/disable",
+                "/api/axile/scheduled-tasks/{instanceId}/disable",
                 requestBody,
                 EndpointInvocationException.class,
                 instanceId);
@@ -431,7 +430,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks-management/{instanceId}/disable",
+                "/api/axile/scheduled-tasks/{instanceId}/disable",
                 requestBody,
                 EndpointInvocationException.class,
                 instanceId);

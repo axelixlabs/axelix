@@ -117,11 +117,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     // @Scheduled tasks
     public static final ActuatorEndpoint SCHEDULED_TASKS = of("/scheduledtasks", HttpMethod.GET);
-
-    // @Scheduled task management
-    public static final ActuatorEndpoint SCHEDULED_TASKS_MANAGEMENT = of("/scheduledtasks", HttpMethod.GET);
-    public static final ActuatorEndpoint ENABLE_SCHEDULED_TASK = of("/scheduledtasksmanagement/enable", HttpMethod.POST);
-    public static final ActuatorEndpoint DISABLE_SCHEDULED_TASK = of("/scheduledtasksmanagement/disable", HttpMethod.POST);
+    public static final ActuatorEndpoint ENABLE_SCHEDULED_TASK = of("/scheduled-tasks-management/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint DISABLE_SCHEDULED_TASK = of("/scheduled-tasks-management/disable", HttpMethod.POST);
 
     // Sessions
     public static final ActuatorEndpoint SESSION = of("/sessions", HttpMethod.GET);
@@ -179,7 +176,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 ALL_SBOMS,
                 SINGLE_SBOM,
                 SCHEDULED_TASKS,
-                SCHEDULED_TASKS_MANAGEMENT,
                 ENABLE_SCHEDULED_TASK,
                 DISABLE_SCHEDULED_TASK,
                 SESSION,

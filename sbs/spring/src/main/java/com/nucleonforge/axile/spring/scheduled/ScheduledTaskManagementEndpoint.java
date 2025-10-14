@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @since 14.10.2025
  * @author Nikita Kirillov
  */
-@RestControllerEndpoint(id = "scheduledtasksmanagement")
+@RestControllerEndpoint(id = "scheduled-tasks-management")
 public class ScheduledTaskManagementEndpoint {
 
     private final ScheduledTaskService taskService;

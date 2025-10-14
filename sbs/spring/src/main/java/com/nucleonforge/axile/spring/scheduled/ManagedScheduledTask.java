@@ -7,7 +7,6 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
@@ -76,9 +75,8 @@ public class ManagedScheduledTask {
 
         Task t = scheduledTask.getTask();
         this.runnable = t.getRunnable();
-        if (t instanceof CronTask cronTask) {
-            this.trigger = cronTask.getTrigger();
-        } else if (t instanceof TriggerTask triggerTask) {
+
+        if (t instanceof TriggerTask triggerTask) {
             this.trigger = triggerTask.getTrigger();
         } else {
             this.trigger = null;

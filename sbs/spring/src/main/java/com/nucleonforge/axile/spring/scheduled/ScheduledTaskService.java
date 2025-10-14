@@ -3,8 +3,8 @@ package com.nucleonforge.axile.spring.scheduled;
 import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.config.FixedDelayTask;
@@ -19,7 +19,7 @@ import org.springframework.scheduling.config.Task;
  */
 public class ScheduledTaskService {
 
-    private static final Log log = LogFactory.getLog(ScheduledTaskService.class);
+    private static final Logger log = LoggerFactory.getLogger(ScheduledTaskService.class);
 
     private final ScheduledTasksRegistry registry;
 
@@ -33,17 +33,17 @@ public class ScheduledTaskService {
                     .orElseThrow(() -> new ScheduledTaskNotFoundException("Task not found: " + target));
 
             if (!task.isEnabled()) {
-                task.setEnabled(true);
                 rescheduleTask(task, force);
-                log.info("Enabled scheduled task: " + target);
+                task.setEnabled(true);
+                log.info("Enabled scheduled task: {}", target);
             } else if (force) {
                 rescheduleTask(task, true);
-                log.info("Forcefully rescheduled enabled task: " + target);
+                log.info("Forcefully rescheduled enabled task: {}", target);
             } else {
-                log.info("Task already enabled, no action taken: " + target);
+                log.info("Task already enabled, no action taken: {}", target);
             }
         } catch (ScheduledTaskNotFoundException e) {
-            log.info("Failed to enable task: " + target, e);
+            log.info("Failed to enable task: {}", target, e);
             throw e;
         }
     }
@@ -53,11 +53,11 @@ public class ScheduledTaskService {
             ManagedScheduledTask task = registry.find(target)
                     .orElseThrow(() -> new ScheduledTaskNotFoundException("Task not found: " + target));
 
-            task.setEnabled(false);
             cancelTask(task, force);
-            log.info("Disabled scheduled task: " + target + "(force: " + force + ")");
+            task.setEnabled(false);
+            log.info("Disabled scheduled task: {}(force: {})", target, force);
         } catch (ScheduledTaskNotFoundException e) {
-            log.info("Failed to disable task: " + target, e);
+            log.info("Failed to disable task: {}", target, e);
             throw e;
         }
     }
@@ -94,17 +94,20 @@ public class ScheduledTaskService {
         if (newFuture != null) {
             managedTask.setFuture(newFuture);
         }
-        log.debug("Rescheduled task: " + managedTask.getId() + " (runImmediately: " + runImmediately + ")");
+        log.debug("Rescheduled task: {} (runImmediately: {})", managedTask.getId(), runImmediately);
     }
 
     private void cancelTask(ManagedScheduledTask managedTask, boolean mayInterruptIfRunning) {
         ScheduledFuture<?> future = managedTask.getFuture();
         if (future != null) {
             boolean cancelled = future.cancel(mayInterruptIfRunning);
-            log.debug("Cancelled task future: " + managedTask.getId() + " (mayInterrupt: " + mayInterruptIfRunning
-                    + ", success: " + cancelled + ")");
+            log.debug(
+                    "Cancelled task future: {} (mayInterrupt: {}, success: {})",
+                    managedTask.getId(),
+                    mayInterruptIfRunning,
+                    cancelled);
         } else {
-            log.debug("No future to cancel for task: " + managedTask.getId());
+            log.debug("No future to cancel for task: {}", managedTask.getId());
         }
     }
 }

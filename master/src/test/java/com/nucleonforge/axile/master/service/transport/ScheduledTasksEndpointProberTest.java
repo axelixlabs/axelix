@@ -161,9 +161,9 @@ public class ScheduledTasksEndpointProberTest {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/scheduledtasksmanagement/enable")) {
+                } else if (path.equals("/" + activeInstanceId + "/scheduled-tasks-management/enable")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/scheduledtasksmanagement/disable")) {
+                } else if (path.equals("/" + activeInstanceId + "/scheduled-tasks-management/disable")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);

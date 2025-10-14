@@ -91,4 +91,8 @@ public final class HttpUrl {
 
         return pathVariables;
     }
+
+    public String getOriginalUrl() {
+        return originalUrl;
+    }
 }

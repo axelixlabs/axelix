@@ -123,8 +123,7 @@ public class ScheduledTasksApi {
     }
 
     @Operation(
-            summary =
-                    "Allows disabling a scheduled task either according to its configured schedule or forcibly, ignoring the schedule.",
+            summary = "Allows disabling a scheduled task.",
             responses = {
                 @ApiResponse(description = "OK", responseCode = "200"),
                 @ApiResponse(

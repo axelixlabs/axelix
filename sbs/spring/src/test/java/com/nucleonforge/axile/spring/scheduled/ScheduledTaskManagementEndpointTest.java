@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class)
-@TestPropertySource(properties = {"management.endpoints.web.exposure.include=scheduledtasks, scheduledtasksmanagement"})
+@TestPropertySource(properties = {"management.endpoints.web.exposure.include=scheduledtasks, scheduled-tasks-management"})
 class ScheduledTaskManagementEndpointTest {
 
     private static final String CRON_TASK_ID =
@@ -233,7 +233,7 @@ class ScheduledTaskManagementEndpointTest {
         ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(target, force);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/scheduledtasksmanagement/enable", defaultEntity(request), Void.class);
+                "/actuator/scheduled-tasks-management/enable", defaultEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
@@ -242,7 +242,7 @@ class ScheduledTaskManagementEndpointTest {
         ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(targetScheduledTask, force);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/scheduledtasksmanagement/disable", defaultEntity(request), Void.class);
+                "/actuator/scheduled-tasks-management/disable", defaultEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }

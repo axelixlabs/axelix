@@ -12,7 +12,7 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.AbstractEndpointProber;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#SCHEDULED_TASKS_MANAGEMENT} endpoint.
+ * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#SCHEDULED_TASKS} endpoint.
  *
  * @author Sergey Cherkasov
  */
@@ -27,6 +27,6 @@ public class GetAllScheduledTasksEndpointProber extends AbstractEndpointProber<S
 
     @Override
     public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.SCHEDULED_TASKS_MANAGEMENT;
+        return ActuatorEndpoints.SCHEDULED_TASKS;
     }
 }
