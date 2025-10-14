@@ -1,5 +1,8 @@
 package com.nucleonforge.axile.spring.properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,22 +18,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestControllerEndpoint(id = "property-management")
 public class PropertyManagementEndpoint {
 
-    private final PropertyDiscoverer propertyDiscoverer;
+    private static final Logger log = LoggerFactory.getLogger(PropertyManagementEndpoint.class);
+
     private final PropertyMutator propertyMutator;
 
-    public PropertyManagementEndpoint(PropertyDiscoverer propertyDiscoverer, PropertyMutator propertyMutator) {
-        this.propertyDiscoverer = propertyDiscoverer;
+    public PropertyManagementEndpoint(PropertyMutator propertyMutator) {
         this.propertyMutator = propertyMutator;
     }
 
     @PostMapping
     public ResponseEntity<Void> mutate(@RequestBody PropertyMutationRequest request) {
-        Property property = propertyDiscoverer.discover(request.propertyName());
+        String propertyName = request.propertyName();
 
-        if (property == null) {
-            throw new PropertyNotFoundException("Property '" + request.propertyName() + "' not found");
+        if (propertyName == null || propertyName.isBlank()) {
+            log.warn("Received property mutation request with blank/empty/null property name");
+            return ResponseEntity.badRequest().build();
         }
-        propertyMutator.mutate(property, request.newValue());
+
+        propertyMutator.mutate(propertyName, request.newValue());
         return ResponseEntity.noContent().build();
     }
 }

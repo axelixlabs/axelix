@@ -55,7 +55,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         properties = {
             "myEmpty.property= ",
             "notEmpty.property=not-empty",
-            "management.endpoint.env.show-values=always"
+            "management.endpoint.env.show-values=always",
+            "kebab-case.property=old-value"
         })
         // spotless:on
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -70,6 +71,9 @@ class PropertyManagementEndpointTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private DefaultPropertyDiscoverer propertyDiscoverer;
 
     @Test
     void mutate_shouldUpdatePropertyValue() throws InterruptedException {
@@ -86,6 +90,30 @@ class PropertyManagementEndpointTest {
         mutateProperty("myEmpty.property", newValue);
 
         Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/myEmpty.property", Map.class);
+
+        assertThat(updatedResponse)
+                .isNotNull()
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("new-value");
+    }
+
+    @Test
+    void mutate_shouldUpdateStandardPropertyValue() throws InterruptedException {
+        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/kebab-case.property", Map.class);
+
+        assertThat(initialResponse)
+                .isNotNull()
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("old-value");
+
+        String newValue = "new-value";
+        mutateProperty("kebab-case.property", newValue);
+
+        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/kebab-case.property", Map.class);
 
         assertThat(updatedResponse)
                 .isNotNull()
@@ -119,49 +147,58 @@ class PropertyManagementEndpointTest {
     }
 
     @Test
-    void mutate_shouldReturnError_whenPropertyNameIsEmpty() {
-        PropertyMutationRequest request = new PropertyMutationRequest("", "someValue");
+    void matate_shouldReturnBadRequest_whenPropertyNameIsEmpty() {
+        PropertyMutationRequest request = new PropertyMutationRequest(" ", "someValue");
 
-        ResponseEntity<PropertyNotFoundException> response =
-                restTemplate.postForEntity(path(), defaultEntity(request), PropertyNotFoundException.class);
+        ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);
 
-        assertThat(response)
-                .isNotNull()
-                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .isNotNull()
-                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNotFoundException.class));
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
     }
 
     @Test
-    void mutate_shouldNotMutate_whenPropertyNameIsBlank() {
-        PropertyMutationRequest request = new PropertyMutationRequest(" \t", "newValue");
+    void mutate_shouldReturnBadRequest_whenPropertyNameIsBlank() {
+        PropertyMutationRequest request = new PropertyMutationRequest("\t", "someValue");
 
-        ResponseEntity<PropertyNotFoundException> response =
-                restTemplate.postForEntity(path(), defaultEntity(request), PropertyNotFoundException.class);
+        ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);
 
-        assertThat(response)
-                .isNotNull()
-                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .isNotNull()
-                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNotFoundException.class));
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
     }
 
     @Test
-    void shouldReturnBadRequest_whenPropertyDoesNotExist() {
-        String propertyName = "nonExistentProperty.property";
-        PropertyMutationRequest request = new PropertyMutationRequest(propertyName, "newValue");
+    void matate_shouldCreateNewProperty_whenPropertyDoesNotExist() throws InterruptedException {
+        Map<?, ?> initialResponse =
+                restTemplate.getForObject("/actuator/env/non-existent-property.property", Map.class);
+        assertThat(initialResponse).isNull();
 
-        ResponseEntity<PropertyNotFoundException> response =
-                restTemplate.postForEntity(path(), defaultEntity(request), PropertyNotFoundException.class);
+        mutateProperty("non-existent-property.property", "true");
 
-        assertThat(response)
+        Map<?, ?> updatedResponse =
+                restTemplate.getForObject("/actuator/env/non-existent-property.property", Map.class);
+
+        assertThat(updatedResponse)
                 .isNotNull()
-                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("true");
+    }
+
+    @Test
+    void matate_shouldCreateNewProperty_whenPropertyNameNonStandard() throws InterruptedException {
+        Map<?, ?> initialResponse = restTemplate.getForObject("/actuator/env/non_$tandard.property", Map.class);
+
+        assertThat(initialResponse).isNull();
+
+        mutateProperty("non_$tandard.property", "someValue");
+
+        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/non_$tandard.property", Map.class);
+
+        assertThat(updatedResponse)
                 .isNotNull()
-                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNotFoundException.class));
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo("someValue");
     }
 
     /**

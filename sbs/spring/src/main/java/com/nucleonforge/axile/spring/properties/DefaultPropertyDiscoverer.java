@@ -23,8 +23,8 @@ public class DefaultPropertyDiscoverer implements PropertyDiscoverer {
     @Override
     @Nullable
     public Property discover(String propertyName) {
-        MutablePropertySources propertySources = environment.getPropertySources();
 
+        MutablePropertySources propertySources = environment.getPropertySources();
         Property property = null;
 
         // We rely on the ordering of PropertySources: the first source containing the property

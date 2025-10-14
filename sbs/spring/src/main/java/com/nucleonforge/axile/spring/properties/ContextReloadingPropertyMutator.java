@@ -31,18 +31,18 @@ public class ContextReloadingPropertyMutator implements PropertyMutator {
     }
 
     @Override
-    public void mutate(Property property, String newValue) {
+    public void mutate(String propertyName, String newValue) {
         MutablePropertySources propertySources = configurableEnvironment.getPropertySources();
 
         PropertySource<?> potentiallyAxilePropertySource = propertySources.get(AXILE_PROPERTY_SOURCE_NAME);
 
         if (potentiallyAxilePropertySource == null) {
             Map<String, Object> source = new HashMap<>();
-            source.put(property.getName(), newValue);
+            source.put(propertyName, newValue);
             propertySources.addFirst(new AxilePropertySource(source));
         } else {
             var axilePropertySource = (AxilePropertySource) potentiallyAxilePropertySource;
-            axilePropertySource.addProperty(property.getName(), newValue);
+            axilePropertySource.addProperty(propertyName, newValue);
         }
 
         contextRestarter.restartContext();
