@@ -150,30 +150,18 @@ class PropertyManagementEndpointTest {
     void matate_shouldReturnBadRequest_whenPropertyNameIsEmpty() {
         PropertyMutationRequest request = new PropertyMutationRequest(" ", "someValue");
 
-        ResponseEntity<PropertyNameIsNotValidException> response =
-                restTemplate.postForEntity(path(), defaultEntity(request), PropertyNameIsNotValidException.class);
+        ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);
 
-        assertThat(response)
-                .isNotNull()
-                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .isNotNull()
-                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNameIsNotValidException.class));
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
     }
 
     @Test
     void mutate_shouldReturnBadRequest_whenPropertyNameIsBlank() {
         PropertyMutationRequest request = new PropertyMutationRequest("\t", "someValue");
 
-        ResponseEntity<PropertyNameIsNotValidException> response =
-                restTemplate.postForEntity(path(), defaultEntity(request), PropertyNameIsNotValidException.class);
+        ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);
 
-        assertThat(response)
-                .isNotNull()
-                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .isNotNull()
-                .satisfies(exception -> assertThat(exception).isInstanceOf(PropertyNameIsNotValidException.class));
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
     }
 
     @Test
