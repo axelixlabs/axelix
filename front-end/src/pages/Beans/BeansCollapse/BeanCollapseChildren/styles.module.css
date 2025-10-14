@@ -1,6 +1,6 @@
 .CollapseBody {
   display: grid;
-  grid-template-columns: 130px 70%;
+  grid-template-columns: 140px 70%;
   gap: 20px;
 }
 
@@ -33,6 +33,7 @@
   padding-bottom: 0;
 }
 
-.Alias{
+.SimpleListValue {
   word-break: break-all;
 }
+

@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next";
-import type { RefObject, SetStateAction, Dispatch } from "react";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 
-import type { IBean, IBeansCollapseHeaderRefs } from "models";
+import { type IBean, type IBeansCollapseHeaderRefs } from "models";
+import { BeanBooleanFlag } from "./BeanBooleanFlag";
+import { BeanSimpleList } from "./BeanSimpleList";
+import { BeanProxyType } from "./BeanProxyType";
 import { TooltipWithCopy } from "components";
 
 import styles from "./styles.module.css";
@@ -51,26 +54,25 @@ export const BeanCollapseChildren = ({
 
   return (
     <div className={styles.CollapseBody}>
-      <div className={styles.CollapseBodyChunkTitle}>{t("dependencies")}:</div>
+      <div className={styles.CollapseBodyChunkTitle}>{t("Beans.dependencies")}:</div>
       <div>
-        {bean.dependencies.map((dependency) => (
-          <div key={dependency} className={styles.CollapseBodyChunkList}>
-            <div className={styles.Dependency}>
-              <TooltipWithCopy text={dependency} onClick={() => handleDependencyClick(dependency)} />
+        {!bean.dependencies.length
+          ? <span>-</span>
+          : bean.dependencies.map((dependency) => (
+            <div key={dependency} className={styles.CollapseBodyChunkList}>
+              <div className={styles.Dependency}>
+                <TooltipWithCopy text={dependency} onClick={() => handleDependencyClick(dependency)} />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
-      <div className={styles.CollapseBodyChunkTitle}>{t("aliases")}:</div>
-      <div>
-        {bean.aliases.map((alias) => (
-          <div key={alias} className={styles.CollapseBodyChunkList}>
-            <div className={styles.Alias}>
-              {alias}
-            </div>
-          </div>
-        ))}
-      </div>
+
+      <BeanSimpleList valuesTag="aliases" values={bean.aliases}></BeanSimpleList>
+      <BeanSimpleList valuesTag="qualifiers" values={bean.qualifiers}></BeanSimpleList>
+      <BeanProxyType proxyType={bean.proxyType} />
+      <BeanBooleanFlag valueTag={"isLazyInitBean"} value={bean.isLazyInit} />
+      <BeanBooleanFlag valueTag={"isPrimaryBean"} value={bean.isPrimary} />
     </div>
   );
 };
+
