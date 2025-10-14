@@ -98,13 +98,7 @@ public class ScheduledTasksApi {
             summary =
                     "Allows enabling a scheduled task either according to its configured schedule or forcibly, ignoring the schedule.",
             responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = ScheduledTasksResponse.class))),
+                @ApiResponse(description = "OK", responseCode = "200"),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -132,13 +126,7 @@ public class ScheduledTasksApi {
             summary =
                     "Allows disabling a scheduled task either according to its configured schedule or forcibly, ignoring the schedule.",
             responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = ScheduledTasksResponse.class))),
+                @ApiResponse(description = "OK", responseCode = "200"),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
