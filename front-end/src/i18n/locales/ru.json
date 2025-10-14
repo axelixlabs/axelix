@@ -20,8 +20,6 @@
   "caches": "Кэши",
   "activeProfiles": "Профили",
   "noData": "Нет данных",
-  "dependencies": "Зависимости",
-  "aliases": "Алиасы",
   "copied": "Скопировано",
   "reset": "Сбросить",
   "configuredExplicitly": "Задан явно",
@@ -30,5 +28,18 @@
   "clearAllCaches": "Очистить все кэши",
   "cacheTarget": "Реализация",
   "cacheName": "Имя",
-  "cleared": "Очищено"
+  "cleared": "Очищено",
+  "saved": "Сохранено",
+  "Beans": {
+    "dependencies": "Зависимости",
+    "aliases": "Алиасы",
+    "qualifiers": "Квалифаеры",
+    "isLazyInitBean": "Ленивый",
+    "isPrimaryBean": "Primary",
+    "beanProxyType": "Проксирование",
+    "unknownProxyingType": "Незивестно",
+    "cglibProxy": "CGLIB",
+    "jdkProxy": "JDK Динамический Прокси",
+    "noProxy": "Не проксирован"
+  }
 }

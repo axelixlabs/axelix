@@ -9,3 +9,5 @@ export * from "./interfaces/beans";
 export * from "./interfaces/auth";
 
 export * from './types/antd'
+
+export * from './enums/beans'
