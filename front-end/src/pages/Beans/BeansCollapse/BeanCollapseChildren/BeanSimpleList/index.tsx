@@ -1,5 +1,6 @@
+import { useTranslation } from "react-i18next";
+
 import styles from "../styles.module.css";
-import {useTranslation} from "react-i18next";
 
 interface IProps {
 
@@ -19,25 +20,22 @@ interface IProps {
  * Functional component that represents a list of simple, non-clickable values to be displayed in the
  * bean collapse drop-down.
  */
-export const BeanSimpleList = ({ valuesTag, values } : IProps) => {
-
+export const BeanSimpleList = ({ valuesTag, values }: IProps) => {
   const { t } = useTranslation();
 
   return (
     <>
-      <div className={styles.CollapseBodyChunkTitle}>{t(valuesTag)}:</div>
+      <div className={styles.CollapseBodyChunkTitle}>{t(`Beans.${valuesTag}`)}:</div>
       <div>
-        {
-          values.length == 0
-            ? <div>-</div>
-            : values.map((values) => (
-              <div key={values} className={styles.CollapseBodyChunkList}>
-                <div className={styles.SimpleListValue}>
-                  {values}
-                </div>
+        {!values.length
+          ? <span>-</span>
+          : values.map((values) => (
+            <div key={values} className={styles.CollapseBodyChunkList}>
+              <div className={styles.SimpleListValue}>
+                {values}
               </div>
-            ))
-        }
+            </div>
+          ))}
       </div>
     </>
   );
