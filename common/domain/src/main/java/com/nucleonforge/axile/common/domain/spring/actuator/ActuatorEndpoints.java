@@ -119,7 +119,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint SCHEDULED_TASKS = of("/scheduledtasks", HttpMethod.GET);
 
     // @Scheduled task management
-    public static final ActuatorEndpoint SCHEDULED_TASKS_MANAGEMENT = of("/scheduledtasksmanagement", HttpMethod.GET);
+    public static final ActuatorEndpoint SCHEDULED_TASKS_MANAGEMENT = of("/scheduledtasks", HttpMethod.GET);
     public static final ActuatorEndpoint ENABLE_SCHEDULED_TASK = of("/scheduledtasksmanagement/enable", HttpMethod.POST);
     public static final ActuatorEndpoint DISABLE_SCHEDULED_TASK = of("/scheduledtasksmanagement/disable", HttpMethod.POST);
 

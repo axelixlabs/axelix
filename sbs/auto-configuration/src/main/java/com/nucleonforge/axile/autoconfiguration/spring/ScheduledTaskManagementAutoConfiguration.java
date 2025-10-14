@@ -3,6 +3,7 @@ package com.nucleonforge.axile.autoconfiguration.spring;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
@@ -21,6 +22,7 @@ import com.nucleonforge.axile.spring.scheduled.ScheduledTasksRegistry;
  */
 @AutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = ScheduledTasksEndpoint.class)
+@ConditionalOnBean(ScheduledAnnotationBeanPostProcessor.class)
 public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean
