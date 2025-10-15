@@ -40,7 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class)
-@TestPropertySource(properties = {"management.endpoints.web.exposure.include=scheduledtasks, scheduled-tasks-management"})
+@TestPropertySource(
+        properties = {"management.endpoints.web.exposure.include=scheduledtasks, scheduled-tasks-management"})
 class ScheduledTaskManagementEndpointTest {
 
     private static final String CRON_TASK_ID =

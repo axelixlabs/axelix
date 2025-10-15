@@ -7,6 +7,8 @@ import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 
+// TODO: we might want to move 'enabled' flag at the same level as the main content.
+//  There seems to be not that much sense to keep it separate.
 /**
  * The response of the {@link ActuatorEndpoints#SCHEDULED_TASKS} actuator endpoint provides information about the application’s scheduled tasks.
  *
