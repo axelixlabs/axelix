@@ -60,13 +60,13 @@ class ScheduledTaskServiceTest {
     void shouldDisabledTask_testCronTask() throws InterruptedException {
         String taskId = CRON_TASK_ID;
 
-        taskService.disableTask(taskId, false);
-        Thread.sleep(1500);
+        taskService.disableTask(taskId, true);
+        Thread.sleep(200);
         cronFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(1200);
 
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isFalse();
+        assertThat(task.getFuture().isCancelled()).isTrue();
     }
 
     @Test
@@ -74,17 +74,18 @@ class ScheduledTaskServiceTest {
         String taskId = CRON_TASK_ID;
 
         taskService.disableTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         cronFlag = false;
+        Thread.sleep(1200);
 
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isFalse();
+        assertThat(task.getFuture().isCancelled()).isTrue();
 
         taskService.enableTask(taskId, true);
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isTrue();
+        assertThat(task.getFuture().isCancelled()).isFalse();
     }
 
     @Test
@@ -92,12 +93,12 @@ class ScheduledTaskServiceTest {
         String taskId = FIXED_DELAY_TASK_ID;
 
         taskService.disableTask(taskId, false);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         fixedDelayFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(200);
 
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isFalse();
+        assertThat(task.getFuture().isCancelled()).isTrue();
     }
 
     @Test
@@ -105,17 +106,17 @@ class ScheduledTaskServiceTest {
         String taskId = FIXED_DELAY_TASK_ID;
 
         taskService.disableTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         fixedDelayFlag = false;
 
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isFalse();
+        assertThat(task.getFuture().isCancelled()).isTrue();
 
         taskService.enableTask(taskId, true);
         Thread.sleep(100);
 
         task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isTrue();
+        assertThat(task.getFuture().isCancelled()).isFalse();
     }
 
     @Test
@@ -123,12 +124,12 @@ class ScheduledTaskServiceTest {
         String taskId = FIXED_RATE_TASK_ID;
 
         taskService.disableTask(taskId, false);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         fixedRateFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(200);
 
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isFalse();
+        assertThat(task.getFuture().isCancelled()).isTrue();
     }
 
     @Test
@@ -136,17 +137,17 @@ class ScheduledTaskServiceTest {
         String taskId = FIXED_RATE_TASK_ID;
 
         taskService.disableTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         fixedRateFlag = false;
 
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isFalse();
+        assertThat(task.getFuture().isCancelled()).isTrue();
 
         taskService.enableTask(taskId, true);
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isTrue();
+        assertThat(task.getFuture().isCancelled()).isFalse();
     }
 
     @Test
@@ -154,12 +155,12 @@ class ScheduledTaskServiceTest {
         String taskId = CUSTOM_TASK_ID;
 
         taskService.disableTask(taskId, false);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         customTaskFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(200);
 
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isFalse();
+        assertThat(task.getFuture().isCancelled()).isTrue();
     }
 
     @Test
@@ -167,17 +168,17 @@ class ScheduledTaskServiceTest {
         String taskId = CUSTOM_TASK_ID;
 
         taskService.disableTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         customTaskFlag = false;
 
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isFalse();
+        assertThat(task.getFuture().isCancelled()).isTrue();
 
         taskService.enableTask(taskId, true);
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         task = taskRegistry.find(taskId).orElseThrow();
-        assertThat(task.isEnabled()).isTrue();
+        assertThat(task.getFuture().isCancelled()).isFalse();
     }
 
     @TestConfiguration
@@ -205,12 +206,12 @@ class ScheduledTaskServiceTest {
             cronFlag = true;
         }
 
-        @Scheduled(fixedDelay = 1000)
+        @Scheduled(fixedDelay = 100)
         public void testFixedDelayTask() {
             fixedDelayFlag = true;
         }
 
-        @Scheduled(fixedRate = 1000, initialDelay = 100)
+        @Scheduled(fixedRate = 100, initialDelay = 50)
         public void testFixedRateTask() {
             fixedRateFlag = true;
         }
@@ -236,7 +237,7 @@ class ScheduledTaskServiceTest {
             @Override
             @Nullable
             public Instant nextExecution(@NonNull TriggerContext triggerContext) {
-                return Instant.now().plusSeconds(1);
+                return Instant.now().plusMillis(100);
             }
         }
     }

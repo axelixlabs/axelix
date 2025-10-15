@@ -1,6 +1,7 @@
 package com.nucleonforge.axile.spring.scheduled;
 
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
@@ -45,7 +46,13 @@ public class ScheduledTasksEndpointExtension {
 
     private boolean resolveTaskEnabledStatus(ScheduledTasksEndpoint.TaskDescriptor taskDescriptor) {
         String target = taskDescriptor.getRunnable().getTarget();
-        return registry.find(target).map(ManagedScheduledTask::isEnabled).orElse(true);
+
+        return registry.find(target)
+                .map(task -> {
+                    ScheduledFuture<?> future = task.getFuture();
+                    return future == null || !future.isCancelled();
+                })
+                .orElse(true);
     }
 
     public record ExtendedScheduledTasksDescriptor(

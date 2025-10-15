@@ -69,10 +69,10 @@ class ScheduledTaskManagementEndpointTest {
     void shouldEnableDisabledTask_testCronTask() throws InterruptedException {
         String taskId = CRON_TASK_ID;
 
-        disableScheduledTask(taskId, false);
-        Thread.sleep(1500);
+        disableScheduledTask(taskId, true);
+        Thread.sleep(200);
         cronFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(1200);
         assertThat(cronFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
@@ -86,9 +86,9 @@ class ScheduledTaskManagementEndpointTest {
         String taskId = CRON_TASK_ID;
 
         disableScheduledTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         cronFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(1200);
         assertThat(cronFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
@@ -97,7 +97,7 @@ class ScheduledTaskManagementEndpointTest {
         });
 
         enableScheduledTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         assertThat(cronFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
@@ -111,9 +111,9 @@ class ScheduledTaskManagementEndpointTest {
         String taskId = FIXED_DELAY_TASK_ID;
 
         disableScheduledTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         fixedDelayFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(200);
         assertThat(fixedDelayFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
@@ -127,9 +127,9 @@ class ScheduledTaskManagementEndpointTest {
         String taskId = FIXED_DELAY_TASK_ID;
 
         disableScheduledTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         fixedDelayFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(200);
         assertThat(fixedDelayFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
@@ -137,8 +137,8 @@ class ScheduledTaskManagementEndpointTest {
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
-        enableScheduledTask(taskId, false);
-        Thread.sleep(1500);
+        enableScheduledTask(taskId, true);
+        Thread.sleep(200);
         assertThat(fixedDelayFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
@@ -152,9 +152,9 @@ class ScheduledTaskManagementEndpointTest {
         String taskId = FIXED_RATE_TASK_ID;
 
         disableScheduledTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         fixedRateFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(200);
         assertThat(fixedRateFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
@@ -168,9 +168,9 @@ class ScheduledTaskManagementEndpointTest {
         String taskId = FIXED_RATE_TASK_ID;
 
         disableScheduledTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         fixedRateFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(200);
         assertThat(fixedRateFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
@@ -178,8 +178,8 @@ class ScheduledTaskManagementEndpointTest {
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
-        enableScheduledTask(taskId, false);
-        Thread.sleep(1500);
+        enableScheduledTask(taskId, true);
+        Thread.sleep(200);
         assertThat(fixedRateFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
@@ -193,9 +193,9 @@ class ScheduledTaskManagementEndpointTest {
         String taskId = CUSTOM_TASK_ID;
 
         disableScheduledTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         customTaskFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(200);
         assertThat(customTaskFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
@@ -210,9 +210,9 @@ class ScheduledTaskManagementEndpointTest {
         String taskId = CUSTOM_TASK_ID;
 
         disableScheduledTask(taskId, true);
-        Thread.sleep(1500);
+        Thread.sleep(200);
         customTaskFlag = false;
-        Thread.sleep(1500);
+        Thread.sleep(200);
         assertThat(customTaskFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
@@ -220,8 +220,8 @@ class ScheduledTaskManagementEndpointTest {
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
-        enableScheduledTask(taskId, false);
-        Thread.sleep(1500);
+        enableScheduledTask(taskId, true);
+        Thread.sleep(200);
         assertThat(customTaskFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
@@ -299,12 +299,12 @@ class ScheduledTaskManagementEndpointTest {
             cronFlag = true;
         }
 
-        @Scheduled(fixedDelay = 1000)
+        @Scheduled(fixedDelay = 100)
         public void testFixedDelayTask() {
             fixedDelayFlag = true;
         }
 
-        @Scheduled(fixedRate = 1000, initialDelay = 100)
+        @Scheduled(fixedRate = 100, initialDelay = 50)
         public void testFixedRateTask() {
             fixedRateFlag = true;
         }
@@ -330,7 +330,7 @@ class ScheduledTaskManagementEndpointTest {
             @Override
             @Nullable
             public Instant nextExecution(@NonNull TriggerContext triggerContext) {
-                return Instant.now().plusSeconds(1);
+                return Instant.now().plusMillis(100);
             }
 
             @Override

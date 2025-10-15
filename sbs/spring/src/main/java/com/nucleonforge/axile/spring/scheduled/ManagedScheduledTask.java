@@ -44,11 +44,6 @@ public class ManagedScheduledTask {
     private final TaskScheduler taskScheduler;
 
     /**
-     * Current enabled state of the task. When {@code false}, the task will not execute.
-     */
-    private volatile boolean enabled = true;
-
-    /**
      * The runnable task to be executed.
      */
     private final Runnable runnable;
@@ -85,14 +80,6 @@ public class ManagedScheduledTask {
 
     public String getId() {
         return id;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     public ScheduledTask getScheduledTask() {
