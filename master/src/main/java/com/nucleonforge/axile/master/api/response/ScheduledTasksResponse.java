@@ -21,6 +21,7 @@ public record ScheduledTasksResponse(
     /**
      * The profile representing a scheduled task with precise execution configuration.
      *
+     * @param enabled          The indicator showing whether the task is enabled {@code true} or disabled {@code false}.
      * @param runnable         The target that will be executed.
      * @param expression       The cron expression that allows specifying (e.g., "0 1 1 5 7 3" or "0 0/15 9-17 ? * MON,WED,FRI" (seconds minutes hours day_of_month month day_of_week))
      * @param nextExecution    The time of the next scheduled execution of this task, if known.
@@ -30,6 +31,7 @@ public record ScheduledTasksResponse(
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record Cron(
+            boolean enabled,
             Runnable runnable,
             String expression,
             @Nullable NextExecution nextExecution,
@@ -38,6 +40,7 @@ public record ScheduledTasksResponse(
     /**
      * The profile representing the interval between task executions, counted from the end of the previous task execution.
      *
+     * @param enabled          The indicator showing whether the task is enabled {@code true} or disabled {@code false}.
      * @param runnable         The target that will be executed.
      * @param interval         The interval, in milliseconds, between the start of each execution.
      * @param initialDelay     The delay, in milliseconds, before first execution.
@@ -48,6 +51,7 @@ public record ScheduledTasksResponse(
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record FixedDelay(
+            boolean enabled,
             Runnable runnable,
             Number interval,
             Number initialDelay,
@@ -57,6 +61,7 @@ public record ScheduledTasksResponse(
     /**
      * The profile representing the interval between task executions, measured from the start of the previous task execution.
      *
+     * @param enabled          The indicator showing whether the task is enabled {@code true} or disabled {@code false}.
      * @param runnable         The target that will be executed.
      * @param interval         The interval, in milliseconds, between the start of each execution.
      * @param initialDelay     The delay, in milliseconds, before first execution.
@@ -67,6 +72,7 @@ public record ScheduledTasksResponse(
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record FixedRate(
+            boolean enabled,
             Runnable runnable,
             Number interval,
             Number initialDelay,
@@ -76,6 +82,7 @@ public record ScheduledTasksResponse(
     /**
      * The profile representing a task with a configured user trigger.
      *
+     * @param enabled         The indicator showing whether the task is enabled {@code true} or disabled {@code false}.
      * @param runnable        The target that will be executed.
      * @param trigger         The trigger used to execute this task.
      * @param lastExecution   The last execution of this task, if any.
@@ -83,7 +90,7 @@ public record ScheduledTasksResponse(
      * @author Sergey Cherkasov
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record Custom(Runnable runnable, String trigger, @Nullable LastExecution lastExecution) {}
+    public record Custom(boolean enabled, Runnable runnable, String trigger, @Nullable LastExecution lastExecution) {}
 
     /**
      * The profile representing the last execution of the task.

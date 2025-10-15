@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.transport;
+package com.nucleonforge.axile.master.service.transport.scheduled;
 
 import org.jspecify.annotations.NonNull;
 
@@ -9,6 +9,7 @@ import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
+import com.nucleonforge.axile.master.service.transport.AbstractEndpointProber;
 
 /**
  * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#SCHEDULED_TASKS} endpoint.
@@ -16,9 +17,9 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
  * @author Sergey Cherkasov
  */
 @Service
-public class ScheduledTasksEndpointProber extends AbstractEndpointProber<ServiceScheduledTasks> {
+public class GetAllScheduledTasksEndpointProber extends AbstractEndpointProber<ServiceScheduledTasks> {
 
-    public ScheduledTasksEndpointProber(
+    public GetAllScheduledTasksEndpointProber(
             InstanceRegistry instanceRegistry,
             MessageDeserializationStrategy<ServiceScheduledTasks> messageDeserializationStrategy) {
         super(instanceRegistry, messageDeserializationStrategy);
