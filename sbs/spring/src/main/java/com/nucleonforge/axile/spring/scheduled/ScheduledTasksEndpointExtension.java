@@ -47,6 +47,9 @@ public class ScheduledTasksEndpointExtension {
     private boolean resolveTaskEnabledStatus(ScheduledTasksEndpoint.TaskDescriptor taskDescriptor) {
         String target = taskDescriptor.getRunnable().getTarget();
 
+        // TODO:
+        //  1. how is that possible that future will be null?
+        //  2. is that correct that we're returning tru in case the task is not found? I guess no.
         return registry.find(target)
                 .map(task -> {
                     ScheduledFuture<?> future = task.getFuture();
