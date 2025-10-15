@@ -43,8 +43,8 @@
     "noProxy": "Не проксирован"
   },
   "ScheduledTasks": {
-    "runnable": "Запускаемый",
-    "expression": "Выражение",
+    "runnable": "Метод",
+    "expression": "Cron выражение",
     "status": "Статус",
     "initialDelay": "Начальная <br /> задержка (мс)",
     "interval": "Интервал (мс)",

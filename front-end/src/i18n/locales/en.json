@@ -44,7 +44,7 @@
   },
   "ScheduledTasks": {
     "runnable": "Runnable",
-    "expression": "Expression",
+    "expression": "Cron expression",
     "status": "Status",
     "initialDelay": "Initial Delay (ms)",
     "interval": "Interval (ms)",

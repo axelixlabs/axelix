@@ -17,6 +17,7 @@ interface IProps {
     isCron: boolean;
 }
 
+// TODO: Same thing as with table header - split into two components.
 export const TableRow = ({ task, isCron }: IProps) => {
     const { t } = useTranslation()
 
