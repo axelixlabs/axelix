@@ -1,12 +1,11 @@
 import type { PropsWithChildren } from 'react';
 
-import { EmptyHandler } from '../EmptyHandler';
+import { TooltipWithCopy } from 'components/TooltipWithCopy';
 import { TablePropertyValue } from './TablePropertyValue';
+import { EmptyHandler } from '../EmptyHandler';
 
 import type { ITableRow } from 'models';
 
-import styles from './styles.module.css'
-import { TooltipWithCopy } from 'components/TooltipWithCopy';
 
 interface IProps {
     /**
@@ -22,9 +21,10 @@ interface IProps {
 
 export const ModifiableTableSection = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
     return (
-        <div className={styles.Table}>
-            <div className={styles.TableHeader}>
-                <div className={styles.TableHeaderCell}>
+      // TODO: this css class CustomizedAntdTable is used also for scheduled tasks, and I do not think it is correct
+        <div className='CustomizedAntdTable'>
+            <div className='TableHeader'>
+                <div className='RowChunk'>
                     <div>{headerName}</div>
                     {children}
                 </div>
@@ -34,12 +34,12 @@ export const ModifiableTableSection = ({ headerName, properties, children }: Pro
                 {properties.map(({ key, displayKey, displayValue }) => (
                     <div
                         key={key}
-                        className={styles.TableRow}
+                        className='TableRow'
                     >
-                        <div className={styles.RowChunk}>
+                        <div className='RowChunk'>
                             <TooltipWithCopy text={displayKey} />
                         </div>
-                        <div className={styles.RowChunk}>
+                        <div className='RowChunk'>
                             <TablePropertyValue propertyName={key} propertyValue={displayValue} />
                         </div>
                     </div>

@@ -9,6 +9,7 @@ import {
   WallboardSlice,
   UpdatePropertySlice,
   CachesSlice,
+  ScheduledTasksSlice
 } from "./slices";
 
 export const store = configureStore({
@@ -20,7 +21,8 @@ export const store = configureStore({
     loggers: LoggersSlice.reducer,
     wallboard: WallboardSlice.reducer,
     updateProperty: UpdatePropertySlice.reducer,
-    caches: CachesSlice.reducer
+    caches: CachesSlice.reducer,
+    scheduledTasks: ScheduledTasksSlice.reducer
   },
 });
 

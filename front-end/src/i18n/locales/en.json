@@ -41,5 +41,17 @@
     "cglibProxy": "CGLIB",
     "jdkProxy": "JDK Dynamic Proxy",
     "noProxy": "No Proxying"
+  },
+  "ScheduledTasks": {
+    "runnable": "Runnable",
+    "expression": "Cron expression",
+    "status": "Status",
+    "initialDelay": "Initial Delay (ms)",
+    "interval": "Interval (ms)",
+    "on": "ON",
+    "off": "OFF",
+    "cron": "Cron",
+    "fixedDelay": "Fixed delay",
+    "fixedRate": "Fixed rate"
   }
 }
