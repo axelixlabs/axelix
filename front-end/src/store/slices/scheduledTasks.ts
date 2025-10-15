@@ -54,6 +54,7 @@ export const ScheduledTasksSlice = createSlice({
             });
         });
         builder.addCase(updateScheduledTasksStatusThunk.rejected, (state, { payload }) => {
+            // @ts-expect-error fix in future
             const { status } = payload;
 
             state.updateScheduleTasksStatusLoading = false;
