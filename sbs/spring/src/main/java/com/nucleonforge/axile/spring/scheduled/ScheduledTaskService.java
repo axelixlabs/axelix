@@ -32,9 +32,8 @@ public class ScheduledTaskService {
             ManagedScheduledTask task = registry.find(target)
                     .orElseThrow(() -> new ScheduledTaskNotFoundException("Task not found: " + target));
 
-            if (!task.isEnabled()) {
+            if (!task.getFuture().isCancelled()) {
                 rescheduleTask(task, force);
-                task.setEnabled(true);
                 log.info("Enabled scheduled task: {}", target);
             } else if (force) {
                 rescheduleTask(task, true);
@@ -54,7 +53,6 @@ public class ScheduledTaskService {
                     .orElseThrow(() -> new ScheduledTaskNotFoundException("Task not found: " + target));
 
             cancelTask(task, force);
-            task.setEnabled(false);
             log.info("Disabled scheduled task: {}(force: {})", target, force);
         } catch (ScheduledTaskNotFoundException e) {
             log.info("Failed to disable task: {}", target, e);

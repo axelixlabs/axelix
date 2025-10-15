@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,7 @@ class ScheduledTasksRegistryTest {
                 .containsExactlyInAnyOrder(CRON_TASK_ID, FIXED_DELAY_TASK_ID, FIXED_RATE_TASK_ID, CUSTOM_TASK_ID);
 
         assertThat(registeredTasks)
-                .allSatisfy(task -> assertThat(task.isEnabled()).isTrue());
+                .allSatisfy(task -> assertThat(task.getFuture().isCancelled()).isFalse());
 
         taskIds.forEach(id -> assertThat(taskRegistry.find(id))
                 .isPresent()
@@ -111,9 +112,7 @@ class ScheduledTasksRegistryTest {
         public void testCronTask() {}
 
         @Scheduled(fixedDelay = 2000)
-        public void testFixedDelayTask() throws InterruptedException {
-            Thread.sleep(50);
-        }
+        public void testFixedDelayTask() {}
 
         @Scheduled(fixedRate = 2000, initialDelay = 100)
         public void testFixedRateTask() {}
@@ -139,12 +138,8 @@ class ScheduledTasksRegistryTest {
         static class CustomTrigger implements Trigger {
             @Override
             @Nullable
-            public Instant nextExecution(TriggerContext triggerContext) {
-                Instant lastCompletion = triggerContext.lastCompletion();
-                if (lastCompletion == null) {
-                    return Instant.now().plusSeconds(1);
-                }
-                return lastCompletion.plusSeconds(2);
+            public Instant nextExecution(@NonNull TriggerContext triggerContext) {
+                return Instant.now().plusMillis(1000);
             }
         }
     }
