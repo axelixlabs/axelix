@@ -11,6 +11,7 @@ import org.springframework.scheduling.config.FixedDelayTask;
 import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.Task;
 
+// TODO: revisit the design of this class in general
 /**
  * Service for managing scheduled tasks with enable/disable functionality.
  *
