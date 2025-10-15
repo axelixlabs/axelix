@@ -257,7 +257,7 @@ public class ScheduledTasksEndpointProberTest {
         // then
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/scheduledtasksmanagement/enable");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/scheduled-tasks-management/enable");
         assertThatJson(recordedRequest.getBody().readUtf8()).isEqualTo(jsonRequest);
     }
 
@@ -282,7 +282,7 @@ public class ScheduledTasksEndpointProberTest {
         // then
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/scheduledtasksmanagement/disable");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/scheduled-tasks-management/disable");
         assertThatJson(recordedRequest.getBody().readUtf8()).isEqualTo(jsonRequest);
     }
 }

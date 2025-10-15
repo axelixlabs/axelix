@@ -28,9 +28,6 @@ import com.nucleonforge.axile.master.api.request.ScheduledTaskToggleRequest;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
-import static com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints.DISABLE_SCHEDULED_TASK;
-import static com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints.ENABLE_SCHEDULED_TASK;
-import static com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints.SCHEDULED_TASKS;
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
@@ -273,16 +270,13 @@ public class ScheduledTasksApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator"
-                        + SCHEDULED_TASKS.path().getOriginalUrl())) {
+                if (path.equals("/" + activeInstanceId + "/actuator/scheduledtasks")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator"
-                        + ENABLE_SCHEDULED_TASK.path().getOriginalUrl())) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/scheduled-tasks-management/enable")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/actuator"
-                        + DISABLE_SCHEDULED_TASK.path().getOriginalUrl())) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/scheduled-tasks-management/disable")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
