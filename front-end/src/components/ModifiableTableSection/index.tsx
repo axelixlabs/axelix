@@ -21,6 +21,7 @@ interface IProps {
 
 export const ModifiableTableSection = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
     return (
+      // TODO: this css class CustomizedAntdTable is used also for scheduled tasks, and I do not think it is correct
         <div className='CustomizedAntdTable'>
             <div className='TableHeader'>
                 <div className='RowChunk'>

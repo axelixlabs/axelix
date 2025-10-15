@@ -3,12 +3,17 @@ import { useTranslation } from 'react-i18next';
 import styles from './styles.module.css'
 
 interface IProps {
+
     /**
      * If true, this is a table for Cron task
      */
     isCron: boolean
 }
 
+// TODO:
+//  I do not think that this is even supposed to be a single component, to be honest.
+//  We have a lot of conditional logic inside depending on the cron task flag. Ideally,
+//  we would want to separate fixedDelay / fixedRate components from the cron,
 export const TableHeader = ({ isCron }: IProps) => {
     const { t } = useTranslation()
 
@@ -24,6 +29,10 @@ export const TableHeader = ({ isCron }: IProps) => {
                 </div>
             ) : (
                 <>
+                  {
+                    // TODO: that also feels wrong to be honest. This br inside the initialDelay is
+                    //  actually a hack, we need to find a way around this
+                  }
                     <div
                         dangerouslySetInnerHTML={{ __html: t("ScheduledTasks.initialDelay") }}
                         className="RowChunk"
