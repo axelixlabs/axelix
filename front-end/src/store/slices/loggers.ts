@@ -1,64 +1,20 @@
-import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-import type { ILoggerData, ILoggersSliceState, ISetLoggerLevelRequestData } from "models";
-import { getLoggersData, setLoggerLevel } from "services/loggers";
-
-
+import { getLoggersThunk, setLoggerLevelThunk } from "store/thunks";
+import type { ILoggersSliceState } from "models";
 
 const initialState: ILoggersSliceState = {
   loading: false,
   updateLoggerSuccess: false,
   levels: [],
   loggers: [],
-  loggersSearchText: "",
-  filteredLoggers: [],
   error: "",
 };
-
-// todo fix any in future for rejectValue
-export const setLoggerLevelThunk = createAsyncThunk<void, ISetLoggerLevelRequestData, { rejectValue: any }>(
-  "setLoggerLevelThunk",
-  async ({ instanceId, loggerName, loggingLevel }, { dispatch, rejectWithValue }) => {
-    try {
-      await setLoggerLevel(instanceId, loggerName, loggingLevel)
-      dispatch(getLoggersThunk(instanceId));
-    } catch (error: any) {
-      return rejectWithValue({
-        status: error.response?.status,
-      });
-    }
-  }
-);
-
-// todo fix any in future for rejectValue
-export const getLoggersThunk = createAsyncThunk<ILoggerData, string, { rejectValue: any }>(
-  "getLoggersThunk",
-  async (instanceId, { rejectWithValue }) => {
-    try {
-      const response = await getLoggersData(instanceId);
-
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue({
-        status: error.response?.status,
-      });
-    }
-  }
-);
 
 export const LoggersSlice = createSlice({
   name: "loggersSlice",
   initialState,
-  reducers: {
-    filterLoggers: (state, action: PayloadAction<string>) => {
-      const searchText = action.payload.toLowerCase().trim();
-      state.loggersSearchText = searchText;
-
-      state.filteredLoggers = state.loggers.filter((logger) => {
-        return logger.name.toLowerCase().includes(searchText);
-      });
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getLoggersThunk.pending, (state) => {
       state.loading = true;
@@ -103,7 +59,5 @@ export const LoggersSlice = createSlice({
     });
   },
 });
-
-export const { filterLoggers } = LoggersSlice.actions;
 
 export default LoggersSlice;

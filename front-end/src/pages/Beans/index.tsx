@@ -1,17 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { BeansCollapse } from "./BeansCollapse";
-import { useAppDispatch, useAppSelector } from "hooks";
-import { filterBeans, getBeansThunk } from "store/slices";
 import { Loader, EmptyHandler, PageSearch } from "components";
+import { useAppDispatch, useAppSelector } from "hooks";
+import { BeansCollapse } from "./BeansCollapse";
+import { getBeansThunk } from "store/thunks";
+import { filterBeans } from "helpers";
+import type { IBean } from "models";
 
 export const Beans = () => {
   const { instanceId } = useParams();
 
   const dispatch = useAppDispatch();
-  const { beans, filteredBeans, beansSearchText, loading, error } =
-    useAppSelector((store) => store.beans);
+  const { beans, loading, error } = useAppSelector((store) => store.beans);
+
+  const [isSearched, setIsSearched] = useState<boolean>(false)
+  const [filteredBeans, setFilteredBeans] = useState<IBean[]>([])
 
   useEffect(() => {
     if (instanceId) {
@@ -28,15 +32,27 @@ export const Beans = () => {
     return error;
   }
 
-  const noDataAfterSearch = !!beansSearchText && !filteredBeans.length;
-  const addonAfter = `${beansSearchText ? filteredBeans.length : beans.length} / ${beans.length}`;
-  const beansList = filteredBeans.length ? filteredBeans : beans
+  const beansList = isSearched ? filteredBeans : beans
+  const noSearchResults = isSearched && !filteredBeans.length;
+  const addonAfter = `${isSearched ? filteredBeans.length : beans.length} / ${beans.length}`;
+
+  const handleSearchChange = (search: string): void => {
+    const isSearching = Boolean(search);
+    setIsSearched(isSearching);
+
+    if (!isSearching) {
+      setFilteredBeans([]);
+      return;
+    }
+
+    setFilteredBeans(filterBeans(beans, search));
+  };
 
   return (
     <>
-      <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterBeans(value))} />
+      <PageSearch addonAfter={addonAfter} onChange={handleSearchChange} />
 
-      <EmptyHandler isEmpty={noDataAfterSearch}>
+      <EmptyHandler isEmpty={noSearchResults}>
         <BeansCollapse beans={beansList} />
       </EmptyHandler>
     </>

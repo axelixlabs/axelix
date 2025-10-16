@@ -3,10 +3,11 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { getEnvironmentThunk, resetChangePropertySuccess } from "store/slices";
 import { EnvironmentProfiles } from "./EnvironmentProfiles";
+import { resetChangePropertySuccess } from "store/slices";
 import { EnvironmentTables } from "./EnvironmentTables";
 import { useAppDispatch, useAppSelector } from "hooks";
+import { getEnvironmentThunk } from "store/thunks";
 import { Loader } from "components";
 
 export const Environment = () => {

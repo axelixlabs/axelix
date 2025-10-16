@@ -27,14 +27,10 @@ export interface ICachesData {
      * List of cache managers
      */
     cacheManagers: ICachesManager[];
-    /**
-     * List of filtered cache managers
-     */
-    filteredCacheManagers: ICachesManager[];
 }
 
 export enum IClearOperationType {
-    CLEAR_SINGLE_CACHE = 0 ,
+    CLEAR_SINGLE_CACHE = 0,
     CLEAR_ALL_CACHES = 1
 }
 
@@ -48,14 +44,9 @@ export interface ICachesSliceState extends ICommonSliceState, ICachesData {
      * Optional clear cache operation that is currently in progress
      */
     clearOperationLoading: IClearOperationType | null,
-
-    /**
-     * Search text for filtering cache managers
-     */
-    cacheManagersSearchText: string,
 }
 
-export interface IClearCacheData  {
+export interface IClearCacheData {
     /**
      * Name of the cache
      */
@@ -66,7 +57,7 @@ export interface IClearCacheData  {
     cacheManager: string
 }
 
-export interface IClearCachePayload  {
+export interface IClearCachePayload {
     /**
      * Instance ID of the service
      */
