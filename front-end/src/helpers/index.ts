@@ -1,6 +1,7 @@
 export * from './scheduledTasks'
 export * from './configProps'
 export * from './environment'
+export * from './wallboard'
 export * from './loggers'
 export * from './global'
 export * from './caches'
