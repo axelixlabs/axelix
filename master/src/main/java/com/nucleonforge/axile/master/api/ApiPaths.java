@@ -86,6 +86,19 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/{instanceId}";
     }
 
+    public static final class ConditionsApi {
+
+        /**
+         * Base path for conditions APIs.
+         */
+        public static final String MAIN = "/conditions";
+
+        /**
+         * Instance id for conditions Endpoint.
+         */
+        public static final String FEED = "/feed/{instanceId}";
+    }
+
     public static final class ConfigpropsApi {
 
         /**
