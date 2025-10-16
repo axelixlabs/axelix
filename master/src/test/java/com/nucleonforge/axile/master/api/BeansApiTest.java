@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link BeansApi}.
  *
  * @since 28.08.2025
- * author Nikita Kirillov
+ * @author Nikita Kirillov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BeansApiTest {
