@@ -1,15 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { filterServiceCards, getWallboardDataThunk } from 'store/slices';
 import { EmptyHandler, Loader, PageSearch } from 'components';
 import { useAppDispatch, useAppSelector } from 'hooks';
+import { getWallboardDataThunk } from 'store/thunks';
 import { WallboardCard } from './WallboardCard';
+import type { IInstanceCard } from 'models';
+import { filterInstances } from 'helpers';
 
 import styles from './styles.module.css'
 
 export const Wallboard = () => {
     const dispatch = useAppDispatch()
-    const { instances, filteredInstances, instancesSearchText, loading, error } = useAppSelector(state => state.wallboard)
+    const { instances, loading, error } = useAppSelector(state => state.wallboard)
+
+    const [isSearched, setIsSearched] = useState<boolean>(false)
+    const [filteredInstances, setFilteredInstances] = useState<IInstanceCard[]>([])
 
     useEffect(() => {
         dispatch(getWallboardDataThunk())
@@ -24,15 +29,27 @@ export const Wallboard = () => {
         return error
     }
 
-    const serviceCardsList = filteredInstances.length ? filteredInstances : instances;
-    const noDataAfterSearch = !!instancesSearchText && !filteredInstances.length;
-    const addonAfter = `${instancesSearchText ? filteredInstances.length : instances.length} / ${instances.length}`;
+    const serviceCardsList = isSearched ? filteredInstances : instances;
+    const noSearchResults = isSearched && !filteredInstances.length;
+    const addonAfter = `${isSearched ? filteredInstances.length : instances.length} / ${instances.length}`;
+
+    const handleSearchChange = (search: string): void => {
+        const isSearching = Boolean(search);
+        setIsSearched(isSearching);
+
+        if (!isSearching) {
+            setFilteredInstances([]);
+            return;
+        }
+
+        setFilteredInstances(filterInstances(instances, search));
+    };
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterServiceCards(value))} />
+            <PageSearch addonAfter={addonAfter} onChange={handleSearchChange} />
 
-            <EmptyHandler isEmpty={noDataAfterSearch}>
+            <EmptyHandler isEmpty={noSearchResults}>
                 <div className={styles.CardsResponsiveWrapper}>
                     {serviceCardsList.map(data => <WallboardCard data={data} key={data.instanceId} />)}
                 </div>

@@ -17,6 +17,4 @@ export interface IServiceCardsData {
 
 export interface IWallboardSliceState extends ICommonSliceState {
   instances: IInstanceCard[];
-  filteredInstances: IInstanceCard[];
-  instancesSearchText: string
 }
