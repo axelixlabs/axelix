@@ -23,13 +23,4 @@ export interface IConfigPropsBeanData {
   beans: IConfigPropsBean[];
 }
 
-export interface IConfigPropsSliceState extends ICommonSliceState, IConfigPropsBeanData {
-  /**
-   * Search text used for filtering configuration properties beans
-   */
-  configPropsSearchText: string;
-  /**
-   * Filtered configuration properties beans after searching
-   */
-  filteredBeans: IConfigPropsBean[];
-}
+export interface IConfigPropsSliceState extends ICommonSliceState, IConfigPropsBeanData { }

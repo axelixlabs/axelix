@@ -1,13 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+import type { ICron, IFixedTasks, IScheduledTaskItem, TaskKey } from 'models';
 import { EmptyHandler, Loader, PageSearch } from "components";
-import type { ICron, IFixedTasks, TaskKey } from 'models';
 import { useAppDispatch, useAppSelector } from 'hooks';
 import { getScheduledTasksThunk } from 'store/thunks';
-import { filterScheduledTasks } from 'store/slices';
 import { getScheduledTasksTypes } from 'utils';
+import { filterScheduledTasks } from 'helpers';
 import { TableHeader } from './TableHeader';
 import { TableRow } from './TableRow';
 
@@ -18,13 +18,10 @@ const ScheduledTasks = () => {
     const { instanceId } = useParams()
     const { t } = useTranslation()
 
-    const {
-        scheduledTasksTypes,
-        filteredScheduledTasksTypes,
-        scheduledTasksSearchText,
-        loading,
-        error
-    } = useAppSelector(store => store.scheduledTasks)
+    const { scheduledTasksTypes, loading, error } = useAppSelector(store => store.scheduledTasks)
+
+    const [isSearched, setIsSearched] = useState<boolean>(false)
+    const [filteredScheduledTasksTypes, setFilteredScheduledTasksTypes] = useState<IScheduledTaskItem[]>([])
 
     useEffect(() => {
         if (instanceId) {
@@ -40,14 +37,26 @@ const ScheduledTasks = () => {
         return error
     }
 
-    const scheduledTasks = filteredScheduledTasksTypes.length ? filteredScheduledTasksTypes : scheduledTasksTypes
-    const noDataAfterSearch = !!scheduledTasksSearchText && !filteredScheduledTasksTypes.length;
+    const scheduledTasks = isSearched ? filteredScheduledTasksTypes : scheduledTasksTypes
+    const noSearchResults = isSearched && !filteredScheduledTasksTypes.length;
+
+    const handleSearchChange = (search: string): void => {
+        const isSearching = Boolean(search);
+        setIsSearched(isSearching);
+
+        if (!isSearching) {
+            setFilteredScheduledTasksTypes([]);
+            return;
+        }
+
+        setFilteredScheduledTasksTypes(filterScheduledTasks(scheduledTasksTypes, search));
+    };
 
     return (
         <>
-            <PageSearch onChange={value => dispatch(filterScheduledTasks(value))} />
+            <PageSearch onChange={handleSearchChange} />
 
-            <EmptyHandler isEmpty={noDataAfterSearch}>
+            <EmptyHandler isEmpty={noSearchResults}>
                 {scheduledTasks.map(({ type, tasks }) => {
                     const isCron = type === 'cron'
                     const isCustom = type === 'custom'

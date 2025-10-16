@@ -96,20 +96,11 @@ export interface IBeansData {
   beans: IBean[];
 }
 
-export interface IBeansSliceState extends ICommonSliceState, IBeansData {
-  /**
-   * Search text used for filtering beans
-   */
-  beansSearchText: string;
-  /**
-   * Filtered beans after searching
-   */
-  filteredBeans: IBean[];
-}
-
 export interface IBeansCollapseHeaderRefs {
   /**
    * Refs to bean collapse headers, used for smooth scrolling.
    */
   [key: string]: HTMLDivElement | null;
 }
+
+export interface IBeansSliceState extends ICommonSliceState, IBeansData { }

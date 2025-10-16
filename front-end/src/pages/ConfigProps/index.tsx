@@ -1,11 +1,14 @@
 import { message } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { filterConfigProps, getConfigPropsThunk, resetChangePropertySuccess } from "store/slices";
 import { Loader, EmptyHandler, ModifiableTableSection, PageSearch } from "components";
+import { resetChangePropertySuccess } from "store/slices";
 import { useAppDispatch, useAppSelector } from "hooks";
+import { getConfigPropsThunk } from "store/thunks";
+import { filterConfigPropsBeans } from "helpers";
+import type { IConfigPropsBean } from "models";
 
 import styles from "./styles.module.css";
 
@@ -15,9 +18,11 @@ export const ConfigProps = () => {
 
   const dispatch = useAppDispatch();
 
-  const { beans, filteredBeans, configPropsSearchText, loading, error } = useAppSelector((store) => store.configProps);
-
+  const { beans, loading, error } = useAppSelector((store) => store.configProps);
   const { changePropertySuccess } = useAppSelector((store) => store.updateProperty);
+
+  const [isSearched, setIsSearched] = useState<boolean>(false)
+  const [filteredBeans, setFilteredBeans] = useState<IConfigPropsBean[]>([])
 
   const fetchConfigProps = () => {
     if (instanceId) {
@@ -46,25 +51,37 @@ export const ConfigProps = () => {
     return error;
   }
 
-  const configProps = filteredBeans.length ? filteredBeans : beans;
-  const noDataAfterSearch = !!configPropsSearchText && !filteredBeans.length;
-  const addonAfter = `${configPropsSearchText ? filteredBeans.length : beans.length} / ${beans.length}`;
+  const beansList = isSearched ? filteredBeans : beans;
+  const noSearchResults = isSearched && !filteredBeans.length;
+  const addonAfter = `${isSearched ? filteredBeans.length : beans.length} / ${beans.length}`;
+
+  const handleSearchChange = (search: string): void => {
+    const isSearching = Boolean(search);
+    setIsSearched(isSearching);
+
+    if (!isSearching) {
+      setFilteredBeans([]);
+      return;
+    }
+
+    setFilteredBeans(filterConfigPropsBeans(beans, search));
+  };
 
   return (
     <>
-      <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterConfigProps(value))} />
+      <PageSearch addonAfter={addonAfter} onChange={handleSearchChange} />
 
-      <EmptyHandler isEmpty={noDataAfterSearch}>
-        {configProps.map(({ beanName, prefix, properties }) => (
+      <EmptyHandler isEmpty={noSearchResults}>
+        {beansList.map(({ beanName, prefix, properties }) => (
           <ModifiableTableSection
             headerName={beanName}
             properties={
               properties.map((property) => {
-                  return {
-                      key: `${prefix}.${property.key}`,
-                      displayKey: property.key,
-                      displayValue: property.value,
-                  }
+                return {
+                  key: `${prefix}.${property.key}`,
+                  displayKey: property.key,
+                  displayValue: property.value,
+                }
               })
             }
 

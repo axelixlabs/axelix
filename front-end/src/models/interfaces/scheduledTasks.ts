@@ -48,14 +48,6 @@ export interface IScheduledTasksSliceState extends ICommonSliceState {
      * Scheduled tasks data after changes in frontend for better comfort
      */
     scheduledTasksTypes: IScheduledTaskItem[];
-    /**
-     * Search text
-     */
-    scheduledTasksSearchText: string;
-    /**
-     * Filtered scheduled tasks
-     */
-    filteredScheduledTasksTypes: IScheduledTaskItem[]
 }
 
 /**
