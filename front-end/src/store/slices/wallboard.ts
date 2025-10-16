@@ -1,47 +1,20 @@
-import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-import type { IServiceCardsData, IWallboardSliceState } from "models";
-import { getWallboardData } from "services";
+import { getWallboardDataThunk } from "store/thunks";
+import type { IWallboardSliceState } from "models";
 
 // import { getWallboardData } from "services";
 
 const initialState: IWallboardSliceState = {
   loading: false,
   error: "",
-  instances: [],
-  filteredInstances: [],
-  instancesSearchText: "",
+  instances: []
 };
-
-// todo fix any in future
-export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, { rejectValue: any }>(
-  "getWallboardDataThunk",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await getWallboardData();
-
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue({
-        status: error.response?.status,
-      });
-    }
-  });
 
 export const WallboardSlice = createSlice({
   name: "wallboardSlice",
   initialState,
-  reducers: {
-    filterServiceCards: (state, action: PayloadAction<string>) => {
-      const searchText = action.payload.toLowerCase().trim();
-      state.instancesSearchText = searchText;
-
-      state.filteredInstances = state.instances.filter(({ name }) => {
-        return name.toLowerCase().includes(searchText);
-      }
-      );
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getWallboardDataThunk.pending, (state) => {
       state.loading = true;
@@ -64,7 +37,5 @@ export const WallboardSlice = createSlice({
     );
   },
 });
-
-export const { filterServiceCards } = WallboardSlice.actions;
 
 export default WallboardSlice;
