@@ -4,75 +4,60 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { Loader, EmptyHandler, ModifiableTableSection, PageSearch } from "components";
-import { resetChangePropertySuccess } from "store/slices";
-import { useAppDispatch, useAppSelector } from "hooks";
-import { getConfigPropsThunk } from "store/thunks";
-import { filterConfigPropsBeans } from "helpers";
-import type { IConfigPropsBean } from "models";
+import { fetchData, filterConfigPropsBeans } from "helpers";
+import { type IConfigPropsBeanData, StatefulRequest } from "models";
 
 import styles from "./styles.module.css";
+import { getConfigPropsData } from "services";
+import { useAppSelector } from "hooks";
 
 export const ConfigProps = () => {
   const { t } = useTranslation()
   const { instanceId } = useParams()
 
-  const dispatch = useAppDispatch();
+  const [search, setSearch] = useState<string>("")
+  const [configProps, setConfigProps] = useState(StatefulRequest.loading<IConfigPropsBeanData>())
+  const updatePropertyState = useAppSelector(state => state.updateProperty)
 
-  const { beans, loading, error } = useAppSelector((store) => store.configProps);
-  const { changePropertySuccess } = useAppSelector((store) => store.updateProperty);
+  const fetchConfigProps = (instanceId: string) =>
+    fetchData(setConfigProps, () => getConfigPropsData(instanceId))
 
-  const [isSearched, setIsSearched] = useState<boolean>(false)
-  const [filteredBeans, setFilteredBeans] = useState<IConfigPropsBean[]>([])
-
-  const fetchConfigProps = () => {
-    if (instanceId) {
-      dispatch(getConfigPropsThunk(instanceId));
-    }
-  };
-
-  // todo So far, I haven't been able to find a way to combine the useEffects without causing an extra server request.
   useEffect(() => {
-    fetchConfigProps()
+    if (instanceId) {
+      fetchConfigProps(instanceId)
+    }
   }, []);
 
   useEffect(() => {
-    if (changePropertySuccess) {
-      fetchConfigProps()
+    if (updatePropertyState.completedSuccessfully() && instanceId) {
+      fetchConfigProps(instanceId)
       message.success(t('saved'))
-      dispatch(resetChangePropertySuccess());
     }
-  }, [changePropertySuccess]);
+  }, [updatePropertyState]);
 
-  if (loading) {
+  if (configProps.loading) {
     return <Loader />;
   }
 
-  if (error) {
-    return error;
+  if (configProps.error) {
+    // TODO: handle this case differently in the future
+    return configProps.error;
   }
 
-  const beansList = isSearched ? filteredBeans : beans;
-  const noSearchResults = isSearched && !filteredBeans.length;
-  const addonAfter = `${isSearched ? filteredBeans.length : beans.length} / ${beans.length}`;
+  const configPropsBeansFeed = configProps.response!.beans;
 
-  const handleSearchChange = (search: string): void => {
-    const isSearching = Boolean(search);
-    setIsSearched(isSearching);
+  const effectiveConfigProps = search
+    ? filterConfigPropsBeans(configPropsBeansFeed, search)
+    : configPropsBeansFeed;
 
-    if (!isSearching) {
-      setFilteredBeans([]);
-      return;
-    }
-
-    setFilteredBeans(filterConfigPropsBeans(beans, search));
-  };
+  const addonAfter = `${effectiveConfigProps.length} / ${configPropsBeansFeed.length}`;
 
   return (
     <>
-      <PageSearch addonAfter={addonAfter} onChange={handleSearchChange} />
+      <PageSearch addonAfter={addonAfter} onChange={(e) => setSearch(e)} />
 
-      <EmptyHandler isEmpty={noSearchResults}>
-        {beansList.map(({ beanName, prefix, properties }) => (
+      <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
+        {effectiveConfigProps.map(({ beanName, prefix, properties }) => (
           <ModifiableTableSection
             headerName={beanName}
             properties={

@@ -1,15 +1,14 @@
-import { Button } from 'antd';
-import type { MouseEvent } from 'react';
+import {Button, message} from 'antd';
+import {type MouseEvent, useState} from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ReloadOutlined } from "@ant-design/icons";
 
-import { useAppDispatch, useAppSelector } from 'hooks';
-import { clearCacheThunk } from 'store/thunks';
 import { TooltipWithCopy } from 'components';
-import {type ICacheData, IClearOperationType} from 'models';
+import { type ICacheData, StatelessRequest } from 'models';
 
 import styles from './styles.module.css'
+import { clearCacheData } from "services";
 
 interface IProps {
     /**
@@ -23,22 +22,24 @@ interface IProps {
 }
 
 export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
-    const dispatch = useAppDispatch()
     const { instanceId } = useParams()
     const { t } = useTranslation()
 
-    const { clearOperationLoading } = useAppSelector((state) => state.caches)
+    const [clearSingleCache, setClearSingleCache] = useState(StatelessRequest.inactive())
 
     const clearCacheClickHandler = (e: MouseEvent<HTMLElement>): void => {
         e.stopPropagation();
         if (instanceId) {
-            dispatch(clearCacheThunk({
-                instanceId,
-                data: {
-                    cacheName: cache.name,
-                    cacheManager: cacheManagerName
-                }
-            }))
+          setClearSingleCache(StatelessRequest.loading())
+          clearCacheData(instanceId, {
+            cacheName: cache.name,
+            cacheManager: cacheManagerName
+          })
+            .then(() => {
+              setClearSingleCache(StatelessRequest.success())
+              message.success(t("cleared"))
+            })
+            .catch(() => setClearSingleCache(StatelessRequest.error("")))
         }
     }
 
@@ -54,7 +55,7 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
             <Button
                 icon={<ReloadOutlined />}
                 type="primary"
-                loading={clearOperationLoading === IClearOperationType.CLEAR_SINGLE_CACHE}
+                loading={clearSingleCache.loading}
                 className={styles.ClearCacheButton}
                 onClick={clearCacheClickHandler}
             />

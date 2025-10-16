@@ -1,14 +1,23 @@
-import type { IScheduledTaskItem } from "models";
+import type { ScheduledTasksResponse } from "models";
 
 export const filterScheduledTasks = (
-    scheduledTasksTypes: IScheduledTaskItem[],
+    scheduledTasksResponse: ScheduledTasksResponse,
     search: string
-): IScheduledTaskItem[] => {
+): ScheduledTasksResponse => {
     const formattedSearch = search.toLowerCase().trim();
 
-    return scheduledTasksTypes.filter(({ tasks }) => (
-        tasks.some(({ runnable }) =>
-            runnable.target.toLowerCase().includes(formattedSearch)
-        )
-    ));
+    return {
+
+      cron : scheduledTasksResponse
+        .cron
+        .filter(value => value.runnable.target.toLowerCase().includes(formattedSearch)),
+
+      fixedDelay : scheduledTasksResponse
+        .fixedDelay
+        .filter(value => value.runnable.target.toLowerCase().includes(formattedSearch)),
+
+      fixedRate: scheduledTasksResponse
+        .fixedRate
+        .filter(value => value.runnable.target.toLowerCase().includes(formattedSearch))
+    };
 };

@@ -4,65 +4,54 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { Loader, EmptyHandler, PageSearch } from "components";
-import { useAppDispatch, useAppSelector } from "hooks";
-import { getLoggersThunk } from "store/thunks";
-import { filterLoggers } from "helpers";
-import type { ILogger } from "models";
+import { fetchData, filterLoggers } from "helpers";
+import {type ILoggerData, type ILoggersSliceState, StatefulRequest} from "models";
 import { Logger } from "./Logger";
+import { getLoggersData } from "services";
+import {useAppSelector} from "hooks";
 
 export const Loggers = () => {
   const { t } = useTranslation();
   const { instanceId } = useParams();
 
-  const dispatch = useAppDispatch();
-  const { loading, updateLoggerSuccess, error, loggers, levels } = useAppSelector((store) => store.loggers);
+  const [loggersData, setLoggersData] = useState(StatefulRequest.loading<ILoggerData>())
+  const [search, setSearch] = useState<string>("")
+  const sliceState : ILoggersSliceState = useAppSelector(state => state.loggers)
 
-  const [isSearched, setIsSearched] = useState<boolean>(false)
-  const [filteredLoggers, setFilteredLoggers] = useState<ILogger[]>([])
+  const fetchLoggersData = (instanceId: string) =>
+    fetchData(setLoggersData, () => getLoggersData(instanceId));
 
   useEffect(() => {
     if (instanceId) {
-      dispatch(getLoggersThunk(instanceId));
+      fetchLoggersData(instanceId);
     }
-  }, []);
+  }, [sliceState]);
 
   useEffect(() => {
-    if (updateLoggerSuccess) {
+    if (sliceState.updateLoggerSuccess) {
       message.success(t("loggerLevelUpdated"))
     }
-  }, [updateLoggerSuccess])
+  }, [sliceState])
 
-  if (loading) {
+  if (loggersData.loading || sliceState.loading) {
     return <Loader />;
   }
 
-  if (error) {
-    return error;
+  if (loggersData.error) {
+    return loggersData.error;
   }
 
-  const noSearchResults = isSearched && !filteredLoggers.length;
-  const addonAfter = `${isSearched ? filteredLoggers.length : loggers.length} / ${loggers.length}`;
-  const loggersData = isSearched ? filteredLoggers : loggers;
-
-  const handleSearchChange = (search: string): void => {
-    const isSearching = Boolean(search);
-    setIsSearched(isSearching);
-
-    if (!isSearching) {
-      setFilteredLoggers([]);
-      return;
-    }
-
-    setFilteredLoggers(filterLoggers(loggers, search));
-  };
+  const loggers = loggersData.response!.loggers;
+  const effectiveLoggers = search ? filterLoggers(loggers, search) : loggers
+  const addonAfter = `${effectiveLoggers.length} / ${loggers.length}`
 
   return (
     <>
-      <PageSearch addonAfter={addonAfter} onChange={handleSearchChange} />
+      <PageSearch addonAfter={addonAfter} onChange={(e) => setSearch(e)} />
 
-      <EmptyHandler isEmpty={noSearchResults}>
-        {loggersData.map((logger) => (
-          <Logger logger={logger} levels={levels} key={logger.name} />
+      <EmptyHandler isEmpty={effectiveLoggers.length === 0}>
+        {effectiveLoggers.map((logger) => (
+          <Logger logger={logger} levels={loggersData.response!.levels} key={logger.name} />
         ))}
       </EmptyHandler>
     </>

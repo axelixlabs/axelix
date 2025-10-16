@@ -2,53 +2,40 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Loader, EmptyHandler, PageSearch } from "components";
-import { useAppDispatch, useAppSelector } from "hooks";
 import { BeansCollapse } from "./BeansCollapse";
-import { getBeansThunk } from "store/thunks";
-import { filterBeans } from "helpers";
-import type { IBean } from "models";
+import { getBeansData } from "services";
+import { fetchData, filterBeans } from "helpers";
+import { StatefulRequest, type BeansResponse } from "models";
 
 export const Beans = () => {
   const { instanceId } = useParams();
 
-  const dispatch = useAppDispatch();
-  const { beans, loading, error } = useAppSelector((store) => store.beans);
-
-  const [effectiveBeans, setEffectiveBeans] = useState<IBean[]>(beans)
+  const [dataState, setDataState] = useState(StatefulRequest.loading<BeansResponse>())
+  const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
-    if (instanceId) {
-      dispatch(getBeansThunk(instanceId));
-    }
+    fetchData(setDataState, () => getBeansData(instanceId!))
   }, []);
 
-  if (loading) {
+  if (dataState.loading) {
     return <Loader />;
   }
 
-  if (error) {
+  if (dataState.error) {
     // todo change error handling in future
-    return error;
+    return dataState.error;
   }
 
-  const beansList = effectiveBeans
-  const noSearchResults = !effectiveBeans.length;
-  const addonAfter = `${effectiveBeans.length} / ${beans.length}`;
-
-  const handleSearchChange = (search: string): void => {
-    if (search) {
-      setEffectiveBeans(filterBeans(beans, search));
-    } else {
-      setEffectiveBeans(beans);
-    }
-  };
+  const beansFeed = dataState.response!.beans;
+  const effectiveBeans = search ? filterBeans(beansFeed, search) : beansFeed;
+  const addonAfter = `${effectiveBeans.length} / ${beansFeed.length}`;
 
   return (
     <>
-      <PageSearch addonAfter={addonAfter} onChange={handleSearchChange} />
+      <PageSearch addonAfter={addonAfter} onChange={search => setSearch(search)} />
 
-      <EmptyHandler isEmpty={noSearchResults}>
-        <BeansCollapse beans={beansList} />
+      <EmptyHandler isEmpty={!effectiveBeans.length}>
+        <BeansCollapse beans={effectiveBeans} />
       </EmptyHandler>
     </>
   );

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Collapse } from "antd";
 import classNames from 'classnames';
-import { Button, type CollapseProps } from 'antd';
-import { ReloadOutlined } from "@ant-design/icons";
+import { type CollapseProps } from 'antd';
 
 import { CacheCollapseHeader } from '../CacheCollapseHeader';
 import type { ICachesManager } from 'models';
@@ -34,11 +33,6 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                 <div className={classNames('MediumTitle', styles.CacheManagerName)}>
                     {cacheManager.name}
                 </div>
-                <Button
-                    icon={<ReloadOutlined />}
-                    type="primary"
-                    className={styles.ClearCachesButton}
-                />
             </div>
             <Collapse
                 accordion

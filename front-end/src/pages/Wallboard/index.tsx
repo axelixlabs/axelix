@@ -1,57 +1,45 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 
-import { EmptyHandler, Loader, PageSearch } from 'components';
-import { useAppDispatch, useAppSelector } from 'hooks';
-import { getWallboardDataThunk } from 'store/thunks';
-import { WallboardCard } from './WallboardCard';
-import type { IInstanceCard } from 'models';
-import { filterInstances } from 'helpers';
+import {EmptyHandler, Loader, PageSearch} from 'components';
+import {WallboardCard} from './WallboardCard';
+import {type IServiceCardsData, StatefulRequest} from 'models';
+import {fetchData, filterInstances} from 'helpers';
 
 import styles from './styles.module.css'
+import {getWallboardData} from "services";
 
 export const Wallboard = () => {
-    const dispatch = useAppDispatch()
-    const { instances, loading, error } = useAppSelector(state => state.wallboard)
 
-    const [isSearched, setIsSearched] = useState<boolean>(false)
-    const [filteredInstances, setFilteredInstances] = useState<IInstanceCard[]>([])
+    const [search, setSearch] = useState<string>("")
+    const [wallboard, setWallboard] = useState(StatefulRequest.loading<IServiceCardsData>())
 
     useEffect(() => {
-        dispatch(getWallboardDataThunk())
+      fetchData(setWallboard, () => getWallboardData())
     }, [])
 
-    if (loading) {
+    if (wallboard.loading) {
         return <Loader />
     }
 
     // todo fix this in future
-    if (error) {
-        return error
+    if (wallboard.error) {
+        return wallboard.error
     }
 
-    const serviceCardsList = isSearched ? filteredInstances : instances;
-    const noSearchResults = isSearched && !filteredInstances.length;
-    const addonAfter = `${isSearched ? filteredInstances.length : instances.length} / ${instances.length}`;
+    const instanceCards = wallboard.response!.instances;
+    const effectiveInstanceCards = search
+        ? filterInstances(instanceCards, search)
+        : instanceCards;
 
-    const handleSearchChange = (search: string): void => {
-        const isSearching = Boolean(search);
-        setIsSearched(isSearching);
-
-        if (!isSearching) {
-            setFilteredInstances([]);
-            return;
-        }
-
-        setFilteredInstances(filterInstances(instances, search));
-    };
+    const addonAfter = `${effectiveInstanceCards} / ${instanceCards.length}`;
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} onChange={handleSearchChange} />
+            <PageSearch addonAfter={addonAfter} onChange={(e) => setSearch(e)} />
 
-            <EmptyHandler isEmpty={noSearchResults}>
+            <EmptyHandler isEmpty={instanceCards.length === 0}>
                 <div className={styles.CardsResponsiveWrapper}>
-                    {serviceCardsList.map(data => <WallboardCard data={data} key={data.instanceId} />)}
+                    {effectiveInstanceCards.map(data => <WallboardCard data={data} key={data.instanceId} />)}
                 </div>
             </EmptyHandler>
         </>

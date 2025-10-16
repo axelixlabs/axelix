@@ -29,13 +29,13 @@ export const TablePropertyValue = ({ propertyName, propertyValue }: IProps) => {
 
     const updatePropertyClickHandler = (): void => {
         if (instanceId) {
-            dispatch(updatePropertyThunk({
-                instanceId,
-                updatePropertyData: {
-                    propertyName: propertyName,
-                    newValue: newPropertyValue,
-                }
-            }))
+          dispatch(updatePropertyThunk({
+            instanceId,
+            updatePropertyData: {
+              propertyName: propertyName,
+              newValue: newPropertyValue,
+            }
+          }))
         }
     }
 

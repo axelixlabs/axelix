@@ -1,48 +1,30 @@
 import { createSlice, } from "@reduxjs/toolkit";
 
-import type { IUpdatePropertySliceState } from "models";
+import { StatelessRequest } from "models";
 import { updatePropertyThunk } from "store/thunks";
 
-const initialState: IUpdatePropertySliceState = {
-    loading: false,
-
-    error: "",
-
-    changePropertySuccess: false
-};
+const initialState: StatelessRequest = StatelessRequest.inactive()
 
 export const UpdatePropertySlice = createSlice({
     name: "updatePropertySlice",
     initialState,
-    reducers: {
-        resetChangePropertySuccess: (state) => {
-            state.changePropertySuccess = false
-        }
-    },
+    reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(updatePropertyThunk.pending, (state) => {
-            state.loading = true;
-            state.changePropertySuccess = false
+        builder.addCase(updatePropertyThunk.pending, () => {
+          return StatelessRequest.loading()
         });
-        builder.addCase(updatePropertyThunk.fulfilled, (state) => {
-            state.loading = false;
-            state.changePropertySuccess = true
+        builder.addCase(updatePropertyThunk.fulfilled, () => {
+          return StatelessRequest.success()
         });
         builder.addCase(updatePropertyThunk.rejected, (state, { payload }) => {
             const { status } = payload;
-            state.changePropertySuccess = false
-            state.loading = false;
 
             if (status >= 400 && status < 500) {
                 // todo translate this in future
-                state.error = "Неизвестная ошибка";
+              return StatelessRequest.error("Неизвестная ошибка");
             } else {
-                state.error = "Произошла внутренняя ошибка сервиса";
+              return StatelessRequest.error("Произошла внутренняя ошибка сервиса");
             }
         });
     },
 });
-
-export const { resetChangePropertySuccess } = UpdatePropertySlice.actions
-
-export default UpdatePropertySlice;

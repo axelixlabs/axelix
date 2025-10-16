@@ -3,37 +3,31 @@ import { useState } from "react";
 import { EmptyHandler, PageSearch, ModifiableTableSection } from "components";
 import type { IEnvironmentPropertySource } from "models";
 import { filterPropertySources } from "helpers";
-import { useAppSelector } from "hooks";
 
-export const EnvironmentTables = () => {
+interface IProps {
 
-  const { propertySources } = useAppSelector((store) => store.environment);
+  /**
+   * The list of property sources to render
+   */
+  propertySources: IEnvironmentPropertySource[];
+}
 
-  const [isSearched, setIsSearched] = useState<boolean>(false)
-  const [filteredPropertySources, setFilteredPropertySources] = useState<IEnvironmentPropertySource[]>([])
+export const EnvironmentTables = ({ propertySources } : IProps) => {
 
-  const propertySourcesList = isSearched ? filteredPropertySources : propertySources;
-  const noSearchResults = isSearched && !filteredPropertySources.length
-  const addonAfter = `${isSearched ? filteredPropertySources.length : propertySources.length} / ${propertySources.length}`;
+  const [search, setSearch] = useState<string>("")
 
-  const handleSearchChange = (search: string): void => {
-    const isSearching = Boolean(search);
-    setIsSearched(isSearching);
+  const effectivePropertySources = search
+    ? filterPropertySources(propertySources, search)
+    : propertySources
 
-    if (!isSearching) {
-      setFilteredPropertySources([]);
-      return;
-    }
-
-    setFilteredPropertySources(filterPropertySources(propertySources, search))
-  };
+  const addonAfter = `${effectivePropertySources.length} / ${propertySources.length}`;
 
   return (
     <>
-      <PageSearch addonAfter={addonAfter} onChange={handleSearchChange} />
+      <PageSearch addonAfter={addonAfter} onChange={(e) => setSearch(e)} />
 
-      <EmptyHandler isEmpty={noSearchResults}>
-        {propertySourcesList.map(({ name, properties }) => (
+      <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
+        {effectivePropertySources.map(({ name, properties }) => (
           <ModifiableTableSection
             headerName={name}
             properties={

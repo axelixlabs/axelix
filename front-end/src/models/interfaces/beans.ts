@@ -1,5 +1,15 @@
 import { EBeanOrigin, EProxyType } from "models";
-import type { ICommonSliceState } from "./globals";
+
+/**
+ * Response for the /beans endpoint
+ */
+export interface BeansResponse {
+
+  /**
+   * The list of beans
+   */
+  beans: IBean[];
+}
 
 /**
  * An interface that represents the state of the particular bean inside the Spring Boot application
@@ -89,18 +99,9 @@ export interface IBeanSource {
   origin: EBeanOrigin;
 }
 
-export interface IBeansData {
-  /**
-   * Full list of beans
-   */
-  beans: IBean[];
-}
-
 export interface IBeansCollapseHeaderRefs {
   /**
    * Refs to bean collapse headers, used for smooth scrolling.
    */
   [key: string]: HTMLDivElement | null;
 }
-
-export interface IBeansSliceState extends ICommonSliceState, IBeansData { }
