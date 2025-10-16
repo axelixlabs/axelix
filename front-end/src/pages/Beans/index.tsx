@@ -14,8 +14,7 @@ export const Beans = () => {
   const dispatch = useAppDispatch();
   const { beans, loading, error } = useAppSelector((store) => store.beans);
 
-  const [isSearched, setIsSearched] = useState<boolean>(false)
-  const [filteredBeans, setFilteredBeans] = useState<IBean[]>([])
+  const [effectiveBeans, setEffectiveBeans] = useState<IBean[]>(beans)
 
   useEffect(() => {
     if (instanceId) {
@@ -32,20 +31,16 @@ export const Beans = () => {
     return error;
   }
 
-  const beansList = isSearched ? filteredBeans : beans
-  const noSearchResults = isSearched && !filteredBeans.length;
-  const addonAfter = `${isSearched ? filteredBeans.length : beans.length} / ${beans.length}`;
+  const beansList = effectiveBeans
+  const noSearchResults = !effectiveBeans.length;
+  const addonAfter = `${effectiveBeans.length} / ${beans.length}`;
 
   const handleSearchChange = (search: string): void => {
-    const isSearching = Boolean(search);
-    setIsSearched(isSearching);
-
-    if (!isSearching) {
-      setFilteredBeans([]);
-      return;
+    if (search) {
+      setEffectiveBeans(filterBeans(beans, search));
+    } else {
+      setEffectiveBeans(beans);
     }
-
-    setFilteredBeans(filterBeans(beans, search));
   };
 
   return (
