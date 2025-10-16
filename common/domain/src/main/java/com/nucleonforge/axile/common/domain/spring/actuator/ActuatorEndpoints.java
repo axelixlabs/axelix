@@ -33,6 +33,10 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // Beans
     public static final ActuatorEndpoint BEANS = of("/beans", HttpMethod.GET);
 
+    // CacheDispatcher
+    public static final ActuatorEndpoint CACHE_DISPATCHER_CLEAR_ENTRY = of("/cache-dispatcher/{cacheManagerName}/clear", HttpMethod.POST);
+    public static final ActuatorEndpoint CACHE_DISPATCHER_CLEAR_ALL = of("/cache-dispatcher/{cacheManagerName}/clear-all", HttpMethod.POST);
+
     // Caches
     public static final ActuatorEndpoint GET_ALL_CACHES = of("/caches", HttpMethod.GET);
     public static final ActuatorEndpoint GET_SINGLE_CACHE = of("/caches/{name}", HttpMethod.GET);
@@ -141,6 +145,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 BEANS,
                 GET_ALL_CACHES,
                 GET_SINGLE_CACHE,
+                CACHE_DISPATCHER_CLEAR_ENTRY,
+                CACHE_DISPATCHER_CLEAR_ALL,
                 CLEAR_ALL_CACHES,
                 CLEAR_SINGLE_CACHES,
                 CONDITIONS,

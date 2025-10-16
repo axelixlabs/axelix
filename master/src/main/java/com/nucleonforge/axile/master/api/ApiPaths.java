@@ -168,10 +168,28 @@ public final class ApiPaths {
         public static final String CACHE_NAME = "/{instanceId}/cache/{cacheName}";
     }
 
+    public static final class CacheDispatcherApi {
+
+        /**
+         * Base path for cache dispatcher APIs.
+         */
+        public static final String MAIN = "/cache-dispatcher";
+
+        /**
+         * Endpoint to clear all cache entries from a given cache manager of a specific instance.
+         */
+        public static final String CLEAR_ALL = "/{instanceId}/{cacheManagerName}/clear-all";
+
+        /**
+         * Endpoint to clear a single cache entry from a given cache manager of a specific instance.
+         */
+        public static final String CLEAR_ENTRY = "/{instanceId}/{cacheManagerName}/clear";
+    }
+
     public static final class ScheduledTasksApi {
 
         /**
-         * Base path for {@link com.nucleonforge.axile.master.api.ScheduledTasksApi} APIs.
+         * Base path for {@link ScheduledTasksApi} APIs.
          *
          */
         public static final String MAIN = "/scheduled-tasks";

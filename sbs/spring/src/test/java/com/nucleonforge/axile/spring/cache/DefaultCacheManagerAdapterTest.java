@@ -11,8 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
 /**
- * Unit tests for {@link DefaultCacheManagerAdapter} verifying cache clearance functionality.
- * <p>Uses Spring's {@link ConcurrentMapCacheManager} for realistic cache behavior to test actual interactions.</p>
+ * Unit tests for {@link DefaultCacheManagerAdapter}.
  *
  * @since 23.06.2025
  * @author Nikita Kirillov
@@ -61,7 +60,7 @@ class DefaultCacheManagerAdapterTest {
     }
 
     @Test
-    void clearWithKey_shouldEvictOnlySpecifiedKey() {
+    void clearWithKey_shouldClearOnlySpecifiedKey() {
         String cacheName = "cache";
         String keyToRemove = "keyToRemove", keyToKeep = "keyToKeep";
         Cache cache = cacheManager.getCache(cacheName);

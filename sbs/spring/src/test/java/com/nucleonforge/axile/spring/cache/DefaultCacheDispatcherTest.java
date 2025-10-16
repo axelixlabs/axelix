@@ -15,9 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Unit tests for {@link DefaultCacheDispatcher} with a real {@link ConcurrentMapCacheManager}.
  *
- * <p>Verifies cache clearing behavior for individual entries, entire caches,
- * and all caches managed by a {@code CacheManager}.
- *
  * @since 24.06.2025
  * @author Nikita Kirillov
  */
@@ -35,7 +32,7 @@ class DefaultCacheDispatcherTest {
     }
 
     @Test
-    void clear_shouldRemoveAllEntriesInCache() {
+    void clear_shouldClearAllEntriesInCache() {
         String key = "key";
         String cacheName = "cache";
         String cacheManagerName = "cacheManager";
@@ -55,7 +52,7 @@ class DefaultCacheDispatcherTest {
     }
 
     @Test
-    void clearKey_shouldEvictSingleEntry() {
+    void clearKey_shouldClearSingleEntry() {
         String cacheName = "cache";
         String keyToRemove = "keyToRemove", keyToKeep = "keyToKeep";
         String cacheManagerName = "cacheManager";
