@@ -15,8 +15,8 @@ import org.springframework.cloud.kubernetes.commons.discovery.KubernetesServiceI
 import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
-import com.nucleonforge.axile.common.domain.Instance;
-import com.nucleonforge.axile.common.domain.InstanceId;
+import com.nucleonforge.axile.master.instance.Instance;
+import com.nucleonforge.axile.master.instance.InstanceId;
 import com.nucleonforge.axile.master.service.transport.ManagedServiceMetadataEndpointProber;
 
 /**

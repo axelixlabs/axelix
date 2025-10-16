@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axile.common.api.caches.ServiceCaches;
 import com.nucleonforge.axile.common.api.caches.SingleCache;
-import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
@@ -30,6 +29,7 @@ import com.nucleonforge.axile.master.api.ApiPaths;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.caches.CacheProfileResponse;
 import com.nucleonforge.axile.master.api.response.caches.CachesResponse;
+import com.nucleonforge.axile.master.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.transport.caches.GetAllCachesEndpointProber;
 import com.nucleonforge.axile.master.service.transport.caches.GetCacheByNameEndpointProber;

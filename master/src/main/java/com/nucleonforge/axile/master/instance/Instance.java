@@ -1,11 +1,10 @@
-package com.nucleonforge.axile.common.domain;
+package com.nucleonforge.axile.master.instance;
 
 import java.time.Instant;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-// TODO: I actually start to think that we need to migrate it to master. What is the point of having that in common?
 /**
  * @param id                 The id of the instance. This id must be unique among all the other instances that are
  *                           managed by this Axile Master.

@@ -2,9 +2,9 @@ package com.nucleonforge.axile.master.service.transport;
 
 import org.jspecify.annotations.NonNull;
 
-import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axile.master.instance.InstanceId;
 import com.nucleonforge.axile.master.service.serde.NoOpMessageDeserializationStrategy;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 

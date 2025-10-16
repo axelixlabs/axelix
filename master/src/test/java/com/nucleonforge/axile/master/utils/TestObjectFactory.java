@@ -10,8 +10,8 @@ import org.instancio.Select;
 import com.nucleonforge.axile.common.domain.BuildInfo;
 import com.nucleonforge.axile.common.domain.ClassPath;
 import com.nucleonforge.axile.common.domain.ClassPathEntry;
-import com.nucleonforge.axile.common.domain.Instance;
-import com.nucleonforge.axile.common.domain.InstanceId;
+import com.nucleonforge.axile.master.instance.Instance;
+import com.nucleonforge.axile.master.instance.InstanceId;
 
 /**
  * Utility factory for creating test objects used in unit and integration tests.
