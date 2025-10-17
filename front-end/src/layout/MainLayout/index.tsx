@@ -28,7 +28,7 @@ export const MainLayout = ({ hideSider }: IProps) => {
         )}
 
         <Layout className={styles.ContentLayout}>
-          <Content className={styles.Content}>
+          <Content className={`${styles.Content} ${!hideSider ? styles.WithSider : ""}`}>
             <Outlet />
           </Content>
         </Layout>
