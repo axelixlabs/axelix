@@ -3,15 +3,23 @@
 }
 
 .Sider {
+  position: fixed;
+  top: var(--axile-header-height);
+  height: 100vh;
   background-color: #fff;
 }
 
 .Content {
   padding: 24px;
-  margin: 0px;
   background: #fff;
 }
 
+.Content.WithSider {
+  /* Set left margin equal to the width of the Sider component */
+  margin-left: 270px;
+}
+
 .ContentLayout {
+  margin-top: var(--axile-header-height);
   padding: 24px;
 }
