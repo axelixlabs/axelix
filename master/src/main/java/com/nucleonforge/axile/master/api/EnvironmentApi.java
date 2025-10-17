@@ -25,7 +25,7 @@ import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse;
 import com.nucleonforge.axile.master.api.response.EnvironmentPropertyResponse;
-import com.nucleonforge.axile.master.instance.InstanceId;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.transport.EnvironmentEndpointProber;
 import com.nucleonforge.axile.master.service.transport.EnvironmentPropertyEndpointProber;

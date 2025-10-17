@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.master.api.response.InstancesGridResponse.InstanceShortProfile;
 import com.nucleonforge.axile.master.api.response.InstancesGridResponse.InstanceStatus;
-import com.nucleonforge.axile.master.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.service.convert.utils.DateTimeFormattingUtils;
 
 /**

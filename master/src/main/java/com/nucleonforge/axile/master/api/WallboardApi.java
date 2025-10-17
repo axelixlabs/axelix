@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.InstancesGridResponse;
-import com.nucleonforge.axile.master.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.service.convert.InstancesToShortProfileConverter;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 

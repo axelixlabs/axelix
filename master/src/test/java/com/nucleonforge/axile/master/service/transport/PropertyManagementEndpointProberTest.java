@@ -24,7 +24,7 @@ import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.api.request.PropertyUpdatedRequest;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
-import com.nucleonforge.axile.master.instance.InstanceId;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 

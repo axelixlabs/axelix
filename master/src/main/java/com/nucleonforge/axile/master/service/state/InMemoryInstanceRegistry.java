@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
-import com.nucleonforge.axile.master.instance.Instance;
-import com.nucleonforge.axile.master.instance.InstanceId;
+import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 
 /**
  * Implementation of the {@link InstanceRegistry} that holds the data in the process memory.

@@ -17,7 +17,7 @@ import org.springframework.util.CollectionUtils;
 import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
-import com.nucleonforge.axile.master.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axile.master.service.transport.ManagedServiceMetadataEndpointProber;
 

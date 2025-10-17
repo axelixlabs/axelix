@@ -7,8 +7,8 @@ import org.jspecify.annotations.NonNull;
 
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
-import com.nucleonforge.axile.master.instance.Instance;
-import com.nucleonforge.axile.master.instance.InstanceId;
+import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 
 /**
  * Central registry of all the {@link Instance instances} that this Axile Master instance is aware about.

@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 
-import com.nucleonforge.axile.master.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.Instance;
 
 /**
  * The SPI interface for discovering {@link Instance instances} of running applications.

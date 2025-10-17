@@ -29,7 +29,7 @@ import com.nucleonforge.axile.master.api.ApiPaths;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.caches.CacheProfileResponse;
 import com.nucleonforge.axile.master.api.response.caches.CachesResponse;
-import com.nucleonforge.axile.master.instance.InstanceId;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.transport.caches.GetAllCachesEndpointProber;
 import com.nucleonforge.axile.master.service.transport.caches.GetCacheByNameEndpointProber;

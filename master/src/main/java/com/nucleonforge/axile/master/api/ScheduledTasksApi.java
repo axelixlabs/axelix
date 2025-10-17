@@ -23,7 +23,7 @@ import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.request.ScheduledTaskToggleRequest;
 import com.nucleonforge.axile.master.api.response.ScheduledTasksResponse;
-import com.nucleonforge.axile.master.instance.InstanceId;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axile.master.service.transport.scheduled.DisableSingleScheduledTaskEndpointProber;
