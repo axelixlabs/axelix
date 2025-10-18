@@ -1,0 +1,14 @@
+components:
+  schemas:
+    ProfileUpdateResponse:
+      type: object
+      properties:
+        updated:
+          type: boolean
+          description: Indicates whether the profiles were successfully updated
+          example: true
+        reason:
+          type: string
+          description: The reason describing why the update was applied or skipped (may be null)
+          nullable: true
+          example: Profiles replaced successfully

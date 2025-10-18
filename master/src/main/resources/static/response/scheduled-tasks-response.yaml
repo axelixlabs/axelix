@@ -1,0 +1,101 @@
+components:
+  schemas:
+    Cron:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        runnable:
+          $ref: '#/components/schemas/Runnable'
+        expression:
+          type: string
+        nextExecution:
+          $ref: '#/components/schemas/NextExecution'
+        lastExecution:
+          $ref: '#/components/schemas/LastExecution'
+    Custom:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        runnable:
+          $ref: '#/components/schemas/Runnable'
+        trigger:
+          type: string
+        lastExecution:
+          $ref: '#/components/schemas/LastExecution'
+    Exception:
+      type: object
+      properties:
+        type:
+          type: string
+        message:
+          type: string
+    FixedDelay:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        runnable:
+          $ref: '#/components/schemas/Runnable'
+        interval:
+          type: number
+        initialDelay:
+          type: number
+        nextExecution:
+          $ref: '#/components/schemas/NextExecution'
+        lastExecution:
+          $ref: '#/components/schemas/LastExecution'
+    FixedRate:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        runnable:
+          $ref: '#/components/schemas/Runnable'
+        interval:
+          type: number
+        initialDelay:
+          type: number
+        nextExecution:
+          $ref: '#/components/schemas/NextExecution'
+        lastExecution:
+          $ref: '#/components/schemas/LastExecution'
+    LastExecution:
+      type: object
+      properties:
+        status:
+          type: string
+        time:
+          type: string
+        exception:
+          $ref: '#/components/schemas/Exception'
+    NextExecution:
+      type: object
+      properties:
+        time:
+          type: string
+    Runnable:
+      type: object
+      properties:
+        target:
+          type: string
+    ScheduledTasksResponse:
+      type: object
+      properties:
+        cron:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cron'
+        fixedDelay:
+          type: array
+          items:
+            $ref: '#/components/schemas/FixedDelay'
+        fixedRate:
+          type: array
+          items:
+            $ref: '#/components/schemas/FixedRate'
+        custom:
+          type: array
+          items:
+            $ref: '#/components/schemas/Custom'
