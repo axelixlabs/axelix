@@ -1,0 +1,11 @@
+components:
+  schemas:
+    ProfileUpdatedRequest:
+      type: object
+      properties:
+        effectiveProfiles:
+          type: array
+          description: Array of effective profiles. To remove all active profiles in instance, the array must be empty
+          items:
+            type: string
+            example: '["profile1","profile2"]'

@@ -51,9 +51,3 @@ components:
           type: array
           items:
             type: string
-
-    LogLevelChangeRequest:
-      type: object
-      properties:
-        configuredLevel:
-          type: string
