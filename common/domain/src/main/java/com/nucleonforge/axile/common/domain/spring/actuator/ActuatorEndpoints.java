@@ -28,6 +28,15 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     private final Set<ActuatorEndpoint> endpoints;
 
+    /**
+     * NOTE: Spring Actuator shows warnings for endpoint IDs containing dots or hyphens,
+     * but they remain functionally valid. The WARNING_PATTERN [.-]+ triggers alerts
+     * while VALID_PATTERN still permits these characters.
+     * <p>
+     * This appears to be a code style recommendation rather than a technical limitation,
+     * and it seems to us that this will not affect anything.
+     * Our endpoints with hyphens work correctly despite the warnings.
+     */
     // spotless:off
 
     // Beans
@@ -166,9 +175,12 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 SET_FOR_LOGGER_GROUP,
                 CLEAR_FOR_LOGGER,
                 MAPPINGS,
+                METADATA,
                 METRICS,
                 SINGLE_METRIC,
+                PROFILE_MANAGEMENT,
                 PROMETHEUS,
+                PROPERTY_MANAGEMENT,
                 QUARTZ,
                 QUARTZ_JOBS,
                 QUARTZ_SINGLE_JOB,
