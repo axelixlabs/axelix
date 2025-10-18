@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.master.api.response.InstancesGridResponse.InstanceShortProfile;
+import com.nucleonforge.axile.master.model.instance.Instance;
 
 /**
  * Unit tests for {@link InstancesToShortProfileConverter}.

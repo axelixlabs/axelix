@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.request.PropertyUpdatedRequest;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.serde.MessageSerializationStrategy;
 import com.nucleonforge.axile.master.service.transport.PropertyManagementEndpointProber;
 

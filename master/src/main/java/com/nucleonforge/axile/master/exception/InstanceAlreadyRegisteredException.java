@@ -1,6 +1,6 @@
 package com.nucleonforge.axile.master.exception;
 
-import com.nucleonforge.axile.common.domain.Instance;
+import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 /**

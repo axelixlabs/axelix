@@ -8,9 +8,9 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axile.common.domain.Instance;
 import com.nucleonforge.axile.master.api.response.InstancesGridResponse.InstanceShortProfile;
 import com.nucleonforge.axile.master.api.response.InstancesGridResponse.InstanceStatus;
+import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.service.convert.utils.DateTimeFormattingUtils;
 
 /**

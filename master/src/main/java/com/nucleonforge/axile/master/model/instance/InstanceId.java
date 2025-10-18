@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.common.domain;
+package com.nucleonforge.axile.master.model.instance;
 
 import org.jspecify.annotations.NonNull;
 

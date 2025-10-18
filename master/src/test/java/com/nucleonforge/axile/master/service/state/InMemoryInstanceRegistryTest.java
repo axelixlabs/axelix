@@ -2,10 +2,10 @@ package com.nucleonforge.axile.master.service.state;
 
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.domain.Instance;
-import com.nucleonforge.axile.common.domain.InstanceId;
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;

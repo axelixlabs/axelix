@@ -11,7 +11,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.domain.Instance;
+import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 @Component
