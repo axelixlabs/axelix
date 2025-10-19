@@ -667,7 +667,7 @@ paths:
   /scheduled-tasks/{instanceId}/enable:
     post:
       tags:
-        - ScheduledTasks API Controller
+        - ScheduledTasks API
       summary: Allows enabling a scheduled task either according to its configured schedule or forcibly, 
                ignoring the schedule.
       operationId: enableSingleScheduledTask
@@ -693,7 +693,7 @@ paths:
   /scheduled-tasks/{instanceId}/disable:
     post:
       tags:
-        - ScheduledTasks API Controller
+        - ScheduledTasks API
       summary: Allows disabling a scheduled task.
       operationId: disableSingleScheduledTask
       parameters:
