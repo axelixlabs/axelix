@@ -4,7 +4,7 @@
   align-items: center;
   column-gap: 20px;
   padding-block: 12px;
-  border-bottom: 1px solid var(--axile-gray);
+  border-bottom: 1px solid var(--axile-medium-grey);
 }
 
 .MainWrapper:last-child {
@@ -35,7 +35,7 @@
   border-radius: 2px;
   cursor: pointer;
   user-select: none;
-  border: 1px solid var(--axile-gray);
+  border: 1px solid var(--axile-medium-grey);
   background-color: #ffffff;
   color: #000000;
   transition: all 0.3s;
@@ -73,7 +73,6 @@
   border: none;
   background-color: transparent;
   cursor: pointer;
-  font-family: "Golos Text", sans-serif;
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;

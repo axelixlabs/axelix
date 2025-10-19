@@ -22,7 +22,7 @@
 }
 
 .CollapseBodyChunkList {
-  border-bottom: 1px solid var(--axile-gray);
+  border-bottom: 1px solid var(--axile-medium-grey);
   margin-bottom: 8px;
   padding-bottom: 8px;
 }

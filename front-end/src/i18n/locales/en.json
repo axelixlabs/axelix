@@ -21,6 +21,7 @@
   "activeProfiles": "Profiles",
   "noData": "No data",
   "copied": "Copied",
+  "copyFailed": "Failed to copy",
   "reset": "Reset",
   "configuredExplicitly": "Configured explicitly",
   "loggerLevelUpdated": "Level has been changed",
