@@ -50,7 +50,7 @@
 }
 
 .CardHeaderUNKNOWN {
-    background-color: var(--axile-gray);
+    background-color: var(--axile-medium-grey);
     outline: 1px solid var(--axile-bold-grey)
 }
 

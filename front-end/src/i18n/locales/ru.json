@@ -21,6 +21,7 @@
   "activeProfiles": "Профили",
   "noData": "Нет данных",
   "copied": "Скопировано",
+  "copyFailed": "Не удалось скопировать",
   "reset": "Сбросить",
   "configuredExplicitly": "Задан явно",
   "loggerLevelUpdated": "Уровень логгера изменён",
