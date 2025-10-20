@@ -16,6 +16,7 @@ import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
+import com.nucleonforge.axile.master.service.serde.DeserializationException;
 import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
@@ -67,7 +68,10 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
                         .formatted(supports(), instanceIdentity, statusCode));
             }
 
-        } catch (IOException | InterruptedException e) {
+            // TODO:
+            //  write integration test to check that correct exception is thrown from AbstractEndpointProber
+            //  when deserializationStrategy fails
+        } catch (IOException | InterruptedException | DeserializationException e) {
             throw new EndpointInvocationException(e);
         }
     }
