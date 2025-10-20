@@ -1,6 +1,7 @@
 components:
   schemas:
     ProfileUpdatedRequest:
+      description: Represents a request to update the currently active Spring profiles in a specific application instance.
       type: object
       properties:
         effectiveProfiles:

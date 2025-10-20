@@ -42,9 +42,8 @@ tags:
 
 
 paths:
-# name:     Wallboard API -> GET
-# desc:     The endpoints related to wallboard grid rendering.
-# response: /response/wallboard-response.yaml -> InstancesGridResponse
+# name: Wallboard API -> GET
+# desc: The endpoints related to wallboard grid rendering.
   /applications/grid:
     get:
       tags:
@@ -57,14 +56,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/wallboard-response.yaml#/components/schemas/InstancesGridResponse'
+                $ref: 'response/instances-grid-response.yaml#/components/schemas/InstancesGridResponse'
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:    API for working with Users -> POST
-# request: /response/user-request.yaml -> LoginRequest
+# name: API for working with Users -> POST
   /users/login:
     post:
       x-controller: User
@@ -83,7 +81,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './request/user-request.yaml#/components/schemas/LoginRequest'
+              $ref: 'request/login-request.yaml#/components/schemas/LoginRequest'
         required: true
       responses:
         '200':
@@ -100,17 +98,16 @@ paths:
               schema:
                 type: object
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '401':
-          $ref: "./error/error.yaml#/components/responses/Unauthorized"
+          $ref: "error/error.yaml#/components/responses/Unauthorized"
         '403':
-          $ref: "./error/error.yaml#/components/responses/Forbidden"
+          $ref: "error/error.yaml#/components/responses/Forbidden"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Beans API -> GET
-# desc:     The beans endpoint provides information about the application’s beans.
-# response: /response/beans-response.yaml -> BeansFeedResponse
+# name: Beans API -> GET
+# desc: The beans endpoint provides information about the application’s beans.
   /beans/feed/{instanceId}:
     get:
       tags:
@@ -125,18 +122,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/beans-response.yaml#/components/schemas/BeansFeedResponse'
+                $ref: 'response/beans/beans-feed-response.yaml#/components/schemas/BeansFeedResponse'
           links:
             Actuator/Beans:
               description: 'https://docs.spring.io/spring-boot/api/rest/actuator/beans.html'
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     General instance information API -> GET
-# desc:     The info endpoint provides general information about the particular Spring Boot instance.
-# response: /response/info-response.yaml -> InfoResponse
+# name: General instance information API -> GET
+# desc: The info endpoint provides general information about the particular Spring Boot instance.
   /info/{instanceId}:
     get:
       tags:
@@ -151,18 +147,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/info-response.yaml#/components/schemas/InfoResponse'
+                $ref: 'response/info/info-response.yaml#/components/schemas/InfoResponse'
           links:
             Actuator/Info:
               description: 'https://docs.spring.io/spring-boot/api/rest/actuator/info.html'
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:    Property Management API -> POST
-# desc:    Provides operations for managing Spring properties of application instances.
-# request: /request/property-management-request.yaml -> PropertyUpdatedRequest
+# name: Property Management API -> POST
+# desc: Provides operations for managing Spring properties of application instances.
   /property-management/{instanceId}:
     post:
       tags:
@@ -175,20 +170,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './request/property-management-request.yaml#/components/schemas/PropertyUpdatedRequest'
+              $ref: 'request/property-update-request.yaml#/components/schemas/PropertyUpdatedRequest'
         required: true
       responses:
         '204':
           description: OK
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Profile Management API -> POST
-# desc:     Provides operations for managing Spring profiles of application instances.
-# response: /response/profile-management-response.yaml -> ProfileUpdateResponse
-# request:  /request/profile-management-request.yaml -> ProfileUpdatedRequest
+# name: Profile Management API -> POST
+# desc: Provides operations for managing Spring profiles of application instances.
   /profile-management/{instanceId}:
     post:
       tags:
@@ -201,7 +194,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './request/profile-management-request.yaml#/components/schemas/ProfileUpdatedRequest'
+              $ref: 'request/profile-update-request.yaml#/components/schemas/ProfileUpdatedRequest'
         required: true
       responses:
         '200':
@@ -209,15 +202,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/profile-management-response.yaml#/components/schemas/ProfileUpdateResponse'
+                $ref: 'response/profile-update-response.yaml#/components/schemas/ProfileUpdateResponse'
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Loggers API -> GET
-# desc:     The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-# response: /response/loggers-response.yaml -> LoggersResponse
+# name: Loggers API -> GET
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
   /loggers/{instanceId}:
     get:
       tags:
@@ -232,18 +224,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/loggers-response.yaml#/components/schemas/LoggersResponse'
+                $ref: 'response/loggers/loggers-response.yaml#/components/schemas/LoggersResponse'
           links:
             Actuator/Loggers:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Loggers API -> GET
-# desc:     The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-# response: /response/loggers-response.yaml -> LoggerProfileResponse
+# name: Loggers API -> GET
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
   /loggers/{instanceId}/logger/{loggerName}:
     get:
       tags:
@@ -264,18 +255,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/loggers-response.yaml#/components/schemas/LoggerProfileResponse'
+                $ref: 'response/loggers/logger-profile-response.yaml#/components/schemas/LoggerProfileResponse'
           links:
             Actuator/Loggers:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Loggers API -> POST
-# desc:     The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-# request:  /request/loggers-request.yaml -> LogLevelChangeRequest
+# name: Loggers API -> POST
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
     post:
       tags:
         - Loggers API
@@ -296,7 +286,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './request/loggers-request.yaml#/components/schemas/LogLevelChangeRequest'
+              $ref: 'request/log-level-change-request.yaml#/components/schemas/LogLevelChangeRequest'
         required: true
       responses:
         '200':
@@ -305,12 +295,12 @@ paths:
             Actuator/Loggers:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:  Loggers API -> POST
-# desc:  The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+# name: Loggers API -> POST
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
   /loggers/{instanceId}/logger/{loggerName}/clear:
     post:
       tags:
@@ -332,13 +322,12 @@ paths:
             Actuator/Loggers:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:      Loggers API -> GET
-# desc:      The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-# response:  /response/loggers-response.yaml -> GroupProfileResponse
+# name: Loggers API -> GET
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
   /loggers/{instanceId}/group/{groupName}:
     get:
       tags:
@@ -359,18 +348,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/loggers-response.yaml#/components/schemas/GroupProfileResponse'
+                $ref: 'response/loggers/group-profile-response.yaml#/components/schemas/GroupProfileResponse'
           links:
             Actuator/Loggers:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Loggers API -> POST
-# desc:     The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-# request:  /request/loggers-request.yaml -> LogLevelChangeRequest
+# name: Loggers API -> POST
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
     post:
       tags:
         - Loggers API
@@ -391,7 +379,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './request/loggers-request.yaml#/components/schemas/LogLevelChangeRequest'
+              $ref: 'request/log-level-change-request.yaml#/components/schemas/LogLevelChangeRequest'
         required: true
       responses:
         '200':
@@ -400,13 +388,12 @@ paths:
             Actuator/Loggers:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Configprops API  -> GET
-# desc:     The configprops endpoint provides information about the application’s @ConfigurationProperties beans.
-# response: /response/configprops-response.yaml -> ConfigpropsFeedResponse
+# name: Configprops API  -> GET
+# desc: The configprops endpoint provides information about the application’s @ConfigurationProperties beans.
   /configprops/feed/{instanceId}:
     get:
       tags:
@@ -421,18 +408,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/configprops-response.yaml#/components/schemas/ConfigpropsFeedResponse'
+                $ref: 'response/configprops/configprops-feed-response.yaml#/components/schemas/ConfigpropsFeedResponse'
           links:
             Actuator/Configuration Properties:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/configprops.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Configprops API  -> GET
-# desc:     The configprops endpoint provides information about the application’s @ConfigurationProperties beans.
-# response: /response/configprops-response.yaml -> ConfigpropsByPrefixResponse
+# name: Configprops API  -> GET
+# desc: The configprops endpoint provides information about the application’s @ConfigurationProperties beans.
   /configprops/{instanceId}/beans/{prefix}:
     get:
       tags:
@@ -453,18 +439,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/configprops-response.yaml#/components/schemas/ConfigpropsByPrefixResponse'
+                $ref: 'response/configprops/configprops-by-prefix-response.yaml#/components/schemas/ConfigpropsByPrefixResponse'
           links:
             Actuator/Configuration Properties:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/configprops.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Environment API -> GET
-# desc:     The env endpoint provides information about the application’s Environment.
-# response: /response/environment-response.yaml -> EnvironmentFeedResponse
+# name: Environment API -> GET
+# desc: The env endpoint provides information about the application’s Environment.
   /env/feed/{instanceId}:
     get:
       tags:
@@ -479,18 +464,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/environment-response.yaml#/components/schemas/EnvironmentFeedResponse'
+                $ref: 'response/environment/environment-feed-response.yaml#/components/schemas/EnvironmentFeedResponse'
           links:
             Spring Boot / Actuator / Environment (env):
               description: 'https://docs.spring.io/spring-boot/api/rest/actuator/env.html'
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Environment API -> GET
-# desc:     The env endpoint provides information about the application’s Environment.
-# response: /response/environment-response.yaml -> EnvironmentPropertyResponse
+# name: Environment API -> GET
+# desc: The env endpoint provides information about the application’s Environment.
   /env/{instanceId}/property/{propertyName}:
     get:
       tags:
@@ -511,18 +495,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/environment-response.yaml#/components/schemas/EnvironmentPropertyResponse'
+                $ref: 'response/environment/environment-property-response.yaml#/components/schemas/EnvironmentPropertyResponse'
           links:
             Actuator/Environment(env):
               description: 'https://docs.spring.io/spring-boot/api/rest/actuator/env.html'
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
 # name: Caches API -> GET
 # desc: The caches endpoint provides access to the application’s caches.
-# response: ./response/caches-response.yaml -> CachesResponse
   /caches/{instanceId}:
     get:
       tags:
@@ -537,14 +520,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/caches-response.yaml#/components/schemas/CachesResponse'
+                $ref: 'response/caches/caches-response.yaml#/components/schemas/CachesResponse'
           links:
             Actuator/Caches:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/caches.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
 # name: Caches API -> DELETE
 # desc: The caches endpoint provides access to the application’s caches.
@@ -562,13 +545,12 @@ paths:
             Actuator/Caches:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/caches.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
 # name: Caches API -> GET
 # desc: The caches endpoint provides access to the application’s caches.
-# response: ./response/caches-response.yaml -> CacheProfileResponse
   /caches/{instanceId}/cache/{cacheName}:
     get:
       tags:
@@ -597,14 +579,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/caches-response.yaml#/components/schemas/CacheProfileResponse'
+                $ref: 'response/caches/cache-profile-response.yaml#/components/schemas/CacheProfileResponse'
           links:
             Actuator/Caches:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/caches.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
 # name: Caches API -> DELETE
 # desc: The caches endpoint provides access to the application’s caches.
@@ -634,13 +616,12 @@ paths:
             Actuator/Caches:
               description: https://docs.spring.io/spring-boot/api/rest/actuator/caches.html
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     ScheduledTasks API -> GET
-# desc:     The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
-# response: ./response/scheduled-tasks-response.yaml -> ScheduledTasksResponse
+# name: ScheduledTasks API -> GET
+# desc: The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
   /scheduled-tasks/{instanceId}:
     get:
       tags:
@@ -655,15 +636,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './response/scheduled-tasks-response.yaml#/components/schemas/ScheduledTasksResponse'
+                $ref: 'response/scheduled-tasks-response.yaml#/components/schemas/ScheduledTasksResponse'
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:    ScheduledTasks API -> POST
-# desc:    The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
-# request: ./request/scheduled-tasks-request.yaml -> ScheduledTaskToggleRequest
+# name: ScheduledTasks API -> POST
+# desc: The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
   /scheduled-tasks/{instanceId}/enable:
     post:
       tags:
@@ -677,19 +657,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './request/scheduled-tasks-request.yaml#/components/schemas/ScheduledTaskToggleRequest'
+              $ref: 'request/scheduled-tasks-toggle-request.yaml#/components/schemas/ScheduledTaskToggleRequest'
         required: true
       responses:
         '200':
           description: OK
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:    ScheduledTasks API -> POST
-# desc:    The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
-# request: ./request/scheduled-tasks-request.yaml -> ScheduledTaskToggleRequest
+# name: ScheduledTasks API -> POST
+# desc:  The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
   /scheduled-tasks/{instanceId}/disable:
     post:
       tags:
@@ -702,18 +681,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './request/scheduled-tasks-request.yaml#/components/schemas/ScheduledTaskToggleRequest'
+              $ref: 'request/scheduled-tasks-toggle-request.yaml#/components/schemas/ScheduledTaskToggleRequest'
         required: true
       responses:
         '200':
           description: OK
         '400':
-          $ref: "./error/error.yaml#/components/responses/BadRequest"
+          $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
-          $ref: "./error/error.yaml#/components/responses/InternalError"
+          $ref: "error/error.yaml#/components/responses/InternalError"
 
-# name:     Software API -> GET
-# response: /response/software-response.yaml -> DistributionSummaryResponse
+# name: Software API -> GET
   /software/core/summary:
     get:
       tags:
@@ -725,7 +703,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: './response/software-response.yaml#/components/schemas/DistributionSummaryResponse'
+                $ref: 'response/software/distribution-summary-response.yaml#/components/schemas/DistributionSummaryResponse'
 
 components:
   parameters:

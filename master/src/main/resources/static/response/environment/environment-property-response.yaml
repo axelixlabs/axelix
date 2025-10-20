@@ -1,0 +1,36 @@
+components:
+  schemas:
+    EnvironmentPropertyResponse:
+      description: The response object that represents an environment property in the application.
+      type: object
+      properties:
+        source:
+          description: The name of the property source from which this value was obtained.
+          type: string
+        value:
+          type: string
+        propertySources:
+          description: The string representation of the property's value.
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertySource'
+            nullable: true
+
+
+    PropertySource:
+      type: object
+      properties:
+        name:
+          type: string
+        property:
+          $ref: '#/components/schemas/Property'
+          nullable: true
+
+    Property:
+      type: object
+      properties:
+        value:
+          type: string
+        origin:
+          type: string
+          nullable: true

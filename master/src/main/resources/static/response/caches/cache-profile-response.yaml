@@ -1,0 +1,15 @@
+components:
+  schemas:
+    CacheProfileResponse:
+      description: The profile contains details about the requested cache.
+      type: object
+      properties:
+        name:
+          description: The cache name.
+          type: string
+        target:
+          description: The fully qualified name of the native cache.
+          type: string
+        cacheManager:
+          description: The cache manager name.
+          type: string

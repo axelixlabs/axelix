@@ -1,0 +1,9 @@
+components:
+  schemas:
+    LogLevelChangeRequest:
+      description: Request to change the logging level of a logger or a logger group.
+      type: object
+      properties:
+        configuredLevel:
+          description: The new logging level to apply.
+          type: string

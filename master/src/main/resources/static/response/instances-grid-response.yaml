@@ -1,0 +1,41 @@
+components:
+  schemas:
+    InstancesGridResponse:
+      description: The grid of {@link InstanceShortProfile instances}.
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/InstanceShortProfile'
+
+    InstanceShortProfile:
+      description: The short profile of the particular Instance, managed by this master deployment.
+      type: object
+      properties:
+        instanceId:
+          type: string
+        name:
+          type: string
+        serviceVersion:
+          type: string
+        commitShaShort:
+          type: string
+        status:
+          $ref: '#/components/schemas/InstanceStatus'
+        deployedFor:
+          description: String representation for how long the service has been already deployed for.
+          type: string
+          nullable: true
+        javaVersion:
+          type: string
+        springBootVersion:
+          type: string
+
+    InstanceStatus:
+      description: State of the given instance.
+      type: string
+      enum:
+        - UP
+        - DOWN
+        - UNKNOWN

@@ -1,0 +1,34 @@
+components:
+  schemas:
+    EnvironmentFeedResponse:
+      description: The feed of the environment used in the application.
+      type: object
+      properties:
+        activeProfiles:
+          description: The list of currently active Spring profiles.
+          type: array
+          items:
+            type: string
+        defaultProfiles:
+          description: The list of default Spring profiles.
+          type: array
+          items:
+            type: string
+        propertySources:
+          description: The list of property sources with their short profiles
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertySourceShortProfile'
+
+    PropertySourceShortProfile:
+      description: Short profile of a given property source.
+      type: object
+      properties:
+        name:
+          description: The sourceName of the property source.
+          type: string
+        properties:
+          description: The map of property names to their string values.
+          type: array
+          items:
+            $ref: '../key-value.yaml#/components/schemas/KeyValue'

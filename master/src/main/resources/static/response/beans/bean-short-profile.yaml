@@ -1,0 +1,116 @@
+components:
+  schemas:
+    BeanShortProfile:
+      description: Short profile of a given bean.
+      type: object
+      properties:
+        beanName:
+          description: The name of the bean.
+          type: string
+        scope:
+          description: The scope of the bean.
+          type: string
+        className:
+          description: The fully qualified class name of the bean.
+          type: string
+        proxyType:
+          $ref: '#/components/schemas/ProxyType'
+        aliases:
+          description: The aliases of the given bean.
+          type: array
+          items:
+            type: string
+        dependencies:
+          description: The list of dependencies of this bean (i.e. other beans that this bean depends on).
+          type: array
+          items:
+            type: string
+        isPrimary:
+          description: Whether the bean is marked with {@link BeanDefinition#isPrimary() primary marker}.
+          type: boolean
+        isLazyInit:
+          description: Whether the bean is lazily instantiated or eagerly.
+          type: boolean
+        qualifiers:
+          description: The list of {@link AutowireCandidateQualifier qualifiers} that are assigned to this bean.
+          type: array
+          items:
+            type: string
+        beanSource:
+          description: The source information describing how this bean was created and its origin type.
+          $ref: '#/components/schemas/BeanSource'
+
+    ProxyType:
+      description: Enum representing the type of proxy applied to a bean.
+      type: string
+      enum:
+        - JDK_PROXY
+        - CGLIB
+        - NO_PROXYING
+      x-enum-descriptions:
+        - Bean is proxied using JDK dynamic proxy.
+        - Bean is proxied using CGLIB.
+        - Bean is not proxied
+
+    BeanOrigin:
+      type: string
+      enum:
+        - COMPONENT_ANNOTATION
+        - BEAN_METHOD
+        - FACTORY_BEAN
+        - UNKNOWN
+      x-enum-descriptions:
+        - Bean originated from some variant of a @Component annotation.
+        - Bean was produced as a result of the @Bean method invocation.
+        - Bean was created by another bean, e.g., Spring Data repositories registered via a factory bean.
+        - Origin of the bean is unknown (programmatically registered beans or similar).
+
+    BeanSource:
+      oneOf:
+        - $ref: '#/components/schemas/UnknownBean'
+        - $ref: '#/components/schemas/FactoryBean'
+        - $ref: '#/components/schemas/BeanMethod'
+        - $ref: '#/components/schemas/ComponentVariant'
+      discriminator:
+        propertyName: origin
+
+    UnknownBean:
+      description: The {@link BeanSource} for the {@link BeanOrigin#UNKNOWN}. 
+                  Does not hold any fields since the actual origin if unknown.
+      type: object
+      properties:
+        origin:
+          $ref: '#/components/schemas/BeanOrigin'
+
+    FactoryBean:
+      description: The {@link BeanSource} for the {@link BeanOrigin#FACTORY_BEAN}. 
+                    Holds the reference to the {@link factoryBeanName factory bean} that produced this bean.
+      type: object
+      properties:
+        factoryBeanName:
+          type: string
+        origin:
+          $ref: '#/components/schemas/BeanOrigin'
+
+    BeanMethod:
+      description: he {@link BeanSource} for the {@link BeanOrigin#BEAN_METHOD}. Has an additional
+                    {@link String} fields for {@link methodName name of the method} that produced the
+                    actual bean, and the name of the class, where this {@link methodName method} resides.
+      type: object
+      properties:
+        enclosingClassName:
+          type: string
+          nullable: true
+        methodName:
+          type: string
+        origin:
+          $ref: '#/components/schemas/BeanOrigin'
+
+    ComponentVariant:
+      description: The {@link BeanSource} for the {@link BeanOrigin#COMPONENT_ANNOTATION}. Does not have
+                    any additional fields since it is quite obvious by the {@link className bean class name}
+                    from where the class actually originated.
+      type: object
+      properties:
+        origin:
+          $ref: '#/components/schemas/BeanOrigin'

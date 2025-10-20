@@ -1,6 +1,7 @@
 components:
   schemas:
     PropertyUpdatedRequest:
+      description: Represents a request to update a specific configuration property in a given application instance.
       type: object
       properties:
         propertyName:

@@ -1,0 +1,13 @@
+components:
+  schemas:
+    LoggerProfileResponse:
+      description: Profile of the active logger.
+      type: object
+      properties:
+        configuredLevel:
+          description: The configured logger level, if any.
+          type: string
+          nullable: true
+        effectiveLevel:
+          description: The logger's current level.
+          type: string

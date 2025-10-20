@@ -1,0 +1,35 @@
+components:
+  schemas:
+    CachesResponse:
+      description: The profile contains a list of all cache managers in the application.
+      type: object
+      properties:
+        cacheManagers:
+          description: The list of cache managers.
+          type: array
+          items:
+            $ref: '#/components/schemas/CacheManagers'
+
+    CacheManagers:
+      description: The profile contains a list of all caches in the application.
+      type: object
+      properties:
+        name:
+          description: The cache manager name.
+          type: string
+        caches:
+          description: The list of caches.
+          type: array
+          items:
+            $ref: '#/components/schemas/Caches'
+
+    Caches:
+      description: The profile contains details about the cache.
+      type: object
+      properties:
+        name:
+          description: The cache name.
+          type: string
+        target:
+          description: The fully qualified name of the native cache.
+          type: string

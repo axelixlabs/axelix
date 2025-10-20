@@ -1,101 +1,171 @@
 components:
   schemas:
-    Cron:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-        runnable:
-          $ref: '#/components/schemas/Runnable'
-        expression:
-          type: string
-        nextExecution:
-          $ref: '#/components/schemas/NextExecution'
-        lastExecution:
-          $ref: '#/components/schemas/LastExecution'
-    Custom:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-        runnable:
-          $ref: '#/components/schemas/Runnable'
-        trigger:
-          type: string
-        lastExecution:
-          $ref: '#/components/schemas/LastExecution'
-    Exception:
-      type: object
-      properties:
-        type:
-          type: string
-        message:
-          type: string
-    FixedDelay:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-        runnable:
-          $ref: '#/components/schemas/Runnable'
-        interval:
-          type: number
-        initialDelay:
-          type: number
-        nextExecution:
-          $ref: '#/components/schemas/NextExecution'
-        lastExecution:
-          $ref: '#/components/schemas/LastExecution'
-    FixedRate:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-        runnable:
-          $ref: '#/components/schemas/Runnable'
-        interval:
-          type: number
-        initialDelay:
-          type: number
-        nextExecution:
-          $ref: '#/components/schemas/NextExecution'
-        lastExecution:
-          $ref: '#/components/schemas/LastExecution'
-    LastExecution:
-      type: object
-      properties:
-        status:
-          type: string
-        time:
-          type: string
-        exception:
-          $ref: '#/components/schemas/Exception'
-    NextExecution:
-      type: object
-      properties:
-        time:
-          type: string
-    Runnable:
-      type: object
-      properties:
-        target:
-          type: string
     ScheduledTasksResponse:
+      description: The profile provides information about the application’s scheduled tasks.
       type: object
       properties:
         cron:
+          description: The list of scheduled cron tasks, if any.
           type: array
           items:
             $ref: '#/components/schemas/Cron'
         fixedDelay:
+          description: The list of scheduled interval with fixed-delay, if any.
           type: array
           items:
             $ref: '#/components/schemas/FixedDelay'
         fixedRate:
+          description: The list of scheduled interval with fixed-rate, if any.
           type: array
           items:
             $ref: '#/components/schemas/FixedRate'
         custom:
+          description: The list of scheduled tasks with a custom configured user triggers, if any.
           type: array
           items:
             $ref: '#/components/schemas/Custom'
+
+    Cron:
+      description: The profile representing a scheduled task with precise execution configuration.
+      type: object
+      properties:
+        enabled:
+          description: The indicator showing whether the task is enabled {@code true} or disabled {@code false}.
+          type: boolean
+        runnable:
+          description: The target that will be executed.
+          $ref: '#/components/schemas/Runnable'
+        expression:
+          description: The cron expression that allows specifying (e.g., "0 1 1 5 7 3" or "0 0/15 9-17 ? * MON,WED,FRI" 
+                      (seconds minutes hours day_of_month month day_of_week))
+          type: string
+        nextExecution:
+          description: The time of the next scheduled execution of this task, if known.
+          allOf:
+            - $ref: '#/components/schemas/NextExecution'
+          nullable: true
+        lastExecution:
+          description: The last execution of this task, if any.
+          allOf:
+            - $ref: '#/components/schemas/LastExecution'
+          nullable: true
+
+    FixedDelay:
+      description: The profile representing the interval between task executions, 
+                    counted from the end of the previous task execution.
+      type: object
+      properties:
+        enabled:
+          description: The indicator showing whether the task is enabled {@code true} or disabled {@code false}.
+          type: boolean
+        runnable:
+          description: The target that will be executed.
+          $ref: '#/components/schemas/Runnable'
+        interval:
+          description: The interval, in milliseconds, between the start of each execution.
+          type: number
+        initialDelay:
+          description: The delay, in milliseconds, before first execution.
+          type: number
+        nextExecution:
+          description: The time of the next scheduled execution of this task, if known.
+          allOf:
+            - $ref: '#/components/schemas/NextExecution'
+          nullable: true
+        lastExecution:
+          description: The last execution of this task, if any.
+          allOf:
+            - $ref: '#/components/schemas/LastExecution'
+          nullable: true
+
+    FixedRate:
+      description: The profile representing the interval between task executions, 
+                    measured from the start of the previous task execution.
+      type: object
+      properties:
+        enabled:
+          description:  The indicator showing whether the task is enabled {@code true} or disabled {@code false}.
+          type: boolean
+        runnable:
+          description: The target that will be executed.
+          $ref: '#/components/schemas/Runnable'
+        interval:
+          description: The interval, in milliseconds, between the start of each execution.
+          type: number
+        initialDelay:
+          description: The delay, in milliseconds, before first execution.
+          type: number
+        nextExecution:
+          description: The time of the next scheduled execution of this task, if known.
+          allOf:
+            - $ref: '#/components/schemas/NextExecution'
+          nullable: true
+        lastExecution:
+          description: The last execution of this task, if any.
+          allOf:
+            - $ref: '#/components/schemas/LastExecution'
+          nullable: true
+
+    Custom:
+      description: The profile representing a task with a configured user trigger.
+      type: object
+      properties:
+        enabled:
+          description: The indicator showing whether the task is enabled {@code true} or disabled {@code false}.
+          type: boolean
+        runnable:
+          description: The target that will be executed.
+          $ref: '#/components/schemas/Runnable'
+        trigger:
+          description: The trigger used to execute this task.
+          type: string
+        lastExecution:
+          description: The last execution of this task, if any.
+          allOf:
+            - $ref: '#/components/schemas/LastExecution'
+          nullable: true
+
+    LastExecution:
+      description: The profile representing the last execution of the task.
+      type: object
+      properties:
+        status:
+          description:  The status of the last execution of a task (STARTED, SUCCESS, ERROR).
+          type: string
+        time:
+          description: The time of the last execution of a task.
+          type: string
+        exception:
+          description: The exception that may occur, if any.
+          allOf:
+            - $ref: '#/components/schemas/Exception'
+          nullable: true
+
+    Exception:
+      description: The profile representing a possible exception.
+      type: object
+      properties:
+        type:
+          description:  The type of exception thrown by the task, if any.
+          type: string
+          nullable: true
+        message:
+          description: The message of the exception thrown by the task, if any.
+          type: string
+          nullable: true
+
+    NextExecution:
+      description: The profile that contains the next execution time of the task.
+      type: object
+      properties:
+        time:
+          description: The execution time.
+          type: string
+
+    Runnable:
+      description: The profile that contains the target that will be executed.
+      type: object
+      properties:
+        target:
+          description: The target for execution.
+          type: string

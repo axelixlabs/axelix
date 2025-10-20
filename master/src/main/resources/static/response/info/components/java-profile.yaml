@@ -1,0 +1,57 @@
+components:
+  schemas:
+    JavaProfile:
+      description: The profile of a given Java environment.
+      type: object
+      properties:
+        version:
+          description: The version of the Java.
+          type: string
+        vendor:
+          description: The vendor details of the Java, if available.
+          $ref: '#/components/schemas/Vendor'
+          nullable: true
+        runtime:
+          description: The runtime details of the Java, if available.
+          $ref: '#/components/schemas/Runtime'
+          nullable: true
+        jvm:
+          description: The JVM details of the Java, if available.
+          $ref: '#/components/schemas/JVM'
+          nullable: true
+
+    Vendor:
+      description: The profile of a given vendor.
+      type: object
+      properties:
+        name:
+          description: The name of the vendor.
+          type: string
+        version:
+          description: The version of the vendor.
+          type: string
+
+    Runtime:
+      description: The profile of a given runtime.
+      type: object
+      properties:
+        name:
+          description: The name of the runtime.
+          type: string
+        version:
+          description: The version of the runtime.
+          type: string
+
+    JVM:
+      description: The profile of a given JVM.
+      type: object
+      properties:
+        name:
+          description: The name of the JVM.
+          type: string
+        vendor:
+          description: The vendor of the JVM.
+          type: string
+        version:
+          description: The version of the JVM.
+          type: string

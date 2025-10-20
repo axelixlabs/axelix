@@ -1,6 +1,7 @@
 components:
   schemas:
     ProfileUpdateResponse:
+      description: The response of a profile update operation in the application.
       type: object
       properties:
         updated:

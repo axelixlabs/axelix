@@ -1,0 +1,15 @@
+components:
+  schemas:
+    OSProfile:
+      description: The profile of a given OS.
+      type: object
+      properties:
+        name:
+          description: The name of the operating system.
+          type: string
+        version:
+          description: The version of the operating system.
+          type: string
+        arch:
+          description: The architecture of the CPU.
+          type: string

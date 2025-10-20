@@ -1,9 +1,0 @@
-components:
-  schemas:
-    ScheduledTaskToggleRequest:
-      type: object
-      properties:
-        targetScheduledTask:
-          type: string
-        force:
-          type: boolean

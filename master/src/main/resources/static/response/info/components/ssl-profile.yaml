@@ -1,0 +1,76 @@
+components:
+  schemas:
+    SSLProfile:
+      description: The profile of a given SSL.
+      type: object
+      properties:
+        bundles:
+          description: The bundles information of the SSL.
+          type: array
+          items:
+            $ref: '#/components/schemas/Bundles'
+
+    Bundles:
+      description: The profile of a given bundle.
+      type: object
+      properties:
+        name:
+          description: The name of the SSL bundle.
+          type: string
+        certificateChains:
+          description: The certificate chains in the bundle.
+          type: array
+          items:
+            $ref: '#/components/schemas/CertificateChains'
+
+    CertificateChains:
+      description: The profile of a given certificate chain.
+      type: object
+      properties:
+        alias:
+          description: The alias of the certificate chain.
+          type: string
+        certificates:
+          description: The certificates in the chain.
+          type: array
+          items:
+            $ref: '#/components/schemas/Certificates'
+
+    Certificates:
+      description: The profile of a given certificate.
+      type: object
+      properties:
+        version:
+          description: The version of the certificate.
+          type: string
+        issuer:
+          description: The issuer of the certificate.
+          type: string
+        validity:
+          description: The certificate validity information.
+          allOf:
+            - $ref: '#/components/schemas/Validity'
+          nullable: true
+        subject:
+          description: The subject of the certificate.
+          type: string
+        serialNumber:
+          description: The serial number of the certificate.
+          type: string
+        signatureAlgorithmName:
+          description: The signature algorithm name.
+          type: string
+        validityStarts:
+          description: The validity start date of the certificate.
+          type: string
+        validityEnds:
+          description: The validity end date of the certificate.
+          type: string
+
+    Validity:
+      description: The profile of a given certificate validity.
+      type: object
+      properties:
+        status:
+          description: The certificate validity status.
+          type: string

@@ -1,0 +1,14 @@
+components:
+  schemas:
+    ScheduledTaskToggleRequest:
+      description: Request to enable execution of a scheduled task.
+      type: object
+      properties:
+        targetScheduledTask:
+          description: The target scheduled task to be enabled.
+          type: string
+        force:
+          description: The value {@code true} forces an immediate change of the task state
+                      it will forcibly enable the task if inactive, or interrupt it if currently running,
+                      regardless of the schedule settings. {@code false} means the task will follow the configured schedule.
+          type: boolean

@@ -1,0 +1,36 @@
+components:
+  schemas:
+    InfoResponse:
+      description: The profile of a given info.
+      type: object
+      properties:
+        git:
+          description: The short profile of the git component response, if available.
+          allOf:
+            - $ref: 'components/git-profile.yaml#/components/schemas/GitProfile'
+          nullable: true
+        build:
+          description: The short profile of the build component response, if available.
+          allOf:
+            - $ref: 'components/build-profile.yaml#/components/schemas/BuildProfile'
+          nullable: true
+        os:
+          description: The short profile of the OS component response, if available.
+          allOf:
+            - $ref: 'components/os-profile.yaml#/components/schemas/OSProfile'
+          nullable: true
+        process:
+          description: The short profile of the process component response, if available.
+          allOf:
+            - $ref: 'components/process-profile.yaml#/components/schemas/ProcessProfile'
+          nullable: true
+        java:
+          description: The short profile of the java component response, if available.
+          allOf:
+            - $ref: 'components/java-profile.yaml#/components/schemas/JavaProfile'
+          nullable: true
+        ssl:
+          description: The short profile of the SSL component response, if available (present since version 3.4.9).
+          allOf:
+            - $ref: 'components/ssl-profile.yaml#/components/schemas/SSLProfile'
+          nullable: true

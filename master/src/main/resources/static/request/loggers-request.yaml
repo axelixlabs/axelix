@@ -1,7 +1,0 @@
-components:
-  schemas:
-    LogLevelChangeRequest:
-      type: object
-      properties:
-        configuredLevel:
-          type: string
