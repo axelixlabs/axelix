@@ -31,7 +31,7 @@ export const Wallboard = () => {
         ? filterInstances(instanceCards, search)
         : instanceCards;
 
-    const addonAfter = `${effectiveInstanceCards} / ${instanceCards.length}`;
+    const addonAfter = `${effectiveInstanceCards.length} / ${instanceCards.length}`;
 
     return (
         <>

@@ -1,5 +1,5 @@
-import {Button, message} from 'antd';
-import {type MouseEvent, useState} from 'react';
+import { Button, message } from 'antd';
+import { type MouseEvent, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ReloadOutlined } from "@ant-design/icons";
@@ -29,18 +29,16 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
 
     const clearCacheClickHandler = (e: MouseEvent<HTMLElement>): void => {
         e.stopPropagation();
-        if (instanceId) {
-          setClearSingleCache(StatelessRequest.loading())
-          clearCacheData(instanceId, {
+        setClearSingleCache(StatelessRequest.loading())
+        clearCacheData(instanceId!, {
             cacheName: cache.name,
             cacheManager: cacheManagerName
-          })
+        })
             .then(() => {
-              setClearSingleCache(StatelessRequest.success())
-              message.success(t("cleared"))
+                setClearSingleCache(StatelessRequest.success())
+                message.success(t("cleared"))
             })
             .catch(() => setClearSingleCache(StatelessRequest.error("")))
-        }
     }
 
     return (

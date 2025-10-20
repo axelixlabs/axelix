@@ -21,9 +21,7 @@ export const Caches = () => {
     const [cacheData, setCacheData] = useState(StatefulRequest.loading<ICachesData>())
 
     useEffect(() => {
-        if (instanceId) {
-          fetchData(setCacheData, () => getCachesData(instanceId));
-        }
+        fetchData(setCacheData, () => getCachesData(instanceId!));
     }, [])
 
     useEffect(() => {

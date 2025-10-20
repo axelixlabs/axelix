@@ -25,27 +25,15 @@ export class StatefulRequest<T> implements IRequest {
   constructor(public loading: boolean, public error: string, public response: T | null) {}
 
   public static loading<U>() : StatefulRequest<U> {
-    return {
-      response: null,
-      error: "",
-      loading: true
-    }
+    return new StatefulRequest<U>(true, "", null);
   }
 
   public static success<U>(response: U) : StatefulRequest<U> {
-    return {
-      response: response,
-      error: "",
-      loading: false
-    }
+    return new StatefulRequest<U>(false, "", response);
   }
 
   public static error<U>(error: string) : StatefulRequest<U> {
-    return {
-      response: null,
-      error: error,
-      loading: false
-    }
+    return new StatefulRequest<U>(false, error, null);
   }
 }
 
