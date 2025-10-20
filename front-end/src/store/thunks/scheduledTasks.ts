@@ -1,9 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 import { getScheduledTasksData } from "services";
-import type { ResponseData } from "models";
+import type { ScheduledTasksResponse } from "models";
 
-export const getScheduledTasksThunk = createAsyncThunk<ResponseData, string, { rejectValue: any }>(
+export const getScheduledTasksThunk = createAsyncThunk<ScheduledTasksResponse, string, { rejectValue: any }>(
     "getScheduledTasksThunk",
     async (instanceId, { rejectWithValue }) => {
         try {

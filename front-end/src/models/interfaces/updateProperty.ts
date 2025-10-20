@@ -1,5 +1,3 @@
-import type { ICommonSliceState } from "./globals";
-
 export interface IUpdatePropertyData {
     /**
      * Property name
@@ -20,12 +18,4 @@ export interface IUpdateProperty {
      * Update property data
      */
     updatePropertyData: IUpdatePropertyData;
-}
-
-export interface IUpdatePropertySliceState extends ICommonSliceState {
-
-    /**
-     * Success flag for property update
-     */
-    changePropertySuccess: boolean;
 }

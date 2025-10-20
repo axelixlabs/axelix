@@ -1,33 +1,44 @@
+import { useState } from "react";
+
 import { EmptyHandler, PageSearch, ModifiableTableSection } from "components";
-import { useAppDispatch, useAppSelector } from "hooks";
-import { filterProperties } from "store/slices";
+import type { IEnvironmentPropertySource } from "models";
+import { filterPropertySources } from "helpers";
 
-export const EnvironmentTables = () => {
-  const dispatch = useAppDispatch();
+interface IProps {
 
-  const { propertySources, filteredPropertySources, environmentSearchText } = useAppSelector((store) => store.environment);
+  /**
+   * The list of property sources to render
+   */
+  propertySources: IEnvironmentPropertySource[];
+}
 
-  const propertySourcesList = filteredPropertySources.length ? filteredPropertySources : propertySources;
-  const noDataAfterSearch = !!environmentSearchText && !filteredPropertySources.length
-  const addonAfter = `${environmentSearchText ? filteredPropertySources.length : propertySources.length} / ${propertySources.length}`;
+export const EnvironmentTables = ({ propertySources } : IProps) => {
+
+  const [search, setSearch] = useState<string>("")
+
+  const effectivePropertySources = search
+    ? filterPropertySources(propertySources, search)
+    : propertySources
+
+  const addonAfter = `${effectivePropertySources.length} / ${propertySources.length}`;
 
   return (
     <>
-      <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterProperties(value))} />
+      <PageSearch addonAfter={addonAfter} onChange={(e) => setSearch(e)} />
 
-      <EmptyHandler isEmpty={noDataAfterSearch}>
-        {propertySourcesList.map(({ name, properties }) => (
+      <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
+        {effectivePropertySources.map(({ name, properties }) => (
           <ModifiableTableSection
             headerName={name}
             properties={
               properties.map(
-                  (property) => (
-                      {
-                        key: property.key,
-                        displayKey: property.key,
-                        displayValue: property.value
-                      }
-                  )
+                (property) => (
+                  {
+                    key: property.key,
+                    displayKey: property.key,
+                    displayValue: property.value
+                  }
+                )
               )
             }
             key={name}

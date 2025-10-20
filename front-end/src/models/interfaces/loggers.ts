@@ -27,14 +27,6 @@ export interface ILoggerData {
 }
 
 export interface ILoggersSliceState extends ICommonSliceState, ILoggerData {
-  /**
-   * Text for searching loggers
-   */
-  loggersSearchText: string;
-  /**
-   * Filtered loggers after searching
-   */
-  filteredLoggers: ILogger[];
   updateLoggerSuccess: boolean
 }
 

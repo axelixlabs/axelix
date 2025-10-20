@@ -1,11 +1,9 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 import { clearAllCachesThunk, clearCacheThunk, getCachesThunk } from "store/thunks";
-import {type ICachesSliceState, IClearOperationType} from "models";
+import { type ICachesSliceState, IClearOperationType } from "models";
 
 const initialState: ICachesSliceState = {
-    cacheManagersSearchText: "",
-    filteredCacheManagers: [],
     cacheManagers: [],
     loading: false,
     success: false,
@@ -16,27 +14,9 @@ const initialState: ICachesSliceState = {
 export const CachesSlice = createSlice({
     name: "cachesSlice",
     initialState,
-    reducers: {
-        filterCacheManagers: (state, action: PayloadAction<string>) => {
-            const searchText = action.payload.toLowerCase().trim();
-            state.cacheManagersSearchText = searchText;
-
-            state.filteredCacheManagers = state.cacheManagers.filter((cacheManager) => {
-                const filterByCacheManagerName = cacheManager.name
-                    .toLowerCase()
-                    .includes(searchText);
-
-                const filterByAliases = cacheManager.caches.some(({ name }) =>
-                    name.toLowerCase().includes(searchText)
-                );
-
-                return filterByCacheManagerName || filterByAliases;
-            });
-        },
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder.addCase(getCachesThunk.pending, (state) => {
-            state.cacheManagersSearchText = ""
             state.success = false
             state.loading = true;
         });
@@ -100,7 +80,5 @@ export const CachesSlice = createSlice({
         });
     },
 });
-
-export const { filterCacheManagers } = CachesSlice.actions;
 
 export default CachesSlice;

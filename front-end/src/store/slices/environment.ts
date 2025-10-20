@@ -1,54 +1,20 @@
-import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-import type { IEnvironmentData, IEnvironmentSliceState } from "models";
-import { getEnvironmentData } from "services";
+import type { IEnvironmentSliceState } from "models";
+import { getEnvironmentThunk } from "store/thunks";
 
 const initialState: IEnvironmentSliceState = {
     loading: false,
     error: "",
     activeProfiles: [],
     defaultProfiles: [],
-    propertySources: [],
-    environmentSearchText: "",
-    filteredPropertySources: [],
+    propertySources: []
 };
-
-export const getEnvironmentThunk = createAsyncThunk<IEnvironmentData, string, { rejectValue: any }>(
-    "getEnvironmentThunk",
-    async (id: string, { rejectWithValue }) => {
-        try {
-            const response = await getEnvironmentData(id);
-
-            return response.data;
-
-            // todo replace any with real type in future
-        } catch (error: any) {
-            return rejectWithValue({
-                status: error.response?.status,
-            });
-        }
-    });
 
 export const EnvironmentSlice = createSlice({
     name: "environmentSlice",
     initialState,
-    reducers: {
-        filterProperties: (state, action: PayloadAction<string>) => {
-            const searchText = action.payload.toLowerCase().trim();
-            state.environmentSearchText = searchText;
-
-            state.filteredPropertySources = state.propertySources.filter(({ name, properties }) => {
-                const filterByPropertySourcesName = name
-                    .toLowerCase()
-                    .includes(searchText);
-                const filterByPropertiesName = properties.some(({ key }) => (
-                    key.toLowerCase().includes(searchText)
-                ));
-                return filterByPropertySourcesName || filterByPropertiesName;
-            }
-            );
-        }
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder.addCase(getEnvironmentThunk.pending, (state) => {
             state.loading = true;
@@ -72,7 +38,5 @@ export const EnvironmentSlice = createSlice({
         });
     },
 });
-
-export const { filterProperties } = EnvironmentSlice.actions;
 
 export default EnvironmentSlice;

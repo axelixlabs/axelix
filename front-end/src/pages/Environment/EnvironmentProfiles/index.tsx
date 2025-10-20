@@ -3,14 +3,18 @@ import { Button, Input } from "antd";
 import { useTranslation } from "react-i18next";
 import { PlusOutlined, DeleteFilled, CheckOutlined } from "@ant-design/icons";
 
-import { useAppSelector } from "hooks";
-
 import styles from "./styles.module.css";
 
-export const EnvironmentProfiles = () => {
-  const { t } = useTranslation();
+interface IProps {
 
-  const { activeProfiles } = useAppSelector((store) => store.environment);
+  /**
+   * List of active profiles inside the given Spring Boot application
+   */
+  activeProfiles: string[];
+}
+
+export const EnvironmentProfiles = ({ activeProfiles } : IProps) => {
+  const { t } = useTranslation();
 
   const [createProfile, setCreateProfile] = useState(false);
 

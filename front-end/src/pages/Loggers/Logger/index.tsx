@@ -2,7 +2,7 @@ import { Tooltip } from "antd";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { setLoggerLevelThunk } from "store/slices";
+import { setLoggerLevelThunk } from "store/thunks";
 import { TooltipWithCopy } from "components";
 import { useAppDispatch } from "hooks";
 import type { ILogger } from "models";

@@ -1,43 +1,41 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { BeansCollapse } from "./BeansCollapse";
-import { useAppDispatch, useAppSelector } from "hooks";
-import { filterBeans, getBeansThunk } from "store/slices";
 import { Loader, EmptyHandler, PageSearch } from "components";
+import { BeansCollapse } from "./BeansCollapse";
+import { getBeansData } from "services";
+import { fetchData, filterBeans } from "helpers";
+import { StatefulRequest, type BeansResponse } from "models";
 
 export const Beans = () => {
   const { instanceId } = useParams();
 
-  const dispatch = useAppDispatch();
-  const { beans, filteredBeans, beansSearchText, loading, error } =
-    useAppSelector((store) => store.beans);
+  const [dataState, setDataState] = useState(StatefulRequest.loading<BeansResponse>())
+  const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
-    if (instanceId) {
-      dispatch(getBeansThunk(instanceId));
-    }
+    fetchData(setDataState, () => getBeansData(instanceId!))
   }, []);
 
-  if (loading) {
+  if (dataState.loading) {
     return <Loader />;
   }
 
-  if (error) {
+  if (dataState.error) {
     // todo change error handling in future
-    return error;
+    return dataState.error;
   }
 
-  const noDataAfterSearch = !!beansSearchText && !filteredBeans.length;
-  const addonAfter = `${beansSearchText ? filteredBeans.length : beans.length} / ${beans.length}`;
-  const beansList = filteredBeans.length ? filteredBeans : beans
+  const beansFeed = dataState.response!.beans;
+  const effectiveBeans = search ? filterBeans(beansFeed, search) : beansFeed;
+  const addonAfter = `${effectiveBeans.length} / ${beansFeed.length}`;
 
   return (
     <>
-      <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterBeans(value))} />
+      <PageSearch addonAfter={addonAfter} onChange={search => setSearch(search)} />
 
-      <EmptyHandler isEmpty={noDataAfterSearch}>
-        <BeansCollapse beans={beansList} />
+      <EmptyHandler isEmpty={!effectiveBeans.length}>
+        <BeansCollapse beans={effectiveBeans} />
       </EmptyHandler>
     </>
   );

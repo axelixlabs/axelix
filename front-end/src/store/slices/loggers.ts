@@ -1,85 +1,21 @@
-import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-import type { ILoggerData, ILoggersSliceState, ISetLoggerLevelRequestData } from "models";
-import { getLoggersData, setLoggerLevel } from "services/loggers";
-
-
+import { setLoggerLevelThunk } from "store/thunks";
+import type { ILoggersSliceState } from "models";
 
 const initialState: ILoggersSliceState = {
   loading: false,
   updateLoggerSuccess: false,
   levels: [],
   loggers: [],
-  loggersSearchText: "",
-  filteredLoggers: [],
   error: "",
 };
-
-// todo fix any in future for rejectValue
-export const setLoggerLevelThunk = createAsyncThunk<void, ISetLoggerLevelRequestData, { rejectValue: any }>(
-  "setLoggerLevelThunk",
-  async ({ instanceId, loggerName, loggingLevel }, { dispatch, rejectWithValue }) => {
-    try {
-      await setLoggerLevel(instanceId, loggerName, loggingLevel)
-      dispatch(getLoggersThunk(instanceId));
-    } catch (error: any) {
-      return rejectWithValue({
-        status: error.response?.status,
-      });
-    }
-  }
-);
-
-// todo fix any in future for rejectValue
-export const getLoggersThunk = createAsyncThunk<ILoggerData, string, { rejectValue: any }>(
-  "getLoggersThunk",
-  async (instanceId, { rejectWithValue }) => {
-    try {
-      const response = await getLoggersData(instanceId);
-
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue({
-        status: error.response?.status,
-      });
-    }
-  }
-);
 
 export const LoggersSlice = createSlice({
   name: "loggersSlice",
   initialState,
-  reducers: {
-    filterLoggers: (state, action: PayloadAction<string>) => {
-      const searchText = action.payload.toLowerCase().trim();
-      state.loggersSearchText = searchText;
-
-      state.filteredLoggers = state.loggers.filter((logger) => {
-        return logger.name.toLowerCase().includes(searchText);
-      });
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getLoggersThunk.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getLoggersThunk.fulfilled, (state, { payload }) => {
-      state.loading = false;
-      state.levels = payload.levels;
-      state.loggers = payload.loggers;
-    });
-    builder.addCase(getLoggersThunk.rejected, (state, { payload }: any) => {
-      const { status } = payload;
-
-      state.loading = false;
-      if (status >= 400 && status < 500) {
-        // todo translate this in future
-        state.error = "Неизвестная ошибка";
-      } else {
-        state.error = "Произошла внутренняя ошибка сервиса";
-      }
-    });
-
     builder.addCase(setLoggerLevelThunk.pending, (state) => {
       state.loading = true;
       state.updateLoggerSuccess = false;
@@ -103,7 +39,5 @@ export const LoggersSlice = createSlice({
     });
   },
 });
-
-export const { filterLoggers } = LoggersSlice.actions;
 
 export default LoggersSlice;

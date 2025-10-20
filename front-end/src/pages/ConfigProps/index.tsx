@@ -1,70 +1,72 @@
 import { message } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { filterConfigProps, getConfigPropsThunk, resetChangePropertySuccess } from "store/slices";
 import { Loader, EmptyHandler, ModifiableTableSection, PageSearch } from "components";
-import { useAppDispatch, useAppSelector } from "hooks";
+import { fetchData, filterConfigPropsBeans } from "helpers";
+import { type IConfigPropsBeanData, StatefulRequest } from "models";
 
 import styles from "./styles.module.css";
+import { getConfigPropsData } from "services";
+import { useAppSelector } from "hooks";
 
 export const ConfigProps = () => {
   const { t } = useTranslation()
   const { instanceId } = useParams()
 
-  const dispatch = useAppDispatch();
+  const [search, setSearch] = useState<string>("")
+  const [configProps, setConfigProps] = useState(StatefulRequest.loading<IConfigPropsBeanData>())
+  const updatePropertyState = useAppSelector(state => state.updateProperty)
 
-  const { beans, filteredBeans, configPropsSearchText, loading, error } = useAppSelector((store) => store.configProps);
+  const fetchConfigProps = (instanceId: string) =>
+    fetchData(setConfigProps, () => getConfigPropsData(instanceId))
 
-  const { changePropertySuccess } = useAppSelector((store) => store.updateProperty);
-
-  const fetchConfigProps = () => {
-    if (instanceId) {
-      dispatch(getConfigPropsThunk(instanceId));
-    }
-  };
-
-  // todo So far, I haven't been able to find a way to combine the useEffects without causing an extra server request.
   useEffect(() => {
-    fetchConfigProps()
+    if (instanceId) {
+      fetchConfigProps(instanceId)
+    }
   }, []);
 
   useEffect(() => {
-    if (changePropertySuccess) {
-      fetchConfigProps()
+    if (updatePropertyState.completedSuccessfully() && instanceId) {
+      fetchConfigProps(instanceId)
       message.success(t('saved'))
-      dispatch(resetChangePropertySuccess());
     }
-  }, [changePropertySuccess]);
+  }, [updatePropertyState]);
 
-  if (loading) {
+  if (configProps.loading) {
     return <Loader />;
   }
 
-  if (error) {
-    return error;
+  if (configProps.error) {
+    // TODO: handle this case differently in the future
+    return configProps.error;
   }
 
-  const configProps = filteredBeans.length ? filteredBeans : beans;
-  const noDataAfterSearch = !!configPropsSearchText && !filteredBeans.length;
-  const addonAfter = `${configPropsSearchText ? filteredBeans.length : beans.length} / ${beans.length}`;
+  const configPropsBeansFeed = configProps.response!.beans;
+
+  const effectiveConfigProps = search
+    ? filterConfigPropsBeans(configPropsBeansFeed, search)
+    : configPropsBeansFeed;
+
+  const addonAfter = `${effectiveConfigProps.length} / ${configPropsBeansFeed.length}`;
 
   return (
     <>
-      <PageSearch addonAfter={addonAfter} onChange={(value) => dispatch(filterConfigProps(value))} />
+      <PageSearch addonAfter={addonAfter} onChange={(e) => setSearch(e)} />
 
-      <EmptyHandler isEmpty={noDataAfterSearch}>
-        {configProps.map(({ beanName, prefix, properties }) => (
+      <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
+        {effectiveConfigProps.map(({ beanName, prefix, properties }) => (
           <ModifiableTableSection
             headerName={beanName}
             properties={
               properties.map((property) => {
-                  return {
-                      key: `${prefix}.${property.key}`,
-                      displayKey: property.key,
-                      displayValue: property.value,
-                  }
+                return {
+                  key: `${prefix}.${property.key}`,
+                  displayKey: property.key,
+                  displayValue: property.value,
+                }
               })
             }
 

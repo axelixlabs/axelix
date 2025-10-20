@@ -1,80 +1,84 @@
-import { useEffect } from "react";
 import { Button, message } from "antd";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { clearAllCachesThunk, getCachesThunk } from "store/thunks";
+import { StatefulRequest, type ICachesData, StatelessRequest } from "models";
+import { EmptyHandler, Loader, PageSearch } from "components";
 import { CacheManagerSection } from "./CacheManagerSection";
-import { useAppDispatch, useAppSelector } from "hooks";
-import { filterCacheManagers } from "store/slices";
-import {EmptyHandler, Loader, PageSearch} from "components";
+import { fetchData, filterCacheManagers } from "helpers";
 
 import styles from './styles.module.css'
-import {IClearOperationType} from "../../models";
+import { clearAllCachesData, getCachesData } from "services";
 
 export const Caches = () => {
     const { t } = useTranslation()
-    const dispatch = useAppDispatch()
     const { instanceId } = useParams()
     const [messageApi, contextHolder] = message.useMessage();
 
-    const {
-        cacheManagers,
-        success,
-        loading,
-        clearOperationLoading,
-        error,
-        cacheManagersSearchText,
-        filteredCacheManagers 
-    } = useAppSelector((state) => state.caches)
+    const [search, setSearch] = useState<string>("")
+    const [clearAllCaches, setClearAllCaches] = useState(StatelessRequest.inactive())
+    const [cacheData, setCacheData] = useState(StatefulRequest.loading<ICachesData>())
 
     useEffect(() => {
-        if (instanceId) {
-            dispatch(getCachesThunk(instanceId))
-        }
+        fetchData(setCacheData, () => getCachesData(instanceId!));
     }, [])
 
     useEffect(() => {
-        if (success) {
-            messageApi.success(t("cleared"))
-        }
-    }, [success])
+      if (clearAllCaches.completedSuccessfully()) {
+        messageApi.success(t("cleared"))
+      }
+      // TODO: handle failure on clear
+    }, [clearAllCaches])
 
-    if (loading) {
+    if (cacheData.loading) {
         return <Loader />
     }
 
     // todo fix this in future
-    if (error) {
-        return error
+    if (cacheData.error) {
+        return cacheData.error
     }
 
     const clearAllCachesClickHandler = (): void => {
         if (instanceId) {
-            dispatch(clearAllCachesThunk(instanceId))
+          setClearAllCaches(StatelessRequest.loading())
+
+          clearAllCachesData(instanceId)
+              .then(value => {
+                if (value.status === 200) {
+                  setClearAllCaches(StatelessRequest.success())
+                } else {
+                  setClearAllCaches(StatelessRequest.error(""))
+                }
+              })
+              .catch(() => {
+                setClearAllCaches(StatelessRequest.error(""))
+              })
         }
     }
 
-    const noDataAfterSearch = !!cacheManagersSearchText && !filteredCacheManagers.length;
-    const cacheManagersData = filteredCacheManagers.length ? filteredCacheManagers : cacheManagers;
+    const requiredCacheManagers = cacheData.response!.cacheManagers
+    const effectiveCacheManagers = search
+      ? filterCacheManagers(requiredCacheManagers, search)
+      : requiredCacheManagers
 
     return (
         <>
             {contextHolder}
             <div className={styles.TopSection}>
-                <PageSearch
-                    onChange={(e) => dispatch(filterCacheManagers(e))}/>
+                <PageSearch onChange={(e) => setSearch(e)} />
 
                 <Button
                     type="primary"
                     onClick={clearAllCachesClickHandler}
-                    loading={clearOperationLoading === IClearOperationType.CLEAR_ALL_CACHES}>
+                    loading={clearAllCaches.loading}>
                     {t("clearAllCaches")}
                 </Button>
             </div>
 
-            <EmptyHandler isEmpty={noDataAfterSearch}>
-                {cacheManagersData.map((cacheManager) => (
+            <EmptyHandler isEmpty={effectiveCacheManagers.length === 0}>
+                {effectiveCacheManagers.map((cacheManager) => (
                     <CacheManagerSection key={cacheManager.name} cacheManager={cacheManager} />
                 ))}
             </EmptyHandler>

@@ -6,7 +6,6 @@ import { EmptyHandler } from '../EmptyHandler';
 
 import type { ITableRow } from 'models';
 
-
 interface IProps {
     /**
      * Table header name

@@ -3,7 +3,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import {
   LoginSlice,
   EnvironmentSlice,
-  BeansSlice,
   ConfigPropsSlice,
   LoggersSlice,
   WallboardSlice,
@@ -16,7 +15,6 @@ export const store = configureStore({
   reducer: {
     login: LoginSlice.reducer,
     environment: EnvironmentSlice.reducer,
-    beans: BeansSlice.reducer,
     configProps: ConfigPropsSlice.reducer,
     loggers: LoggersSlice.reducer,
     wallboard: WallboardSlice.reducer,

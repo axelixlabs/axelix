@@ -1,12 +1,81 @@
+/**
+ * @deprecated We're attempting to migrate from this abstraction, since redux slice in and
+ * of itself does not have properties {@link loading} or {@link error}. These are the properties
+ * of the individual request, and not the slice. Use {@link IRequest} instead.
+ */
 export interface ICommonSliceState {
+
     /**
      * True if a login request is in progress
      */
     loading: boolean;
+
     /**
      * Error message if login failed, empty string otherwise
      * */
     error: string;
+}
+
+/**
+ * The {@link IRequest} implementation that is stateful, meaning, that it produces
+ * some result/state, see the `response` field.
+ */
+export class StatefulRequest<T> implements IRequest {
+
+  constructor(public loading: boolean, public error: string, public response: T | null) {}
+
+  public static loading<U>() : StatefulRequest<U> {
+    return new StatefulRequest<U>(true, "", null);
+  }
+
+  public static success<U>(response: U) : StatefulRequest<U> {
+    return new StatefulRequest<U>(false, "", response);
+  }
+
+  public static error<U>(error: string) : StatefulRequest<U> {
+    return new StatefulRequest<U>(false, error, null);
+  }
+}
+
+/**
+ * The {@link IRequest} implementation that does not evaluate to any value
+ */
+export class StatelessRequest implements IRequest {
+
+  constructor(public loading: boolean, public error: string, public completed: boolean) {}
+
+  public completedSuccessfully(): boolean {
+    return this.completed && !this.error && !this.loading
+  }
+
+  public static loading() : StatelessRequest {
+    return new StatelessRequest(true, "", false);
+  }
+
+  public static inactive() : StatelessRequest {
+    return new StatelessRequest(false, "", false);
+  }
+
+  public static success() : StatelessRequest {
+    return new StatelessRequest(false, "", true);
+  }
+
+  public static error(error: string) : StatelessRequest {
+    return new StatelessRequest(false, error, true);
+  }
+}
+
+export interface IRequest {
+
+  /**
+   * True if a login request is in progress
+   */
+  loading: boolean;
+
+  /**
+   * Error message if login failed, empty string otherwise
+   * */
+  error: string;
 }
 
 /**

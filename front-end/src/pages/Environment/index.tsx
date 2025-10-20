@@ -1,54 +1,55 @@
 import { message } from "antd";
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { getEnvironmentThunk, resetChangePropertySuccess } from "store/slices";
 import { EnvironmentProfiles } from "./EnvironmentProfiles";
 import { EnvironmentTables } from "./EnvironmentTables";
-import { useAppDispatch, useAppSelector } from "hooks";
+import { useAppSelector } from "hooks";
 import { Loader } from "components";
+import {type IEnvironmentData, StatefulRequest} from "models";
+import {fetchData} from "helpers";
+import {getEnvironmentData} from "services";
 
 export const Environment = () => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
   const { instanceId } = useParams();
 
-  const { loading, error } = useAppSelector((store) => store.environment);
-  const { changePropertySuccess } = useAppSelector((store) => store.updateProperty);
+  const [environment, setEnvironment] = useState(StatefulRequest.loading<IEnvironmentData>());
 
-  const fetchEnvironment = () => {
-    if (instanceId) {
-      dispatch(getEnvironmentThunk(instanceId));
-    }
-  };
+  const updateProperty = useAppSelector((store) => store.updateProperty);
+
+  const fetchEnvironment = (instanceId: string) => fetchData(
+    setEnvironment,
+    () => getEnvironmentData(instanceId));
 
   // todo So far, I haven't been able to find a way to combine the useEffects without causing an extra server request.
   useEffect(() => {
-    fetchEnvironment()
+    if (instanceId) {
+      fetchEnvironment(instanceId);
+    }
   }, []);
 
   useEffect(() => {
-    if (changePropertySuccess) {
-      fetchEnvironment();
+    if (updateProperty.completedSuccessfully() && instanceId) {
+      fetchEnvironment(instanceId);
       message.success(t("propertyChangedSuccessfully"));
-      dispatch(resetChangePropertySuccess());
     }
-  }, [changePropertySuccess]);
+  }, [updateProperty]);
 
-  if (loading) {
+  if (environment.loading) {
     return <Loader />;
   }
 
-  if (error) {
+  if (environment.error) {
     // todo change error handling in future
-    return error;
+    return environment.error;
   }
 
   return (
     <>
-      <EnvironmentProfiles />
-      <EnvironmentTables />
+      <EnvironmentProfiles activeProfiles={environment.response!.activeProfiles} />
+      <EnvironmentTables propertySources={environment.response!.propertySources} />
     </>
   );
 };

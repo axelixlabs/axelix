@@ -6,4 +6,3 @@ export * from "./wallboard";
 export * from "./loggers";
 export * from "./caches";
 export * from "./login";
-export * from "./beans";
