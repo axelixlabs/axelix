@@ -31,6 +31,11 @@
   "cacheName": "Name",
   "cleared": "Cleared",
   "saved": "Saved",
+  "Conditions": {
+    "title": "Conditions",
+    "negativeMatches": "Negative Matches",
+    "positiveMatches": "Positive Matches"
+  },
   "Beans": {
     "dependencies": "Dependencies",
     "aliases": "Aliases",

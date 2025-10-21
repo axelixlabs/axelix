@@ -32,7 +32,7 @@ export const Beans = () => {
 
   return (
     <>
-      <PageSearch addonAfter={addonAfter} onChange={search => setSearch(search)} />
+      <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
 
       <EmptyHandler isEmpty={!effectiveBeans.length}>
         <BeansCollapse beans={effectiveBeans} />

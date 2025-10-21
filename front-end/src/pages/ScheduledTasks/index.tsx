@@ -47,7 +47,7 @@ const ScheduledTasks = () => {
       : scheduledTasksData
     return (
         <>
-            <PageSearch onChange={(e) => setSearch(e)} />
+            <PageSearch search={search} setSearch={setSearch} />
 
             <EmptyHandler isEmpty={isEmpty(effectiveScheduledTasks)}>
               <CronTasks cronTasks={effectiveScheduledTasks.cron}/>

@@ -35,7 +35,7 @@ export const Wallboard = () => {
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} onChange={(e) => setSearch(e)} />
+            <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
 
             <EmptyHandler isEmpty={instanceCards.length === 0}>
                 <div className={styles.CardsResponsiveWrapper}>

@@ -1,8 +1,3 @@
-.TopSection {
-    /* Убрать стиль после замены input на <PageSearch /> */
-    margin-bottom: 30px;
-}
-
 .Search {
     max-width: 400px;
 }
@@ -10,5 +5,4 @@
 .TopSection {
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
