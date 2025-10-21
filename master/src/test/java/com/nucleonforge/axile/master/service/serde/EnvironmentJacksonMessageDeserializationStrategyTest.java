@@ -39,13 +39,16 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                   "name": "systemProperties",
                   "properties": {
                     "java.specification.version": {
-                      "value": "17"
+                      "value": "17",
+                      "isPrimary": true
                     },
                     "java.class.path": {
-                      "value": "gradle-worker.jar"
+                      "value": "gradle-worker.jar",
+                      "isPrimary": true
                     },
                     "java.vm.vendor": {
-                      "value": "BellSoft"
+                      "value": "BellSoft",
+                      "isPrimary": true
                     }
                   }
                 },
@@ -54,7 +57,8 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                   "properties": {
                     "JAVA_HOME": {
                       "value": "/opt/Java_Liberica_jdk/17.0.16-12/x64",
-                      "origin": "System Environment Property \\"JAVA_HOME\\""
+                      "origin": "System Environment Property \\"JAVA_HOME\\"",
+                      "isPrimary": false
                     }
                   }
                 },
@@ -63,7 +67,8 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                   "properties": {
                     "com.example.cache.max-size": {
                       "value": "1000",
-                      "origin": "class path resource [/env/application.properties]"
+                      "origin": "class path resource [/env/application.properties]",
+                      "isPrimary": false
                     }
                   }
                 }
@@ -94,13 +99,20 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
         assertThat(systemProps.properties())
                 .hasSize(3)
                 .extractingByKey("java.specification.version")
-                .satisfies(pv -> assertThat(pv.value()).isEqualTo("17"));
+                .satisfies(pv -> {
+                    assertThat(pv.value()).isEqualTo("17");
+                    assertThat(pv.isPrimary()).isTrue();
+                });
 
-        assertThat(systemProps.properties()).extractingByKey("java.class.path").satisfies(pv -> assertThat(pv.value())
-                .isEqualTo("gradle-worker.jar"));
+        assertThat(systemProps.properties()).extractingByKey("java.class.path").satisfies(pv -> {
+            assertThat(pv.value()).isEqualTo("gradle-worker.jar");
+            assertThat(pv.isPrimary()).isTrue();
+        });
 
-        assertThat(systemProps.properties()).extractingByKey("java.vm.vendor").satisfies(pv -> assertThat(pv.value())
-                .isEqualTo("BellSoft"));
+        assertThat(systemProps.properties()).extractingByKey("java.vm.vendor").satisfies(pv -> {
+            assertThat(pv.value()).isEqualTo("BellSoft");
+            assertThat(pv.isPrimary()).isTrue();
+        });
 
         EnvironmentFeed.PropertySource systemEnv = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemEnvironment"))
@@ -113,6 +125,21 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                 .satisfies(pv -> {
                     assertThat(pv.value()).isEqualTo("/opt/Java_Liberica_jdk/17.0.16-12/x64");
                     assertThat(pv.origin()).isEqualTo("System Environment Property \"JAVA_HOME\"");
+                    assertThat(pv.isPrimary()).isFalse();
+                });
+
+        EnvironmentFeed.PropertySource configProps = environmentFeed.propertySources().stream()
+                .filter(ps -> ps.sourceName().equals("Config resource classpath:actuate/env/"))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(configProps.properties())
+                .hasSize(1)
+                .extractingByKey("com.example.cache.max-size")
+                .satisfies(pv -> {
+                    assertThat(pv.value()).isEqualTo("1000");
+                    assertThat(pv.origin()).isEqualTo("class path resource [/env/application.properties]");
+                    assertThat(pv.isPrimary()).isFalse();
                 });
     }
 }

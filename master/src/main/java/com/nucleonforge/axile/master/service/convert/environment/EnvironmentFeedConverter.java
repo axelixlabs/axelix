@@ -8,10 +8,9 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axile.common.api.env.AxilePropertyValue;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.common.api.env.PropertyValue;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse;
-import com.nucleonforge.axile.master.api.response.KeyValue;
 import com.nucleonforge.axile.master.service.convert.Converter;
 
 /**
@@ -30,15 +29,25 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
         List<EnvironmentFeedResponse.PropertySourceShortProfile> propertySources = new ArrayList<>();
 
         for (EnvironmentFeed.PropertySource ps : source.propertySources()) {
-            List<KeyValue> properties = new ArrayList<>();
-            if (ps.properties() != null) {
-                for (Map.Entry<String, PropertyValue> entry : ps.properties().entrySet()) {
-                    properties.add(new KeyValue(entry.getKey(), entry.getValue().value()));
-                }
-            }
+            List<EnvironmentFeedResponse.PropertySourceShortProfile.PropertyEntry> properties = getPropertyEntries(ps);
             propertySources.add(new EnvironmentFeedResponse.PropertySourceShortProfile(ps.sourceName(), properties));
         }
 
         return new EnvironmentFeedResponse(activeProfiles, defaultProfiles, propertySources);
+    }
+
+    private List<EnvironmentFeedResponse.PropertySourceShortProfile.PropertyEntry> getPropertyEntries(
+            EnvironmentFeed.PropertySource propertySource) {
+        List<EnvironmentFeedResponse.PropertySourceShortProfile.PropertyEntry> properties = new ArrayList<>();
+        if (propertySource.properties() != null) {
+            for (Map.Entry<String, AxilePropertyValue> entry :
+                    propertySource.properties().entrySet()) {
+                properties.add(new EnvironmentFeedResponse.PropertySourceShortProfile.PropertyEntry(
+                        entry.getKey(),
+                        entry.getValue().value(),
+                        entry.getValue().isPrimary()));
+            }
+        }
+        return properties;
     }
 }

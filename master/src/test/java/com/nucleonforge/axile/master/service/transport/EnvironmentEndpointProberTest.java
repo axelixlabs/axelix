@@ -1,7 +1,6 @@
 package com.nucleonforge.axile.master.service.transport;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -17,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nucleonforge.axile.common.api.env.AxilePropertyValue;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.common.api.env.PropertyValue;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
@@ -66,46 +65,50 @@ class EnvironmentEndpointProberTest {
         // language=json
         String jsonResponse =
                 """
+        {
+          "activeProfiles": ["production"],
+          "defaultProfiles": ["default", "test"],
+          "propertySources": [
             {
-              "activeProfiles": ["production"],
-              "defaultProfiles": ["default", "test"],
-              "propertySources": [
-                {
-                  "name": "servletContextInitParams",
-                  "properties": {}
+              "name": "servletContextInitParams",
+              "properties": {}
+            },
+            {
+              "name": "systemProperties",
+              "properties": {
+                "java.specification.version": {
+                  "value": "17",
+                  "isPrimary": true
                 },
-                {
-                  "name": "systemProperties",
-                  "properties": {
-                    "java.specification.version": {
-                      "value": "17"
-                    },
-                    "java.vm.vendor": {
-                      "value": "BellSoft"
-                    }
-                  }
-                },
-                {
-                  "name": "systemEnvironment",
-                  "properties": {
-                    "JAVA_HOME": {
-                      "value": "Java_Liberica_jdk/17.0.16-12/x64",
-                      "origin": "System Environment Property \\"JAVA_HOME\\""
-                    }
-                  }
-                },
-                {
-                  "name": "Config resource classpath:actuate/env/",
-                  "properties": {
-                    "com.example.cache.max-size": {
-                      "value": "1000",
-                      "origin": "class path resource [application.properties]"
-                    }
-                  }
+                "java.vm.vendor": {
+                  "value": "BellSoft",
+                  "isPrimary": true
                 }
-              ]
+              }
+            },
+            {
+              "name": "systemEnvironment",
+              "properties": {
+                "JAVA_HOME": {
+                  "value": "Java_Liberica_jdk/17.0.16-12/x64",
+                  "origin": "System Environment Property \\"JAVA_HOME\\"",
+                  "isPrimary": true
+                }
+              }
+            },
+            {
+              "name": "Config resource classpath:actuate/env/",
+              "properties": {
+                "com.example.cache.max-size": {
+                  "value": "1000",
+                  "origin": "class path resource [application.properties]",
+                  "isPrimary": true
+                }
+              }
             }
-        """;
+          ]
+        }
+    """;
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -113,7 +116,7 @@ class EnvironmentEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/env")) {
+                if (path.equals("/" + activeInstanceId + "/axile-env")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -134,55 +137,54 @@ class EnvironmentEndpointProberTest {
 
         assertThat(feed).isNotNull();
 
-        List<String> activeProfiles = feed.activeProfiles();
-        assertThat(activeProfiles).containsOnly("production");
-
-        List<String> defaultProfiles = feed.defaultProfiles();
-        assertThat(defaultProfiles).containsOnly("test", "default");
+        assertThat(feed.activeProfiles()).containsOnly("production");
+        assertThat(feed.defaultProfiles()).containsOnly("test", "default");
 
         EnvironmentFeed.PropertySource servletParams = feed.propertySources().stream()
-                .filter(name -> name.sourceName().equals("servletContextInitParams"))
+                .filter(ps -> ps.sourceName().equals("servletContextInitParams"))
                 .findFirst()
                 .orElseThrow();
-        assertThat(servletParams.sourceName()).isEqualTo("servletContextInitParams");
         assertThat(servletParams.properties()).isEmpty();
 
         EnvironmentFeed.PropertySource systemProperties = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemProperties"))
                 .findFirst()
                 .orElseThrow();
-        assertThat(systemProperties.sourceName()).isEqualTo("systemProperties");
         assertThat(systemProperties.properties())
                 .hasSize(2)
                 .containsKeys("java.specification.version", "java.vm.vendor");
 
-        PropertyValue javaSpecVersion = systemProperties.properties().get("java.specification.version");
+        AxilePropertyValue javaSpecVersion = systemProperties.properties().get("java.specification.version");
         assertThat(javaSpecVersion.value()).isEqualTo("17");
         assertThat(javaSpecVersion.origin()).isNull();
+        assertThat(javaSpecVersion.isPrimary()).isTrue();
 
-        PropertyValue javaVmVendor = systemProperties.properties().get("java.vm.vendor");
+        AxilePropertyValue javaVmVendor = systemProperties.properties().get("java.vm.vendor");
         assertThat(javaVmVendor.value()).isEqualTo("BellSoft");
         assertThat(javaVmVendor.origin()).isNull();
+        assertThat(javaVmVendor.isPrimary()).isTrue();
 
         EnvironmentFeed.PropertySource systemEnvironment = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemEnvironment"))
                 .findFirst()
                 .orElseThrow();
-        assertThat(systemEnvironment.properties()).hasSize(1).containsKey("JAVA_HOME");
+        assertThat(systemEnvironment.properties()).containsKey("JAVA_HOME");
 
-        PropertyValue javaHome = systemEnvironment.properties().get("JAVA_HOME");
+        AxilePropertyValue javaHome = systemEnvironment.properties().get("JAVA_HOME");
         assertThat(javaHome.value()).isEqualTo("Java_Liberica_jdk/17.0.16-12/x64");
         assertThat(javaHome.origin()).isEqualTo("System Environment Property \"JAVA_HOME\"");
+        assertThat(javaHome.isPrimary()).isTrue();
 
         EnvironmentFeed.PropertySource configResource = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("Config resource classpath:actuate/env/"))
                 .findFirst()
                 .orElseThrow();
-        assertThat(configResource.properties()).hasSize(1).containsKey("com.example.cache.max-size");
+        assertThat(configResource.properties()).containsKey("com.example.cache.max-size");
 
-        PropertyValue cacheMaxSize = configResource.properties().get("com.example.cache.max-size");
+        AxilePropertyValue cacheMaxSize = configResource.properties().get("com.example.cache.max-size");
         assertThat(cacheMaxSize.value()).isEqualTo("1000");
         assertThat(cacheMaxSize.origin()).isEqualTo("class path resource [application.properties]");
+        assertThat(cacheMaxSize.isPrimary()).isTrue();
     }
 
     @Test
