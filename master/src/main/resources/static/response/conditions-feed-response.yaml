@@ -1,0 +1,58 @@
+components:
+  schemas:
+    ConditionsFeedResponse:
+      description: The feed of the conditions in the application.
+      type: object
+      properties:
+        positiveMatches:
+          description: The list of configuration classes where all conditions matched successfully.
+          type: array
+          items:
+            $ref: '#/components/schemas/PositiveCondition'
+        negativeMatches:
+          description: The list of configuration classes where some conditions did not match
+          type: array
+          items:
+            $ref: '#/components/schemas/NegativeCondition'
+
+    PositiveCondition:
+      description: Represents a configuration class where all conditions matched successfully.
+      type: object
+      properties:
+        target:
+          description: The short identifier of the configuration element, typically a class or method name
+          type: string
+        matches:
+          description: The list of conditions that were evaluated and matched
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionMatch'
+
+    NegativeCondition:
+      description: Represents a configuration class where some conditions did not match.
+      type: object
+      properties:
+        target:
+          description: The short identifier of the configuration element, typically a class or method name
+          type: string
+        notMatched:
+          description: The list of conditions that were not matched
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionMatch'
+        matched:
+          description: The list of conditions that were matched
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionMatch'
+
+    ConditionMatch:
+      description: Represents the result of evaluating a single condition.
+      type: object
+      properties:
+        condition:
+          description: The simple name of the condition class that was evaluated
+          type: string
+        message:
+          description: The descriptive message explaining why the condition matched or did not match
+          type: string

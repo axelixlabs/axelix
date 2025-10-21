@@ -17,6 +17,9 @@ tags:
   - name: General instance information API
     description: The info endpoint provides general information about the particular Spring Boot instance.
 
+  - name: Conditions API
+    description: The conditions endpoint provides information about the application's auto-configuration conditions evaluation.
+
   - name: Configprops API
     description: The configprops endpoint provides information about the application’s @ConfigurationProperties beans.
 
@@ -151,6 +154,31 @@ paths:
           links:
             Actuator/Info:
               description: 'https://docs.spring.io/spring-boot/api/rest/actuator/info.html'
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Conditions API -> GET
+# desc: The conditions endpoint provides information about the application's auto-configuration conditions evaluation.
+  /conditions/feed/{instanceId}:
+    get:
+      tags:
+        - Conditions API
+      summary: Returns conditions feed for the given instance
+      operationId: getBeansProfile
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/conditions-feed-response.yaml#/components/schemas/ConditionsFeedResponse'
+          links:
+            Actuator/Conditions:
+              description: 'https://docs.spring.io/spring-boot/api/rest/actuator/conditions.html'
         '400':
           $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':

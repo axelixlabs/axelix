@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +29,6 @@ import com.nucleonforge.axile.master.service.transport.caches.GetCacheByNameEndp
  *
  * @author Sergey Cherkasov
  */
-@Tag(name = "Caches API", description = "The caches endpoint provides access to the application’s caches.")
 @RestController
 @RequestMapping(path = ApiPaths.CachesApi.MAIN)
 public class CachesReadApi {
