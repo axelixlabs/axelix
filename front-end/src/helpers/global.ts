@@ -27,6 +27,6 @@ export async function fetchData<S>(
 
     setDataState(() => StatefulRequest.success(result.data))
   } catch {
-    setDataState(() => StatefulRequest.error(""))
+    setDataState(() => StatefulRequest.error("Some error"))
   }
 }

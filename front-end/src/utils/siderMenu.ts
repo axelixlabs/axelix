@@ -13,6 +13,7 @@ export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
                 { key: `/instance/${instanceId}/beans`, label: "Beans" },
                 { key: `/instance/${instanceId}/config-props`, label: t("configurationProperties") },
                 { key: `/instance/${instanceId}/scheduled-tasks`, label: t("scheduledTasks") },
+                { key: `/instance/${instanceId}/conditions`, label: t("Conditions.title") },
             ],
         },
         { key: `/instance/${instanceId}/loggers`, label: t("loggers") },

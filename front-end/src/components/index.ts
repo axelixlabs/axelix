@@ -6,3 +6,4 @@ export { EmptyHandler } from "./EmptyHandler";
 export { PageSearch } from "./PageSearch";
 export { default } from "./Loadable";
 export { Loader } from "./Loader";
+export { Copy } from './Copy';

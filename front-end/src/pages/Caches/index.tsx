@@ -67,7 +67,7 @@ export const Caches = () => {
         <>
             {contextHolder}
             <div className={styles.TopSection}>
-                <PageSearch onChange={(e) => setSearch(e)} />
+                <PageSearch search={search} setSearch={setSearch} />
 
                 <Button
                     type="primary"

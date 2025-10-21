@@ -1,9 +1,8 @@
-import { message, Tooltip } from "antd";
-import { useTranslation } from "react-i18next";
+import { Tooltip } from "antd";
+
+import {Copy} from "../Copy";
 
 import styles from "./styles.module.css";
-
-import CopyIcon from "assets/icons/copy.svg";
 
 interface IProps {
     /**
@@ -17,19 +16,6 @@ interface IProps {
 }
 
 export const TooltipWithCopy = ({ text, onClick }: IProps) => {
-    const { t } = useTranslation();
-
-    const handleCopy = async (e: React.MouseEvent<HTMLImageElement>): Promise<void> => {
-        e.stopPropagation();
-
-        try {
-            await navigator.clipboard.writeText(text);
-            message.success(t("copied"));
-        } catch {
-            message.error(t("copyFailed"));
-        }
-    };
-
     return (
         <>
             <Tooltip
@@ -46,12 +32,7 @@ export const TooltipWithCopy = ({ text, onClick }: IProps) => {
                     <div className={styles.Text} onClick={onClick}>
                         {text}
                     </div>
-                    <img
-                        src={CopyIcon}
-                        alt="Copy icon"
-                        onClick={handleCopy}
-                        className={styles.CopyIcon}
-                    />
+                    <Copy text={text} />
                 </div>
             </Tooltip>
         </>

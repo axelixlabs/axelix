@@ -31,6 +31,11 @@
   "cacheName": "Имя",
   "cleared": "Очищено",
   "saved": "Сохранено",
+  "Conditions": {
+    "title": "Условия",
+    "negativeMatches": "Отрицательные совпадения",
+    "positiveMatches": "Положительные совпадения"
+  },
   "Beans": {
     "dependencies": "Зависимости",
     "aliases": "Алиасы",
