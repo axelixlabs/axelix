@@ -33,7 +33,8 @@ public record EnvironmentFeedResponse(
          *
          * @param name       the property name
          * @param value     the property value
-         * @param isPrimary whether this property is the "winning" property
+         * @param isPrimary whether this property value is primary (i.e. this value takes precedence over
+         *                  the other values from other property sources)
          */
         public record PropertyEntry(String name, @Nullable String value, boolean isPrimary) {}
     }

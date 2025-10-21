@@ -47,7 +47,7 @@ class EnvironmentFeedConverterTest {
                 .anySatisfy(kv -> {
                     assertThat(kv.name()).isEqualTo("java.vm.vendor");
                     assertThat(kv.value()).isEqualTo("Amazon.com Inc.");
-                    assertThat(kv.isPrimary()).isFalse(); // новый check
+                    assertThat(kv.isPrimary()).isTrue();
                 })
                 .anySatisfy(kv -> {
                     assertThat(kv.name()).isEqualTo("org.jboss.logging.provider");
@@ -60,7 +60,7 @@ class EnvironmentFeedConverterTest {
         assertThat(propertySource2.properties()).hasSize(1).anySatisfy(kv -> {
             assertThat(kv.name()).isEqualTo("JAVA_HOME");
             assertThat(kv.value()).isEqualTo(".jdks\\corretto-17.0.16");
-            assertThat(kv.isPrimary()).isFalse();
+            assertThat(kv.isPrimary()).isTrue();
         });
 
         EnvironmentFeedResponse.PropertySourceShortProfile propertySource3 = getPropertySourceProfileByName(
@@ -119,7 +119,7 @@ class EnvironmentFeedConverterTest {
                 "systemProperties",
                 Map.of(
                         "java.vm.vendor",
-                        new AxilePropertyValue("Amazon.com Inc.", null, false),
+                        new AxilePropertyValue("Amazon.com Inc.", null, true),
                         "org.jboss.logging.provider",
                         new AxilePropertyValue("slf4j", null, false)));
 
@@ -128,7 +128,7 @@ class EnvironmentFeedConverterTest {
                 Map.of(
                         "JAVA_HOME",
                         new AxilePropertyValue(
-                                ".jdks\\corretto-17.0.16", "System Environment Property \"JAVA_HOME\"", false)));
+                                ".jdks\\corretto-17.0.16", "System Environment Property \"JAVA_HOME\"", true)));
 
         EnvironmentFeed.PropertySource propertySource3 = new EnvironmentFeed.PropertySource(
                 "Config resource class path resource [application.yaml]",

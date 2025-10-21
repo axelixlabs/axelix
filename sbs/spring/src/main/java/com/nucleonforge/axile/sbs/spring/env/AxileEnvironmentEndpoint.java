@@ -1,16 +1,13 @@
 package com.nucleonforge.axile.sbs.spring.env;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.boot.actuate.endpoint.OperationResponseBody;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
+import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -24,40 +21,26 @@ public class AxileEnvironmentEndpoint {
 
     private final EnvironmentEndpoint delegate;
 
-    public AxileEnvironmentEndpoint(EnvironmentEndpoint delegate) {
+    private final EnvPropertyEnricher envPropertyEnricher;
+
+    public AxileEnvironmentEndpoint(EnvironmentEndpoint delegate, EnvPropertyEnricher envPropertyEnricher) {
         this.delegate = delegate;
+        this.envPropertyEnricher = envPropertyEnricher;
     }
 
     @GetMapping
-    public EnvironmentDescriptor environment(@Nullable String pattern) {
-        EnvironmentEndpoint.EnvironmentDescriptor descriptor = delegate.environment(pattern);
+    public AxileEnvironmentDescriptor environment(@Nullable String pattern) {
+        EnvironmentDescriptor originalDescriptor = delegate.environment(pattern);
 
-        Map<String, String> primaryMap = new LinkedHashMap<>();
-        for (EnvironmentEndpoint.PropertySourceDescriptor source : descriptor.getPropertySources()) {
-            for (String key : source.getProperties().keySet()) {
-                primaryMap.putIfAbsent(key, source.getName());
-            }
-        }
-
-        List<PropertySourceDescriptor> sources = descriptor.getPropertySources().stream()
-                .map(src -> new PropertySourceDescriptor(
-                        src.getName(),
-                        src.getProperties().entrySet().stream()
-                                .collect(Collectors.toMap(
-                                        Map.Entry::getKey,
-                                        entry -> new PropertyValueDescriptor(
-                                                entry.getValue().getValue(),
-                                                entry.getValue().getOrigin(),
-                                                Objects.equals(primaryMap.get(entry.getKey()), src.getName()))))))
-                .toList();
-
-        return new EnvironmentDescriptor(descriptor.getActiveProfiles(), sources);
+        return envPropertyEnricher.enrich(originalDescriptor);
     }
 
-    public record EnvironmentDescriptor(List<String> activeProfiles, List<PropertySourceDescriptor> propertySources)
-            implements OperationResponseBody {}
+    public record AxileEnvironmentDescriptor(
+            List<String> activeProfiles,
+            List<String> defaultProfiles,
+            List<AxilePropertySourceDescriptor> propertySources) {}
 
-    public record PropertySourceDescriptor(String name, Map<String, PropertyValueDescriptor> properties) {}
+    public record AxilePropertySourceDescriptor(String name, Map<String, AxilePropertyValueDescriptor> properties) {}
 
-    public record PropertyValueDescriptor(Object value, String origin, boolean isPrimary) {}
+    public record AxilePropertyValueDescriptor(Object value, String origin, boolean isPrimary) {}
 }

@@ -6,8 +6,11 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint;
+import com.nucleonforge.axile.sbs.spring.env.DefaultEnvPropertyEnricher;
+import com.nucleonforge.axile.sbs.spring.env.EnvPropertyEnricher;
 
 /**
  * Auto-configuration for the {@link AxileEnvironmentEndpoint}.
@@ -21,7 +24,14 @@ public class AxileEnvironmentEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxileEnvironmentEndpoint axileEnvironmentEndpoint(EnvironmentEndpoint environmentEndpoint) {
-        return new AxileEnvironmentEndpoint(environmentEndpoint);
+    public EnvPropertyEnricher envPropertyEnricher(Environment environment) {
+        return new DefaultEnvPropertyEnricher(environment);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AxileEnvironmentEndpoint axileEnvironmentEndpoint(
+            EnvironmentEndpoint environmentEndpoint, EnvPropertyEnricher envPropertyEnricher) {
+        return new AxileEnvironmentEndpoint(environmentEndpoint, envPropertyEnricher);
     }
 }

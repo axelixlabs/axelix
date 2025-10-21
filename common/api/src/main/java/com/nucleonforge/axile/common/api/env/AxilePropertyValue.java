@@ -9,7 +9,8 @@ import org.jspecify.annotations.Nullable;
  *
  * @param value  the string representation of the property's value
  * @param origin the origin of the property if available (e.g. location in a file), may be {@code null}
- * @param isPrimary
+ * @param isPrimary whether this property value is primary (i.e. this value takes precedence over the other values
+ *                 from other property sources)
  *
  * @see EnvironmentFeed
  * @since 21.10.2025
