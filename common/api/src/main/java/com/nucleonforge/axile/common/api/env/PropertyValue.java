@@ -8,7 +8,6 @@ import org.jspecify.annotations.Nullable;
  * @param value  the string representation of the property's value
  * @param origin the origin of the property if available (e.g. location in a file), may be {@code null}
  *
- * @see EnvironmentFeed
  * @see EnvironmentProperty
  * @since 03.09.2025
  * @author Nikita Kirillov
