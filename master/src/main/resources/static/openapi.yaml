@@ -17,15 +17,6 @@ tags:
   - name: General instance information API
     description: The info endpoint provides general information about the particular Spring Boot instance.
 
-  - name: Property Management API
-    description: Provides operations for managing Spring properties of application instances.
-
-  - name: Profile Management API
-    description: Provides operations for managing Spring profiles of application instances.
-
-  - name: Loggers API
-    description: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-
   - name: Configprops API
     description: The configprops endpoint provides information about the application’s @ConfigurationProperties beans.
 
@@ -37,6 +28,15 @@ tags:
 
   - name: ScheduledTasks API
     description: The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
+
+  - name: Property Management API
+    description: Provides operations for managing Spring properties of application instances.
+
+  - name: Profile Management API
+    description: Provides operations for managing Spring profiles of application instances.
+
+  - name: Loggers API
+    description: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
 
   - name: Software API
 
@@ -151,242 +151,6 @@ paths:
           links:
             Actuator/Info:
               description: 'https://docs.spring.io/spring-boot/api/rest/actuator/info.html'
-        '400':
-          $ref: "error/error.yaml#/components/responses/BadRequest"
-        '500':
-          $ref: "error/error.yaml#/components/responses/InternalError"
-
-# name: Property Management API -> POST
-# desc: Provides operations for managing Spring properties of application instances.
-  /property-management/{instanceId}:
-    post:
-      tags:
-        - Property Management API
-      summary: Updates a configuration property for the given application instance.
-      operationId: changePropertyValue
-      parameters:
-        - $ref: "#/components/parameters/InstanceIdParam"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: 'request/property-update-request.yaml#/components/schemas/PropertyUpdatedRequest'
-        required: true
-      responses:
-        '204':
-          description: OK
-        '400':
-          $ref: "error/error.yaml#/components/responses/BadRequest"
-        '500':
-          $ref: "error/error.yaml#/components/responses/InternalError"
-
-# name: Profile Management API -> POST
-# desc: Provides operations for managing Spring profiles of application instances.
-  /profile-management/{instanceId}:
-    post:
-      tags:
-        - Profile Management API
-      summary: Replaces active profiles for the given application instance.
-      operationId: replaceProfile
-      parameters:
-        - $ref: "#/components/parameters/InstanceIdParam"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: 'request/profile-update-request.yaml#/components/schemas/ProfileUpdatedRequest'
-        required: true
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: 'response/profile-update-response.yaml#/components/schemas/ProfileUpdateResponse'
-        '400':
-          $ref: "error/error.yaml#/components/responses/BadRequest"
-        '500':
-          $ref: "error/error.yaml#/components/responses/InternalError"
-
-# name: Loggers API -> GET
-# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-  /loggers/{instanceId}:
-    get:
-      tags:
-        - Loggers API
-      summary: Returns details of the application’s loggers.
-      operationId: getAllLoggers
-      parameters:
-        - $ref: "#/components/parameters/InstanceIdParam"
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: 'response/loggers/loggers-response.yaml#/components/schemas/LoggersResponse'
-          links:
-            Actuator/Loggers:
-              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
-        '400':
-          $ref: "error/error.yaml#/components/responses/BadRequest"
-        '500':
-          $ref: "error/error.yaml#/components/responses/InternalError"
-
-# name: Loggers API -> GET
-# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-  /loggers/{instanceId}/logger/{loggerName}:
-    get:
-      tags:
-        - Loggers API
-      summary: Returns the details of the requested logger.
-      operationId: getLoggerByName
-      parameters:
-        - $ref: "#/components/parameters/InstanceIdParam"
-        - name: loggerName
-          in: path
-          description: The name of the logger to find
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: 'response/loggers/logger-profile-response.yaml#/components/schemas/LoggerProfileResponse'
-          links:
-            Actuator/Loggers:
-              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
-        '400':
-          $ref: "error/error.yaml#/components/responses/BadRequest"
-        '500':
-          $ref: "error/error.yaml#/components/responses/InternalError"
-
-# name: Loggers API -> POST
-# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-    post:
-      tags:
-        - Loggers API
-      summary: The request specifies the desired logging level for a logger by its name.
-      description: >-
-        Suggested logging levels that the user can select to configure the
-        logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE
-      operationId: setLoggingLevelByLoggerName
-      parameters:
-        - $ref: "#/components/parameters/InstanceIdParam"
-        - name: loggerName
-          in: path
-          description: The name of the logger to find
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: 'request/log-level-change-request.yaml#/components/schemas/LogLevelChangeRequest'
-        required: true
-      responses:
-        '200':
-          description: OK
-          links:
-            Actuator/Loggers:
-              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
-        '400':
-          $ref: "error/error.yaml#/components/responses/BadRequest"
-        '500':
-          $ref: "error/error.yaml#/components/responses/InternalError"
-
-# name: Loggers API -> POST
-# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-  /loggers/{instanceId}/logger/{loggerName}/clear:
-    post:
-      tags:
-        - Loggers API
-      summary: Clears the configured logging level of a logger, reverting it to the global/default setting.
-      operationId: clearLoggingLevelByLoggerName
-      parameters:
-        - $ref: "#/components/parameters/InstanceIdParam"
-        - name: loggerName
-          in: path
-          description: The name of the logger to find
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          links:
-            Actuator/Loggers:
-              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
-        '400':
-          $ref: "error/error.yaml#/components/responses/BadRequest"
-        '500':
-          $ref: "error/error.yaml#/components/responses/InternalError"
-
-# name: Loggers API -> GET
-# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-  /loggers/{instanceId}/group/{groupName}:
-    get:
-      tags:
-        - Loggers API
-      summary: Returns details of the requested logger group.
-      operationId: getGroupByName
-      parameters:
-        - $ref: "#/components/parameters/InstanceIdParam"
-        - name: groupName
-          in: path
-          description: The name of the logger group to find
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: 'response/loggers/group-profile-response.yaml#/components/schemas/GroupProfileResponse'
-          links:
-            Actuator/Loggers:
-              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
-        '400':
-          $ref: "error/error.yaml#/components/responses/BadRequest"
-        '500':
-          $ref: "error/error.yaml#/components/responses/InternalError"
-
-# name: Loggers API -> POST
-# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
-    post:
-      tags:
-        - Loggers API
-      summary: The request specifies the desired logging level for a logger group by its name.
-      description: >-
-        Suggested logging levels that the user can select to configure the
-        logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE
-      operationId: setLoggingLevelByGroupName
-      parameters:
-        - $ref: "#/components/parameters/InstanceIdParam"
-        - name: groupName
-          in: path
-          description: The name of the logger group to find
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: 'request/log-level-change-request.yaml#/components/schemas/LogLevelChangeRequest'
-        required: true
-      responses:
-        '200':
-          description: OK
-          links:
-            Actuator/Loggers:
-              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
         '400':
           $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':
@@ -686,6 +450,242 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Property Management API -> POST
+# desc: Provides operations for managing Spring properties of application instances.
+  /property-management/{instanceId}:
+    post:
+      tags:
+        - Property Management API
+      summary: Updates a configuration property for the given application instance.
+      operationId: changePropertyValue
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/property-update-request.yaml#/components/schemas/PropertyUpdatedRequest'
+        required: true
+      responses:
+        '204':
+          description: OK
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Profile Management API -> POST
+# desc: Provides operations for managing Spring profiles of application instances.
+  /profile-management/{instanceId}:
+    post:
+      tags:
+        - Profile Management API
+      summary: Replaces active profiles for the given application instance.
+      operationId: replaceProfile
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/profile-update-request.yaml#/components/schemas/ProfileUpdatedRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/profile-update-response.yaml#/components/schemas/ProfileUpdateResponse'
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> GET
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+  /loggers/{instanceId}:
+    get:
+      tags:
+        - Loggers API
+      summary: Returns details of the application’s loggers.
+      operationId: getAllLoggers
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/loggers/loggers-response.yaml#/components/schemas/LoggersResponse'
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> GET
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+  /loggers/{instanceId}/logger/{loggerName}:
+    get:
+      tags:
+        - Loggers API
+      summary: Returns the details of the requested logger.
+      operationId: getLoggerByName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: loggerName
+          in: path
+          description: The name of the logger to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/loggers/logger-profile-response.yaml#/components/schemas/LoggerProfileResponse'
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> POST
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+    post:
+      tags:
+        - Loggers API
+      summary: The request specifies the desired logging level for a logger by its name.
+      description: >-
+        Suggested logging levels that the user can select to configure the
+        logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+      operationId: setLoggingLevelByLoggerName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: loggerName
+          in: path
+          description: The name of the logger to find
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/log-level-change-request.yaml#/components/schemas/LogLevelChangeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> POST
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+  /loggers/{instanceId}/logger/{loggerName}/clear:
+    post:
+      tags:
+        - Loggers API
+      summary: Clears the configured logging level of a logger, reverting it to the global/default setting.
+      operationId: clearLoggingLevelByLoggerName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: loggerName
+          in: path
+          description: The name of the logger to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> GET
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+  /loggers/{instanceId}/group/{groupName}:
+    get:
+      tags:
+        - Loggers API
+      summary: Returns details of the requested logger group.
+      operationId: getGroupByName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: groupName
+          in: path
+          description: The name of the logger group to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/loggers/group-profile-response.yaml#/components/schemas/GroupProfileResponse'
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> POST
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+    post:
+      tags:
+        - Loggers API
+      summary: The request specifies the desired logging level for a logger group by its name.
+      description: >-
+        Suggested logging levels that the user can select to configure the
+        logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+      operationId: setLoggingLevelByGroupName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: groupName
+          in: path
+          description: The name of the logger group to find
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/log-level-change-request.yaml#/components/schemas/LogLevelChangeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
         '400':
           $ref: "error/error.yaml#/components/responses/BadRequest"
         '500':

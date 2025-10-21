@@ -12,3 +12,6 @@ components:
                       it will forcibly enable the task if inactive, or interrupt it if currently running,
                       regardless of the schedule settings. {@code false} means the task will follow the configured schedule.
           type: boolean
+      required:
+        - targetScheduledTask
+        - force

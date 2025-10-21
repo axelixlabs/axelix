@@ -7,3 +7,5 @@ components:
         configuredLevel:
           description: The new logging level to apply.
           type: string
+      required:
+        - configuredLevel

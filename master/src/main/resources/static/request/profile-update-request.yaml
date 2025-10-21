@@ -10,3 +10,5 @@ components:
           items:
             type: string
             example: '["profile1","profile2"]'
+      required:
+        - effectiveProfiles
