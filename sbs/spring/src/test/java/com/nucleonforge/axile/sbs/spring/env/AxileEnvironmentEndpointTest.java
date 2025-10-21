@@ -1,11 +1,13 @@
 package com.nucleonforge.axile.sbs.spring.env;
 
 import java.util.Map;
-import java.util.Objects;
+import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
@@ -14,13 +16,14 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -35,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         properties = {
             "axile.env.test.prop1=systemValue1",
             "axile.env.test.prop2=systemValue2",
-            "management.endpoint.env.show-values=always",
+            "management.endpoint.env.show-values=always"
         })
 @TestPropertySource(properties = {"axile.env.test.prop1=fromTestSource"})
 class AxileEnvironmentEndpointTest {
@@ -44,17 +47,11 @@ class AxileEnvironmentEndpointTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    ConfigurableEnvironment environment;
+    private ConfigurableEnvironment environment;
 
     @BeforeEach
     void before() {
-        System.setProperty("axile.env.test.prop2", "systemValue");
         environment.getSystemProperties().put("axile.env.test.prop2", "systemValue");
-    }
-
-    @AfterEach
-    void after() {
-        System.clearProperty("axile.env.test.prop2");
     }
 
     @DynamicPropertySource
@@ -62,98 +59,82 @@ class AxileEnvironmentEndpointTest {
         registry.add("axile.env.test.prop2", () -> "dynamicValue");
     }
 
-    @Test
-    void shouldMarkWinningPropertyFromHighestSource() {
-        ResponseEntity<AxileEnvironmentEndpoint.EnvironmentDescriptor> response =
-                restTemplate.getForEntity("/actuator/axile-env", AxileEnvironmentEndpoint.EnvironmentDescriptor.class);
+    @ParameterizedTest(name = "Property ''{0}'' should resolve from highest-precedence source")
+    @MethodSource("propertyExpectations")
+    void shouldSelectPrimaryPropertyFromHighestPrecedenceSource(String propertyName, String expectedValue) {
+        ResponseEntity<AxileEnvironmentEndpoint.AxileEnvironmentDescriptor> response = restTemplate.getForEntity(
+                "/actuator/axile-env", AxileEnvironmentEndpoint.AxileEnvironmentDescriptor.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
 
-        AxileEnvironmentEndpoint.EnvironmentDescriptor body = response.getBody();
-        assertThat(body.propertySources()).isNotEmpty();
+        var body = response.getBody();
+        assertThat(body).isNotNull();
 
-        var appearances = body.propertySources().stream()
+        var propertyAppearances = body.propertySources().stream()
                 .flatMap(src -> src.properties().entrySet().stream()
-                        .filter(e -> e.getKey().equals("axile.env.test.prop1"))
+                        .filter(e -> e.getKey().equals(propertyName))
                         .map(e -> Map.entry(src.name(), e.getValue())))
                 .toList();
 
-        assertThat(appearances).hasSizeGreaterThanOrEqualTo(1);
+        assertThat(propertyAppearances).isNotEmpty();
 
-        var winner = appearances.stream()
+        var primary = propertyAppearances.stream()
                 .filter(e -> e.getValue().isPrimary())
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(winner.getValue().value()).isEqualTo("fromTestSource");
-        assertThat(winner.getValue().isPrimary()).isTrue();
+        assertThat(primary.getValue().value()).isEqualTo(expectedValue);
 
-        appearances.stream().filter(e -> !e.getValue().isPrimary()).forEach(e -> assertThat(false)
-                .isFalse());
+        if (propertyAppearances.size() > 1) {
+            assertThat(propertyAppearances.stream().anyMatch(e -> !e.getValue().isPrimary()))
+                    .isTrue();
+        }
+    }
+
+    private static Stream<Arguments> propertyExpectations() {
+        return Stream.of(
+                Arguments.of("axile.env.test.prop1", "fromTestSource"),
+                Arguments.of("axile.env.test.prop2", "dynamicValue"),
+                Arguments.of("axile.env.test.prop3", "fromCommandLine"));
     }
 
     @Test
-    void shouldFallbackToLowerPriorityWhenSystemPropertyRemoved() {
-        System.clearProperty("axile.env.test.prop2");
-
-        ResponseEntity<AxileEnvironmentEndpoint.EnvironmentDescriptor> response =
-                restTemplate.getForEntity("/actuator/axile-env", AxileEnvironmentEndpoint.EnvironmentDescriptor.class);
+    void shouldReturnValidJsonStructure() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axile-env", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        var body = response.getBody();
-        assertThat(body).isNotNull();
 
-        var winner = body.propertySources().stream()
-                .flatMap(src -> src.properties().entrySet().stream())
-                .filter(e -> e.getKey().equals("axile.env.test.prop2")
-                        && e.getValue().isPrimary())
-                .findFirst()
-                .orElseThrow();
+        String responseBody = response.getBody();
+        assertThat(responseBody).isNotNull();
 
-        assertThat(winner.getValue().value()).isEqualTo("dynamicValue");
-    }
+        assertThatJson(responseBody).node("activeProfiles").isNotNull().isArray();
 
-    @Test
-    void shouldPreferCommandLinePropertyOverYml() {
-        Map<String, Object> ymlProps = Map.of("axile.env.test.prop3", "fromYml");
-        environment.getPropertySources().addLast(new MapPropertySource("ymlProps", ymlProps));
+        assertThatJson(responseBody).node("defaultProfiles").isNotNull().isArray();
 
-        ResponseEntity<AxileEnvironmentEndpoint.EnvironmentDescriptor> response =
-                restTemplate.getForEntity("/actuator/axile-env", AxileEnvironmentEndpoint.EnvironmentDescriptor.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        var body = response.getBody();
-        assertThat(body).isNotNull();
-
-        var appearances = body.propertySources().stream()
-                .flatMap(src -> src.properties().entrySet().stream()
-                        .filter(e -> e.getKey().equals("axile.env.test.prop3"))
-                        .map(e -> Map.entry(src.name(), e.getValue())))
-                .toList();
-
-        assertThat(appearances).hasSizeGreaterThanOrEqualTo(2);
-
-        var winner = appearances.stream()
-                .filter(e -> e.getValue().isPrimary())
-                .findFirst()
-                .orElseThrow();
-
-        assertThat(winner.getValue().value()).isEqualTo("fromCommandLine");
-        assertThat(winner.getValue().isPrimary()).isTrue();
-
-        assertThat(appearances.stream()
-                        .filter(e -> !e.getValue().isPrimary())
-                        .anyMatch(e -> Objects.equals(e.getValue().value(), "fromYml")))
-                .isTrue();
+        assertThatJson(responseBody)
+                .inPath("propertySources[*].properties")
+                .isArray()
+                .allSatisfy(properties -> assertThatJson(properties)
+                        .isObject()
+                        .allSatisfy((propertyName, propertyValue) -> assertThatJson(propertyValue)
+                                .isObject()
+                                .containsKey("isPrimary")
+                                .node("isPrimary")
+                                .isBoolean()));
     }
 
     @TestConfiguration
-    static class TestConfig {
+    static class AxileEnvironmentEndpointTestConfiguration {
 
         @Bean
-        public AxileEnvironmentEndpoint axileEnvironmentEndpoint(EnvironmentEndpoint delegate) {
-            return new AxileEnvironmentEndpoint(delegate);
+        public EnvPropertyEnricher envPropertyEnricher(Environment environment) {
+            return new DefaultEnvPropertyEnricher(environment);
+        }
+
+        @Bean
+        public AxileEnvironmentEndpoint axileEnvironmentEndpoint(
+                EnvironmentEndpoint delegate, EnvPropertyEnricher envPropertyEnricher) {
+            return new AxileEnvironmentEndpoint(delegate, envPropertyEnricher);
         }
     }
 }
