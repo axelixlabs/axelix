@@ -12,3 +12,6 @@ components:
           type: string
           description: The new value of the property. May be null or empty
           example: 'true'
+      required:
+        - propertyName
+        - newValue
