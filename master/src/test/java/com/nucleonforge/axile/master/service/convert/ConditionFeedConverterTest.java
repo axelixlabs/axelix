@@ -31,16 +31,16 @@ class ConditionFeedConverterTest {
         var positive1 = getPositiveByTarget(
                 conditionsFeedResponse, "EndpointAutoConfiguration#propertiesEndpointAccessResolver");
         assertThat(positive1.target()).isEqualTo("EndpointAutoConfiguration#propertiesEndpointAccessResolver");
-        assertThat(positive1.matches()).hasSize(1);
-        assertThat(positive1.matches().get(0).condition()).isEqualTo("OnBeanCondition");
-        assertThat(positive1.matches().get(0).message()).contains("@ConditionalOnMissingBean");
+        assertThat(positive1.matched()).hasSize(1);
+        assertThat(positive1.matched().get(0).condition()).isEqualTo("OnBeanCondition");
+        assertThat(positive1.matched().get(0).message()).contains("@ConditionalOnMissingBean");
 
         var positive2 = getPositiveByTarget(
                 conditionsFeedResponse, "EndpointAutoConfiguration#endpointCachingOperationInvokerAdvisor");
         assertThat(positive2.target()).isEqualTo("EndpointAutoConfiguration#endpointCachingOperationInvokerAdvisor");
-        assertThat(positive2.matches()).hasSize(1);
-        assertThat(positive2.matches().get(0).condition()).isEqualTo("OnBeanCondition");
-        assertThat(positive2.matches().get(0).message()).contains("CachingOperationInvokerAdvisor");
+        assertThat(positive2.matched()).hasSize(1);
+        assertThat(positive2.matched().get(0).condition()).isEqualTo("OnBeanCondition");
+        assertThat(positive2.matched().get(0).message()).contains("CachingOperationInvokerAdvisor");
 
         assertThat(conditionsFeedResponse.negativeMatches()).hasSize(2);
 

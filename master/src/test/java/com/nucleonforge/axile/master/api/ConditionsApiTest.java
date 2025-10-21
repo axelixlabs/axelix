@@ -48,7 +48,7 @@ class ConditionsApiTest {
       "positiveMatches": [
         {
           "target": "EndpointAutoConfiguration#propertiesEndpointAccessResolver",
-          "matches": [
+          "matched": [
             {
               "condition": "OnBeanCondition",
               "message": "@ConditionalOnMissingBean (types: org.springframework.boot.actuate.endpoint.EndpointAccessResolver; SearchStrategy: all) did not find any beans"
@@ -57,7 +57,7 @@ class ConditionsApiTest {
         },
         {
           "target": "EndpointAutoConfiguration#endpointCachingOperationInvokerAdvisor",
-          "matches": [
+          "matched": [
             {
               "condition": "OnBeanCondition",
                "message": "@ConditionalOnMissingBean (types: org.springframework.boot.actuate.endpoint.invoker.cache.CachingOperationInvokerAdvisor; SearchStrategy: all) did not find any beans"

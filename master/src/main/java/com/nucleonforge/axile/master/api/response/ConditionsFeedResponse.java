@@ -27,13 +27,13 @@ public record ConditionsFeedResponse(List<PositiveCondition> positiveMatches, Li
      * Represents a configuration class where all conditions matched successfully.
      *
      * @param target a short identifier of the configuration element, typically a class or method name
-     * @param matches list of conditions that were evaluated and matched
+     * @param matched list of conditions that were evaluated and matched
      */
-    public record PositiveCondition(String target, List<ConditionMatch> matches) {
+    public record PositiveCondition(String target, List<ConditionMatch> matched) {
 
         public PositiveCondition {
-            if (matches == null) {
-                matches = Collections.emptyList();
+            if (matched == null) {
+                matched = Collections.emptyList();
             }
         }
     }
