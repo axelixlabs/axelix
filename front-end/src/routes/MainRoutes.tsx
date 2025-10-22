@@ -7,6 +7,7 @@ import Loadable from "components";
 const ScheduledTasks = Loadable(lazy(() => import('pages/ScheduledTasks')))
 const Environment = Loadable(lazy(() => import('pages/Environment')))
 const ConfigProps = Loadable(lazy(() => import('pages/ConfigProps')))
+const Conditions = Loadable(lazy(() => import('pages/Conditions')))
 const Wallboard = Loadable(lazy(() => import('pages/Wallboard')))
 const Loggers = Loadable(lazy(() => import('pages/Loggers')))
 const Caches = Loadable(lazy(() => import('pages/Caches')))
@@ -28,6 +29,7 @@ export const MainRoutes = () => {
         <Route path="/instance/:instanceId/loggers" element={<Loggers />} />
         <Route path="/instance/:instanceId/caches" element={<Caches />} />
         <Route path="instance/:instanceId/scheduled-tasks" element={<ScheduledTasks />} />
+        <Route path="instance/:instanceId/conditions" element={<Conditions />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/wallboard" replace />} />

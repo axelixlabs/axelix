@@ -6,8 +6,6 @@ import type { IBean, IBeansCollapseHeaderRefs } from "models";
 import { BeanCollapseChildren } from "./BeanCollapseChildren";
 import { BeanCollapseLabels } from "./BeanCollapseLabels";
 
-import styles from './styles.module.css'
-
 interface IProps {
   /**
    * List of beans: full or filtered
@@ -42,7 +40,7 @@ export const BeansCollapse = ({ beans }: IProps) => {
       items={createCollapseItems(beans)}
       onChange={(key) => setActiveKey(key)}
       bordered
-      className={styles.Collapse}
+      className="Collapse"
     />
   );
 };

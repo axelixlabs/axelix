@@ -1,0 +1,6 @@
+.CopyIcon {
+    height: 16px;
+    width: 16px;
+    color: var(--axile-primary-green);
+    cursor: pointer;
+}

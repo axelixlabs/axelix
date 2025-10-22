@@ -3,13 +3,19 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 
 import styles from './styles.module.css'
+import type {Dispatch, SetStateAction} from "react";
 
 interface IProps {
 
     /**
-     * Callback function when the search value changes
+     * The value of the search
      */
-    onChange: (value: string) => void;
+    search: string;
+
+    /**
+     * SetState to update the search string
+     */
+    setSearch: Dispatch<SetStateAction<string>>;
 
     /**
      * Whether to add a bottom gutter to the search field
@@ -22,14 +28,15 @@ interface IProps {
     addonAfter?: string
 }
 
-export const PageSearch = ({ onChange, addonAfter, hasBottomGutter = true }: IProps) => {
+export const PageSearch = ({ setSearch, search, addonAfter, hasBottomGutter = true }: IProps) => {
     const { t } = useTranslation()
 
     return (
         <Input
             placeholder={t("search")}
             addonAfter={addonAfter}
-            onChange={(e) => onChange(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className={classNames(
                 styles.Search,
                 { [styles.BottomGutter]: hasBottomGutter }

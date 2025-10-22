@@ -1,0 +1,24 @@
+.FirstSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    column-gap: 20px;
+}
+
+.ConditionsMainTitle{
+    margin-bottom: 20px;
+}
+
+.TargetWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    background-color: var(--axile-primary-light-green);
+    font-weight: 600;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 16px;
+    border: 1px solid var(--axile-medium-grey);
+    border-bottom: none;
+    word-break: break-all;
+}
