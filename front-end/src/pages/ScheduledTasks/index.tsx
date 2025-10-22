@@ -12,8 +12,8 @@ import {EmptyHandler, Loader, PageSearch} from "components";
 import {fetchData, filterScheduledTasks} from 'helpers';
 
 import {getScheduledTasksData} from "services";
-import {CronTask} from "./CronTask";
-import {FixedTask} from "./FixedTask";
+import {CronTasks} from "./CronTasks";
+import {FixedTasks} from "./FixedTasks";
 
 const ScheduledTasks = () => {
     const { instanceId } = useParams()
@@ -50,9 +50,9 @@ const ScheduledTasks = () => {
             <PageSearch onChange={(e) => setSearch(e)} />
 
             <EmptyHandler isEmpty={isEmpty(effectiveScheduledTasks)}>
-              <CronTask cronTasks={effectiveScheduledTasks.cron}/>
-              <FixedTask taskTitle={t("ScheduledTasks.fixedDelay")} fixedTasks={effectiveScheduledTasks.fixedDelay}/>
-              <FixedTask taskTitle={t("ScheduledTasks.fixedRate")} fixedTasks={effectiveScheduledTasks.fixedRate}/>
+              <CronTasks cronTasks={effectiveScheduledTasks.cron}/>
+              <FixedTasks taskTitle={t("ScheduledTasks.fixedDelay")} fixedTasks={effectiveScheduledTasks.fixedDelay}/>
+              <FixedTasks taskTitle={t("ScheduledTasks.fixedRate")} fixedTasks={effectiveScheduledTasks.fixedRate}/>
             </EmptyHandler>
         </>
     )

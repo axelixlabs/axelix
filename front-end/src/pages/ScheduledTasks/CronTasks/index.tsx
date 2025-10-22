@@ -2,8 +2,8 @@ import styles from "../styles.module.css";
 import {TableHeader} from "../TableHeader";
 import {EmptyHandler} from "components";
 import type {ICron} from "models";
-import {TableRow} from "../TableRow";
 import {useTranslation} from "react-i18next";
+import {CronTaskTableRow} from "../CronTaskTableRow";
 
 interface IProps {
 
@@ -13,7 +13,7 @@ interface IProps {
   cronTasks: ICron[];
 }
 
-export const CronTask = ( { cronTasks } : IProps) => {
+export const CronTasks = ({ cronTasks } : IProps) => {
 
   const { t } = useTranslation();
 
@@ -30,7 +30,7 @@ export const CronTask = ( { cronTasks } : IProps) => {
           <EmptyHandler isEmpty={cronTasks.length === 0}>
             {
               cronTasks.map((task: ICron, index: number) => (
-                <TableRow task={task} isCron={true} key={index} />)
+                <CronTaskTableRow task={task} key={index} />)
               )
             }
           </EmptyHandler>

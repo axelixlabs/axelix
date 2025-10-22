@@ -53,6 +53,8 @@
     "off": "OFF",
     "cron": "Cron",
     "fixedDelay": "Fixed delay",
-    "fixedRate": "Fixed rate"
+    "fixedRate": "Fixed rate",
+    "enabled" : "Task enabled",
+    "disabled" : "Task disabled"
   }
 }

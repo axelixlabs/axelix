@@ -53,6 +53,8 @@
     "off": "ВЫКЛ",
     "cron": "Cron",
     "fixedDelay": "Fixed delay",
-    "fixedRate": "Fixed rate"
+    "fixedRate": "Fixed rate",
+    "enabled" : "Задача включена",
+    "disabled" : "Задача выключена"
   }
 }

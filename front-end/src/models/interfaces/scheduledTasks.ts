@@ -1,13 +1,19 @@
 import type { ICommonSliceState } from "./globals";
 
+interface IEnable {
+    enabled: boolean
+}
+
 interface ITarget {
+
     /**
      * Target field of runnable field
      */
     target: string;
 }
 
-interface IRunnable {
+export interface IRunnable extends IEnable {
+
     /**
      * Runnable field of scheduled tasks types body
      */
@@ -61,4 +67,11 @@ export interface ScheduledTasksResponse {
 
 export function isEmpty(resp: ScheduledTasksResponse) : boolean {
   return resp.cron.length === 0 && resp.fixedDelay.length === 0 && resp.fixedRate.length === 0;
+}
+
+export interface IUpdateScheduledTasksBody {
+    instanceId: string;
+    targetScheduledTask: string;
+    force: boolean;
+    statusType: "enable" | "disable"
 }

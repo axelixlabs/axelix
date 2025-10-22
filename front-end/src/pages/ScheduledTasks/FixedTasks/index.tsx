@@ -2,7 +2,7 @@ import styles from "../styles.module.css";
 import type { IFixedTasks } from "models";
 import {TableHeader} from "../TableHeader";
 import {EmptyHandler} from "components";
-import {TableRow} from "../TableRow";
+import {FixedTaskTableRow} from "../FixedTaskTableRow";
 
 interface IProps {
 
@@ -19,7 +19,7 @@ interface IProps {
   fixedTasks: IFixedTasks[];
 }
 
-export const FixedTask = ( { taskTitle, fixedTasks } : IProps ) => {
+export const FixedTasks = ({ taskTitle, fixedTasks } : IProps ) => {
 
   return (
     <>
@@ -34,7 +34,7 @@ export const FixedTask = ( { taskTitle, fixedTasks } : IProps ) => {
           <EmptyHandler isEmpty={fixedTasks.length === 0}>
             {
               fixedTasks.map((task: IFixedTasks, index: number) => (
-                <TableRow task={task} isCron={false} key={index} />
+                <FixedTaskTableRow task={task} key={index} />
               ))
             }
           </EmptyHandler>
