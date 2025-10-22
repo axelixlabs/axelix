@@ -1,48 +1,48 @@
 import type { ICommonSliceState } from "./globals";
 
 export interface ILogger {
-  /**
-   * Logger name
-   */
-  name: string;
-  /**
-   * Explicitly configured level for logger, if any 
-   */
-  configuredLevel?: string;
-  /**
-   * Single logger current level
-   */
-  effectiveLevel: string;
+    /**
+     * Logger name
+     */
+    name: string;
+    /**
+     * Explicitly configured level for logger, if any
+     */
+    configuredLevel?: string;
+    /**
+     * Single logger current level
+     */
+    effectiveLevel: string;
 }
 
 export interface ILoggerData {
-  /**
+    /**
      * All possible logging levels that are supported by the logging system inside the instance
      */
-  levels: string[];
-  /**
-   * All loggers
-   */
-  loggers: ILogger[];
+    levels: string[];
+    /**
+     * All loggers
+     */
+    loggers: ILogger[];
 }
 
 export interface ILoggersSliceState extends ICommonSliceState, ILoggerData {
-  updateLoggerSuccess: boolean
+    updateLoggerSuccess: boolean;
 }
 
 export interface ISetLoggerLevelRequestData {
-  /**
-   * Instance id
-   */
-  instanceId: string;
-  /**
-   * Logger name
-   */
-  loggerName: string;
-  /**
-   * Selected level
-   */
-  loggingLevel: string
+    /**
+     * Instance id
+     */
+    instanceId: string;
+    /**
+     * Logger name
+     */
+    loggerName: string;
+    /**
+     * Selected level
+     */
+    loggingLevel: string;
 }
 
 // todo use this in future

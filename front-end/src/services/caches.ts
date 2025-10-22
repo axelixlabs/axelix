@@ -12,8 +12,7 @@ export const clearAllCachesData = (instanceId: string) => {
 export const clearCacheData = (instanceId: string, data: IClearCacheData) => {
     return apiFetch.delete(`caches/${instanceId}/cache/${data.cacheName}`, {
         params: {
-            cacheManager : data.cacheManager
+            cacheManager: data.cacheManager,
         },
     });
 };
-

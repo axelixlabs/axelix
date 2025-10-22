@@ -17,4 +17,5 @@ export const getEnvironmentThunk = createAsyncThunk<IEnvironmentData, string, { 
                 status: error.response?.status,
             });
         }
-    });
+    },
+);

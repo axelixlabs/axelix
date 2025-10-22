@@ -1,18 +1,19 @@
-import { useState } from 'react';
 import { Collapse } from "antd";
-import classNames from 'classnames';
-import { type CollapseProps } from 'antd';
+import { type CollapseProps } from "antd";
+import classNames from "classnames";
+import { useState } from "react";
 
-import { CacheCollapseHeader } from '../CacheCollapseHeader';
-import type { ICachesManager } from 'models';
+import type { ICachesManager } from "models";
 
-import styles from './styles.module.css'
+import { CacheCollapseHeader } from "../CacheCollapseHeader";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
      * Single cache manager data
      */
-    cacheManager: ICachesManager
+    cacheManager: ICachesManager;
 }
 
 export const CacheManagerSection = ({ cacheManager }: IProps) => {
@@ -30,17 +31,15 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
     return (
         <div className={styles.CacheManagerWrapper}>
             <div className={styles.CacheManagerTopSection}>
-                <div className={classNames('MediumTitle', styles.CacheManagerName)}>
-                    {cacheManager.name}
-                </div>
+                <div className={classNames("MediumTitle", styles.CacheManagerName)}>{cacheManager.name}</div>
             </div>
             <Collapse
                 accordion
                 activeKey={activeKey}
                 items={createCollapseItems()}
-            // todo add handler in future
-            // onChange={(key) => setActiveKey(key)}
+                // todo add handler in future
+                // onChange={(key) => setActiveKey(key)}
             />
         </div>
-    )
+    );
 };

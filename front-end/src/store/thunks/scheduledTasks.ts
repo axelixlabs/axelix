@@ -1,8 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 import type { ScheduledTasksResponse } from "models";
-import { getScheduledTasksData, updateScheduledTasksStatus } from "services";
 import type { IUpdateScheduledTasksBody } from "models";
+import { getScheduledTasksData, updateScheduledTasksStatus } from "services";
 
 export const getScheduledTasksThunk = createAsyncThunk<ScheduledTasksResponse, string, { rejectValue: any }>(
     "getScheduledTasksThunk",
@@ -18,8 +18,8 @@ export const getScheduledTasksThunk = createAsyncThunk<ScheduledTasksResponse, s
                 status: error.response?.status,
             });
         }
-    });
-
+    },
+);
 
 // todo add types in future for this thunk
 export const updateScheduledTasksStatusThunk = createAsyncThunk(
@@ -28,9 +28,9 @@ export const updateScheduledTasksStatusThunk = createAsyncThunk(
         try {
             await updateScheduledTasksStatus(responseBody);
 
-            return ({
-                target: responseBody.targetScheduledTask
-            })
+            return {
+                target: responseBody.targetScheduledTask,
+            };
 
             // todo replace any with real type in future
         } catch (error: any) {
@@ -38,4 +38,5 @@ export const updateScheduledTasksStatusThunk = createAsyncThunk(
                 status: error.response?.status,
             });
         }
-    });
+    },
+);

@@ -1,8 +1,8 @@
 .Prefix {
-  color: var(--axile-text-grey);
-  margin-top: 8px;
+    color: var(--axile-text-grey);
+    margin-top: 8px;
 }
 
 .PrefixTitle {
-  color: var(--axile-primary-green);
+    color: var(--axile-primary-green);
 }

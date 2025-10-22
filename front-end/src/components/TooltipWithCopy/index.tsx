@@ -1,6 +1,6 @@
 import { Tooltip } from "antd";
 
-import {Copy} from "../Copy";
+import { Copy } from "../Copy";
 
 import styles from "./styles.module.css";
 
@@ -12,7 +12,7 @@ interface IProps {
     /**
      * Different onclick handlers on tooltip text
      */
-    onClick?: () => void
+    onClick?: () => void;
 }
 
 export const TooltipWithCopy = ({ text, onClick }: IProps) => {
@@ -24,7 +24,7 @@ export const TooltipWithCopy = ({ text, onClick }: IProps) => {
                     root: {
                         maxWidth: 600,
                         whiteSpace: "normal",
-                    }
+                    },
                 }}
                 className={styles.Tooltip}
             >

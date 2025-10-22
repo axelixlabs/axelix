@@ -1,30 +1,30 @@
 .Header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background-color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: var(--axile-header-height);
-  border-bottom: 1px solid var(--axile-medium-grey);
-  box-shadow: 0 4px 20px rgb(0 0 0 / 5%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--axile-header-height);
+    border-bottom: 1px solid var(--axile-medium-grey);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 5%);
 }
 
 .Logo {
-  width: 140px;
-  cursor: pointer;
+    width: 140px;
+    cursor: pointer;
 }
 
 .LinksAndAvatarWrapper {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .Avatar {
-  margin-inline: 30px 20px;
-  background-color: var(--axile-primary-green);
-  cursor: pointer;
+    margin-inline: 30px 20px;
+    background-color: var(--axile-primary-green);
+    cursor: pointer;
 }

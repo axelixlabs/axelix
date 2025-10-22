@@ -8,7 +8,7 @@ const initialState: IEnvironmentSliceState = {
     error: "",
     activeProfiles: [],
     defaultProfiles: [],
-    propertySources: []
+    propertySources: [],
 };
 
 export const EnvironmentSlice = createSlice({

@@ -1,12 +1,12 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "lib": ["es6", "dom"],
-    "rootDir": "./cypress",
-    "strict": true,
-    "sourceMap": true,
-    "noEmit": true,
-    "types": ["cypress", "node"]
-  },
-  "include": ["./cypress/**/*.ts"]
+    "compilerOptions": {
+        "target": "es5",
+        "lib": ["es6", "dom"],
+        "rootDir": "./cypress",
+        "strict": true,
+        "sourceMap": true,
+        "noEmit": true,
+        "types": ["cypress", "node"]
+    },
+    "include": ["./cypress/**/*.ts"]
 }

@@ -1,47 +1,45 @@
 export const statePalette = {
-  OFF: {
-    colorPrimary: "#838383",
-    colorPrimaryHover: "#d9d9d9",
-    colorPrimaryActive: "#595959",
-  },
-  ERROR: {
-    colorPrimary: "#ff4d4f",
-    colorPrimaryHover: "#ff7875",
-    colorPrimaryActive: "#d9363e",
-  },
-  WARN: {
-    colorPrimary: "#faad14",
-    colorPrimaryHover: "#ffd666",
-    colorPrimaryActive: "#d48806",
-  },
-  INFO: {
-    colorPrimary: "#fadb14",
-    colorPrimaryHover: "#ffec3d",
-    colorPrimaryActive: "#d4b106",
-  },
-  DEBUG: {
-    colorPrimary: "#1890ff",
-    colorPrimaryHover: "#69c0ff",
-    colorPrimaryActive: "#096dd9",
-  },
-  TRACE: {
-    colorPrimary: "#13c2c2",
-    colorPrimaryHover: "#36e3e3",
-    colorPrimaryActive: "#0b8a8a",
-  },
-  ALL: {
-    colorPrimary: "#52c41a",
-    colorPrimaryHover: "#95de64",
-    colorPrimaryActive: "#389e0d",
-  },
-  DEFAULT: {
-    colorPrimary: "#722ed1",
-    colorPrimaryHover: "#b37feb",
-    colorPrimaryActive: "#531dab",
-  },
+    OFF: {
+        colorPrimary: "#838383",
+        colorPrimaryHover: "#d9d9d9",
+        colorPrimaryActive: "#595959",
+    },
+    ERROR: {
+        colorPrimary: "#ff4d4f",
+        colorPrimaryHover: "#ff7875",
+        colorPrimaryActive: "#d9363e",
+    },
+    WARN: {
+        colorPrimary: "#faad14",
+        colorPrimaryHover: "#ffd666",
+        colorPrimaryActive: "#d48806",
+    },
+    INFO: {
+        colorPrimary: "#fadb14",
+        colorPrimaryHover: "#ffec3d",
+        colorPrimaryActive: "#d4b106",
+    },
+    DEBUG: {
+        colorPrimary: "#1890ff",
+        colorPrimaryHover: "#69c0ff",
+        colorPrimaryActive: "#096dd9",
+    },
+    TRACE: {
+        colorPrimary: "#13c2c2",
+        colorPrimaryHover: "#36e3e3",
+        colorPrimaryActive: "#0b8a8a",
+    },
+    ALL: {
+        colorPrimary: "#52c41a",
+        colorPrimaryHover: "#95de64",
+        colorPrimaryActive: "#389e0d",
+    },
+    DEFAULT: {
+        colorPrimary: "#722ed1",
+        colorPrimaryHover: "#b37feb",
+        colorPrimaryActive: "#531dab",
+    },
 };
-
-
 
 // todo Remove light colors in the future if they are not needed.
 

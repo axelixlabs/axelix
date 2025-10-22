@@ -1,6 +1,6 @@
 import { Menu } from "antd";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { findOpenKeys } from "helpers";
 import { getItems } from "utils";

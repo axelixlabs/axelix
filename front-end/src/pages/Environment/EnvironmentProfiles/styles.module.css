@@ -1,50 +1,50 @@
 .MainWrapper {
-  margin-bottom: 30px;
+    margin-bottom: 30px;
 }
 
 .ProfilesWrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-weight: 500;
-  letter-spacing: 0%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-weight: 500;
+    letter-spacing: 0%;
 }
 
 .ProfileWrapper {
-  display: flex;
+    display: flex;
 }
 
 .ProfileTitle {
-  background: var(--axile-primary-light-green);
-  border-radius: 4px;
+    background: var(--axile-primary-light-green);
+    border-radius: 4px;
 }
 
 .ProfileValue {
-  background: var(--axile-light-grey);
-  border-radius: 4px;
+    background: var(--axile-light-grey);
+    border-radius: 4px;
 }
 
 .ProfileTitle,
 .ProfileValue {
-  padding: 8px;
+    padding: 8px;
 }
 
 .DeleteActiveProfileIcon {
-  margin-left: 8px;
-  cursor: pointer;
-  color: red;
+    margin-left: 8px;
+    cursor: pointer;
+    color: red;
 }
 
 .CreateProfileWrapper {
-  display: flex;
-  column-gap: 8px;
-  flex: 1 1 150px;
+    display: flex;
+    column-gap: 8px;
+    flex: 1 1 150px;
 }
 
 .CreateProfileInput {
-  max-width: 120px;
+    max-width: 120px;
 }
 
 .CreateProfileActionsButton {
-  flex-shrink: 0;
+    flex-shrink: 0;
 }
