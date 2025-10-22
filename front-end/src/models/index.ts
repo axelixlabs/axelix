@@ -11,6 +11,7 @@ export * from "./interfaces/beans";
 export * from "./interfaces/auth";
 
 export * from './types/scheduledTasks';
+export * from './types/conditions.ts';
 export * from './types/antd';
 
 export * from './enums/conditions.ts'

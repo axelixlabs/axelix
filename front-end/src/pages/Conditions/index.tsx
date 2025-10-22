@@ -1,84 +1,95 @@
-import {EmptyHandler, Loader, PageSearch} from "components";
+import { EmptyHandler, Loader, PageSearch } from "components";
 
-import styles from "./styles.module.css";
 import { Tabs, type TabsProps } from "antd";
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {Matches} from "./Matches";
+import { Matches } from "./Matches";
 import { getConditionsData } from "services";
-import { useParams} from "react-router-dom";
-import {fetchData, filterMatches} from "helpers";
+import { useParams } from "react-router-dom";
+import { fetchData, filterMatches } from "helpers";
 import {
   StatefulRequest,
   type IConditionsData,
-  type INegativeMatches,
-  type IPositiveMatches,
-  EConditionsTabs
+  EConditionsTabs, type IConditionBeanNegative, type IConditionBeanPositive,
+  type ConditionBeanCollection
 } from "models";
+import { NegativeMatchTarget } from "./NegativeMatchTarget";
+import { PositiveMatchTarget } from "./PositiveMatchTarget";
+import styles from "./styles.module.css";
 
 export const Conditions = () => {
-    const { t } = useTranslation()
-    const { instanceId } = useParams()
-    const [activeKey, setActiveKey] = useState<string>(EConditionsTabs.NEGATIVE_MATCHES);
-    const [dataState, setDataState] = useState(StatefulRequest.loading<IConditionsData>())
-    const [search, setSearch] = useState<string>("");
+  const { t } = useTranslation()
+  const { instanceId } = useParams()
 
-    useEffect(() => {
-        fetchData(setDataState, () => getConditionsData(instanceId!))
-    }, []);
+  const [activeKey, setActiveKey] = useState<EConditionsTabs>(EConditionsTabs.NEGATIVE_MATCHES);
+  const [dataState, setDataState] = useState(StatefulRequest.loading<IConditionsData>())
+  const [search, setSearch] = useState<string>("");
 
-    if (dataState.loading) {
-        return <Loader />
-    }
+  useEffect(() => {
+    fetchData(setDataState, () => getConditionsData(instanceId!))
+  }, []);
 
-    if (dataState.error) {
-        return dataState.error
-    }
+  if (dataState.loading) {
+    return <Loader />
+  }
 
-    const negativeMatches = dataState.response!.negativeMatches
-    const positiveMatches = dataState.response!.positiveMatches
+  if (dataState.error) {
+    return dataState.error
+  }
 
-    const isNegativeTab = activeKey === EConditionsTabs.NEGATIVE_MATCHES
-    const matches = isNegativeTab ? negativeMatches : positiveMatches
+  const negativeMatches = dataState.response!.negativeMatches
+  const positiveMatches = dataState.response!.positiveMatches
 
-    const effectiveMatches = search ? filterMatches(matches, search) : matches
-    const addonAfter = `${effectiveMatches.length} / ${matches.length}`;
+  const isNegativeTab = activeKey === EConditionsTabs.NEGATIVE_MATCHES
+
+  const matches: ConditionBeanCollection = isNegativeTab ? negativeMatches : positiveMatches
+
+  const effectiveMatches: ConditionBeanCollection = search ? filterMatches(matches, search) : matches
+  const addonAfter = `${effectiveMatches.length} / ${matches.length}`;
 
   const tabs: TabsProps['items'] = [
-        {
-            key: EConditionsTabs.NEGATIVE_MATCHES,
-            label: t("Conditions.negativeMatches"),
-            children: <Matches title={t("Conditions.negativeMatches")} matches={effectiveMatches as INegativeMatches[]} />
-        },
-        {
-            key: EConditionsTabs.POSITIVE_MATCHES,
-            label: t("Conditions.positiveMatches"),
-            children: <Matches title={t("Conditions.positiveMatches")} matches={effectiveMatches as IPositiveMatches[]} />,
-        },
-    ]
+    {
+      key: EConditionsTabs.NEGATIVE_MATCHES,
+      label: t("Conditions.negativeMatches"),
+      children: (
+        <Matches title={t("Conditions.negativeMatches")}>
+          <NegativeMatchTarget negativeMatches={effectiveMatches as IConditionBeanNegative[]} />
+        </Matches>
+      )
+    },
+    {
+      key: EConditionsTabs.POSITIVE_MATCHES,
+      label: t("Conditions.positiveMatches"),
+      children: (
+        <Matches title={t("Conditions.positiveMatches")}>
+          <PositiveMatchTarget positiveMatches={effectiveMatches as IConditionBeanPositive[]} />
+        </Matches>
+      ),
+    },
+  ]
 
   const handleTabChange = (activeKey: string): void => {
     setSearch("")
-    setActiveKey(activeKey)
+    setActiveKey(activeKey as EConditionsTabs)
   }
 
   return (
-        <>
-            <div className={styles.FirstSection}>
-                <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
-                <Tabs
-                    activeKey={activeKey}
-                    onChange={handleTabChange}
-                    size="small"
-                    items={tabs.map(tab => ({ key: tab.key, label: tab.label }))}
-                />
-            </div>
+    <>
+      <div className={styles.FirstSection}>
+        <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
+        <Tabs
+          activeKey={activeKey}
+          onChange={handleTabChange}
+          size="small"
+          items={tabs.map(tab => ({ key: tab.key, label: tab.label }))}
+        />
+      </div>
 
-          <EmptyHandler isEmpty={!effectiveMatches.length}>
-            {tabs.find(tab => tab.key === activeKey)!.children}
-          </EmptyHandler>
-        </>
-    );
+      <EmptyHandler isEmpty={!effectiveMatches.length}>
+        {tabs.find(tab => tab.key === activeKey)!.children}
+      </EmptyHandler>
+    </>
+  );
 };
 
 export default Conditions;
