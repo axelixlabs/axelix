@@ -6,11 +6,9 @@ import { AuthRoutes } from "./AuthRoutes";
 import { MainRoutes } from "./MainRoutes";
 
 export const AppRoutes = () => {
-  const token = useAppSelector((state) => {
-    return state.login.accessToken;
-  });
+    const token = useAppSelector((state) => {
+        return state.login.accessToken;
+    });
 
-  return (
-    <BrowserRouter>{!token ? <AuthRoutes /> : <MainRoutes />}</BrowserRouter>
-  );
+    return <BrowserRouter>{!token ? <AuthRoutes /> : <MainRoutes />}</BrowserRouter>;
 };

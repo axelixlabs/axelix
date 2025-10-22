@@ -7,7 +7,7 @@ import { updateProperty } from "services";
 export const updatePropertyThunk = createAsyncThunk<void, IUpdateProperty, { rejectValue: any }>(
     "updatePropertyThunk",
     async ({ instanceId, updatePropertyData }, { rejectWithValue }) => {
-        const { propertyName, newValue } = updatePropertyData
+        const { propertyName, newValue } = updatePropertyData;
 
         try {
             await updateProperty(instanceId, {
@@ -21,4 +21,5 @@ export const updatePropertyThunk = createAsyncThunk<void, IUpdateProperty, { rej
                 status: error.response?.status,
             });
         }
-    });
+    },
+);

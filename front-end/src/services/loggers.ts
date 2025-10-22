@@ -6,6 +6,6 @@ export const getLoggersData = (id: string) => {
 
 export const setLoggerLevel = (instanceId: string, loggerName: string, loggingLevel: string) => {
     return apiFetch.post(`loggers/${instanceId}/logger/${loggerName}`, {
-        configuredLevel: loggingLevel
+        configuredLevel: loggingLevel,
     });
-}
+};

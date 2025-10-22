@@ -1,14 +1,15 @@
-import { Button, message } from 'antd';
-import { type MouseEvent, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { ReloadOutlined } from "@ant-design/icons";
 
-import { TooltipWithCopy } from 'components';
-import { type ICacheData, StatelessRequest } from 'models';
+import { Button, message } from "antd";
+import { type MouseEvent, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
 
-import styles from './styles.module.css'
+import { TooltipWithCopy } from "components";
+import { type ICacheData, StatelessRequest } from "models";
 import { clearCacheData } from "services";
+
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
@@ -18,28 +19,28 @@ interface IProps {
     /**
      * Single cache data
      */
-    cache: ICacheData
+    cache: ICacheData;
 }
 
 export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
-    const { instanceId } = useParams()
-    const { t } = useTranslation()
+    const { instanceId } = useParams();
+    const { t } = useTranslation();
 
-    const [clearSingleCache, setClearSingleCache] = useState(StatelessRequest.inactive())
+    const [clearSingleCache, setClearSingleCache] = useState(StatelessRequest.inactive());
 
     const clearCacheClickHandler = (e: MouseEvent<HTMLElement>): void => {
         e.stopPropagation();
-        setClearSingleCache(StatelessRequest.loading())
+        setClearSingleCache(StatelessRequest.loading());
         clearCacheData(instanceId!, {
             cacheName: cache.name,
-            cacheManager: cacheManagerName
+            cacheManager: cacheManagerName,
         })
             .then(() => {
-                setClearSingleCache(StatelessRequest.success())
-                message.success(t("cleared"))
+                setClearSingleCache(StatelessRequest.success());
+                message.success(t("cleared"));
             })
-            .catch(() => setClearSingleCache(StatelessRequest.error("")))
-    }
+            .catch(() => setClearSingleCache(StatelessRequest.error("")));
+    };
 
     return (
         <div className={styles.CollapseHeader}>
@@ -58,5 +59,5 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
                 onClick={clearCacheClickHandler}
             />
         </div>
-    )
+    );
 };

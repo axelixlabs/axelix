@@ -6,22 +6,20 @@ import { EProxyType } from "models";
 import styles from "../styles.module.css";
 
 interface IProps {
-
-  /**
-   * The proxying algorithm used to create the instance of the bean. Might be null
-   * in case the backend was unable to figure it out.
-   */
-  proxyType: EProxyType | null
+    /**
+     * The proxying algorithm used to create the instance of the bean. Might be null
+     * in case the backend was unable to figure it out.
+     */
+    proxyType: EProxyType | null;
 }
-
 
 export const BeanProxyType = ({ proxyType }: IProps) => {
-  const { t } = useTranslation();
+    const { t } = useTranslation();
 
-  return (
-    <>
-      <div className={styles.CollapseBodyChunkTitle}>{t("Beans.beanProxyType")}:</div>
-      <span>{resolveProxying(t, proxyType)}</span>
-    </>
-  );
-}
+    return (
+        <>
+            <div className={styles.CollapseBodyChunkTitle}>{t("Beans.beanProxyType")}:</div>
+            <span>{resolveProxying(t, proxyType)}</span>
+        </>
+    );
+};

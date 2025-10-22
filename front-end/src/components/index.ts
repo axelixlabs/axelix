@@ -1,9 +1,9 @@
-export { ModifiableTableSection } from './ModifiableTableSection';
+export { ModifiableTableSection } from "./ModifiableTableSection";
 export { LanguageSwitcher } from "./LanguageSwitcher";
-export { TooltipWithCopy } from './TooltipWithCopy';
+export { TooltipWithCopy } from "./TooltipWithCopy";
 export { LinearProgress } from "./LinearProgress";
 export { EmptyHandler } from "./EmptyHandler";
 export { PageSearch } from "./PageSearch";
 export { default } from "./Loadable";
 export { Loader } from "./Loader";
-export { Copy } from './Copy';
+export { Copy } from "./Copy";

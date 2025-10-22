@@ -6,16 +6,14 @@ export const filterConfigPropsBeans = (beans: IConfigPropsBean[], search: string
     return beans.filter(({ beanName, prefix, properties }) => {
         const lowerBeanName = beanName.toLowerCase();
         if (lowerBeanName.includes(formattedSearch)) {
-            return true
+            return true;
         }
 
         const lowerPrefix = prefix.toLowerCase();
         if (lowerPrefix.includes(formattedSearch)) {
-            return true
+            return true;
         }
 
-        return properties.some(({ key }) => (
-            key.toLowerCase().includes(formattedSearch)
-        ));
+        return properties.some(({ key }) => key.toLowerCase().includes(formattedSearch));
     });
 };

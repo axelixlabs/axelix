@@ -1,50 +1,40 @@
 import { useState } from "react";
 
-import { EmptyHandler, PageSearch, ModifiableTableSection } from "components";
-import type { IEnvironmentPropertySource } from "models";
+import { EmptyHandler, ModifiableTableSection, PageSearch } from "components";
 import { filterPropertySources } from "helpers";
+import type { IEnvironmentPropertySource } from "models";
 
 interface IProps {
-
-  /**
-   * The list of property sources to render
-   */
-  propertySources: IEnvironmentPropertySource[];
+    /**
+     * The list of property sources to render
+     */
+    propertySources: IEnvironmentPropertySource[];
 }
 
-export const EnvironmentTables = ({ propertySources } : IProps) => {
+export const EnvironmentTables = ({ propertySources }: IProps) => {
+    const [search, setSearch] = useState<string>("");
 
-  const [search, setSearch] = useState<string>("")
+    const effectivePropertySources = search ? filterPropertySources(propertySources, search) : propertySources;
 
-  const effectivePropertySources = search
-    ? filterPropertySources(propertySources, search)
-    : propertySources
+    const addonAfter = `${effectivePropertySources.length} / ${propertySources.length}`;
 
-  const addonAfter = `${effectivePropertySources.length} / ${propertySources.length}`;
+    return (
+        <>
+            <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
 
-  return (
-    <>
-      <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
-
-      <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
-        {effectivePropertySources.map(({ name, properties }) => (
-          <ModifiableTableSection
-            headerName={name}
-            properties={
-              properties.map(
-                (property) => (
-                  {
-                    key: property.key,
-                    displayKey: property.key,
-                    displayValue: property.value
-                  }
-                )
-              )
-            }
-            key={name}
-          />
-        ))}
-      </EmptyHandler>
-    </>
-  );
+            <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
+                {effectivePropertySources.map(({ name, properties }) => (
+                    <ModifiableTableSection
+                        headerName={name}
+                        properties={properties.map((property) => ({
+                            key: property.key,
+                            displayKey: property.key,
+                            displayValue: property.value,
+                        }))}
+                        key={name}
+                    />
+                ))}
+            </EmptyHandler>
+        </>
+    );
 };

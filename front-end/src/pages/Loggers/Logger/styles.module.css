@@ -1,88 +1,88 @@
 .MainWrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  column-gap: 20px;
-  padding-block: 12px;
-  border-bottom: 1px solid var(--axile-medium-grey);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 20px;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--axile-medium-grey);
 }
 
 .MainWrapper:last-child {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .LoggerValuesWrapper {
-  display: flex;
-  column-gap: 8px;
+    display: flex;
+    column-gap: 8px;
 }
 
 .LevelsWrapper {
-  display: flex;
+    display: flex;
 }
 
-.RadioGroupWrapper{
-  position: relative;
+.RadioGroupWrapper {
+    position: relative;
 }
 
 .RadioButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 15px;
-  height: 32px;
-  font-size: 15px;
-  line-height: 32px;
-  border-radius: 2px;
-  cursor: pointer;
-  user-select: none;
-  border: 1px solid var(--axile-medium-grey);
-  background-color: #ffffff;
-  color: #000000;
-  transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    height: 32px;
+    font-size: 15px;
+    line-height: 32px;
+    border-radius: 2px;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid var(--axile-medium-grey);
+    background-color: #ffffff;
+    color: #000000;
+    transition: all 0.3s;
 }
 
 .RadioButton input {
-  display: none;
+    display: none;
 }
 
 .RadioButton.Selected,
 .RadioButton.Selected:active {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #ffffff;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #ffffff;
 }
 
 .RadioButton.Selected:active {
-  background-color: var(--color-primary-active);
-  border-color: var(--color-primary-active);
+    background-color: var(--color-primary-active);
+    border-color: var(--color-primary-active);
 }
 
 .RadioButton:hover:not(.Selected) {
-  background-color: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
 }
 
 .RadioButton:active:not(.Selected) {
-  background-color: var(--color-primary-active);
-  border-color: var(--color-primary-active);
-  color: #ffffff;
+    background-color: var(--color-primary-active);
+    border-color: var(--color-primary-active);
+    color: #ffffff;
 }
 
 .Reset {
-  color: red;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 22px;
+    color: red;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 22px;
 }
 
 .TargetIcon {
-  height: 16px;
-  width: 16px;
-  position: absolute;
-  top: -7px;
-  right: -7px;
-  z-index: 1000;
+    height: 16px;
+    width: 16px;
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    z-index: 1000;
 }

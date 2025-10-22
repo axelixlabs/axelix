@@ -1,8 +1,9 @@
-import type { MenuItem } from "models";
 import type { TFunction } from "i18next";
 
+import type { MenuItem } from "models";
+
 export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
-    return ([
+    return [
         {
             key: "insights",
             label: t("insights"),
@@ -20,5 +21,5 @@ export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
         { key: `/instance/${instanceId}/jvm`, label: "JVM" },
         { key: `/instance/${instanceId}/mappings`, label: t("mappings") },
         { key: `/instance/${instanceId}/caches`, label: t("caches") },
-    ])
-}
+    ];
+};

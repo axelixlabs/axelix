@@ -1,41 +1,37 @@
+import { useTranslation } from "react-i18next";
+
+import { EmptyHandler } from "components";
+import type { ICron } from "models";
+
+import { CronTaskTableRow } from "../CronTaskTableRow";
+import { TableHeader } from "../TableHeader";
 import styles from "../styles.module.css";
-import {TableHeader} from "../TableHeader";
-import {EmptyHandler} from "components";
-import type {ICron} from "models";
-import {useTranslation} from "react-i18next";
-import {CronTaskTableRow} from "../CronTaskTableRow";
 
 interface IProps {
-
-  /**
-   * List of cron tasks to be rendered
-   */
-  cronTasks: ICron[];
+    /**
+     * List of cron tasks to be rendered
+     */
+    cronTasks: ICron[];
 }
 
-export const CronTasks = ({ cronTasks } : IProps) => {
+export const CronTasks = ({ cronTasks }: IProps) => {
+    const { t } = useTranslation();
 
-  const { t } = useTranslation();
+    return (
+        <>
+            <div key="cron" className={styles.SectionWrapper}>
+                <div className={`MediumTitle ${styles.TaskType}`}>{t("ScheduledTasks.cron")}</div>
 
-  return (
-    <>
-      <div key="cron" className={styles.SectionWrapper}>
-        <div className={`MediumTitle ${styles.TaskType}`}>
-          {t("ScheduledTasks.cron")}
-        </div>
+                <div className="CustomizedAntdTable">
+                    <TableHeader isCron={true} />
 
-        <div className='CustomizedAntdTable'>
-          <TableHeader isCron={true} />
-
-          <EmptyHandler isEmpty={cronTasks.length === 0}>
-            {
-              cronTasks.map((task: ICron, index: number) => (
-                <CronTaskTableRow task={task} key={index} />)
-              )
-            }
-          </EmptyHandler>
-        </div>
-      </div>
-    </>
-  );
-}
+                    <EmptyHandler isEmpty={cronTasks.length === 0}>
+                        {cronTasks.map((task: ICron, index: number) => (
+                            <CronTaskTableRow task={task} key={index} />
+                        ))}
+                    </EmptyHandler>
+                </div>
+            </div>
+        </>
+    );
+};

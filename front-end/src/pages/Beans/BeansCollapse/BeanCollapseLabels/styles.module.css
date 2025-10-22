@@ -1,28 +1,28 @@
 .CollapseHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  column-gap: 20px;
-  scroll-margin-top: 150px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 20px;
+    scroll-margin-top: 150px;
 }
 
 .ScopeWrapper {
-  display: flex;
-  justify-content: flex-end;
-  border-radius: 4px;
-  padding: 8px;
-  background-color: var(--axile-medium-grey);
-  font-weight: 500;
-  line-height: 16px;
-  letter-spacing: 0;
+    display: flex;
+    justify-content: flex-end;
+    border-radius: 4px;
+    padding: 8px;
+    background-color: var(--axile-medium-grey);
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0;
 }
 
 .ClassName {
-  color: var(--axile-bold-grey);
-  margin-top: 8px;
+    color: var(--axile-bold-grey);
+    margin-top: 8px;
 }
 
-.CollapseHeaderContent{
-  overflow: hidden;
-  width: 80%;
+.CollapseHeaderContent {
+    overflow: hidden;
+    width: 80%;
 }

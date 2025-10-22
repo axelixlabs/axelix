@@ -1,87 +1,81 @@
 import { message } from "antd";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
 
-import { Loader, EmptyHandler, ModifiableTableSection, PageSearch } from "components";
+import { EmptyHandler, Loader, ModifiableTableSection, PageSearch } from "components";
 import { fetchData, filterConfigPropsBeans } from "helpers";
+import { useAppSelector } from "hooks";
 import { type IConfigPropsBeanData, StatefulRequest } from "models";
+import { getConfigPropsData } from "services";
 
 import styles from "./styles.module.css";
-import { getConfigPropsData } from "services";
-import { useAppSelector } from "hooks";
 
 export const ConfigProps = () => {
-  const { t } = useTranslation()
-  const { instanceId } = useParams()
+    const { t } = useTranslation();
+    const { instanceId } = useParams();
 
-  const [search, setSearch] = useState<string>("")
-  const [configProps, setConfigProps] = useState(StatefulRequest.loading<IConfigPropsBeanData>())
-  const updatePropertyState = useAppSelector(state => state.updateProperty)
+    const [search, setSearch] = useState<string>("");
+    const [configProps, setConfigProps] = useState(StatefulRequest.loading<IConfigPropsBeanData>());
+    const updatePropertyState = useAppSelector((state) => state.updateProperty);
 
-  const fetchConfigProps = (instanceId: string) =>
-    fetchData(setConfigProps, () => getConfigPropsData(instanceId))
+    const fetchConfigProps = (instanceId: string) => fetchData(setConfigProps, () => getConfigPropsData(instanceId));
 
-  useEffect(() => {
-    if (instanceId) {
-      fetchConfigProps(instanceId)
+    useEffect(() => {
+        if (instanceId) {
+            fetchConfigProps(instanceId);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (updatePropertyState.completedSuccessfully() && instanceId) {
+            fetchConfigProps(instanceId);
+            message.success(t("saved"));
+        }
+    }, [updatePropertyState]);
+
+    if (configProps.loading) {
+        return <Loader />;
     }
-  }, []);
 
-  useEffect(() => {
-    if (updatePropertyState.completedSuccessfully() && instanceId) {
-      fetchConfigProps(instanceId)
-      message.success(t('saved'))
+    if (configProps.error) {
+        // TODO: handle this case differently in the future
+        return configProps.error;
     }
-  }, [updatePropertyState]);
 
-  if (configProps.loading) {
-    return <Loader />;
-  }
+    const configPropsBeansFeed = configProps.response!.beans;
 
-  if (configProps.error) {
-    // TODO: handle this case differently in the future
-    return configProps.error;
-  }
+    const effectiveConfigProps = search ? filterConfigPropsBeans(configPropsBeansFeed, search) : configPropsBeansFeed;
 
-  const configPropsBeansFeed = configProps.response!.beans;
+    const addonAfter = `${effectiveConfigProps.length} / ${configPropsBeansFeed.length}`;
 
-  const effectiveConfigProps = search
-    ? filterConfigPropsBeans(configPropsBeansFeed, search)
-    : configPropsBeansFeed;
+    return (
+        <>
+            <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
 
-  const addonAfter = `${effectiveConfigProps.length} / ${configPropsBeansFeed.length}`;
-
-  return (
-    <>
-      <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
-
-      <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
-        {effectiveConfigProps.map(({ beanName, prefix, properties }) => (
-          <ModifiableTableSection
-            headerName={beanName}
-            properties={
-              properties.map((property) => {
-                return {
-                  key: `${prefix}.${property.key}`,
-                  displayKey: property.key,
-                  displayValue: property.value,
-                }
-              })
-            }
-
-            key={beanName}
-          >
-            {prefix && (
-              <div className={styles.Prefix}>
-                <span className={styles.PrefixTitle}>Prefix:</span> {prefix}
-              </div>
-            )}
-          </ModifiableTableSection>
-        ))}
-      </EmptyHandler>
-    </>
-  );
+            <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
+                {effectiveConfigProps.map(({ beanName, prefix, properties }) => (
+                    <ModifiableTableSection
+                        headerName={beanName}
+                        properties={properties.map((property) => {
+                            return {
+                                key: `${prefix}.${property.key}`,
+                                displayKey: property.key,
+                                displayValue: property.value,
+                            };
+                        })}
+                        key={beanName}
+                    >
+                        {prefix && (
+                            <div className={styles.Prefix}>
+                                <span className={styles.PrefixTitle}>Prefix:</span> {prefix}
+                            </div>
+                        )}
+                    </ModifiableTableSection>
+                ))}
+            </EmptyHandler>
+        </>
+    );
 };
 
 export default ConfigProps;

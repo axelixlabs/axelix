@@ -1,12 +1,11 @@
-import { Input } from 'antd';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
+import { Input } from "antd";
+import classNames from "classnames";
+import type { Dispatch, SetStateAction } from "react";
+import { useTranslation } from "react-i18next";
 
-import styles from './styles.module.css'
-import type {Dispatch, SetStateAction} from "react";
+import styles from "./styles.module.css";
 
 interface IProps {
-
     /**
      * The value of the search
      */
@@ -25,11 +24,11 @@ interface IProps {
     /**
      * Optional text to display after the search field
      */
-    addonAfter?: string
+    addonAfter?: string;
 }
 
 export const PageSearch = ({ setSearch, search, addonAfter, hasBottomGutter = true }: IProps) => {
-    const { t } = useTranslation()
+    const { t } = useTranslation();
 
     return (
         <Input
@@ -37,9 +36,7 @@ export const PageSearch = ({ setSearch, search, addonAfter, hasBottomGutter = tr
             addonAfter={addonAfter}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className={classNames(
-                styles.Search,
-                { [styles.BottomGutter]: hasBottomGutter }
-            )} />
-    )
+            className={classNames(styles.Search, { [styles.BottomGutter]: hasBottomGutter })}
+        />
+    );
 };

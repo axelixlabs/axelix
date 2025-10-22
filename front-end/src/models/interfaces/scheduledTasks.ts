@@ -1,11 +1,10 @@
 import type { ICommonSliceState } from "./globals";
 
 interface IEnable {
-    enabled: boolean
+    enabled: boolean;
 }
 
 interface ITarget {
-
     /**
      * Target field of runnable field
      */
@@ -13,11 +12,10 @@ interface ITarget {
 }
 
 export interface IRunnable extends IEnable {
-
     /**
      * Runnable field of scheduled tasks types body
      */
-    runnable: ITarget
+    runnable: ITarget;
 }
 
 /**
@@ -37,16 +35,15 @@ export interface IFixedTasks extends IRunnable {
 
 // TODO: See the comment: https://github.com/Nucleon-Forge/axile/pull/205#discussion_r2431398757
 export interface IScheduledTaskItem {
-
     // TODO: migrate to enum later in the future
     /**
      * Scheduled tasks type
      */
-    type: "cron" | "fixedDelay" | "fixedRate" | "custom",
+    type: "cron" | "fixedDelay" | "fixedRate" | "custom";
     /**
      * Scheduled tasks list
      */
-    tasks: ICron[] | IFixedTasks[]
+    tasks: ICron[] | IFixedTasks[];
 }
 
 export interface IScheduledTasksSliceState extends ICommonSliceState {
@@ -65,13 +62,13 @@ export interface ScheduledTasksResponse {
     fixedRate: IFixedTasks[];
 }
 
-export function isEmpty(resp: ScheduledTasksResponse) : boolean {
-  return resp.cron.length === 0 && resp.fixedDelay.length === 0 && resp.fixedRate.length === 0;
+export function isEmpty(resp: ScheduledTasksResponse): boolean {
+    return resp.cron.length === 0 && resp.fixedDelay.length === 0 && resp.fixedRate.length === 0;
 }
 
 export interface IUpdateScheduledTasksBody {
     instanceId: string;
     targetScheduledTask: string;
     force: boolean;
-    statusType: "enable" | "disable"
+    statusType: "enable" | "disable";
 }

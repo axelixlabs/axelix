@@ -1,67 +1,65 @@
 import { Button, message } from "antd";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
 
-import { StatefulRequest, type ICachesData, StatelessRequest } from "models";
 import { EmptyHandler, Loader, PageSearch } from "components";
-import { CacheManagerSection } from "./CacheManagerSection";
 import { fetchData, filterCacheManagers } from "helpers";
-
-import styles from './styles.module.css'
+import { type ICachesData, StatefulRequest, StatelessRequest } from "models";
 import { clearAllCachesData, getCachesData } from "services";
 
+import { CacheManagerSection } from "./CacheManagerSection";
+import styles from "./styles.module.css";
+
 export const Caches = () => {
-    const { t } = useTranslation()
-    const { instanceId } = useParams()
+    const { t } = useTranslation();
+    const { instanceId } = useParams();
     const [messageApi, contextHolder] = message.useMessage();
 
-    const [search, setSearch] = useState<string>("")
-    const [clearAllCaches, setClearAllCaches] = useState(StatelessRequest.inactive())
-    const [cacheData, setCacheData] = useState(StatefulRequest.loading<ICachesData>())
+    const [search, setSearch] = useState<string>("");
+    const [clearAllCaches, setClearAllCaches] = useState(StatelessRequest.inactive());
+    const [cacheData, setCacheData] = useState(StatefulRequest.loading<ICachesData>());
 
     useEffect(() => {
         fetchData(setCacheData, () => getCachesData(instanceId!));
-    }, [])
+    }, []);
 
     useEffect(() => {
-      if (clearAllCaches.completedSuccessfully()) {
-        messageApi.success(t("cleared"))
-      }
-      // TODO: handle failure on clear
-    }, [clearAllCaches])
+        if (clearAllCaches.completedSuccessfully()) {
+            messageApi.success(t("cleared"));
+        }
+        // TODO: handle failure on clear
+    }, [clearAllCaches]);
 
     if (cacheData.loading) {
-        return <Loader />
+        return <Loader />;
     }
 
     // todo fix this in future
     if (cacheData.error) {
-        return cacheData.error
+        return cacheData.error;
     }
 
     const clearAllCachesClickHandler = (): void => {
         if (instanceId) {
-          setClearAllCaches(StatelessRequest.loading())
+            setClearAllCaches(StatelessRequest.loading());
 
-          clearAllCachesData(instanceId)
-              .then(value => {
-                if (value.status === 200) {
-                  setClearAllCaches(StatelessRequest.success())
-                } else {
-                  setClearAllCaches(StatelessRequest.error(""))
-                }
-              })
-              .catch(() => {
-                setClearAllCaches(StatelessRequest.error(""))
-              })
+            clearAllCachesData(instanceId)
+                .then((value) => {
+                    if (value.status === 200) {
+                        setClearAllCaches(StatelessRequest.success());
+                    } else {
+                        setClearAllCaches(StatelessRequest.error(""));
+                    }
+                })
+                .catch(() => {
+                    setClearAllCaches(StatelessRequest.error(""));
+                });
         }
-    }
+    };
 
-    const requiredCacheManagers = cacheData.response!.cacheManagers
-    const effectiveCacheManagers = search
-      ? filterCacheManagers(requiredCacheManagers, search)
-      : requiredCacheManagers
+    const requiredCacheManagers = cacheData.response!.cacheManagers;
+    const effectiveCacheManagers = search ? filterCacheManagers(requiredCacheManagers, search) : requiredCacheManagers;
 
     return (
         <>
@@ -69,10 +67,7 @@ export const Caches = () => {
             <div className={styles.TopSection}>
                 <PageSearch search={search} setSearch={setSearch} />
 
-                <Button
-                    type="primary"
-                    onClick={clearAllCachesClickHandler}
-                    loading={clearAllCaches.loading}>
+                <Button type="primary" onClick={clearAllCachesClickHandler} loading={clearAllCaches.loading}>
                     {t("clearAllCaches")}
                 </Button>
             </div>
@@ -83,7 +78,7 @@ export const Caches = () => {
                 ))}
             </EmptyHandler>
         </>
-    )
+    );
 };
 
 export default Caches;

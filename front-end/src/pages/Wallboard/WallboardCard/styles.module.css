@@ -3,7 +3,7 @@
     flex-direction: column;
     justify-content: space-between;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .Card:hover {
@@ -37,21 +37,21 @@
 }
 
 .CardDOWN {
-    border: 1px solid var(--axile-primary-red)
+    border: 1px solid var(--axile-primary-red);
 }
 
 .CardHeaderDOWN {
     background-color: var(--axile-primary-light-red);
-    outline: 1px solid var(--axile-primary-red)
+    outline: 1px solid var(--axile-primary-red);
 }
 
 .CardUNKNOWN {
-    border: 1px solid var(--axile-bold-grey)
+    border: 1px solid var(--axile-bold-grey);
 }
 
 .CardHeaderUNKNOWN {
     background-color: var(--axile-medium-grey);
-    outline: 1px solid var(--axile-bold-grey)
+    outline: 1px solid var(--axile-bold-grey);
 }
 
 .CardBody {

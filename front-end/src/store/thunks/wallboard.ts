@@ -16,4 +16,5 @@ export const getWallboardDataThunk = createAsyncThunk<IServiceCardsData, void, {
                 status: error.response?.status,
             });
         }
-    });
+    },
+);

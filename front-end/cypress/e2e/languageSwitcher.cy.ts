@@ -1,85 +1,79 @@
 interface ITranslationItem {
-  // todo В будущем определить где будут содержаться интерфейси тестов
+    // todo В будущем определить где будут содержаться интерфейси тестов
 
-  /**
-   * Data used to find specific elements on a page and check whether they have been translated.
-   * Depending on the selected language, an attempt will be made to find the translatable text.
-   */
-  locator: string;
-  ruText: string;
-  enText: string;
+    /**
+     * Data used to find specific elements on a page and check whether they have been translated.
+     * Depending on the selected language, an attempt will be made to find the translatable text.
+     */
+    locator: string;
+    ruText: string;
+    enText: string;
 }
 
 const translationItems: ITranslationItem[] = [
-  {
-    locator: '[data-test="header-links"]',
-    ruText: "Дашборд",
-    enText: "Dashboard",
-  },
-  {
-    locator: '[data-test="header-links"]',
-    ruText: "Панель",
-    enText: "Wallboard",
-  },
-  {
-    locator: ".ant-layout-sider-children",
-    ruText: "Аналитика",
-    enText: "Insights",
-  },
-  {
-    locator: ".ant-layout-sider-children",
-    ruText: "Логгеры",
-    enText: "Loggers",
-  },
-  {
-    locator: ".ant-layout-sider-children",
-    ruText: "Сопоставления",
-    enText: "Mappings",
-  },
+    {
+        locator: '[data-test="header-links"]',
+        ruText: "Дашборд",
+        enText: "Dashboard",
+    },
+    {
+        locator: '[data-test="header-links"]',
+        ruText: "Панель",
+        enText: "Wallboard",
+    },
+    {
+        locator: ".ant-layout-sider-children",
+        ruText: "Аналитика",
+        enText: "Insights",
+    },
+    {
+        locator: ".ant-layout-sider-children",
+        ruText: "Логгеры",
+        enText: "Loggers",
+    },
+    {
+        locator: ".ant-layout-sider-children",
+        ruText: "Сопоставления",
+        enText: "Mappings",
+    },
 ];
 
 const findTranslatedElements = (lang: "ru" | "en"): void => {
-  translationItems.forEach(({ locator, ruText, enText }) => {
-    const currentTranslates = lang === "ru" ? ruText : enText;
-    cy.contains(locator, currentTranslates).should("exist");
-  });
+    translationItems.forEach(({ locator, ruText, enText }) => {
+        const currentTranslates = lang === "ru" ? ruText : enText;
+        cy.contains(locator, currentTranslates).should("exist");
+    });
 };
 
 const switchLanguage = (lang: "ru" | "en"): void => {
-  const currentLanguage = lang === "ru" ? "Русский" : "English";
-  cy.get('[data-test="language-switcher-select"]').click();
-  cy.contains(".ant-select-item", currentLanguage).click();
+    const currentLanguage = lang === "ru" ? "Русский" : "English";
+    cy.get('[data-test="language-switcher-select"]').click();
+    cy.contains(".ant-select-item", currentLanguage).click();
 
-  cy.window()
-    .its("localStorage")
-    .invoke("getItem", "i18nextLng")
-    .should("eq", lang);
+    cy.window().its("localStorage").invoke("getItem", "i18nextLng").should("eq", lang);
 };
 
 describe("Internationalization works correctly", () => {
-  beforeEach(() => {
-    cy.window().then((win) => {
-      win.localStorage.setItem("accessToken", "mockAccessToken");
+    beforeEach(() => {
+        cy.window().then((win) => {
+            win.localStorage.setItem("accessToken", "mockAccessToken");
+        });
+        cy.visit("/");
     });
-    cy.visit("/");
-  });
 
-  it("Should have default language - Russian", () => {
-    cy.window()
-      .its("localStorage")
-      .invoke("getItem", "i18nextLng")
-      .should("eq", "ru");
+    it("Should have default language - Russian", () => {
+        cy.window().its("localStorage").invoke("getItem", "i18nextLng").should("eq", "ru");
 
-    findTranslatedElements("ru");
-  });
+        findTranslatedElements("ru");
+    });
 
-  it("Should switch language correctly", () => {
-    switchLanguage("en");
+    it("Should switch language correctly", () => {
+        switchLanguage("en");
 
-    findTranslatedElements("en");
+        findTranslatedElements("en");
 
-    switchLanguage("ru");
+        switchLanguage("ru");
 
-    findTranslatedElements("ru");
-  });
+        findTranslatedElements("ru");
+    });
 });

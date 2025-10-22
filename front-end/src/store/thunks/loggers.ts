@@ -8,11 +8,11 @@ export const setLoggerLevelThunk = createAsyncThunk<void, ISetLoggerLevelRequest
     "setLoggerLevelThunk",
     async ({ instanceId, loggerName, loggingLevel }, { rejectWithValue }) => {
         try {
-            await setLoggerLevel(instanceId, loggerName, loggingLevel)
+            await setLoggerLevel(instanceId, loggerName, loggingLevel);
         } catch (error: any) {
             return rejectWithValue({
                 status: error.response?.status,
             });
         }
-    }
+    },
 );

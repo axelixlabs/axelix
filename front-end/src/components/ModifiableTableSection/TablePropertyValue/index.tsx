@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
+
 import { Button, Input } from "antd";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
-import { updatePropertyThunk } from "store/thunks";
 import { useAppDispatch } from "hooks";
+import { updatePropertyThunk } from "store/thunks";
 
-import styles from './styles.module.css'
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
@@ -22,22 +23,24 @@ interface IProps {
 
 export const TablePropertyValue = ({ propertyName, propertyValue }: IProps) => {
     const dispatch = useAppDispatch();
-    const { instanceId } = useParams()
+    const { instanceId } = useParams();
 
     const [editProperty, setEditProperty] = useState<boolean>(false);
-    const [newPropertyValue, setNewPropertyValue] = useState<string>(propertyValue)
+    const [newPropertyValue, setNewPropertyValue] = useState<string>(propertyValue);
 
     const updatePropertyClickHandler = (): void => {
         if (instanceId) {
-          dispatch(updatePropertyThunk({
-            instanceId,
-            updatePropertyData: {
-              propertyName: propertyName,
-              newValue: newPropertyValue,
-            }
-          }))
+            dispatch(
+                updatePropertyThunk({
+                    instanceId,
+                    updatePropertyData: {
+                        propertyName: propertyName,
+                        newValue: newPropertyValue,
+                    },
+                }),
+            );
         }
-    }
+    };
 
     return (
         <div className={styles.MainWrapper}>
@@ -53,8 +56,8 @@ export const TablePropertyValue = ({ propertyName, propertyValue }: IProps) => {
                         icon={<CloseOutlined />}
                         type="primary"
                         onClick={() => {
-                            setEditProperty(false)
-                            setNewPropertyValue(propertyValue)
+                            setEditProperty(false);
+                            setNewPropertyValue(propertyValue);
                         }}
                         className={styles.CloseButton}
                     />
@@ -68,7 +71,7 @@ export const TablePropertyValue = ({ propertyName, propertyValue }: IProps) => {
                 </div>
             ) : (
                 <div className={styles.PropertyValueWrapper}>
-                    {propertyValue ?? 'null'}
+                    {propertyValue ?? "null"}
                     <Button
                         icon={<EditOutlined />}
                         type="primary"
@@ -78,5 +81,5 @@ export const TablePropertyValue = ({ propertyName, propertyValue }: IProps) => {
                 </div>
             )}
         </div>
-    )
+    );
 };
