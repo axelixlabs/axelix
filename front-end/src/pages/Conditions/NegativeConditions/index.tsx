@@ -1,24 +1,25 @@
 import styles from '../styles.module.css'
-import {EConditionStatus, type ICondition, type IConditionBeanNegative} from "models";
+import {EConditionStatus, type IConditionBeanNegative} from "models";
 
 import { Copy } from "components";
 import { ConditionsAccordionEntry } from "../ConditionAccordionEntry";
 import { Fragment } from 'react/jsx-runtime';
 
 interface IProps {
+
     /**
      * Negative or positive match
      */
     negativeMatches: IConditionBeanNegative[]
 }
 
-export const NegativeMatchTarget = ({ negativeMatches }: IProps) => {
+export const NegativeConditions = ({ negativeMatches }: IProps) => {
     return (
         <>
             {negativeMatches.map(({ target, matched, notMatched }) => {
                 const itemsWithStatus = [
-                    ...notMatched.map<ICondition>(item => ({ ...item, status: EConditionStatus.NOT_MATCHED })),
-                    ...matched.map<ICondition>(item => ({ ...item, status: EConditionStatus.MATCHED }))
+                    ...notMatched.map(item => ({ ...item, status: EConditionStatus.NOT_MATCHED })),
+                    ...matched.map(item => ({ ...item, status: EConditionStatus.MATCHED }))
                 ];
 
                 return (

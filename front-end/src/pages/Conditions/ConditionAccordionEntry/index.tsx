@@ -7,8 +7,13 @@ import Checkmark from 'assets/icons/checkmark.svg'
 
 import styles from './styles.module.css'
 
+interface IStatusAwareCondition extends ICondition {
+
+  status: EConditionStatus
+}
+
 interface IProps {
-    items: ICondition[]
+    items: IStatusAwareCondition[]
 }
 
 export const ConditionsAccordionEntry = ({ items }: IProps) => {
@@ -27,7 +32,7 @@ export const ConditionsAccordionEntry = ({ items }: IProps) => {
             key: `${message} ${condition}`,
             label: (
                 <div className={styles.LabelWrapper}>
-                    {!!status && findNeededIcon(status)}
+                    {findNeededIcon(status)}
                     {condition}
                 </div>
             ),

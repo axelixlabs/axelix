@@ -13,8 +13,8 @@ import {
   EConditionsTabs, type IConditionBeanNegative, type IConditionBeanPositive,
   type ConditionBeanCollection
 } from "models";
-import { NegativeMatchTarget } from "./NegativeMatchTarget";
-import { PositiveMatchTarget } from "./PositiveMatchTarget";
+import { NegativeConditions } from "./NegativeConditions";
+import { PositiveConditions } from "./PositiveConditions";
 import styles from "./styles.module.css";
 
 export const Conditions = () => {
@@ -53,7 +53,7 @@ export const Conditions = () => {
       label: t("Conditions.negativeMatches"),
       children: (
         <Matches title={t("Conditions.negativeMatches")}>
-          <NegativeMatchTarget negativeMatches={effectiveMatches as IConditionBeanNegative[]} />
+          <NegativeConditions negativeMatches={effectiveMatches as IConditionBeanNegative[]} />
         </Matches>
       )
     },
@@ -62,7 +62,7 @@ export const Conditions = () => {
       label: t("Conditions.positiveMatches"),
       children: (
         <Matches title={t("Conditions.positiveMatches")}>
-          <PositiveMatchTarget positiveMatches={effectiveMatches as IConditionBeanPositive[]} />
+          <PositiveConditions positiveMatches={effectiveMatches as IConditionBeanPositive[]} />
         </Matches>
       ),
     },

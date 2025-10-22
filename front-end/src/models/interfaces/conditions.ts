@@ -1,12 +1,9 @@
-import type { EConditionStatus } from "models";
-
 /**
  * Condition data
  */
 export interface ICondition {
     condition: string;
     message: string;
-    status?: EConditionStatus
 }
 
 /**
