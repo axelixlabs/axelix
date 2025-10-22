@@ -1,16 +1,11 @@
 import { Input } from "antd";
 import classNames from "classnames";
-import type { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    /**
-     * The value of the search
-     */
-    search: string;
-
     /**
      * SetState to update the search string
      */
@@ -27,15 +22,24 @@ interface IProps {
     addonAfter?: string;
 }
 
-export const PageSearch = ({ setSearch, search, addonAfter, hasBottomGutter = true }: IProps) => {
+export const PageSearch = ({ setSearch, addonAfter, hasBottomGutter = true }: IProps) => {
     const { t } = useTranslation();
+
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+
+        debounceRef.current = setTimeout(() => setSearch(e.target.value), 500);
+    };
 
     return (
         <Input
             placeholder={t("search")}
             addonAfter={addonAfter}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleChange}
             className={classNames(styles.Search, { [styles.BottomGutter]: hasBottomGutter })}
         />
     );

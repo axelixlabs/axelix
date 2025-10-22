@@ -51,7 +51,7 @@ export const ConfigProps = () => {
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
+            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
 
             <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
                 {effectiveConfigProps.map(({ beanName, prefix, properties }) => (

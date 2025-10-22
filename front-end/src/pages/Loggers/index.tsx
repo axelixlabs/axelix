@@ -48,7 +48,7 @@ export const Loggers = () => {
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
+            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
 
             <EmptyHandler isEmpty={effectiveLoggers.length === 0}>
                 {effectiveLoggers.map((logger) => (

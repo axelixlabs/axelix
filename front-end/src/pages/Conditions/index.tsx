@@ -79,7 +79,8 @@ export const Conditions = () => {
     return (
         <>
             <div className={styles.FirstSection}>
-                <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
+                <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
+
                 <Tabs
                     activeKey={activeKey}
                     onChange={handleTabChange}

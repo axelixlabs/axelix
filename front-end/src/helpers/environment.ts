@@ -12,6 +12,6 @@ export const filterPropertySources = (
             return true;
         }
 
-        return properties.some(({ key }) => key.toLowerCase().includes(formattedSearch));
+        return properties.some(({ name }) => name.toLowerCase().includes(formattedSearch));
     });
 };
