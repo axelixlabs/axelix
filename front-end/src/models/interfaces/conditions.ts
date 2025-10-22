@@ -1,32 +1,33 @@
+import type { EConditionStatus } from "models";
+
 /**
  * Condition data
  */
 export interface ICondition {
     condition: string;
     message: string;
-}
-
-/**
- * Negative condition matches
- */
-export interface INegativeMatches {
-    target: string;
-    notMatched: ICondition[];
-    matched: ICondition[];
+    status?: EConditionStatus
 }
 
 /**
  * Positive condition matches
  */
-export interface IPositiveMatches {
+export interface IConditionBeanPositive {
     target: string;
-    matches: ICondition[];
+    matched: ICondition[];
+}
+
+/**
+ * Negative condition matches
+ */
+export interface IConditionBeanNegative extends IConditionBeanPositive {
+    notMatched: ICondition[];
 }
 
 /**
  * All condition data received from the server
  */
 export interface IConditionsData {
-    negativeMatches: INegativeMatches[];
-    positiveMatches: IPositiveMatches[];
+    negativeMatches: IConditionBeanNegative[];
+    positiveMatches: IConditionBeanPositive[];
 }

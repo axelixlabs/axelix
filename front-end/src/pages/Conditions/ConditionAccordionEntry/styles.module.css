@@ -1,0 +1,20 @@
+.Collapse {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-bottom: 40px;
+}
+
+.Collapse:last-child {
+    margin-bottom: 0;
+}
+
+.LabelWrapper {
+    display: flex;
+    align-items: flex-start;
+    column-gap: 8px;
+    word-break: break-all;
+}
+
+.Message {
+    word-break: break-all;
+}
