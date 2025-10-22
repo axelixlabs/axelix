@@ -37,7 +37,7 @@ const ScheduledTasks = () => {
     const effectiveScheduledTasks = search ? filterScheduledTasks(scheduledTasksData, search) : scheduledTasksData;
     return (
         <>
-            <PageSearch search={search} setSearch={setSearch} />
+            <PageSearch setSearch={setSearch} />
 
             <EmptyHandler isEmpty={isEmpty(effectiveScheduledTasks)}>
                 <CronTasks cronTasks={effectiveScheduledTasks.cron} />
