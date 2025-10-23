@@ -1,9 +1,15 @@
 import { notification } from "antd";
 import type { AxiosResponse } from "axios";
 import { t } from "i18next";
-import type { Dispatch, SetStateAction } from "react";
+import type { Dispatch, RefObject, SetStateAction } from "react";
 
-import { type IConfigPropsBean, type IEnvironmentPropertySource, type MenuItem, StatefulRequest } from "models";
+import {
+    type IConfigPropsBean,
+    type ICustomTooltipState,
+    type IEnvironmentPropertySource,
+    type MenuItem,
+    StatefulRequest,
+} from "models";
 import { UNKNOWN_ERROR } from "utils";
 
 export const findOpenKeys = (items: MenuItem[], path: string): string[] => {
@@ -71,4 +77,36 @@ export function showErrorNotification(errorCode: string): void {
 
 export const commonNormalize = (string: string): string => {
     return canonicalize(string);
+};
+
+export const calculateTooltipPosition = (
+    triggerRef: RefObject<HTMLElement | null>,
+    tooltipRef: RefObject<HTMLElement | null>,
+    setTooltipState: Dispatch<SetStateAction<ICustomTooltipState>>,
+): void => {
+    const element = triggerRef.current;
+    const tooltip = tooltipRef.current;
+
+    if (!element || !tooltip) {
+        return;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const tipRect = tooltip.getBoundingClientRect();
+    const margin = 8;
+
+    let left = rect.left + rect.width / 2 - tipRect.width / 2;
+    left = Math.max(8, Math.min(left, innerWidth - tipRect.width - 8));
+
+    const top = rect.top - tipRect.height - margin;
+
+    setTooltipState({ top: Math.round(top), left: Math.round(left) });
+};
+
+export const isTooltipTruncatedText = (element: HTMLElement | null): boolean => {
+    if (!element) {
+        return false;
+    }
+
+    return element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight;
 };

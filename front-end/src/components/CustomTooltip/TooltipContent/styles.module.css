@@ -1,0 +1,32 @@
+.TooltipContentWrapper {
+    position: fixed;
+    z-index: 999;
+    padding: 6px 8px;
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+    background: rgba(20, 20, 20, 0.96);
+    color: #fff;
+    font-size: 15px;
+    line-height: 1.2;
+    word-break: break-word;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.TooltipOpened {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.TooltipArrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    transform: rotate(45deg);
+    background: inherit;
+    box-shadow: inherit;
+    bottom: -5px;
+    left: calc(50% - 5px);
+}

@@ -1,15 +1,12 @@
-.TextWrapper {
-    display: flex;
-    align-items: center;
-    column-gap: 8px;
+.MainWrapper {
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
+  min-width: 0;
 }
 
 .Text {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.Tooltip {
-    min-width: 0;
 }

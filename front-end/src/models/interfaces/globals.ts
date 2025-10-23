@@ -1,3 +1,5 @@
+import type { MouseEvent, Ref, RefObject } from "react";
+
 /**
  * @deprecated We're attempting to migrate from this abstraction, since redux slice in and
  * of itself does not have properties {@link loading} or {@link error}. These are the properties
@@ -135,4 +137,34 @@ export interface IErrorResponse {
      * Server text used to display a user-friendly notification
      */
     code?: string;
+}
+
+export interface ICustomTooltipState {
+    /**
+     *  Vertical position of the tooltip (in pixels)
+     * */
+    top: number;
+    /**
+     *  Horizontal position of the tooltip (in pixels)
+     * */
+    left: number;
+}
+
+export interface ITooltipChildProps {
+    /**
+     *  Optional ref for the trigger element
+     * */
+    ref?: Ref<HTMLElement>;
+    /**
+     *  Reference to the trigger element (used for position calculation)
+     * */
+    triggerRef: RefObject<HTMLElement>;
+    /**
+     *  Optional mouse enter event handler
+     * */
+    onMouseEnter?: (e: MouseEvent<HTMLElement>) => void;
+    /**
+     *  Optional mouse leave event handler
+     * */
+    onMouseLeave?: (e: MouseEvent<HTMLElement>) => void;
 }

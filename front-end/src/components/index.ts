@@ -2,6 +2,7 @@ export { ModifiableTableSection } from "./ModifiableTableSection";
 export { LanguageSwitcher } from "./LanguageSwitcher";
 export { TooltipWithCopy } from "./TooltipWithCopy";
 export { LinearProgress } from "./LinearProgress";
+export { CustomTooltip } from "./CustomTooltip";
 export { EmptyHandler } from "./EmptyHandler";
 export { PageSearch } from "./PageSearch";
 export { Accordion } from "./Accordion";
