@@ -1,0 +1,1 @@
+{"root":["./cypress/e2e/languageswitcher.cy.ts","./cypress/support/commands.ts","./cypress/support/e2e.ts"],"version":"5.8.3"}

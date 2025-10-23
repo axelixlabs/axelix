@@ -26,35 +26,40 @@ export const Login = () => {
         dispatch(loginThunk(loginData));
     };
 
-    return (
-        <div className={styles.LoginFormWrapper}>
-            <h1 className={classNames("MediumTitle", styles.LoginTitle)}>{t("login")}</h1>
-            <Form layout="vertical" onFinish={onFinish} autoComplete="off">
-                <Form.Item
-                    key={t("username")}
-                    label={t("username")}
-                    name="username"
-                    required={false}
-                    rules={[{ required: true, message: t("enterUsername") }]}
-                >
-                    <Input className={styles.LoginInput} />
-                </Form.Item>
-                <Form.Item
-                    key={t("password")}
-                    label={t("password")}
-                    name="password"
-                    required={false}
-                    rules={[{ required: true, message: t("enterPassword") }]}
-                >
-                    <Input.Password className={styles.LoginInput} />
-                </Form.Item>
-                <Button type="primary" htmlType="submit" loading={loading} className={styles.SubmitButton}>
-                    {t("loginButtonText")}
-                </Button>
-                <p className={styles.Error}>{error}</p>
-            </Form>
-        </div>
-    );
+  return (
+    <div className={styles.LoginFormWrapper}>
+      <h1 className={classNames('MediumTitle', styles.LoginTitle)}>{t("Authorization.login")}</h1>
+      <Form layout="vertical" onFinish={onFinish} autoComplete="off">
+        <Form.Item
+          key="username"
+          label={t("Authorization.username")}
+          name="username"
+          required={false}
+          rules={[{ required: true, message: t("Authorization.enterUsername") }]}
+        >
+          <Input className={styles.LoginInput} />
+        </Form.Item>
+        <Form.Item
+          key="password"
+          label={t("Authorization.password")}
+          name="password"
+          required={false}
+          rules={[{ required: true, message: t("Authorization.enterPassword") }]}
+        >
+          <Input.Password className={styles.LoginInput} />
+        </Form.Item>
+        <Button
+          type="primary"
+          htmlType="submit"
+          loading={loading}
+          className={styles.SubmitButton}
+        >
+          {t("Authorization.loginButtonText")}
+        </Button>
+        <p className={styles.Error}>{error}</p>
+      </Form>
+    </div>
+  );
 };
 
 export default Login;

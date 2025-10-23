@@ -37,7 +37,7 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
         })
             .then(() => {
                 setClearSingleCache(StatelessRequest.success());
-                message.success(t("cleared"));
+                message.success(t("Caches.cleared"))
             })
             .catch(() => setClearSingleCache(StatelessRequest.error("")));
     };
@@ -45,10 +45,10 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
     return (
         <div className={styles.CollapseHeader}>
             <div>
-                <span>{t("cacheName")}: </span>
+                <span>{t("Caches.cacheName")}: </span>
                 <span className={styles.CacheName}>{cache.name}</span>
                 <div className={styles.Target}>
-                    {t("cacheTarget")}: <TooltipWithCopy text={cache.target} />
+                    {t("Caches.cacheTarget")}: <TooltipWithCopy text={cache.target} />
                 </div>
             </div>
             <Button

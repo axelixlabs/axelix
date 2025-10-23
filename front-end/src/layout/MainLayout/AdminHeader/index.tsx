@@ -16,12 +16,12 @@ export const AdminHeader = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const items: MenuProps["items"] = [
-        {
-            key: "logout",
-            label: <div>{t("logout")}</div>,
-        },
-    ];
+  const items: MenuProps["items"] = [
+    {
+      key: "logout",
+      label: <div>{t("Authorization.logout")}</div>,
+    },
+  ];
 
     return (
         <Header className={styles.Header}>

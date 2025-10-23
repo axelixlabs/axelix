@@ -1,65 +1,77 @@
 {
-    "login": "Вход",
-    "logout": "Выйти",
-    "search": "Поиск",
-    "username": "Имя пользователя",
-    "enterUsername": "Введите имя пользователя",
-    "password": "Пароль",
-    "enterPassword": "Введите пароль",
-    "loginButtonText": "Войти",
+  "search": "Поиск",
+  "noData": "Нет данных",
+  "copied": "Скопировано",
+  "copyFailed": "Не удалось скопировать",
+  "reset": "Сбросить",
+  "propertyChangedSuccessfully": "Свойство Изменено",
+  "saved": "Сохранено",
+  "Environments": {
+    "activeProfiles": "Профили"
+  },
+  "Loggers": {
+    "configuredExplicitly": "Задан явно",
+    "loggerLevelUpdated": "Уровень логгера изменён"
+  },
+  "Header": {
     "dashboard": "Дашборд",
-    "wallboard": "Панель",
+    "wallboard": "Панель"
+  },
+  "Sider": {
     "insights": "Аналитика",
     "details": "Детали",
     "metrics": "Метрики",
     "environment": "Окружение",
     "configurationProperties": "Свойства конфигурации",
     "scheduledTasks": "Запланированные задачи",
+    "conditions": "Условия",
     "loggers": "Логгеры",
     "mappings": "Сопоставления",
-    "caches": "Кэши",
-    "activeProfiles": "Профили",
-    "noData": "Нет данных",
-    "copied": "Скопировано",
-    "copyFailed": "Не удалось скопировать",
-    "reset": "Сбросить",
-    "configuredExplicitly": "Задан явно",
-    "loggerLevelUpdated": "Уровень логгера изменён",
-    "propertyChangedSuccessfully": "Свойство Изменено",
+    "caches": "Кэши"
+  },
+  "Caches": {
     "clearAllCaches": "Очистить все кэши",
     "cacheTarget": "Реализация",
     "cacheName": "Имя",
-    "cleared": "Очищено",
-    "saved": "Сохранено",
-    "Conditions": {
-        "title": "Условия",
-        "negativeMatches": "Отрицательные совпадения",
-        "positiveMatches": "Положительные совпадения"
-    },
-    "Beans": {
-        "dependencies": "Зависимости",
-        "aliases": "Алиасы",
-        "qualifiers": "Квалифаеры",
-        "isLazyInitBean": "Ленивый",
-        "isPrimaryBean": "Primary",
-        "beanProxyType": "Проксирование",
-        "unknownProxyingType": "Незивестно",
-        "cglibProxy": "CGLIB",
-        "jdkProxy": "JDK Динамический Прокси",
-        "noProxy": "Не проксирован"
-    },
-    "ScheduledTasks": {
-        "runnable": "Метод",
-        "expression": "Cron выражение",
-        "status": "Статус",
-        "initialDelay": "Начальная <br /> задержка (мс)",
-        "interval": "Интервал (мс)",
-        "on": "ВКЛ",
-        "off": "ВЫКЛ",
-        "cron": "Cron",
-        "fixedDelay": "Fixed delay",
-        "fixedRate": "Fixed rate",
-        "enabled": "Задача включена",
-        "disabled": "Задача выключена"
-    }
+    "cleared": "Очищено"
+  },
+  "Authorization": {
+    "login": "Вход",
+    "logout": "Выйти",
+    "username": "Имя пользователя",
+    "enterUsername": "Введите имя пользователя",
+    "password": "Пароль",
+    "enterPassword": "Введите пароль",
+    "loginButtonText": "Войти"
+  },
+  "Conditions": {
+    "negativeMatches": "Отрицательные совпадения",
+    "positiveMatches": "Положительные совпадения"
+  },
+  "Beans": {
+    "dependencies": "Зависимости",
+    "aliases": "Алиасы",
+    "qualifiers": "Квалифаеры",
+    "isLazyInitBean": "Ленивый",
+    "isPrimaryBean": "Primary",
+    "beanProxyType": "Проксирование",
+    "unknownProxyingType": "Незивестно",
+    "cglibProxy": "CGLIB",
+    "jdkProxy": "JDK Динамический Прокси",
+    "noProxy": "Не проксирован"
+  },
+  "ScheduledTasks": {
+    "runnable": "Метод",
+    "expression": "Cron выражение",
+    "status": "Статус",
+    "initialDelay": "Начальная <br /> задержка (мс)",
+    "interval": "Интервал (мс)",
+    "on": "ВКЛ",
+    "off": "ВЫКЛ",
+    "cron": "Cron",
+    "fixedDelay": "Fixed delay",
+    "fixedRate": "Fixed rate",
+    "enabled": "Задача включена",
+    "disabled": "Задача выключена"
+  }
 }

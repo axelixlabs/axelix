@@ -75,7 +75,7 @@ export const Logger = ({ levels, logger }: IProps) => {
                                     {level}
                                 </label>
                                 {configuredLevel === level && (
-                                    <Tooltip title={t("configuredExplicitly")} className={styles.Tooltip}>
+                                    <Tooltip title={t("Loggers.configuredExplicitly")} className={styles.Tooltip}>
                                         <img src={TargetIcon} alt="Target icon" className={styles.TargetIcon} />
                                     </Tooltip>
                                 )}

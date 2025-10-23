@@ -26,7 +26,7 @@ export const Caches = () => {
 
     useEffect(() => {
         if (clearAllCaches.completedSuccessfully()) {
-            messageApi.success(t("cleared"));
+            messageApi.success(t("Caches.cleared"));
         }
         // TODO: handle failure on clear
     }, [clearAllCaches]);
@@ -68,7 +68,7 @@ export const Caches = () => {
                 <PageSearch search={search} setSearch={setSearch} />
 
                 <Button type="primary" onClick={clearAllCachesClickHandler} loading={clearAllCaches.loading}>
-                    {t("clearAllCaches")}
+                    {t("Caches.clearAllCaches")}
                 </Button>
             </div>
 

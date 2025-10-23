@@ -10,16 +10,15 @@ export const LanguageSwitcher = () => {
         i18n.changeLanguage(value);
     };
 
-    return (
-        <Select
-            data-test="language-switcher-select"
-            defaultValue={i18n.language}
-            onChange={handleChange}
-            options={[
-                { value: "en", label: "English" },
-                { value: "ru", label: "Русский" },
-            ]}
-            className={styles.LanguageSwitcherSelect}
-        />
-    );
+  return (
+    <Select
+      defaultValue={i18n.language}
+      onChange={handleChange}
+      options={[
+        { value: "en", label: "English" },
+        { value: "ru", label: "Русский" },
+      ]}
+      className={styles.LanguageSwitcherSelect}
+    />
+  );
 };
