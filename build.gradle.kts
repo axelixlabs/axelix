@@ -20,14 +20,6 @@ allprojects {
     version = "1.0.0-SNAPSHOT"
 
     repositories {
-        maven {
-            url = uri("https://maven.pkg.github.com/Nucleon-Forge/axile")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
-            }
-        }
-
         mavenCentral()
     }
 }
@@ -75,18 +67,18 @@ subprojects {
         repositories {
             maven {
                 name = "NucleonForgeAxile"
-                url = uri("https://maven.pkg.github.com/Nucleon-Forge/axile")
+                url = uri("https://158.160.69.73:8443/repository/axile-monorepo/")
                 credentials {
-                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                    password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+                    username = project.findProperty("nexus.user") as String? ?: System.getenv("NEXUS_USER")
+                    password = project.findProperty("nexus.password") as String? ?: System.getenv("NEXUS_PASSWORD")
                 }
             }
         }
 
         publications {
 
-            // Publish to GitHub Package Registry
-            register<MavenPublication>("gpr") {
+            // Publish to Nexus
+            register<MavenPublication>("nexus") {
                 from(components["java"])
             }
         }
