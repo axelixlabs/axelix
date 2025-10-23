@@ -15,4 +15,5 @@ export const getConfigPropsThunk = createAsyncThunk<IConfigPropsBeanData, string
                 status: error.response?.status,
             });
         }
-    });
+    },
+);

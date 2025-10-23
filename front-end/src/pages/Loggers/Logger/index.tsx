@@ -1,89 +1,90 @@
 import { Tooltip } from "antd";
-import { useParams } from "react-router-dom";
+import TargetIcon from "assets/icons/TargetIcon.svg";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
 
-import { setLoggerLevelThunk } from "store/thunks";
 import { TooltipWithCopy } from "components";
 import { useAppDispatch } from "hooks";
 import type { ILogger } from "models";
+import { setLoggerLevelThunk } from "store/thunks";
 import { statePalette } from "utils";
-
-import TargetIcon from 'assets/icons/TargetIcon.svg'
 
 import styles from "./styles.module.css";
 
 interface IProps {
-  /**
-   * All possible logging levels that are supported by the logging system inside the instance
-  */
-  levels: string[];
-  /**
-   * Single logger
-   */
-  logger: ILogger;
+    /**
+     * All possible logging levels that are supported by the logging system inside the instance
+     */
+    levels: string[];
+    /**
+     * Single logger
+     */
+    logger: ILogger;
 }
 
 export const Logger = ({ levels, logger }: IProps) => {
-  const { t } = useTranslation();
-  const dispatch = useAppDispatch();
-  const { effectiveLevel, configuredLevel } = logger
-  const { instanceId } = useParams();
+    const { t } = useTranslation();
+    const dispatch = useAppDispatch();
+    const { effectiveLevel, configuredLevel } = logger;
+    const { instanceId } = useParams();
 
-  const handleChange = (level: string): void => {
-    if (configuredLevel === level) {
-      return
-    }
+    const handleChange = (level: string): void => {
+        if (configuredLevel === level) {
+            return;
+        }
 
-    if (instanceId) {
-      dispatch(setLoggerLevelThunk({
-        instanceId,
-        loggerName: logger.name,
-        loggingLevel: level
-      }));
-    }
-  };
-
-  return (
-    <div className={styles.MainWrapper}>
-      <TooltipWithCopy text={logger.name} />
-
-      <div className={styles.LoggerValuesWrapper}>
-        <div className={styles.LevelsWrapper}>
-          {levels.map((level) => {
-            // @ts-expect-error todo fix type in future
-            const color = statePalette[level] || statePalette.DEFAULT;
-
-            return (
-              <div className={styles.RadioGroupWrapper} key={level}>
-                <label
-                  className={`${styles.RadioButton} ${effectiveLevel === level ? styles.Selected : ""}`}
-                  style={{
-                    "--color-primary": color.colorPrimary,
-                    "--color-primary-hover": color.colorPrimaryHover,
-                    "--color-primary-active": color.colorPrimaryActive,
-                  } as React.CSSProperties}
-                >
-                  <input
-                    type="radio"
-                    value={level}
-                    checked={effectiveLevel === level}
-                    onChange={() => handleChange(level)}
-                  />
-                  {level}
-                </label>
-                {configuredLevel === level && (
-                  <Tooltip title={t("configuredExplicitly")} className={styles.Tooltip}>
-                    <img src={TargetIcon} alt="Target icon" className={styles.TargetIcon} />
-                  </Tooltip>
-                )}
-              </div>
+        if (instanceId) {
+            dispatch(
+                setLoggerLevelThunk({
+                    instanceId,
+                    loggerName: logger.name,
+                    loggingLevel: level,
+                }),
             );
-          })}
+        }
+    };
+
+    return (
+        <div className={styles.MainWrapper}>
+            <TooltipWithCopy text={logger.name} />
+
+            <div className={styles.LoggerValuesWrapper}>
+                <div className={styles.LevelsWrapper}>
+                    {levels.map((level) => {
+                        // @ts-expect-error todo fix type in future
+                        const color = statePalette[level] || statePalette.DEFAULT;
+
+                        return (
+                            <div className={styles.RadioGroupWrapper} key={level}>
+                                <label
+                                    className={`${styles.RadioButton} ${effectiveLevel === level ? styles.Selected : ""}`}
+                                    style={
+                                        {
+                                            "--color-primary": color.colorPrimary,
+                                            "--color-primary-hover": color.colorPrimaryHover,
+                                            "--color-primary-active": color.colorPrimaryActive,
+                                        } as React.CSSProperties
+                                    }
+                                >
+                                    <input
+                                        type="radio"
+                                        value={level}
+                                        checked={effectiveLevel === level}
+                                        onChange={() => handleChange(level)}
+                                    />
+                                    {level}
+                                </label>
+                                {configuredLevel === level && (
+                                    <Tooltip title={t("configuredExplicitly")} className={styles.Tooltip}>
+                                        <img src={TargetIcon} alt="Target icon" className={styles.TargetIcon} />
+                                    </Tooltip>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+                <button className={styles.Reset}>{t("reset")}</button>
+            </div>
         </div>
-        <button className={styles.Reset}>
-          {t("reset")}
-        </button>
-      </div>
-    </div>
-  );
+    );
 };

@@ -1,36 +1,36 @@
 .MainWrapper {
-  background-color: #edeaec;
+    background-color: #edeaec;
 }
 
 .Header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  width: 100%;
-  height: var(--axile-header-height);
-  background-color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 100%;
+    height: var(--axile-header-height);
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .LanguageSwitcherWrapper {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .ContentWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: var(--axile-header-height);
-  min-height: calc(100vh - var(--axile-header-height));
-  padding-block: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: var(--axile-header-height);
+    min-height: calc(100vh - var(--axile-header-height));
+    padding-block: 30px;
 }
 
 .Logo {
-  width: 140px;
+    width: 140px;
 }

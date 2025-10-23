@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-import { clearAllCachesData, clearCacheData, getCachesData } from "services";
 import type { ICachesData, IClearCachePayload } from "models";
+import { clearAllCachesData, clearCacheData, getCachesData } from "services";
 
 export const getCachesThunk = createAsyncThunk<ICachesData, string, { rejectValue: any }>(
     "getCachesThunk",
@@ -16,7 +16,8 @@ export const getCachesThunk = createAsyncThunk<ICachesData, string, { rejectValu
                 status: error.response?.status,
             });
         }
-    });
+    },
+);
 
 export const clearAllCachesThunk = createAsyncThunk<void, string, { rejectValue: any }>(
     "clearAllCachesThunk",
@@ -29,7 +30,8 @@ export const clearAllCachesThunk = createAsyncThunk<void, string, { rejectValue:
                 status: error.response?.status,
             });
         }
-    });
+    },
+);
 
 export const clearCacheThunk = createAsyncThunk<void, IClearCachePayload, { rejectValue: any }>(
     "clearCacheThunk",
@@ -42,4 +44,5 @@ export const clearCacheThunk = createAsyncThunk<void, IClearCachePayload, { reje
                 status: error.response?.status,
             });
         }
-    });
+    },
+);

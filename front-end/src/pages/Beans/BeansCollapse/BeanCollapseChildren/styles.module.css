@@ -1,39 +1,38 @@
 .CollapseBody {
-  display: grid;
-  grid-template-columns: 140px 70%;
-  gap: 20px;
+    display: grid;
+    grid-template-columns: 140px 70%;
+    gap: 20px;
 }
 
 .Dependency {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .Dependency:hover {
-  color: var(--axile-primary-green);
+    color: var(--axile-primary-green);
 }
 
 .Divider {
-  margin-block: 5px;
+    margin-block: 5px;
 }
 
 .CollapseBodyChunkTitle {
-  font-weight: 600;
-  word-break: break-all;
+    font-weight: 600;
+    word-break: break-all;
 }
 
 .CollapseBodyChunkList {
-  border-bottom: 1px solid var(--axile-medium-grey);
-  margin-bottom: 8px;
-  padding-bottom: 8px;
+    border-bottom: 1px solid var(--axile-medium-grey);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
 }
 
 .CollapseBodyChunkList:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 .SimpleListValue {
-  word-break: break-all;
+    word-break: break-all;
 }
-

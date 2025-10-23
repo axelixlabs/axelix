@@ -1,25 +1,25 @@
 .MainWrapper {
-  min-height: 100vh;
+    min-height: 100vh;
 }
 
 .Sider {
-  position: fixed;
-  top: var(--axile-header-height);
-  height: 100vh;
-  background-color: #fff;
+    position: fixed;
+    top: var(--axile-header-height);
+    height: 100vh;
+    background-color: #fff;
 }
 
 .Content {
-  padding: 24px;
-  background: #fff;
+    padding: 24px;
+    background: #fff;
 }
 
 .Content.WithSider {
-  /* Set left margin equal to the width of the Sider component */
-  margin-left: 270px;
+    /* Set left margin equal to the width of the Sider component */
+    margin-left: 270px;
 }
 
 .ContentLayout {
-  margin-top: var(--axile-header-height);
-  padding: 24px;
+    margin-top: var(--axile-header-height);
+    padding: 24px;
 }

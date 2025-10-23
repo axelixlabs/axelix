@@ -3,12 +3,11 @@ import type { TFunction } from "i18next";
 import { EProxyType, type IBean } from "models";
 
 export const resolveProxying = (t: TFunction, proxyType: EProxyType | null): string => {
-
     if (!proxyType) {
-        return t("Beans.unknownProxyingType")
+        return t("Beans.unknownProxyingType");
     }
 
-    let message: string
+    let message: string;
 
     switch (proxyType) {
         case EProxyType.CGLIB: {
@@ -26,7 +25,7 @@ export const resolveProxying = (t: TFunction, proxyType: EProxyType | null): str
     }
 
     return message;
-}
+};
 
 export const filterBeans = (beans: IBean[], search: string): IBean[] => {
     const formattedSearch = search.toLowerCase().trim();
@@ -34,12 +33,12 @@ export const filterBeans = (beans: IBean[], search: string): IBean[] => {
     return beans.filter(({ beanName, className, aliases }) => {
         const lowerBeanName = beanName.toLowerCase();
         if (lowerBeanName.includes(formattedSearch)) {
-            return true
+            return true;
         }
 
         const lowerClassName = className.toLowerCase();
         if (lowerClassName.includes(formattedSearch)) {
-            return true
+            return true;
         }
 
         return aliases.some((alias) => alias.toLowerCase().includes(formattedSearch));

@@ -1,62 +1,67 @@
 @import url(./antdCustomizedTable.css);
 
 @font-face {
-  font-family: "Golos";
-  src: url("fonts/Variable_Golos_Text.woff2") format("woff2");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
+    font-family: "Golos";
+    src: url("fonts/Variable_Golos_Text.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
 }
 
 :root {
-  --axile-header-height: 65px;
-  --axile-primary-green: #00ab55;
-  --axile-primary-light-green: #00ab551a;
-  --axile-light-grey: #f0f0f0;
-  --axile-medium-grey: #d9d9d9;
-  --axile-bold-grey: #838383;
-  --axile-primary-red: #FF000A;
-  --axile-primary-light-red: #FF000A1A;
+    --axile-header-height: 65px;
+    --axile-primary-green: #00ab55;
+    --axile-primary-light-green: #00ab551a;
+    --axile-light-grey: #f0f0f0;
+    --axile-medium-grey: #d9d9d9;
+    --axile-bold-grey: #838383;
+    --axile-primary-red: #ff000a;
+    --axile-primary-light-red: #ff000a1a;
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 html {
-  scroll-behavior: smooth;
+    scroll-behavior: smooth;
 }
 
 body {
-  font-family: "Golos", Helvetica, Arial, sans-serif, -apple-system;
+    font-family:
+        "Golos",
+        Helvetica,
+        Arial,
+        sans-serif,
+        -apple-system;
 }
 
 ul,
 ol {
-  list-style: none;
+    list-style: none;
 }
 
 a {
-  text-decoration: none;
-  color: inherit;
+    text-decoration: none;
+    color: inherit;
 }
 
 .MainContainer {
-  background-color: #fff;
-  max-width: 1450px;
-  padding: 0 40px;
-  width: 100%;
-  margin: 0 auto;
+    background-color: #fff;
+    max-width: 1450px;
+    padding: 0 40px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .MediumTitle {
-  font-size: 32px;
-  line-height: 1.2;
-  font-weight: bold;
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: bold;
 }
 
 /* This is a customization of the Ant Design Collapse component.
