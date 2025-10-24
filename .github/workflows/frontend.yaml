@@ -28,6 +28,7 @@ jobs:
       - name: Lint application
         run: npm run lint
   deploy:
+    needs: lint
     env:
       DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
       CR_URL: ${{ vars.CR_URL }}
