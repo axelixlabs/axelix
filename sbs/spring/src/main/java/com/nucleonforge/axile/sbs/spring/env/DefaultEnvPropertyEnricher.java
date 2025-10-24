@@ -43,6 +43,11 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
     private Map<String, String> buildPrimarySourceMap(EnvironmentDescriptor descriptor) {
         Map<String, String> primaryMap = new LinkedHashMap<>();
+
+        // The built-in assumption here is that the property sources from the original spring endpoint
+        // are returned in the order of their precedence, meaning, that the earlier property source
+        // present in the list, the more priority it has over the other property sources. That is why
+        // simple putIfAbsent is sufficient.
         for (PropertySourceDescriptor source : descriptor.getPropertySources()) {
             for (String key : source.getProperties().keySet()) {
                 primaryMap.putIfAbsent(key, source.getName());

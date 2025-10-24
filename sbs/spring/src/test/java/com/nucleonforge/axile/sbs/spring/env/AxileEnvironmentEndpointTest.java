@@ -26,6 +26,10 @@ import org.springframework.test.context.TestPropertySource;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+// TODO:
+//  I'm not sure this test does what it is supposed to do. When debugging it, I found out that
+//  different properties, such as 'axile.env.test.prop1' for instance, are present only in one
+//  property source, which is almost certainly not the desirable behavior
 /**
  * Integration tests for {@link AxileEnvironmentEndpoint}.
  *
@@ -105,6 +109,10 @@ class AxileEnvironmentEndpointTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         String responseBody = response.getBody();
+
+        // We're not exactly sure about the shape of the returned json. It may and it would
+        // vary depending on the CI/CD runner, on the overall environment and spring version etc.
+        // So we just check the basic invariants.
         assertThat(responseBody).isNotNull();
 
         assertThatJson(responseBody).node("activeProfiles").isNotNull().isArray();
@@ -118,7 +126,7 @@ class AxileEnvironmentEndpointTest {
                         .isObject()
                         .allSatisfy((propertyName, propertyValue) -> assertThatJson(propertyValue)
                                 .isObject()
-                                .containsKey("isPrimary")
+                                .containsKey("isPrimary") // isPrimary flag should always present in response
                                 .node("isPrimary")
                                 .isBoolean()));
     }
