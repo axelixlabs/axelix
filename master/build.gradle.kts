@@ -57,3 +57,11 @@ tasks.jar {
 tasks.bootJar {
     archiveFileName = "master.jar"
 }
+
+publishing {
+    publications {
+        named<MavenPublication>("nexus") {
+            artifact(tasks.bootJar.get())
+        }
+    }
+}

@@ -30,9 +30,11 @@ jobs:
       CR_MASTER_REPOSITORY: ${{ vars.CR_MASTER_REPOSITORY }}
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
 
-      # These are needed in order to publish the final build artifacts into GitHub package registry
-      USERNAME: ${{ github.actor }}
-      TOKEN: ${{ secrets.TOKEN }}
+      # These are needed in order to publish the final build artifacts into Nexus package registry
+      NEXUS_USER: ${{ secrets.NEXUS_USER }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      NEXUS_HOST_PORT: ${{ secrets.NEXUS_HOST_PORT }}
+      STORE_PASS: ${{ secrets.STORE_PASS }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -57,6 +59,17 @@ jobs:
       # TODO: We probably would want here to not use build-cache for releases of production artifacts
       - name: Gradle build
         run: ./gradlew build --configuration-cache --build-cache
+
+      - name: Download and trust Nexus SSL certificate for Gradle
+        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        run: |
+          TRUSTSTORE="$JAVA_HOME/lib/security/cacerts"
+          openssl s_client -connect $NEXUS_HOST_PORT -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM > nexus.crt
+          sudo keytool -importcert -file nexus.crt -alias nexus-ssl -keystore $TRUSTSTORE -storepass $STORE_PASS -noprompt
+
+      - name: Publish Libraries to Nexus
+        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        run: ./gradlew publish
 
       - name: Set up Docker
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
