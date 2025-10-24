@@ -29,7 +29,7 @@ export const Loggers = () => {
 
     useEffect(() => {
         if (sliceState.updateLoggerSuccess) {
-            message.success(t("loggerLevelUpdated"));
+            message.success(t("Loggers.loggerLevelUpdated"));
         }
     }, [sliceState]);
 
