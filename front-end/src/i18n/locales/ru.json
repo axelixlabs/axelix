@@ -3,7 +3,6 @@
     "noData": "Нет данных",
     "copied": "Скопировано",
     "copyFailed": "Не удалось скопировать",
-    "reset": "Сбросить",
     "propertyChangedSuccessfully": "Свойство Изменено",
     "saved": "Сохранено",
     "Environments": {
@@ -11,7 +10,8 @@
     },
     "Loggers": {
         "configuredExplicitly": "Задан явно",
-        "loggerLevelUpdated": "Уровень логгера изменён"
+        "loggerLevelUpdated": "Уровень логгера изменён",
+        "reset": "Сбросить"
     },
     "Header": {
         "dashboard": "Дашборд",
@@ -30,12 +30,12 @@
         "caches": "Кэши"
     },
     "Caches": {
-        "clearAllCaches": "Очистить все кэши",
-        "cacheTarget": "Реализация",
-        "cacheName": "Имя",
+        "clearAll": "Очистить все кэши",
+        "target": "Реализация",
+        "name": "Имя",
         "cleared": "Очищено"
     },
-    "Authorization": {
+    "Authentication": {
         "login": "Вход",
         "logout": "Выйти",
         "username": "Имя пользователя",

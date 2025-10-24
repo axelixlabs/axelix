@@ -68,7 +68,7 @@ export const Caches = () => {
                 <PageSearch search={search} setSearch={setSearch} />
 
                 <Button type="primary" onClick={clearAllCachesClickHandler} loading={clearAllCaches.loading}>
-                    {t("Caches.clearAllCaches")}
+                    {t("Caches.clearAll")}
                 </Button>
             </div>
 

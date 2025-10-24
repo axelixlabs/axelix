@@ -28,28 +28,28 @@ export const Login = () => {
 
     return (
         <div className={styles.LoginFormWrapper}>
-            <h1 className={classNames("MediumTitle", styles.LoginTitle)}>{t("Authorization.login")}</h1>
+            <h1 className={classNames("MediumTitle", styles.LoginTitle)}>{t("Authentication.login")}</h1>
             <Form layout="vertical" onFinish={onFinish} autoComplete="off">
                 <Form.Item
                     key="username"
-                    label={t("Authorization.username")}
+                    label={t("Authentication.username")}
                     name="username"
                     required={false}
-                    rules={[{ required: true, message: t("Authorization.enterUsername") }]}
+                    rules={[{ required: true, message: t("Authentication.enterUsername") }]}
                 >
                     <Input className={styles.LoginInput} />
                 </Form.Item>
                 <Form.Item
                     key="password"
-                    label={t("Authorization.password")}
+                    label={t("Authentication.password")}
                     name="password"
                     required={false}
-                    rules={[{ required: true, message: t("Authorization.enterPassword") }]}
+                    rules={[{ required: true, message: t("Authentication.enterPassword") }]}
                 >
                     <Input.Password className={styles.LoginInput} />
                 </Form.Item>
                 <Button type="primary" htmlType="submit" loading={loading} className={styles.SubmitButton}>
-                    {t("Authorization.loginButtonText")}
+                    {t("Authentication.loginButtonText")}
                 </Button>
                 <p className={styles.Error}>{error}</p>
             </Form>

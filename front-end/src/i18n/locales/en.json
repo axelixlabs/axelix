@@ -3,7 +3,6 @@
     "noData": "No data",
     "copied": "Copied",
     "copyFailed": "Failed to copy",
-    "reset": "Reset",
     "propertyChangedSuccessfully": "Property Changed",
     "saved": "Saved",
     "Environments": {
@@ -11,7 +10,8 @@
     },
     "Loggers": {
         "configuredExplicitly": "Configured explicitly",
-        "loggerLevelUpdated": "Level has been changed"
+        "loggerLevelUpdated": "Level has been changed",
+        "reset": "Reset"
     },
     "Header": {
         "dashboard": "Dashboard",
@@ -30,12 +30,12 @@
         "caches": "Caches"
     },
     "Caches": {
-        "clearAllCaches": "Clear All Caches",
-        "cacheTarget": "Target",
-        "cacheName": "Name",
+        "clearAll": "Clear All Caches",
+        "target": "Target",
+        "name": "Name",
         "cleared": "Cleared"
     },
-    "Authorization": {
+    "Authentication": {
         "login": "Login",
         "logout": "Logout",
         "username": "Username",

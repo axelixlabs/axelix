@@ -83,7 +83,7 @@ export const Logger = ({ levels, logger }: IProps) => {
                         );
                     })}
                 </div>
-                <button className={styles.Reset}>{t("reset")}</button>
+                <button className={styles.Reset}>{t("Loggers.reset")}</button>
             </div>
         </div>
     );
