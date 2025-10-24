@@ -37,7 +37,7 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
         })
             .then(() => {
                 setClearSingleCache(StatelessRequest.success());
-                message.success(t("Caches.cleared"))
+                message.success(t("Caches.cleared"));
             })
             .catch(() => setClearSingleCache(StatelessRequest.error("")));
     };
