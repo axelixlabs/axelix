@@ -2,6 +2,8 @@ package com.nucleonforge.axile.master.api.response;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
 
 /**
@@ -22,7 +24,18 @@ public record EnvironmentFeedResponse(
      * Short profile of a given property source.
      *
      * @param name       the sourceName of the property source
-     * @param properties the map of property names to their string values
+     * @param properties the list of property entries with name, value and primary flag
      */
-    public record PropertySourceShortProfile(String name, List<KeyValue> properties) {}
+    public record PropertySourceShortProfile(String name, List<PropertyEntry> properties) {
+
+        /**
+         * Represents a property with its value and whether it is the primary ("winning") property.
+         *
+         * @param name       the property name
+         * @param value     the property value
+         * @param isPrimary whether this property value is primary (i.e. this value takes precedence over
+         *                  the other values from other property sources)
+         */
+        public record PropertyEntry(String name, @Nullable String value, boolean isPrimary) {}
+    }
 }

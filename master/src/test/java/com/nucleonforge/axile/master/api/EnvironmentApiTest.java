@@ -54,12 +54,14 @@ class EnvironmentApiTest {
               "name": "systemProperties",
               "properties": [
                 {
-                  "key": "java.vm.vendor",
-                  "value": "BellSoft"
+                  "name": "java.vm.vendor",
+                  "value": "BellSoft",
+                  "isPrimary": true
                 },
                 {
-                  "key": "java.specification.version",
-                  "value": "17"
+                  "name": "java.specification.version",
+                  "value": "17",
+                  "isPrimary": true
                 }
               ]
             },
@@ -67,8 +69,9 @@ class EnvironmentApiTest {
               "name": "systemEnvironment",
               "properties": [
                 {
-                  "key": "JAVA_HOME",
-                  "value": "/opt/hostedtoolcache/Java_Liberica_jdk/17.0.16-12/x64"
+                  "name": "JAVA_HOME",
+                  "value": "/opt/hostedtoolcache/Java_Liberica_jdk/17.0.16-12/x64",
+                  "isPrimary": true
                 }
               ]
             }
@@ -133,10 +136,12 @@ class EnvironmentApiTest {
                   "name": "systemProperties",
                   "properties": {
                     "java.vm.vendor": {
-                      "value": "BellSoft"
+                      "value": "BellSoft",
+                      "isPrimary": true
                     },
                     "java.specification.version": {
-                      "value": "17"
+                      "value": "17",
+                      "isPrimary": true
                     }
                   }
                 },
@@ -145,7 +150,8 @@ class EnvironmentApiTest {
                   "properties": {
                     "JAVA_HOME": {
                       "value": "/opt/hostedtoolcache/Java_Liberica_jdk/17.0.16-12/x64",
-                      "origin": "System Environment Property \\"JAVA_HOME\\""
+                      "origin": "System Environment Property \\"JAVA_HOME\\"",
+                      "isPrimary": true
                     }
                   }
                 }
@@ -201,7 +207,7 @@ class EnvironmentApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/env")) {
+                if (path.equals("/" + activeInstanceId + "/axile-env")) {
                     return new MockResponse()
                             .setBody(jsonEnvResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

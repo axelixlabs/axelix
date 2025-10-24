@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axile.common.api.env.AxilePropertyValue;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.common.api.env.PropertyValue;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse;
 import com.nucleonforge.axile.master.service.convert.environment.EnvironmentFeedConverter;
 
@@ -45,19 +45,22 @@ class EnvironmentFeedConverterTest {
         assertThat(propertySource1.properties())
                 .hasSize(2)
                 .anySatisfy(kv -> {
-                    assertThat(kv.key()).isEqualTo("java.vm.vendor");
+                    assertThat(kv.name()).isEqualTo("java.vm.vendor");
                     assertThat(kv.value()).isEqualTo("Amazon.com Inc.");
+                    assertThat(kv.isPrimary()).isTrue();
                 })
                 .anySatisfy(kv -> {
-                    assertThat(kv.key()).isEqualTo("org.jboss.logging.provider");
+                    assertThat(kv.name()).isEqualTo("org.jboss.logging.provider");
                     assertThat(kv.value()).isEqualTo("slf4j");
+                    assertThat(kv.isPrimary()).isFalse();
                 });
 
         EnvironmentFeedResponse.PropertySourceShortProfile propertySource2 =
                 getPropertySourceProfileByName(environmentFeedResponse, "systemEnvironment");
         assertThat(propertySource2.properties()).hasSize(1).anySatisfy(kv -> {
-            assertThat(kv.key()).isEqualTo("JAVA_HOME");
+            assertThat(kv.name()).isEqualTo("JAVA_HOME");
             assertThat(kv.value()).isEqualTo(".jdks\\corretto-17.0.16");
+            assertThat(kv.isPrimary()).isTrue();
         });
 
         EnvironmentFeedResponse.PropertySourceShortProfile propertySource3 = getPropertySourceProfileByName(
@@ -65,12 +68,14 @@ class EnvironmentFeedConverterTest {
         assertThat(propertySource3.properties())
                 .hasSize(2)
                 .anySatisfy(kv -> {
-                    assertThat(kv.key()).isEqualTo("spring.datasource.driver-class-sourceName");
+                    assertThat(kv.name()).isEqualTo("spring.datasource.driver-class-sourceName");
                     assertThat(kv.value()).isEqualTo("org.h2.Driver");
+                    assertThat(kv.isPrimary()).isFalse();
                 })
                 .anySatisfy(kv -> {
-                    assertThat(kv.key()).isEqualTo("spring.jpa.hibernate.ddl-auto");
+                    assertThat(kv.name()).isEqualTo("spring.jpa.hibernate.ddl-auto");
                     assertThat(kv.value()).isEqualTo("create-drop");
+                    assertThat(kv.isPrimary()).isFalse();
                 });
 
         EnvironmentFeedResponse.PropertySourceShortProfile propertySource4 =
@@ -78,12 +83,14 @@ class EnvironmentFeedConverterTest {
         assertThat(propertySource4.properties())
                 .hasSize(2)
                 .anySatisfy(kv -> {
-                    assertThat(kv.key()).isEqualTo("spring.cloud.client.hostname");
+                    assertThat(kv.name()).isEqualTo("spring.cloud.client.hostname");
                     assertThat(kv.value()).isEqualTo("DESKTOP-111");
+                    assertThat(kv.isPrimary()).isFalse();
                 })
                 .anySatisfy(kv -> {
-                    assertThat(kv.key()).isEqualTo("spring.cloud.client.ip-address");
+                    assertThat(kv.name()).isEqualTo("spring.cloud.client.ip-address");
                     assertThat(kv.value()).isEqualTo("192.0.0.0");
+                    assertThat(kv.isPrimary()).isFalse();
                 });
     }
 
@@ -112,29 +119,32 @@ class EnvironmentFeedConverterTest {
                 "systemProperties",
                 Map.of(
                         "java.vm.vendor",
-                        new PropertyValue("Amazon.com Inc.", null),
+                        new AxilePropertyValue("Amazon.com Inc.", null, true),
                         "org.jboss.logging.provider",
-                        new PropertyValue("slf4j", null)));
+                        new AxilePropertyValue("slf4j", null, false)));
 
         EnvironmentFeed.PropertySource propertySource2 = new EnvironmentFeed.PropertySource(
                 "systemEnvironment",
                 Map.of(
                         "JAVA_HOME",
-                        new PropertyValue(".jdks\\corretto-17.0.16", "System Environment Property \"JAVA_HOME\"")));
+                        new AxilePropertyValue(
+                                ".jdks\\corretto-17.0.16", "System Environment Property \"JAVA_HOME\"", true)));
 
         EnvironmentFeed.PropertySource propertySource3 = new EnvironmentFeed.PropertySource(
                 "Config resource class path resource [application.yaml]",
                 Map.of(
                         "spring.datasource.driver-class-sourceName",
-                        new PropertyValue("org.h2.Driver", "class path resource [application.yaml] - 4:24"),
+                        new AxilePropertyValue("org.h2.Driver", "class path resource [application.yaml] - 4:24", false),
                         "spring.jpa.hibernate.ddl-auto",
-                        new PropertyValue("create-drop", "class path resource [application.yaml] - 9:17")));
+                        new AxilePropertyValue("create-drop", "class path resource [application.yaml] - 9:17", false)));
 
         EnvironmentFeed.PropertySource propertySource4 = new EnvironmentFeed.PropertySource(
                 "springCloudClientHostInfo",
                 Map.of(
-                        "spring.cloud.client.hostname", new PropertyValue("DESKTOP-111", null),
-                        "spring.cloud.client.ip-address", new PropertyValue("192.0.0.0", null)));
+                        "spring.cloud.client.hostname",
+                        new AxilePropertyValue("DESKTOP-111", null, false),
+                        "spring.cloud.client.ip-address",
+                        new AxilePropertyValue("192.0.0.0", null, false)));
 
         return new ArrayList<>(List.of(propertySource1, propertySource2, propertySource3, propertySource4));
     }

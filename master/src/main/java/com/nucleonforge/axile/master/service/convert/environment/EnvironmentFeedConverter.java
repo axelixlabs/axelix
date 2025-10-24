@@ -2,16 +2,16 @@ package com.nucleonforge.axile.master.service.convert.environment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.common.api.env.PropertyValue;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse;
-import com.nucleonforge.axile.master.api.response.KeyValue;
+import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse.PropertySourceShortProfile;
+import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse.PropertySourceShortProfile.PropertyEntry;
 import com.nucleonforge.axile.master.service.convert.Converter;
 
 /**
@@ -27,18 +27,27 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
     public @NonNull EnvironmentFeedResponse convertInternal(@NonNull EnvironmentFeed source) {
         List<String> activeProfiles = source.activeProfiles();
         List<String> defaultProfiles = source.defaultProfiles();
-        List<EnvironmentFeedResponse.PropertySourceShortProfile> propertySources = new ArrayList<>();
+        List<PropertySourceShortProfile> propertySources = new ArrayList<>();
 
-        for (EnvironmentFeed.PropertySource ps : source.propertySources()) {
-            List<KeyValue> properties = new ArrayList<>();
-            if (ps.properties() != null) {
-                for (Map.Entry<String, PropertyValue> entry : ps.properties().entrySet()) {
-                    properties.add(new KeyValue(entry.getKey(), entry.getValue().value()));
-                }
-            }
-            propertySources.add(new EnvironmentFeedResponse.PropertySourceShortProfile(ps.sourceName(), properties));
+        for (PropertySource propertySource : source.propertySources()) {
+            List<PropertyEntry> properties = getPropertyEntries(propertySource);
+            propertySources.add(new PropertySourceShortProfile(propertySource.sourceName(), properties));
         }
 
         return new EnvironmentFeedResponse(activeProfiles, defaultProfiles, propertySources);
+    }
+
+    private List<PropertyEntry> getPropertyEntries(PropertySource propertySource) {
+        List<PropertyEntry> properties = new ArrayList<>();
+
+        if (propertySource.properties() != null) {
+            for (var entry : propertySource.properties().entrySet()) {
+                properties.add(new PropertyEntry(
+                        entry.getKey(),
+                        entry.getValue().value(),
+                        entry.getValue().isPrimary()));
+            }
+        }
+        return properties;
     }
 }
