@@ -19,7 +19,7 @@ export const AdminHeader = () => {
     const items: MenuProps["items"] = [
         {
             key: "logout",
-            label: <div>{t("logout")}</div>,
+            label: <div>{t("Authentication.logout")}</div>,
         },
     ];
 

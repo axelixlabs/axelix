@@ -12,13 +12,13 @@ export const NavigationBar = () => {
                 to="/dashboard"
                 className={({ isActive }) => (isActive ? `${styles.Link} ${styles.ActiveLink}` : styles.Link)}
             >
-                {t("dashboard")}
+                {t("Header.dashboard")}
             </NavLink>
             <NavLink
                 to="/wallboard"
                 className={({ isActive }) => (isActive ? `${styles.Link} ${styles.ActiveLink}` : styles.Link)}
             >
-                {t("wallboard")}
+                {t("Header.wallboard")}
             </NavLink>
         </nav>
     );

@@ -21,7 +21,7 @@ export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.ProfilesWrapper}>
-                <div className={styles.ProfileTitle}>{t("activeProfiles")}</div>
+                <div className={styles.ProfileTitle}>{t("Environments.activeProfiles")}</div>
                 {activeProfiles.map((activeProfile) => (
                     <div className={styles.ProfileWrapper} key={activeProfile}>
                         <div className={styles.ProfileValue}>

@@ -12,7 +12,6 @@ export const LanguageSwitcher = () => {
 
     return (
         <Select
-            data-test="language-switcher-select"
             defaultValue={i18n.language}
             onChange={handleChange}
             options={[
