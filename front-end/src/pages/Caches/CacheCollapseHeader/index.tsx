@@ -45,10 +45,10 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
     return (
         <div className={styles.CollapseHeader}>
             <div>
-                <span>{t("Caches.cacheName")}: </span>
+                <span>{t("Caches.name")}: </span>
                 <span className={styles.CacheName}>{cache.name}</span>
                 <div className={styles.Target}>
-                    {t("Caches.cacheTarget")}: <TooltipWithCopy text={cache.target} />
+                    {t("Caches.target")}: <TooltipWithCopy text={cache.target} />
                 </div>
             </div>
             <Button
