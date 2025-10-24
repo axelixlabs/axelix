@@ -1,12 +1,12 @@
 import js from "@eslint/js";
 
+import eslintConfigPrettier from "eslint-config-prettier";
+import eslintPluginPrettier from "eslint-plugin-prettier";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import tseslint from "typescript-eslint";
-import eslintPluginPrettier from "eslint-plugin-prettier";
-import eslintConfigPrettier from "eslint-config-prettier";
 
 export default [
     {
@@ -15,9 +15,9 @@ export default [
     {
         plugins: {
             "react-hooks": reactHooks,
-            "react" : react,
+            react: react,
             "react-refresh": reactRefresh,
-            "prettier": eslintPluginPrettier,
+            prettier: eslintPluginPrettier,
         },
     },
     js.configs.recommended,
@@ -47,7 +47,8 @@ export default [
     {
         // TODO: Remove this rule later on, once the error handling logic is resolved
         rules: {
-            "@typescript-eslint/no-explicit-any": ["off"]
-        }
-    }
+            "@typescript-eslint/no-explicit-any": ["off"],
+            "prettier/prettier": "error",
+        },
+    },
 ];
