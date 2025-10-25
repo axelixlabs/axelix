@@ -14,7 +14,11 @@ const initialState: ILoggersSliceState = {
 export const LoggersSlice = createSlice({
     name: "loggersSlice",
     initialState,
-    reducers: {},
+    reducers: {
+        resetUpdateLoggerSuccess: (state) => {
+            state.updateLoggerSuccess = false;
+        },
+    },
     extraReducers: (builder) => {
         builder.addCase(setLoggerLevelThunk.pending, (state) => {
             state.loading = true;
@@ -40,4 +44,4 @@ export const LoggersSlice = createSlice({
     },
 });
 
-export default LoggersSlice;
+export const { resetUpdateLoggerSuccess } = LoggersSlice.actions;

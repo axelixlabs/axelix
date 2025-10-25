@@ -10,7 +10,7 @@ import { LanguageSwitcher } from "components";
 import { NavigationBar } from "./NavigationBar";
 import styles from "./styles.module.css";
 
-import Logo from "assets/icons/logo.png";
+import LogoIcon from "assets/icons/logo.png";
 
 export const AdminHeader = () => {
     const { t } = useTranslation();
@@ -25,7 +25,7 @@ export const AdminHeader = () => {
 
     return (
         <Header className={styles.Header}>
-            <img src={Logo} alt="Axile logo" onClick={() => navigate("/")} className={styles.Logo} />
+            <img src={LogoIcon} alt="Axile logo" onClick={() => navigate("/")} className={styles.Logo} />
             <div className={styles.LinksAndAvatarWrapper}>
                 <NavigationBar />
                 <Dropdown menu={{ items }}>

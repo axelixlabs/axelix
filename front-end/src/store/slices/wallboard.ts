@@ -3,8 +3,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { IWallboardSliceState } from "models";
 import { getWallboardDataThunk } from "store/thunks";
 
-// import { getWallboardData } from "services";
-
 const initialState: IWallboardSliceState = {
     loading: false,
     error: "",

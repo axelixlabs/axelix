@@ -1,5 +1,4 @@
 import { Tooltip } from "antd";
-import TargetIcon from "assets/icons/TargetIcon.svg";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
@@ -10,6 +9,8 @@ import { setLoggerLevelThunk } from "store/thunks";
 import { statePalette } from "utils";
 
 import styles from "./styles.module.css";
+
+import TargetIcon from "assets/icons/target.svg";
 
 interface IProps {
     /**

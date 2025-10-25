@@ -80,5 +80,3 @@ export const CachesSlice = createSlice({
         });
     },
 });
-
-export default CachesSlice;

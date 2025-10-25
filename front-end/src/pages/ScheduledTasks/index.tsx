@@ -21,9 +21,7 @@ const ScheduledTasks = () => {
         fetchData(setScheduledTasks, () => getScheduledTasksData(instanceId));
 
     useEffect(() => {
-        if (instanceId) {
-            fetchScheduledTasks(instanceId);
-        }
+        fetchScheduledTasks(instanceId!);
     }, []);
 
     if (scheduledTasks.loading) {

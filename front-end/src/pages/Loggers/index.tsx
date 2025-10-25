@@ -5,33 +5,35 @@ import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterLoggers } from "helpers";
-import { useAppSelector } from "hooks";
-import { type ILoggerData, type ILoggersSliceState, StatefulRequest } from "models";
+import { useAppDispatch, useAppSelector } from "hooks";
+import { type ILoggerData, StatefulRequest } from "models";
 import { getLoggersData } from "services";
+import { resetUpdateLoggerSuccess } from "store/slices";
 
 import { Logger } from "./Logger";
 
 export const Loggers = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
+    const dispatch = useAppDispatch();
 
     const [loggersData, setLoggersData] = useState(StatefulRequest.loading<ILoggerData>());
     const [search, setSearch] = useState<string>("");
-    const sliceState: ILoggersSliceState = useAppSelector((state) => state.loggers);
+    const sliceState = useAppSelector((state) => state.loggers);
 
     const fetchLoggersData = (instanceId: string) => fetchData(setLoggersData, () => getLoggersData(instanceId));
 
     useEffect(() => {
-        if (instanceId) {
-            fetchLoggersData(instanceId);
-        }
-    }, [sliceState]);
+        fetchLoggersData(instanceId!);
+    }, []);
 
     useEffect(() => {
         if (sliceState.updateLoggerSuccess) {
             message.success(t("Loggers.loggerLevelUpdated"));
+            fetchLoggersData(instanceId!);
+            dispatch(resetUpdateLoggerSuccess());
         }
-    }, [sliceState]);
+    }, [sliceState.updateLoggerSuccess]);
 
     if (loggersData.loading || sliceState.loading) {
         return <Loader />;

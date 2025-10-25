@@ -38,5 +38,3 @@ export const EnvironmentSlice = createSlice({
         });
     },
 });
-
-export default EnvironmentSlice;
