@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { doesLocationStartWith } from "helpers";
 
@@ -7,14 +7,15 @@ import styles from "./styles.module.css";
 
 export const NavigationBar = () => {
     const { t } = useTranslation();
+    const { pathname } = useLocation();
 
-    const isWallboardPage = doesLocationStartWith("/wallboard") || location.pathname === "/";
+    const isWallboardPage = doesLocationStartWith("/wallboard", pathname) || pathname === "/";
 
     return (
         <nav data-test="header-links">
             <Link
                 to="/dashboard"
-                className={`${styles.Link} ${doesLocationStartWith("/instance") ? styles.ActiveLink : ""}`}
+                className={`${styles.Link} ${doesLocationStartWith("/instance", pathname) ? styles.ActiveLink : ""}`}
             >
                 {t("Header.dashboard")}
             </Link>

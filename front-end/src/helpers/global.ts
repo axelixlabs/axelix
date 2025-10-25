@@ -29,6 +29,6 @@ export async function fetchData<S>(setDataState: SetRequestState<S>, dataFetcher
     }
 }
 
-export const doesLocationStartWith = (path: string): boolean => {
-    return location.pathname.startsWith(path);
+export const doesLocationStartWith = (path: string, pathname: string): boolean => {
+    return pathname.startsWith(path);
 };
