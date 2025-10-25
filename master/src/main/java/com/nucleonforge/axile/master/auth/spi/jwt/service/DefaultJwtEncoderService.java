@@ -41,16 +41,8 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
     }
 
     @Override
-    // TODO: Why PMD complains here? I do not see CyclomaticComplexity here being >= 10
-    @SuppressWarnings("PMD.CyclomaticComplexity")
     public String generateToken(User user) throws JwtTokenGenerationException {
-        if (user == null) {
-            throw new JwtTokenGenerationException("User cannot be null");
-        }
-
-        if (user.username() == null || user.username().isEmpty()) {
-            throw new JwtTokenGenerationException("Username cannot be null or empty");
-        }
+        checkEmptyUserAndUserName(user);
 
         try {
             Instant now = Instant.now();
@@ -67,6 +59,16 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
             throw e;
         } catch (Exception e) {
             throw new JwtTokenGenerationException("Failed to generate JWT token", e);
+        }
+    }
+
+    private void checkEmptyUserAndUserName(User user) {
+        if (user == null) {
+            throw new JwtTokenGenerationException("User cannot be null");
+        }
+
+        if (user.username() == null || user.username().isEmpty()) {
+            throw new JwtTokenGenerationException("Username cannot be null or empty");
         }
     }
 
