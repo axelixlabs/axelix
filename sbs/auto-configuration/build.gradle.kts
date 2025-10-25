@@ -1,8 +1,8 @@
+import Dependencies.jsonwebtokenVersion
+
 plugins {
     id("sbs")
 }
-
-val jsonwebtokenVersion = "0.12.6"
 
 dependencies {
     // Self

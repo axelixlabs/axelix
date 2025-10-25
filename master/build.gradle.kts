@@ -1,15 +1,11 @@
+import Dependencies.jsonwebtokenVersion
+
 plugins {
     id("shared")
     id("org.springframework.boot") version Dependencies.springBootVersion
 }
 
 val testcontainersVersion = "1.21.3"
-
-// TODO: the JWT version also ideally needs to be extracted
-val jsonwebtokenVersion = "0.12.6"
-
-// TODO: instancio is 100% candidate for being extracted to 'shared'
-val instancioVersion = "5.5.1"
 val springDocSwaggerVersion = "2.0.4"
 
 dependencies {
@@ -41,7 +37,6 @@ dependencies {
     testImplementation("org.postgresql:postgresql")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("org.instancio:instancio-core:${instancioVersion}")
 }
 
 configurations.all {
