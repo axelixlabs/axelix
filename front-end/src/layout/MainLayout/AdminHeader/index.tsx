@@ -25,7 +25,7 @@ export const AdminHeader = () => {
 
     return (
         <Header className={styles.Header}>
-            <img src={LogoIcon} alt="Axile logo" onClick={() => navigate("/")} className={styles.Logo} />
+            <img src={LogoIcon} alt="Axile logo" onClick={() => navigate("/wallboard")} className={styles.Logo} />
             <div className={styles.LinksAndAvatarWrapper}>
                 <NavigationBar />
                 <Dropdown menu={{ items }}>
