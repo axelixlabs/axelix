@@ -1,5 +1,3 @@
-import type { ICommonSliceState } from "./globals";
-
 export interface ILogger {
     /**
      * Logger name
@@ -24,10 +22,6 @@ export interface ILoggerData {
      * All loggers
      */
     loggers: ILogger[];
-}
-
-export interface ILoggersSliceState extends ICommonSliceState, ILoggerData {
-    updateLoggerSuccess: boolean;
 }
 
 export interface ISetLoggerLevelRequestData {

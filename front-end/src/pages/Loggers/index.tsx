@@ -5,8 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterLoggers } from "helpers";
-import { useAppSelector } from "hooks";
-import { type ILoggerData, type ILoggersSliceState, StatefulRequest } from "models";
+import { type ILoggerData, StatefulRequest, StatelessRequest } from "models";
 import { getLoggersData } from "services";
 
 import { Logger } from "./Logger";
@@ -17,23 +16,25 @@ export const Loggers = () => {
 
     const [loggersData, setLoggersData] = useState(StatefulRequest.loading<ILoggerData>());
     const [search, setSearch] = useState<string>("");
-    const sliceState: ILoggersSliceState = useAppSelector((state) => state.loggers);
+    const [updateLoggerLevel, setUpdateLoggerLevel] = useState(StatelessRequest.inactive());
 
     const fetchLoggersData = (instanceId: string) => fetchData(setLoggersData, () => getLoggersData(instanceId));
 
-    useEffect(() => {
-        if (instanceId) {
-            fetchLoggersData(instanceId);
-        }
-    }, [sliceState]);
+    const isLoggerLevelUpdated = updateLoggerLevel.completedSuccessfully();
 
     useEffect(() => {
-        if (sliceState.updateLoggerSuccess) {
+        fetchLoggersData(instanceId!);
+    }, []);
+
+    useEffect(() => {
+        if (isLoggerLevelUpdated) {
             message.success(t("Loggers.loggerLevelUpdated"));
+            fetchLoggersData(instanceId!);
+            setUpdateLoggerLevel(StatelessRequest.inactive());
         }
-    }, [sliceState]);
+    }, [isLoggerLevelUpdated]);
 
-    if (loggersData.loading || sliceState.loading) {
+    if (loggersData.loading || updateLoggerLevel.loading) {
         return <Loader />;
     }
 
@@ -51,7 +52,12 @@ export const Loggers = () => {
 
             <EmptyHandler isEmpty={effectiveLoggers.length === 0}>
                 {effectiveLoggers.map((logger) => (
-                    <Logger logger={logger} levels={loggersData.response!.levels} key={logger.name} />
+                    <Logger
+                        logger={logger}
+                        levels={loggersData.response!.levels}
+                        key={logger.name}
+                        setUpdateLoggerLevel={setUpdateLoggerLevel}
+                    />
                 ))}
             </EmptyHandler>
         </>

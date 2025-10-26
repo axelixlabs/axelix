@@ -5,8 +5,8 @@ import { EConditionStatus, type ICondition } from "models";
 
 import styles from "./styles.module.css";
 
-import Checkmark from "assets/icons/checkmark.svg";
-import Close from "assets/icons/close.svg";
+import CheckmarkIcon from "assets/icons/checkmark.svg";
+import CloseIcon from "assets/icons/close.svg";
 
 interface IStatusAwareCondition extends ICondition {
     status: EConditionStatus;
@@ -21,10 +21,10 @@ export const ConditionsAccordionEntry = ({ items }: IProps) => {
 
     const findNeededIcon = (status: EConditionStatus) => {
         if (status === EConditionStatus.NOT_MATCHED) {
-            return <img src={Close} alt="Close icon" />;
+            return <img src={CloseIcon} alt="Close icon" />;
         }
 
-        return <img src={Checkmark} alt="Checkmark icon" />;
+        return <img src={CheckmarkIcon} alt="Checkmark icon" />;
     };
 
     const createCollapseItems = (): CollapseProps["items"] =>

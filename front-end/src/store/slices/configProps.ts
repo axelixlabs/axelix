@@ -34,5 +34,3 @@ export const ConfigPropsSlice = createSlice({
         });
     },
 });
-
-export default ConfigPropsSlice;

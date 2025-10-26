@@ -18,6 +18,9 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front-end
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

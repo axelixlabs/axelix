@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 
 import { LanguageSwitcher } from "components";
-import Logo from "src/assets/icons/logo.png";
+import LogoIcon from "src/assets/icons/logo.png";
 
 import styles from "./styles.module.css";
 
@@ -11,7 +11,7 @@ export const MinimalLayout = () => {
             <div className={styles.Header}>
                 <div className="MainContainer">
                     <div className={styles.LanguageSwitcherWrapper}>
-                        <img src={Logo} alt="Axile logo" className={styles.Logo} />
+                        <img src={LogoIcon} alt="Axile logo" className={styles.Logo} />
                         <LanguageSwitcher />
                     </div>
                 </div>

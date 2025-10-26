@@ -10,13 +10,13 @@ export const NavigationBar = () => {
         <nav data-test="header-links">
             <NavLink
                 to="/dashboard"
-                className={({ isActive }) => (isActive ? `${styles.Link} ${styles.ActiveLink}` : styles.Link)}
+                className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
             >
                 {t("Header.dashboard")}
             </NavLink>
             <NavLink
                 to="/wallboard"
-                className={({ isActive }) => (isActive ? `${styles.Link} ${styles.ActiveLink}` : styles.Link)}
+                className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
             >
                 {t("Header.wallboard")}
             </NavLink>

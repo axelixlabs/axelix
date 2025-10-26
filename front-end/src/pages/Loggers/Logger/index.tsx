@@ -1,15 +1,16 @@
 import { Tooltip } from "antd";
-import TargetIcon from "assets/icons/TargetIcon.svg";
+import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
-import { useAppDispatch } from "hooks";
-import type { ILogger } from "models";
-import { setLoggerLevelThunk } from "store/thunks";
+import { type ILogger, StatelessRequest } from "models";
+import { setLoggerLevel } from "services";
 import { statePalette } from "utils";
 
 import styles from "./styles.module.css";
+
+import TargetIcon from "assets/icons/target.svg";
 
 interface IProps {
     /**
@@ -20,11 +21,14 @@ interface IProps {
      * Single logger
      */
     logger: ILogger;
+    /**
+     * setState to update the logger level
+     */
+    setUpdateLoggerLevel: Dispatch<SetStateAction<StatelessRequest>>;
 }
 
-export const Logger = ({ levels, logger }: IProps) => {
+export const Logger = ({ levels, logger, setUpdateLoggerLevel }: IProps) => {
     const { t } = useTranslation();
-    const dispatch = useAppDispatch();
     const { effectiveLevel, configuredLevel } = logger;
     const { instanceId } = useParams();
 
@@ -33,15 +37,12 @@ export const Logger = ({ levels, logger }: IProps) => {
             return;
         }
 
-        if (instanceId) {
-            dispatch(
-                setLoggerLevelThunk({
-                    instanceId,
-                    loggerName: logger.name,
-                    loggingLevel: level,
-                }),
-            );
-        }
+        setUpdateLoggerLevel(StatelessRequest.loading());
+        setLoggerLevel(instanceId!, logger.name, level)
+            .then(() => {
+                setUpdateLoggerLevel(StatelessRequest.success());
+            })
+            .catch(() => setUpdateLoggerLevel(StatelessRequest.error("")));
     };
 
     return (

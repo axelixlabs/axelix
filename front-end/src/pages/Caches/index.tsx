@@ -24,13 +24,6 @@ export const Caches = () => {
         fetchData(setCacheData, () => getCachesData(instanceId!));
     }, []);
 
-    useEffect(() => {
-        if (clearAllCaches.completedSuccessfully()) {
-            messageApi.success(t("Caches.cleared"));
-        }
-        // TODO: handle failure on clear
-    }, [clearAllCaches]);
-
     if (cacheData.loading) {
         return <Loader />;
     }
@@ -48,6 +41,7 @@ export const Caches = () => {
                 .then((value) => {
                     if (value.status === 200) {
                         setClearAllCaches(StatelessRequest.success());
+                        messageApi.success(t("Caches.cleared"));
                     } else {
                         setClearAllCaches(StatelessRequest.error(""));
                     }
