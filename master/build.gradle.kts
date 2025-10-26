@@ -21,14 +21,11 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.slf4j:slf4j-api")
     implementation("io.jsonwebtoken:jjwt-api:$jsonwebtokenVersion")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
 
     // Runtime
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:$jsonwebtokenVersion")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jsonwebtokenVersion")
     runtimeOnly("ch.qos.logback:logback-classic")
 
-    // Swagger(OpenAPI)
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocSwaggerVersion")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
