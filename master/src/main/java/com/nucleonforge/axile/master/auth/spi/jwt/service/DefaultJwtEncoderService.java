@@ -42,7 +42,7 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
 
     @Override
     public String generateToken(User user) throws JwtTokenGenerationException {
-        checkEmptyUserAndUserName(user);
+        validateUser(user);
 
         try {
             Instant now = Instant.now();
@@ -62,7 +62,7 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
         }
     }
 
-    private void checkEmptyUserAndUserName(User user) {
+    private void validateUser(User user) {
         if (user == null) {
             throw new JwtTokenGenerationException("User cannot be null");
         }
