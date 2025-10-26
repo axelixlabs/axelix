@@ -31,13 +31,13 @@ export const ModifiableTableSection = ({ headerName, properties, children }: Pro
             </div>
 
             <EmptyHandler isEmpty={!properties.length}>
-                {properties.map(({ key, displayKey, displayValue }) => (
+                {properties.map(({ key, displayKey, displayValue, isPrimary }) => (
                     <div key={key} className="TableRow">
                         <div className="RowChunk">
                             <TooltipWithCopy text={displayKey} />
                         </div>
                         <div className="RowChunk">
-                            <TablePropertyValue propertyName={key} propertyValue={displayValue} />
+                            <TablePropertyValue propertyName={key} propertyValue={displayValue} isPrimary={isPrimary} />
                         </div>
                     </div>
                 ))}

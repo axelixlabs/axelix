@@ -1,5 +1,9 @@
 .MainWrapper {
-    padding-right: 100px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    column-gap: 20px;
+    padding-right: 80px;
 }
 
 .EditPropertyField {
@@ -14,12 +18,12 @@
 
 .PropertyValueWrapper {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    column-gap: 18px;
+    column-gap: 20px;
 }
 
 .EditPropertyWrapper {
+    width: 100%;
     display: flex;
     justify-content: flex-end;
     column-gap: 8px;

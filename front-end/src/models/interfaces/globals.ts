@@ -109,4 +109,9 @@ export interface ITableRow {
      * The value to be displayed
      */
     displayValue: string;
+
+    /**
+     * If true, the property is primary
+     */
+    isPrimary?: boolean;
 }
