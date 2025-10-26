@@ -28,7 +28,3 @@ export async function fetchData<S>(setDataState: SetRequestState<S>, dataFetcher
         setDataState(() => StatefulRequest.error("Some error"));
     }
 }
-
-export const doesLocationStartWith = (path: string, pathname: string): boolean => {
-    return pathname.startsWith(path);
-};
