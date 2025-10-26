@@ -1,4 +1,19 @@
-import type { ICommonSliceState, IKeyValuePair } from "./globals";
+import type { ICommonSliceState } from "./globals";
+
+interface IProperties {
+    /**
+     * The property name
+     */
+    name: string;
+    /**
+     * The property value
+     */
+    value: string;
+    /**
+     * If true, the property is primary
+     * */
+    isPrimary: boolean;
+}
 
 export interface IEnvironmentPropertySource {
     /**
@@ -8,7 +23,7 @@ export interface IEnvironmentPropertySource {
     /**
      * Environment properties list
      */
-    properties: IKeyValuePair[];
+    properties: IProperties[];
 }
 
 export interface IEnvironmentData {
