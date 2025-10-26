@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Link, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
 import styles from "./styles.module.css";
 
@@ -7,15 +7,17 @@ export const NavigationBar = () => {
     const { t } = useTranslation();
     const { pathname } = useLocation();
 
-    const isWallboardPage = pathname.startsWith("/wallboard") || pathname === "/";
-    const isDashboardPage = pathname.startsWith("/instance");
+    const isActive = pathname === "/wallboard" || pathname === "/";
 
     return (
         <nav data-test="header-links">
-            <Link to="/dashboard" className={`${styles.Link} ${isDashboardPage ? styles.ActiveLink : ""}`}>
+            <NavLink
+                to="/dashboard"
+                className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
+            >
                 {t("Header.dashboard")}
-            </Link>
-            <Link to="/wallboard" className={`${styles.Link} ${isWallboardPage ? styles.ActiveLink : ""}`}>
+            </NavLink>
+            <Link to="/wallboard" className={`${styles.Link} ${isActive ? styles.ActiveLink : ""}`}>
                 {t("Header.wallboard")}
             </Link>
         </nav>
