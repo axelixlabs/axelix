@@ -4,12 +4,6 @@ plugins {
 }
 
 val testcontainersVersion = "1.21.3"
-
-// TODO: the JWT version also ideally needs to be extracted
-val jsonwebtokenVersion = "0.12.6"
-
-// TODO: instancio is 100% candidate for being extracted to 'shared'
-val instancioVersion = "5.5.1"
 val springDocSwaggerVersion = "2.0.4"
 
 dependencies {
@@ -24,15 +18,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.slf4j:slf4j-api")
-    implementation("io.jsonwebtoken:jjwt-api:$jsonwebtokenVersion")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
 
     // Runtime
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:$jsonwebtokenVersion")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jsonwebtokenVersion")
     runtimeOnly("ch.qos.logback:logback-classic")
 
-    // Swagger(OpenAPI)
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocSwaggerVersion")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -41,7 +31,6 @@ dependencies {
     testImplementation("org.postgresql:postgresql")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("org.instancio:instancio-core:${instancioVersion}")
 }
 
 configurations.all {
