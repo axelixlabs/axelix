@@ -20,7 +20,7 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
+            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
 
             <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
                 {effectivePropertySources.map(({ name, properties }) => (
