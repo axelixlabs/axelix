@@ -3,7 +3,7 @@ import { EBeanOrigin, EProxyType } from "models";
 /**
  * Response for the /beans endpoint
  */
-export interface BeansResponse {
+export interface IBeansResponseBody {
     /**
      * The list of beans
      */
@@ -70,7 +70,7 @@ export interface IBean {
  * The "source" of the bean. By "source" we mean how exactly this particular {@link IBean} was discovered
  * by the Spring Framework
  */
-export interface IBeanSource {
+interface IBeanSource {
     /**
      * Optional name of the method that actually produces the instance of the given bean. Present in response from the
      * backend only in case of {@link origin} is equal to {@link BeanOrigin.BEAN_METHOD}

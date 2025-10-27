@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterBeans } from "helpers";
-import { type BeansResponse, StatefulRequest } from "models";
+import { type IBeansResponseBody, StatefulRequest } from "models";
 import { getBeansData } from "services";
 
 import { BeansCollapse } from "./BeansCollapse";
@@ -11,7 +11,7 @@ import { BeansCollapse } from "./BeansCollapse";
 export const Beans = () => {
     const { instanceId } = useParams();
 
-    const [dataState, setDataState] = useState(StatefulRequest.loading<BeansResponse>());
+    const [dataState, setDataState] = useState(StatefulRequest.loading<IBeansResponseBody>());
     const [search, setSearch] = useState<string>("");
 
     useEffect(() => {

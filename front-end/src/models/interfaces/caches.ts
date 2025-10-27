@@ -1,5 +1,3 @@
-import type { ICommonSliceState } from "./globals";
-
 export interface ICacheData {
     /**
      * Name of the cache
@@ -22,31 +20,18 @@ export interface ICachesManager {
     caches: ICacheData[];
 }
 
-export interface ICachesData {
+export interface ICachesResponseBody {
     /**
      * List of cache managers
      */
     cacheManagers: ICachesManager[];
 }
 
-export enum IClearOperationType {
-    CLEAR_SINGLE_CACHE = 0,
-    CLEAR_ALL_CACHES = 1,
-}
-
-export interface ICachesSliceState extends ICommonSliceState, ICachesData {
+export interface IClearCacheRequestData {
     /**
-     * Success status for cache clear operations
+     * Instance ID of the service
      */
-    success: boolean;
-
-    /**
-     * Optional clear cache operation that is currently in progress
-     */
-    clearOperationLoading: IClearOperationType | null;
-}
-
-export interface IClearCacheData {
+    instanceId: string;
     /**
      * Name of the cache
      */
@@ -55,15 +40,4 @@ export interface IClearCacheData {
      * Name of the cache manager associated with the cache
      */
     cacheManager: string;
-}
-
-export interface IClearCachePayload {
-    /**
-     * Instance ID of the service
-     */
-    instanceId: string;
-    /**
-     * Data containing cache name and cache manager
-     */
-    data: IClearCacheData;
 }

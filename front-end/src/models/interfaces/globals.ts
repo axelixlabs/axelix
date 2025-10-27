@@ -87,7 +87,6 @@ export interface IRequest {
  */
 export interface IKeyValuePair {
     key: string;
-
     value: string;
 }
 
@@ -114,4 +113,19 @@ export interface ITableRow {
      * True if propertyValue is primary, false otherwise
      */
     isPrimary?: boolean;
+}
+
+export interface IUpdatePropertyRequestData {
+    /**
+     * Instance id of service
+     */
+    instanceId: string;
+    /**
+     * Property name
+     */
+    propertyName: string;
+    /**
+     * New property value
+     */
+    newValue: string;
 }

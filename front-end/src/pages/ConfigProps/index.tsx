@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { EmptyHandler, Loader, ModifiableTableSection, PageSearch } from "components";
 import { fetchData, filterConfigPropsBeans } from "helpers";
 import { useAppSelector } from "hooks";
-import { type IConfigPropsBeanData, StatefulRequest } from "models";
+import { type IConfigPropsResponseBody, StatefulRequest } from "models";
 import { getConfigPropsData } from "services";
 
 import styles from "./styles.module.css";
@@ -16,7 +16,7 @@ export const ConfigProps = () => {
     const { instanceId } = useParams();
 
     const [search, setSearch] = useState<string>("");
-    const [configProps, setConfigProps] = useState(StatefulRequest.loading<IConfigPropsBeanData>());
+    const [configProps, setConfigProps] = useState(StatefulRequest.loading<IConfigPropsResponseBody>());
     const updatePropertyState = useAppSelector((state) => state.updateProperty);
 
     const fetchConfigProps = (instanceId: string) => fetchData(setConfigProps, () => getConfigPropsData(instanceId));

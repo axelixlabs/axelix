@@ -1,4 +1,3 @@
-export * from "./interfaces/updateProperty";
 export * from "./interfaces/scheduledTasks";
 export * from "./interfaces/environment";
 export * from "./interfaces/configProps";

@@ -24,7 +24,7 @@ export interface IConditionBeanNegative extends IConditionBeanPositive {
 /**
  * All condition data received from the server
  */
-export interface IConditionsData {
+export interface IConditionsResponseBody {
     negativeMatches: IConditionBeanNegative[];
     positiveMatches: IConditionBeanPositive[];
 }
