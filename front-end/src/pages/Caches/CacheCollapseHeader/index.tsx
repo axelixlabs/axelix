@@ -31,7 +31,8 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
     const clearCacheClickHandler = (e: MouseEvent<HTMLElement>): void => {
         e.stopPropagation();
         setClearSingleCache(StatelessRequest.loading());
-        clearCacheData(instanceId!, {
+        clearCacheData({
+            instanceId: instanceId!,
             cacheName: cache.name,
             cacheManager: cacheManagerName,
         })

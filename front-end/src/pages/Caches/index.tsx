@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterCacheManagers } from "helpers";
-import { type ICachesData, StatefulRequest, StatelessRequest } from "models";
+import { type ICachesResponseBody, StatefulRequest, StatelessRequest } from "models";
 import { clearAllCachesData, getCachesData } from "services";
 
 import { CacheManagerSection } from "./CacheManagerSection";
@@ -18,7 +18,7 @@ export const Caches = () => {
 
     const [search, setSearch] = useState<string>("");
     const [clearAllCaches, setClearAllCaches] = useState(StatelessRequest.inactive());
-    const [cacheData, setCacheData] = useState(StatefulRequest.loading<ICachesData>());
+    const [cacheData, setCacheData] = useState(StatefulRequest.loading<ICachesResponseBody>());
 
     useEffect(() => {
         fetchData(setCacheData, () => getCachesData(instanceId!));

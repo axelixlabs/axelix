@@ -39,10 +39,8 @@ export const TablePropertyValue = ({ propertyName, propertyValue, isPrimary }: I
         dispatch(
             updatePropertyThunk({
                 instanceId: instanceId!,
-                updatePropertyData: {
-                    propertyName: propertyName,
-                    newValue: newPropertyValue,
-                },
+                propertyName: propertyName,
+                newValue: newPropertyValue,
             }),
         );
     };

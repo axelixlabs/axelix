@@ -38,7 +38,11 @@ export const Logger = ({ levels, logger, setUpdateLoggerLevel }: IProps) => {
         }
 
         setUpdateLoggerLevel(StatelessRequest.loading());
-        setLoggerLevel(instanceId!, logger.name, level)
+        setLoggerLevel({
+            instanceId: instanceId!,
+            loggerName: logger.name,
+            loggingLevel: level,
+        })
             .then(() => {
                 setUpdateLoggerLevel(StatelessRequest.success());
             })

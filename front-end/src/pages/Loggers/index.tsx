@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterLoggers } from "helpers";
-import { type ILoggerData, StatefulRequest, StatelessRequest } from "models";
+import { type ILoggersResponseBody, StatefulRequest, StatelessRequest } from "models";
 import { getLoggersData } from "services";
 
 import { Logger } from "./Logger";
@@ -14,7 +14,7 @@ export const Loggers = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
-    const [loggersData, setLoggersData] = useState(StatefulRequest.loading<ILoggerData>());
+    const [loggersData, setLoggersData] = useState(StatefulRequest.loading<ILoggersResponseBody>());
     const [search, setSearch] = useState<string>("");
     const [updateLoggerLevel, setUpdateLoggerLevel] = useState(StatelessRequest.inactive());
 

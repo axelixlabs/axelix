@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import type { ILoginSliceState, ILoginSubmitValue } from "models";
+import type { ILoginSliceState, ILoginSubmitRequestData } from "models";
 import { login } from "services/auth";
 
 const initialState: ILoginSliceState = {
@@ -9,7 +9,7 @@ const initialState: ILoginSliceState = {
     error: "",
 };
 
-export const loginThunk = createAsyncThunk("login", async (data: ILoginSubmitValue, { rejectWithValue }) => {
+export const loginThunk = createAsyncThunk("login", async (data: ILoginSubmitRequestData, { rejectWithValue }) => {
     try {
         // todo do this after resolving cors error from server
         const response = await login(data);

@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 
 import { useAppDispatch, useAppSelector } from "hooks";
-import type { ILoginSubmitValue } from "models";
+import type { ILoginSubmitRequestData } from "models";
 import { loginThunk } from "store/slices/login";
 
 import styles from "./styles.module.css";
@@ -15,7 +15,7 @@ export const Login = () => {
     const loading = useAppSelector((store) => store.login.loading);
     const error = useAppSelector((store) => store.login.error);
 
-    const onFinish = (values: ILoginSubmitValue): void => {
+    const onFinish = (values: ILoginSubmitRequestData): void => {
         const { username, password } = values;
 
         const loginData = {
