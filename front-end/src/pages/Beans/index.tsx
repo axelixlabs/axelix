@@ -33,7 +33,7 @@ export const Beans = () => {
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} search={search} setSearch={setSearch} />
+            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
 
             <EmptyHandler isEmpty={!effectiveBeans.length}>
                 <BeansCollapse beans={effectiveBeans} />

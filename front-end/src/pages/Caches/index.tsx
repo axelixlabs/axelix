@@ -59,7 +59,7 @@ export const Caches = () => {
         <>
             {contextHolder}
             <div className={styles.TopSection}>
-                <PageSearch search={search} setSearch={setSearch} />
+                <PageSearch setSearch={setSearch} />
 
                 <Button type="primary" onClick={clearAllCachesClickHandler} loading={clearAllCaches.loading}>
                     {t("Caches.clearAll")}
