@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterScheduledTasks } from "helpers";
-import { type ScheduledTasksResponse, StatefulRequest, isEmpty } from "models";
+import { fetchData, filterScheduledTasks, isEmpty } from "helpers";
+import { type ScheduledTasksResponseBody, StatefulRequest } from "models";
 import { getScheduledTasksData } from "services";
 
 import { CronTasks } from "./CronTasks";
@@ -14,7 +14,7 @@ const ScheduledTasks = () => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
-    const [scheduledTasks, setScheduledTasks] = useState(StatefulRequest.loading<ScheduledTasksResponse>());
+    const [scheduledTasks, setScheduledTasks] = useState(StatefulRequest.loading<ScheduledTasksResponseBody>());
     const [search, setSearch] = useState<string>("");
 
     const fetchScheduledTasks = (instanceId: string) =>

@@ -1,4 +1,4 @@
-import type { ICommonSliceState, IKeyValuePair } from "./globals";
+import type { IKeyValuePair } from "./globals";
 
 export interface IConfigPropsBean {
     /**
@@ -16,11 +16,9 @@ export interface IConfigPropsBean {
     properties: IKeyValuePair[];
 }
 
-export interface IConfigPropsBeanData {
+export interface IConfigPropsResponseBody {
     /**
      * Full list of configuration properties beans
      */
     beans: IConfigPropsBean[];
 }
-
-export interface IConfigPropsSliceState extends ICommonSliceState, IConfigPropsBeanData {}

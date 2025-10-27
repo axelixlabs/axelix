@@ -10,7 +10,7 @@ import {
     EConditionsTabs,
     type IConditionBeanNegative,
     type IConditionBeanPositive,
-    type IConditionsData,
+    type IConditionsResponseBody,
     StatefulRequest,
 } from "models";
 import { getConditionsData } from "services";
@@ -25,7 +25,7 @@ export const Conditions = () => {
     const { instanceId } = useParams();
 
     const [activeKey, setActiveKey] = useState<EConditionsTabs>(EConditionsTabs.NEGATIVE_MATCHES);
-    const [dataState, setDataState] = useState(StatefulRequest.loading<IConditionsData>());
+    const [dataState, setDataState] = useState(StatefulRequest.loading<IConditionsResponseBody>());
     const [search, setSearch] = useState<string>("");
 
     useEffect(() => {

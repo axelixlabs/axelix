@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterInstances } from "helpers";
-import { type IServiceCardsData, StatefulRequest } from "models";
+import { type IServiceCardsResponseBody, StatefulRequest } from "models";
 import { getWallboardData } from "services";
 
 import { WallboardCard } from "./WallboardCard";
@@ -10,7 +10,7 @@ import styles from "./styles.module.css";
 
 export const Wallboard = () => {
     const [search, setSearch] = useState<string>("");
-    const [wallboard, setWallboard] = useState(StatefulRequest.loading<IServiceCardsData>());
+    const [wallboard, setWallboard] = useState(StatefulRequest.loading<IServiceCardsResponseBody>());
 
     useEffect(() => {
         fetchData(setWallboard, () => getWallboardData());

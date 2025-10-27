@@ -56,17 +56,13 @@ export interface IScheduledTasksSliceState extends ICommonSliceState {
 /**
  * Initial scheduled tasks response data
  */
-export interface ScheduledTasksResponse {
+export interface ScheduledTasksResponseBody {
     cron: ICron[];
     fixedDelay: IFixedTasks[];
     fixedRate: IFixedTasks[];
 }
 
-export function isEmpty(resp: ScheduledTasksResponse): boolean {
-    return resp.cron.length === 0 && resp.fixedDelay.length === 0 && resp.fixedRate.length === 0;
-}
-
-export interface IUpdateScheduledTasksBody {
+export interface IUpdateScheduledTasksRequestData {
     instanceId: string;
     targetScheduledTask: string;
     force: boolean;

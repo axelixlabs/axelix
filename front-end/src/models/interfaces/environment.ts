@@ -1,5 +1,3 @@
-import type { ICommonSliceState } from "./globals";
-
 interface IProperties {
     /**
      * The property name
@@ -26,7 +24,7 @@ export interface IEnvironmentPropertySource {
     properties: IProperties[];
 }
 
-export interface IEnvironmentData {
+export interface IEnvironmentResponseBody {
     /**
      * Environment active profiles list
      */
@@ -41,5 +39,3 @@ export interface IEnvironmentData {
      */
     propertySources: IEnvironmentPropertySource[];
 }
-
-export interface IEnvironmentSliceState extends ICommonSliceState, IEnvironmentData {}

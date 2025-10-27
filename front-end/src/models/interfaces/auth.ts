@@ -1,6 +1,6 @@
 import type { ICommonSliceState } from "./globals";
 
-export interface ILoginSubmitValue {
+export interface ILoginSubmitRequestData {
     /**
      * The username of the user.
      * Used to identify the user during the login process.

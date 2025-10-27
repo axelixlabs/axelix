@@ -1,19 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-import type { IUpdateProperty } from "models";
+import type { IUpdatePropertyRequestData } from "models";
 import { updateProperty } from "services";
 
 // todo replace any with real type in future
-export const updatePropertyThunk = createAsyncThunk<void, IUpdateProperty, { rejectValue: any }>(
+export const updatePropertyThunk = createAsyncThunk<void, IUpdatePropertyRequestData, { rejectValue: any }>(
     "updatePropertyThunk",
-    async ({ instanceId, updatePropertyData }, { rejectWithValue }) => {
-        const { propertyName, newValue } = updatePropertyData;
-
+    async (data, { rejectWithValue }) => {
         try {
-            await updateProperty(instanceId, {
-                propertyName,
-                newValue,
-            });
+            await updateProperty(data);
 
             // todo replace any with real type in future
         } catch (error: any) {

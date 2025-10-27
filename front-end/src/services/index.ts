@@ -4,6 +4,7 @@ export * from "./configProps";
 export * from "./conditions";
 export * from "./wallboard";
 export * from "./loggers";
+export * from "./globals";
 export * from "./caches";
 export * from "./beans";
 export * from "./auth";

@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { Loader } from "components";
 import { fetchData } from "helpers";
 import { useAppSelector } from "hooks";
-import { type IEnvironmentData, StatefulRequest } from "models";
+import { type IEnvironmentResponseBody, StatefulRequest } from "models";
 import { getEnvironmentData } from "services";
 
 import { EnvironmentProfiles } from "./EnvironmentProfiles";
@@ -16,7 +16,7 @@ export const Environment = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
-    const [environment, setEnvironment] = useState(StatefulRequest.loading<IEnvironmentData>());
+    const [environment, setEnvironment] = useState(StatefulRequest.loading<IEnvironmentResponseBody>());
 
     const updateProperty = useAppSelector((store) => store.updateProperty);
 

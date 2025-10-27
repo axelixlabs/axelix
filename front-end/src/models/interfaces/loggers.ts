@@ -13,7 +13,7 @@ export interface ILogger {
     effectiveLevel: string;
 }
 
-export interface ILoggerData {
+export interface ILoggersResponseBody {
     /**
      * All possible logging levels that are supported by the logging system inside the instance
      */
@@ -38,14 +38,3 @@ export interface ISetLoggerLevelRequestData {
      */
     loggingLevel: string;
 }
-
-// todo use this in future
-//   groups: [
-//     {
-//       "name": "string",
-//       "configuredLevel": "string",
-//       "members": [
-//         "string"
-//       ]
-//     }
-//   ], // todo
