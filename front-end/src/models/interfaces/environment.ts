@@ -10,8 +10,8 @@ interface IProperties {
      */
     value: string;
     /**
-     * If true, the property is primary
-     * */
+     * True if propertyValue is primary, false otherwise
+     */
     isPrimary: boolean;
 }
 

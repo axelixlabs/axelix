@@ -23,7 +23,7 @@ interface IProps {
     propertyName: string;
 
     /**
-     *  If true, the property is primary
+     *  True if propertyValue is primary, false otherwise
      */
     isPrimary?: boolean;
 }
@@ -49,44 +49,45 @@ export const TablePropertyValue = ({ propertyName, propertyValue, isPrimary }: I
 
     return (
         <div className={styles.MainWrapper}>
-            {editProperty ? (
-                <div className={styles.EditPropertyWrapper}>
-                    <Input
-                        value={newPropertyValue}
-                        onChange={(e) => setNewPropertyValue(e.target.value)}
-                        className={styles.EditPropertyField}
-                    />
+            <div className={styles.InnerWrapper}>
+                {editProperty ? (
+                    <div className={styles.EditPropertyWrapper}>
+                        <Input
+                            value={newPropertyValue}
+                            onChange={(e) => setNewPropertyValue(e.target.value)}
+                            className={styles.EditPropertyField}
+                        />
 
-                    <Button
-                        icon={<CloseOutlined />}
-                        type="primary"
-                        onClick={() => {
-                            setEditProperty(false);
-                            setNewPropertyValue(propertyValue);
-                        }}
-                        className={styles.CloseButton}
-                    />
+                        <Button
+                            icon={<CloseOutlined />}
+                            type="primary"
+                            onClick={() => {
+                                setEditProperty(false);
+                                setNewPropertyValue(propertyValue);
+                            }}
+                            className={styles.CloseButton}
+                        />
 
-                    <Button
-                        icon={<CheckOutlined />}
-                        type="primary"
-                        onClick={updatePropertyClickHandler}
-                        className={styles.UpdateButton}
-                    />
-                </div>
-            ) : (
-                <div className={styles.PropertyValueWrapper}>
-                    {propertyValue ?? "null"}
-                    <Button
-                        icon={<EditOutlined />}
-                        type="primary"
-                        onClick={() => setEditProperty(true)}
-                        className={styles.EditButton}
-                    />
-                </div>
-            )}
-
-            {isPrimary && <img src={CrownIcon} alt="Crown icon" />}
+                        <Button
+                            icon={<CheckOutlined />}
+                            type="primary"
+                            onClick={updatePropertyClickHandler}
+                            className={styles.UpdateButton}
+                        />
+                    </div>
+                ) : (
+                    <div className={styles.PropertyValueWrapper}>
+                        {propertyValue ?? "null"}
+                        <Button
+                            icon={<EditOutlined />}
+                            type="primary"
+                            onClick={() => setEditProperty(true)}
+                            className={styles.EditButton}
+                        />
+                    </div>
+                )}
+                {isPrimary && <img src={CrownIcon} alt="Crown icon" className={styles.PrimaryIcon} />}
+            </div>
         </div>
     );
 };

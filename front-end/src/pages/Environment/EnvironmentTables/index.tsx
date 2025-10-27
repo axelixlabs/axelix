@@ -27,10 +27,10 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
                     <ModifiableTableSection
                         headerName={name}
                         properties={properties.map((property) => ({
-                            ...property,
                             key: property.name,
                             displayKey: property.name,
                             displayValue: property.value,
+                            isPrimary: property.isPrimary,
                         }))}
                         key={name}
                     />
