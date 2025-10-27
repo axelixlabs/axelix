@@ -88,7 +88,7 @@ public class ScheduledTasksApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.ScheduledTasksApi.INSTANCE_ID)
-    public ScheduledTasksResponse getAllScheduledTasksResponse(@PathVariable("instanceId") String instanceId) {
+    public ScheduledTasksResponse getAllScheduledTasks(@PathVariable("instanceId") String instanceId) {
         ServiceScheduledTasks serviceScheduledTasks =
                 getAllScheduledTasksEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(converter.convert(serviceScheduledTasks));

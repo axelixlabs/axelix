@@ -335,7 +335,7 @@ public class ScheduledTasksApiTest {
 
     @Test
     @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerErrorOnGetAllScheduledTasksResponse() {
+    void shouldReturnInternalServerErrorOnGetAllScheduledTasks() {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
@@ -348,7 +348,7 @@ public class ScheduledTasksApiTest {
     }
 
     @Test
-    void shouldReturnBadRequestForUnregisteredInstanceOnGetAllScheduledTasksResponse() {
+    void shouldReturnBadRequestForUnregisteredInstanceOnGetAllScheduledTasks() {
         String instanceId = "unregistered-scheduled-tasks-management-instance";
 
         // when.
