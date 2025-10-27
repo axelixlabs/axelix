@@ -2,6 +2,10 @@
     padding-right: 100px;
 }
 
+.InnerWrapper {
+    position: relative;
+}
+
 .EditPropertyField {
     max-width: 400px;
 }
@@ -16,11 +20,19 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    column-gap: 18px;
+    column-gap: 20px;
 }
 
 .EditPropertyWrapper {
     display: flex;
     justify-content: flex-end;
     column-gap: 8px;
+}
+
+.PrimaryIcon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    /* The size is calculated using this formula: icon width + the left margin we want to have for the icon */
+    right: -44px;
 }

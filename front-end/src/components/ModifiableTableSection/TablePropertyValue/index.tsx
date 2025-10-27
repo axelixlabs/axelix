@@ -9,6 +9,8 @@ import { updatePropertyThunk } from "store/thunks";
 
 import styles from "./styles.module.css";
 
+import CrownIcon from "assets/icons/crown.svg";
+
 interface IProps {
     /**
      * Property value
@@ -19,9 +21,14 @@ interface IProps {
      * The name of the property.
      */
     propertyName: string;
+
+    /**
+     *  True if propertyValue is primary, false otherwise
+     */
+    isPrimary?: boolean;
 }
 
-export const TablePropertyValue = ({ propertyName, propertyValue }: IProps) => {
+export const TablePropertyValue = ({ propertyName, propertyValue, isPrimary }: IProps) => {
     const dispatch = useAppDispatch();
     const { instanceId } = useParams();
 
@@ -29,57 +36,58 @@ export const TablePropertyValue = ({ propertyName, propertyValue }: IProps) => {
     const [newPropertyValue, setNewPropertyValue] = useState<string>(propertyValue);
 
     const updatePropertyClickHandler = (): void => {
-        if (instanceId) {
-            dispatch(
-                updatePropertyThunk({
-                    instanceId,
-                    updatePropertyData: {
-                        propertyName: propertyName,
-                        newValue: newPropertyValue,
-                    },
-                }),
-            );
-        }
+        dispatch(
+            updatePropertyThunk({
+                instanceId: instanceId!,
+                updatePropertyData: {
+                    propertyName: propertyName,
+                    newValue: newPropertyValue,
+                },
+            }),
+        );
     };
 
     return (
         <div className={styles.MainWrapper}>
-            {editProperty ? (
-                <div className={styles.EditPropertyWrapper}>
-                    <Input
-                        value={newPropertyValue}
-                        onChange={(e) => setNewPropertyValue(e.target.value)}
-                        className={styles.EditPropertyField}
-                    />
+            <div className={styles.InnerWrapper}>
+                {editProperty ? (
+                    <div className={styles.EditPropertyWrapper}>
+                        <Input
+                            value={newPropertyValue}
+                            onChange={(e) => setNewPropertyValue(e.target.value)}
+                            className={styles.EditPropertyField}
+                        />
 
-                    <Button
-                        icon={<CloseOutlined />}
-                        type="primary"
-                        onClick={() => {
-                            setEditProperty(false);
-                            setNewPropertyValue(propertyValue);
-                        }}
-                        className={styles.CloseButton}
-                    />
+                        <Button
+                            icon={<CloseOutlined />}
+                            type="primary"
+                            onClick={() => {
+                                setEditProperty(false);
+                                setNewPropertyValue(propertyValue);
+                            }}
+                            className={styles.CloseButton}
+                        />
 
-                    <Button
-                        icon={<CheckOutlined />}
-                        type="primary"
-                        onClick={updatePropertyClickHandler}
-                        className={styles.UpdateButton}
-                    />
-                </div>
-            ) : (
-                <div className={styles.PropertyValueWrapper}>
-                    {propertyValue ?? "null"}
-                    <Button
-                        icon={<EditOutlined />}
-                        type="primary"
-                        onClick={() => setEditProperty(true)}
-                        className={styles.EditButton}
-                    />
-                </div>
-            )}
+                        <Button
+                            icon={<CheckOutlined />}
+                            type="primary"
+                            onClick={updatePropertyClickHandler}
+                            className={styles.UpdateButton}
+                        />
+                    </div>
+                ) : (
+                    <div className={styles.PropertyValueWrapper}>
+                        {propertyValue ?? "null"}
+                        <Button
+                            icon={<EditOutlined />}
+                            type="primary"
+                            onClick={() => setEditProperty(true)}
+                            className={styles.EditButton}
+                        />
+                    </div>
+                )}
+                {isPrimary && <img src={CrownIcon} alt="Crown icon" className={styles.PrimaryIcon} />}
+            </div>
         </div>
     );
 };
