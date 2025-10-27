@@ -1,5 +1,3 @@
-import Dependencies.jsonwebtokenVersion
-
 plugins {
     id("shared")
     id("org.springframework.boot") version Dependencies.springBootVersion
@@ -20,7 +18,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.slf4j:slf4j-api")
-    implementation("io.jsonwebtoken:jjwt-api:$jsonwebtokenVersion")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
 
     // Runtime

@@ -1,5 +1,3 @@
-import Dependencies.jsonwebtokenVersion
-
 plugins {
     id("sbs")
 }
