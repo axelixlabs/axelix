@@ -56,6 +56,19 @@ public final class ApiPaths {
         public static final String PROPERTY = "/{instanceId}/property/{propertyName}";
     }
 
+    public static final class StateExportApi {
+
+        /**
+         * Base path for state export API.
+         */
+        public static final String MAIN = "/export-state";
+
+        /**
+         * Endpoint to export the state of the given application instance.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+    }
+
     public static final class SoftwareApi {
 
         /**

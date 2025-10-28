@@ -80,7 +80,7 @@ public class ConditionsApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.ConditionsApi.FEED)
-    public ConditionsFeedResponse getBeansProfile(@PathVariable("instanceId") String instanceId) {
+    public ConditionsFeedResponse getConditionsFeed(@PathVariable("instanceId") String instanceId) {
         ConditionsFeed result = conditionsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(converter.convert(result));
     }

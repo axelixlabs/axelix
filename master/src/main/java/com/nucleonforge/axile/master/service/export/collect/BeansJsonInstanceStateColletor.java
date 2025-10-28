@@ -1,0 +1,32 @@
+package com.nucleonforge.axile.master.service.export.collect;
+
+import org.springframework.stereotype.Component;
+
+import com.nucleonforge.axile.master.api.BeansApi;
+
+/**
+ * Collects Spring Beans information for application state export.
+ *
+ * @see BeansApi
+ * @since 27.10.2025
+ * @author Nikita Kirillov
+ */
+@Component
+public class BeansJsonInstanceStateColletor extends AbstractJsonInstanceStateCollector {
+
+    private final BeansApi beansApi;
+
+    public BeansJsonInstanceStateColletor(BeansApi beansApi) {
+        this.beansApi = beansApi;
+    }
+
+    @Override
+    public String getName() {
+        return "beans";
+    }
+
+    @Override
+    protected Object collectInternal(String instanceId) {
+        return beansApi.getBeansProfile(instanceId);
+    }
+}

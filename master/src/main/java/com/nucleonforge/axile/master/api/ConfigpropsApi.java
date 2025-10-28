@@ -91,7 +91,7 @@ public class ConfigpropsApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.ConfigpropsApi.FEED)
-    public ConfigpropsFeedResponse getBeansFeedProfile(@PathVariable("instanceId") String instanceId) {
+    public ConfigpropsFeedResponse getConfigpropsFeed(@PathVariable("instanceId") String instanceId) {
         ConfigpropsFeed result = configpropsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(configpropsFeedConverter.convert(result));
     }
