@@ -1,15 +1,18 @@
-package com.nucleonforge.axile.master.service.state.export;
+package com.nucleonforge.axile.master.service.export;
 
 import com.nucleonforge.axile.master.exception.StateExportException;
+import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.service.export.collect.JsonInstanceStateCollector;
 
 /**
- * Service for exporting application instance state data.
- * Provides capability to export various application metrics and configuration.
+ * Service for exporting the state of the given {@link Instance}.
+ * <p>
+ * The "state" of the given instance is assembled by {@link JsonInstanceStateCollector JsonInstanceStateCollectors}.
  *
  * @author Nikita Kirillov
  * @since 27.10.2025
  */
-public interface ApplicationStateExportService {
+public interface InstanceStateExporter {
 
     /**
      * Exports state of the specified application instance.

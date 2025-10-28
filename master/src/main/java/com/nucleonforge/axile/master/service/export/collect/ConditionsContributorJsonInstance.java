@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.state.export;
+package com.nucleonforge.axile.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
@@ -12,11 +12,11 @@ import com.nucleonforge.axile.master.api.ConditionsApi;
  * @author Nikita Kirillov
  */
 @Component
-public class ConditionsDataCollector implements StateDataCollector {
+public class ConditionsContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final ConditionsApi conditionsApi;
 
-    public ConditionsDataCollector(final ConditionsApi conditionsApi) {
+    public ConditionsContributorJsonInstance(final ConditionsApi conditionsApi) {
         this.conditionsApi = conditionsApi;
     }
 
@@ -26,7 +26,7 @@ public class ConditionsDataCollector implements StateDataCollector {
     }
 
     @Override
-    public Object collectData(String instanceId) {
+    protected Object collectInternal(String instanceId) {
         return conditionsApi.getConditionsFeed(instanceId);
     }
 }

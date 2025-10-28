@@ -1,9 +1,9 @@
 package com.nucleonforge.axile.master.exception;
 
-import com.nucleonforge.axile.master.service.state.export.DefaultApplicationStateExportService;
+import com.nucleonforge.axile.master.service.export.ZipArchiveInstanceStateExporter;
 
 /**
- * Typically thrown by the {@link DefaultApplicationStateExportService} when state export
+ * Typically thrown by the {@link ZipArchiveInstanceStateExporter} when state export
  * operations fail due to IO errors, data collection issues, or archive creation problems.
  *
  * @since 27.10.2025

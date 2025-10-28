@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.state.export;
+package com.nucleonforge.axile.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
@@ -12,11 +12,11 @@ import com.nucleonforge.axile.master.api.ScheduledTasksApi;
  * @author Nikita Kirillov
  */
 @Component
-public class ScheduledTasksDataCollector implements StateDataCollector {
+public class ScheduledTasksContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final ScheduledTasksApi scheduledTasksApi;
 
-    public ScheduledTasksDataCollector(ScheduledTasksApi scheduledTasksApi) {
+    public ScheduledTasksContributorJsonInstance(ScheduledTasksApi scheduledTasksApi) {
         this.scheduledTasksApi = scheduledTasksApi;
     }
 
@@ -26,7 +26,7 @@ public class ScheduledTasksDataCollector implements StateDataCollector {
     }
 
     @Override
-    public Object collectData(String instanceId) {
+    protected Object collectInternal(String instanceId) {
         return scheduledTasksApi.getAllScheduledTasks(instanceId);
     }
 }

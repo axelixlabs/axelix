@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.state.export;
+package com.nucleonforge.axile.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
@@ -12,11 +12,11 @@ import com.nucleonforge.axile.master.api.EnvironmentApi;
  * @author Nikita Kirillov
  */
 @Component
-public class EnvironmentDataCollector implements StateDataCollector {
+public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final EnvironmentApi environmentApi;
 
-    public EnvironmentDataCollector(EnvironmentApi environmentApi) {
+    public EnvironmentContributorJsonInstance(EnvironmentApi environmentApi) {
         this.environmentApi = environmentApi;
     }
 
@@ -26,7 +26,7 @@ public class EnvironmentDataCollector implements StateDataCollector {
     }
 
     @Override
-    public Object collectData(String instanceId) {
+    protected Object collectInternal(String instanceId) {
         return environmentApi.getEnvironment(instanceId);
     }
 }
