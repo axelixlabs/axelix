@@ -1,9 +1,8 @@
-package com.nucleonforge.axile.master.service.state.export;
+package com.nucleonforge.axile.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.master.api.BeansApi;
-import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
 
 /**
  * Collects Spring Beans information for application state export.
@@ -13,11 +12,11 @@ import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
  * @author Nikita Kirillov
  */
 @Component
-public class BeansDataCollector implements StateDataCollector {
+public class BeansJsonInstanceStateColletor extends AbstractJsonInstanceStateCollector {
 
     private final BeansApi beansApi;
 
-    public BeansDataCollector(BeansApi beansApi) {
+    public BeansJsonInstanceStateColletor(BeansApi beansApi) {
         this.beansApi = beansApi;
     }
 
@@ -27,7 +26,7 @@ public class BeansDataCollector implements StateDataCollector {
     }
 
     @Override
-    public BeansFeedResponse collectData(String instanceId) {
+    protected Object collectInternal(String instanceId) {
         return beansApi.getBeansProfile(instanceId);
     }
 }

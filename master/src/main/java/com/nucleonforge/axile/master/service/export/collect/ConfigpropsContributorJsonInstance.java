@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.state.export;
+package com.nucleonforge.axile.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
@@ -12,11 +12,11 @@ import com.nucleonforge.axile.master.api.ConfigpropsApi;
  * @author Nikita Kirillov
  */
 @Component
-public class ConfigpropsDataCollector implements StateDataCollector {
+public class ConfigpropsContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final ConfigpropsApi configpropsApi;
 
-    public ConfigpropsDataCollector(ConfigpropsApi configpropsApi) {
+    public ConfigpropsContributorJsonInstance(ConfigpropsApi configpropsApi) {
         this.configpropsApi = configpropsApi;
     }
 
@@ -26,7 +26,7 @@ public class ConfigpropsDataCollector implements StateDataCollector {
     }
 
     @Override
-    public Object collectData(String instanceId) {
+    protected Object collectInternal(String instanceId) {
         return configpropsApi.getConfigpropsFeed(instanceId);
     }
 }

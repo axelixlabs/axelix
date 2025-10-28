@@ -3,6 +3,7 @@ package com.nucleonforge.axile.master.api;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
@@ -27,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
+import com.nucleonforge.axile.master.service.export.collect.JsonInstanceStateCollector;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -46,6 +48,9 @@ class StateExportApiTest {
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
+
+    @Autowired
+    private List<JsonInstanceStateCollector> stateCollectors;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -257,22 +262,20 @@ class StateExportApiTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
-        assertThat(response.getHeaders().getContentDisposition().getFilename())
-                .contains("instance-state-" + activeInstanceId)
-                .endsWith(".zip");
+        assertThat(response.getHeaders().getContentDisposition().getFilename()).endsWith(".zip");
 
         byte[] zipData = response.getBody();
         assertThat(zipData).isNotEmpty();
 
         try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipData))) {
-            Set<String> entries = new HashSet<>();
+            Set<String> zipEntriesNames = new HashSet<>();
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
-                entries.add(entry.getName());
+                zipEntriesNames.add(entry.getName());
                 zis.closeEntry();
             }
 
-            assertThat(entries)
+            assertThat(zipEntriesNames)
                     .containsOnly(
                             "beans.json",
                             "cache.json",

@@ -59,12 +59,12 @@ public final class ApiPaths {
     public static final class StateExportApi {
 
         /**
-         * Base path for export state.
+         * Base path for state export API.
          */
         public static final String MAIN = "/export-state";
 
         /**
-         * Endpoint to export state of a given application instance.
+         * Endpoint to export the state of the given application instance.
          */
         public static final String INSTANCE_ID = "/{instanceId}";
     }

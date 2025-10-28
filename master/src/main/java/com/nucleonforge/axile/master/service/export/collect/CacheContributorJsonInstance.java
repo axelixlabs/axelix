@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.state.export;
+package com.nucleonforge.axile.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
@@ -12,11 +12,11 @@ import com.nucleonforge.axile.master.api.caches.CachesReadApi;
  * @author Nikita Kirillov
  */
 @Component
-public class CacheDataCollector implements StateDataCollector {
+public class CacheContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final CachesReadApi cachesReadApi;
 
-    public CacheDataCollector(final CachesReadApi cachesReadApi) {
+    public CacheContributorJsonInstance(final CachesReadApi cachesReadApi) {
         this.cachesReadApi = cachesReadApi;
     }
 
@@ -26,7 +26,7 @@ public class CacheDataCollector implements StateDataCollector {
     }
 
     @Override
-    public Object collectData(String instanceId) {
+    protected Object collectInternal(String instanceId) {
         return cachesReadApi.getAllCaches(instanceId);
     }
 }
