@@ -15,21 +15,28 @@ on:
     paths:
       - 'front-end/**'
 
+permissions: 
+  issues: read
+  pull-requests: read
+  contents: read
+
 jobs:
   check_linked_issues:
-    name: Check linked issues
     runs-on: ubuntu-latest
-    permissions: 
-      issues: read
-      pull-requests: read
-      contents: read
-    # if: github.event_name == 'pull_request'
     steps:
+      - name: Skip if not a pull_request event
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "Not a pull_request event - skipping linked-issues check.";
+            exit 0;
+          fi
+
       - name: Check PR labels for refactoring
         id: check_label
         uses: actions/github-script@v6
         with:
           script: |
+            const core = require('@actions/core');
             const labels = (context.payload.pull_request && context.payload.pull_request.labels) || [];
             const names = labels.map(l => l.name.toLowerCase());
             const refLabel = 'refactoring';
@@ -53,7 +60,7 @@ jobs:
           echo "Failing the job to block merge until an issue is linked in PR description.";
           exit 1;
   lint:
-    needs: check_linked_issues
+    needs: lint
     runs-on: ubuntu-latest
     defaults:
       run:
