@@ -60,6 +60,7 @@ jobs:
           echo "Failing the job to block merge until an issue is linked in PR description.";
           exit 1;
   lint:
+    needs: check_linked_issues
     runs-on: ubuntu-latest
     defaults:
       run:
