@@ -53,7 +53,7 @@ jobs:
         uses: nearform-actions/github-action-check-linked-issues@v1
         id: check-linked-issues
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fail if no linked issues found
         if: ${{ steps.check_label.outputs.has_refactoring != 'true' && steps.check-linked-issues.outputs.linked_issues_count == '0' }}
