@@ -15,14 +15,14 @@ on:
     paths:
       - 'front-end/**'
 
-permissions: 
-  issues: read
-  pull-requests: read
-  contents: read
 
 jobs:
   check_linked_issues:
     runs-on: ubuntu-latest
+    permissions: 
+      issues: read
+      pull-requests: read
+      contents: read
     name: Check linked issues
     steps:
       # - name: Skip if not a pull_request event
@@ -52,6 +52,8 @@ jobs:
         if: ${{ steps.check_label.outputs.has_refactoring != 'true' }}
         uses: nearform-actions/github-action-check-linked-issues@v1
         id: check-linked-issues
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fail if no linked issues found
         if: ${{ steps.check_label.outputs.has_refactoring != 'true' && steps.check-linked-issues.outputs.linked_issues_count == '0' }}
