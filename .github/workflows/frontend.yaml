@@ -30,7 +30,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const core = require('@actions/core');
             const labels = (context.payload.pull_request && context.payload.pull_request.labels) || [];
             const names = labels.map(l => l.name.toLowerCase());
             const refLabel = 'refactoring';
