@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.sbs.spring.info;
+package com.nucleonforge.axile.sbs.spring.details;
 
 import jakarta.annotation.Nullable;
 
