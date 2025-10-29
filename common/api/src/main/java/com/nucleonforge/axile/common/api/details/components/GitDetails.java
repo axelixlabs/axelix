@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @param commitAuthor       The commit author information.
  * @param commitTimestamp    The timestamp of the commit.
  *
- * @author Sergey Cherkasov
+ * @author Nikita Kirilov, Sergey Cherkasov
  */
 public record GitDetails(
         @JsonProperty("commitShaShort") String commitShaShort,
@@ -24,7 +24,7 @@ public record GitDetails(
      * @param name         The commit author name.
      * @param email        The commit author email.
      *
-     * @author Sergey Cherkasov
+     * @author Nikita Kirilov, Sergey Cherkasov
      */
     public record CommitAuthor(@JsonProperty("name") String name, @JsonProperty("email") String email) {}
 }
