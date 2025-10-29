@@ -1,6 +1,5 @@
 package com.nucleonforge.axile.master.service.state;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,7 +54,6 @@ public class InMemoryInstanceRegistry implements InstanceRegistry {
 
     @Override
     public Set<Instance> getAll() {
-        // TODO: Is this thread safe?
-        return new HashSet<>(source.values());
+        return Set.copyOf(source.values());
     }
 }
