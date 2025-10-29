@@ -13,6 +13,7 @@ interface IProps {
 
 export const EnvironmentTables = ({ propertySources }: IProps) => {
     const [search, setSearch] = useState<string>("");
+
     const effectivePropertySources = search ? filterPropertySources(propertySources, search) : propertySources;
 
     const addonAfter = `${effectivePropertySources.length} / ${propertySources.length}`;
