@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @param version  The version of the operating system.
  * @param arch     The architecture of the CPU.
  *
- * @author Sergey Cherkasov
+ * @author Nikita Kirilov, Sergey Cherkasov
  */
 public record OsDetails(
         @JsonProperty("name") String name,

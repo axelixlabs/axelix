@@ -76,6 +76,9 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // General Info
     public static final ActuatorEndpoint INFO = of("/info", HttpMethod.GET);
 
+    // Details
+    public static final ActuatorEndpoint DETAILS = of("/axile-details", HttpMethod.GET);
+
     // Integration Graph (Spring Integrations project)
     public static final ActuatorEndpoint INTEGRATIONS_GRAPH = of("/integrationgraph", HttpMethod.GET);
     public static final ActuatorEndpoint REBUILD_INTEGRATIONS_GRAPH = of("/integrationgraph", HttpMethod.POST);
@@ -164,6 +167,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 HEAP_DUMP,
                 HTTP_EXCHANGES,
                 INFO,
+                DETAILS,
                 INTEGRATIONS_GRAPH,
                 REBUILD_INTEGRATIONS_GRAPH,
                 LIQUIBASE,

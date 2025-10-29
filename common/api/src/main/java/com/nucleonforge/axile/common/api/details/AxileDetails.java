@@ -18,7 +18,7 @@ import com.nucleonforge.axile.common.api.details.components.SpringDetails;
  * @param build    The DTO containing build component details.
  * @param os       The DTO containing OS component details.
  *
- * @author Sergey Cherkasov
+ * @author Nikita Kirilov, Sergey Cherkasov
  */
 public record AxileDetails(
         @JsonProperty("git") @Nullable GitDetails git,
