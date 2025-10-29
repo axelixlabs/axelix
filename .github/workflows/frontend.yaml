@@ -23,14 +23,8 @@ permissions:
 jobs:
   check_linked_issues:
     runs-on: ubuntu-latest
+    # if: github.event_name == 'pull_request'
     steps:
-      - name: Skip if not a pull_request event
-        run: |
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "Not a pull_request event - skipping linked-issues check.";
-            exit 0;
-          fi
-
       - name: Check PR labels for refactoring
         id: check_label
         uses: actions/github-script@v6
