@@ -12,9 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Sergey Cherkasov
  */
-public record BuildInfo(
+public record BuildDetails(
         @JsonProperty("artifact") String artifact,
-        @JsonProperty("name") String name,
         @JsonProperty("version") String version,
         @JsonProperty("group") String group,
         @JsonProperty("time") String time) {}

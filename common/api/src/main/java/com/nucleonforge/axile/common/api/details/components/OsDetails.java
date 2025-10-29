@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Sergey Cherkasov
  */
-public record OSInfo(
+public record OsDetails(
         @JsonProperty("name") String name,
         @JsonProperty("version") String version,
         @JsonProperty("arch") String arch) {}

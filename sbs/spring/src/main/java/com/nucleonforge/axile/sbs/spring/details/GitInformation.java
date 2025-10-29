@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.sbs.spring.info;
+package com.nucleonforge.axile.sbs.spring.details;
 
 import org.springframework.boot.info.GitProperties;
 

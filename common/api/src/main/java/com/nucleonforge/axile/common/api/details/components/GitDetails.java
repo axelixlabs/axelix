@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Sergey Cherkasov
  */
-public record GitInfo(
+public record GitDetails(
         @JsonProperty("commitShaShort") String commitShaShort,
         @JsonProperty("branch") String branch,
         @JsonProperty("commitAuthor") CommitAuthor commitAuthor,
