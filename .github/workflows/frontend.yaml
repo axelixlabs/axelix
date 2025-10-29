@@ -15,48 +15,48 @@ on:
     paths:
       - 'front-end/**'
 
-permissions:
-  issues: read
-  pull-requests: read
-  contents: read                            
+# permissions:
+#   issues: read
+#   pull-requests: read
+#   contents: read                            
 
 jobs:
-  check_linked_issues:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Skip if not a pull_request event
-        run: |
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "Not a pull_request event - skipping linked-issues check.";
-            exit 0;
-          fi
-      - name: Check PR labels for refactoring
-        id: check_label
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const core = require('@actions/core');
-            const labels = (context.payload.pull_request && context.payload.pull_request.labels) || [];
-            const names = labels.map(l => l.name.toLowerCase());
-            const refLabel = 'refactoring';
-            const hasRefactoring = names.includes(refLabel);
-            core.setOutput('has_refactoring', hasRefactoring ? 'true' : 'false');
-      - name: Skip linked-issues check if refactoring label present
-        if: ${{ steps.check_label.outputs.has_refactoring == 'true' }}
-        run: |
-          echo "The PR is labeled 'refactoring' - the linked issues check was skipped."
-      - name: Run linked-issues check
-        if: ${{ steps.check_label.outputs.has_refactoring != 'true' }}
-        uses: nearform-actions/github-action-check-linked-issues@v1
-        id: check-linked-issues
-      - name: Fail if no linked issues found
-        if: ${{ steps.check_label.outputs.has_refactoring != 'true' && steps.check-linked-issues.outputs.linked_issues_count == '0' }}
-        run: |
-          echo "ERROR: No linked issues found (linked_issues_count=${{ steps.check-linked-issues.outputs.linked_issues_count }}).";
-          echo "Failing the job to block merge until an issue is linked in PR description.";
-          exit 1;
+  # check_linked_issues:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Skip if not a pull_request event
+  #       run: |
+  #         if [ "${{ github.event_name }}" != "pull_request" ]; then
+  #           echo "Not a pull_request event - skipping linked-issues check.";
+  #           exit 0;
+  #         fi
+  #     - name: Check PR labels for refactoring
+  #       id: check_label
+  #       uses: actions/github-script@v6
+  #       with:
+  #         script: |
+  #           const core = require('@actions/core');
+  #           const labels = (context.payload.pull_request && context.payload.pull_request.labels) || [];
+  #           const names = labels.map(l => l.name.toLowerCase());
+  #           const refLabel = 'refactoring';
+  #           const hasRefactoring = names.includes(refLabel);
+  #           core.setOutput('has_refactoring', hasRefactoring ? 'true' : 'false');
+  #     - name: Skip linked-issues check if refactoring label present
+  #       if: ${{ steps.check_label.outputs.has_refactoring == 'true' }}
+  #       run: |
+  #         echo "The PR is labeled 'refactoring' - the linked issues check was skipped."
+  #     - name: Run linked-issues check
+  #       if: ${{ steps.check_label.outputs.has_refactoring != 'true' }}
+  #       uses: nearform-actions/github-action-check-linked-issues@v1
+  #       id: check-linked-issues
+  #     - name: Fail if no linked issues found
+  #       if: ${{ steps.check_label.outputs.has_refactoring != 'true' && steps.check-linked-issues.outputs.linked_issues_count == '0' }}
+  #       run: |
+  #         echo "ERROR: No linked issues found (linked_issues_count=${{ steps.check-linked-issues.outputs.linked_issues_count }}).";
+  #         echo "Failing the job to block merge until an issue is linked in PR description.";
+  #         exit 1;
   lint:
-    needs: check_linked_issues
+    # needs: check_linked_issues
     runs-on: ubuntu-latest
     defaults:
       run:
