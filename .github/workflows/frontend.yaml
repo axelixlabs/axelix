@@ -23,6 +23,7 @@ permissions:
 jobs:
   check_linked_issues:
     runs-on: ubuntu-latest
+    name: Check linked issues
     steps:
       # - name: Skip if not a pull_request event
       #   run: |
