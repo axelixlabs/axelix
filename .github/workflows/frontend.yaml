@@ -16,7 +16,7 @@ on:
       - 'front-end/**'
 
 jobs:
-  check-linked-issues:
+  check_linked_issues:
     runs-on: ubuntu-latest
     steps:
       - name: Check for Linked Issues
@@ -26,7 +26,6 @@ jobs:
           message: "This pull request requires at least one linked issue."
 
   lint:
-    needs: check-linked-issues
     runs-on: ubuntu-latest
     defaults:
       run:
