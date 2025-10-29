@@ -16,15 +16,11 @@ on:
       - 'front-end/**'
 
 jobs:
-  check_linked_issues:
+  check-linked-issues:
     runs-on: ubuntu-latest
     steps:
       - name: Check for Linked Issues
         uses: nearform-actions/github-action-check-linked-issues@v1
-        with:
-          require-issues: true
-          message: "This pull request requires at least one linked issue."
-
   lint:
     runs-on: ubuntu-latest
     defaults:
