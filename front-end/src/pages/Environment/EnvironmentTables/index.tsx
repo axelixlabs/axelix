@@ -16,6 +16,7 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
 
     const effectivePropertySources = search ? filterPropertySources(propertySources, search) : propertySources;
 
+
     const addonAfter = `${effectivePropertySources.length} / ${propertySources.length}`;
 
     return (
