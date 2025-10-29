@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Check for Linked Issues
         uses: nearform-actions/github-action-check-linked-issues@v1
+        with:
+          exclude-labels: "refactoring"
   lint:
     runs-on: ubuntu-latest
     defaults:
