@@ -25,7 +25,7 @@
     display: grid;
     grid-template-columns: 50% 50%;
     align-items: center;
-    transition: background 0.3s;
+    transition: background-color 0.3s;
 }
 
 .TableRow:nth-child(even) {
@@ -34,6 +34,10 @@
 
 .TableRow:hover {
     background-color: #f5f5f5;
+}
+
+.TableRow:last-child {
+    border-radius: 6px;
 }
 
 .RowChunk {
