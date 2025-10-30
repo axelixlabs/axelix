@@ -1,4 +1,6 @@
-package com.nucleonforge.axile.common.api.details;
+package com.nucleonforge.axile.master.model.details;
+
+import com.nucleonforge.axile.common.api.details.AxileDetails;
 
 /**
  * DTO that contains details about this application.
