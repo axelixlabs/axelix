@@ -2,6 +2,7 @@ export * from "./scheduledTasks";
 export * from "./conditions.ts";
 export * from "./configProps";
 export * from "./environment";
+export * from "./details.ts";
 export * from "./wallboard";
 export * from "./loggers";
 export * from "./global";

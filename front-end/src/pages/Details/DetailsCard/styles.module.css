@@ -1,0 +1,22 @@
+.Card {
+    box-shadow: 3px 8px 30px 0px #00000040;
+}
+
+.TableHeaderRowChunk {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    column-gap: 8px;
+}
+
+.CardIcon {
+    height: 16px;
+    width: 16px;
+}
+
+.ValueWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    column-gap: 8px;
+}
