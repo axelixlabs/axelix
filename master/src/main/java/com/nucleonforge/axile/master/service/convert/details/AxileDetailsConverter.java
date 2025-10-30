@@ -6,13 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.details.AxileDetails;
-import com.nucleonforge.axile.common.api.details.TransitAxileDetails;
 import com.nucleonforge.axile.master.api.response.details.AxileDetailsResponse;
 import com.nucleonforge.axile.master.api.response.details.components.BuildProfile;
 import com.nucleonforge.axile.master.api.response.details.components.GitProfile;
 import com.nucleonforge.axile.master.api.response.details.components.OSProfile;
 import com.nucleonforge.axile.master.api.response.details.components.RuntimeProfile;
 import com.nucleonforge.axile.master.api.response.details.components.SpringProfile;
+import com.nucleonforge.axile.master.model.details.TransitAxileDetails;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.convert.details.components.BuildDetailsConverter;
 import com.nucleonforge.axile.master.service.convert.details.components.GitDetailsConverter;

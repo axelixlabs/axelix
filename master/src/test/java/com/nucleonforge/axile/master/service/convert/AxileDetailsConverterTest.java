@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.details.AxileDetails;
-import com.nucleonforge.axile.common.api.details.TransitAxileDetails;
 import com.nucleonforge.axile.common.api.details.components.BuildDetails;
 import com.nucleonforge.axile.common.api.details.components.GitDetails;
 import com.nucleonforge.axile.common.api.details.components.OsDetails;
@@ -16,6 +15,7 @@ import com.nucleonforge.axile.master.api.response.details.components.GitProfile;
 import com.nucleonforge.axile.master.api.response.details.components.OSProfile;
 import com.nucleonforge.axile.master.api.response.details.components.RuntimeProfile;
 import com.nucleonforge.axile.master.api.response.details.components.SpringProfile;
+import com.nucleonforge.axile.master.model.details.TransitAxileDetails;
 import com.nucleonforge.axile.master.service.convert.details.AxileDetailsConverter;
 import com.nucleonforge.axile.master.service.convert.details.components.BuildDetailsConverter;
 import com.nucleonforge.axile.master.service.convert.details.components.GitDetailsConverter;
