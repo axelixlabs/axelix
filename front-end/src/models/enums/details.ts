@@ -1,7 +1,7 @@
 export enum ECopyableField {
-    CommitShaShort = "commitShaShort",
-    Branch = "branch",
-    Artifact = "artifact",
+    COMMIT_SHA_SHORT = "commitShaShort",
+    BRANCH = "branch",
+    ARTIFACT = "artifact",
 }
 
 export enum EDynamicIconsKeys {

@@ -22,7 +22,7 @@ export const detailsIcons = {
 };
 
 export const isCopyNeeded: ECopyableField[] = [
-    ECopyableField.CommitShaShort,
-    ECopyableField.Branch,
-    ECopyableField.Artifact,
+    ECopyableField.COMMIT_SHA_SHORT,
+    ECopyableField.BRANCH,
+    ECopyableField.ARTIFACT,
 ];
