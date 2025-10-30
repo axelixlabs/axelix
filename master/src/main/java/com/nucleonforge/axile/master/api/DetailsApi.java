@@ -20,7 +20,8 @@ import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
-import com.nucleonforge.axile.master.service.convert.ConverterWithPayload;
+import com.nucleonforge.axile.master.service.convert.Converter;
+import com.nucleonforge.axile.master.service.convert.details.DetailsConversionRequest;
 import com.nucleonforge.axile.master.service.transport.DetailsEndpointProber;
 
 /**
@@ -36,11 +37,11 @@ import com.nucleonforge.axile.master.service.transport.DetailsEndpointProber;
 public class DetailsApi {
 
     private final DetailsEndpointProber detailsEndpointProber;
-    private final ConverterWithPayload<AxileDetails, AxileDetailsResponse> converter;
+    private final Converter<DetailsConversionRequest, AxileDetailsResponse> converter;
 
     public DetailsApi(
             DetailsEndpointProber detailsEndpointProber,
-            ConverterWithPayload<AxileDetails, AxileDetailsResponse> converter) {
+            Converter<DetailsConversionRequest, AxileDetailsResponse> converter) {
         this.detailsEndpointProber = detailsEndpointProber;
         this.converter = converter;
     }
@@ -74,7 +75,9 @@ public class DetailsApi {
     @GetMapping(path = ApiPaths.DetailsApi.INSTANCE_ID)
     public AxileDetailsResponse getDetailsResponse(@PathVariable("instanceId") String instanceId)
             throws InstanceNotFoundException {
-        AxileDetails axileDetails = detailsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(converter.convert(axileDetails, instanceId));
+
+        InstanceId id = InstanceId.of(instanceId);
+        AxileDetails axileDetails = detailsEndpointProber.invoke(id, NoHttpPayload.INSTANCE);
+        return Objects.requireNonNull(converter.convert(new DetailsConversionRequest(axileDetails, id)));
     }
 }

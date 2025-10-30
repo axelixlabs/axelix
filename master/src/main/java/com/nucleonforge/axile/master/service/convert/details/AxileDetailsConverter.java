@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.convert;
+package com.nucleonforge.axile.master.service.convert.details;
 
 import org.jspecify.annotations.NonNull;
 
@@ -19,6 +19,7 @@ import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.SpringPro
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
+import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 /**
@@ -27,7 +28,7 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
  * @author Nikita Kirilov, Sergey Cherkasov
  */
 @Service
-public class AxileDetailsConverter implements ConverterWithPayload<AxileDetails, AxileDetailsResponse> {
+public class AxileDetailsConverter implements Converter<DetailsConversionRequest, AxileDetailsResponse> {
 
     private final InstanceRegistry instanceRegistry;
 
@@ -36,7 +37,10 @@ public class AxileDetailsConverter implements ConverterWithPayload<AxileDetails,
     }
 
     @Override
-    public @NonNull AxileDetailsResponse convertInternal(@NonNull AxileDetails source, @NonNull String instanceId) {
+    public @NonNull AxileDetailsResponse convertInternal(@NonNull DetailsConversionRequest request) {
+        AxileDetails source = request.axileDetails();
+        InstanceId instanceId = request.instanceId();
+
         String serviceName = getServiceName(instanceId);
         GitProfile gitProfile = gitDetailsConverter(source.git());
         RuntimeProfile runtimeProfile = runtimeDetailsConverter(source.runtime());
@@ -48,11 +52,13 @@ public class AxileDetailsConverter implements ConverterWithPayload<AxileDetails,
                 serviceName, gitProfile, runtimeProfile, springProfile, buildProfile, osProfile);
     }
 
-    private String getServiceName(String instanceId) {
-        Instance instance = instanceRegistry.get(InstanceId.of(instanceId)).orElse(null);
+    private String getServiceName(InstanceId instanceId) {
+        Instance instance = instanceRegistry.get(instanceId).orElse(null);
+
         if (instance == null) {
             throw new InstanceNotFoundException();
         }
+
         return instance.name();
     }
 

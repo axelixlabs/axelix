@@ -21,6 +21,7 @@ import com.nucleonforge.axile.sbs.spring.master.LibraryDiscoverer;
 import static com.nucleonforge.axile.sbs.spring.details.GarbageCollectorInfoAssembler.getGarbageCollectorInfo;
 import static com.nucleonforge.axile.sbs.spring.utils.StringUtils.emptyIfNull;
 
+// TODO: Revisit the design of this class.
 /**
  * Default implementation of {@link ServiceDetailsAssembler}.
  *
@@ -67,14 +68,12 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
     }
 
     private SpringDetails getSpringDetails() {
-        Optional<String> springBootVersion =
-                libraryDiscoverer.getLibraryVersion("spring-boot", "org.springframework.boot");
-        Optional<String> springVersion = libraryDiscoverer.getLibraryVersion("spring-core", "org.springframework");
-        Optional<String> springCloudVersion = libraryDiscoverer
-                .getLibraryVersion("spring-cloud-context", "org.springframework.cloud")
-                .or(() -> libraryDiscoverer.getLibraryVersion("spring-cloud-commons", "org.springframework.cloud"))
-                .or(() -> libraryDiscoverer.getLibraryVersion("spring-cloud-starter", "org.springframework.cloud"));
+        // spotless:off
+        var springBootVersion = libraryDiscoverer.getLibraryVersion("spring-boot", "org.springframework.boot");
+        var springVersion = libraryDiscoverer.getLibraryVersion("spring-core", "org.springframework");
+        var springCloudVersion = libraryDiscoverer.getLibraryVersion("spring-cloud-commons", "org.springframework.cloud");
         return new SpringDetails(springBootVersion.orElse(""), springVersion.orElse(""), springCloudVersion.orElse(""));
+        // spotless:on
     }
 
     private RuntimeDetails getRuntimeDetails() {

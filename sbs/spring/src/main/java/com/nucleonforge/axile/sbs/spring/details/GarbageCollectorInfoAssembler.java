@@ -5,6 +5,9 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Utility class for retrieving garbage collector information.
  *
@@ -12,6 +15,8 @@ import java.util.stream.Collectors;
  * @author Nikita Kirillov
  */
 public class GarbageCollectorInfoAssembler {
+
+    private static final Logger log = LoggerFactory.getLogger(GarbageCollectorInfoAssembler.class);
 
     private GarbageCollectorInfoAssembler() {}
 
@@ -25,32 +30,19 @@ public class GarbageCollectorInfoAssembler {
             if (!gcNames.isEmpty()) {
                 String joined = String.join(", ", gcNames).toLowerCase();
 
-                if (joined.contains("g1")) {
-                    return "G1 GC";
-                }
-                if (joined.contains("shenandoah")) {
-                    return "Shenandoah GC";
-                }
-                if (joined.contains("zgc")) {
-                    return "ZGC";
-                }
-                if (joined.contains("epsilongc") || joined.contains("epsilon")) {
-                    return "Epsilon GC";
-                }
-                if (joined.contains("parallel") || joined.contains("ps marksweep") || joined.contains("ps scavenge")) {
-                    return "Parallel GC";
-                }
-                if (joined.contains("concurrent") || joined.contains("parnew")) {
-                    return "Concurrent Mark Sweep (CMS)";
-                }
-                if (joined.contains("marksweepcompact") || joined.contains("copy")) {
-                    return "Serial GC";
+                GarageCollector garageCollector = GarageCollector.fromName(joined);
+
+                if (garageCollector == GarageCollector.UNKNOWN) {
+                    return String.join(", ", gcNames);
                 }
 
-                return String.join(", ", gcNames);
+                return garageCollector.name();
             }
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
+            log.warn(
+                    "Unable to determine the GC used inside the given application. Falling back to UNKNOWN", exception);
         }
-        return "Unknown GC";
+
+        return GarageCollector.UNKNOWN.name();
     }
 }

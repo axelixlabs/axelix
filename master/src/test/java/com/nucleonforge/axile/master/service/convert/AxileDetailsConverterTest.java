@@ -20,6 +20,9 @@ import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.GitProfil
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.OSProfile;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.RuntimeProfile;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.SpringProfile;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
+import com.nucleonforge.axile.master.service.convert.details.AxileDetailsConverter;
+import com.nucleonforge.axile.master.service.convert.details.DetailsConversionRequest;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
@@ -49,7 +52,8 @@ public class AxileDetailsConverterTest {
     @Test
     void testConvertHappyPath() {
         // when.
-        AxileDetailsResponse response = converter.convertInternal(getAxileDetails(), activeInstanceId);
+        AxileDetailsResponse response = converter.convertInternal(
+                new DetailsConversionRequest(getAxileDetails(), InstanceId.of(activeInstanceId)));
 
         assertThat(response.serviceName()).isEqualTo("test-object-factory-instance");
 
