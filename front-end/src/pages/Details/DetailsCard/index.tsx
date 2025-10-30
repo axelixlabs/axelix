@@ -1,15 +1,17 @@
 import { Copy } from "components";
 import { resolveIconFromContent } from "helpers";
+import type { ECopyableField } from "models";
 import { detailsIcons, isCopyNeeded } from "utils";
 
 import styles from "./styles.module.css";
 
 interface IProps {
-    title: any;
-    content: any;
+    title: string;
+    content: string[][];
 }
 
 export const DetailsCard = ({ title, content }: IProps) => {
+    // @ts-expect-error Fix this in future
     const icon = detailsIcons[resolveIconFromContent(title, content) || title];
 
     return (
@@ -27,7 +29,7 @@ export const DetailsCard = ({ title, content }: IProps) => {
                     <div className="RowChunk">
                         <div className={styles.ValueWrapper}>
                             {value}
-                            {isCopyNeeded.includes(title) && <Copy text={value} />}
+                            {isCopyNeeded.includes(title as ECopyableField) && <Copy text={value} />}
                         </div>
                     </div>
                 </div>
