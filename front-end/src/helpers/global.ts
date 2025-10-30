@@ -1,7 +1,7 @@
 import type { AxiosResponse } from "axios";
-import { type Dispatch, type SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
-import { type MenuItem, StatefulRequest } from "models";
+import { type IConfigPropsBean, type IEnvironmentPropertySource, type MenuItem, StatefulRequest } from "models";
 
 export const findOpenKeys = (items: MenuItem[], path: string): string[] => {
     const parent = items.find(
@@ -28,3 +28,9 @@ export async function fetchData<S>(setDataState: SetRequestState<S>, dataFetcher
         setDataState(() => StatefulRequest.error("Some error"));
     }
 }
+
+export const getPropertiesCount = <T extends IEnvironmentPropertySource | IConfigPropsBean>(
+    propertySourcesList: T[],
+): number => {
+    return propertySourcesList.reduce((result, { properties }) => result + properties.length, 0);
+};
