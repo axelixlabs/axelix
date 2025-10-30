@@ -6,7 +6,7 @@ import styles from "./styles.module.css";
 
 interface IProps {
     title: any;
-    content: any
+    content: any;
 }
 
 export const DetailsCard = ({ title, content }: IProps) => {
