@@ -1,7 +1,3 @@
-.TableHeader {
-    grid-template-columns: 1fr 170px 170px 110px;
-}
-
 .CronTableHeader {
     grid-template-columns: 1fr 170px 110px;
 }
