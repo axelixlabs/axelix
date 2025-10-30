@@ -45,4 +45,8 @@ public class StringUtils {
 
         return false;
     }
+
+    public static String checkNull(String target) {
+        return target == null ? "" : target;
+    }
 }

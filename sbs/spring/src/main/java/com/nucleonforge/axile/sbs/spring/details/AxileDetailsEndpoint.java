@@ -6,7 +6,7 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import com.nucleonforge.axile.common.api.details.AxileDetails;
 
 /**
- * TODO
+ * Custom Spring Boot Actuator endpoint. Provides comprehensive instance operational details.
  *
  * @see AxileDetails
  * @since 29.10.2025

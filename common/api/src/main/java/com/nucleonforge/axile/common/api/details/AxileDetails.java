@@ -21,8 +21,21 @@ import com.nucleonforge.axile.common.api.details.components.SpringDetails;
  * @author Nikita Kirilov, Sergey Cherkasov
  */
 public record AxileDetails(
+        @Nullable String instanceName,
         @JsonProperty("git") @Nullable GitDetails git,
-        @JsonProperty("spring") @Nullable SpringDetails spring,
-        @JsonProperty("runtime") @Nullable RuntimeDetails runtime,
+        @JsonProperty("spring") SpringDetails spring,
+        @JsonProperty("runtime") RuntimeDetails runtime,
         @JsonProperty("build") @Nullable BuildDetails build,
-        @JsonProperty("os") @Nullable OsDetails os) {}
+        @JsonProperty("os") OsDetails os) {
+
+    public AxileDetails setInstanceName(String instanceName) {
+        return new AxileDetails(
+            instanceName,
+            this.git,
+            this.spring,
+            this.runtime,
+            this.build,
+            this.os
+        );
+    }
+}
