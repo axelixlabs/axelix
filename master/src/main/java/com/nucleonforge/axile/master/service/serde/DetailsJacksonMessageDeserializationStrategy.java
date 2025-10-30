@@ -5,12 +5,12 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.details.AxileDetails;
+import com.nucleonforge.axile.common.api.AxileDetails;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for {@link AxileDetails}.
  *
- * @author SergeyCherkasov
+ * @author Nikita Kirilov, Sergey Cherkasov
  */
 @Component
 public class DetailsJacksonMessageDeserializationStrategy extends JacksonMessageDeserializationStrategy<AxileDetails> {

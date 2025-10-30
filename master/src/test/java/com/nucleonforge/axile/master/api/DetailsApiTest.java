@@ -51,8 +51,8 @@ public class DetailsApiTest {
            "git": {
              "commitShaShort": "7a663cb",
              "branch": "local/local-test",
-             "authorName": "Никита",
-             "authorEmail": "145802687+NikitaKirilloff@users.noreply.github.com",
+             "authorName": "NikitaKirilloff",
+             "authorEmail": "NikitaKirilloff@github.com",
              "commitTimestamp": "1761249922000"
            },
            "runtime": {
@@ -106,13 +106,14 @@ public class DetailsApiTest {
         // language=json
         String jsonResponse =
                 """
-                {
+        {
+        "instanceName": null,
              "git": {
                  "commitShaShort": "7a663cb",
                  "branch": "local/local-test",
                  "commitAuthor": {
-                     "name": "Никита",
-                     "email": "145802687+NikitaKirilloff@users.noreply.github.com"
+                     "name": "NikitaKirilloff",
+                     "email": "NikitaKirilloff@github.com"
                  },
                  "commitTimestamp": "1761249922000"
              },

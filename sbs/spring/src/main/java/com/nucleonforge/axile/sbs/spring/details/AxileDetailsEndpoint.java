@@ -3,7 +3,7 @@ package com.nucleonforge.axile.sbs.spring.details;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.nucleonforge.axile.common.api.details.AxileDetails;
+import com.nucleonforge.axile.common.api.AxileDetails;
 
 /**
  * Custom Spring Boot Actuator endpoint. Provides comprehensive instance operational details.

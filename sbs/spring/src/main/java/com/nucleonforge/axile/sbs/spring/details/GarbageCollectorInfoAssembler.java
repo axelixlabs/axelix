@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
  */
 public class GarbageCollectorInfoAssembler {
 
-    private GarbageCollectorInfoAssembler(){}
+    private GarbageCollectorInfoAssembler() {}
 
     public static String getGarbageCollectorInfo() {
         try {
             List<String> gcNames = ManagementFactory.getGarbageCollectorMXBeans().stream()
-                .map(GarbageCollectorMXBean::getName)
-                .collect(Collectors.toList());
+                    .map(GarbageCollectorMXBean::getName)
+                    .collect(Collectors.toList());
 
             if (!gcNames.isEmpty()) {
                 String joined = String.join(", ", gcNames).toLowerCase();
