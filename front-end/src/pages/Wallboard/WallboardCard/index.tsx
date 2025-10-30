@@ -13,7 +13,7 @@ interface IProps {
 
 export const WallboardCard = ({ data }: IProps) => {
     return (
-        <Link to={`/instance/${data.instanceId}/beans`} className={`${styles.Card} ${styles[`Card${data.status}`]}`}>
+        <Link to={`/instance/${data.instanceId}/details`} className={`${styles.Card} ${styles[`Card${data.status}`]}`}>
             <div className={`${styles.CardHeader} ${styles[`CardHeader${data.status}`]}`}>{data.name}</div>
             <div className={styles.CardBody}>
                 <div>Version: {data.serviceVersion}</div>
