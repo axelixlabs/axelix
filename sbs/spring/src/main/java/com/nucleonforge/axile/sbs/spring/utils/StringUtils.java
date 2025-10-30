@@ -46,7 +46,7 @@ public class StringUtils {
         return false;
     }
 
-    public static String checkNull(String target) {
-        return target == null ? "" : target;
+    public static String emptyIfNull(String target) {
+        return target != null ? target : "";
     }
 }

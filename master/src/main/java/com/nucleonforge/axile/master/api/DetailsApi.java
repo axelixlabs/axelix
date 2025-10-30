@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +18,7 @@ import com.nucleonforge.axile.common.api.AxileDetails;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse;
+import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.Converter;
@@ -36,9 +36,8 @@ import com.nucleonforge.axile.master.service.transport.DetailsEndpointProber;
 @RestController
 @RequestMapping(path = ApiPaths.DetailsApi.MAIN)
 public class DetailsApi {
-    @Autowired
-    private InstanceRegistry instanceRegistry;
 
+    private final InstanceRegistry instanceRegistry;
     private final DetailsEndpointProber detailsEndpointProber;
     private final Converter<AxileDetails, AxileDetailsResponse> converter;
 
@@ -46,6 +45,7 @@ public class DetailsApi {
             InstanceRegistry instanceRegistry,
             DetailsEndpointProber detailsEndpointProber,
             Converter<AxileDetails, AxileDetailsResponse> converter) {
+        this.instanceRegistry = instanceRegistry;
         this.detailsEndpointProber = detailsEndpointProber;
         this.converter = converter;
     }
@@ -77,12 +77,15 @@ public class DetailsApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.DetailsApi.INSTANCE_ID)
-    public AxileDetailsResponse getDetailsResponse(@PathVariable("instanceId") String instanceId) {
+    public AxileDetailsResponse getDetailsResponse(@PathVariable("instanceId") String instanceId)
+            throws InstanceNotFoundException {
         AxileDetails axileDetails = detailsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
 
-        // TODO It is necessary to consider moving this to a separate service.
         Instance instance = instanceRegistry.get(InstanceId.of(instanceId)).orElse(null);
-        String instanceName = instance == null ? "UNKNOW" : instance.name();
+        if (instance == null) {
+            throw new InstanceNotFoundException();
+        }
+        String instanceName = instance.name();
 
         return Objects.requireNonNull(converter.convert(axileDetails.setInstanceName(instanceName)));
     }

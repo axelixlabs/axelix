@@ -37,7 +37,7 @@ public class DetailsJacksonMessageDeserializationStrategyTest {
              "spring": {
                  "springBootVersion": "3.5.0",
                  "springFrameworkVersion": "7.0",
-                 "springCloudVersion": "2013.0.8"
+                 "springCloudVersion": "2023.0.1"
              },
              "runtime": {
                  "javaVersion": "17.0.16",
@@ -74,7 +74,7 @@ public class DetailsJacksonMessageDeserializationStrategyTest {
         AxileDetails.SpringDetails spring = axileDetails.spring();
         assertThat(spring.springBootVersion()).isEqualTo("3.5.0");
         assertThat(spring.springFrameworkVersion()).isEqualTo("7.0");
-        assertThat(spring.springCloudVersion()).isEqualTo("2013.0.8");
+        assertThat(spring.springCloudVersion()).isEqualTo("2023.0.1");
 
         // RuntimeDetails
         AxileDetails.RuntimeDetails runtime = axileDetails.runtime();

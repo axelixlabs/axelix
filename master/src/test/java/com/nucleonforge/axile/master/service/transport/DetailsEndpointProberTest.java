@@ -71,7 +71,7 @@ public class DetailsEndpointProberTest {
              "spring": {
                  "springBootVersion": "3.5.0",
                  "springFrameworkVersion": "7.0",
-                 "springCloudVersion": "2013.0.8"
+                 "springCloudVersion": "2023.0.1"
              },
              "runtime": {
                  "javaVersion": "17.0.16",
@@ -99,7 +99,7 @@ public class DetailsEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/axile-details")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axile-details")) {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -113,8 +113,7 @@ public class DetailsEndpointProberTest {
     @Test
     void shouldReturnAxileDetailsResponse() {
         // when.
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
         AxileDetails axileDetails =
                 detailsEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
@@ -130,7 +129,7 @@ public class DetailsEndpointProberTest {
         AxileDetails.SpringDetails spring = axileDetails.spring();
         assertThat(spring.springBootVersion()).isEqualTo("3.5.0");
         assertThat(spring.springFrameworkVersion()).isEqualTo("7.0");
-        assertThat(spring.springCloudVersion()).isEqualTo("2013.0.8");
+        assertThat(spring.springCloudVersion()).isEqualTo("2023.0.1");
 
         // RuntimeDetails
         AxileDetails.RuntimeDetails runtime = axileDetails.runtime();

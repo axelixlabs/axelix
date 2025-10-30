@@ -42,11 +42,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 public class DetailsApiTest {
-    // language=json
-    private static final String EXPECTED_DETAILS_JSON =
-            """
 
-            {
+    private static final String EXPECTED_DETAILS_JSON =
+            // language=json
+            """
+         {
            "serviceName": "test-object-factory-instance",
            "git": {
              "commitShaShort": "7a663cb",
@@ -64,7 +64,7 @@ public class DetailsApiTest {
            "spring": {
              "springBootVersion": "3.5.0",
              "springFrameworkVersion": "7.0",
-             "springCloudVersion": ""
+             "springCloudVersion": "4.1.4"
            },
            "build": {
              "artifact": "spring-petclinic",
@@ -80,7 +80,45 @@ public class DetailsApiTest {
          }
         """;
 
+    private static final String EXPECTED_DETAILS_JSON_WITHOUT_PLUGIN =
+            // language=json
+            """
+     {
+       "serviceName": "test-object-factory-instance",
+       "git": {
+             "commitShaShort": "",
+             "branch": "",
+             "authorName": "",
+             "authorEmail": "",
+             "commitTimestamp": ""
+           },
+       "runtime": {
+         "javaVersion": "17.0.16",
+         "kotlinVersion": "1.9.0",
+         "jdkVendor": "Corretto-17.0.16.8.1",
+         "garbageCollector": "G1 GC"
+       },
+       "spring": {
+         "springBootVersion": "3.5.0",
+         "springFrameworkVersion": "7.0",
+         "springCloudVersion": "4.1.4"
+       },
+       "build": {
+             "artifact": "",
+             "version": "",
+             "group": "",
+             "time": ""
+           },
+       "os": {
+         "name": "Windows 10",
+         "version": "10.0",
+         "arch": "amd64"
+       }
+     }
+    """;
+
     private static final String activeInstanceId = UUID.randomUUID().toString();
+    private static final String instanceWithoutPluginId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
 
@@ -120,7 +158,7 @@ public class DetailsApiTest {
              "spring": {
                  "springBootVersion": "3.5.0",
                  "springFrameworkVersion": "7.0",
-                 "springCloudVersion": ""
+                 "springCloudVersion": "4.1.4"
              },
              "runtime": {
                  "javaVersion": "17.0.16",
@@ -142,6 +180,45 @@ public class DetailsApiTest {
          }
         """;
 
+        // language=json
+        String jsonResponseWithoutPlugin =
+                """
+            {
+              "instanceName": null,
+              "git": {
+                 "commitShaShort": "",
+                 "branch": "",
+                 "commitAuthor": {
+                     "name": "",
+                     "email": ""
+                 },
+                 "commitTimestamp": ""
+             },
+              "spring": {
+                "springBootVersion": "3.5.0",
+                "springFrameworkVersion": "7.0",
+                "springCloudVersion": "4.1.4"
+              },
+              "runtime": {
+                "javaVersion": "17.0.16",
+                "jdkVendor": "Corretto-17.0.16.8.1",
+                "garbageCollector": "G1 GC",
+                "kotlinVersion": "1.9.0"
+              },
+              "build": {
+                 "artifact": "",
+                 "version": "",
+                 "group": "",
+                 "time": ""
+             },
+              "os": {
+                "name": "Windows 10",
+                "version": "10.0",
+                "arch": "amd64"
+              }
+            }
+            """;
+
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
@@ -151,6 +228,10 @@ public class DetailsApiTest {
                 if (path.equals("/" + activeInstanceId + "/actuator/axile-details")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + instanceWithoutPluginId + "/actuator/axile-details")) {
+                    return new MockResponse()
+                            .setBody(jsonResponseWithoutPlugin)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -176,6 +257,23 @@ public class DetailsApiTest {
     }
 
     @Test
+    void shouldReturnJSONDetailsResponseWithoutPlugin() {
+        // when.
+        registry.register(createInstanceWithUrl(
+                instanceWithoutPluginId, mockWebServer.url(instanceWithoutPluginId) + "/actuator"));
+
+        ResponseEntity<String> response =
+                restTemplate.getForEntity("/api/axile/details/{instanceId}", String.class, instanceWithoutPluginId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+
+        String body = response.getBody();
+        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_DETAILS_JSON_WITHOUT_PLUGIN);
+    }
+
+    @Test
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
@@ -191,7 +289,7 @@ public class DetailsApiTest {
 
     @Test
     void shouldReturnBadRequestForUnregisteredInstance() {
-        String instanceId = "unregistered-info-instance";
+        String instanceId = UUID.randomUUID().toString();
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(

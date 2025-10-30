@@ -17,10 +17,10 @@ import org.jspecify.annotations.Nullable;
  */
 public record AxileDetails(
         @Nullable String instanceName,
-        @JsonProperty("git") @Nullable GitDetails git,
+        @JsonProperty("git") GitDetails git,
         @JsonProperty("spring") SpringDetails spring,
         @JsonProperty("runtime") RuntimeDetails runtime,
-        @JsonProperty("build") @Nullable BuildDetails build,
+        @JsonProperty("build") BuildDetails build,
         @JsonProperty("os") OsDetails os) {
 
     public AxileDetails setInstanceName(String instanceName) {

@@ -1,6 +1,5 @@
 package com.nucleonforge.axile.master.api.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -15,7 +14,6 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Nikita Kirilov, Sergey Cherkasov
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public record AxileDetailsResponse(
         @Nullable String serviceName,
         @Nullable GitProfile git,
@@ -33,7 +31,6 @@ public record AxileDetailsResponse(
      * @param authorEmail        The commit author email.
      * @param commitTimestamp    The timestamp of the commit.
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record GitProfile(
             String commitShaShort, String branch, String authorName, String authorEmail, String commitTimestamp) {}
 
@@ -45,7 +42,6 @@ public record AxileDetailsResponse(
      * @param jdkVendor         The name of the vendor.
      * @param garbageCollector  The name of the garbage collector.
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record RuntimeProfile(String javaVersion, String kotlinVersion, String jdkVendor, String garbageCollector) {}
 
     /**
@@ -55,7 +51,6 @@ public record AxileDetailsResponse(
      * @param springFrameworkVersion  The version of the Spring Framework.
      * @param springCloudVersion      The version of the Spring Cloud.
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record SpringProfile(String springBootVersion, String springFrameworkVersion, String springCloudVersion) {}
 
     /**
@@ -66,7 +61,6 @@ public record AxileDetailsResponse(
      * @param group        The group ID of the application.
      * @param time         The time the application was built.
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record BuildProfile(String artifact, String version, String group, String time) {}
 
     /**
@@ -76,6 +70,5 @@ public record AxileDetailsResponse(
      * @param version  The version of the operating system.
      * @param arch     The architecture of the CPU.
      */
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record OSProfile(String name, String version, String arch) {}
 }
