@@ -6,12 +6,27 @@ export const filterPropertySources = (
 ): IEnvironmentPropertySource[] => {
     const formattedSearch = search.toLowerCase().trim();
 
-    return propertySources.filter(({ name, properties }) => {
-        const lowerName = name.toLowerCase();
-        if (lowerName.includes(formattedSearch)) {
-            return true;
+    return propertySources.reduce<IEnvironmentPropertySource[]>((result, propertySource) => {
+        const { name, properties } = propertySource;
+
+        const sourceNameLower = propertySource.name.toLowerCase();
+
+        if (sourceNameLower.includes(formattedSearch)) {
+            result.push(propertySource);
+            return result;
         }
 
-        return properties.some(({ name }) => name.toLowerCase().includes(formattedSearch));
-    });
+        const filteredProperties = properties.filter((property) =>
+            property.name.toLowerCase().includes(formattedSearch),
+        );
+
+        if (filteredProperties.length) {
+            result.push({
+                name: name,
+                properties: filteredProperties,
+            });
+        }
+
+        return result;
+    }, []);
 };

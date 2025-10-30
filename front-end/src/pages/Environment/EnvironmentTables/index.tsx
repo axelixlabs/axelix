@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { EmptyHandler, ModifiableTableSection, PageSearch } from "components";
-import { filterPropertySources } from "helpers";
+import { filterPropertySources, getPropertiesCount } from "helpers";
 import type { IEnvironmentPropertySource } from "models";
 
 interface IProps {
@@ -15,7 +15,10 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
     const [search, setSearch] = useState<string>("");
     const effectivePropertySources = search ? filterPropertySources(propertySources, search) : propertySources;
 
-    const addonAfter = `${effectivePropertySources.length} / ${propertySources.length}`;
+    const totalPropertiesCount = getPropertiesCount<IEnvironmentPropertySource>(propertySources);
+    const filteredPropertiesCount = getPropertiesCount<IEnvironmentPropertySource>(effectivePropertySources);
+
+    const addonAfter = `${filteredPropertiesCount} / ${totalPropertiesCount}`;
 
     return (
         <>

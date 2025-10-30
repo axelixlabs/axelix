@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { EmptyHandler, Loader, ModifiableTableSection, PageSearch } from "components";
-import { fetchData, filterConfigPropsBeans } from "helpers";
+import { Loader, PageSearch } from "components";
+import { fetchData, filterConfigPropsBeans, getPropertiesCount } from "helpers";
 import { useAppSelector } from "hooks";
-import { type IConfigPropsResponseBody, StatefulRequest } from "models";
+import { type IConfigPropsBean, type IConfigPropsResponseBody, StatefulRequest } from "models";
 import { getConfigPropsData } from "services";
 
-import styles from "./styles.module.css";
+import { ConfigPropsTables } from "./ConfigPropsTables";
 
 export const ConfigProps = () => {
     const { t } = useTranslation();
@@ -47,33 +47,15 @@ export const ConfigProps = () => {
 
     const effectiveConfigProps = search ? filterConfigPropsBeans(configPropsBeansFeed, search) : configPropsBeansFeed;
 
-    const addonAfter = `${effectiveConfigProps.length} / ${configPropsBeansFeed.length}`;
+    const totalPropertiesCount = getPropertiesCount<IConfigPropsBean>(configPropsBeansFeed);
+    const filteredPropertiesCount = getPropertiesCount<IConfigPropsBean>(effectiveConfigProps);
+
+    const addonAfter = `${filteredPropertiesCount} / ${totalPropertiesCount}`;
 
     return (
         <>
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
-
-            <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
-                {effectiveConfigProps.map(({ beanName, prefix, properties }) => (
-                    <ModifiableTableSection
-                        headerName={beanName}
-                        properties={properties.map((property) => {
-                            return {
-                                key: `${prefix}.${property.key}`,
-                                displayKey: property.key,
-                                displayValue: property.value,
-                            };
-                        })}
-                        key={beanName}
-                    >
-                        {prefix && (
-                            <div className={styles.Prefix}>
-                                <span className={styles.PrefixTitle}>Prefix:</span> {prefix}
-                            </div>
-                        )}
-                    </ModifiableTableSection>
-                ))}
-            </EmptyHandler>
+            <ConfigPropsTables effectiveConfigProps={effectiveConfigProps} />
         </>
     );
 };
