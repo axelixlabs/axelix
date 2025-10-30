@@ -32,11 +32,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest
 public class AxileDetailsConverterTest {
+
     @Autowired
     private InstanceRegistry instanceRegistry;
 
+    private final String activeInstanceId = UUID.randomUUID().toString();
+
     private AxileDetailsConverter converter;
-    String activeInstanceId = UUID.randomUUID().toString();
 
     @BeforeEach
     void prepare() {
@@ -49,10 +51,10 @@ public class AxileDetailsConverterTest {
         // when.
         AxileDetailsResponse response = converter.convertInternal(getAxileDetails(), activeInstanceId);
 
-        // ServiceName
         assertThat(response.serviceName()).isEqualTo("test-object-factory-instance");
 
         GitProfile git = response.git();
+        assertThat(git).isNotNull();
         assertThat(git.commitShaShort()).isEqualTo("7a663cb");
         assertThat(git.branch()).isEqualTo("local/local-test");
         assertThat(git.authorName()).isEqualTo("sergeycherkasovv");
@@ -71,6 +73,7 @@ public class AxileDetailsConverterTest {
         assertThat(runtime.kotlinVersion()).isEqualTo("1.9.0");
 
         BuildProfile build = response.build();
+        assertThat(build).isNotNull();
         assertThat(build.artifact()).isEqualTo("spring-petclinic");
         assertThat(build.version()).isEqualTo("3.5.0-SNAPSHOT");
         assertThat(build.group()).isEqualTo("org.springframework.samples");

@@ -10,6 +10,7 @@ import org.springframework.boot.info.BuildProperties;
 import com.nucleonforge.axile.common.api.AxileDetails;
 import com.nucleonforge.axile.common.api.AxileDetails.BuildDetails;
 import com.nucleonforge.axile.common.api.AxileDetails.GitDetails;
+import com.nucleonforge.axile.common.api.AxileDetails.GitDetails.CommitAuthor;
 import com.nucleonforge.axile.common.api.AxileDetails.OsDetails;
 import com.nucleonforge.axile.common.api.AxileDetails.RuntimeDetails;
 import com.nucleonforge.axile.common.api.AxileDetails.SpringDetails;
@@ -42,14 +43,12 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
 
     @Override
     public AxileDetails assemble() {
-
         GitDetails git = getGitDetails();
         SpringDetails spring = getSpringDetails();
         RuntimeDetails runtime = getRuntimeDetails();
         BuildDetails build = getBuildDetails();
         OsDetails os = getOsDetails();
 
-        // We intentionally set podName == null, this field will be initialized in Master
         return new AxileDetails(git, spring, runtime, build, os);
     }
 
@@ -63,7 +62,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
         return new GitDetails(
                 emptyIfNull(gitCommitInfo.commitShaShort()),
                 emptyIfNull(gitCommitInfo.branch()),
-                new GitDetails.CommitAuthor(emptyIfNull(commitAuthor.name()), emptyIfNull(commitAuthor.email())),
+                new CommitAuthor(emptyIfNull(commitAuthor.name()), emptyIfNull(commitAuthor.email())),
                 emptyIfNull(gitCommitInfo.commitTimestamp()));
     }
 
@@ -80,7 +79,9 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
 
     private RuntimeDetails getRuntimeDetails() {
         String javaVersion = emptyIfNull(System.getProperty("java.version"));
-        String jdkVendor = emptyIfNull(System.getProperty("java.vendor.version"));
+        String jdkVendorFromVersion = System.getProperty("java.vendor.version");
+        String jdkVendor =
+                emptyIfNull(jdkVendorFromVersion != null ? jdkVendorFromVersion : System.getProperty("java.vendor"));
         String garbageCollector = getGarbageCollectorInfo();
         Optional<String> kotlinVersion = libraryDiscoverer.getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin");
 

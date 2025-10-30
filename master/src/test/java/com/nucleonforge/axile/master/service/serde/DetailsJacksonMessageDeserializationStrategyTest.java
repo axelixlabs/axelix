@@ -6,6 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.AxileDetails;
+import com.nucleonforge.axile.common.api.AxileDetails.BuildDetails;
+import com.nucleonforge.axile.common.api.AxileDetails.GitDetails;
+import com.nucleonforge.axile.common.api.AxileDetails.OsDetails;
+import com.nucleonforge.axile.common.api.AxileDetails.RuntimeDetails;
+import com.nucleonforge.axile.common.api.AxileDetails.SpringDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,36 +67,31 @@ public class DetailsJacksonMessageDeserializationStrategyTest {
         // when.
         AxileDetails axileDetails = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
-        // GitDetails
-        AxileDetails.GitDetails git = axileDetails.git();
+        GitDetails git = axileDetails.git();
         assertThat(git.commitShaShort()).isEqualTo("7a663cb");
         assertThat(git.branch()).isEqualTo("local/local-test");
         assertThat(git.commitAuthor().name()).isEqualTo("Mikhail Polivakha");
         assertThat(git.commitAuthor().email()).isEqualTo("mikhailpolivakha@github.com");
         assertThat(git.commitTimestamp()).isEqualTo("1761249922000");
 
-        // SpringDetails
-        AxileDetails.SpringDetails spring = axileDetails.spring();
+        SpringDetails spring = axileDetails.spring();
         assertThat(spring.springBootVersion()).isEqualTo("3.5.0");
         assertThat(spring.springFrameworkVersion()).isEqualTo("7.0");
         assertThat(spring.springCloudVersion()).isEqualTo("2023.0.1");
 
-        // RuntimeDetails
-        AxileDetails.RuntimeDetails runtime = axileDetails.runtime();
+        RuntimeDetails runtime = axileDetails.runtime();
         assertThat(runtime.javaVersion()).isEqualTo("17.0.16");
         assertThat(runtime.jdkVendor()).isEqualTo("Corretto-17.0.16.8.1");
         assertThat(runtime.garbageCollector()).isEqualTo("G1 GC");
         assertThat(runtime.kotlinVersion()).isEqualTo("1.9.0");
 
-        // BuildDetails
-        AxileDetails.BuildDetails build = axileDetails.build();
+        BuildDetails build = axileDetails.build();
         assertThat(build.artifact()).isEqualTo("spring-petclinic");
         assertThat(build.version()).isEqualTo("3.5.0-SNAPSHOT");
         assertThat(build.group()).isEqualTo("org.springframework.samples");
         assertThat(build.time()).isEqualTo("2025-10-29T15:10:54.770Z");
 
-        // OSDetails
-        AxileDetails.OsDetails os = axileDetails.os();
+        OsDetails os = axileDetails.os();
         assertThat(os.name()).isEqualTo("Windows 10");
         assertThat(os.version()).isEqualTo("10.0");
         assertThat(os.arch()).isEqualTo("amd64");

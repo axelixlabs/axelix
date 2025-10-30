@@ -183,7 +183,6 @@ public class DetailsApiTest {
         String jsonResponseWithoutPlugin =
                 """
             {
-              "instanceName": null,
               "git": {
                  "commitShaShort": "",
                  "branch": "",

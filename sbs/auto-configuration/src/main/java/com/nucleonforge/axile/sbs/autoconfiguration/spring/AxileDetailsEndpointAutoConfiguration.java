@@ -21,7 +21,12 @@ import com.nucleonforge.axile.sbs.spring.master.LibraryDiscoverer;
  * @since 30.10.2025
  * @author Nikita Kirillov, Sergey Cherkasov
  */
-@AutoConfiguration(after = {InfoContributorAutoConfiguration.class, LibraryDiscovererAutoConfiguration.class})
+@AutoConfiguration(
+        after = {
+            InfoContributorAutoConfiguration.class,
+            LibraryDiscovererAutoConfiguration.class,
+            GitInformationProviderAutoConfiguration.class
+        })
 @ConditionalOnAvailableEndpoint(endpoint = InfoEndpoint.class)
 public class AxileDetailsEndpointAutoConfiguration {
 

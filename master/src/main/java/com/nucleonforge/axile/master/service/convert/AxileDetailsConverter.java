@@ -36,21 +36,24 @@ public class AxileDetailsConverter implements ConverterWithPayload<AxileDetails,
     }
 
     @Override
-    public @NonNull AxileDetailsResponse convertInternal(@NonNull AxileDetails source, String instanceId) {
+    public @NonNull AxileDetailsResponse convertInternal(@NonNull AxileDetails source, @NonNull String instanceId) {
+        String serviceName = getServiceName(instanceId);
         GitProfile gitProfile = gitDetailsConverter(source.git());
         RuntimeProfile runtimeProfile = runtimeDetailsConverter(source.runtime());
         SpringProfile springProfile = springDetailsConverter(source.spring());
         BuildProfile buildProfile = buildDetailsConverter(source.build());
         OSProfile osProfile = osDetailsConverter(source.os());
 
-        System.out.println(instanceId);
+        return new AxileDetailsResponse(
+                serviceName, gitProfile, runtimeProfile, springProfile, buildProfile, osProfile);
+    }
+
+    private String getServiceName(String instanceId) {
         Instance instance = instanceRegistry.get(InstanceId.of(instanceId)).orElse(null);
         if (instance == null) {
             throw new InstanceNotFoundException();
         }
-        String serviceName = instance.name();
-        return new AxileDetailsResponse(
-                serviceName, gitProfile, runtimeProfile, springProfile, buildProfile, osProfile);
+        return instance.name();
     }
 
     private GitProfile gitDetailsConverter(GitDetails gitDetails) {

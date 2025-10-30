@@ -49,8 +49,6 @@ class AxileDetailsEndpointTest {
         String responseBody = response.getBody();
         assertThat(responseBody).isNotNull();
 
-        assertThatJson(responseBody).node("instanceName").isNull(); // intentionally null as per implementation
-
         assertThatJson(responseBody).node("git").isNotNull();
         assertThatJson(responseBody)
                 .inPath("git")
@@ -99,7 +97,7 @@ class AxileDetailsEndpointTest {
     }
 
     @Test
-    void shouldContainValidRuntimeInformation() {
+    void shouldContainValidDetails() {
         ResponseEntity<AxileDetails> response =
                 restTemplate.getForEntity("/actuator/axile-details", AxileDetails.class);
 

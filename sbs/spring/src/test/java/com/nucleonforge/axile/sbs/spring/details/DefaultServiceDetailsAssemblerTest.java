@@ -48,8 +48,8 @@ class DefaultServiceDetailsAssemblerTest {
         assertThat(result).isNotNull();
 
         GitDetails git = result.git();
-        assertThat(git.commitShaShort()).isNotBlank();
-        assertThat(git.branch()).isNotBlank();
+        assertThat(git.commitShaShort()).isEqualTo("a8b0929");
+        assertThat(git.branch()).isEqualTo("main");
         assertThat(git.commitAuthor().name()).isEqualTo("Mikhail Polivakha");
         assertThat(git.commitAuthor().email()).isEqualTo("mikhailpolivakha@email.com");
         assertThat(git.commitTimestamp()).isEqualTo("2025-09-28T13:50:13+03:00");
@@ -58,12 +58,14 @@ class DefaultServiceDetailsAssemblerTest {
         assertThat(spring).isNotNull();
         assertThat(spring.springBootVersion()).isNotBlank();
         assertThat(spring.springFrameworkVersion()).isNotBlank();
+        assertThat(spring.springCloudVersion()).isBlank();
 
         RuntimeDetails runtime = result.runtime();
         assertThat(runtime).isNotNull();
         assertThat(runtime.javaVersion()).isNotBlank();
         assertThat(runtime.jdkVendor()).isNotBlank();
         assertThat(runtime.garbageCollector()).isNotBlank();
+        assertThat(runtime.kotlinVersion()).isBlank();
 
         BuildDetails build = result.build();
         assertThat(build.artifact()).isEqualTo("axile-sbs");
