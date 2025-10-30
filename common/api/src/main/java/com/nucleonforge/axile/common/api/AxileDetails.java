@@ -1,12 +1,10 @@
 package com.nucleonforge.axile.common.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The response returned by the custom Axile details endpoint.
  *
- * @param instanceName  The name of the pod of the registered instance.
  * @param git           The DTO containing git component details.
  * @param spring        The DTO containing spring component details.
  * @param runtime       The DTO containing runtime component details.
@@ -16,16 +14,11 @@ import org.jspecify.annotations.Nullable;
  * @author Nikita Kirilov, Sergey Cherkasov
  */
 public record AxileDetails(
-        @Nullable String instanceName,
         @JsonProperty("git") GitDetails git,
         @JsonProperty("spring") SpringDetails spring,
         @JsonProperty("runtime") RuntimeDetails runtime,
         @JsonProperty("build") BuildDetails build,
         @JsonProperty("os") OsDetails os) {
-
-    public AxileDetails setInstanceName(String instanceName) {
-        return new AxileDetails(instanceName, this.git, this.spring, this.runtime, this.build, this.os);
-    }
 
     /**
      * DTO that encapsulates the git information of the given artifact.

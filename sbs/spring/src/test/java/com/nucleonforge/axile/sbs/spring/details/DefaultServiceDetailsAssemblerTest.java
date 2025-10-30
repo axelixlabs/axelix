@@ -46,7 +46,6 @@ class DefaultServiceDetailsAssemblerTest {
         AxileDetails result = serviceDetailsAssembler.assemble();
 
         assertThat(result).isNotNull();
-        assertThat(result.instanceName()).isNull(); // intentionally null as per comment
 
         GitDetails git = result.git();
         assertThat(git.commitShaShort()).isNotBlank();

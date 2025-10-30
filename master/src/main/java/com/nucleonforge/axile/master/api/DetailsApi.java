@@ -19,10 +19,8 @@ import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
-import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
-import com.nucleonforge.axile.master.service.convert.Converter;
-import com.nucleonforge.axile.master.service.state.InstanceRegistry;
+import com.nucleonforge.axile.master.service.convert.ConverterWithPayload;
 import com.nucleonforge.axile.master.service.transport.DetailsEndpointProber;
 
 /**
@@ -37,15 +35,12 @@ import com.nucleonforge.axile.master.service.transport.DetailsEndpointProber;
 @RequestMapping(path = ApiPaths.DetailsApi.MAIN)
 public class DetailsApi {
 
-    private final InstanceRegistry instanceRegistry;
     private final DetailsEndpointProber detailsEndpointProber;
-    private final Converter<AxileDetails, AxileDetailsResponse> converter;
+    private final ConverterWithPayload<AxileDetails, AxileDetailsResponse> converter;
 
     public DetailsApi(
-            InstanceRegistry instanceRegistry,
             DetailsEndpointProber detailsEndpointProber,
-            Converter<AxileDetails, AxileDetailsResponse> converter) {
-        this.instanceRegistry = instanceRegistry;
+            ConverterWithPayload<AxileDetails, AxileDetailsResponse> converter) {
         this.detailsEndpointProber = detailsEndpointProber;
         this.converter = converter;
     }
@@ -80,13 +75,6 @@ public class DetailsApi {
     public AxileDetailsResponse getDetailsResponse(@PathVariable("instanceId") String instanceId)
             throws InstanceNotFoundException {
         AxileDetails axileDetails = detailsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
-
-        Instance instance = instanceRegistry.get(InstanceId.of(instanceId)).orElse(null);
-        if (instance == null) {
-            throw new InstanceNotFoundException();
-        }
-        String instanceName = instance.name();
-
-        return Objects.requireNonNull(converter.convert(axileDetails.setInstanceName(instanceName)));
+        return Objects.requireNonNull(converter.convert(axileDetails, instanceId));
     }
 }

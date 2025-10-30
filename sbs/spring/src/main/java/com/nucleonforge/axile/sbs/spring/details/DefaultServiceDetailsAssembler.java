@@ -50,7 +50,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
         OsDetails os = getOsDetails();
 
         // We intentionally set podName == null, this field will be initialized in Master
-        return new AxileDetails(null, git, spring, runtime, build, os);
+        return new AxileDetails(git, spring, runtime, build, os);
     }
 
     private GitDetails getGitDetails() {

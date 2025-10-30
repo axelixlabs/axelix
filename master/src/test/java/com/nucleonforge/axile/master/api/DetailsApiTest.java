@@ -145,7 +145,6 @@ public class DetailsApiTest {
         String jsonResponse =
                 """
         {
-        "instanceName": null,
              "git": {
                  "commitShaShort": "7a663cb",
                  "branch": "local/local-test",

@@ -1,6 +1,12 @@
 package com.nucleonforge.axile.master.service.convert;
 
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import com.nucleonforge.axile.common.api.AxileDetails;
 import com.nucleonforge.axile.common.api.AxileDetails.BuildDetails;
@@ -14,7 +20,9 @@ import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.GitProfil
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.OSProfile;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.RuntimeProfile;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.SpringProfile;
+import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -22,16 +30,27 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
+@SpringBootTest
 public class AxileDetailsConverterTest {
-    private final AxileDetailsConverter converter = new AxileDetailsConverter();
+    @Autowired
+    private InstanceRegistry instanceRegistry;
+
+    private AxileDetailsConverter converter;
+    String activeInstanceId = UUID.randomUUID().toString();
+
+    @BeforeEach
+    void prepare() {
+        instanceRegistry.register(createInstance(activeInstanceId));
+        converter = new AxileDetailsConverter(instanceRegistry);
+    }
 
     @Test
     void testConvertHappyPath() {
         // when.
-        AxileDetailsResponse response = converter.convertInternal(getAxileDetails());
+        AxileDetailsResponse response = converter.convertInternal(getAxileDetails(), activeInstanceId);
 
         // ServiceName
-        assertThat(response.serviceName()).isEqualTo("test");
+        assertThat(response.serviceName()).isEqualTo("test-object-factory-instance");
 
         GitProfile git = response.git();
         assertThat(git.commitShaShort()).isEqualTo("7a663cb");
@@ -80,6 +99,6 @@ public class AxileDetailsConverterTest {
 
         OsDetails osDetails = new AxileDetails.OsDetails("Windows 10", "10.0", "amd64");
 
-        return new AxileDetails("test", gitDetails, springDetails, runtimeDetails, buildDetails, osDetails);
+        return new AxileDetails(gitDetails, springDetails, runtimeDetails, buildDetails, osDetails);
     }
 }

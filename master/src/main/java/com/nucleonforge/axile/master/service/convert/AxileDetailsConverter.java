@@ -16,6 +16,10 @@ import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.GitProfil
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.OSProfile;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.RuntimeProfile;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.SpringProfile;
+import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
+import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 /**
  * The {@link Converter} from {@link AxileDetails} to {@link AxileDetailsResponse}.
@@ -23,17 +27,28 @@ import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.SpringPro
  * @author Nikita Kirilov, Sergey Cherkasov
  */
 @Service
-public class AxileDetailsConverter implements Converter<AxileDetails, AxileDetailsResponse> {
+public class AxileDetailsConverter implements ConverterWithPayload<AxileDetails, AxileDetailsResponse> {
+
+    private final InstanceRegistry instanceRegistry;
+
+    public AxileDetailsConverter(InstanceRegistry instanceRegistry) {
+        this.instanceRegistry = instanceRegistry;
+    }
 
     @Override
-    public @NonNull AxileDetailsResponse convertInternal(@NonNull AxileDetails source) {
-        String serviceName = source.instanceName();
+    public @NonNull AxileDetailsResponse convertInternal(@NonNull AxileDetails source, String instanceId) {
         GitProfile gitProfile = gitDetailsConverter(source.git());
         RuntimeProfile runtimeProfile = runtimeDetailsConverter(source.runtime());
         SpringProfile springProfile = springDetailsConverter(source.spring());
         BuildProfile buildProfile = buildDetailsConverter(source.build());
         OSProfile osProfile = osDetailsConverter(source.os());
 
+        System.out.println(instanceId);
+        Instance instance = instanceRegistry.get(InstanceId.of(instanceId)).orElse(null);
+        if (instance == null) {
+            throw new InstanceNotFoundException();
+        }
+        String serviceName = instance.name();
         return new AxileDetailsResponse(
                 serviceName, gitProfile, runtimeProfile, springProfile, buildProfile, osProfile);
     }
