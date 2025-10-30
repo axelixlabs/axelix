@@ -214,4 +214,16 @@ public final class ApiPaths {
          */
         public static final String DISABLE_TASK = "/{instanceId}/disable";
     }
+
+    public static final class DetailsApi {
+
+        /**
+         * Base path for details APIs.
+         */
+        public static final String MAIN = "/details";
+        /**
+         * Details endpoint with instance ID
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+    }
 }

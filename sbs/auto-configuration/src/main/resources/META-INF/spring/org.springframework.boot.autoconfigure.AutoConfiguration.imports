@@ -12,4 +12,5 @@ com.nucleonforge.axile.sbs.autoconfiguration.spring.GitInformationProviderAutoCo
 com.nucleonforge.axile.sbs.autoconfiguration.spring.ScheduledTaskManagementAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.spring.ConditionsReportEndpointExtensionAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileEnvironmentEndpointAutoConfiguration
+com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileDetailsEndpointAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.auth.JwtAuthAutoConfiguration
