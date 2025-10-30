@@ -15,6 +15,7 @@ public class GarbageCollectorInfoAssembler {
 
     private GarbageCollectorInfoAssembler() {}
 
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     public static String getGarbageCollectorInfo() {
         try {
             List<String> gcNames = ManagementFactory.getGarbageCollectorMXBeans().stream()
@@ -24,14 +25,27 @@ public class GarbageCollectorInfoAssembler {
             if (!gcNames.isEmpty()) {
                 String joined = String.join(", ", gcNames).toLowerCase();
 
-                if (joined.contains("g1")) return "G1 GC";
-                if (joined.contains("shenandoah")) return "Shenandoah GC";
-                if (joined.contains("zgc")) return "ZGC";
-                if (joined.contains("epsilongc") || joined.contains("epsilon")) return "Epsilon (no-op) GC";
-                if (joined.contains("parallel") || joined.contains("ps marksweep") || joined.contains("ps scavenge"))
+                if (joined.contains("g1")) {
+                    return "G1 GC";
+                }
+                if (joined.contains("shenandoah")) {
+                    return "Shenandoah GC";
+                }
+                if (joined.contains("zgc")) {
+                    return "ZGC";
+                }
+                if (joined.contains("epsilongc") || joined.contains("epsilon")) {
+                    return "Epsilon GC";
+                }
+                if (joined.contains("parallel") || joined.contains("ps marksweep") || joined.contains("ps scavenge")) {
                     return "Parallel GC";
-                if (joined.contains("concurrent") || joined.contains("parnew")) return "Concurrent Mark Sweep (CMS)";
-                if (joined.contains("mark sweep compact") || joined.contains("copy")) return "Serial GC";
+                }
+                if (joined.contains("concurrent") || joined.contains("parnew")) {
+                    return "Concurrent Mark Sweep (CMS)";
+                }
+                if (joined.contains("marksweepcompact") || joined.contains("copy")) {
+                    return "Serial GC";
+                }
 
                 return String.join(", ", gcNames);
             }
