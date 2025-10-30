@@ -1,0 +1,38 @@
+.AccordionBody {
+  display: grid;
+  grid-template-columns: 140px 70%;
+  gap: 20px;
+}
+
+.Dependency {
+  cursor: pointer;
+}
+
+.Dependency:hover {
+  color: var(--axile-primary-green);
+}
+
+.Divider {
+  margin-block: 5px;
+}
+
+.AccordionBodyChunkTitle {
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.AccordionBodyChunkList {
+  border-bottom: 1px solid var(--axile-medium-grey);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+}
+
+.AccordionBodyChunkList:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.SimpleListValue {
+  word-break: break-all;
+}

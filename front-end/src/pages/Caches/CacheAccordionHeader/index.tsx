@@ -22,7 +22,7 @@ interface IProps {
     cache: ICacheData;
 }
 
-export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
+export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
@@ -44,12 +44,13 @@ export const CacheCollapseHeader = ({ cacheManagerName, cache }: IProps) => {
     };
 
     return (
-        <div className={styles.CollapseHeader}>
-            <div>
-                <span>{t("Caches.name")}: </span>
+        <div className={styles.AccordionHeader}>
+            <div className={styles.HeaderContentWrapper}>
+                <span>{t("cacheName")}: </span>
                 <span className={styles.CacheName}>{cache.name}</span>
                 <div className={styles.Target}>
-                    {t("Caches.target")}: <TooltipWithCopy text={cache.target} />
+                    {/* TODO: This part we need to be fix after tooltip PR merge */}
+                    {t("cacheTarget")}: <TooltipWithCopy text={cache.target} />
                 </div>
             </div>
             <Button

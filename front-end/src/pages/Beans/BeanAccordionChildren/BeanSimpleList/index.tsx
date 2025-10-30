@@ -24,13 +24,14 @@ export const BeanSimpleList = ({ valuesTag, values }: IProps) => {
 
     return (
         <>
-            <div className={styles.CollapseBodyChunkTitle}>{t(`Beans.${valuesTag}`)}:</div>
+            <div className={styles.AccordionBodyChunkTitle}>{t(`Beans.${valuesTag}`)}:</div>
+
             <div>
                 {!values.length ? (
                     <span>-</span>
                 ) : (
                     values.map((values) => (
-                        <div key={values} className={styles.CollapseBodyChunkList}>
+                        <div key={values} className={styles.AccordionBodyChunkList}>
                             <div className={styles.SimpleListValue}>{values}</div>
                         </div>
                     ))

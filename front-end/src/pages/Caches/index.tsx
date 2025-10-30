@@ -17,9 +17,10 @@ export const Caches = () => {
     const [messageApi, contextHolder] = message.useMessage();
 
     const [search, setSearch] = useState<string>("");
-    const [clearAllCaches, setClearAllCaches] = useState(StatelessRequest.inactive());
-    const [cacheData, setCacheData] = useState(StatefulRequest.loading<ICachesResponseBody>());
 
+    const [clearAllCaches, setClearAllCaches] = useState(StatelessRequest.inactive());
+
+    const [cacheData, setCacheData] = useState(StatefulRequest.loading<ICachesResponseBody>());
     useEffect(() => {
         fetchData(setCacheData, () => getCachesData(instanceId!));
     }, []);
@@ -60,7 +61,6 @@ export const Caches = () => {
             {contextHolder}
             <div className={styles.TopSection}>
                 <PageSearch setSearch={setSearch} />
-
                 <Button type="primary" onClick={clearAllCachesClickHandler} loading={clearAllCaches.loading}>
                     {t("Caches.clearAll")}
                 </Button>

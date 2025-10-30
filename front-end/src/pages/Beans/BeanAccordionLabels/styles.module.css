@@ -1,9 +1,9 @@
-.CollapseHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    column-gap: 20px;
-    scroll-margin-top: 150px;
+.AccordionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 20px;
+  scroll-margin-top: 150px;
 }
 
 .ScopeWrapper {
@@ -22,7 +22,6 @@
     margin-top: 8px;
 }
 
-.CollapseHeaderContent {
-    overflow: hidden;
-    width: 80%;
+.AccordionHeaderContent{
+  min-width: 0;
 }
