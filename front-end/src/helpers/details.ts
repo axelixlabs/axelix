@@ -1,17 +1,23 @@
+import { EDynamicIconsKeys, EDynamicIconsProperties } from "models";
 import { detailsIcons } from "utils";
 
-export const resolveIconFromContent = (title, content) => {
-    const getValue = (key) => content.find(([name]) => name === key)?.[1];
+export const resolveIconFromContent = (title: string, content: string[][]): string | undefined => {
+    const getValue = (key: string) => {
+        return content.find(([name]) => name === key)?.[1];
+    };
 
     switch (title) {
-        case "os": {
+        case EDynamicIconsKeys.OS: {
             const osName = getValue("name")?.toLowerCase();
-            return detailsIcons[osName] ? osName : "linux";
+            // @ts-expect-error Fix in futurre
+            if (osName && detailsIcons[osName]) {
+                return osName;
+            }
+
+            return EDynamicIconsProperties.LINUX;
         }
-        case "runtime": {
-            return getValue("kotlinVersion") ? "kotlin" : "java";
+        case EDynamicIconsKeys.RUNTIME: {
+            return getValue("kotlinVersion") ? EDynamicIconsProperties.KOTLIN : EDynamicIconsProperties.JAVA;
         }
-        default:
-            return undefined;
     }
 };

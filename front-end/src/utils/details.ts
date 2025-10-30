@@ -10,8 +10,6 @@ import LinuxIcon from "assets/icons/linux.svg";
 import SpringIcon from "assets/icons/spring.svg";
 import WindowsIcon from "assets/icons/windows.svg";
 
-export const detailsCardsPreferredOrder = ["git", "build", "spring", "runtime", "os"];
-
 export const detailsIcons = {
     git: GitIcon,
     spring: SpringIcon,
