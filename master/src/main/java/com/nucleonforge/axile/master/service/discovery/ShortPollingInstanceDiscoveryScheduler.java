@@ -17,7 +17,7 @@ import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 /**
- * Service responsible for periodically discovering and refreshing managed service instances in the registry using.
+ * Job that performs periodical discovering and refresh of managed service instances in the registry.
  *
  * @since 29.10.2025
  * @author Nikita Kirillov
@@ -50,7 +50,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
         registerNewInstances(discoveredInstances, currentlyRegisteredIds);
         deregisterMissingInstances(currentlyRegisteredIds, discoveredIds);
 
-        logger.info(
+        logger.debug(
                 "Instance discovery refresh completed. Registered instances: {}",
                 instanceRegistry.getAll().size());
     }
@@ -68,7 +68,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
             if (!currentlyRegisteredIds.contains(instance.id())) {
                 try {
                     instanceRegistry.register(instance);
-                    logger.info("Registered new instance: {}", instance.id());
+                    logger.debug("Registered new instance: {}", instance.id());
                 } catch (InstanceAlreadyRegisteredException e) {
                     logger.debug("Instance already registered: {}", instance.id());
                 }
@@ -81,7 +81,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
             if (!discoveredIds.contains(existingId)) {
                 try {
                     instanceRegistry.deRegister(existingId);
-                    logger.info("Deregistered instance: {}", existingId);
+                    logger.debug("Deregistered instance: {}", existingId);
                 } catch (InstanceNotFoundException e) {
                     logger.debug("Instance not found during deregistration: {}", existingId);
                 }

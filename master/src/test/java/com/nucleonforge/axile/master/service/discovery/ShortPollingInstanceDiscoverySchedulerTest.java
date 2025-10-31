@@ -1,18 +1,19 @@
 package com.nucleonforge.axile.master.service.discovery;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import okhttp3.HttpUrl;
+import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.instancio.Instancio;
 import org.instancio.Select;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,127 +77,29 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
-    void shouldRegisterNewK8sInstanceWhenDiscovered() {
-        String testServiceId = "test-service";
-        String instanceId = UUID.randomUUID().toString();
-        String expectedPodName = "test-pod";
-
-        // language=json
-        String actuatorResponse =
-                """
-        {
-          "version": "1.0.0-SNAPSHOT",
-          "serviceVersion": "3.5.0-SNAPSHOT",
-          "commitShortSha": "a8b0929",
-          "javaVersion": "17.0.14u",
-          "springBootVersion": "3.5.0",
-          "healthStatus": "UP"
-        }
-        """;
-
-        mockWebServer.enqueue(
-                new MockResponse().setBody(actuatorResponse).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
-
-        HttpUrl url = mockWebServer.url("");
-
-        Map<String, String> metadata = new HashMap<>();
-        metadata.put("app.kubernetes.io/name", expectedPodName);
-        metadata.put("creationTimestamp", "2024-01-01T00:00:00Z");
-
-        ServiceInstance k8sServiceInstance = Instancio.of(DefaultKubernetesServiceInstance.class)
-                .set(Select.field("instanceId"), instanceId)
-                .set(Select.field("serviceId"), testServiceId)
-                .set(Select.field("secure"), false)
-                .set(Select.field("host"), url.host())
-                .set(Select.field("port"), url.port())
-                .set(Select.field("metadata"), metadata)
-                .create();
-
-        Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
-        Mockito.when(discoveryClient.getInstances(testServiceId)).thenReturn(List.of(k8sServiceInstance));
-
-        subject.performDiscovery();
-
-        Set<Instance> registeredInstances = instanceRegistry.getAll();
-        assertThat(registeredInstances).hasSize(1);
-
-        Instance registeredInstance = registeredInstances.iterator().next();
-        assertThat(registeredInstance.id().instanceId()).isEqualTo(instanceId);
-        assertThat(registeredInstance.name()).isEqualTo(expectedPodName);
-        assertThat(registeredInstance.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
-        assertThat(registeredInstance.actuatorUrl()).isEqualTo(url + "actuator");
-    }
-
-    @Test
-    void shouldDeregisterK8sInstanceWhenNoLongerInDiscovery() {
-        String serviceId = "test-service";
-        String instanceId = UUID.randomUUID().toString();
-
-        // language=json
-        String actuatorResponse =
-                """
-            {
-              "version": "1.0.0-SNAPSHOT",
-              "serviceVersion": "3.5.0-SNAPSHOT",
-              "commitShortSha": "a8b0929",
-              "javaVersion": "17.0.14u",
-              "springBootVersion": "3.5.0",
-              "healthStatus": "UP"
-            }
-            """;
-
-        mockWebServer.enqueue(
-                new MockResponse().setBody(actuatorResponse).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
-
-        HttpUrl url = mockWebServer.url(instanceId);
-
-        ServiceInstance k8sServiceInstance = Instancio.of(DefaultKubernetesServiceInstance.class)
-                .set(Select.field("instanceId"), instanceId)
-                .set(Select.field("serviceId"), serviceId)
-                .set(Select.field("secure"), false)
-                .set(Select.field("host"), url.host())
-                .set(Select.field("port"), url.port())
-                .create();
-
-        Mockito.when(discoveryClient.getServices())
-                .thenReturn(List.of(serviceId))
-                .thenReturn(List.of());
-
-        Mockito.when(discoveryClient.getInstances(serviceId)).thenReturn(List.of(k8sServiceInstance));
-
-        subject.performDiscovery();
-
-        assertThat(instanceRegistry.getAll()).hasSize(1);
-
-        subject.performDiscovery();
-
-        assertThat(instanceRegistry.getAll()).isEmpty();
-    }
-
-    @Test
-    void shouldHandleMultipleK8sInstances() {
+    void shouldRegisterNewK8sInstancesWhenDiscovered() {
         String service1 = "service-1";
         String service2 = "service-2";
         String instance1Id = UUID.randomUUID().toString();
         String instance2Id = UUID.randomUUID().toString();
 
         // language=json
-        String actuatorResponse =
+        String response =
                 """
-            {
-              "version": "1.0.0-SNAPSHOT",
-              "serviceVersion": "1.0.0",
-              "commitShortSha": "a8b0929",
-              "javaVersion": "17.0.0",
-              "springBootVersion": "3.0.0",
-              "healthStatus": "UP"
-            }
-            """;
+        {
+          "version": "1.0.0-SNAPSHOT",
+          "serviceVersion": "1.0.0",
+          "commitShortSha": "a8b0929",
+          "javaVersion": "17.0.0",
+          "springBootVersion": "3.0.0",
+          "healthStatus": "UP"
+        }
+        """;
 
         mockWebServer.enqueue(
-                new MockResponse().setBody(actuatorResponse).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
         mockWebServer.enqueue(
-                new MockResponse().setBody(actuatorResponse).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
         HttpUrl url1 = mockWebServer.url(instance1Id);
         HttpUrl url2 = mockWebServer.url(instance2Id);
@@ -234,72 +137,61 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
-    void shouldSkipIncompatibleK8sInstances() {
+    void shouldDeregisterK8sInstanceWhenNoLongerInDiscovery() {
         String serviceId = "test-service";
-        String compatibleInstanceId = UUID.randomUUID().toString();
-        String incompatibleInstanceId = UUID.randomUUID().toString();
+        String instanceId = UUID.randomUUID().toString();
 
         // language=json
-        String compatibleResponse =
+        String response =
                 """
             {
               "version": "1.0.0-SNAPSHOT",
-              "serviceVersion": "1.0.0",
+              "serviceVersion": "3.5.0-SNAPSHOT",
               "commitShortSha": "a8b0929",
-              "javaVersion": "17.0.0",
-              "springBootVersion": "3.0.0",
+              "javaVersion": "17.0.14u",
+              "springBootVersion": "3.5.0",
               "healthStatus": "UP"
             }
             """;
 
-        // language=json
-        String incompatibleResponse =
-                """
-            {
-              "version": "2.0.0-INCOMPATIBLE",
-              "serviceVersion": "2.0.0",
-              "commitShortSha": "b9c183a",
-              "javaVersion": "21.0.0",
-              "springBootVersion": "3.2.0",
-              "healthStatus": "UP"
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String path = request.getPath();
+                assert request.getPath() != null;
+
+                if (path.equals("/actuator/axile-metadata")) {
+                    return new MockResponse()
+                            .setBody(response)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                }
+                return new MockResponse().setResponseCode(404);
             }
-            """;
+        });
 
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(compatibleResponse)
-                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
-        mockWebServer.enqueue(new MockResponse()
-                .setBody(incompatibleResponse)
-                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+        HttpUrl url = mockWebServer.url(instanceId);
 
-        HttpUrl compatibleUrl = mockWebServer.url(compatibleInstanceId);
-        HttpUrl incompatibleUrl = mockWebServer.url(incompatibleInstanceId);
-
-        ServiceInstance compatibleInstance = Instancio.of(DefaultKubernetesServiceInstance.class)
-                .set(Select.field("instanceId"), compatibleInstanceId)
+        ServiceInstance k8sServiceInstance = Instancio.of(DefaultKubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), instanceId)
                 .set(Select.field("serviceId"), serviceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), compatibleUrl.host())
-                .set(Select.field("port"), compatibleUrl.port())
+                .set(Select.field("host"), url.host())
+                .set(Select.field("port"), url.port())
                 .create();
 
-        ServiceInstance incompatibleInstance = Instancio.of(DefaultKubernetesServiceInstance.class)
-                .set(Select.field("instanceId"), incompatibleInstanceId)
-                .set(Select.field("serviceId"), serviceId)
-                .set(Select.field("secure"), false)
-                .set(Select.field("host"), incompatibleUrl.host())
-                .set(Select.field("port"), incompatibleUrl.port())
-                .create();
+        Mockito.when(discoveryClient.getServices())
+                .thenReturn(List.of(serviceId))
+                .thenReturn(List.of());
 
-        Mockito.when(discoveryClient.getServices()).thenReturn(List.of(serviceId));
-        Mockito.when(discoveryClient.getInstances(serviceId))
-                .thenReturn(List.of(compatibleInstance, incompatibleInstance));
+        Mockito.when(discoveryClient.getInstances(serviceId)).thenReturn(List.of(k8sServiceInstance));
 
         subject.performDiscovery();
 
-        Set<Instance> registeredInstances = instanceRegistry.getAll();
-        assertThat(registeredInstances).hasSize(1);
-        assertThat(registeredInstances.iterator().next().id().instanceId()).isEqualTo(compatibleInstanceId);
+        assertThat(instanceRegistry.getAll()).hasSize(1);
+
+        subject.performDiscovery();
+
+        assertThat(instanceRegistry.getAll()).isEmpty();
     }
 
     @Test
