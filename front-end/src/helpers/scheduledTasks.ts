@@ -1,9 +1,9 @@
-import type { ScheduledTasksResponseBody } from "models";
+import type { IScheduledTasksResponseBody } from "models";
 
 export const filterScheduledTasks = (
-    scheduledTasksResponse: ScheduledTasksResponseBody,
+    scheduledTasksResponse: IScheduledTasksResponseBody,
     search: string,
-): ScheduledTasksResponseBody => {
+): IScheduledTasksResponseBody => {
     const formattedSearch = search.toLowerCase().trim();
 
     return {
@@ -21,6 +21,6 @@ export const filterScheduledTasks = (
     };
 };
 
-export function isEmpty(resp: ScheduledTasksResponseBody): boolean {
+export function isEmpty(resp: IScheduledTasksResponseBody): boolean {
     return resp.cron.length === 0 && resp.fixedDelay.length === 0 && resp.fixedRate.length === 0;
 }
