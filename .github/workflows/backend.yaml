@@ -70,22 +70,22 @@ jobs:
         run: ./gradlew build --configuration-cache --build-cache
 
       - name: Download and trust Nexus SSL certificate for Gradle
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        if: ${{ env.SHOULD_DEPLOY }}
         run: |
           TRUSTSTORE="$JAVA_HOME/lib/security/cacerts"
           openssl s_client -connect $NEXUS_HOST_PORT -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM > nexus.crt
           sudo keytool -importcert -file nexus.crt -alias nexus-ssl -keystore $TRUSTSTORE -storepass $STORE_PASS -noprompt
 
       - name: Publish Libraries to Nexus
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        if: ${{ env.SHOULD_DEPLOY }}
         run: ./gradlew publish
 
       - name: Set up Docker
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        if: ${{ env.SHOULD_DEPLOY }}
         uses: docker/setup-docker-action@v4
 
       - name: Build Docker Image
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        if: ${{ env.SHOULD_DEPLOY }}
         # TODO:
         #  1. extract version from gradle.properties file later on. For now hardcoded is fine
         #  2. And also we need to take the repository part inside the image name from the terraform output
@@ -93,30 +93,30 @@ jobs:
           docker build --tag $CR_URL/$CR_MASTER_REPOSITORY/master:1.0.0-SNAPSHOT --file master/docker/Dockerfile .
 
       - name: Docker login to Yandex Cloud CR
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        if: ${{ env.SHOULD_DEPLOY }}
         # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is my token
         run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
       - name: Docker push to Yandex Cloud CR
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        if: ${{ env.SHOULD_DEPLOY }}
         run: docker push $CR_URL/$CR_MASTER_REPOSITORY/master:1.0.0-SNAPSHOT
 
       - name: Docker logout
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        if: ${{ env.SHOULD_DEPLOY }}
         run: docker logout
 
       - name: Checkout source code
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        if: ${{ env.SHOULD_DEPLOY }}
         uses: actions/checkout@v4
 
       - name: Setup Helm
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        if: ${{ env.SHOULD_DEPLOY }}
         uses: azure/setup-helm@v4.3.0
         with:
           version: v3.14.0
 
       - name: Deploy master to K8S
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        if: ${{ env.SHOULD_DEPLOY }}
         working-directory: master/chart
         run: |
           mkdir -p ~/.kube
