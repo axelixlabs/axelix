@@ -2,10 +2,6 @@ name: Build / Deploy Front-End
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ master ]
-    paths:
-      - 'front-end/**'
   pull_request:
     branches: [ master ]
     paths:
@@ -15,14 +11,21 @@ on:
       - opened
       - reopened
       - synchronize
+  push:
+    branches: [ master ]
+    paths:
+      - 'front-end/**'
+      - '.github/workflows/frontend.yaml'
+
+env:
+  SHOULD_DEPLOY: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
 
 jobs:
   check-linked-issues:
-    if: ${{ !((github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'workflow_dispatch') }}
+    if: ${{ !env.SHOULD_DEPLOY }}
     runs-on: ubuntu-latest
     steps:
       - name: Check for linked issues
-        if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch') }}
         uses: nearform-actions/github-action-check-linked-issues@v1
         with:
           exclude-labels: "refactoring"
@@ -50,7 +53,7 @@ jobs:
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
     name: Build nginx Docker container
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
+    if: ${{ env.SHOULD_DEPLOY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
