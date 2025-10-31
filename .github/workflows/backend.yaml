@@ -26,9 +26,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check for linked issues
+        if: ${{ env.SHOULD_DEPLOY == 'false' }}
         uses: nearform-actions/github-action-check-linked-issues@v1
         with:
           exclude-labels: "refactoring"
+
   build-deploy-source:
     runs-on: ubuntu-latest
     env:
