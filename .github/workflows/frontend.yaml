@@ -17,12 +17,14 @@ on:
 
 jobs:
   check-linked-issues:
+    if: ${{ !((github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     steps:
       - name: Check for linked issues
         uses: nearform-actions/github-action-check-linked-issues@v1
         with:
           exclude-labels: "refactoring"
+
   lint:
     runs-on: ubuntu-latest
     defaults:
