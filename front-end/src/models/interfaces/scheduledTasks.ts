@@ -56,7 +56,7 @@ export interface IScheduledTasksSliceState extends ICommonSliceState {
 /**
  * Initial scheduled tasks response data
  */
-export interface ScheduledTasksResponseBody {
+export interface IScheduledTasksResponseBody {
     cron: ICron[];
     fixedDelay: IFixedTasks[];
     fixedRate: IFixedTasks[];

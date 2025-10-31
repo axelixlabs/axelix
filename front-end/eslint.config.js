@@ -24,6 +24,13 @@ export default [
     js.configs.recommended,
     ...tseslint.configs.recommended,
     {
+        files: ["**/*.json"],
+        languageOptions: {
+            parser: jsoncParser,
+        },
+    },
+    {
+        files: ["**/*.{js,jsx,ts,tsx}"],
         languageOptions: {
             parser: tseslint.parser,
             globals: {
@@ -32,26 +39,33 @@ export default [
                 ...globals.es2022,
             },
         },
-    },
-    {
-        files: ["**/*.{js,jsx,ts,tsx}"],
-    },
-    {
-        files: ["**/*.json"],
-        languageOptions: {
-            parser: jsoncParser,
+        rules: {
+            // TODO: Remove this rule later on, once the error handling logic is resolved
+            "@typescript-eslint/no-explicit-any": ["off"],
+            "prettier/prettier": "error",
+
+            "@typescript-eslint/naming-convention": [
+                "error",
+                {
+                    selector: "interface",
+                    format: ["PascalCase"],
+                    prefix: ["I"],
+                },
+                {
+                    selector: "enum",
+                    format: ["PascalCase"],
+                    prefix: ["E"],
+                },
+                {
+                    selector: "enumMember",
+                    format: ["UPPER_CASE"],
+                },
+            ],
         },
     },
     {
         settings: {
             react: { version: "detect" },
-        },
-    },
-    {
-        // TODO: Remove this rule later on, once the error handling logic is resolved
-        rules: {
-            "@typescript-eslint/no-explicit-any": ["off"],
-            "prettier/prettier": "error",
         },
     },
     eslintConfigPrettier,
