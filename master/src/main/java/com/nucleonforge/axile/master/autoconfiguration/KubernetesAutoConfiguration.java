@@ -13,9 +13,12 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnCloudPlatform;
 import org.springframework.boot.cloud.CloudPlatform;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.kubernetes.commons.discovery.KubernetesDiscoveryProperties;
 import org.springframework.cloud.kubernetes.fabric8.discovery.KubernetesDiscoveryClientAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+
+import com.nucleonforge.axile.master.service.discovery.AxileKubernetesDiscoveryClient;
 
 /**
  * Auto-configuration for K8S related components.
@@ -41,10 +44,14 @@ public class KubernetesAutoConfiguration {
         return new KubernetesClientBuilder()
                 .withConfig(new ConfigBuilder()
                         .withMasterUrl(masterUrl)
-
                         //                                                .withCaCertFile(caCertFile)
                         .withOauthToken(Files.readString(Paths.get(tokenPath)))
                         .build())
                 .build();
+    }
+
+    @Bean
+    public DiscoveryClient discoveryClient(KubernetesClient kubernetesClient) {
+        return new AxileKubernetesDiscoveryClient(kubernetesClient);
     }
 }
