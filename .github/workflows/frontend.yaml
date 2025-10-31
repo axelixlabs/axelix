@@ -6,6 +6,7 @@ on:
     branches: [ master ]
     paths:
       - 'front-end/**'
+      - '.github/workflows/frontend.yaml'
   pull_request:
     branches: [ master ]
     paths:
