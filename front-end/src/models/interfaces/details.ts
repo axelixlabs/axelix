@@ -6,7 +6,7 @@ interface IDetailsGit {
     commitTimestamp: string;
 }
 
-interface IDetailsRuntime {
+export interface IDetailsRuntime {
     javaVersion: string;
     jdkVendor: string;
     garbageCollector: string;

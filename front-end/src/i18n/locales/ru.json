@@ -6,7 +6,36 @@
     "propertyChangedSuccessfully": "Свойство Изменено",
     "saved": "Сохранено",
     "Details": {
-        "downloadState": "Выгрузить состояние"
+        "downloadState": "Выгрузить состояние",
+        "spring" : {
+          "springBootVersion" : "Spring Boot",
+          "springFrameworkVersion" : "Spring Framework",
+          "springCloudVersion" : "Spring Cloud"
+        },
+        "runtime" : {
+          "javaVersion" : "Java",
+          "kotlinVersion" : "Kotlin",
+          "jdkVendor" : "JDK Вендор",
+          "garbageCollector" : "Сборщик мусора"
+        },
+        "os" : {
+          "name" : "Семейство",
+          "version" : "Версия",
+          "arch" : "Архитектура CPU"
+        },
+        "build" : {
+          "group" : "Группа",
+          "version" : "Версия",
+          "artifact" : "Имя артефакта",
+          "time" : "Время сборки"
+        },
+        "git" : {
+          "commitShaShort" : "Коммит",
+          "branch" : "Ветка",
+          "authorName" : "Автор комита",
+          "authorEmail" : "Email автора",
+          "commitTimestamp" : "Время комита"
+        }
     },
     "Environments": {
         "activeProfiles": "Профили"

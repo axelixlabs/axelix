@@ -6,7 +6,36 @@
     "propertyChangedSuccessfully": "Property Changed",
     "saved": "Saved",
     "Details": {
-        "downloadState": "Download state"
+        "downloadState": "Download state",
+        "spring" : {
+          "springBootVersion" : "Spring Boot",
+          "springFrameworkVersion" : "Spring Framework",
+          "springCloudVersion" : "Spring Cloud"
+        },
+        "runtime" : {
+          "javaVersion" : "Java",
+          "kotlinVersion" : "Kotlin",
+          "jdkVendor" : "JDK Vendor",
+          "garbageCollector" : "Garbage Collector"
+        },
+        "os" : {
+          "name" : "OS Family",
+          "version" : "Kernel Version",
+          "arch" : "CPU Architecture"
+        },
+        "build" : {
+          "group" : "Group ID",
+          "version" : "Version",
+          "artifact" : "Artifact ID",
+          "time" : "Build Timestamp"
+        },
+        "git" : {
+          "commitShaShort" : "Commit SHA",
+          "branch" : "Branch",
+          "authorName" : "Commit's Author",
+          "authorEmail" : "Author's Email",
+          "commitTimestamp" : "Commit's Timestamp"
+        }
     },
     "Environments": {
         "activeProfiles": "Profiles"

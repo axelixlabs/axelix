@@ -3,14 +3,3 @@ export enum ECopyableField {
     BRANCH = "branch",
     ARTIFACT = "artifact",
 }
-
-export enum EDynamicIconsKeys {
-    OS = "os",
-    RUNTIME = "runtime",
-}
-
-export enum EDynamicIconsProperties {
-    LINUX = "linux",
-    KOTLIN = "kotlin",
-    JAVA = "java",
-}

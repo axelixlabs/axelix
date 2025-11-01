@@ -26,7 +26,6 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                         header={<CacheAccordionHeader cacheManagerName={cacheManager.name} cache={cache} />}
                         children={<></>}
                         key={cache.name}
-                        isActiveKey={false}
                         // todo add handler in future
                         // onChange={(key) => setActiveKey(key)}
                     />
