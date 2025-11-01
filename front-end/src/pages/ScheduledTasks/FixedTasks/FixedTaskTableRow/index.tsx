@@ -1,7 +1,7 @@
 import { TooltipWithCopy } from "components";
 import type { IFixedTasks } from "models";
 
-import { OnOffSwitch } from "../OnOffSwitch";
+import { OnOffSwitch } from "../../OnOffSwitch";
 
 import styles from "./styles.module.css";
 

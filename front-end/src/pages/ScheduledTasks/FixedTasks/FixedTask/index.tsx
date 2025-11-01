@@ -1,9 +1,9 @@
 import { EmptyHandler } from "components";
 import type { IFixedTasks } from "models";
 
+import styles from "../../styles.module.css";
+import { FixedTaskTableHeader } from "../FixedTaskTableHeader";
 import { FixedTaskTableRow } from "../FixedTaskTableRow";
-import { TableHeader } from "../TableHeader";
-import styles from "../styles.module.css";
 
 interface IProps {
     /**
@@ -26,7 +26,7 @@ export const FixedTasks = ({ taskTitle, fixedTasks }: IProps) => {
                 <div className={`MediumTitle ${styles.TaskType}`}>{taskTitle}</div>
 
                 <div className="CustomizedAntdTable">
-                    <TableHeader isCron={false} />
+                    <FixedTaskTableHeader />
 
                     <EmptyHandler isEmpty={fixedTasks.length === 0}>
                         {fixedTasks.map((task: IFixedTasks, index: number) => (

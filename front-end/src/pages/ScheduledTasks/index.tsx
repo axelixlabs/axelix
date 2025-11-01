@@ -1,3 +1,5 @@
+import { CronTasks } from "./Cron/CronTasks";
+import { FixedTasks } from "./FixedTasks/FixedTask";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -6,9 +8,6 @@ import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterScheduledTasks, isEmpty } from "helpers";
 import { type ScheduledTasksResponseBody, StatefulRequest } from "models";
 import { getScheduledTasksData } from "services";
-
-import { CronTasks } from "./CronTasks";
-import { FixedTasks } from "./FixedTasks";
 
 const ScheduledTasks = () => {
     const { instanceId } = useParams();
