@@ -1,0 +1,32 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.MainTitle {
+    width: min(500px, 100%);
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 1.2;
+    text-align: center;
+    margin: 0 auto 40px;
+    word-break: break-all;
+    transform: translateX(50%);
+}
+
+.Download {
+    width: fit-content;
+    justify-self: end;
+}
+
+.DownloadIcon {
+    height: 16px;
+    width: 16px;
+}
+
+@media all and (max-width: 1220px) {
+    .MainTitle {
+        text-align: left;
+        transform: translateX(0);
+    }
+}
