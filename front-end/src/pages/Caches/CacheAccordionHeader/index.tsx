@@ -46,11 +46,11 @@ export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
     return (
         <div className={styles.AccordionHeader}>
             <div className={styles.HeaderContentWrapper}>
-                <span>{t("cacheName")}: </span>
+                <span>{t("Caches.name")}: </span>
                 <span className={styles.CacheName}>{cache.name}</span>
                 <div className={styles.Target}>
                     {/* TODO: This part we need to be fix after tooltip PR merge */}
-                    {t("cacheTarget")}: <TooltipWithCopy text={cache.target} />
+                    {t("Caches.target")}: <TooltipWithCopy text={cache.target} />
                 </div>
             </div>
             <Button
