@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterScheduledTasks, isEmpty } from "helpers";
-import { type ScheduledTasksResponseBody, StatefulRequest } from "models";
+import { type IScheduledTasksResponseBody, StatefulRequest } from "models";
 import { getScheduledTasksData } from "services";
 
 import { CronTasks } from "./CronTasks";
@@ -14,7 +14,7 @@ const ScheduledTasks = () => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
-    const [scheduledTasks, setScheduledTasks] = useState(StatefulRequest.loading<ScheduledTasksResponseBody>());
+    const [scheduledTasks, setScheduledTasks] = useState(StatefulRequest.loading<IScheduledTasksResponseBody>());
     const [search, setSearch] = useState<string>("");
 
     const fetchScheduledTasks = (instanceId: string) =>
