@@ -1,13 +1,14 @@
-.CollapseHeader {
+.AccordionHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    column-gap: 8px;
+    column-gap: 20px;
 }
 
 .Target {
     display: flex;
     column-gap: 8px;
+    margin-top: 8px;
 }
 
 .CacheName {
@@ -17,4 +18,8 @@
 
 .ClearCacheButton {
     flex-shrink: 0;
+}
+
+.HeaderContentWrapper {
+    min-width: 0
 }

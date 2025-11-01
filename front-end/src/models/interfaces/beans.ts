@@ -95,10 +95,3 @@ interface IBeanSource {
      */
     origin: EBeanOrigin;
 }
-
-export interface IBeansCollapseHeaderRefs {
-    /**
-     * Refs to bean collapse headers, used for smooth scrolling.
-     */
-    [key: string]: HTMLDivElement | null;
-}

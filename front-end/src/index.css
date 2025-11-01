@@ -73,3 +73,8 @@ In the future, when a custom accordion is implemented, remove this."
     flex: 0 0 calc(100% - 24px) !important;
     max-width: calc(100% - 24px) !important;
 }
+
+.AccordionsWrapper {
+    border: 1px solid var(--axile-medium-grey);
+    border-radius: 8px;
+}

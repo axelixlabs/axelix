@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { EmptyHandler, Loader, PageSearch } from "components";
+import { Accordion, EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterBeans } from "helpers";
 import { type IBeansResponseBody, StatefulRequest } from "models";
 import { getBeansData } from "services";
 
-import { BeansCollapse } from "./BeansCollapse";
+import { BeanAccordionChildren } from "./BeanAccordionChildren";
+import { BeanAccordionLabels } from "./BeanAccordionLabels";
 
 export const Beans = () => {
     const { instanceId } = useParams();
 
     const [dataState, setDataState] = useState(StatefulRequest.loading<IBeansResponseBody>());
     const [search, setSearch] = useState<string>("");
+    const [activeKey, setActiveKey] = useState<string>("");
 
     useEffect(() => {
         fetchData(setDataState, () => getBeansData(instanceId!));
@@ -36,7 +38,17 @@ export const Beans = () => {
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
 
             <EmptyHandler isEmpty={!effectiveBeans.length}>
-                <BeansCollapse beans={effectiveBeans} />
+                <div className="AccordionsWrapper">
+                    {effectiveBeans.map((bean) => (
+                        <Accordion
+                            header={<BeanAccordionLabels bean={bean} />}
+                            key={bean.beanName}
+                            isActiveKey={activeKey === bean.beanName}
+                        >
+                            <BeanAccordionChildren bean={bean} setActiveKey={setActiveKey} />
+                        </Accordion>
+                    ))}
+                </div>
             </EmptyHandler>
         </>
     );

@@ -22,7 +22,7 @@ export const BeanBooleanFlag = ({ value, valueTag }: IProps) => {
 
     return (
         <>
-            <div className={styles.CollapseBodyChunkTitle}>{t(`Beans.${valueTag}`)}:</div>
+            <div className={styles.AccordionBodyChunkTitle}>{t(`Beans.${valueTag}`)}:</div>
             <Checkbox checked={value} />
         </>
     );
