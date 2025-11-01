@@ -31,7 +31,7 @@ import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link KubernetesInstanceDiscovererTest}.
+ * Integration tests for {@link KubernetesInstanceDiscoverer}.
  *
  * @author Nikita Kirillov
  * @since 21.09.2025
