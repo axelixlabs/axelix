@@ -5,6 +5,9 @@
     "copyFailed": "Не удалось скопировать",
     "propertyChangedSuccessfully": "Свойство Изменено",
     "saved": "Сохранено",
+    "Details": {
+        "downloadState": "Выгрузить состояние"
+    },
     "Environments": {
         "activeProfiles": "Профили"
     },

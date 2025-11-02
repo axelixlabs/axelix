@@ -5,6 +5,9 @@
     "copyFailed": "Failed to copy",
     "propertyChangedSuccessfully": "Property Changed",
     "saved": "Saved",
+    "Details": {
+        "downloadState": "Download state"
+    },
     "Environments": {
         "activeProfiles": "Profiles"
     },
