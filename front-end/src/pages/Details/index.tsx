@@ -7,7 +7,7 @@ import { type IDetailsResponseBody, StatefulRequest } from "models";
 import { getDetailsData } from "services";
 
 import { DetailsCard } from "./DetailsCard";
-import { DetailsFirstSection } from "./DetailsFirstSection";
+import { DetailsHeader } from "./DetailsFirstSection";
 import styles from "./styles.module.css";
 
 const Details = () => {
@@ -48,7 +48,7 @@ const Details = () => {
 
     return (
         <>
-            <DetailsFirstSection serviceName={serviceName} />
+            <DetailsHeader instanceName={serviceName} />
 
             <div className={styles.InnerWrapper}>
                 <div className={styles.ColumnWrapper}>

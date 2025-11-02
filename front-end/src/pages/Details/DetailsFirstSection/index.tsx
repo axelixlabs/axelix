@@ -8,18 +8,18 @@ import DownloadIcon from "assets/icons/download.svg";
 
 interface IProps {
     /**
-     * The name of the service
+     * The name of the instance
      */
-    serviceName: string;
+    instanceName: string;
 }
 
-export const DetailsFirstSection = ({ serviceName }: IProps) => {
+export const DetailsHeader = ({ instanceName }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
     return (
         <div className={styles.MainWrapper}>
-            <div className={styles.MainTitle}>{serviceName}</div>
+            <div className={styles.MainTitle}>{instanceName}</div>
             <Button
                 type="primary"
                 icon={<img src={DownloadIcon} alt="Download icon" className={styles.DownloadIcon} />}
