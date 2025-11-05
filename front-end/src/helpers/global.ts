@@ -34,3 +34,7 @@ export const getPropertiesCount = <T extends IEnvironmentPropertySource | IConfi
 ): number => {
     return propertySourcesList.reduce((result, { properties }) => result + properties.length, 0);
 };
+
+export const canonicalize = (string: string): string => {
+    return string.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+};
