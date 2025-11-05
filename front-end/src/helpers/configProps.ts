@@ -1,20 +1,22 @@
 import type { IConfigPropsBean } from "models";
 
+import { canonicalize } from "./global";
+
 export const filterConfigPropsBeans = (beans: IConfigPropsBean[], search: string): IConfigPropsBean[] => {
-    const formattedSearch = search.toLowerCase().trim();
+    const formattedSearch = canonicalize(search);
 
     return beans.reduce<IConfigPropsBean[]>((result, bean) => {
         const { beanName, prefix, properties } = bean;
 
-        const isBeanNameMatch = beanName.toLowerCase().includes(formattedSearch);
-        const isPrefixMatch = prefix.toLowerCase().includes(formattedSearch);
+        const isBeanNameMatch = canonicalize(beanName).includes(formattedSearch);
+        const isPrefixMatch = canonicalize(prefix).includes(formattedSearch);
 
         if (isBeanNameMatch || isPrefixMatch) {
             result.push(bean);
             return result;
         }
 
-        const filteredProperties = properties.filter(({ key }) => key.toLowerCase().includes(formattedSearch));
+        const filteredProperties = properties.filter(({ key }) => canonicalize(key).includes(formattedSearch));
 
         if (filteredProperties.length) {
             result.push({

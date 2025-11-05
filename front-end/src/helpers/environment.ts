@@ -1,23 +1,25 @@
 import type { IEnvironmentPropertySource } from "models";
 
+import { canonicalize } from "./global";
+
 export const filterPropertySources = (
     propertySources: IEnvironmentPropertySource[],
     search: string,
 ): IEnvironmentPropertySource[] => {
-    const formattedSearch = search.toLowerCase().trim();
+    const formattedSearch = canonicalize(search);
 
     return propertySources.reduce<IEnvironmentPropertySource[]>((result, propertySource) => {
         const { name, properties } = propertySource;
 
-        const sourceNameLower = propertySource.name.toLowerCase();
+        const sourceNameCanonical = canonicalize(name);
 
-        if (sourceNameLower.includes(formattedSearch)) {
+        if (sourceNameCanonical.includes(formattedSearch)) {
             result.push(propertySource);
             return result;
         }
 
         const filteredProperties = properties.filter((property) =>
-            property.name.toLowerCase().includes(formattedSearch),
+            canonicalize(property.name).includes(formattedSearch),
         );
 
         if (filteredProperties.length) {
