@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { useAppDispatch, useAppSelector } from "hooks";
 import type { ILoginSubmitRequestData } from "models";
-import { loginThunk } from "store/slices/login";
+import { loginThunk } from "store/thunks";
 
 import styles from "./styles.module.css";
 
