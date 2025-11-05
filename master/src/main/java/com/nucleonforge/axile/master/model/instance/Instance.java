@@ -28,9 +28,23 @@ public record Instance(
         InstanceStatus status,
         @NonNull String actuatorUrl) {
 
+    public Instance copy(InstanceStatus instanceStatus) {
+        return new Instance(
+                this.id,
+                this.name,
+                this.serviceVersion,
+                this.javaVersion,
+                this.springBootVersion,
+                this.commitShaShort,
+                this.deployedAt,
+                instanceStatus,
+                this.actuatorUrl);
+    }
+
     public enum InstanceStatus {
         UP,
         DOWN,
-        UNKNOWN
+        UNKNOWN,
+        RELOAD
     }
 }

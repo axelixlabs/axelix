@@ -56,4 +56,10 @@ public class InMemoryInstanceRegistry implements InstanceRegistry {
     public Set<Instance> getAll() {
         return Set.copyOf(source.values());
     }
+
+    @Override
+    public synchronized void refresh(Instance instance) {
+        this.source.remove(instance.id());
+        this.source.putIfAbsent(instance.id(), instance);
+    }
 }

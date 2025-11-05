@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.request.PropertyUpdatedRequest;
+import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
+import com.nucleonforge.axile.master.service.discovery.InstanceModifyStatus;
 import com.nucleonforge.axile.master.service.serde.MessageSerializationStrategy;
 import com.nucleonforge.axile.master.service.transport.PropertyManagementEndpointProber;
 
@@ -37,12 +39,15 @@ public class PropertyManagementApi {
 
     private final PropertyManagementEndpointProber propertyManagementEndpointProber;
     private final MessageSerializationStrategy messageSerializationStrategy;
+    private final InstanceModifyStatus instanceModifyStatus;
 
     public PropertyManagementApi(
             PropertyManagementEndpointProber profileManagementEndpointProber,
-            MessageSerializationStrategy messageSerializationStrategy) {
+            MessageSerializationStrategy messageSerializationStrategy,
+            InstanceModifyStatus instanceModifyStatus) {
         this.propertyManagementEndpointProber = profileManagementEndpointProber;
         this.messageSerializationStrategy = messageSerializationStrategy;
+        this.instanceModifyStatus = instanceModifyStatus;
     }
 
     @Operation(
@@ -71,6 +76,7 @@ public class PropertyManagementApi {
 
         HttpPayload payload = HttpPayload.json(messageSerializationStrategy.serialize(request));
         propertyManagementEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
+        instanceModifyStatus.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);
         return ResponseEntity.noContent().build();
     }
 }
