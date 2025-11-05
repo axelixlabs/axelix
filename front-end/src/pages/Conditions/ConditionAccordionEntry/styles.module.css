@@ -1,10 +1,10 @@
-.Collapse {
+.AccordionsWrapper {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     margin-bottom: 40px;
 }
 
-.Collapse:last-child {
+.AccordionsWrapper:last-child {
     margin-bottom: 0;
 }
 
