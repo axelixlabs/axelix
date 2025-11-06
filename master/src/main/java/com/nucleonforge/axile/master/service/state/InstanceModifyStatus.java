@@ -1,11 +1,10 @@
-package com.nucleonforge.axile.master.service.discovery;
+package com.nucleonforge.axile.master.service.state;
 
 import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
-import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 /**
  * Service for changing the status of an {@link Instance}.
