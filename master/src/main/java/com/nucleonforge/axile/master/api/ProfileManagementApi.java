@@ -24,8 +24,8 @@ import com.nucleonforge.axile.master.api.response.ProfileUpdateResponse;
 import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.Converter;
-import com.nucleonforge.axile.master.service.discovery.InstanceModifyStatus;
 import com.nucleonforge.axile.master.service.serde.MessageSerializationStrategy;
+import com.nucleonforge.axile.master.service.state.InstanceModifyStatus;
 import com.nucleonforge.axile.master.service.transport.ProfileManagementEndpointProber;
 
 /**

@@ -25,12 +25,15 @@ import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.api.request.PropertyUpdatedRequest;
+import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrlAndStatus;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -86,14 +89,22 @@ class PropertyManagementApiTest {
     void shouldReturnOkOnPropertyUpdate() {
         PropertyUpdatedRequest request = new PropertyUpdatedRequest("property.enabled", "false");
 
-        registry.register(createInstanceWithUrl(
+        registry.register(createInstanceWithUrlAndStatus(
                 activeInstanceId,
-                mockWebServer.url(activeInstanceId + "/actuator").toString()));
+                mockWebServer.url(activeInstanceId + "/actuator").toString(),
+                Instance.InstanceStatus.UP));
+
+        Instance instance = registry.get(InstanceId.of(activeInstanceId)).orElseThrow(InstanceNotFoundException::new);
+        assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
                 "/api/axile/property-management/{instanceId}", defaultEntity(request), Void.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        Instance instanceModify =
+                registry.get(InstanceId.of(activeInstanceId)).orElseThrow(InstanceNotFoundException::new);
+        assertThat(instanceModify.status()).isEqualTo(Instance.InstanceStatus.RELOAD);
     }
 
     @Test

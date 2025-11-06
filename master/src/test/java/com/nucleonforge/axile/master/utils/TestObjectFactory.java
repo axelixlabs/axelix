@@ -23,6 +23,8 @@ public final class TestObjectFactory {
 
     private static final String DEFAULT_URL = "http://example.com";
 
+    private static final Instance.InstanceStatus DEFAULT_STATUS = Instance.InstanceStatus.UP;
+
     private TestObjectFactory() {}
 
     public static Instance createInstance(String id) {
@@ -31,6 +33,14 @@ public final class TestObjectFactory {
 
     // TODO:
     public static Instance createInstanceWithUrl(String id, String url) {
+        return createInstanceWithUrlAndStatus(id, url, DEFAULT_STATUS);
+    }
+
+    public static Instance createInstanceWithStatus(String id, Instance.InstanceStatus status) {
+        return createInstanceWithUrlAndStatus(id, DEFAULT_URL, status);
+    }
+
+    public static Instance createInstanceWithUrlAndStatus(String id, String url, Instance.InstanceStatus status) {
         return new Instance(
                 InstanceId.of(id),
                 "test-object-factory-instance",
@@ -39,7 +49,7 @@ public final class TestObjectFactory {
                 "3.5.0",
                 "df027cf",
                 Instant.now(),
-                Instance.InstanceStatus.UP,
+                status,
                 url);
     }
 

@@ -26,12 +26,15 @@ import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.api.request.ProfileUpdatedRequest;
+import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrlAndStatus;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -107,15 +110,23 @@ class ProfileManagementApiTest {
         List<String> profiles = List.of("postgres");
         ProfileUpdatedRequest request = new ProfileUpdatedRequest(profiles);
 
-        registry.register(createInstanceWithUrl(
+        registry.register(createInstanceWithUrlAndStatus(
                 activeInstanceId,
-                mockWebServer.url(activeInstanceId + "/actuator").toString()));
+                mockWebServer.url(activeInstanceId + "/actuator").toString(),
+                Instance.InstanceStatus.UP));
+
+        Instance instance = registry.get(InstanceId.of(activeInstanceId)).orElseThrow(InstanceNotFoundException::new);
+        assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
 
         ResponseEntity<String> response = restTemplate.postForEntity(
                 "/api/axile/profile-management/{instanceId}", defaultEntity(request), String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+
+        Instance instanceModify =
+                registry.get(InstanceId.of(activeInstanceId)).orElseThrow(InstanceNotFoundException::new);
+        assertThat(instanceModify.status()).isEqualTo(Instance.InstanceStatus.RELOAD);
 
         String body = response.getBody();
         assertThatJson(body).isEqualTo(EXPECTED_JSON);
