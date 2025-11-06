@@ -13,10 +13,29 @@ interface IProps {
      * True when the selected dependency equals the bean name
      */
     isActiveKey?: boolean;
+    /**
+     * CSS styles for the accordion header
+     */
+    headerStyles?: string;
+    /**
+     * CSS classes for the accordion content.
+     */
+    contentStyles?: string;
+    /**
+     * Indicates whether the accordion is expanded
+     */
+    accordionExpanded?: boolean;
 }
 
-export const Accordion = ({ header, children, isActiveKey }: PropsWithChildren<IProps>) => {
-    const [open, setOpen] = useState<boolean>(false);
+export const Accordion = ({
+    header,
+    children,
+    isActiveKey,
+    headerStyles,
+    contentStyles,
+    accordionExpanded = false,
+}: PropsWithChildren<IProps>) => {
+    const [open, setOpen] = useState<boolean>(accordionExpanded);
 
     const handlerClick = (): void => {
         setOpen(!open);
@@ -24,12 +43,12 @@ export const Accordion = ({ header, children, isActiveKey }: PropsWithChildren<I
 
     return (
         <div className={`${styles.MainWrapper} ${isActiveKey || open ? styles.Open : ""}`}>
-            <div className={styles.HeaderWrapper} onClick={handlerClick}>
+            <div className={`${styles.HeaderWrapper} ${headerStyles}`} onClick={handlerClick}>
                 <img src={ArrowIcon} alt="Arrow icon" className={styles.Icon} />
                 <div className={styles.Header}>{header}</div>
             </div>
             <div className={styles.ContentWrapper}>
-                <div className={styles.Content}>{children}</div>
+                <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
             </div>
         </div>
     );

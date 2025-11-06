@@ -1,7 +1,8 @@
+/* TODO: this css class CustomizedAntdTable is used also for scheduled tasks, and I do not think it is correct */
 .CustomizedAntdTable {
     width: 100%;
     border: 1px solid #f0f0f0;
-    border-radius: 8px;
+    border-radius: var(--axile-border-radius-large);
     border-collapse: separate;
     border-spacing: 0;
     margin-bottom: 40px;

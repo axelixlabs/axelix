@@ -1,3 +1,4 @@
+import { Accordion } from "components/Accordion";
 import { TooltipWithCopy } from "components/TooltipWithCopy";
 import type { PropsWithChildren } from "react";
 
@@ -6,6 +7,7 @@ import type { ITableRow } from "models";
 import { EmptyHandler } from "../EmptyHandler";
 
 import { TablePropertyValue } from "./TablePropertyValue";
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
@@ -21,15 +23,17 @@ interface IProps {
 
 export const ModifiableTableSection = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
     return (
-        // TODO: this css class CustomizedAntdTable is used also for scheduled tasks, and I do not think it is correct
-        <div className="CustomizedAntdTable">
-            <div className="TableHeader">
-                <div className="RowChunk">
+        <Accordion
+            header={
+                <div className={styles.AccordionHeader}>
                     <div>{headerName}</div>
                     {children}
                 </div>
-            </div>
-
+            }
+            headerStyles={styles.HeaderStyles}
+            contentStyles={styles.ContentStyles}
+            accordionExpanded
+        >
             <EmptyHandler isEmpty={!properties.length}>
                 {properties.map(({ key, displayKey, displayValue, isPrimary }) => (
                     <div key={key} className="TableRow">
@@ -42,6 +46,6 @@ export const ModifiableTableSection = ({ headerName, properties, children }: Pro
                     </div>
                 ))}
             </EmptyHandler>
-        </div>
+        </Accordion>
     );
 };
