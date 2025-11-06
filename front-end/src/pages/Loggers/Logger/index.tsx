@@ -50,7 +50,7 @@ export const Logger = ({ levels, logger, setUpdateLoggerLevel }: IProps) => {
             <TooltipWithCopy text={logger.name} />
 
             <Levels
-                levelCheckEntity={effectiveLevel}
+                checkedLevel={effectiveLevel}
                 configuredLevel={configuredLevel}
                 levels={levels}
                 handleChange={handleChange}

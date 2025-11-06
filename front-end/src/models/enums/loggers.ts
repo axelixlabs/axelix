@@ -1,4 +1,4 @@
 export enum ELoggersTabs {
-    LOGGERS = "Loggers",
+    LOGGERS = "loggers",
     LOGGER_GROUPS = "loggerGroups",
 }

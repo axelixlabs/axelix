@@ -58,7 +58,7 @@ export const LoggerGroups = ({ loggerGroups, levels, setUpdateLoggerGroupLevel }
                                 <Levels
                                     levels={levels}
                                     configuredLevel={configuredLevel}
-                                    levelCheckEntity={configuredLevel}
+                                    checkedLevel={configuredLevel}
                                     handleChange={handleChange}
                                 />
                             </div>

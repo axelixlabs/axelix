@@ -15,9 +15,9 @@ interface IProps {
     /**
      * The entity through which the selected level will be found
      */
-    levelCheckEntity?: string;
+    checkedLevel?: string;
     /**
-     * The configured level of a logger group
+     * The configured level of a logger group, if any
      */
     configuredLevel?: string;
     /**
@@ -26,7 +26,7 @@ interface IProps {
     handleChange: (level: string) => void;
 }
 
-export const Levels = ({ levels, levelCheckEntity, configuredLevel, handleChange }: IProps) => {
+export const Levels = ({ levels, checkedLevel, configuredLevel, handleChange }: IProps) => {
     const { t } = useTranslation();
 
     return (
@@ -39,7 +39,7 @@ export const Levels = ({ levels, levelCheckEntity, configuredLevel, handleChange
                     return (
                         <div className={styles.RadioGroupWrapper} key={level}>
                             <label
-                                className={`${styles.RadioButton} ${levelCheckEntity === level ? styles.Selected : ""}`}
+                                className={`${styles.RadioButton} ${checkedLevel === level ? styles.Selected : ""}`}
                                 style={
                                     {
                                         "--color-primary": color.colorPrimary,
@@ -51,7 +51,7 @@ export const Levels = ({ levels, levelCheckEntity, configuredLevel, handleChange
                                 <input
                                     type="radio"
                                     value={level}
-                                    checked={levelCheckEntity === level}
+                                    checked={checkedLevel === level}
                                     onChange={() => handleChange(level)}
                                 />
                                 {level}

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterLoggerGroupsOrLoggers, filterLoggers, getLoggerGroupsLoggersCount } from "helpers";
+import { fetchData, filterLoggerGroups, filterLoggers } from "helpers";
 import { ELoggersTabs, type ILoggersResponseBody, StatefulRequest, StatelessRequest } from "models";
 import { getLoggersData } from "services";
 
@@ -36,6 +36,7 @@ export const Loggers = () => {
             message.success(t("Loggers.loggerLevelUpdated"));
             fetchLoggersData(instanceId!);
             setUpdateLoggerLevel(StatelessRequest.inactive());
+            setUpdateLoggerGroupLevel(StatelessRequest.inactive());
         }
     }, [isLoggerLevelUpdated, isLoggerGroupLevelUpdated]);
 
@@ -52,13 +53,10 @@ export const Loggers = () => {
     const loggers = loggersData.response!.loggers;
 
     const effectiveLoggers = search ? filterLoggers(loggers, search) : loggers;
-    const effectiveLoggerGroups = search ? filterLoggerGroupsOrLoggers(loggerGroups, search) : loggerGroups;
-
-    const totalLoggerGroupsLoggersCount = getLoggerGroupsLoggersCount(loggerGroups);
-    const filteredLoggerGroupsLoggersCount = getLoggerGroupsLoggersCount(effectiveLoggerGroups);
+    const effectiveLoggerGroups = search ? filterLoggerGroups(loggerGroups, search) : loggerGroups;
 
     const loggersAddonAfter = `${effectiveLoggers.length} / ${loggers.length}`;
-    const loggerGroupsAddonAffter = `${filteredLoggerGroupsLoggersCount} / ${totalLoggerGroupsLoggersCount}`;
+    const loggerGroupsAddonAffter = `${effectiveLoggerGroups.length} / ${loggerGroups.length}`;
     const addonAfter = activeKey === ELoggersTabs.LOGGERS ? loggersAddonAfter : loggerGroupsAddonAffter;
 
     const tabs: TabsProps["items"] = [
