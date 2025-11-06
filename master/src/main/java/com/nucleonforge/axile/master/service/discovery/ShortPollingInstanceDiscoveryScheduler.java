@@ -67,8 +67,8 @@ public class ShortPollingInstanceDiscoveryScheduler {
         for (Instance instance : discoveredInstances) {
             if (currentlyRegisteredIds.contains(instance.id())) {
                 instanceRegistry.refresh(instance);
-            }
-            if (!currentlyRegisteredIds.contains(instance.id())) {
+                logger.debug("Refresh instance: {}", instance.id());
+            } else {
                 try {
                     instanceRegistry.register(instance);
                     logger.debug("Registered new instance: {}", instance.id());
