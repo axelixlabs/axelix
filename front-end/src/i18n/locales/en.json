@@ -12,6 +12,8 @@
         "activeProfiles": "Profiles"
     },
     "Loggers": {
+        "loggers": "Loggers",
+        "loggerGroups": "Logger groups",
         "configuredExplicitly": "Configured explicitly",
         "loggerLevelUpdated": "Level has been changed",
         "reset": "Reset"
