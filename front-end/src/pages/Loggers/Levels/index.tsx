@@ -12,14 +12,17 @@ interface IProps {
      * All possible logging levels that are supported by the logging system inside the instance
      */
     levels: string[];
+
     /**
-     * The entity through which the selected level will be found
+     * The logging level inside the {@link levels} array, that is considered to be currently active.
      */
     checkedLevel?: string;
+
     /**
      * The configured level of a logger group, if any
      */
     configuredLevel?: string;
+
     /**
      * The function that should update the level
      */

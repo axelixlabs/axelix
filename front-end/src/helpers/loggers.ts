@@ -19,9 +19,9 @@ export const filterLoggerGroups = (loggerGroups: ILoggerGroup[], search: string)
             return result;
         }
 
-        const filteredMembers = members.filter((member) => member.toLowerCase().includes(formattedSearch));
+        const anyLoggerMatches = members.some((member) => member.toLowerCase().includes(formattedSearch));
 
-        if (filteredMembers.length) {
+        if (anyLoggerMatches) {
             result.push(loggerGroup);
             return result;
         }
