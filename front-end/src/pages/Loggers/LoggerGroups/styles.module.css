@@ -1,0 +1,18 @@
+.Member {
+    word-break: break-all;
+    border-bottom: 1px solid var(--axile-medium-grey);
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+
+.Member:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.AccordionHeader {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 20px;
+}
