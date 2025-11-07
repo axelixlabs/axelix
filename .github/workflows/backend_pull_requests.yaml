@@ -8,15 +8,12 @@ on:
       - 'common/**'
     branches: [ master ]
 
-jobs:
-  check-linked-issues:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check for linked issues
-        uses: nearform-actions/github-action-check-linked-issues@v1
-        with:
-          exclude-labels: "refactoring, dependencies"
+concurrency:
+  # Unique ID of the concurrency group, which cancels an already running workflow for this PR (if any)
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
+jobs:
   check-pr-size:
     runs-on: ubuntu-latest
     permissions:
