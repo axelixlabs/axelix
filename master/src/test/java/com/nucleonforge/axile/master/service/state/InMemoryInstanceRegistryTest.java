@@ -80,18 +80,19 @@ class InMemoryInstanceRegistryTest {
     }
 
     @Test
-    void shouldReplaceInstanceWhenItExists() {
+    void shouldReplaceExistingInstance() {
         String id = "id-7";
-        Instance instance = createInstance(id);
-        registry.register(instance);
+        Instance first = createInstance(id);
+        Instance second = createInstance(first.id().instanceId());
+        registry.register(first);
 
         // when.
-        registry.replace(instance);
+        registry.replace(second);
 
         // then.
         Instance actual = registry.get(InstanceId.of(id)).orElse(null);
         assertThat(actual).isNotNull();
-        assertThat(actual).isEqualTo(instance);
+        assertThat(actual).isEqualTo(second);
     }
 
     @Test
