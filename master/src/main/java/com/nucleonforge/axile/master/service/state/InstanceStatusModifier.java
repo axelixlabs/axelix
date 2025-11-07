@@ -12,17 +12,17 @@ import com.nucleonforge.axile.master.model.instance.InstanceId;
  * @author Sergey Cherkasov
  */
 @Service
-public class InstanceModifyStatus {
+public class InstanceStatusModifier {
 
     private final InstanceRegistry instanceRegistry;
 
-    public InstanceModifyStatus(InstanceRegistry instanceRegistry) {
+    public InstanceStatusModifier(InstanceRegistry instanceRegistry) {
         this.instanceRegistry = instanceRegistry;
     }
 
     public void modifyStatus(String instanceId, Instance.InstanceStatus instanceStatus) {
         Instance instance = instanceRegistry.get(InstanceId.of(instanceId)).orElseThrow(InstanceNotFoundException::new);
         Instance instanceNew = instance.copy(instanceStatus);
-        instanceRegistry.refresh(instanceNew);
+        instanceRegistry.replace(instanceNew);
     }
 }

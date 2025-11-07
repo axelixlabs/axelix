@@ -94,9 +94,6 @@ class PropertyManagementApiTest {
                 mockWebServer.url(activeInstanceId + "/actuator").toString(),
                 Instance.InstanceStatus.UP));
 
-        Instance instance = registry.get(InstanceId.of(activeInstanceId)).orElseThrow(InstanceNotFoundException::new);
-        assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
-
         ResponseEntity<Void> response = restTemplate.postForEntity(
                 "/api/axile/property-management/{instanceId}", defaultEntity(request), Void.class, activeInstanceId);
 

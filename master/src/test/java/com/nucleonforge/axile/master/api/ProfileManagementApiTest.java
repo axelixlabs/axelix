@@ -115,9 +115,6 @@ class ProfileManagementApiTest {
                 mockWebServer.url(activeInstanceId + "/actuator").toString(),
                 Instance.InstanceStatus.UP));
 
-        Instance instance = registry.get(InstanceId.of(activeInstanceId)).orElseThrow(InstanceNotFoundException::new);
-        assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
-
         ResponseEntity<String> response = restTemplate.postForEntity(
                 "/api/axile/profile-management/{instanceId}", defaultEntity(request), String.class, activeInstanceId);
 

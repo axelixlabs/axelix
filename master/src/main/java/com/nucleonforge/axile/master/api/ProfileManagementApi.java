@@ -25,7 +25,7 @@ import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.serde.MessageSerializationStrategy;
-import com.nucleonforge.axile.master.service.state.InstanceModifyStatus;
+import com.nucleonforge.axile.master.service.state.InstanceStatusModifier;
 import com.nucleonforge.axile.master.service.transport.ProfileManagementEndpointProber;
 
 /**
@@ -44,17 +44,17 @@ public class ProfileManagementApi {
     private final ProfileManagementEndpointProber profileManagementEndpointProber;
     private final Converter<ProfileMutationResult, ProfileUpdateResponse> converter;
     private final MessageSerializationStrategy messageSerializationStrategy;
-    private final InstanceModifyStatus instanceModifyStatus;
+    private final InstanceStatusModifier instanceStatusModifier;
 
     public ProfileManagementApi(
             ProfileManagementEndpointProber profileManagementEndpointProber,
             Converter<ProfileMutationResult, ProfileUpdateResponse> converter,
             MessageSerializationStrategy messageSerializationStrategy,
-            InstanceModifyStatus instanceModifyStatus) {
+            InstanceStatusModifier instanceStatusModifier) {
         this.profileManagementEndpointProber = profileManagementEndpointProber;
         this.converter = converter;
         this.messageSerializationStrategy = messageSerializationStrategy;
-        this.instanceModifyStatus = instanceModifyStatus;
+        this.instanceStatusModifier = instanceStatusModifier;
     }
 
     @Operation(
@@ -89,7 +89,7 @@ public class ProfileManagementApi {
 
         HttpPayload payload = HttpPayload.json(messageSerializationStrategy.serialize(request));
         ProfileMutationResult result = profileManagementEndpointProber.invoke(InstanceId.of(instanceId), payload);
-        instanceModifyStatus.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);
+        instanceStatusModifier.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);
         return Objects.requireNonNull(converter.convert(result));
     }
 }
