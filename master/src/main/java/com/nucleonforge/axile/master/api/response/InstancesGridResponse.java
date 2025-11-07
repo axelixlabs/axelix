@@ -36,6 +36,7 @@ public record InstancesGridResponse(Collection<InstanceShortProfile> instances) 
     public enum InstanceStatus {
         UP,
         DOWN,
-        UNKNOWN
+        UNKNOWN,
+        RELOAD
     }
 }

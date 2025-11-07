@@ -80,6 +80,36 @@ class InMemoryInstanceRegistryTest {
     }
 
     @Test
+    void shouldReplaceInstanceWhenItExists() {
+        String id = "id-7";
+        Instance instance = createInstance(id);
+        registry.register(instance);
+
+        // when.
+        registry.replace(instance);
+
+        // then.
+        Instance actual = registry.get(InstanceId.of(id)).orElse(null);
+        assertThat(actual).isNotNull();
+        assertThat(actual).isEqualTo(instance);
+    }
+
+    @Test
+    void shouldReplaceInstanceWhenItDoesNotExist() {
+        String id = "id-8";
+        Instance instance = createInstance(id);
+        assertThat(registry.get(InstanceId.of(id))).isEmpty();
+
+        // when.
+        registry.replace(instance);
+
+        // then
+        Instance actual = registry.get(InstanceId.of(id)).orElse(null);
+        assertThat(actual).isNotNull();
+        assertThat(actual).isEqualTo(instance);
+    }
+
+    @Test
     void shouldThrowIfInstanceToDeregisterNotFound() {
         assertThatExceptionOfType(InstanceNotFoundException.class)
                 .isThrownBy(() -> registry.deRegister(InstanceId.of("not-existing")));

@@ -48,6 +48,11 @@ public class InMemoryInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
+    public void replace(Instance instance) {
+        source.compute(instance.id(), (id, existing) -> instance);
+    }
+
+    @Override
     public Optional<Instance> get(InstanceId instanceId) {
         return Optional.ofNullable(source.get(instanceId));
     }

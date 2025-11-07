@@ -39,6 +39,14 @@ public interface InstanceRegistry {
     void deRegister(InstanceId instanceId) throws InstanceNotFoundException;
 
     /**
+     * Deregister and register the {@link Instance}. If the {@link Instance} with such {@link InstanceId}
+     * is not present in the registry, then simply new {@link Instance} is registered.
+     *
+     * @param  instance the instance to be registered
+     */
+    void replace(Instance instance);
+
+    /**
      * Get {@link Instance} by its id.
      *
      * @param instanceId the id of the instance to get.
