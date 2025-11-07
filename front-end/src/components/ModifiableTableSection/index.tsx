@@ -1,3 +1,4 @@
+import { Accordion } from "components/Accordion";
 import { TooltipWithCopy } from "components/TooltipWithCopy";
 import type { PropsWithChildren } from "react";
 
@@ -6,6 +7,7 @@ import type { ITableRow } from "models";
 import { EmptyHandler } from "../EmptyHandler";
 
 import { TablePropertyValue } from "./TablePropertyValue";
+import styles from "./styles.module.css";
 
 interface IProps {
     /**
@@ -21,27 +23,35 @@ interface IProps {
 
 export const ModifiableTableSection = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
     return (
-        // TODO: this css class CustomizedAntdTable is used also for scheduled tasks, and I do not think it is correct
-        <div className="CustomizedAntdTable">
-            <div className="TableHeader">
-                <div className="RowChunk">
-                    <div>{headerName}</div>
-                    {children}
-                </div>
-            </div>
-
-            <EmptyHandler isEmpty={!properties.length}>
-                {properties.map(({ key, displayKey, displayValue, isPrimary }) => (
-                    <div key={key} className="TableRow">
-                        <div className="RowChunk">
-                            <TooltipWithCopy text={displayKey} />
-                        </div>
-                        <div className="RowChunk">
-                            <TablePropertyValue propertyName={key} propertyValue={displayValue} isPrimary={isPrimary} />
-                        </div>
+        <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
+            <Accordion
+                header={
+                    <div className={styles.AccordionHeader}>
+                        <div>{headerName}</div>
+                        {children}
                     </div>
-                ))}
-            </EmptyHandler>
+                }
+                headerStyles={styles.HeaderStyles}
+                contentStyles={styles.ContentStyles}
+                accordionExpanded
+            >
+                <EmptyHandler isEmpty={!properties.length}>
+                    {properties.map(({ key, displayKey, displayValue, isPrimary }) => (
+                        <div key={key} className="TableRow">
+                            <div className="RowChunk">
+                                <TooltipWithCopy text={displayKey} />
+                            </div>
+                            <div className="RowChunk">
+                                <TablePropertyValue
+                                    propertyName={key}
+                                    propertyValue={displayValue}
+                                    isPrimary={isPrimary}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </EmptyHandler>
+            </Accordion>
         </div>
     );
 };

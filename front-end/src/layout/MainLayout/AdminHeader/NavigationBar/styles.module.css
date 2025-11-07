@@ -2,7 +2,7 @@
     transition: all 0.3s;
     align-self: center;
     padding: 8px 12px;
-    border-radius: 4px;
+    border-radius: var(--axile-border-radius-small);
     margin-right: 8px;
 }
 

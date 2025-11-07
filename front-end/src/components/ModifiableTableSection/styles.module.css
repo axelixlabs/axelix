@@ -1,0 +1,16 @@
+.AccordionWrapper {
+    margin-bottom: 40px;
+}
+
+.AccordionHeader {
+    font-weight: 600;
+}
+
+.HeaderStyles {
+    background-color: var(--axile-primary-light-green);
+    padding: 16px;
+}
+
+.ContentStyles{
+    padding: 0;
+}

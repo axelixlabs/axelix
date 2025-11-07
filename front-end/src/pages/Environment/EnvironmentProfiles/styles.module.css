@@ -16,12 +16,12 @@
 
 .ProfileTitle {
     background: var(--axile-primary-light-green);
-    border-radius: 4px;
+    border-radius: var(--axile-border-radius-small);
 }
 
 .ProfileValue {
     background: var(--axile-light-grey);
-    border-radius: 4px;
+    border-radius: var(--axile-border-radius-small);
 }
 
 .ProfileTitle,

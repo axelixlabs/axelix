@@ -17,6 +17,8 @@
     --axile-bold-grey: #838383;
     --axile-primary-red: #ff000a;
     --axile-primary-light-red: #ff000a1a;
+    --axile-border-radius-large: 8px;
+    --axile-border-radius-small: 4px;
 }
 
 *,
@@ -66,5 +68,6 @@ a {
 
 .AccordionsWrapper {
     border: 1px solid var(--axile-medium-grey);
-    border-radius: 8px;
+    border-radius: var(--axile-border-radius-large);
+    overflow: hidden;
 }
