@@ -8,8 +8,8 @@ import { fetchData, filterLoggerGroups, filterLoggers } from "helpers";
 import { ELoggersTabs, type ILoggersResponseBody, StatefulRequest, StatelessRequest } from "models";
 import { getLoggersData } from "services";
 
+import { Logger } from "./Logger";
 import { LoggerGroups } from "./LoggerGroups";
-import { LoggersList } from "./LoggersList";
 import styles from "./styles.module.css";
 
 export const Loggers = () => {
@@ -52,12 +52,15 @@ export const Loggers = () => {
     const loggerGroups = loggersData.response!.groups;
     const loggers = loggersData.response!.loggers;
 
-    const effectiveLoggers = search ? filterLoggers(loggers, search) : loggers;
-    const effectiveLoggerGroups = search ? filterLoggerGroups(loggerGroups, search) : loggerGroups;
+    const isLoggersTab = activeKey === ELoggersTabs.LOGGERS;
+    const isLoggerGroupsTab = activeKey === ELoggersTabs.LOGGER_GROUPS;
+
+    const effectiveLoggers = isLoggersTab && search ? filterLoggers(loggers, search) : loggers;
+    const effectiveLoggerGroups = isLoggerGroupsTab && search ? filterLoggerGroups(loggerGroups, search) : loggerGroups;
 
     const loggersAddonAfter = `${effectiveLoggers.length} / ${loggers.length}`;
     const loggerGroupsAddonAffter = `${effectiveLoggerGroups.length} / ${loggerGroups.length}`;
-    const addonAfter = activeKey === ELoggersTabs.LOGGERS ? loggersAddonAfter : loggerGroupsAddonAffter;
+    const addonAfter = isLoggersTab ? loggersAddonAfter : loggerGroupsAddonAffter;
 
     const tabs: TabsProps["items"] = [
         {
@@ -65,11 +68,14 @@ export const Loggers = () => {
             label: t("Loggers.loggers"),
             children: (
                 <EmptyHandler isEmpty={effectiveLoggers.length === 0}>
-                    <LoggersList
-                        effectiveLoggers={effectiveLoggers}
-                        levels={levels}
-                        setUpdateLoggerLevel={setUpdateLoggerLevel}
-                    />
+                    {effectiveLoggers.map((logger) => (
+                        <Logger
+                            logger={logger}
+                            levels={levels}
+                            setUpdateLoggerLevel={setUpdateLoggerLevel}
+                            key={logger.name}
+                        />
+                    ))}
                 </EmptyHandler>
             ),
         },
