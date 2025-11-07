@@ -43,7 +43,7 @@ export const Beans = () => {
                         <Accordion
                             header={<BeanAccordionLabels bean={bean} />}
                             key={bean.beanName}
-                            isActiveKey={activeKey === bean.beanName}
+                            accordionExpanded={activeKey === bean.beanName}
                         >
                             <BeanAccordionChildren bean={bean} setActiveKey={setActiveKey} />
                         </Accordion>

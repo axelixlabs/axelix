@@ -9,18 +9,17 @@ interface IProps {
      * Header of the accordion
      */
     header: ReactNode;
-    /**
-     * True when the selected dependency equals the bean name
-     */
-    isActiveKey?: boolean;
+
     /**
      * CSS styles for the accordion header
      */
     headerStyles?: string;
+
     /**
      * CSS classes for the accordion content.
      */
     contentStyles?: string;
+
     /**
      * Indicates whether the accordion is expanded
      */
@@ -30,7 +29,6 @@ interface IProps {
 export const Accordion = ({
     header,
     children,
-    isActiveKey,
     headerStyles,
     contentStyles,
     accordionExpanded = false,
@@ -42,7 +40,7 @@ export const Accordion = ({
     };
 
     return (
-        <div className={`${styles.MainWrapper} ${isActiveKey || open ? styles.Open : ""}`}>
+        <div className={`${styles.MainWrapper} ${open ? styles.Open : ""}`}>
             <div className={`${styles.HeaderWrapper} ${headerStyles}`} onClick={handlerClick}>
                 <img src={ArrowIcon} alt="Arrow icon" className={styles.Icon} />
                 <div className={styles.Header}>{header}</div>
