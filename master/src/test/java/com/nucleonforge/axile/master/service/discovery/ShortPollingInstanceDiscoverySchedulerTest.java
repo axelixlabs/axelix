@@ -29,6 +29,7 @@ import org.springframework.cloud.kubernetes.commons.discovery.DefaultKubernetesS
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
+import com.nucleonforge.axile.master.service.state.InstanceStatusModifier;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,6 +56,12 @@ class ShortPollingInstanceDiscoverySchedulerTest {
 
     @Autowired
     private InstanceRegistry instanceRegistry;
+
+    @Autowired
+    private InstancesDiscoverer instancesDiscoverer;
+
+    @Autowired
+    private InstanceStatusModifier instanceStatusModifier;
 
     @MockBean
     private DiscoveryClient discoveryClient;
@@ -134,6 +141,56 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 .collect(Collectors.toSet());
 
         assertThat(registeredInstanceIds).containsOnly(instance1Id, instance2Id);
+    }
+
+    @Test
+    void shouldReplaceInstancesWhenDiscovered() {
+        String service = "service-3";
+        String instanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String response =
+                """
+            {
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion": "1.0.0",
+              "commitShortSha": "a8b0929",
+              "javaVersion": "17.0.0",
+              "springBootVersion": "3.0.0",
+              "healthStatus": "UP"
+            }
+            """;
+
+        mockWebServer.enqueue(
+                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+        mockWebServer.enqueue(
+                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+
+        HttpUrl url1 = mockWebServer.url(instanceId);
+
+        ServiceInstance k8sInstance = Instancio.of(DefaultKubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), instanceId)
+                .set(Select.field("serviceId"), service)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), url1.host())
+                .set(Select.field("port"), url1.port())
+                .create();
+
+        Mockito.when(discoveryClient.getServices()).thenReturn(List.of(service));
+        Mockito.when(discoveryClient.getInstances(service)).thenReturn(List.of(k8sInstance));
+        subject.performDiscovery();
+
+        // New status -> RELOAD
+        instanceStatusModifier.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);
+
+        // when. -> Replace Instance
+        subject.performDiscovery();
+
+        // then. -> Status UP
+        assertThat(instanceRegistry.getAll()).hasSize(1).allSatisfy(instance -> {
+            assertThat(instance.id().instanceId()).isEqualTo(instanceId);
+            assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
+        });
     }
 
     @Test

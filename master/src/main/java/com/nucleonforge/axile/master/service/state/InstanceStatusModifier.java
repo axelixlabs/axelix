@@ -1,0 +1,28 @@
+package com.nucleonforge.axile.master.service.state;
+
+import org.springframework.stereotype.Service;
+
+import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
+
+/**
+ * Service for changing the status of an {@link Instance}.
+ *
+ * @author Sergey Cherkasov
+ */
+@Service
+public class InstanceStatusModifier {
+
+    private final InstanceRegistry instanceRegistry;
+
+    public InstanceStatusModifier(InstanceRegistry instanceRegistry) {
+        this.instanceRegistry = instanceRegistry;
+    }
+
+    public void modifyStatus(String instanceId, Instance.InstanceStatus instanceStatus) {
+        Instance instance = instanceRegistry.get(InstanceId.of(instanceId)).orElseThrow(InstanceNotFoundException::new);
+        Instance instanceNew = instance.copy(instanceStatus);
+        instanceRegistry.replace(instanceNew);
+    }
+}
