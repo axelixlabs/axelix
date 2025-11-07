@@ -48,7 +48,7 @@ public class InMemoryInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public void refresh(Instance instance) {
+    public void replace(Instance instance) {
         source.compute(instance.id(), (id, existing) -> instance);
     }
 

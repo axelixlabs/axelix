@@ -48,7 +48,6 @@ public record ServiceMetadata(
     public enum HealthStatus {
         UP,
         DOWN,
-        UNKNOWN,
-        RELOAD
+        UNKNOWN
     }
 }

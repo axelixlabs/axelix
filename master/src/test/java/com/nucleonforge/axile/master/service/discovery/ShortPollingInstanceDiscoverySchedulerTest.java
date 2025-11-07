@@ -28,9 +28,8 @@ import org.springframework.cloud.kubernetes.commons.discovery.DefaultKubernetesS
 
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.Instance;
-import com.nucleonforge.axile.master.model.instance.InstanceId;
-import com.nucleonforge.axile.master.service.state.InstanceModifyStatus;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
+import com.nucleonforge.axile.master.service.state.InstanceStatusModifier;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,7 +61,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     private InstancesDiscoverer instancesDiscoverer;
 
     @Autowired
-    private InstanceModifyStatus instanceModifyStatus;
+    private InstanceStatusModifier instanceStatusModifier;
 
     @MockBean
     private DiscoveryClient discoveryClient;
@@ -145,7 +144,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
-    void shouldRefreshInstancesWhenDiscovered() {
+    void shouldReplaceInstancesWhenDiscovered() {
         String service = "service-3";
         String instanceId = UUID.randomUUID().toString();
 
@@ -179,29 +178,19 @@ class ShortPollingInstanceDiscoverySchedulerTest {
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(service));
         Mockito.when(discoveryClient.getInstances(service)).thenReturn(List.of(k8sInstance));
-
-        // Not Instance -> registry Instance in Memory
         subject.performDiscovery();
 
-        // Status -> UP
-        Instance instance = instanceRegistry.get(InstanceId.of(instanceId)).orElseThrow(InstanceNotFoundException::new);
-        assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
+        // New status -> RELOAD
+        instanceStatusModifier.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);
 
-        // Modify status -> RELOAD
-        instanceModifyStatus.modifyStatus(instance.id().instanceId(), Instance.InstanceStatus.RELOAD);
-
-        // Status -> RELOAD
-        Instance instanceNewStatus =
-                instanceRegistry.get(InstanceId.of(instanceId)).orElseThrow(InstanceNotFoundException::new);
-        assertThat(instanceNewStatus.status()).isEqualTo(Instance.InstanceStatus.RELOAD);
-
-        // Refresh Instance
+        // when. -> Replace Instance
         subject.performDiscovery();
 
-        // Status -> UP
-        Instance refreshInstance =
-                instanceRegistry.get(InstanceId.of(instanceId)).orElseThrow(InstanceNotFoundException::new);
-        assertThat(refreshInstance.status()).isEqualTo(Instance.InstanceStatus.UP);
+        // then. -> Status UP
+        assertThat(instanceRegistry.getAll()).hasSize(1).allSatisfy(instance -> {
+            assertThat(instance.id().instanceId()).isEqualTo(instanceId);
+            assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
+        });
     }
 
     @Test

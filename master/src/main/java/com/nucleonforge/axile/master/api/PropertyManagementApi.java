@@ -21,7 +21,7 @@ import com.nucleonforge.axile.master.api.request.PropertyUpdatedRequest;
 import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.serde.MessageSerializationStrategy;
-import com.nucleonforge.axile.master.service.state.InstanceModifyStatus;
+import com.nucleonforge.axile.master.service.state.InstanceStatusModifier;
 import com.nucleonforge.axile.master.service.transport.PropertyManagementEndpointProber;
 
 /**
@@ -39,15 +39,15 @@ public class PropertyManagementApi {
 
     private final PropertyManagementEndpointProber propertyManagementEndpointProber;
     private final MessageSerializationStrategy messageSerializationStrategy;
-    private final InstanceModifyStatus instanceModifyStatus;
+    private final InstanceStatusModifier instanceStatusModifier;
 
     public PropertyManagementApi(
             PropertyManagementEndpointProber profileManagementEndpointProber,
             MessageSerializationStrategy messageSerializationStrategy,
-            InstanceModifyStatus instanceModifyStatus) {
+            InstanceStatusModifier instanceStatusModifier) {
         this.propertyManagementEndpointProber = profileManagementEndpointProber;
         this.messageSerializationStrategy = messageSerializationStrategy;
-        this.instanceModifyStatus = instanceModifyStatus;
+        this.instanceStatusModifier = instanceStatusModifier;
     }
 
     @Operation(
@@ -76,7 +76,7 @@ public class PropertyManagementApi {
 
         HttpPayload payload = HttpPayload.json(messageSerializationStrategy.serialize(request));
         propertyManagementEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
-        instanceModifyStatus.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);
+        instanceStatusModifier.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);
         return ResponseEntity.noContent().build();
     }
 }

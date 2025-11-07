@@ -90,7 +90,6 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
             case UP -> Instance.InstanceStatus.UP;
             case DOWN -> Instance.InstanceStatus.DOWN;
             case UNKNOWN -> Instance.InstanceStatus.UNKNOWN;
-            case RELOAD -> Instance.InstanceStatus.RELOAD;
         };
     }
 
