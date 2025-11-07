@@ -13,7 +13,7 @@ interface IProps {
 export const ConfigPropsTables = ({ effectiveConfigProps }: IProps) => {
     return (
         <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
-            <div className="AccordionsWrapper">
+            <>
                 {effectiveConfigProps.map(({ beanName, prefix, properties }) => (
                     <ModifiableTableSection
                         headerName={beanName}
@@ -33,7 +33,7 @@ export const ConfigPropsTables = ({ effectiveConfigProps }: IProps) => {
                         )}
                     </ModifiableTableSection>
                 ))}
-            </div>
+            </>
         </EmptyHandler>
     );
 };

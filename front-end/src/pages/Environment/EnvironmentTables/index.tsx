@@ -25,7 +25,7 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
 
             <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
-                <div className="AccordionsWrapper">
+                <>
                     {effectivePropertySources.map(({ name, properties }) => (
                         <ModifiableTableSection
                             headerName={name}
@@ -38,7 +38,7 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
                             key={name}
                         />
                     ))}
-                </div>
+                </>
             </EmptyHandler>
         </>
     );
