@@ -2,7 +2,6 @@ package com.nucleonforge.axile.master.service.state;
 
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +22,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @SpringBootTest
 public class InstanceModifyStatusTest {
+    private static final String activeInstanceId = UUID.randomUUID().toString();
+
     @Autowired
     private InstanceRegistry registry;
 
-    private final String activeInstanceId = UUID.randomUUID().toString();
-
+    @Autowired
     private InstanceModifyStatus modifyStatus;
-
-    @BeforeEach
-    void prepare() {
-        modifyStatus = new InstanceModifyStatus(registry);
-    }
 
     @Test
     void shouldInstanceModifyStatus() {
@@ -51,9 +46,7 @@ public class InstanceModifyStatusTest {
 
     @Test
     void shouldInstanceNotFoundException() {
-        String instanceId = UUID.randomUUID().toString();
-
-        assertThatThrownBy(() -> modifyStatus.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD))
+        assertThatThrownBy(() -> modifyStatus.modifyStatus(activeInstanceId, Instance.InstanceStatus.RELOAD))
                 .isInstanceOf(InstanceNotFoundException.class);
     }
 }
