@@ -1,4 +1,6 @@
-interface IDetailsGit {
+import type { JSX } from "react";
+
+export interface IDetailsGit {
     commitShaShort: string;
     branch: string;
     authorName: string;
@@ -13,20 +15,20 @@ export interface IDetailsRuntime {
     kotlinVersion: string;
 }
 
-interface IDetailsSpring {
+export interface IDetailsSpring {
     springBootVersion: string;
     SpringFrameworkVersion: string;
     SpringCloudVersion: string;
 }
 
-interface IDetailsBuild {
+export interface IDetailsBuild {
     artifact: string;
     version: string;
     group: string;
     time: string;
 }
 
-interface IDetailsOS {
+export interface IDetailsOS {
     name: string;
     version: string;
     arch: string;
@@ -39,4 +41,12 @@ export interface IDetailsResponseBody {
     spring: IDetailsSpring;
     build: IDetailsBuild;
     os: IDetailsOS;
+}
+
+/**
+ * Single Details Card Record
+ */
+export interface IDetailsCardRecord {
+    key: string;
+    value: string | JSX.Element;
 }

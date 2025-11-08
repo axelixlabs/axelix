@@ -12,7 +12,7 @@ import WindowsIcon from "assets/icons/windows.svg";
  *
  * @param osName operating system name
  */
-export function resolveOsIcon(osName: string) {
+export function resolveOsIcon(osName: string): string {
     switch (osName.trim().toLowerCase()) {
         case "windows":
             return WindowsIcon;
@@ -23,10 +23,9 @@ export function resolveOsIcon(osName: string) {
     }
 }
 
-export function isCopyableField(field: string) {
-    const b = (Object.values(ECopyableField) as string[]).includes(field);
-    console.log("isCopyableField", b);
-    return b;
+export function isCopyableField(field: string): boolean {
+    const isCopyable = (Object.values(ECopyableField) as string[]).includes(field);
+    return isCopyable;
 }
 
 /**
@@ -34,6 +33,6 @@ export function isCopyableField(field: string) {
  *
  * @param runtime the runtime information
  */
-export function resolveLangIcon(runtime: IDetailsRuntime) {
+export function resolveLangIcon(runtime: IDetailsRuntime): string {
     return runtime.kotlinVersion ? KotlinIcon : JavaIcon;
 }
