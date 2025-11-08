@@ -31,8 +31,10 @@ public class ConfigpropsFeedConverterTest {
                 new ConfigpropsFeed.Context(beansMapContext2(), "parentId"))));
 
         // bean1
-        ConfigpropsProfile beanProfile1 = getBeanByName(configpropsFeedResponse, "bean1");
-        assertThat(beanProfile1.beanName()).isEqualTo("bean1");
+        ConfigpropsProfile beanProfile1 = getBeanByName(
+                configpropsFeedResponse, "org.springframework.boot.autoconfigure.transaction.TransactionProperties");
+        assertThat(beanProfile1.beanName())
+                .isEqualTo("org.springframework.boot.autoconfigure.transaction.TransactionProperties");
 
         // bean1 -> prefix
         assertThat(beanProfile1.prefix()).isEqualTo("management.endpoints.web.cors");
@@ -86,8 +88,11 @@ public class ConfigpropsFeedConverterTest {
                         new KeyValue("exposure.exclude", null));
 
         // bean3
-        ConfigpropsProfile beanProfile3 = getBeanByName(configpropsFeedResponse, "bean3");
-        assertThat(beanProfile3.beanName()).isEqualTo("bean3");
+        ConfigpropsProfile beanProfile3 = getBeanByName(
+                configpropsFeedResponse,
+                "org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties");
+        assertThat(beanProfile3.beanName())
+                .isEqualTo("org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties");
 
         // application2 -> bean3 -> prefix
         assertThat(beanProfile3.prefix()).isEqualTo("spring.jackson");
@@ -159,8 +164,11 @@ public class ConfigpropsFeedConverterTest {
 
         // return
         return Map.of(
-                "bean1",
+                // bean 1
+                "spring.transaction-org.springframework.boot.autoconfigure.transaction.TransactionProperties",
                 new ConfigpropsFeed.Bean("management.endpoints.web.cors", bean1Properties, bean1Inputs),
+
+                // bean 2
                 "bean2",
                 new ConfigpropsFeed.Bean("management.endpoints.web", bean2Properties, bean2Inputs));
     }
@@ -173,6 +181,9 @@ public class ConfigpropsFeedConverterTest {
                 "serialization2", Map.of("INDENT_OUTPUT", Map.of("value", "true", "origin", Map.of())),
                 "defaultPropertyInclusion2", Map.of("value", "non_null", "origin", Map.of()));
 
-        return Map.of("bean3", new ConfigpropsFeed.Bean("spring.jackson", properties, inputs));
+        // bean 3
+        return Map.of(
+                "management.observations-org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties",
+                new ConfigpropsFeed.Bean("spring.jackson", properties, inputs));
     }
 }

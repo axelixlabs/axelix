@@ -31,7 +31,7 @@ public class ConfigpropsByPrefixConverterTest {
                 new ConfigpropsFeed.Context(beansMapContext2(), "parentId"))));
 
         // beans
-        String beanName = "spring.jackson-org.springframework.boot.autoconfigure.jackson.JacksonProperties";
+        String beanName = "org.springframework.boot.autoconfigure.jackson.JacksonProperties";
         List<ConfigpropsProfile> beans = response.beans().stream()
                 .filter(b -> b.beanName().equals(beanName))
                 .sorted(Comparator.comparingInt(b -> b.properties().size()))

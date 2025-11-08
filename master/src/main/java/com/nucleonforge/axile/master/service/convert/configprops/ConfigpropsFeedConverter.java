@@ -16,6 +16,7 @@ import com.nucleonforge.axile.master.service.convert.Converter;
  */
 @Service
 public class ConfigpropsFeedConverter extends AbstractConfigpropsConverter<ConfigpropsFeedResponse> {
+
     @Override
     protected ConfigpropsFeedResponse convertBeans(List<ConfigpropsProfile> beans) {
         ConfigpropsFeedResponse response = new ConfigpropsFeedResponse();

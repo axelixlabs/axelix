@@ -46,7 +46,7 @@ public class ConfigpropsApiFeedTest {
             {
           "beans": [
             {
-              "beanName": "management.endpoints.web.cors-org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
+              "beanName": "org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
               "prefix": "management.endpoints.web.cors",
               "properties": [
                 { "key": "allowedOrigins", "value": null },
@@ -66,7 +66,7 @@ public class ConfigpropsApiFeedTest {
               ]
             },
             {
-              "beanName": "management.endpoints.web.cors-org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
+              "beanName": "org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
               "prefix": "management.endpoints.web.cors",
               "properties": [
                 { "key": "allowedOrigins", "value": null },
@@ -86,7 +86,7 @@ public class ConfigpropsApiFeedTest {
               ]
             },
             {
-              "beanName": "management.endpoints.web-org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties",
+              "beanName": "org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties",
               "prefix": "management.endpoints.web",
               "properties": [
                 { "key": "pathMapping", "value": null },
@@ -105,7 +105,7 @@ public class ConfigpropsApiFeedTest {
               ]
             },
             {
-              "beanName": "spring.web-org.springframework.boot.autoconfigure.web.WebProperties",
+              "beanName": "org.springframework.boot.autoconfigure.web.WebProperties",
               "prefix": "spring.web",
               "properties": [
                 { "key": "localeResolver", "value": "ACCEPT_HEADER" },

@@ -48,7 +48,7 @@ public class ConfigpropsApiByPrefixTest {
         {
           "beans": [
             {
-              "beanName": "spring.jackson-org.springframework.boot.autoconfigure.jackson.JacksonProperties",
+              "beanName": "org.springframework.boot.autoconfigure.jackson.JacksonProperties",
               "prefix": "spring.jackson",
               "properties": [
                 { "key": "serialization.INDENT_OUTPUT", "value": "true" },
@@ -81,7 +81,7 @@ public class ConfigpropsApiByPrefixTest {
         {
           "beans": [
             {
-              "beanName": "spring.web-org.springframework.boot.autoconfigure.web.WebProperties",
+              "beanName": "org.springframework.boot.autoconfigure.web.WebProperties",
               "prefix": "spring.web",
               "properties": [
                 { "key": "serialization.INDENT_OUTPUT", "value": "true" },
@@ -105,7 +105,7 @@ public class ConfigpropsApiByPrefixTest {
               ]
             },
             {
-              "beanName": "spring.web-org.springframework.boot.autoconfigure.web.WebProperties",
+              "beanName": "org.springframework.boot.autoconfigure.web.WebProperties",
               "prefix": "spring.web",
               "properties": [
                 { "key": "serialization.INDENT_OUTPUT", "value": "true" },
