@@ -34,3 +34,11 @@ export const getPropertiesCount = <T extends IEnvironmentPropertySource | IConfi
 ): number => {
     return propertySourcesList.reduce((result, { properties }) => result + properties.length, 0);
 };
+
+/**
+ * The "canonicalization" is the process of normalizing the name of the given object
+ * to adhere to {@link https://github.com/spring-projects/spring-boot/wiki/relaxed-binding-2.0 relaxed binding rules of the properties in Spring Boot}.
+ */
+export const canonicalize = (string: string): string => {
+    return string.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+};
