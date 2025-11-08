@@ -11,9 +11,9 @@ export const filterPropertySources = (
     return propertySources.reduce<IEnvironmentPropertySource[]>((result, propertySource) => {
         const { name, properties } = propertySource;
 
-        const sourceNameCanonical = canonicalize(name);
+        const isNameMatch = name.includes(search.trim());
 
-        if (sourceNameCanonical.includes(formattedSearch)) {
+        if (isNameMatch) {
             result.push(propertySource);
             return result;
         }

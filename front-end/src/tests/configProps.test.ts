@@ -19,7 +19,7 @@ describe("Filter configProps", () => {
                     value: "jackson",
                 },
                 {
-                    key: "generateDdl.",
+                    key: "generateDdl",
                     value: "true",
                 },
             ],
@@ -32,26 +32,62 @@ describe("Filter configProps", () => {
     });
 
     it("A match by the configProps beanName (partially entered) - returns the original configProps bean object", () => {
-        const result = filterConfigPropsBeans(beans, "!!!jpa.or__m.{{}}jpa.       ");
+        const result = filterConfigPropsBeans(beans, "       jpa.orm.jpa.         ");
         expect(result).toHaveLength(1);
         const findedConfigBean = result[0];
         expect(findedConfigBean).toBe(beans[1]);
     });
 
-    it("A match by the configProps prefix (partially entered) - returns the original configProps bean object", () => {
+    it("A match by the configProps prefix (partially entered)", () => {
         const result = filterConfigPropsBeans(beans, "openInView.---       ");
         expect(result).toHaveLength(1);
         const findedConfigBean = result[0];
-        expect(findedConfigBean).toBe(beans[1]);
+        expect(findedConfigBean).toEqual({
+            beanName: "jpa.orm.jpa.JpaProperties",
+            prefix: "openInView.showSql",
+            properties: [
+                {
+                    key: "oi",
+                    value: "jackson",
+                },
+                {
+                    key: "generateDdl",
+                    value: "true",
+                },
+            ],
+        });
     });
 
-    it("Match by property key (partially entered) - returns the configProps bean with filtered properties", () => {
-        const result = filterConfigPropsBeans(beans, "       !!!oi!!!   ");
+    it("A match by the configProps prefix + property key (partially entered)", () => {
+        const result = filterConfigPropsBeans(beans, "openInView.--------showSql.!!!!!!!!!!!!!!generate       ");
         expect(result).toHaveLength(1);
         const findedConfigBean = result[0];
-        expect(findedConfigBean.beanName).toBe(beans[1].beanName);
-        expect(findedConfigBean.prefix).toBe(beans[1].prefix);
-        expect(findedConfigBean.properties).toEqual([{ key: "oi", value: "jackson" }]);
+        expect(findedConfigBean).toEqual({
+            beanName: "jpa.orm.jpa.JpaProperties",
+            prefix: "openInView.showSql",
+            properties: [
+                {
+                    key: "generateDdl",
+                    value: "true",
+                },
+            ],
+        });
+    });
+
+    it("A match by the configProps property key (partially entered)", () => {
+        const result = filterConfigPropsBeans(beans, "!!!!!!!!!!!!!!generate       ");
+        expect(result).toHaveLength(1);
+        const findedConfigBean = result[0];
+        expect(findedConfigBean).toEqual({
+            beanName: "jpa.orm.jpa.JpaProperties",
+            prefix: "openInView.showSql",
+            properties: [
+                {
+                    key: "generateDdl",
+                    value: "true",
+                },
+            ],
+        });
     });
 
     it("If nothing is found, returns an empty array", () => {
