@@ -3,7 +3,8 @@
     flex-direction: column;
     justify-content: space-between;
     border-radius: var(--axile-border-radius-large);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    box-shadow: 4px 4px 10px 0px #00000040;
+
 }
 
 .Card:hover {
