@@ -8,15 +8,16 @@ export const filterConfigPropsBeans = (beans: IConfigPropsBean[], search: string
     return beans.reduce<IConfigPropsBean[]>((result, bean) => {
         const { beanName, prefix, properties } = bean;
 
-        const isBeanNameMatch = canonicalize(beanName).includes(formattedSearch);
-        const isPrefixMatch = canonicalize(prefix).includes(formattedSearch);
+        const isBeanNameMatch = beanName.includes(search.trim());
 
-        if (isBeanNameMatch || isPrefixMatch) {
+        if (isBeanNameMatch) {
             result.push(bean);
             return result;
         }
 
-        const filteredProperties = properties.filter(({ key }) => canonicalize(key).includes(formattedSearch));
+        const filteredProperties = properties.filter(({ key }) => {
+            return `${canonicalize(prefix)}${canonicalize(key)}`.includes(formattedSearch);
+        });
 
         if (filteredProperties.length) {
             result.push({

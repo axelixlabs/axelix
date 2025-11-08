@@ -32,7 +32,7 @@ describe("Filter propertySources", () => {
     });
 
     it("A match by the propertySource name (partially entered) - returns the original propertySource object", () => {
-        const result = filterPropertySources(propertySources, "AxIlE_PROPERTY...SOURCE!!!NA");
+        const result = filterPropertySources(propertySources, "            AXILE_PROPERTY_SOURCE_           ");
         expect(result).toHaveLength(1);
         expect(result[0]).toBe(propertySources[1]);
     });
