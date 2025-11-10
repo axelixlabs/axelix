@@ -92,7 +92,8 @@
         "unknownProxyingType": "Незивестно",
         "cglibProxy": "CGLIB",
         "jdkProxy": "JDK Динамический Прокси",
-        "noProxy": "Не проксирован"
+        "noProxy": "Не проксирован",
+        "beanSource": "Источник бина"
     },
     "ScheduledTasks": {
         "runnable": "Метод",

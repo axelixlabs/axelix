@@ -92,7 +92,8 @@
         "unknownProxyingType": "Unknown",
         "cglibProxy": "CGLIB",
         "jdkProxy": "JDK Dynamic Proxy",
-        "noProxy": "No Proxying"
+        "noProxy": "No Proxying",
+        "beanSource": "Bean Source"
     },
     "ScheduledTasks": {
         "runnable": "Runnable",
