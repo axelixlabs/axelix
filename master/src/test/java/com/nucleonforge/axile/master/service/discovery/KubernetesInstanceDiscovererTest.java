@@ -46,19 +46,13 @@ class KubernetesInstanceDiscovererTest {
     @MockBean
     private DiscoveryClient discoveryClient;
 
-    private String host;
-
-    private int port;
-
     private URI uri;
 
     @BeforeEach
     void startServer() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        host = mockWebServer.getHostName();
-        port = mockWebServer.getPort();
-        uri = URI.create("http://" + host + ":" + port);
+        uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
     }
 
     @AfterEach
@@ -102,9 +96,8 @@ class KubernetesInstanceDiscovererTest {
         ServiceInstance serviceInstance = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), activeInstanceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), host)
-                .set(Select.field("port"), port)
-                .set(Select.field("uri"), uri)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(activeInstanceId));
@@ -172,9 +165,8 @@ class KubernetesInstanceDiscovererTest {
             .set(Select.field("instanceId"), firstServiceInstanceBadVersionId)
             .set(Select.field("serviceId"), firstServiceId)
             .set(Select.field("secure"), false)
-            .set(Select.field("host"), host)
-            .set(Select.field("port"), port)
-            .set(Select.field("uri"), uri)
+            .set(Select.field("host"), uri.getHost())
+            .set(Select.field("port"), uri.getPort())
             .create();
 
         // secondService -> good application version instance
@@ -183,9 +175,8 @@ class KubernetesInstanceDiscovererTest {
             .set(Select.field("instanceId"), secondServiceInstanceGoodVersionId)
             .set(Select.field("serviceId"), secondServiceId)
             .set(Select.field("secure"), false)
-            .set(Select.field("host"), host)
-            .set(Select.field("port"), port)
-            .set(Select.field("uri"), uri)
+            .set(Select.field("host"), uri.getHost())
+            .set(Select.field("port"), uri.getPort())
             .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(firstServiceId, secondServiceId));
@@ -287,18 +278,16 @@ class KubernetesInstanceDiscovererTest {
                 .set(Select.field("instanceId"), healthyInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), host)
-                .set(Select.field("port"), port)
-                .set(Select.field("uri"), uri)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
         ServiceInstance timeoutK8sPod = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), timeoutInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), host)
-                .set(Select.field("port"), port)
-                .set(Select.field("uri"), uri)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
@@ -335,20 +324,18 @@ class KubernetesInstanceDiscovererTest {
                 .set(Select.field("instanceId"), healthyK8SInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), host)
-                .set(Select.field("port"), port)
-                .set(Select.field("uri"), uri)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
         ServiceInstance connectionRefusedPod = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), connectionRefusedInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), host)
+                .set(Select.field("host"), uri.getHost())
                 // the assumption is that ports under 1024 cannot be allocated by mockwebserver (require root
                 // privileges)
                 .set(Select.field("port"), 10)
-                .set(Select.field("uri"), uri)
                 .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));

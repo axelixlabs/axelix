@@ -58,14 +58,13 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     @MockBean
     private DiscoveryClient discoveryClient;
 
-    private String host;
-
-    private int port;
-
     private URI uri;
 
     @BeforeEach
     void setUp() throws IOException {
+        if (mockWebServer != null) {
+            mockWebServer.close();
+        }
         mockWebServer = new MockWebServer();
         mockWebServer.start();
         instanceRegistry.getAll().forEach(instance -> {
@@ -74,9 +73,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             } catch (InstanceNotFoundException ignored) {
             }
         });
-        host = mockWebServer.getHostName();
-        port = mockWebServer.getPort();
-        uri = URI.create("http://" + host + ":" + port);
+        uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
     }
 
     @AfterEach
@@ -113,18 +110,16 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 .set(Select.field("instanceId"), instance1Id)
                 .set(Select.field("serviceId"), service1)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), host)
-                .set(Select.field("port"), port)
-                .set(Select.field("uri"), uri)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
         ServiceInstance k8sInstance2 = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instance2Id)
                 .set(Select.field("serviceId"), service2)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), host)
-                .set(Select.field("port"), port)
-                .set(Select.field("uri"), uri)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(service1, service2));
@@ -183,9 +178,8 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 .set(Select.field("instanceId"), instanceId)
                 .set(Select.field("serviceId"), service)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), host)
-                .set(Select.field("port"), port)
-                .set(Select.field("uri"), uri)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(service));
@@ -241,9 +235,8 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 .set(Select.field("instanceId"), instanceId)
                 .set(Select.field("serviceId"), serviceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), host)
-                .set(Select.field("port"), port)
-                .set(Select.field("uri"), uri)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
         Mockito.when(discoveryClient.getServices())

@@ -1,8 +1,6 @@
 package com.nucleonforge.axile.master.service.discovery;
 
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,9 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.validation.constraints.NotNull;
-
+import com.nucleonforge.axile.master.utils.CollectionUtils;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
@@ -20,6 +16,7 @@ import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,33 +33,15 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
  */
 public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
 
-    private static final Logger log = LoggerFactory.getLogger(KubernetesInstanceDiscoverer.class);
+    private static final Logger log = LoggerFactory.getLogger(AxileKubernetesDiscoveryClient.class);
 
     private final KubernetesClient kubernetesClient;
+    private final Set<String> namespaces;
 
-    @Value("${spring.cloud.kubernetes.discovery.namespaces:}")
-    private List<String> namespaces = new ArrayList<>();
-
-    public AxileKubernetesDiscoveryClient(KubernetesClient kubernetesClient) {
+    // TODO: We need to work here with the dedicated configuration properties, not just injecting @Value and stuff
+    public AxileKubernetesDiscoveryClient(KubernetesClient kubernetesClient, Set<String> namespaces) {
+        this.namespaces = CollectionUtils.defaultIfEmpty(namespaces, kubernetesClient.getNamespace());
         this.kubernetesClient = kubernetesClient;
-    }
-
-    @PostConstruct
-    public void init() {
-        if (namespaces == null || namespaces.isEmpty()) {
-            String currentNamespace = kubernetesClient.getNamespace();
-
-            if (currentNamespace == null || currentNamespace.trim().isEmpty()) {
-                throw new IllegalStateException(
-                        "Unable to determine current Kubernetes namespace. "
-                                + "Either configure 'spring.cloud.kubernetes.discovery.namespaces' or run inside a Pod with serviceaccount.");
-            }
-
-            namespaces = Collections.singletonList(currentNamespace);
-            log.info("DiscoveryClient using current namespace: {}", currentNamespace);
-        } else {
-            log.info("DiscoveryClient using configured namespaces: {}", namespaces);
-        }
     }
 
     @Override
@@ -97,6 +76,8 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
         Set<String> serviceNames = new HashSet<>();
 
         for (String namespace : namespaces) {
+
+            // TODO: Can we query multiple namespaces at one time?
             ServiceList serviceList =
                     kubernetesClient.services().inNamespace(namespace).list();
 
@@ -113,6 +94,9 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
 
     @Nullable
     private Service getService(String namespace, String serviceId) {
+
+        // Yeah, that sucks, but we have to query all services and filter in memory since K8S API
+        // does not allow to query by the resource UID for some reason.
         return kubernetesClient.services().inNamespace(namespace).list().getItems().stream()
                 .filter(service ->
                         serviceId.equalsIgnoreCase(service.getMetadata().getUid()))
@@ -137,15 +121,29 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
                 .getItems();
     }
 
+    /**
+     * Important: new {@link ServiceInstance} is created for every single {@link ServicePort}. The assumption is that
+     * the client, that requested the API would filter out those services that are actually important.
+     */
     private List<ServiceInstance> buildInstances(
             String serviceId, String namespace, List<Pod> pods, List<ServicePort> ports) {
 
         return pods.stream()
                 .filter(this::hasValidPodInfo)
                 .flatMap(pod -> ports.stream()
-                        .map(port -> createServiceInstance(serviceId, namespace, pod, port))
+                        .map(port -> tryToCreateServiceInstance(serviceId, namespace, pod, port))
                         .filter(Objects::nonNull))
                 .toList();
+    }
+
+    @Nullable
+    private ServiceInstance tryToCreateServiceInstance(String serviceId, String namespace, Pod pod, ServicePort port) {
+        try {
+            return createServiceInstance(serviceId, namespace, pod, port);
+        } catch (IllegalArgumentException e) {
+            log.warn(e.getMessage());
+            return null;
+        }
     }
 
     private boolean hasValidPodInfo(Pod pod) {
@@ -155,15 +153,10 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
                 && !pod.getStatus().getPodIP().isBlank();
     }
 
-    @Nullable
-    private ServiceInstance createServiceInstance(String serviceId, String namespace, Pod pod, ServicePort port) {
+    private ServiceInstance createServiceInstance(String serviceId, String namespace, Pod pod, ServicePort port)
+        throws IllegalArgumentException {
 
-        boolean secure = "https".equalsIgnoreCase(port.getName());
-
-        URI uri = createUri(pod.getStatus().getPodIP(), port, secure);
-        if (uri == null) {
-            return null;
-        }
+        validateServicePort(serviceId, port);
 
         Map<String, String> metadata = Map.of(
                 "namespace", namespace,
@@ -175,21 +168,21 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
                 serviceId,
                 pod.getMetadata().getName(),
                 pod.getStatus().getPodIP(),
-                port.getPort(),
-                secure,
-                uri,
+                port.getTargetPort().getIntVal(),
+                "https".equalsIgnoreCase(port.getName()),
                 metadata,
                 pod.getMetadata().getCreationTimestamp());
     }
 
-    @Nullable
-    private URI createUri(String host, ServicePort sp, boolean cesure) {
-        try {
-            String protocol = cesure ? "https" : "http";
-            return URI.create(protocol + "://" + host + ":" + sp.getPort());
-        } catch (IllegalArgumentException e) {
-            log.warn("Invalid URI for pod IP '{}' and port '{}': {}", host, sp.getPort(), e.getMessage());
-            return null;
+    private void validateServicePort(String serviceId, ServicePort servicePort) {
+        Integer targetPort = servicePort.getTargetPort().getIntVal();
+
+        if (targetPort == null) {
+            throw new IllegalArgumentException("""
+                As of now, we do not support named K8S ports. \s
+                The targetPort of the K8S '%s' is supposed to be an integer, \s
+                but it is not. So, as of now, the service will not get registered. \s
+                """.formatted(serviceId));
         }
     }
 }
