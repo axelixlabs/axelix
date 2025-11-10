@@ -1,0 +1,16 @@
+components:
+  schemas:
+    DistributionResponse:
+      description: Response that contains the summary of used versions for the
+                    <strong>single software component</strong> used in the ecosystem.
+      type: object
+      properties:
+        softwareComponentName:
+          description: The name of the software component used in the ecosystem.
+          type: string
+        versions:
+          description: Map of version numbers to their occurrence counts.
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64

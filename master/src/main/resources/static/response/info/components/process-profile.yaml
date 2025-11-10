@@ -1,0 +1,125 @@
+components:
+  schemas:
+    ProcessProfile:
+      description: The profile of a given process.
+      type: object
+      properties:
+        pid:
+          description: The ID of the process.
+          type: integer
+          format: int64
+        parentPid:
+          description: The ID of the parent process.
+          type: integer
+          format: int64
+        owner:
+          description: The owner of the process.
+          type: string
+        memory:
+          description: The Memory information of the process, if available (present since version 3.4.9).
+          $ref: '#/components/schemas/Memory'
+          nullable: true
+        virtualThreads:
+          description: The virtual thread information of the process (if VirtualThreadSchedulerMXBean is available, present since version 3.5.5).
+          $ref: '#/components/schemas/VirtualThreads'
+          nullable: true
+        cpus:
+          description: The number of CPUs available to the process.
+          type: integer
+          format: int32
+          nullable: true
+
+    Memory:
+      description: The profile of a given memory.
+      type: object
+      properties:
+        heap:
+          description: The heap of the memory.
+          $ref: '#/components/schemas/Heap'
+          nullable: true
+        nonHeap:
+          description: The non-heap of the memory.
+          $ref: '#/components/schemas/NonHeap'
+          nullable: true
+        garbageCollectors:
+          description: The details of the garbage collectors.
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/GarbageCollectors'
+          nullable: true
+
+    Heap:
+      description: The profile of a given heap.
+      type: object
+      properties:
+        max:
+          description: The maximum number of bytes that can be used by the JVM (or -1).
+          type: integer
+          format: int64
+        used:
+          description: The number of bytes currently being used.
+          type: integer
+          format: int64
+        committed:
+          description: The number of bytes committed for JVM use.
+          type: integer
+          format: int64
+        init:
+          description: The number of bytes initially requested by the JVM.
+          type: integer
+          format: int64
+
+    NonHeap:
+      description: The profile of a given non-heap.
+      type: object
+      properties:
+        max:
+          description: The maximum number of bytes that can be used by the JVM (or -1).
+          type: integer
+          format: int64
+        used:
+          description: The number of bytes currently being used.
+          type: integer
+          format: int64
+        committed:
+          description: The number of bytes committed for JVM use.
+          type: integer
+          format: int64
+        init:
+          description: The number of bytes initially requested by the JVM.
+          type: integer
+          format: int64
+
+    GarbageCollectors:
+      description: The profile of a given garbage collector.
+      type: object
+      properties:
+        name:
+          description: The name of the garbage collector.
+          type: string
+        collectionCount:
+          description: The total number of collections that have occurred.
+          type: integer
+          format: int32
+
+    VirtualThreads:
+      description: The profile of a given virtual thread.
+      type: object
+      properties:
+        mounted:
+          description: The estimate of the number of virtual threads currently mounted by the scheduler.
+          type: integer
+          format: int64
+        queued:
+          description: The estimate of the number of virtual threads queued to the scheduler to start or continue execution.
+          type: integer
+          format: int64
+        parallelism:
+          description: The scheduler’s target parallelism.
+          type: integer
+          format: int64
+        poolSize:
+          description: The current number of platform threads that the scheduler has started but have not terminated.
+          type: integer
+          format: int64

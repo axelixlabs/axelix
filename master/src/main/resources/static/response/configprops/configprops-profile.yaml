@@ -1,0 +1,22 @@
+components:
+  schemas:
+    ConfigpropsProfile:
+      description: The profile of a given @ConfigurationProperties bean.
+      type: object
+      properties:
+        beanName:
+          description: The name of the bean.
+          type: string
+        prefix:
+          description: The prefix applied to the names of the bean properties.
+          type: string
+        properties:
+          description: The properties of the bean as name-value pairs.
+          type: array
+          items:
+            $ref: '../key-value.yaml#/components/schemas/KeyValue'
+        inputs:
+          description: The origin of each configuration parameter — which value was applied and from which source — to configure a specific property.
+          type: array
+          items:
+            $ref: '../key-value.yaml#/components/schemas/KeyValue'

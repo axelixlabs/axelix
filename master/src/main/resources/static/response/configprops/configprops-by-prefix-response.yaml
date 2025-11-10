@@ -1,0 +1,14 @@
+components:
+  schemas:
+    ConfigpropsByPrefixResponse:
+      description: The @ConfigurationProperties beans used in the application that have given prefix.
+      type: object
+      properties:
+        beans:
+          description: The unified list of beans that have the given prefix.
+                        (It is possible that we may have N @ConfigurationProperties beans with the same
+                        prefix, but in different application contexts. That is why we have the List here,
+                        and not a singe ConfigpropsProfile.)
+          type: array
+          items:
+            $ref: 'configprops-profile.yaml#/components/schemas/ConfigpropsProfile'

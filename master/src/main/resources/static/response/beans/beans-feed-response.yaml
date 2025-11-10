@@ -1,0 +1,11 @@
+components:
+  schemas:
+    BeansFeedResponse:
+      description: The feed of the beans used in the application.
+      type: object
+      properties:
+        beans:
+          description: The list of short profiles for beans.
+          type: array
+          items:
+            $ref: 'bean-short-profile.yaml#/components/schemas/BeanShortProfile'

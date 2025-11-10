@@ -1,0 +1,10 @@
+components:
+  schemas:
+    KeyValue:
+      description: Represents an abstract key-value pair.
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string

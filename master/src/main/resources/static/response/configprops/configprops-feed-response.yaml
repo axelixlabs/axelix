@@ -1,0 +1,11 @@
+components:
+  schemas:
+    ConfigpropsFeedResponse:
+      description: The feed of @ConfigurationProperties beans used in the application.
+      type: object
+      properties:
+        beans:
+          description: The unified list of beans that contains beans from one or more contexts.
+          type: array
+          items:
+            $ref: 'configprops-profile.yaml#/components/schemas/ConfigpropsProfile'

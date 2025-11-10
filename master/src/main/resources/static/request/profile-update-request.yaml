@@ -1,0 +1,14 @@
+components:
+  schemas:
+    ProfileUpdatedRequest:
+      description: Represents a request to update the currently active Spring profiles in a specific application instance.
+      type: object
+      properties:
+        effectiveProfiles:
+          type: array
+          description: Array of effective profiles. To remove all active profiles in instance, the array must be empty
+          items:
+            type: string
+            example: '["profile1","profile2"]'
+      required:
+        - effectiveProfiles

@@ -1,0 +1,15 @@
+components:
+  schemas:
+    GroupProfileResponse:
+      description: The profile of a group with its loggers.
+      type: object
+      properties:
+        configuredLevel:
+          description: The configured level of the logger group, if any.
+          type: string
+          nullable: true
+        members:
+          description: The loggers that are part of this group.
+          type: array
+          items:
+            type: string

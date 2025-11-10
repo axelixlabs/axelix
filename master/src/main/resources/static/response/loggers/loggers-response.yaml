@@ -1,0 +1,53 @@
+components:
+  schemas:
+    LoggersResponse:
+      description: The profile of the logging system.
+      type: object
+      properties:
+        levels:
+          description: The levels supported by the current logging system.
+          type: array
+          items:
+            type: string
+        groups:
+          description: The logger groups keyed by name.
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        loggers:
+          description: The loggers keyed by name.
+          type: array
+          items:
+            $ref: '#/components/schemas/Logger'
+
+    Group:
+      description: The profile of a group with its loggers.
+      type: object
+      properties:
+        name:
+          description: The name of the logger group.
+          type: string
+        configuredLevel:
+          description: The configured level of the logger group, if any.
+          type: string
+          nullable: true
+        members:
+          description: The loggers that are part of this group.
+          type: array
+          items:
+            type: string
+
+    Logger:
+      description: Profile of the active logger.
+      type: object
+      properties:
+        name:
+          description: The name of the logger.
+          type: string
+        configuredLevel:
+          description: The configured logger level, if any.
+          type: string
+          nullable: true
+        effectiveLevel:
+          description: The logger's current level.
+          type: string

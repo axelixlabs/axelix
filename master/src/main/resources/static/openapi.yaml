@@ -1,0 +1,745 @@
+openapi: 3.0.1
+info:
+  title: Nucleon Forge Axile
+  version: 1.0.0
+servers:
+  - url: http://158.160.200.59/api/axile
+
+tags:
+  - name: Wallboard API
+    description: The endpoints related to wallboard grid rendering.
+
+  - name: API for working with Users
+
+  - name: Beans API
+    description: The beans endpoint provides information about the application’s beans.
+
+  - name: General instance information API
+    description: The info endpoint provides general information about the particular Spring Boot instance.
+
+  - name: Conditions API
+    description: The conditions endpoint provides information about the application's auto-configuration conditions evaluation.
+
+  - name: Configprops API
+    description: The configprops endpoint provides information about the application’s @ConfigurationProperties beans.
+
+  - name: Environment API
+    description: The env endpoint provides information about the application’s Environment.
+
+  - name: Caches API
+    description: The caches endpoint provides access to the application’s caches.
+
+  - name: ScheduledTasks API
+    description: The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
+
+  - name: Property Management API
+    description: Provides operations for managing Spring properties of application instances.
+
+  - name: Profile Management API
+    description: Provides operations for managing Spring profiles of application instances.
+
+  - name: Loggers API
+    description: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+
+  - name: Software API
+
+
+paths:
+# name: Wallboard API -> GET
+# desc: The endpoints related to wallboard grid rendering.
+  /applications/grid:
+    get:
+      tags:
+        - Wallboard API
+      summary: Returns all instances that are managed by this Axile deployment
+      operationId: getInstancesGrid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/instances-grid-response.yaml#/components/schemas/InstancesGridResponse'
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: API for working with Users -> POST
+  /users/login:
+    post:
+      x-controller: User
+      tags:
+        - API for working with Users
+      summary: Log-in by the username/password combination
+      operationId: login
+      parameters:
+        - name: loginRequest
+          in: query
+          description: Request for login
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/login-request.yaml#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Authorization:
+              description: The JWT token that should be subsequently used for auth purposes
+              required: true
+              style: simple
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                type: object
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '401':
+          $ref: "error/error.yaml#/components/responses/Unauthorized"
+        '403':
+          $ref: "error/error.yaml#/components/responses/Forbidden"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Beans API -> GET
+# desc: The beans endpoint provides information about the application’s beans.
+  /beans/feed/{instanceId}:
+    get:
+      tags:
+        - Beans API
+      summary: Returns beans feed for the given instance
+      operationId: getBeansProfile
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/beans/beans-feed-response.yaml#/components/schemas/BeansFeedResponse'
+          links:
+            Actuator/Beans:
+              description: 'https://docs.spring.io/spring-boot/api/rest/actuator/beans.html'
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: General instance information API -> GET
+# desc: The info endpoint provides general information about the particular Spring Boot instance.
+  /info/{instanceId}:
+    get:
+      tags:
+        - General instance information API
+      summary: Returns general information about the instance.
+      operationId: getInfoResponse
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/info/info-response.yaml#/components/schemas/InfoResponse'
+          links:
+            Actuator/Info:
+              description: 'https://docs.spring.io/spring-boot/api/rest/actuator/info.html'
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Conditions API -> GET
+# desc: The conditions endpoint provides information about the application's auto-configuration conditions evaluation.
+  /conditions/feed/{instanceId}:
+    get:
+      tags:
+        - Conditions API
+      summary: Returns conditions feed for the given instance
+      operationId: getBeansProfile
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/conditions-feed-response.yaml#/components/schemas/ConditionsFeedResponse'
+          links:
+            Actuator/Conditions:
+              description: 'https://docs.spring.io/spring-boot/api/rest/actuator/conditions.html'
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Configprops API  -> GET
+# desc: The configprops endpoint provides information about the application’s @ConfigurationProperties beans.
+  /configprops/feed/{instanceId}:
+    get:
+      tags:
+        - Configprops API
+      summary: Returns all @ConfigurationProperties beans of the application.
+      operationId: getBeansFeedProfile
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/configprops/configprops-feed-response.yaml#/components/schemas/ConfigpropsFeedResponse'
+          links:
+            Actuator/Configuration Properties:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/configprops.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Configprops API  -> GET
+# desc: The configprops endpoint provides information about the application’s @ConfigurationProperties beans.
+  /configprops/{instanceId}/beans/{prefix}:
+    get:
+      tags:
+        - Configprops API
+      summary: Returns the @ConfigurationProperties beans of a given instance with given prefix
+      operationId: getBeanByPrefixProfile
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: prefix
+          in: path
+          description: The prefix of @ConfigurationProperties beans to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/configprops/configprops-by-prefix-response.yaml#/components/schemas/ConfigpropsByPrefixResponse'
+          links:
+            Actuator/Configuration Properties:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/configprops.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Environment API -> GET
+# desc: The env endpoint provides information about the application’s Environment.
+  /env/feed/{instanceId}:
+    get:
+      tags:
+        - Environment API
+      summary: Returns information about the application’s Environment.
+      operationId: getEnvironment
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/environment/environment-feed-response.yaml#/components/schemas/EnvironmentFeedResponse'
+          links:
+            Spring Boot / Actuator / Environment (env):
+              description: 'https://docs.spring.io/spring-boot/api/rest/actuator/env.html'
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Environment API -> GET
+# desc: The env endpoint provides information about the application’s Environment.
+  /env/{instanceId}/property/{propertyName}:
+    get:
+      tags:
+        - Environment API
+      summary: Returns a specific property of an instance
+      operationId: getProperty
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: propertyName
+          in: path
+          description: Name of the environment property
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/environment/environment-property-response.yaml#/components/schemas/EnvironmentPropertyResponse'
+          links:
+            Actuator/Environment(env):
+              description: 'https://docs.spring.io/spring-boot/api/rest/actuator/env.html'
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Caches API -> GET
+# desc: The caches endpoint provides access to the application’s caches.
+  /caches/{instanceId}:
+    get:
+      tags:
+        - Caches API
+      summary: Returns details of the application's caches.
+      operationId: getAllCaches
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/caches/caches-response.yaml#/components/schemas/CachesResponse'
+          links:
+            Actuator/Caches:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/caches.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Caches API -> DELETE
+# desc: The caches endpoint provides access to the application’s caches.
+    delete:
+      tags:
+        - Caches API
+      summary: Clears all caches in the application.
+      operationId: clearAllCaches
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Caches:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/caches.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Caches API -> GET
+# desc: The caches endpoint provides access to the application’s caches.
+  /caches/{instanceId}/cache/{cacheName}:
+    get:
+      tags:
+        - Caches API
+      summary: >-
+        Returns details of the requested cache by its name and cache manager
+        name.
+      operationId: getCacheByNameWithQueryParameter
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: cacheName
+          in: path
+          description: The name of the cache to find
+          required: true
+          schema:
+            type: string
+        - name: cacheManager
+          in: query
+          description: The name of the cache manager where the cache with the given 'cacheName' resides
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/caches/cache-profile-response.yaml#/components/schemas/CacheProfileResponse'
+          links:
+            Actuator/Caches:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/caches.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Caches API -> DELETE
+# desc: The caches endpoint provides access to the application’s caches.
+    delete:
+      tags:
+        - Caches API
+      summary: Clears the cache by its name and cache manager name.
+      operationId: clearCacheByNameWithQueryParameter
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: cacheName
+          in: path
+          description: The name of the cache to find
+          required: true
+          schema:
+            type: string
+        - name: cacheManager
+          in: query
+          description: The name of the cache manager where the cache with the given 'cacheName' resides
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Caches:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/caches.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: ScheduledTasks API -> GET
+# desc: The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
+  /scheduled-tasks/{instanceId}:
+    get:
+      tags:
+        - ScheduledTasks API
+      summary: Returns details of the application’s scheduled tasks
+      operationId: getAllScheduledTasksResponse
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/scheduled-tasks-response.yaml#/components/schemas/ScheduledTasksResponse'
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: ScheduledTasks API -> POST
+# desc: The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
+  /scheduled-tasks/{instanceId}/enable:
+    post:
+      tags:
+        - ScheduledTasks API
+      summary: Allows enabling a scheduled task either according to its configured schedule or forcibly, 
+               ignoring the schedule.
+      operationId: enableSingleScheduledTask
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/scheduled-tasks-toggle-request.yaml#/components/schemas/ScheduledTaskToggleRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: ScheduledTasks API -> POST
+# desc:  The scheduled-tasks endpoint provides information about the application’s scheduled tasks.
+  /scheduled-tasks/{instanceId}/disable:
+    post:
+      tags:
+        - ScheduledTasks API
+      summary: Allows disabling a scheduled task.
+      operationId: disableSingleScheduledTask
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/scheduled-tasks-toggle-request.yaml#/components/schemas/ScheduledTaskToggleRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Property Management API -> POST
+# desc: Provides operations for managing Spring properties of application instances.
+  /property-management/{instanceId}:
+    post:
+      tags:
+        - Property Management API
+      summary: Updates a configuration property for the given application instance.
+      operationId: changePropertyValue
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/property-update-request.yaml#/components/schemas/PropertyUpdatedRequest'
+        required: true
+      responses:
+        '204':
+          description: OK
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Profile Management API -> POST
+# desc: Provides operations for managing Spring profiles of application instances.
+  /profile-management/{instanceId}:
+    post:
+      tags:
+        - Profile Management API
+      summary: Replaces active profiles for the given application instance.
+      operationId: replaceProfile
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/profile-update-request.yaml#/components/schemas/ProfileUpdatedRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/profile-update-response.yaml#/components/schemas/ProfileUpdateResponse'
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> GET
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+  /loggers/{instanceId}:
+    get:
+      tags:
+        - Loggers API
+      summary: Returns details of the application’s loggers.
+      operationId: getAllLoggers
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/loggers/loggers-response.yaml#/components/schemas/LoggersResponse'
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> GET
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+  /loggers/{instanceId}/logger/{loggerName}:
+    get:
+      tags:
+        - Loggers API
+      summary: Returns the details of the requested logger.
+      operationId: getLoggerByName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: loggerName
+          in: path
+          description: The name of the logger to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/loggers/logger-profile-response.yaml#/components/schemas/LoggerProfileResponse'
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> POST
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+    post:
+      tags:
+        - Loggers API
+      summary: The request specifies the desired logging level for a logger by its name.
+      description: >-
+        Suggested logging levels that the user can select to configure the
+        logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+      operationId: setLoggingLevelByLoggerName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: loggerName
+          in: path
+          description: The name of the logger to find
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/log-level-change-request.yaml#/components/schemas/LogLevelChangeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> POST
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+  /loggers/{instanceId}/logger/{loggerName}/clear:
+    post:
+      tags:
+        - Loggers API
+      summary: Clears the configured logging level of a logger, reverting it to the global/default setting.
+      operationId: clearLoggingLevelByLoggerName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: loggerName
+          in: path
+          description: The name of the logger to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> GET
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+  /loggers/{instanceId}/group/{groupName}:
+    get:
+      tags:
+        - Loggers API
+      summary: Returns details of the requested logger group.
+      operationId: getGroupByName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: groupName
+          in: path
+          description: The name of the logger group to find
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: 'response/loggers/group-profile-response.yaml#/components/schemas/GroupProfileResponse'
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Loggers API -> POST
+# desc: The loggers endpoint provides access to the application’s loggers and the configuration of their levels.
+    post:
+      tags:
+        - Loggers API
+      summary: The request specifies the desired logging level for a logger group by its name.
+      description: >-
+        Suggested logging levels that the user can select to configure the
+        logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+      operationId: setLoggingLevelByGroupName
+      parameters:
+        - $ref: "#/components/parameters/InstanceIdParam"
+        - name: groupName
+          in: path
+          description: The name of the logger group to find
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'request/log-level-change-request.yaml#/components/schemas/LogLevelChangeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          links:
+            Actuator/Loggers:
+              description: https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html
+        '400':
+          $ref: "error/error.yaml#/components/responses/BadRequest"
+        '500':
+          $ref: "error/error.yaml#/components/responses/InternalError"
+
+# name: Software API -> GET
+  /software/core/summary:
+    get:
+      tags:
+        - Software API
+      operationId: getCoreDistributionGrid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: 'response/software/distribution-summary-response.yaml#/components/schemas/DistributionSummaryResponse'
+
+components:
+  parameters:
+# The global parameter is applied to all API controllers.
+    InstanceIdParam:
+      name: instanceId
+      in: path
+      description: Application Instance ID
+      required: true
+      schema:
+        type: string

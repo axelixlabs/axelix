@@ -32,3 +32,7 @@ axile:
     discovery:
       auto: true
       execution-environment: k8s
+
+springdoc:
+  swagger-ui:
+    url: /openapi.yaml

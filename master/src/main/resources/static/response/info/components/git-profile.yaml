@@ -1,0 +1,24 @@
+components:
+  schemas:
+    GitProfile:
+      description: The profile of a given build.
+      type: object
+      properties:
+        branch:
+          description: The name of the Git branch.
+          type: string
+        commit:
+          description: The details of the Git commit, if any.
+          $ref: '#/components/schemas/Commit'
+          nullable: true
+
+    Commit:
+      description: The profile of a given commit.
+      type: object
+      properties:
+        id:
+          description: The ID of the commit.
+          type: string
+        time:
+          description: The timestamp of the commit.
+          type: string

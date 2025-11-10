@@ -1,0 +1,21 @@
+components:
+  schemas:
+    BuildProfile:
+      description: The profile of a given build.
+      type: object
+      properties:
+        artifact:
+          description: The artifact ID of the application.
+          type: string
+        name:
+          description: The name of the application.
+          type: string
+        version:
+          description: The version of the application.
+          type: string
+        group:
+          description: The group ID of the application.
+          type: string
+        time:
+          description: The time the application was built.
+          type: string

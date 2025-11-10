@@ -1,0 +1,10 @@
+components:
+  schemas:
+    DistributionSummaryResponse:
+      description: The summary of all software distributions used in hte ecosystem.
+      type: object
+      properties:
+        distributions:
+          type: array
+          items:
+            $ref: 'distribution-response.yaml#/components/schemas/DistributionResponse'
