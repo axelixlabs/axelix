@@ -24,8 +24,7 @@ export function resolveOsIcon(osName: string): string {
 }
 
 export function isCopyableField(field: string): boolean {
-    const isCopyable = (Object.values(ECopyableField) as string[]).includes(field);
-    return isCopyable;
+    return (Object.values(ECopyableField) as string[]).includes(field);
 }
 
 /**

@@ -93,7 +93,18 @@
         "cglibProxy": "CGLIB",
         "jdkProxy": "JDK Динамический Прокси",
         "noProxy": "Не проксирован",
-        "beanSource": "Источник бина"
+        "beanSource" : {
+          "titles" : {
+            "main" : "Происхождение",
+            "beanMethod" : "Bean метод",
+            "enclosingClass" : "Внешний @Configuration класс",
+            "factoryBeanName" : "Имя FactoryBean бина"
+          },
+          "COMPONENT_ANNOTATION" : "@Component аннотация или аналоги",
+          "UNKNOWN" : "Незивестно",
+          "FACTORY_BEAN" : "Создан другим FactoryBean-ом",
+          "BEAN_METHOD" : "@Bean метод"
+        }
     },
     "ScheduledTasks": {
         "runnable": "Метод",
