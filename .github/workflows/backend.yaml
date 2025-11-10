@@ -76,6 +76,11 @@ jobs:
           TRUSTSTORE="$JAVA_HOME/lib/security/cacerts"
           openssl s_client -connect $NEXUS_HOST_PORT -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM > nexus.crt
           sudo keytool -importcert -file nexus.crt -alias nexus-ssl -keystore $TRUSTSTORE -storepass $STORE_PASS -noprompt
+          
+          GRADLE_TRUSTSTORE="$HOME/.gradle/cacerts"
+          mkdir -p $HOME/.gradle
+          cp "$TRUSTSTORE" "$GRADLE_TRUSTSTORE"
+          echo "org.gradle.jvmargs=-Djavax.net.ssl.trustStore=$GRADLE_TRUSTSTORE -Djavax.net.ssl.trustStorePassword=$STORE_PASS" >> $HOME/.gradle/gradle.properties
 
       - name: Publish Libraries to Nexus
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
