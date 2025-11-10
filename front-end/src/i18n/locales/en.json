@@ -93,7 +93,18 @@
         "cglibProxy": "CGLIB",
         "jdkProxy": "JDK Dynamic Proxy",
         "noProxy": "No Proxying",
-        "beanSource": "Bean Source"
+        "beanSource" : {
+          "titles" : {
+            "main" : "Origin",
+            "beanMethod" : "Bean method",
+            "enclosingClass" : "Enclosing @Configuration class",
+            "factoryBeanName" : "FactoryBean name"
+          },
+          "COMPONENT_ANNOTATION" : "@Component annotation or its variants",
+          "UNKNOWN" : "Unknown",
+          "FACTORY_BEAN" : "Produced by the FactoryBean",
+          "BEAN_METHOD" : "@Bean annotated method"
+        }
     },
     "ScheduledTasks": {
         "runnable": "Runnable",

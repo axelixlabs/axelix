@@ -17,17 +17,21 @@ export const BeanSource = ({ beanSource }: IProps) => {
     const statelessBeanSource =
         beanSource.origin === EBeanOrigin.UNKNOWN || beanSource.origin === EBeanOrigin.COMPONENT_ANNOTATION;
 
-    const resolveTreeChildrens = (): TreeDataNode[] | undefined => {
+    const translatedTitle = t(`Beans.beanSource.${beanSource.origin}`);
+
+    const resolveTreeChildren = (): TreeDataNode[] | undefined => {
         if (beanSource.origin === EBeanOrigin.BEAN_METHOD) {
             return [
                 {
-                    title: beanSource.origin,
+                    title: translatedTitle,
                     key: beanSource.origin,
                     children: [
                         {
                             title: (
                                 <div className={styles.BeanTreeItem}>
-                                    <div className={styles.BeanTreeLabel}>Bean Method:</div>
+                                    <div className={styles.BeanTreeLabel}>
+                                        {t("Beans.beanSource.titles.beanMethod")}:
+                                    </div>
                                     <div className={styles.BeanTreeValue}>{beanSource.methodName}</div>
                                 </div>
                             ),
@@ -36,7 +40,9 @@ export const BeanSource = ({ beanSource }: IProps) => {
                         {
                             title: (
                                 <div className={styles.BeanTreeItem}>
-                                    <div className={styles.BeanTreeLabel}>Enclosing class name:</div>
+                                    <div className={styles.BeanTreeLabel}>
+                                        {t("Beans.beanSource.titles.enclosingClass")}:
+                                    </div>
                                     <div className={styles.BeanTreeValue}>{beanSource.enclosingClassName}</div>
                                 </div>
                             ),
@@ -50,13 +56,15 @@ export const BeanSource = ({ beanSource }: IProps) => {
         if (beanSource.origin === EBeanOrigin.FACTORY_BEAN) {
             return [
                 {
-                    title: beanSource.origin,
+                    title: translatedTitle,
                     key: beanSource.origin,
                     children: [
                         {
                             title: (
                                 <div className={styles.BeanTreeItem}>
-                                    <div className={styles.BeanTreeLabel}>Factory Bean Name:</div>
+                                    <div className={styles.BeanTreeLabel}>
+                                        {t("Beans.beanSource.titles.factoryBeanName")}:
+                                    </div>
                                     <div className={styles.BeanTreeValue}>{beanSource.factoryBeanName}</div>
                                 </div>
                             ),
@@ -70,8 +78,8 @@ export const BeanSource = ({ beanSource }: IProps) => {
 
     return (
         <>
-            <div className={sharedStyles.AccordionBodyChunkTitle}>{t(`Beans.beanSource`)}:</div>
-            {statelessBeanSource ? beanSource.origin : <Tree showLine treeData={resolveTreeChildrens()} />}
+            <div className={sharedStyles.AccordionBodyChunkTitle}>{t(`Beans.beanSource.titles.main`)}:</div>
+            {statelessBeanSource ? translatedTitle : <Tree showLine treeData={resolveTreeChildren()} />}
         </>
     );
 };
