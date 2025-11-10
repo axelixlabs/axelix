@@ -6,16 +6,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.api.model.ServicePort;
+import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -96,8 +99,12 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
         for (String namespace : namespaces) {
             ServiceList serviceList =
                     kubernetesClient.services().inNamespace(namespace).list();
+
             serviceNames.addAll(serviceList.getItems().stream()
-                    .map(service -> service.getMetadata().getName())
+                    .map(Service::getMetadata)
+                    .filter(Objects::nonNull)
+                    .map(ObjectMeta::getUid)
+                    .filter(Objects::nonNull)
                     .toList());
         }
 
@@ -106,99 +113,82 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
 
     @Nullable
     private Service getService(String namespace, String serviceId) {
-        try {
-            return kubernetesClient
-                    .services()
-                    .inNamespace(namespace)
-                    .withName(serviceId)
-                    .get();
-        } catch (Exception ignored) {
-            return null;
-        }
+        return kubernetesClient.services().inNamespace(namespace).list().getItems().stream()
+                .filter(service ->
+                        serviceId.equalsIgnoreCase(service.getMetadata().getUid()))
+                .findFirst()
+                .orElse(null);
     }
 
     private List<Pod> getPodsForService(Service service, String namespace) {
-        if (service.getSpec() == null) {
+        Map<String, String> selectors = Optional.ofNullable(service.getSpec())
+                .map(ServiceSpec::getSelector)
+                .orElse(null);
+
+        if (selectors == null || selectors.isEmpty()) {
             return List.of();
         }
 
-        Map<String, String> selector = service.getSpec().getSelector();
-        if (selector == null || selector.isEmpty()) {
-            return List.of();
-        }
-
-        try {
-            PodList podList = kubernetesClient
-                    .pods()
-                    .inNamespace(namespace)
-                    .withLabels(selector)
-                    .list();
-
-            return podList.getItems() != null ? podList.getItems() : List.of();
-        } catch (Exception e) {
-            log.warn(
-                    "Failed to list pods for service '{}' in namespace '{}': {}",
-                    service.getMetadata().getName(),
-                    namespace,
-                    e.getMessage());
-            return List.of();
-        }
+        return kubernetesClient
+                .pods()
+                .inNamespace(namespace)
+                .withLabels(selectors)
+                .list()
+                .getItems();
     }
 
     private List<ServiceInstance> buildInstances(
             String serviceId, String namespace, List<Pod> pods, List<ServicePort> ports) {
-        List<ServiceInstance> instances = new ArrayList<>();
 
-        for (Pod pod : pods) {
-            if (pod.getMetadata() == null || pod.getStatus() == null) {
-                continue;
-            }
+        return pods.stream()
+                .filter(this::hasValidPodInfo)
+                .flatMap(pod -> ports.stream()
+                        .map(port -> createServiceInstance(serviceId, namespace, pod, port))
+                        .filter(Objects::nonNull))
+                .toList();
+    }
 
-            String podIp = pod.getStatus().getPodIP();
-            if (podIp == null || podIp.isBlank()) {
-                continue;
-            }
-
-            String podName = pod.getMetadata().getName();
-            String deployTime = pod.getMetadata().getCreationTimestamp();
-
-            for (ServicePort sp : ports) {
-                boolean isSecure = "https".equalsIgnoreCase(sp.getName());
-                URI uri = createUri(podIp, sp, isSecure);
-
-                if (uri == null) {
-                    continue;
-                }
-
-                Map<String, String> metadata = Map.of(
-                        "namespace", namespace,
-                        "servicePortName", sp.getName(),
-                        "protocol", sp.getProtocol());
-
-                AxileKubernetesServiceInstance instance = new AxileKubernetesServiceInstance(
-                        pod.getMetadata().getUid(),
-                        serviceId,
-                        podName,
-                        podIp,
-                        sp.getPort(),
-                        isSecure,
-                        uri,
-                        metadata,
-                        deployTime);
-
-                instances.add(instance);
-            }
-        }
-
-        return instances;
+    private boolean hasValidPodInfo(Pod pod) {
+        return pod.getMetadata() != null
+                && pod.getStatus() != null
+                && pod.getStatus().getPodIP() != null
+                && !pod.getStatus().getPodIP().isBlank();
     }
 
     @Nullable
-    private URI createUri(String podIp, ServicePort sp, boolean isSecure) {
+    private ServiceInstance createServiceInstance(String serviceId, String namespace, Pod pod, ServicePort port) {
+
+        boolean secure = "https".equalsIgnoreCase(port.getName());
+
+        URI uri = createUri(pod.getStatus().getPodIP(), port, secure);
+        if (uri == null) {
+            return null;
+        }
+
+        Map<String, String> metadata = Map.of(
+                "namespace", namespace,
+                "servicePortName", port.getName(),
+                "protocol", port.getProtocol());
+
+        return new AxileKubernetesServiceInstance(
+                pod.getMetadata().getUid(),
+                serviceId,
+                pod.getMetadata().getName(),
+                pod.getStatus().getPodIP(),
+                port.getPort(),
+                secure,
+                uri,
+                metadata,
+                pod.getMetadata().getCreationTimestamp());
+    }
+
+    @Nullable
+    private URI createUri(String host, ServicePort sp, boolean cesure) {
         try {
-            return URI.create((isSecure ? "https" : "http") + "://" + podIp + ":" + sp.getPort());
-        } catch (Exception e) {
-            log.warn("Invalid URI for pod IP '{}' and port '{}': {}", podIp, sp.getPort(), e.getMessage());
+            String protocol = cesure ? "https" : "http";
+            return URI.create(protocol + "://" + host + ":" + sp.getPort());
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid URI for pod IP '{}' and port '{}': {}", host, sp.getPort(), e.getMessage());
             return null;
         }
     }

@@ -1,12 +1,12 @@
 package com.nucleonforge.axile.master.service.discovery;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -16,7 +16,6 @@ import org.instancio.Select;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -25,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.kubernetes.commons.discovery.DefaultKubernetesServiceInstance;
 
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.Instance;
@@ -47,7 +45,6 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axile.master.discovery.polling.fixed-delay=1000",
             "axile.master.discovery.polling.initial-delay=0"
         })
-@Disabled
 class ShortPollingInstanceDiscoverySchedulerTest {
 
     private static MockWebServer mockWebServer;
@@ -58,11 +55,14 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     @Autowired
     private InstanceRegistry instanceRegistry;
 
-    @Autowired
-    private InstancesDiscoverer instancesDiscoverer;
-
     @MockBean
     private DiscoveryClient discoveryClient;
+
+    private String host;
+
+    private int port;
+
+    private URI uri;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -74,6 +74,9 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             } catch (InstanceNotFoundException ignored) {
             }
         });
+        host = mockWebServer.getHostName();
+        port = mockWebServer.getPort();
+        uri = URI.create("http://" + host + ":" + port);
     }
 
     @AfterEach
@@ -106,23 +109,22 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         mockWebServer.enqueue(
                 new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
-        HttpUrl url1 = mockWebServer.url(instance1Id);
-        HttpUrl url2 = mockWebServer.url(instance2Id);
-
-        ServiceInstance k8sInstance1 = Instancio.of(DefaultKubernetesServiceInstance.class)
+        ServiceInstance k8sInstance1 = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instance1Id)
                 .set(Select.field("serviceId"), service1)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), url1.host())
-                .set(Select.field("port"), url1.port())
+                .set(Select.field("host"), host)
+                .set(Select.field("port"), port)
+                .set(Select.field("uri"), uri)
                 .create();
 
-        ServiceInstance k8sInstance2 = Instancio.of(DefaultKubernetesServiceInstance.class)
+        ServiceInstance k8sInstance2 = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instance2Id)
                 .set(Select.field("serviceId"), service2)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), url2.host())
-                .set(Select.field("port"), url2.port())
+                .set(Select.field("host"), host)
+                .set(Select.field("port"), port)
+                .set(Select.field("uri"), uri)
                 .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(service1, service2));
@@ -177,14 +179,13 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         mockWebServer.enqueue(
                 new MockResponse().setBody(secondResponse).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
-        HttpUrl url = mockWebServer.url(instanceId);
-
-        ServiceInstance k8sInstance = Instancio.of(DefaultKubernetesServiceInstance.class)
+        ServiceInstance k8sInstance = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instanceId)
                 .set(Select.field("serviceId"), service)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), url.host())
-                .set(Select.field("port"), url.port())
+                .set(Select.field("host"), host)
+                .set(Select.field("port"), port)
+                .set(Select.field("uri"), uri)
                 .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(service));
@@ -236,14 +237,13 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             }
         });
 
-        HttpUrl url = mockWebServer.url(instanceId);
-
-        ServiceInstance k8sServiceInstance = Instancio.of(DefaultKubernetesServiceInstance.class)
+        ServiceInstance k8sServiceInstance = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instanceId)
                 .set(Select.field("serviceId"), serviceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), url.host())
-                .set(Select.field("port"), url.port())
+                .set(Select.field("host"), host)
+                .set(Select.field("port"), port)
+                .set(Select.field("uri"), uri)
                 .create();
 
         Mockito.when(discoveryClient.getServices())

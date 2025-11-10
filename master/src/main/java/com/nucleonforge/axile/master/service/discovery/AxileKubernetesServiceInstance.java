@@ -9,11 +9,11 @@ import org.springframework.cloud.client.ServiceInstance;
  * Represents a Kubernetes service instance for {@link AxileKubernetesDiscoveryClient}.
  *
  * @param instanceId unique identifier (uid) of the pod instance
- * @param serviceId name of the Kubernetes service
+ * @param serviceId id of the Kubernetes service
  * @param podName name of the pod
  * @param host pod IP address
  * @param port service port
- * @param isSecure indicates if the connection should use HTTPS
+ * @param secure indicates if the connection should use HTTPS
  * @param uri full URI to access the service instance
  * @param metadata additional metadata about the instance
  * @param deploymentAt timestamp when the pod was created
@@ -27,7 +27,7 @@ public record AxileKubernetesServiceInstance(
         String podName,
         String host,
         int port,
-        boolean isSecure,
+        boolean secure,
         URI uri,
         Map<String, String> metadata,
         String deploymentAt)
@@ -55,7 +55,7 @@ public record AxileKubernetesServiceInstance(
 
     @Override
     public boolean isSecure() {
-        return isSecure;
+        return secure;
     }
 
     @Override
