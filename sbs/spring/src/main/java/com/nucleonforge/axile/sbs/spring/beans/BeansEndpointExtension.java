@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
 import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.ClassUtils;
@@ -23,8 +23,6 @@ import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.common.api.BeansFeed.Bean;
 import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
 import com.nucleonforge.axile.common.api.BeansFeed.Context;
-
-import static com.nucleonforge.axile.sbs.spring.beans.ConfigurationPropertiesBeanDetector.isConfigurationPropertiesBean;
 
 /**
  * Web extension for Spring Boot Beans Actuator endpoint.
@@ -55,15 +53,18 @@ public class BeansEndpointExtension {
 
         actuatorResponse.getContexts().forEach((contextId, contextDescriptor) -> {
             Map<String, Bean> beans = new HashMap<>();
+            ConfigurableApplicationContext targetContext = findConfigurableContextForBean(contextId);
 
-            contextDescriptor.getBeans().forEach((beanName, beanDescriptor) -> {
-                ConfigurableApplicationContext targetContext = findConfigurableContextForBean(contextId);
+            if (targetContext != null) {
 
-                if (targetContext != null) {
+                Map<String, ConfigurationPropertiesBean> configPropsBeanMap =
+                        ConfigurationPropertiesBean.getAll(targetContext);
+
+                contextDescriptor.getBeans().forEach((beanName, beanDescriptor) -> {
                     BeanMetaInfo metaInfo = enricher.extract(beanName, targetContext.getBeanFactory());
 
                     Set<BeanDependency> enrichedDependencies =
-                            enrichDependencies(beanDescriptor.getDependencies(), targetContext.getBeanFactory());
+                            enrichDependencies(beanDescriptor.getDependencies(), configPropsBeanMap);
 
                     beans.put(
                             beanName,
@@ -76,11 +77,11 @@ public class BeansEndpointExtension {
                                     enrichedDependencies,
                                     metaInfo.isLazyInit(),
                                     metaInfo.isPrimary(),
-                                    metaInfo.isConfigPropsBean(),
+                                    configPropsBeanMap.containsKey(beanName),
                                     metaInfo.qualifiers(),
                                     metaInfo.beanSource()));
-                }
-            });
+                });
+            }
 
             contexts.put(contextId, new Context(contextDescriptor.getParentId(), beans));
         });
@@ -108,7 +109,8 @@ public class BeansEndpointExtension {
         return null;
     }
 
-    private Set<BeanDependency> enrichDependencies(String[] dependencies, ConfigurableListableBeanFactory beanFactory) {
+    private Set<BeanDependency> enrichDependencies(
+            String[] dependencies, Map<String, ConfigurationPropertiesBean> configPropsBeanMap) {
         if (dependencies == null || dependencies.length == 0) {
             return Collections.emptySet();
         }
@@ -116,7 +118,7 @@ public class BeansEndpointExtension {
         return Arrays.stream(dependencies)
                 .filter(Objects::nonNull)
                 .filter(dep -> !dep.trim().isEmpty())
-                .map(depName -> new BeanDependency(depName, isConfigurationPropertiesBean(beanFactory, depName)))
+                .map(depName -> new BeanDependency(depName, configPropsBeanMap.containsKey(depName)))
                 .collect(Collectors.toSet());
     }
 }

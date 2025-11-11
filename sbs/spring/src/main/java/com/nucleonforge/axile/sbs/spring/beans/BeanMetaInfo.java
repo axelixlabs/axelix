@@ -14,6 +14,5 @@ public record BeanMetaInfo(
         ProxyType proxyType,
         boolean isLazyInit,
         boolean isPrimary,
-        boolean isConfigPropsBean,
         List<String> qualifiers,
         BeansFeed.BeanSource beanSource) {}
