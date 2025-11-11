@@ -10,9 +10,15 @@ export interface IBeansResponseBody {
     beans: IBean[];
 }
 
-// TODO: Add tsDoc in future
 interface IDependency {
+    /**
+     * The name of the dependent bean
+     */
     name: string;
+
+    /**
+     * flag that designates that the bean is the config props bean.
+     */
     isConfigPropsDependency: boolean;
 }
 
@@ -70,7 +76,10 @@ export interface IBean {
      * The source from which the bean came from.
      */
     beanSource: IBeanSource;
-    // TODO: Add tsDoc in future
+
+    /**
+     * flag that designates that the bean is the config props bean.
+     */
     isConfigPropsBean: boolean;
 }
 
