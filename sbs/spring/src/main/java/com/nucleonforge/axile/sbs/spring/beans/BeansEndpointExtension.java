@@ -57,6 +57,7 @@ public class BeansEndpointExtension {
 
             if (targetContext != null) {
 
+                // TODO: Consider to cache the configprops beans extracted from the context later on
                 Map<String, ConfigurationPropertiesBean> configPropsBeanMap =
                         ConfigurationPropertiesBean.getAll(targetContext);
 
