@@ -1,11 +1,11 @@
 package com.nucleonforge.axile.master.service.discovery;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -23,7 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.kubernetes.commons.discovery.DefaultKubernetesServiceInstance;
 
 import com.nucleonforge.axile.master.model.instance.Instance;
 
@@ -47,10 +46,13 @@ class KubernetesInstanceDiscovererTest {
     @MockBean
     private DiscoveryClient discoveryClient;
 
+    private URI uri;
+
     @BeforeEach
     void startServer() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
+        uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
     }
 
     @AfterEach
@@ -90,14 +92,12 @@ class KubernetesInstanceDiscovererTest {
             }
         });
 
-        HttpUrl url = mockWebServer.url(activeInstanceId);
-
         // TODO: that is not compile-time safe. Can we do better?
-        ServiceInstance serviceInstance = Instancio.of(DefaultKubernetesServiceInstance.class)
+        ServiceInstance serviceInstance = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), activeInstanceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), url.host())
-                .set(Select.field("port"), url.port())
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(activeInstanceId));
@@ -160,26 +160,23 @@ class KubernetesInstanceDiscovererTest {
 
         // spotless:off
         // firstService -> bad application version instance
-        HttpUrl firstUrl = mockWebServer.url(firstServiceInstanceBadVersionId);
-
         ServiceInstance firstServiceBadVersion = Instancio
-            .of(DefaultKubernetesServiceInstance.class)
+            .of(AxileKubernetesServiceInstance.class)
             .set(Select.field("instanceId"), firstServiceInstanceBadVersionId)
             .set(Select.field("serviceId"), firstServiceId)
             .set(Select.field("secure"), false)
-            .set(Select.field("host"), firstUrl.host())
-            .set(Select.field("port"), firstUrl.port())
+            .set(Select.field("host"), uri.getHost())
+            .set(Select.field("port"), uri.getPort())
             .create();
 
-        HttpUrl secondUrl = mockWebServer.url(secondServiceInstanceGoodVersionId);
         // secondService -> good application version instance
         ServiceInstance secondServiceGoodVersion = Instancio
-            .of(DefaultKubernetesServiceInstance.class)
+            .of(AxileKubernetesServiceInstance.class)
             .set(Select.field("instanceId"), secondServiceInstanceGoodVersionId)
             .set(Select.field("serviceId"), secondServiceId)
             .set(Select.field("secure"), false)
-            .set(Select.field("host"), secondUrl.host())
-            .set(Select.field("port"), secondUrl.port())
+            .set(Select.field("host"), uri.getHost())
+            .set(Select.field("port"), uri.getPort())
             .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(firstServiceId, secondServiceId));
@@ -215,15 +212,10 @@ class KubernetesInstanceDiscovererTest {
             }
         });
 
-        // secondService -> good application version instance
-        HttpUrl httpUrl = mockWebServer.url(testInstanceId);
-
-        ServiceInstance k8sPod = Instancio.of(DefaultKubernetesServiceInstance.class)
+        ServiceInstance k8sPod = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), testInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), httpUrl.host())
-                .set(Select.field("port"), httpUrl.port())
                 .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
@@ -282,23 +274,20 @@ class KubernetesInstanceDiscovererTest {
             }
         });
 
-        HttpUrl healthyUrl = mockWebServer.url(healthyInstanceId);
-
-        ServiceInstance healthyK8sPod = Instancio.of(DefaultKubernetesServiceInstance.class)
+        ServiceInstance healthyK8sPod = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), healthyInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), healthyUrl.host())
-                .set(Select.field("port"), healthyUrl.port())
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
-        HttpUrl timeoutUrl = mockWebServer.url(timeoutInstanceId);
-        ServiceInstance timeoutK8sPod = Instancio.of(DefaultKubernetesServiceInstance.class)
+        ServiceInstance timeoutK8sPod = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), timeoutInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), timeoutUrl.host())
-                .set(Select.field("port"), timeoutUrl.port())
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(testServiceId));
@@ -331,21 +320,19 @@ class KubernetesInstanceDiscovererTest {
         mockWebServer.enqueue(
                 new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
-        HttpUrl healthyUrl = mockWebServer.url(healthyK8SInstanceId);
-
-        ServiceInstance healthyK8SPod = Instancio.of(DefaultKubernetesServiceInstance.class)
+        ServiceInstance healthyK8SPod = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), healthyK8SInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), healthyUrl.host())
-                .set(Select.field("port"), healthyUrl.port())
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
                 .create();
 
-        ServiceInstance connectionRefusedPod = Instancio.of(DefaultKubernetesServiceInstance.class)
+        ServiceInstance connectionRefusedPod = Instancio.of(AxileKubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), connectionRefusedInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
-                .set(Select.field("host"), healthyUrl.host())
+                .set(Select.field("host"), uri.getHost())
                 // the assumption is that ports under 1024 cannot be allocated by mockwebserver (require root
                 // privileges)
                 .set(Select.field("port"), 10)

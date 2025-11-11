@@ -1,10 +1,11 @@
 package com.nucleonforge.axile.master.service.discovery;
 
-import java.time.DateTimeException;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
+import java.time.format.DateTimeParseException;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,24 +50,16 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     }
 
     @Override
-    @SuppressWarnings("NullAway")
     protected Instance toDomainInstance(InstanceIntermediateProfile profile) throws IllegalArgumentException {
         ServiceInstance serviceInstance = profile.serviceInstance();
 
-        if (serviceInstance instanceof KubernetesServiceInstance k8sInstance) {
+        if (serviceInstance instanceof AxileKubernetesServiceInstance k8sInstance) {
 
-            if (k8sInstance.getMetadata() == null) {
-                throw new IllegalArgumentException(
-                        "Unable to register K8S pod '%s' as a managed instance - no metadata present on the pod"
-                                .formatted(serviceInstance.getInstanceId()));
-            }
-
-            String podName = k8sInstance.getMetadata().get("app.kubernetes.io/name");
             Instant deployedAt = extractPodDeployTimestamp(k8sInstance);
 
             return new Instance(
                     InstanceId.of(k8sInstance.getInstanceId()),
-                    podName,
+                    k8sInstance.podName(),
                     profile.metadata().serviceVersion(),
                     profile.metadata().javaVersion(),
                     profile.metadata().springBootVersion(),
@@ -93,22 +86,22 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
         };
     }
 
-    @SuppressWarnings("NullAway")
-    private static Instant extractPodDeployTimestamp(KubernetesServiceInstance k8sInstance) {
-        String deployedAtAsString = k8sInstance.getMetadata().get(POD_CREATION_TIMESTAMP);
+    @Nullable
+    private static Instant extractPodDeployTimestamp(AxileKubernetesServiceInstance k8sInstance) {
+        String deployedAtAsString = k8sInstance.getDeploymentAt();
+
+        if (deployedAtAsString == null) {
+            log.warn(
+                    "The K8S pod's {} {} filed in metadata is null",
+                    k8sInstance.getInstanceId(),
+                    POD_CREATION_TIMESTAMP);
+            return null;
+        }
 
         try {
-            if (deployedAtAsString == null) {
-                log.warn(
-                        "The K8S pod's {} {} filed in metadata is null",
-                        k8sInstance.getInstanceId(),
-                        POD_CREATION_TIMESTAMP);
-                return null;
-            }
-            TemporalAccessor temporal =
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.Z").parse(deployedAtAsString);
-            return Instant.from(temporal);
-        } catch (DateTimeException e) {
+            return OffsetDateTime.parse(deployedAtAsString, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                    .toInstant();
+        } catch (DateTimeParseException e) {
             log.warn(
                     """
                 Unable to parse the deployment timestamp of the pod : {}.

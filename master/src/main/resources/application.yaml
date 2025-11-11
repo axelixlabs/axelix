@@ -17,7 +17,6 @@ spring:
       discovery:
         enabled: true
         discovery-server-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}
-        namespaces: default
       # See the doc https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/
       sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
       ca-cert-path: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
