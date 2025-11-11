@@ -10,3 +10,7 @@
 .BeanTreeValue {
     word-break: break-all;
 }
+
+.Tree {
+    margin-left: -3px;
+}

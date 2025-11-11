@@ -79,7 +79,11 @@ export const BeanSource = ({ beanSource }: IProps) => {
     return (
         <>
             <div className={sharedStyles.AccordionBodyChunkTitle}>{t(`Beans.beanSource.titles.main`)}:</div>
-            {statelessBeanSource ? translatedTitle : <Tree showLine treeData={resolveTreeChildren()} />}
+            {statelessBeanSource ? (
+                translatedTitle
+            ) : (
+                <Tree expandAction="click" showLine treeData={resolveTreeChildren()} className={styles.Tree} />
+            )}
         </>
     );
 };
