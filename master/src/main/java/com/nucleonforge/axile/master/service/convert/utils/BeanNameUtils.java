@@ -8,7 +8,7 @@ package com.nucleonforge.axile.master.service.convert.utils;
 public class BeanNameUtils {
 
     /**
-     * Strips the configsprops prefix from the bean name.
+     * Strips the configprops prefix from the bean name.
      * <p>
      * The problem is that the bean name of the configprops bean as returned by the actuator, for some reason, contains
      * the dash at the very beginning. I do not know why. We do not want to show it in the bean name.

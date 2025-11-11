@@ -1,8 +1,10 @@
 package com.nucleonforge.axile.sbs.spring.beans;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,12 +14,14 @@ import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
 import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.ClassUtils;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.common.api.BeansFeed.Bean;
+import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
 import com.nucleonforge.axile.common.api.BeansFeed.Context;
 
 /**
@@ -49,12 +53,20 @@ public class BeansEndpointExtension {
 
         actuatorResponse.getContexts().forEach((contextId, contextDescriptor) -> {
             Map<String, Bean> beans = new HashMap<>();
+            ConfigurableApplicationContext targetContext = findConfigurableContextForBean(contextId);
 
-            contextDescriptor.getBeans().forEach((beanName, beanDescriptor) -> {
-                ConfigurableApplicationContext targetContext = findConfigurableContextForBean(contextId);
+            if (targetContext != null) {
 
-                if (targetContext != null) {
+                // TODO: Consider to cache the configprops beans extracted from the context later on
+                Map<String, ConfigurationPropertiesBean> configPropsBeanMap =
+                        ConfigurationPropertiesBean.getAll(targetContext);
+
+                contextDescriptor.getBeans().forEach((beanName, beanDescriptor) -> {
                     BeanMetaInfo metaInfo = enricher.extract(beanName, targetContext.getBeanFactory());
+
+                    Set<BeanDependency> enrichedDependencies =
+                            enrichDependencies(beanDescriptor.getDependencies(), configPropsBeanMap);
+
                     beans.put(
                             beanName,
                             new Bean(
@@ -63,13 +75,14 @@ public class BeansEndpointExtension {
                                             .getName(),
                                     metaInfo.proxyType(),
                                     toSet(beanDescriptor.getAliases()),
-                                    toSet(beanDescriptor.getDependencies()),
+                                    enrichedDependencies,
                                     metaInfo.isLazyInit(),
                                     metaInfo.isPrimary(),
+                                    configPropsBeanMap.containsKey(beanName),
                                     metaInfo.qualifiers(),
                                     metaInfo.beanSource()));
-                }
-            });
+                });
+            }
 
             contexts.put(contextId, new Context(contextDescriptor.getParentId(), beans));
         });
@@ -95,5 +108,18 @@ public class BeansEndpointExtension {
         }
 
         return null;
+    }
+
+    private Set<BeanDependency> enrichDependencies(
+            String[] dependencies, Map<String, ConfigurationPropertiesBean> configPropsBeanMap) {
+        if (dependencies == null || dependencies.length == 0) {
+            return Collections.emptySet();
+        }
+
+        return Arrays.stream(dependencies)
+                .filter(Objects::nonNull)
+                .filter(dep -> !dep.trim().isEmpty())
+                .map(depName -> new BeanDependency(depName, configPropsBeanMap.containsKey(depName)))
+                .collect(Collectors.toSet());
     }
 }

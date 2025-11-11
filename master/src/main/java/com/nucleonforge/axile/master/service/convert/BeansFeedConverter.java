@@ -8,11 +8,14 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
+import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanDependencyProfile;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanMethod;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanSource;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile.ComponentVariant;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile.FactoryBean;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.ProxyType;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile.UnknownBean;
 import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
 import com.nucleonforge.axile.master.service.convert.utils.BeanNameUtils;
@@ -32,19 +35,20 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
         source.contexts().values().forEach(context -> {
             if (context != null && context.beans() != null) {
                 context.beans().forEach((beanName, bean) -> {
+                    boolean isConfigPropsBean = bean.isConfigPropsBean();
+                    String processedBeanName =
+                            isConfigPropsBean ? BeanNameUtils.stripConfigPropsPrefix(beanName) : beanName;
+
                     BeanShortProfile profile = new BeanShortProfile(
-                            // TODO:
-                            //  This is not right. We need to strip prefix ONLY if we're sure
-                            //  that this is the configprops bean. Same goes for dependencies.
-                            //  Waiting for the https://github.com/Nucleon-Forge/axile/issues/283
-                            BeanNameUtils.stripConfigPropsPrefix(beanName),
+                            processedBeanName,
                             bean.scope(),
                             bean.type(),
-                            BeanShortProfile.ProxyType.valueOf(bean.proxyType().name()),
+                            ProxyType.valueOf(bean.proxyType().name()),
                             bean.aliases(),
-                            extractDependencies(bean),
+                            convertDependencies(bean.dependencies()),
                             bean.isPrimary(),
                             bean.isLazyInit(),
+                            isConfigPropsBean,
                             bean.qualifiers(),
                             covertBeanSource(bean));
                     beansFeedResponse.addBean(profile);
@@ -55,9 +59,15 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
         return beansFeedResponse;
     }
 
-    private static Set<String> extractDependencies(BeansFeed.Bean bean) {
-        return bean.dependencies().stream()
-                .map(BeanNameUtils::stripConfigPropsPrefix)
+    private Set<BeanDependencyProfile> convertDependencies(Set<BeanDependency> dependencies) {
+        return dependencies.stream()
+                .map(dep -> {
+                    boolean isConfigPropsDep = dep.isConfigPropsDependency();
+                    String processedDepName =
+                            isConfigPropsDep ? BeanNameUtils.stripConfigPropsPrefix(dep.name()) : dep.name();
+
+                    return new BeanShortProfile.BeanDependencyProfile(processedDepName, isConfigPropsDep);
+                })
                 .collect(Collectors.toSet());
     }
 
