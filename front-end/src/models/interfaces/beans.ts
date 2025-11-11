@@ -10,6 +10,12 @@ export interface IBeansResponseBody {
     beans: IBean[];
 }
 
+// TODO: Add tsDoc in future
+interface IDependency {
+    name: string;
+    isConfigPropsDependency: boolean;
+}
+
 /**
  * An interface that represents the state of the particular bean inside the Spring Boot application
  */
@@ -58,12 +64,14 @@ export interface IBean {
     /**
      * Bean dependencies
      */
-    dependencies: string[];
+    dependencies: IDependency[];
 
     /**
      * The source from which the bean came from.
      */
     beanSource: IBeanSource;
+    // TODO: Add tsDoc in future
+    isConfigPropsBean: boolean;
 }
 
 /**

@@ -31,15 +31,11 @@ export const BeanAccordionChildren = ({ bean, setActiveKey }: IProps) => {
                 {!bean.dependencies.length ? (
                     <span>-</span>
                 ) : (
-                    bean.dependencies.map((dependency) => (
-                        <div
-                            key={dependency}
-                            className={styles.AccordionBodyChunkList}
-                            onClick={() => setActiveKey(dependency)}
-                        >
+                    bean.dependencies.map(({ name }) => (
+                        <div key={name} className={styles.AccordionBodyChunkList} onClick={() => setActiveKey(name)}>
                             {/* TODO: This part we need to be fix after tooltip PR merge */}
-                            <a href={`#${dependency}`} className={styles.Dependency}>
-                                <TooltipWithCopy text={dependency} />
+                            <a href={`#${name}`} className={styles.Dependency}>
+                                <TooltipWithCopy text={name} />
                             </a>
                         </div>
                     ))
