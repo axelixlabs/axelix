@@ -125,3 +125,22 @@ jobs:
           echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
           chmod 600 ~/.kube/config
           helm upgrade --install master . -f values.yaml
+
+  dispatch:
+    needs: [build-deploy-source]
+    strategy:
+      matrix:
+        playground_repo: [
+          'Nucleon-Forge/notification-service',
+          'Nucleon-Forge/feature-service',
+          'Nucleon-Forge/spring-petclinic'
+        ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Dispatch
+        if: ${{ env.SHOULD_DEPLOY == 'true' }}
+        uses: peter-evans/repository-dispatch@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ matrix.playground_repo }}
+          event-type: monorepo-backend-updated
