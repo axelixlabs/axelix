@@ -26,6 +26,7 @@ import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.common.api.BeansFeed.Bean;
+import static com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
 import static com.nucleonforge.axile.common.api.BeansFeed.BeanMethod;
 import static com.nucleonforge.axile.common.api.BeansFeed.ComponentVariant;
 import static com.nucleonforge.axile.common.api.BeansFeed.Context;
@@ -71,62 +72,68 @@ class BeansEndpointProberTest {
         // language=json
         String jsonResponse =
                 """
-        {
-          "contexts": {
-            "application": {
-              "parentId": null,
-              "beans": {
-                "jmxEndpointProperties": {
-                  "scope": "singleton",
-                  "type": "JmxEndpointProperties",
-                  "proxyType" : "CGLIB",
-                  "aliases": [],
-                  "dependencies": [],
-                  "isLazyInit": false,
-                  "isPrimary": false,
-                  "qualifiers": [],
-                  "beanSource": {
-                     "origin": "COMPONENT_ANNOTATION"
-                  }
-                },
-                "jacksonObjectMapperBuilder": {
-                  "scope": "prototype",
-                  "type": "Jackson2ObjectMapperBuilder",
-                  "proxyType" : "JDK_PROXY",
-                  "resource": "class path resource JacksonObjectMapperBuilderConfiguration.class",
-                  "aliases": [],
-                  "dependencies": [
-                    "JacksonObjectMapperBuilderConfiguration"
-                  ],
-                  "isLazyInit": true,
-                  "isPrimary": true,
-                  "qualifiers": ["primaryMapper"],
-                  "beanSource": {
-                    "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
-                    "methodName": "entityManagerFactoryBuilder",
-                    "origin": "BEAN_METHOD"
-                  }
-                },
-                "testSessionBean": {
-                  "scope": "session",
-                  "type": "TestSessionBean",
-                  "proxyType" : "NO_PROXYING",
-                  "resource": "class path resource [org.example.com]",
-                  "aliases": ["sessionBeanForProberTest"],
-                  "dependencies": [],
-                  "isLazyInit": false,
-                  "isPrimary": false,
-                  "qualifiers": [],
-                  "beanSource": {
-                    "factoryBeanName": "org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean",
-                    "origin": "FACTORY_BEAN"
-                  }
-                }
-              }
-            }
-          }
-        }
-        """;
+           {
+             "contexts": {
+               "application": {
+                 "parentId": null,
+                 "beans": {
+                   "jmxEndpointProperties": {
+                     "scope": "singleton",
+                     "type": "JmxEndpointProperties",
+                     "proxyType" : "CGLIB",
+                     "aliases": [],
+                     "dependencies": [],
+                     "isLazyInit": false,
+                     "isPrimary": false,
+                     "isConfigPropsBean": true,
+                     "qualifiers": [],
+                     "beanSource": {
+                        "origin": "COMPONENT_ANNOTATION"
+                     }
+                   },
+                   "jacksonObjectMapperBuilder": {
+                     "scope": "prototype",
+                     "type": "Jackson2ObjectMapperBuilder",
+                     "proxyType" : "JDK_PROXY",
+                     "resource": "class path resource JacksonObjectMapperBuilderConfiguration.class",
+                     "aliases": [],
+                     "dependencies": [
+                       {
+                         "name": "spring.cache-org.springframework.boot.autoconfigure.cache.CacheProperties",
+                         "isConfigPropsDependency": true
+                       }
+                     ],
+                     "isLazyInit": true,
+                     "isPrimary": true,
+                     "isConfigPropsBean": false,
+                     "qualifiers": ["primaryMapper"],
+                     "beanSource": {
+                       "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
+                       "methodName": "entityManagerFactoryBuilder",
+                       "origin": "BEAN_METHOD"
+                     }
+                   },
+                   "testSessionBean": {
+                     "scope": "session",
+                     "type": "TestSessionBean",
+                     "proxyType" : "NO_PROXYING",
+                     "resource": "class path resource [org.example.com]",
+                     "aliases": ["sessionBeanForProberTest"],
+                     "dependencies": [],
+                     "isLazyInit": false,
+                     "isPrimary": false,
+                     "isConfigPropsBean": true,
+                     "qualifiers": [],
+                     "beanSource": {
+                       "factoryBeanName": "org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean",
+                       "origin": "FACTORY_BEAN"
+                     }
+                   }
+                 }
+               }
+             }
+           }
+           """;
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -168,6 +175,7 @@ class BeansEndpointProberTest {
         assertThat(jmxEndpoint.dependencies()).isEmpty();
         assertThat(jmxEndpoint.isLazyInit()).isFalse();
         assertThat(jmxEndpoint.isPrimary()).isFalse();
+        assertThat(jmxEndpoint.isConfigPropsBean()).isTrue();
         assertThat(jmxEndpoint.qualifiers()).isEmpty();
         assertThat(jmxEndpoint.beanSource()).isInstanceOf(ComponentVariant.class);
 
@@ -176,9 +184,15 @@ class BeansEndpointProberTest {
         assertThat(jacksonBuilder.type()).isEqualTo("Jackson2ObjectMapperBuilder");
         assertThat(jacksonBuilder.proxyType()).isEqualTo(ProxyType.JDK_PROXY);
         assertThat(jacksonBuilder.aliases()).isEmpty();
-        assertThat(jacksonBuilder.dependencies()).containsExactlyInAnyOrder("JacksonObjectMapperBuilderConfiguration");
+        assertThat(jacksonBuilder.dependencies())
+                .extracting(BeanDependency::name)
+                .containsExactlyInAnyOrder("spring.cache-org.springframework.boot.autoconfigure.cache.CacheProperties");
+        assertThat(jacksonBuilder.dependencies())
+                .extracting(BeanDependency::isConfigPropsDependency)
+                .containsExactly(true);
         assertThat(jacksonBuilder.isLazyInit()).isTrue();
         assertThat(jacksonBuilder.isPrimary()).isTrue();
+        assertThat(jacksonBuilder.isConfigPropsBean()).isFalse();
         assertThat(jacksonBuilder.qualifiers()).containsExactly("primaryMapper");
 
         assertThat(jacksonBuilder.beanSource()).isInstanceOf(BeanMethod.class);
@@ -197,6 +211,7 @@ class BeansEndpointProberTest {
         assertThat(testSessionBean.dependencies()).isEmpty();
         assertThat(testSessionBean.isLazyInit()).isFalse();
         assertThat(testSessionBean.isPrimary()).isFalse();
+        assertThat(testSessionBean.isConfigPropsBean()).isTrue();
         assertThat(testSessionBean.qualifiers()).isEmpty();
 
         assertThat(testSessionBean.beanSource()).isInstanceOf(FactoryBean.class);
