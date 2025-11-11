@@ -10,6 +10,18 @@ export interface IBeansResponseBody {
     beans: IBean[];
 }
 
+interface IDependency {
+    /**
+     * The name of the dependent bean
+     */
+    name: string;
+
+    /**
+     * flag that designates that the bean is the config props bean.
+     */
+    isConfigPropsDependency: boolean;
+}
+
 /**
  * An interface that represents the state of the particular bean inside the Spring Boot application
  */
@@ -58,12 +70,17 @@ export interface IBean {
     /**
      * Bean dependencies
      */
-    dependencies: string[];
+    dependencies: IDependency[];
 
     /**
      * The source from which the bean came from.
      */
     beanSource: IBeanSource;
+
+    /**
+     * flag that designates that the bean is the config props bean.
+     */
+    isConfigPropsBean: boolean;
 }
 
 /**
