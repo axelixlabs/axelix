@@ -1,13 +1,16 @@
 package com.nucleonforge.axile.sbs.spring.beans;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
@@ -18,7 +21,10 @@ import org.springframework.util.ClassUtils;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.common.api.BeansFeed.Bean;
+import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
 import com.nucleonforge.axile.common.api.BeansFeed.Context;
+
+import static com.nucleonforge.axile.sbs.spring.beans.ConfigurationPropertiesBeanDetector.isConfigurationPropertiesBean;
 
 /**
  * Web extension for Spring Boot Beans Actuator endpoint.
@@ -55,6 +61,10 @@ public class BeansEndpointExtension {
 
                 if (targetContext != null) {
                     BeanMetaInfo metaInfo = enricher.extract(beanName, targetContext.getBeanFactory());
+
+                    Set<BeanDependency> enrichedDependencies =
+                            enrichDependencies(beanDescriptor.getDependencies(), targetContext.getBeanFactory());
+
                     beans.put(
                             beanName,
                             new Bean(
@@ -63,9 +73,10 @@ public class BeansEndpointExtension {
                                             .getName(),
                                     metaInfo.proxyType(),
                                     toSet(beanDescriptor.getAliases()),
-                                    toSet(beanDescriptor.getDependencies()),
+                                    enrichedDependencies,
                                     metaInfo.isLazyInit(),
                                     metaInfo.isPrimary(),
+                                    metaInfo.isConfigPropsBean(),
                                     metaInfo.qualifiers(),
                                     metaInfo.beanSource()));
                 }
@@ -95,5 +106,17 @@ public class BeansEndpointExtension {
         }
 
         return null;
+    }
+
+    private Set<BeanDependency> enrichDependencies(String[] dependencies, ConfigurableListableBeanFactory beanFactory) {
+        if (dependencies == null || dependencies.length == 0) {
+            return Collections.emptySet();
+        }
+
+        return Arrays.stream(dependencies)
+                .filter(Objects::nonNull)
+                .filter(dep -> !dep.trim().isEmpty())
+                .map(depName -> new BeanDependency(depName, isConfigurationPropertiesBean(beanFactory, depName)))
+                .collect(Collectors.toSet());
     }
 }

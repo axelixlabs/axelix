@@ -38,6 +38,7 @@ class BeansJacksonMessageDeserializationStrategyTest {
                   "dependencies" : [ ],
                   "isLazyInit" : false,
                   "isPrimary" : true,
+                  "isConfigPropsBean": true,
                   "qualifiers" : [ "qualifier1" ],
                   "beanSource": {
                      "origin": "COMPONENT_ANNOTATION"
@@ -48,9 +49,19 @@ class BeansJacksonMessageDeserializationStrategyTest {
                   "scope" : "singleton",
                   "proxyType" : "CGLIB",
                   "type" : "org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration",
-                  "dependencies" : [ "123", "321" ],
+                  "dependencies": [
+                    {
+                      "name": "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
+                      "isConfigPropsDependency": true
+                    },
+                    {
+                      "name": "com.nucleonforge.axile.sbs.autoconfiguration.spring.BeanAnalyzerAutoConfiguration",
+                      "isConfigPropsDependency": false
+                    }
+                 ],
                   "isLazyInit" : true,
                   "isPrimary" : false,
+                  "isConfigPropsBean": false,
                   "qualifiers" : [ ],
                   "beanSource": {
                     "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
@@ -66,6 +77,7 @@ class BeansJacksonMessageDeserializationStrategyTest {
                   "dependencies" : [ ],
                   "isLazyInit" : false,
                   "isPrimary" : false,
+                  "isConfigPropsBean": true,
                   "qualifiers" : [ "main", "secondary" ],
                   "beanSource": {
                     "factoryBeanName": "org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean",
@@ -96,19 +108,35 @@ class BeansJacksonMessageDeserializationStrategyTest {
                             "org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration$DispatcherServletRegistrationConfiguration");
             assertThat(first.isLazyInit()).isFalse();
             assertThat(first.isPrimary()).isTrue();
+            assertThat(first.isConfigPropsBean()).isTrue();
             assertThat(first.qualifiers()).containsOnly("qualifier1");
             assertThat(first.beanSource()).isInstanceOf(BeansFeed.ComponentVariant.class);
 
             BeansFeed.Bean second = context.beans()
                     .get("org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration");
             assertThat(second.aliases()).isEmpty();
-            assertThat(second.dependencies()).containsOnly("123", "321");
+            assertThat(second.dependencies())
+                    .hasSize(2)
+                    .satisfiesExactlyInAnyOrder(
+                            dep -> {
+                                assertThat(dep.name())
+                                        .isEqualTo(
+                                                "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties");
+                                assertThat(dep.isConfigPropsDependency()).isTrue();
+                            },
+                            dep -> {
+                                assertThat(dep.name())
+                                        .isEqualTo(
+                                                "com.nucleonforge.axile.sbs.autoconfiguration.spring.BeanAnalyzerAutoConfiguration");
+                                assertThat(dep.isConfigPropsDependency()).isFalse();
+                            });
             assertThat(second.scope()).isEqualTo("singleton");
             assertThat(second.proxyType()).isEqualTo(BeansFeed.ProxyType.CGLIB);
             assertThat(second.type())
                     .isEqualTo("org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration");
             assertThat(second.isLazyInit()).isTrue();
             assertThat(second.isPrimary()).isFalse();
+            assertThat(second.isConfigPropsBean()).isFalse();
             assertThat(second.qualifiers()).isEmpty();
             assertThat(second.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
             assertThat((BeansFeed.BeanMethod) second.beanSource())
@@ -129,6 +157,7 @@ class BeansJacksonMessageDeserializationStrategyTest {
                     .isEqualTo("org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration");
             assertThat(third.isLazyInit()).isFalse();
             assertThat(third.isPrimary()).isFalse();
+            assertThat(third.isConfigPropsBean()).isTrue();
             assertThat(third.qualifiers()).containsOnly("main", "secondary");
             assertThat(third.beanSource()).isInstanceOf(BeansFeed.FactoryBean.class);
             assertThat((BeansFeed.FactoryBean) third.beanSource())

@@ -55,6 +55,7 @@ class BeansApiTest {
               "dependencies": [],
               "isPrimary": false,
               "isLazyInit": false,
+              "isConfigPropsBean": true,
               "qualifiers": [],
               "beanSource": {
                   "origin": "COMPONENT_ANNOTATION"
@@ -67,11 +68,18 @@ class BeansApiTest {
               "aliases": [],
               "proxyType" : "JDK_PROXY",
               "dependencies": [
-                "JacksonObjectMapperBuilderConfiguration",
-                "org.springframework.boot.autoconfigure.orm.jpa.JpaProperties"
+                {
+                  "name": "JacksonObjectMapperBuilderConfiguration",
+                  "isConfigPropsDependency": true
+                },
+                {
+                  "name": "org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
+                  "isConfigPropsDependency": true
+                }
               ],
               "isPrimary": true,
               "isLazyInit": true,
+              "isConfigPropsBean": true,
               "qualifiers": ["primaryMapper"],
               "beanSource": {
                 "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
@@ -88,6 +96,7 @@ class BeansApiTest {
               "dependencies": [],
               "isPrimary": false,
               "isLazyInit": false,
+              "isConfigPropsBean": false,
               "qualifiers": [],
               "beanSource": {
                 "factoryBeanName": "org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean",
@@ -137,6 +146,7 @@ class BeansApiTest {
                   "dependencies": [],
                   "isLazyInit": false,
                   "isPrimary": false,
+                  "isConfigPropsBean": true,
                   "qualifiers": [],
                   "beanSource": {
                      "origin": "COMPONENT_ANNOTATION"
@@ -149,11 +159,18 @@ class BeansApiTest {
                   "resource": "class path resource JacksonObjectMapperBuilderConfiguration.class",
                   "aliases": [],
                   "dependencies": [
-                    "JacksonObjectMapperBuilderConfiguration",
-                    "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties"
-                  ],
+                    {
+                      "name": "some.prefix-JacksonObjectMapperBuilderConfiguration",
+                      "isConfigPropsDependency": true
+                    },
+                    {
+                     "name": "prefix-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
+                     "isConfigPropsDependency": true
+                   }
+                 ],
                   "isLazyInit": true,
                   "isPrimary": true,
+                  "isConfigPropsBean": true,
                   "qualifiers": ["primaryMapper"],
                   "beanSource": {
                     "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
@@ -170,6 +187,7 @@ class BeansApiTest {
                   "dependencies": [],
                   "isLazyInit": false,
                   "isPrimary": false,
+                  "isConfigPropsBean": false,
                   "qualifiers": [],
                   "beanSource": {
                     "factoryBeanName": "org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean",

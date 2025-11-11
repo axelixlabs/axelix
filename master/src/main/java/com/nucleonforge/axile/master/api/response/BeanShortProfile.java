@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
  * @param dependencies The list of dependencies of this bean (i.e. other beans that this bean depends on).
  * @param isLazyInit   Whether the bean is lazily instantiated or eagerly.
  * @param isPrimary    Whether the bean is marked with {@link BeanDefinition#isPrimary() primary marker}.
+ * @param isConfigPropsBean
  * @param qualifiers   The list of {@link AutowireCandidateQualifier qualifiers} that are assigned to this bean.
  * @param beanSource   The source information describing how this bean was created and its origin type.
  *
@@ -34,9 +35,10 @@ public record BeanShortProfile(
         String className,
         ProxyType proxyType,
         Set<String> aliases,
-        Set<String> dependencies,
+        Set<BeanDependencyProfile> dependencies,
         boolean isPrimary,
         boolean isLazyInit,
+        boolean isConfigPropsBean,
         List<String> qualifiers,
         BeanSource beanSource) {
 
@@ -51,6 +53,8 @@ public record BeanShortProfile(
             qualifiers = Collections.emptyList();
         }
     }
+
+    public record BeanDependencyProfile(String name, boolean isConfigPropsDependency) {}
 
     public enum BeanOrigin {
 

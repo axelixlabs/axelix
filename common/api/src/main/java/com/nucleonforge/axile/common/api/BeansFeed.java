@@ -42,9 +42,10 @@ public record BeansFeed(Map<String, Context> contexts) {
             @JsonProperty("type") String type,
             @JsonProperty("proxyType") ProxyType proxyType,
             @JsonProperty("aliases") Set<String> aliases,
-            @JsonProperty("dependencies") Set<String> dependencies,
+            @JsonProperty("dependencies") Set<BeanDependency> dependencies,
             @JsonProperty("isLazyInit") boolean isLazyInit,
             @JsonProperty("isPrimary") boolean isPrimary,
+            @JsonProperty("isConfigPropsBean") boolean isConfigPropsBean,
             @JsonProperty("qualifiers") List<String> qualifiers,
             @JsonDeserialize(using = BeanSourceDeserializer.class) BeanSource beanSource) {
 
@@ -62,6 +63,10 @@ public record BeansFeed(Map<String, Context> contexts) {
             }
         }
     }
+
+    public record BeanDependency(
+            @JsonProperty("name") String name,
+            @JsonProperty("isConfigPropsDependency") boolean isConfigPropsDependency) {}
 
     public enum BeanOrigin {
         COMPONENT_ANNOTATION,

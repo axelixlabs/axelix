@@ -8,7 +8,9 @@ import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
+import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile;
+import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanDependencyProfile;
 import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +40,7 @@ class BeansFeedConverterTest {
             assertThat(bean1).extracting(BeanShortProfile::scope).isEqualTo("singleton");
             assertThat(bean1).extracting(BeanShortProfile::isPrimary).isEqualTo(false);
             assertThat(bean1).extracting(BeanShortProfile::isLazyInit).isEqualTo(false);
+            assertThat(bean1).extracting(BeanShortProfile::isConfigPropsBean).isEqualTo(true);
             assertThat(bean1)
                     .extracting(BeanShortProfile::qualifiers, InstanceOfAssertFactories.COLLECTION)
                     .isEmpty();
@@ -57,16 +60,22 @@ class BeansFeedConverterTest {
             assertThat(bean2).extracting(BeanShortProfile::scope).isEqualTo("session");
             assertThat(bean2).extracting(BeanShortProfile::isPrimary).isEqualTo(true);
             assertThat(bean2).extracting(BeanShortProfile::isLazyInit).isEqualTo(false);
+            assertThat(bean2).extracting(BeanShortProfile::isConfigPropsBean).isEqualTo(false);
             assertThat(bean2)
                     .extracting(BeanShortProfile::qualifiers, InstanceOfAssertFactories.COLLECTION)
                     .containsOnly("first");
-
             assertThat(bean2)
                     .extracting(BeanShortProfile::aliases, InstanceOfAssertFactories.COLLECTION)
                     .hasSize(0);
             assertThat(bean2)
                     .extracting(BeanShortProfile::dependencies, InstanceOfAssertFactories.COLLECTION)
-                    .containsOnly("dep1", "dep2");
+                    .hasSize(1)
+                    .extracting("name")
+                    .containsOnly("org.springframework.boot.autoconfigure.orm.jpa.JpaProperties");
+            assertThat(bean2)
+                    .extracting(BeanShortProfile::dependencies, InstanceOfAssertFactories.COLLECTION)
+                    .extracting("isConfigPropsDependency")
+                    .containsOnly(true);
             assertThat(bean2)
                     .extracting(BeanShortProfile::beanSource)
                     .isInstanceOf(BeanShortProfile.FactoryBean.class)
@@ -82,9 +91,20 @@ class BeansFeedConverterTest {
                     .containsOnly("abc", "bcd");
             assertThat(bean3)
                     .extracting(BeanShortProfile::dependencies, InstanceOfAssertFactories.COLLECTION)
-                    .hasSize(0);
+                    .filteredOn(dep -> "org.springframework.boot.autoconfigure.orm.jpa.JpaProperties"
+                            .equals(((BeanDependencyProfile) dep).name()))
+                    .extracting("isConfigPropsDependency")
+                    .containsOnly(true);
+            assertThat(bean3)
+                    .extracting(BeanShortProfile::dependencies, InstanceOfAssertFactories.COLLECTION)
+                    .filteredOn(dep ->
+                            "org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration"
+                                    .equals(((BeanDependencyProfile) dep).name()))
+                    .extracting("isConfigPropsDependency")
+                    .containsOnly(false);
             assertThat(bean3).extracting(BeanShortProfile::isPrimary).isEqualTo(true);
             assertThat(bean3).extracting(BeanShortProfile::isLazyInit).isEqualTo(true);
+            assertThat(bean3).extracting(BeanShortProfile::isConfigPropsBean).isEqualTo(true);
             assertThat(bean3)
                     .extracting(BeanShortProfile::qualifiers, InstanceOfAssertFactories.COLLECTION)
                     .containsOnly("one", "two");
@@ -119,6 +139,7 @@ class BeansFeedConverterTest {
                         Set.of(),
                         false,
                         false,
+                        true,
                         List.of(),
                         new BeansFeed.ComponentVariant()),
 
@@ -129,9 +150,11 @@ class BeansFeedConverterTest {
                         "java.lang.Integer",
                         BeansFeed.ProxyType.JDK_PROXY,
                         Set.of(),
-                        Set.of("dependency.prefix1-dep1", "dependency.prefix2-dep2"),
+                        Set.of(new BeanDependency(
+                                "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties", true)),
                         false,
                         true,
+                        false,
                         List.of("first"),
                         new BeansFeed.FactoryBean("someFactoryBean")),
 
@@ -142,7 +165,14 @@ class BeansFeedConverterTest {
                         "java.util.Date",
                         BeansFeed.ProxyType.NO_PROXYING,
                         Set.of("abc", "bcd"),
-                        Set.of(),
+                        Set.of(
+                                new BeanDependency(
+                                        "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
+                                        true),
+                                new BeanDependency(
+                                        "org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration",
+                                        false)),
+                        true,
                         true,
                         true,
                         List.of("one", "two"),

@@ -18,6 +18,8 @@ import org.springframework.util.ClassUtils;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
 
+import static com.nucleonforge.axile.sbs.spring.beans.ConfigurationPropertiesBeanDetector.isConfigurationPropertiesBean;
+
 /**
  * Default implementation of {@link BeanMetaInfoExtractor}.
  *
@@ -44,6 +46,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
                 analyzeProxyType(bean.getClass()),
                 beanDefinition.isLazyInit(),
                 beanDefinition.isPrimary(),
+                isConfigurationPropertiesBean(beanFactory, beanName),
                 qualifiersRegistry.getQualifiers(beanName),
                 analyzeBeanSource(beanDefinition, beanName));
     }
