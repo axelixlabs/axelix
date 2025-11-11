@@ -3,8 +3,6 @@ package com.nucleonforge.axile.master.autoconfiguration;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Set;
 
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -54,9 +52,7 @@ public class KubernetesAutoConfiguration {
 
     @Bean
     public DiscoveryClient discoveryClient(
-        KubernetesClient kubernetesClient,
-        @Value("${spring.cloud.kubernetes.discovery.namespaces:}") Set<String> namespaces
-    ) {
-        return new AxileKubernetesDiscoveryClient(kubernetesClient, namespaces);
+            KubernetesClient kubernetesClient, KubernetesDiscoveryProperties discoveryProperties) {
+        return new AxileKubernetesDiscoveryClient(kubernetesClient, discoveryProperties.namespaces());
     }
 }

@@ -3,9 +3,9 @@ package com.nucleonforge.axile.master.service.discovery;
 import java.net.URI;
 import java.util.Map;
 
-import com.nucleonforge.axile.master.model.instance.Instance;
-
 import org.springframework.cloud.client.ServiceInstance;
+
+import com.nucleonforge.axile.master.model.instance.Instance;
 
 /**
  * Represents a Kubernetes service instance for {@link AxileKubernetesDiscoveryClient}.

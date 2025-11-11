@@ -3,9 +3,11 @@ package com.nucleonforge.axile.master.service.discovery;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
@@ -16,22 +18,22 @@ import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
-import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import io.fabric8.kubernetes.client.dsl.ServiceResource;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.mockito.Answers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,36 +43,28 @@ import static org.mockito.Mockito.when;
  * @since 10.11.2025
  * @author Nikita Kirillov
  */
-@SpringBootTest(classes = {AxileKubernetesDiscoveryClient.class})
-@TestPropertySource(properties = {"spring.cloud.kubernetes.discovery.namespaces=prod,staging"})
+@SpringBootTest
 class AxileKubernetesDiscoveryClientTest {
+
+    @Configuration
+    static class TestConfig {
+        @Bean
+        @Primary
+        public AxileKubernetesDiscoveryClient axileDiscoveryClient(KubernetesClient kubernetesClient) {
+            return new AxileKubernetesDiscoveryClient(kubernetesClient, Set.of("prod", "staging"));
+        }
+    }
 
     @Autowired
     private AxileKubernetesDiscoveryClient discoveryClient;
 
-    @MockBean
+    @MockBean(answer = Answers.RETURNS_DEEP_STUBS)
     private KubernetesClient kubernetesClient;
 
-    @Mock
-    private MixedOperation<Service, ServiceList, ServiceResource<Service>> servicesMixedOperation;
+    private MixedOperation<Service, ServiceList, ServiceResource<Service>> servicesOp =
+            mock(MixedOperation.class, RETURNS_DEEP_STUBS);
 
-    @Mock
-    private MixedOperation<Pod, PodList, PodResource> podsMixedOperation;
-
-    @Mock
-    private NonNamespaceOperation<Service, ServiceList, ServiceResource<Service>> nonNamespaceServiceOperation;
-
-    @Mock
-    private NonNamespaceOperation<Pod, PodList, PodResource> nonNamespacePodOperation;
-
-    @BeforeEach
-    void setUp() {
-        when(kubernetesClient.services()).thenReturn(servicesMixedOperation);
-        when(servicesMixedOperation.inNamespace(anyString())).thenReturn(nonNamespaceServiceOperation);
-        when(kubernetesClient.pods()).thenReturn(podsMixedOperation);
-        when(podsMixedOperation.inNamespace(anyString())).thenReturn(nonNamespacePodOperation);
-        when(nonNamespacePodOperation.withLabels(anyMap())).thenReturn(nonNamespacePodOperation);
-    }
+    private MixedOperation<Pod, PodList, PodResource> podsOp = mock(MixedOperation.class, RETURNS_DEEP_STUBS);
 
     @Test
     void shouldReturnServicesByUidFromMultipleNamespaces() {
@@ -84,13 +78,10 @@ class AxileKubernetesDiscoveryClientTest {
         ServiceList serviceList1 = createServiceList(service1, service3);
         ServiceList serviceList2 = createServiceList(service2);
 
-        NonNamespaceOperation<Service, ServiceList, ServiceResource<Service>> nonNamespaceOperation =
-                mock(NonNamespaceOperation.class);
+        when(kubernetesClient.services()).thenReturn(servicesOp);
 
-        when(servicesMixedOperation.inNamespace(namespace1)).thenReturn(nonNamespaceServiceOperation);
-        when(servicesMixedOperation.inNamespace(namespace2)).thenReturn(nonNamespaceOperation);
-        when(nonNamespaceServiceOperation.list()).thenReturn(serviceList1);
-        when(nonNamespaceOperation.list()).thenReturn(serviceList2);
+        when(servicesOp.inNamespace(namespace1).list()).thenReturn(serviceList1);
+        when(servicesOp.inNamespace(namespace2).list()).thenReturn(serviceList2);
 
         List<String> services = discoveryClient.getServices();
 
@@ -99,14 +90,12 @@ class AxileKubernetesDiscoveryClientTest {
 
     @Test
     void shouldReturnEmptyListWhenNoServicesFound() {
+        when(kubernetesClient.services()).thenReturn(servicesOp);
+
         ServiceList emptyServiceList = createServiceList();
 
-        NonNamespaceOperation<Service, ServiceList, ServiceResource<Service>> nonNamespaceOperation =
-                mock(NonNamespaceOperation.class);
-
-        when(servicesMixedOperation.inNamespace("staging")).thenReturn(nonNamespaceOperation);
-        when(nonNamespaceServiceOperation.list()).thenReturn(emptyServiceList);
-        when(nonNamespaceOperation.list()).thenReturn(emptyServiceList);
+        when(servicesOp.inNamespace("prod").list()).thenReturn(emptyServiceList);
+        when(servicesOp.inNamespace("staging").list()).thenReturn(emptyServiceList);
 
         List<String> services = discoveryClient.getServices();
 
@@ -133,23 +122,16 @@ class AxileKubernetesDiscoveryClientTest {
         ServiceList stagingServiceList = createServiceList(stagingService);
         PodList stagingPodList = createPodList(stagingPod1, stagingPod2);
 
+        when(kubernetesClient.services()).thenReturn(servicesOp);
+        when(kubernetesClient.pods()).thenReturn(podsOp);
+
         // prod namespace
-        when(servicesMixedOperation.inNamespace(prodNamespace)).thenReturn(nonNamespaceServiceOperation);
-        when(podsMixedOperation.inNamespace(prodNamespace)).thenReturn(nonNamespacePodOperation);
-        when(nonNamespaceServiceOperation.list()).thenReturn(prodServiceList);
-        when(nonNamespacePodOperation.withLabels(anyMap())).thenReturn(nonNamespacePodOperation);
-        when(nonNamespacePodOperation.list()).thenReturn(prodPodList);
+        when(servicesOp.inNamespace(prodNamespace).list()).thenReturn(prodServiceList);
+        when(podsOp.inNamespace(prodNamespace).withLabels(anyMap()).list()).thenReturn(prodPodList);
 
         // staging namespace
-        NonNamespaceOperation<Service, ServiceList, ServiceResource<Service>> stagingNsServiceOp =
-                mock(NonNamespaceOperation.class);
-        NonNamespaceOperation<Pod, PodList, PodResource> stagingNsPodOp = mock(NonNamespaceOperation.class);
-
-        when(servicesMixedOperation.inNamespace(stagingNamespace)).thenReturn(stagingNsServiceOp);
-        when(podsMixedOperation.inNamespace(stagingNamespace)).thenReturn(stagingNsPodOp);
-        when(stagingNsServiceOp.list()).thenReturn(stagingServiceList);
-        when(stagingNsPodOp.withLabels(anyMap())).thenReturn(stagingNsPodOp);
-        when(stagingNsPodOp.list()).thenReturn(stagingPodList);
+        when(servicesOp.inNamespace(stagingNamespace).list()).thenReturn(stagingServiceList);
+        when(podsOp.inNamespace(stagingNamespace).withLabels(anyMap()).list()).thenReturn(stagingPodList);
 
         List<ServiceInstance> instances = discoveryClient.getInstances(serviceUid);
 
@@ -168,12 +150,10 @@ class AxileKubernetesDiscoveryClientTest {
     void shouldReturnEmptyInstancesWhenServiceNotFound() {
         ServiceList emptyServiceList = createServiceList();
 
-        NonNamespaceOperation<Service, ServiceList, ServiceResource<Service>> nonNamespaceOperation =
-                mock(NonNamespaceOperation.class);
+        when(kubernetesClient.services()).thenReturn(servicesOp);
 
-        when(servicesMixedOperation.inNamespace("staging")).thenReturn(nonNamespaceOperation);
-        when(nonNamespaceServiceOperation.list()).thenReturn(emptyServiceList);
-        when(nonNamespaceOperation.list()).thenReturn(emptyServiceList);
+        when(servicesOp.inNamespace("prod").list()).thenReturn(emptyServiceList);
+        when(servicesOp.inNamespace("staging").list()).thenReturn(emptyServiceList);
 
         List<ServiceInstance> instances = discoveryClient.getInstances("non-existent-uid");
 
@@ -188,7 +168,9 @@ class AxileKubernetesDiscoveryClientTest {
         Service service = createMockService("service-no-selector", serviceUid, namespace, null);
         ServiceList serviceList = createServiceList(service);
 
-        when(nonNamespaceServiceOperation.list()).thenReturn(serviceList);
+        when(kubernetesClient.services()).thenReturn(servicesOp);
+        when(servicesOp.inNamespace("prod").list()).thenReturn(serviceList);
+        when(servicesOp.inNamespace("staging").list()).thenReturn(new ServiceList());
 
         List<ServiceInstance> instances = discoveryClient.getInstances(serviceUid);
 
@@ -201,12 +183,16 @@ class AxileKubernetesDiscoveryClientTest {
         String namespace = "prod";
 
         Service service = createMockService("staging", serviceUid, namespace, Map.of("app", "test-app"));
-
         ServiceList serviceList = createServiceList(service);
         PodList emptyPodList = createPodList();
 
-        when(nonNamespaceServiceOperation.list()).thenReturn(serviceList);
-        when(nonNamespacePodOperation.list()).thenReturn(emptyPodList);
+        when(kubernetesClient.services()).thenReturn(servicesOp);
+        when(kubernetesClient.pods()).thenReturn(podsOp);
+
+        when(servicesOp.inNamespace("prod").list()).thenReturn(serviceList);
+        when(servicesOp.inNamespace("staging").list()).thenReturn(new ServiceList());
+
+        when(podsOp.inNamespace("prod").withLabels(anyMap()).list()).thenReturn(emptyPodList);
 
         List<ServiceInstance> instances = discoveryClient.getInstances(serviceUid);
 
@@ -219,25 +205,19 @@ class AxileKubernetesDiscoveryClientTest {
         String namespace = "prod";
 
         Service service = createMockService("prod-service", serviceUid, namespace, Map.of("app", "test-app"));
-
         Pod podWithIp = createMockPod("pod-with-ip", "10.0.0.1", namespace, Map.of("app", "test-app"));
-
         Pod podWithoutIp = createMockPod("pod-without-ip", null, namespace, Map.of("app", "test-app"));
 
         ServiceList serviceList = createServiceList(service);
         PodList podList = createPodList(podWithIp, podWithoutIp);
 
-        when(nonNamespaceServiceOperation.list()).thenReturn(serviceList);
-        when(nonNamespacePodOperation.list()).thenReturn(podList);
+        when(kubernetesClient.services()).thenReturn(servicesOp);
+        when(kubernetesClient.pods()).thenReturn(podsOp);
 
-        NonNamespaceOperation<Service, ServiceList, ServiceResource<Service>> nonNamespaceOperation =
-                mock(NonNamespaceOperation.class);
-        NonNamespaceOperation<Pod, PodList, PodResource> namespace2PodOp = mock(NonNamespaceOperation.class);
+        when(servicesOp.inNamespace("prod").list()).thenReturn(serviceList);
+        when(servicesOp.inNamespace("staging").list()).thenReturn(new ServiceList());
 
-        when(servicesMixedOperation.inNamespace("staging")).thenReturn(nonNamespaceOperation);
-        when(podsMixedOperation.inNamespace("staging")).thenReturn(namespace2PodOp);
-        when(nonNamespaceOperation.list()).thenReturn(new ServiceList());
-        when(namespace2PodOp.list()).thenReturn(new PodList());
+        when(podsOp.inNamespace("prod").withLabels(anyMap()).list()).thenReturn(podList);
 
         List<ServiceInstance> instances = discoveryClient.getInstances(serviceUid);
 
@@ -264,23 +244,16 @@ class AxileKubernetesDiscoveryClientTest {
         ServiceList stagingServiceList = createServiceList(stagingService);
         PodList stagingPodList = createPodList(stagingPod);
 
+        when(kubernetesClient.services()).thenReturn(servicesOp);
+        when(kubernetesClient.pods()).thenReturn(podsOp);
+
         // prod namespace
-        when(servicesMixedOperation.inNamespace(prodNamespace)).thenReturn(nonNamespaceServiceOperation);
-        when(podsMixedOperation.inNamespace(prodNamespace)).thenReturn(nonNamespacePodOperation);
-        when(nonNamespaceServiceOperation.list()).thenReturn(prodServiceList);
-        when(nonNamespacePodOperation.withLabels(anyMap())).thenReturn(nonNamespacePodOperation);
-        when(nonNamespacePodOperation.list()).thenReturn(prodPodList);
+        when(servicesOp.inNamespace(prodNamespace).list()).thenReturn(prodServiceList);
+        when(podsOp.inNamespace(prodNamespace).withLabels(anyMap()).list()).thenReturn(prodPodList);
 
         // staging namespace
-        NonNamespaceOperation<Service, ServiceList, ServiceResource<Service>> stagingNamespaceServiceOp =
-                mock(NonNamespaceOperation.class);
-        NonNamespaceOperation<Pod, PodList, PodResource> stagingNamespacePodOp = mock(NonNamespaceOperation.class);
-
-        when(servicesMixedOperation.inNamespace(stagingNamespace)).thenReturn(stagingNamespaceServiceOp);
-        when(podsMixedOperation.inNamespace(stagingNamespace)).thenReturn(stagingNamespacePodOp);
-        when(stagingNamespaceServiceOp.list()).thenReturn(stagingServiceList);
-        when(stagingNamespacePodOp.withLabels(anyMap())).thenReturn(stagingNamespacePodOp);
-        when(stagingNamespacePodOp.list()).thenReturn(stagingPodList);
+        when(servicesOp.inNamespace(stagingNamespace).list()).thenReturn(stagingServiceList);
+        when(podsOp.inNamespace(stagingNamespace).withLabels(anyMap()).list()).thenReturn(stagingPodList);
 
         List<ServiceInstance> instances = discoveryClient.getInstances(serviceUid);
 
@@ -300,10 +273,12 @@ class AxileKubernetesDiscoveryClientTest {
         String namespace = "prod";
 
         Service service = createMockService("empty-selector-service", serviceUid, namespace, Collections.emptyMap());
-
         ServiceList serviceList = createServiceList(service);
 
-        when(nonNamespaceServiceOperation.list()).thenReturn(serviceList);
+        when(kubernetesClient.services()).thenReturn(servicesOp);
+
+        when(servicesOp.inNamespace("prod").list()).thenReturn(serviceList);
+        when(servicesOp.inNamespace("staging").list()).thenReturn(new ServiceList());
 
         List<ServiceInstance> instances = discoveryClient.getInstances(serviceUid);
 
@@ -331,6 +306,7 @@ class AxileKubernetesDiscoveryClientTest {
         ServicePort port = mock(ServicePort.class);
         when(port.getName()).thenReturn("http");
         when(port.getPort()).thenReturn(8080);
+        when(port.getTargetPort()).thenReturn(new IntOrString(8080));
         when(port.getProtocol()).thenReturn("TCP");
         when(spec.getPorts()).thenReturn(List.of(port));
 
@@ -353,11 +329,13 @@ class AxileKubernetesDiscoveryClientTest {
         ServicePort httpPort = mock(ServicePort.class);
         when(httpPort.getName()).thenReturn("http");
         when(httpPort.getPort()).thenReturn(8080);
+        when(httpPort.getTargetPort()).thenReturn(new IntOrString(8080));
         when(httpPort.getProtocol()).thenReturn("TCP");
 
         ServicePort httpsPort = mock(ServicePort.class);
         when(httpsPort.getName()).thenReturn("https");
         when(httpsPort.getPort()).thenReturn(8443);
+        when(httpsPort.getTargetPort()).thenReturn(new IntOrString(8443));
         when(httpsPort.getProtocol()).thenReturn("TCP");
 
         when(spec.getPorts()).thenReturn(List.of(httpPort, httpsPort));

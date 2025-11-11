@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import com.nucleonforge.axile.master.utils.CollectionUtils;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
@@ -16,14 +15,15 @@ import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+
+import com.nucleonforge.axile.master.utils.CollectionUtils;
 
 /**
  * Axile Kubernetes implementation of {@link DiscoveryClient}.
@@ -38,7 +38,6 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
     private final KubernetesClient kubernetesClient;
     private final Set<String> namespaces;
 
-    // TODO: We need to work here with the dedicated configuration properties, not just injecting @Value and stuff
     public AxileKubernetesDiscoveryClient(KubernetesClient kubernetesClient, Set<String> namespaces) {
         this.namespaces = CollectionUtils.defaultIfEmpty(namespaces, kubernetesClient.getNamespace());
         this.kubernetesClient = kubernetesClient;
@@ -50,7 +49,7 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
     }
 
     @Override
-    public List<ServiceInstance> getInstances(@NotNull String serviceId) {
+    public List<ServiceInstance> getInstances(@NonNull String serviceId) {
         List<ServiceInstance> instances = new ArrayList<>();
 
         for (String namespace : namespaces) {
@@ -154,7 +153,7 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
     }
 
     private ServiceInstance createServiceInstance(String serviceId, String namespace, Pod pod, ServicePort port)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
 
         validateServicePort(serviceId, port);
 
@@ -178,11 +177,13 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
         Integer targetPort = servicePort.getTargetPort().getIntVal();
 
         if (targetPort == null) {
-            throw new IllegalArgumentException("""
+            throw new IllegalArgumentException(
+                    """
                 As of now, we do not support named K8S ports. \s
                 The targetPort of the K8S '%s' is supposed to be an integer, \s
                 but it is not. So, as of now, the service will not get registered. \s
-                """.formatted(serviceId));
+                """
+                            .formatted(serviceId));
         }
     }
 }
