@@ -10,6 +10,7 @@ import com.nucleonforge.axile.common.api.ConfigpropsFeed;
 import com.nucleonforge.axile.master.api.response.KeyValue;
 import com.nucleonforge.axile.master.api.response.configprops.ConfigpropsProfile;
 import com.nucleonforge.axile.master.service.convert.Converter;
+import com.nucleonforge.axile.master.service.convert.utils.BeanNameUtils;
 
 /**
  * Abstract {@link Converter} for the Configprops endpoint,
@@ -27,27 +28,13 @@ public abstract class AbstractConfigpropsConverter<R> implements Converter<Confi
         return convertBeans(source.contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().entrySet().stream())
                 .map(entry -> {
-                    String beanName = stripBeanName(entry.getKey());
+                    String beanName = BeanNameUtils.stripConfigPropsPrefix(entry.getKey());
                     ConfigpropsFeed.Bean bean = entry.getValue();
                     List<KeyValue> properties = flatten("", bean.properties());
                     List<KeyValue> inputs = flatten("", bean.inputs());
                     return new ConfigpropsProfile(beanName, bean.prefix(), properties, inputs);
                 })
                 .toList());
-    }
-
-    /**
-     * The bean name of the configprops bean as returned by the actuator, for some reason, contains
-     * the dash at the very beginning. I do not know why. We do not want to show it in the bean name.
-     */
-    private static String stripBeanName(String beanName) {
-        int indexOfDash = beanName.indexOf("-");
-
-        if (indexOfDash != -1 && indexOfDash < beanName.length() - 1) {
-            return beanName.substring(indexOfDash + 1);
-        } else {
-            return beanName;
-        }
     }
 
     protected abstract R convertBeans(List<ConfigpropsProfile> beans);

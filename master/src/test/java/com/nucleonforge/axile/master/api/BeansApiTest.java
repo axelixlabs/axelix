@@ -67,7 +67,8 @@ class BeansApiTest {
               "aliases": [],
               "proxyType" : "JDK_PROXY",
               "dependencies": [
-                "JacksonObjectMapperBuilderConfiguration"
+                "JacksonObjectMapperBuilderConfiguration",
+                "org.springframework.boot.autoconfigure.orm.jpa.JpaProperties"
               ],
               "isPrimary": true,
               "isLazyInit": true,
@@ -128,7 +129,7 @@ class BeansApiTest {
             "application": {
               "parentId": null,
               "beans": {
-                "jmxEndpointProperties": {
+                "management.prefix-jmxEndpointProperties": {
                   "scope": "singleton",
                   "type": "JmxEndpointProperties",
                   "proxyType" : "CGLIB",
@@ -148,7 +149,8 @@ class BeansApiTest {
                   "resource": "class path resource JacksonObjectMapperBuilderConfiguration.class",
                   "aliases": [],
                   "dependencies": [
-                    "JacksonObjectMapperBuilderConfiguration"
+                    "JacksonObjectMapperBuilderConfiguration",
+                    "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties"
                   ],
                   "isLazyInit": true,
                   "isPrimary": true,

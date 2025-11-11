@@ -110,7 +110,7 @@ class BeansFeedConverterTest {
         return Map.of(
 
                 // first bean
-                "bean1",
+                "some.prefix-bean1",
                 new BeansFeed.Bean(
                         "singleton",
                         "java.lang.String",
@@ -129,7 +129,7 @@ class BeansFeedConverterTest {
                         "java.lang.Integer",
                         BeansFeed.ProxyType.JDK_PROXY,
                         Set.of(),
-                        Set.of("dep1", "dep2"),
+                        Set.of("dependency.prefix1-dep1", "dependency.prefix2-dep2"),
                         false,
                         true,
                         List.of("first"),
