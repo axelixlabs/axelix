@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { Loader } from "components";
+import { EmptyHandler, Loader } from "components";
 import { fetchData } from "helpers";
 import { useAppSelector } from "hooks";
 import { type IEnvironmentResponseBody, StatefulRequest } from "models";
@@ -41,14 +41,16 @@ export const Environment = () => {
     }
 
     if (environment.error) {
-        // todo change error handling in future
-        return environment.error;
+        return <EmptyHandler isEmpty />;
     }
+
+    const activeProfiles = environment.response!.activeProfiles;
+    const propertySources = environment.response!.propertySources;
 
     return (
         <>
-            <EnvironmentProfiles activeProfiles={environment.response!.activeProfiles} />
-            <EnvironmentTables propertySources={environment.response!.propertySources} />
+            <EnvironmentProfiles activeProfiles={activeProfiles} />
+            <EnvironmentTables propertySources={propertySources} />
         </>
     );
 };

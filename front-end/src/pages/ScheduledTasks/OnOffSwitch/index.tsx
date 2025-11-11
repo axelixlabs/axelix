@@ -1,10 +1,12 @@
 import { Switch, message } from "antd";
+import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { type IRunnable, StatelessRequest } from "models";
+import { type IErrorResponse, type IRunnable, StatelessRequest } from "models";
 import { updateScheduledTasksStatus } from "services";
+import { UNKNOWN_ERROR } from "utils";
 
 interface IProps {
     /**
@@ -33,7 +35,9 @@ export const OnOffSwitch = ({ runnable }: IProps) => {
                 runnable.enabled = !runnable.enabled;
                 setMutationRequest(StatelessRequest.success());
             })
-            .catch(() => setMutationRequest(StatelessRequest.error(""))); // TODO: Error handling
+            .catch((error: AxiosError<IErrorResponse>) => {
+                setMutationRequest(StatelessRequest.error(error?.response?.data?.code ?? UNKNOWN_ERROR));
+            });
     };
 
     return (

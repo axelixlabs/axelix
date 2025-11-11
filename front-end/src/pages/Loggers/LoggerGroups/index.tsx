@@ -1,9 +1,11 @@
+import type { AxiosError } from "axios";
 import type { Dispatch, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
 import { Accordion, TooltipWithCopy } from "components";
-import { type ILoggerGroup, StatelessRequest } from "models";
+import { type IErrorResponse, type ILoggerGroup, StatelessRequest } from "models";
 import { changeLoggerGroupLevel } from "services";
+import { UNKNOWN_ERROR } from "utils";
 
 import { Levels } from "../Levels";
 
@@ -45,8 +47,10 @@ export const LoggerGroups = ({ loggerGroups, levels, setUpdateLoggerGroupLevel }
                                 setUpdateLoggerGroupLevel(StatelessRequest.error(""));
                             }
                         })
-                        .catch(() => {
-                            setUpdateLoggerGroupLevel(StatelessRequest.error(""));
+                        .catch((error: AxiosError<IErrorResponse>) => {
+                            setUpdateLoggerGroupLevel(
+                                StatelessRequest.error(error?.response?.data?.code ?? UNKNOWN_ERROR),
+                            );
                         });
                 };
 

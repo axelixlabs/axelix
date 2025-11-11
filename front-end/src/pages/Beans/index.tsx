@@ -24,8 +24,7 @@ export const Beans = () => {
     }
 
     if (dataState.error) {
-        // todo change error handling in future
-        return dataState.error;
+        return <EmptyHandler isEmpty />;
     }
 
     const beansFeed = dataState.response!.beans;
