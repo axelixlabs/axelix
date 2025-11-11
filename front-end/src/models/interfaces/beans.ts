@@ -70,7 +70,7 @@ export interface IBean {
  * The "source" of the bean. By "source" we mean how exactly this particular {@link IBean} was discovered
  * by the Spring Framework
  */
-interface IBeanSource {
+export interface IBeanSource {
     /**
      * Optional name of the method that actually produces the instance of the given bean. Present in response from the
      * backend only in case of {@link origin} is equal to {@link BeanOrigin.BEAN_METHOD}
