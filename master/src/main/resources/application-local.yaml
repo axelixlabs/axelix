@@ -8,5 +8,5 @@ spring:
         discovery-server-url: https://158.160.194.14:443
         namespaces: default
       # Should be set-up in local .env file or by any other means
-      sa-token-path: C:\Prog\Project\axile\master\local\token
-      ca-cert-path: C:\Prog\Project\axile\master\local\ca.cert
+      sa-token-path: ${LOCAL_TOKEN_PATH:}
+      ca-cert-path: ${LOCAL_CA_PATH:}
