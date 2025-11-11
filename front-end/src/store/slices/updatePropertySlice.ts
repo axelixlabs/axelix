@@ -16,15 +16,9 @@ export const UpdatePropertySlice = createSlice({
         builder.addCase(updatePropertyThunk.fulfilled, () => {
             return StatelessRequest.success();
         });
-        builder.addCase(updatePropertyThunk.rejected, (state, { payload }) => {
-            const { status } = payload;
-
-            if (status >= 400 && status < 500) {
-                // todo translate this in future
-                return StatelessRequest.error("Неизвестная ошибка");
-            } else {
-                return StatelessRequest.error("Произошла внутренняя ошибка сервиса");
-            }
+        builder.addCase(updatePropertyThunk.rejected, (_, { payload }) => {
+            const { code } = payload;
+            return StatelessRequest.error(code);
         });
     },
 });

@@ -1,6 +1,6 @@
 import type { IConfigPropsBean } from "models";
 
-import { canonicalize } from "./global";
+import { canonicalize } from "./globals";
 
 export const filterConfigPropsBeans = (beans: IConfigPropsBean[], search: string): IConfigPropsBean[] => {
     const formattedSearch = canonicalize(search);

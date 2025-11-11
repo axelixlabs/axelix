@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { Loader, PageSearch } from "components";
+import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterConfigPropsBeans, getPropertiesCount } from "helpers";
 import { useAppSelector } from "hooks";
 import { type IConfigPropsBean, type IConfigPropsResponseBody, StatefulRequest } from "models";
@@ -28,8 +28,8 @@ export const ConfigProps = () => {
     }, []);
 
     useEffect(() => {
-        if (updatePropertyState.completedSuccessfully() && instanceId) {
-            fetchConfigProps(instanceId);
+        if (updatePropertyState.completedSuccessfully()) {
+            fetchConfigProps(instanceId!);
             message.success(t("saved"));
         }
     }, [updatePropertyState]);
@@ -39,8 +39,7 @@ export const ConfigProps = () => {
     }
 
     if (configProps.error) {
-        // TODO: handle this case differently in the future
-        return configProps.error;
+        return <EmptyHandler isEmpty />;
     }
 
     const configPropsBeansFeed = configProps.response!.beans;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Copy, Loader } from "components";
+import { Copy, EmptyHandler, Loader } from "components";
 import { fetchData, isCopyableField, resolveLangIcon, resolveOsIcon } from "helpers";
 import { type IDetailsCardRecord, type IDetailsResponseBody, StatefulRequest } from "models";
 import type { DetailsBuildValuesData } from "models/types/details";
@@ -30,8 +30,7 @@ const Details = () => {
     }
 
     if (dataState.error) {
-        // todo change error handling in future
-        return dataState.error;
+        return <EmptyHandler isEmpty />;
     }
 
     const buildValues = (data: DetailsBuildValuesData): IDetailsCardRecord[] => {

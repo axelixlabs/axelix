@@ -37,7 +37,7 @@ export const Conditions = () => {
     }
 
     if (dataState.error) {
-        return dataState.error;
+        return <EmptyHandler isEmpty />;
     }
 
     const negativeMatches = dataState.response!.negativeMatches;

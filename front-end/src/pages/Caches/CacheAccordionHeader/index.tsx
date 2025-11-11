@@ -1,13 +1,15 @@
 import { ReloadOutlined } from "@ant-design/icons";
 
 import { Button, message } from "antd";
+import type { AxiosError } from "axios";
 import { type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
-import { type ICacheData, StatelessRequest } from "models";
+import { type ICacheData, type IErrorResponse, StatelessRequest } from "models";
 import { clearCacheData } from "services";
+import { UNKNOWN_ERROR } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -40,7 +42,9 @@ export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
                 setClearSingleCache(StatelessRequest.success());
                 message.success(t("Caches.cleared"));
             })
-            .catch(() => setClearSingleCache(StatelessRequest.error("")));
+            .catch((error: AxiosError<IErrorResponse>) => {
+                setClearSingleCache(StatelessRequest.error(error?.response?.data?.code ?? UNKNOWN_ERROR));
+            });
     };
 
     return (

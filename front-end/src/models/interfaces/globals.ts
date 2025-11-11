@@ -129,3 +129,10 @@ export interface IUpdatePropertyRequestData {
      */
     newValue: string;
 }
+
+export interface IErrorResponse {
+    /**
+     * Server text used to display a user-friendly notification
+     */
+    code?: string;
+}

@@ -45,7 +45,7 @@ export const Loggers = () => {
     }
 
     if (loggersData.error) {
-        return loggersData.error;
+        return <EmptyHandler isEmpty />;
     }
 
     const levels = loggersData.response!.levels;

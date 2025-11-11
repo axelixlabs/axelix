@@ -1,7 +1,10 @@
+import { notification } from "antd";
 import type { AxiosResponse } from "axios";
+import { t } from "i18next";
 import type { Dispatch, SetStateAction } from "react";
 
 import { type IConfigPropsBean, type IEnvironmentPropertySource, type MenuItem, StatefulRequest } from "models";
+import { UNKNOWN_ERROR } from "utils";
 
 export const findOpenKeys = (items: MenuItem[], path: string): string[] => {
     const parent = items.find(
@@ -24,8 +27,10 @@ export async function fetchData<S>(setDataState: SetRequestState<S>, dataFetcher
         const result = await dataFetcher();
 
         setDataState(() => StatefulRequest.success(result.data));
-    } catch {
-        setDataState(() => StatefulRequest.error("Some error"));
+        // TODO: Fix type in future
+    } catch (error: any) {
+        const errorCode = error?.response?.data?.code ?? UNKNOWN_ERROR;
+        setDataState(() => StatefulRequest.error(errorCode));
     }
 }
 
@@ -46,3 +51,11 @@ export const canonicalize = (string: string): string => {
 export const normalizeHtmlElementId = (elementId: string): string => {
     return canonicalize(elementId);
 };
+
+export function showErrorNotification(errorCode: string | undefined): void {
+    notification.error({
+        message: t("ErrorCodes.error"),
+        description: !errorCode ? t(`ErrorCodes.${UNKNOWN_ERROR}`) : t(`ErrorCodes.${errorCode}`),
+        placement: "top",
+    });
+}
