@@ -16,12 +16,12 @@ export function scrollToAccordionById(query: string, searchSubject: ESearchSubje
         const dataset = element.dataset;
         const beanName = dataset.beanName;
         const beanClass = dataset.beanClass;
-        const beanAliases = dataset.beanAliases?.split(" ") || [];
+        const beanAliases = dataset.beanAliases?.split(",") || [];
 
         const isMatchingBean =
-            (searchSubject == ESearchSubject.BEAN_CLASS && beanClass == query) ||
-            (searchSubject == ESearchSubject.BEAN_NAME_OR_ALIAS &&
-                (beanName == query || beanAliases.some((t) => t == query)));
+            (searchSubject === ESearchSubject.BEAN_CLASS && beanClass === query) ||
+            (searchSubject === ESearchSubject.BEAN_NAME_OR_ALIAS &&
+                (beanName === query || beanAliases.some((alias) => alias === query)));
 
         if (isMatchingBean) {
             const accordion = element.closest<HTMLElement>(`.${styles.MainWrapper}`) ?? element;
@@ -32,7 +32,7 @@ export function scrollToAccordionById(query: string, searchSubject: ESearchSubje
                 accordionHeader.click();
             }
 
-            element.scrollIntoView({ behavior: "smooth", block: "start" });
+            element.scrollIntoView();
 
             return;
         }
