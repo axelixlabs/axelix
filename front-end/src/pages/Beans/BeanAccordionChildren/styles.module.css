@@ -6,6 +6,9 @@
 
 .Dependency {
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
 }
 
 .Dependency:hover {

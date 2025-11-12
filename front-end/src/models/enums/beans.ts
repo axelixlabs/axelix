@@ -13,3 +13,8 @@ export enum EBeanOrigin {
     FACTORY_BEAN = "FACTORY_BEAN",
     UNKNOWN = "UNKNOWN",
 }
+
+export enum ESearchSubject {
+    BEAN_NAME_OR_ALIAS,
+    BEAN_CLASS,
+}

@@ -55,7 +55,7 @@ export const ConfigProps = () => {
     return (
         <>
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
-            <ConfigPropsTables effectiveConfigProps={effectiveConfigProps} />
+            <ConfigPropsTables effectiveConfigProps={effectiveConfigProps} loading={configProps.loading} />
         </>
     );
 };
