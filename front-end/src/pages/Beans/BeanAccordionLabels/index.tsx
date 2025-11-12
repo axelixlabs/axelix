@@ -16,9 +16,9 @@ export const BeanAccordionLabels = ({ bean }: IProps) => {
     return (
         <div
             data-bean-entry
-            data-bean-name={`${beanName}`}
-            data-bean-class={`${className}`}
-            data-bean-aliases={`${aliases}`}
+            data-bean-name={beanName}
+            data-bean-class={className}
+            data-bean-aliases={aliases}
             className={styles.AccordionHeader}
         >
             <div className={styles.AccordionHeaderContent}>
