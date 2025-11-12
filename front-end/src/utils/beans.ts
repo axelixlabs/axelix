@@ -1,9 +1,6 @@
-import styles from "../components/Accordion/styles.module.css";
+import { ESearchSubject } from "models";
 
-export enum ESearchSubject {
-    BEAN_NAME_OR_ALIAS,
-    BEAN_CLASS,
-}
+import styles from "../components/Accordion/styles.module.css";
 
 export function scrollToAccordionById(query: string, searchSubject: ESearchSubject): void {
     if (!query) {

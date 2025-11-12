@@ -1,14 +1,18 @@
 import { useTranslation } from "react-i18next";
+import { Link, useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
-import { type IBean } from "models";
-import { ESearchSubject, scrollToAccordionById } from "utils";
+import { canonicalize } from "helpers";
+import { ESearchSubject, type IBean } from "models";
+import { scrollToAccordionById } from "utils";
 
 import { BeanBooleanFlag } from "./BeanBooleanFlag";
 import { BeanProxyType } from "./BeanProxyType";
 import { BeanSimpleList } from "./BeanSimpleList";
 import { BeanSource } from "./BeanSource";
 import styles from "./styles.module.css";
+
+import LinkIcon from "assets/icons/link.svg";
 
 interface IProps {
     /**
@@ -19,6 +23,7 @@ interface IProps {
 
 export const BeanAccordionChildren = ({ bean }: IProps) => {
     const { t } = useTranslation();
+    const { instanceId } = useParams();
 
     return (
         <div className={styles.AccordionBody}>
@@ -27,7 +32,7 @@ export const BeanAccordionChildren = ({ bean }: IProps) => {
                 {!bean.dependencies.length ? (
                     <span>-</span>
                 ) : (
-                    bean.dependencies.map(({ name }) => (
+                    bean.dependencies.map(({ name, isConfigPropsDependency }) => (
                         <div
                             key={name}
                             className={styles.AccordionBodyChunkList}
@@ -36,6 +41,11 @@ export const BeanAccordionChildren = ({ bean }: IProps) => {
                             {/* TODO: This part we need to be fix after tooltip PR merge */}
                             <div className={styles.Dependency}>
                                 <TooltipWithCopy text={name} />
+                                {isConfigPropsDependency && (
+                                    <Link to={`/instance/${instanceId}/config-props#${canonicalize(name)}`}>
+                                        <img src={LinkIcon} alt="Link icon" />
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     ))

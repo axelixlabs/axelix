@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
 import { EmptyHandler, ModifiableTableSection } from "components";
 import type { IConfigPropsBean } from "models";
 
@@ -8,9 +11,25 @@ interface IProps {
      * The list of config props
      */
     effectiveConfigProps: IConfigPropsBean[];
+    /**
+     * If true, a request is made to fetch the config props data
+     */
+    loading: boolean;
 }
 
-export const ConfigPropsTables = ({ effectiveConfigProps }: IProps) => {
+export const ConfigPropsTables = ({ effectiveConfigProps, loading }: IProps) => {
+    const { hash } = useLocation();
+
+    useEffect(() => {
+        if (!loading && hash) {
+            const elementToScroll = document.querySelector(hash);
+
+            if (elementToScroll) {
+                elementToScroll.scrollIntoView();
+            }
+        }
+    }, [loading, hash]);
+
     return (
         <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
             <>
@@ -25,6 +44,7 @@ export const ConfigPropsTables = ({ effectiveConfigProps }: IProps) => {
                             };
                         })}
                         key={beanName}
+                        configPropsTable
                     >
                         {prefix && (
                             <div className={styles.Prefix}>

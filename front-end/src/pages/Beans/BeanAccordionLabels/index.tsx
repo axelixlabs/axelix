@@ -1,7 +1,12 @@
+import { Link, useParams } from "react-router-dom";
+
 import { TooltipWithCopy } from "components";
+import { canonicalize } from "helpers";
 import type { IBean } from "models";
 
 import styles from "./styles.module.css";
+
+import LinkIcon from "assets/icons/link.svg";
 
 interface IProps {
     /**
@@ -11,7 +16,8 @@ interface IProps {
 }
 
 export const BeanAccordionLabels = ({ bean }: IProps) => {
-    const { beanName, className, scope, aliases } = bean;
+    const { beanName, className, scope, aliases, isConfigPropsBean } = bean;
+    const { instanceId } = useParams();
 
     return (
         <div
@@ -22,7 +28,17 @@ export const BeanAccordionLabels = ({ bean }: IProps) => {
             className={styles.AccordionHeader}
         >
             <div className={styles.AccordionHeaderContent}>
-                <TooltipWithCopy text={beanName} />
+                <div className={styles.BeanNameWrapper}>
+                    <TooltipWithCopy text={beanName} />
+                    {isConfigPropsBean && (
+                        <Link
+                            to={`/instance/${instanceId}/config-props#${canonicalize(beanName)}`}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <img src={LinkIcon} alt="Link icon" />
+                        </Link>
+                    )}
+                </div>
                 <div className={styles.ClassName}>
                     <TooltipWithCopy text={className} />
                 </div>
