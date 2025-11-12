@@ -1,5 +1,7 @@
 package com.nucleonforge.axile.master.api;
 
+import com.nucleonforge.axile.master.model.instance.Instance;
+
 /**
  * Constant class that holds the paths to the APIs that Axile Master exposes
  *
@@ -192,6 +194,24 @@ public final class ApiPaths {
          * Endpoint to retrieve a specific cache by name from an instance.
          */
         public static final String CACHE_NAME = "/{instanceId}/cache/{cacheName}";
+    }
+
+    public static final class MetricsApi {
+
+        /**
+         * Base path for metrics APIs.
+         */
+        public static final String MAIN = "/metrics";
+
+        /**
+         * Retrieve metrics within a given {@link Instance}.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+
+        /**
+         * Retrieve a given metric within a given {@link Instance}.
+         */
+        public static final String CACHE_NAME = "/{instanceId}/{metric}";
     }
 
     public static final class ScheduledTasksApi {

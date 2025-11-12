@@ -23,6 +23,7 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 /**
  * The common implementation of the {@link EndpointProber}.
  *
+ * @param <O> the type of the response body (output).
  * @author Mikhail Polivakha
  */
 public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
