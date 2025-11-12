@@ -3,6 +3,10 @@
     column-gap: 8px;
 }
 
+.BeanTreeItemHover:hover {
+    color: var(--axile-primary-green);
+}
+
 .BeanTreeLabel {
     flex-shrink: 0;
 }

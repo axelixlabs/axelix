@@ -1,8 +1,8 @@
-import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
 import { TooltipWithCopy } from "components";
 import { type IBean } from "models";
+import { scrollToAccordionById } from "utils";
 
 import { BeanBooleanFlag } from "./BeanBooleanFlag";
 import { BeanProxyType } from "./BeanProxyType";
@@ -15,13 +15,9 @@ interface IProps {
      * Single bean
      */
     bean: IBean;
-    /**
-     * Setter for the state that indicates whether the selected dependency equals the bean name
-     */
-    setActiveKey: Dispatch<SetStateAction<string>>;
 }
 
-export const BeanAccordionChildren = ({ bean, setActiveKey }: IProps) => {
+export const BeanAccordionChildren = ({ bean }: IProps) => {
     const { t } = useTranslation();
 
     return (
@@ -32,11 +28,15 @@ export const BeanAccordionChildren = ({ bean, setActiveKey }: IProps) => {
                     <span>-</span>
                 ) : (
                     bean.dependencies.map(({ name }) => (
-                        <div key={name} className={styles.AccordionBodyChunkList} onClick={() => setActiveKey(name)}>
+                        <div
+                            key={name}
+                            className={styles.AccordionBodyChunkList}
+                            onClick={() => scrollToAccordionById(name)}
+                        >
                             {/* TODO: This part we need to be fix after tooltip PR merge */}
-                            <a href={`#${name}`} className={styles.Dependency}>
+                            <div className={styles.Dependency}>
                                 <TooltipWithCopy text={name} />
-                            </a>
+                            </div>
                         </div>
                     ))
                 )}

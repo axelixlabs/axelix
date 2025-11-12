@@ -2,6 +2,7 @@ import { Tree, type TreeDataNode } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { EBeanOrigin, type IBeanSource } from "models";
+import { scrollToAccordionById } from "utils";
 
 import sharedStyles from "../styles.module.css";
 
@@ -35,18 +36,21 @@ export const BeanSource = ({ beanSource }: IProps) => {
                                     <div className={styles.BeanTreeValue}>{beanSource.methodName}</div>
                                 </div>
                             ),
-                            key: beanSource.methodName!,
+                            key: beanSource.methodName ?? "methodName",
                         },
                         {
                             title: (
-                                <div className={styles.BeanTreeItem}>
+                                <div
+                                    className={`${styles.BeanTreeItem} ${styles.BeanTreeItemHover}`}
+                                    onClick={() => scrollToAccordionById(`class-${beanSource.enclosingClassName}`)}
+                                >
                                     <div className={styles.BeanTreeLabel}>
                                         {t("Beans.beanSource.titles.enclosingClass")}:
                                     </div>
                                     <div className={styles.BeanTreeValue}>{beanSource.enclosingClassName}</div>
                                 </div>
                             ),
-                            key: beanSource.enclosingClassName!,
+                            key: beanSource.enclosingClassName ?? "enclosingClassName",
                         },
                     ],
                 },
@@ -61,14 +65,19 @@ export const BeanSource = ({ beanSource }: IProps) => {
                     children: [
                         {
                             title: (
-                                <div className={styles.BeanTreeItem}>
+                                <div
+                                    className={`${styles.BeanTreeItem} ${styles.BeanTreeItemHover}`}
+                                    onClick={() =>
+                                        scrollToAccordionById(beanSource.factoryBeanName, EBeanOrigin.FACTORY_BEAN)
+                                    }
+                                >
                                     <div className={styles.BeanTreeLabel}>
                                         {t("Beans.beanSource.titles.factoryBeanName")}:
                                     </div>
                                     <div className={styles.BeanTreeValue}>{beanSource.factoryBeanName}</div>
                                 </div>
                             ),
-                            key: beanSource.factoryBeanName!,
+                            key: beanSource.factoryBeanName ?? "factoryBeanName",
                         },
                     ],
                 },
