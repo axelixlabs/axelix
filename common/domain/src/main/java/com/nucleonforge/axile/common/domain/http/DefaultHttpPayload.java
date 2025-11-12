@@ -17,6 +17,10 @@ public record DefaultHttpPayload(
         byte[] requestBody)
         implements HttpPayload {
 
+    public DefaultHttpPayload(List<HttpHeader> headers) {
+        this(headers, Collections.emptyList(), Collections.emptyMap(), new byte[0]);
+    }
+
     public DefaultHttpPayload(Map<String, String> pathVariableValues) {
         this(Collections.emptyList(), Collections.emptyList(), pathVariableValues, new byte[0]);
     }

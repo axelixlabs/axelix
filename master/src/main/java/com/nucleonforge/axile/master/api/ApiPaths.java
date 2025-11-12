@@ -154,6 +154,32 @@ public final class ApiPaths {
         public static final String CLEAR_FOR_LOGGER = "/{instanceId}/logger/{loggerName}/clear";
     }
 
+    public static final class LogFileApi {
+
+        /**
+         * Base path for logfile API.
+         */
+        public static final String MAIN = "/logfile";
+
+        /**
+         * Logfile endpoint with instance ID.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+    }
+
+    public static final class HeapDumpApi {
+
+        /**
+         * Base path for heap-dump API.
+         */
+        public static final String MAIN = "/heapdump";
+
+        /**
+         * Heap-dump endpoint with instance ID.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+    }
+
     public static final class ProfileManagementApi {
 
         /**

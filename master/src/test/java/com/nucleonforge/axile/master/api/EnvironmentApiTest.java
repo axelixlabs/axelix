@@ -207,11 +207,11 @@ class EnvironmentApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/axile-env")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axile-env")) {
                     return new MockResponse()
                             .setBody(jsonEnvResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/env/sun.management.compiler")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/env/sun.management.compiler")) {
                     return new MockResponse()
                             .setBody(jsonEnvPropertyResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -221,8 +221,7 @@ class EnvironmentApiTest {
             }
         });
 
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
     @AfterEach

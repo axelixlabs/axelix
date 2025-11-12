@@ -3,7 +3,6 @@ package com.nucleonforge.axile.master.api;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
@@ -28,7 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
-import com.nucleonforge.axile.master.service.export.collect.JsonInstanceStateCollector;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -48,9 +46,6 @@ class StateExportApiTest {
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
-
-    @Autowired
-    private List<JsonInstanceStateCollector> stateCollectors;
 
     @Autowired
     private TestRestTemplate restTemplate;
