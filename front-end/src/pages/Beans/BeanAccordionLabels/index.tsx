@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
-import { canonicalize } from "helpers";
+import { normalizeHtmlElementId } from "helpers";
 import type { IBean } from "models";
 
 import styles from "./styles.module.css";
@@ -32,7 +32,7 @@ export const BeanAccordionLabels = ({ bean }: IProps) => {
                     <TooltipWithCopy text={beanName} />
                     {isConfigPropsBean && (
                         <Link
-                            to={`/instance/${instanceId}/config-props#${canonicalize(beanName)}`}
+                            to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(beanName)}`}
                             onClick={(e) => e.stopPropagation()}
                         >
                             <img src={LinkIcon} alt="Link icon" />

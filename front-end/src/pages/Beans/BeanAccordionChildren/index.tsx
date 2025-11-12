@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
-import { canonicalize } from "helpers";
+import { normalizeHtmlElementId } from "helpers";
 import { ESearchSubject, type IBean } from "models";
 import { scrollToAccordionById } from "utils";
 
@@ -42,7 +42,7 @@ export const BeanAccordionChildren = ({ bean }: IProps) => {
                             <div className={styles.Dependency}>
                                 <TooltipWithCopy text={name} />
                                 {isConfigPropsDependency && (
-                                    <Link to={`/instance/${instanceId}/config-props#${canonicalize(name)}`}>
+                                    <Link to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(name)}`}>
                                         <img src={LinkIcon} alt="Link icon" />
                                     </Link>
                                 )}
