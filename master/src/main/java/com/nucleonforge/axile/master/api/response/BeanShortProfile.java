@@ -10,6 +10,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Component;
  * @param dependencies The list of dependencies of this bean (i.e. other beans that this bean depends on).
  * @param isLazyInit   Whether the bean is lazily instantiated or eagerly.
  * @param isPrimary    Whether the bean is marked with {@link BeanDefinition#isPrimary() primary marker}.
- * @param isConfigPropsBean
+ * @param isConfigPropsBean Whether the bean is a configuration properties bean {@link ConfigurationProperties}.
  * @param qualifiers   The list of {@link AutowireCandidateQualifier qualifiers} that are assigned to this bean.
  * @param beanSource   The source information describing how this bean was created and its origin type.
  *
@@ -54,6 +55,10 @@ public record BeanShortProfile(
         }
     }
 
+    /**
+     * @param name The name of the dependency bean.
+     * @param isConfigPropsDependency Whether the dependency is a configuration properties dependency.
+     */
     public record BeanDependencyProfile(String name, boolean isConfigPropsDependency) {}
 
     public enum BeanOrigin {
