@@ -42,3 +42,7 @@ export const getPropertiesCount = <T extends IEnvironmentPropertySource | IConfi
 export const canonicalize = (string: string): string => {
     return string.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 };
+
+export const normalizeHtmlElementId = (elementId: string): string => {
+    return canonicalize(elementId);
+};

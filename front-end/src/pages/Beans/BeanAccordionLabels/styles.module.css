@@ -6,6 +6,12 @@
   scroll-margin-top: 150px;
 }
 
+.BeanNameWrapper {
+  display: flex;
+  align-items: center;
+  column-gap: 8px
+}
+
 .ScopeWrapper {
   display: flex;
   justify-content: flex-end;

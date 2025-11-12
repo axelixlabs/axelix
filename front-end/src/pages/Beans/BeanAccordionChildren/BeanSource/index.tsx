@@ -1,8 +1,8 @@
 import { Tree, type TreeDataNode } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { EBeanOrigin, type IBeanSource } from "models";
-import { ESearchSubject, scrollToAccordionById } from "utils";
+import { EBeanOrigin, ESearchSubject, type IBeanSource } from "models";
+import { scrollToAccordionById } from "utils";
 
 import sharedStyles from "../styles.module.css";
 

@@ -1,5 +1,6 @@
 .AccordionWrapper {
     margin-bottom: 40px;
+    scroll-margin-top: 150px;
 }
 
 .AccordionHeader {

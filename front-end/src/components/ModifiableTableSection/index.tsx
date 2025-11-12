@@ -2,6 +2,7 @@ import { Accordion } from "components/Accordion";
 import { TooltipWithCopy } from "components/TooltipWithCopy";
 import type { PropsWithChildren } from "react";
 
+import { normalizeHtmlElementId } from "helpers";
 import type { ITableRow } from "models";
 
 import { EmptyHandler } from "../EmptyHandler";
@@ -23,7 +24,7 @@ interface IProps {
 
 export const ModifiableTableSection = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
     return (
-        <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
+        <div className={`AccordionsWrapper ${styles.AccordionWrapper}`} id={normalizeHtmlElementId(headerName)}>
             <Accordion
                 header={
                     <div className={styles.AccordionHeader}>
