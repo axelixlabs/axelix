@@ -2,7 +2,7 @@ import { Accordion } from "components/Accordion";
 import { TooltipWithCopy } from "components/TooltipWithCopy";
 import type { PropsWithChildren } from "react";
 
-import { canonicalize } from "helpers";
+import { normalizeHtmlElementId } from "helpers";
 import type { ITableRow } from "models";
 
 import { EmptyHandler } from "../EmptyHandler";
@@ -20,24 +20,11 @@ interface IProps {
      * Table rows data
      */
     properties: ITableRow[];
-
-    /**
-     * If true, the table is used for the confgprops page
-     */
-    configPropsTable?: boolean;
 }
 
-export const ModifiableTableSection = ({
-    headerName,
-    properties,
-    children,
-    configPropsTable,
-}: PropsWithChildren<IProps>) => {
+export const ModifiableTableSection = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
     return (
-        <div
-            className={`AccordionsWrapper ${styles.AccordionWrapper}`}
-            id={configPropsTable ? canonicalize(headerName) : undefined}
-        >
+        <div className={`AccordionsWrapper ${styles.AccordionWrapper}`} id={normalizeHtmlElementId(headerName)}>
             <Accordion
                 header={
                     <div className={styles.AccordionHeader}>

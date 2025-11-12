@@ -44,7 +44,6 @@ export const ConfigPropsTables = ({ effectiveConfigProps, loading }: IProps) => 
                             };
                         })}
                         key={beanName}
-                        configPropsTable
                     >
                         {prefix && (
                             <div className={styles.Prefix}>
