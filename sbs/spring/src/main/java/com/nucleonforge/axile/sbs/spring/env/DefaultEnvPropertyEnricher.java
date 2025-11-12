@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
@@ -11,6 +12,7 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDe
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertyValueDescriptor;
 import org.springframework.core.env.Environment;
 
+import com.nucleonforge.axile.sbs.spring.configprops.ServiceConfigurationProperties;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxileEnvironmentDescriptor;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertySourceDescriptor;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertyValueDescriptor;
@@ -22,11 +24,16 @@ import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePrope
  * @author Nikita Kirillov
  */
 public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
+    private final Map<String, String> propertyToBeanName = new ConcurrentHashMap<>();
 
     private final Environment environment;
+    private final ServiceConfigurationProperties serviceConfigurationProperties;
 
-    public DefaultEnvPropertyEnricher(Environment environment) {
+    public DefaultEnvPropertyEnricher(
+            Environment environment, ServiceConfigurationProperties serviceConfigurationProperties) {
+        this.serviceConfigurationProperties = serviceConfigurationProperties;
         this.environment = environment;
+        initPropertiesToBeanName();
     }
 
     @Override
@@ -65,9 +72,40 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                     boolean isPrimary = Objects.equals(primarySourceMap.get(entry.getKey()), source.getName());
 
                     return new AxileEnvironmentEndpoint.AxilePropertyValueDescriptor(
-                            original.getValue(), original.getOrigin(), isPrimary);
+                            original.getValue(),
+                            original.getOrigin(),
+                            isPrimary,
+                            propertyToBeanName.getOrDefault(entry.getKey(), null));
                 }));
 
         return new AxilePropertySourceDescriptor(source.getName(), enrichedProperties);
+    }
+
+    private void initPropertiesToBeanName() {
+        serviceConfigurationProperties
+                .getConfigurationProperties()
+                .getContexts()
+                .values()
+                .forEach(context -> context.getBeans().forEach((beanName, bean) -> {
+                    bean.getProperties().keySet().forEach(prop -> {
+                        String property = bean.getPrefix() + "." + prop;
+                        String stripBeanName = stripBeanName(beanName);
+                        propertyToBeanName.put(property, stripBeanName);
+                    });
+                }));
+    }
+
+    /**
+     * The bean name of the configprops bean as returned by the actuator, for some reason, contains
+     * the dash at the very beginning. I do not know why. We do not want to show it in the bean name.
+     */
+    private static String stripBeanName(String beanName) {
+        int indexOfDash = beanName.indexOf("-");
+
+        if (indexOfDash != -1 && indexOfDash < beanName.length() - 1) {
+            return beanName.substring(indexOfDash + 1);
+        } else {
+            return beanName;
+        }
     }
 }

@@ -42,5 +42,6 @@ public class AxileEnvironmentEndpoint {
 
     public record AxilePropertySourceDescriptor(String name, Map<String, AxilePropertyValueDescriptor> properties) {}
 
-    public record AxilePropertyValueDescriptor(Object value, String origin, boolean isPrimary) {}
+    public record AxilePropertyValueDescriptor(
+            Object value, String origin, boolean isPrimary, @Nullable String configPropsBeanName) {}
 }

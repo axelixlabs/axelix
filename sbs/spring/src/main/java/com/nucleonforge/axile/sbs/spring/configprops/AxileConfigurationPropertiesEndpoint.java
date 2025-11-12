@@ -4,28 +4,24 @@ import org.springframework.boot.actuate.context.properties.ConfigurationProperti
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 
 @Endpoint(id = "axile-configprops")
-@CacheConfig(cacheNames = "axile-configprops-cache", cacheManager = "axileCacheManager")
 public class AxileConfigurationPropertiesEndpoint {
 
-    private final ConfigurationPropertiesReportEndpoint delegate;
+    private final ServiceConfigurationProperties service;
 
-    public AxileConfigurationPropertiesEndpoint(ConfigurationPropertiesReportEndpoint delegate) {
-        this.delegate = delegate;
+    public AxileConfigurationPropertiesEndpoint(ServiceConfigurationProperties service) {
+        this.service = service;
     }
 
     @ReadOperation
-    @Cacheable(key = "'configurationProperties'")
     public ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor configurationProperties() {
-        return delegate.configurationProperties();
+        return service.getConfigurationProperties();
     }
 
     @ReadOperation
     public ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor configurationPropertiesWithPrefix(
             @Selector String prefix) {
-        return delegate.configurationPropertiesWithPrefix(prefix);
+        return service.getConfigurationPropertiesWithPrefix(prefix);
     }
 }

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,6 +24,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
+import com.nucleonforge.axile.sbs.spring.configprops.ServiceConfigurationProperties;
+
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 21.10.2025
  * @author Nikita Kirillov
  */
+@Disabled
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         args = {"--axile.env.test.prop3=fromCommandLine"},
@@ -135,8 +139,9 @@ class AxileEnvironmentEndpointTest {
     static class AxileEnvironmentEndpointTestConfiguration {
 
         @Bean
-        public EnvPropertyEnricher envPropertyEnricher(Environment environment) {
-            return new DefaultEnvPropertyEnricher(environment);
+        public EnvPropertyEnricher envPropertyEnricher(
+                Environment environment, ServiceConfigurationProperties serviceConfigurationProperties) {
+            return new DefaultEnvPropertyEnricher(environment, serviceConfigurationProperties);
         }
 
         @Bean

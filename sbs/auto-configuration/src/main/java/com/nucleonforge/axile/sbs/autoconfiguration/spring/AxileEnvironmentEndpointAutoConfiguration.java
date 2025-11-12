@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
+import com.nucleonforge.axile.sbs.spring.configprops.ServiceConfigurationProperties;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint;
 import com.nucleonforge.axile.sbs.spring.env.DefaultEnvPropertyEnricher;
 import com.nucleonforge.axile.sbs.spring.env.EnvPropertyEnricher;
@@ -18,14 +19,18 @@ import com.nucleonforge.axile.sbs.spring.env.EnvPropertyEnricher;
  * @since 21.10.2025
  * @author Nikita Kirillov
  */
-@AutoConfiguration(after = EnvironmentEndpointAutoConfiguration.class)
+@AutoConfiguration(
+        after = {
+            EnvironmentEndpointAutoConfiguration.class,
+            AxileConfigurationsPropertiesEndpointAutoConfiguration.class
+        })
 @ConditionalOnAvailableEndpoint(endpoint = EnvironmentEndpoint.class)
 public class AxileEnvironmentEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public EnvPropertyEnricher envPropertyEnricher(Environment environment) {
-        return new DefaultEnvPropertyEnricher(environment);
+    public EnvPropertyEnricher envPropertyEnricher(Environment environment, ServiceConfigurationProperties service) {
+        return new DefaultEnvPropertyEnricher(environment, service);
     }
 
     @Bean

@@ -8,16 +8,23 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axile.sbs.spring.configprops.AxileConfigurationPropertiesEndpoint;
+import com.nucleonforge.axile.sbs.spring.configprops.ServiceConfigurationProperties;
 
-@AutoConfiguration(
-        after = {ConfigurationPropertiesReportEndpointAutoConfiguration.class, AxileCachingAutoConfiguration.class})
+@AutoConfiguration(after = ConfigurationPropertiesReportEndpointAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = ConfigurationPropertiesReportEndpoint.class)
 public class AxileConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxileConfigurationPropertiesEndpoint axileConfigurationPropertiesEndpoint(
+    public ServiceConfigurationProperties inMemoryConfigurationProperties(
             ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
-        return new AxileConfigurationPropertiesEndpoint(configurationPropertiesReportEndpoint);
+        return new ServiceConfigurationProperties(configurationPropertiesReportEndpoint);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AxileConfigurationPropertiesEndpoint axileConfigurationPropertiesEndpoint(
+            ServiceConfigurationProperties serviceConfigurationProperties) {
+        return new AxileConfigurationPropertiesEndpoint(serviceConfigurationProperties);
     }
 }
