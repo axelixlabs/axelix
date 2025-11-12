@@ -20,6 +20,12 @@ interface IProps {
 export const ConfigPropsTables = ({ effectiveConfigProps, loading }: IProps) => {
     const { hash } = useLocation();
 
+    // TODO:
+    //  We have to use useEffect hook here since the page is rendered by the browser initially
+    //  when there is no data yet backing the configprops table. Therefore, there is no element
+    //  with the requested 'hash', and thus the browser simply cannot navigate to the element that
+    //  is just not yet loaded from the backend. Once the data is loaded, the browser will not re-attempt
+    //  to re-navigate to the requested 'hash', and therefore we have to do it manually here.
     useEffect(() => {
         if (!loading && hash) {
             const elementToScroll = document.querySelector(hash);
