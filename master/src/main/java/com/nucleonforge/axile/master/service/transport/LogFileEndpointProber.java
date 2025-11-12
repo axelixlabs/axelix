@@ -2,13 +2,12 @@ package com.nucleonforge.axile.master.service.transport;
 
 import org.jspecify.annotations.NonNull;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
-import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
+import com.nucleonforge.axile.master.service.serde.LogFileMessageDeserializationStrategy;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 /**
@@ -21,9 +20,7 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 public class LogFileEndpointProber extends AbstractEndpointProber<Resource> {
 
     public LogFileEndpointProber(
-            InstanceRegistry instanceRegistry,
-            @Qualifier("logFileMessageDeserializationStrategy")
-                    MessageDeserializationStrategy<Resource> messageDeserializationStrategy) {
+            InstanceRegistry instanceRegistry, LogFileMessageDeserializationStrategy messageDeserializationStrategy) {
         super(instanceRegistry, messageDeserializationStrategy);
     }
 

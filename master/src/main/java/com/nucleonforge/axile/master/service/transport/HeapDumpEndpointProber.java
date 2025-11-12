@@ -2,13 +2,12 @@ package com.nucleonforge.axile.master.service.transport;
 
 import org.jspecify.annotations.NonNull;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
-import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
+import com.nucleonforge.axile.master.service.serde.HeapDumpMessageDeserializationStrategy;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 /**
@@ -21,9 +20,7 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 public class HeapDumpEndpointProber extends AbstractEndpointProber<Resource> {
 
     public HeapDumpEndpointProber(
-            InstanceRegistry instanceRegistry,
-            @Qualifier("heapDumpMessageDeserializationStrategy")
-                    MessageDeserializationStrategy<Resource> messageDeserializationStrategy) {
+            InstanceRegistry instanceRegistry, HeapDumpMessageDeserializationStrategy messageDeserializationStrategy) {
         super(instanceRegistry, messageDeserializationStrategy);
     }
 
