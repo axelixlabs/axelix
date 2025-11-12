@@ -284,7 +284,7 @@ public class InfoApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/info")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/info")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -298,8 +298,7 @@ public class InfoApiTest {
     @Test
     void shouldReturnJSONServiceInfo() {
         // when.
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         ResponseEntity<String> response =
                 restTemplate.getForEntity("/api/axile/info/{instanceId}", String.class, activeInstanceId);
