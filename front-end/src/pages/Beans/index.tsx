@@ -14,7 +14,6 @@ export const Beans = () => {
 
     const [dataState, setDataState] = useState(StatefulRequest.loading<IBeansResponseBody>());
     const [search, setSearch] = useState<string>("");
-    const [activeKey, setActiveKey] = useState<string>("");
 
     useEffect(() => {
         fetchData(setDataState, () => getBeansData(instanceId!));
@@ -40,12 +39,8 @@ export const Beans = () => {
             <EmptyHandler isEmpty={!effectiveBeans.length}>
                 <div className="AccordionsWrapper">
                     {effectiveBeans.map((bean) => (
-                        <Accordion
-                            header={<BeanAccordionLabels bean={bean} />}
-                            key={bean.beanName}
-                            accordionExpanded={activeKey === bean.beanName}
-                        >
-                            <BeanAccordionChildren bean={bean} setActiveKey={setActiveKey} />
+                        <Accordion header={<BeanAccordionLabels bean={bean} />} key={bean.beanName}>
+                            <BeanAccordionChildren bean={bean} />
                         </Accordion>
                     ))}
                 </div>

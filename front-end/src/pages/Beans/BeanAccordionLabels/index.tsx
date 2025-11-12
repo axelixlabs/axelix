@@ -11,10 +11,16 @@ interface IProps {
 }
 
 export const BeanAccordionLabels = ({ bean }: IProps) => {
-    const { beanName, className, scope } = bean;
+    const { beanName, className, scope, aliases } = bean;
 
     return (
-        <div id={beanName} className={styles.AccordionHeader}>
+        <div
+            data-bean-entry
+            data-bean-name={beanName}
+            data-bean-class={className}
+            data-bean-aliases={aliases}
+            className={styles.AccordionHeader}
+        >
             <div className={styles.AccordionHeaderContent}>
                 <TooltipWithCopy text={beanName} />
                 <div className={styles.ClassName}>
