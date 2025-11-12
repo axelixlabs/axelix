@@ -1,20 +1,27 @@
-import { EBeanOrigin } from "models";
-
 import styles from "../components/Accordion/styles.module.css";
 
-export function scrollToAccordionById(targetBeanId: string | undefined, source?: string): void {
-    if (!targetBeanId) {
+export enum ESearchSubject {
+    BEAN_NAME_OR_ALIAS,
+    BEAN_CLASS,
+}
+
+export function scrollToAccordionById(query: string, searchSubject: ESearchSubject): void {
+    if (!query) {
         return;
     }
 
-    const elementsWithBeanIds = document.querySelectorAll<HTMLElement>("[data-bean-ids]");
+    const elementsWithBeanIds = document.querySelectorAll<HTMLElement>("[data-bean-entry]");
 
     for (const element of elementsWithBeanIds) {
-        const ids = element.dataset.beanIds?.split(" ") || [];
+        const dataset = element.dataset;
+        const beanName = dataset.beanName;
+        const beanClass = dataset.beanClass;
+        const beanAliases = dataset.beanAliases?.split(" ") || [];
 
-        const isMatchingBean = ids.some(
-            (id) => targetBeanId === id || (source === EBeanOrigin.FACTORY_BEAN && id === `alias-${targetBeanId}`),
-        );
+        const isMatchingBean =
+            (searchSubject == ESearchSubject.BEAN_CLASS && beanClass == query) ||
+            (searchSubject == ESearchSubject.BEAN_NAME_OR_ALIAS &&
+                (beanName == query || beanAliases.some((t) => t == query)));
 
         if (isMatchingBean) {
             const accordion = element.closest<HTMLElement>(`.${styles.MainWrapper}`) ?? element;

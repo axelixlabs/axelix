@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { TooltipWithCopy } from "components";
 import { type IBean } from "models";
-import { scrollToAccordionById } from "utils";
+import { ESearchSubject, scrollToAccordionById } from "utils";
 
 import { BeanBooleanFlag } from "./BeanBooleanFlag";
 import { BeanProxyType } from "./BeanProxyType";
@@ -31,7 +31,7 @@ export const BeanAccordionChildren = ({ bean }: IProps) => {
                         <div
                             key={name}
                             className={styles.AccordionBodyChunkList}
-                            onClick={() => scrollToAccordionById(name)}
+                            onClick={() => scrollToAccordionById(name, ESearchSubject.BEAN_NAME_OR_ALIAS)}
                         >
                             {/* TODO: This part we need to be fix after tooltip PR merge */}
                             <div className={styles.Dependency}>
