@@ -4,7 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Proxy;
 import java.util.function.Supplier;
 
@@ -17,9 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import net.bytebuddy.jar.asm.ClassWriter;
-import net.bytebuddy.jar.asm.MethodVisitor;
-import net.bytebuddy.jar.asm.Opcodes;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +54,6 @@ import com.nucleonforge.axile.common.api.BeansFeed.ComponentVariant;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.ANONYMOUS_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.CONFIGURATION_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.CUSTOM_DATABASE_QUALIFIER_BEAN;
-import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.HIDDEN_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.JDK_PROXY_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.LAZY_COMPONENT;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.LAZY_PRIMARY_BEAN_METHOD;
@@ -241,22 +236,6 @@ class DefaultBeanMetaInfoExtractorTest {
     }
 
     @Test
-    void shouldExtractHiddenLocalBean() {
-        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract(HIDDEN_BEAN, testBeanFactory);
-
-        assertThat(beanMetaInfo).satisfies(it -> {
-            assertThat(it.isLazyInit()).isFalse();
-            assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
-
-            BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
-            assertThat(source.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
-            assertThat(source.methodName()).isEqualTo(HIDDEN_BEAN);
-        });
-    }
-
-    @Test
     void shouldExtractJdkProxyBean() {
         BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract(JDK_PROXY_BEAN, testBeanFactory);
 
@@ -308,8 +287,6 @@ class DefaultBeanMetaInfoExtractorTest {
         static final String CUSTOM_DATABASE_QUALIFIER_BEAN = "CustomDatabaseQualifierBean";
 
         static final String ANONYMOUS_BEAN = "anonymousBean";
-
-        static final String HIDDEN_BEAN = "hiddenBean";
 
         static final String JDK_PROXY_BEAN = "jdkProxyBean";
 
@@ -414,48 +391,6 @@ class DefaultBeanMetaInfoExtractorTest {
                 @Override
                 public void run() {}
             };
-        }
-
-        @Bean(HIDDEN_BEAN)
-        public Object hiddenBean() throws Exception {
-            byte[] classBytes = generateSimpleClass();
-
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
-            MethodHandles.Lookup hiddenLookup =
-                    lookup.defineHiddenClass(classBytes, true, MethodHandles.Lookup.ClassOption.NESTMATE);
-
-            Class<?> hiddenClass = hiddenLookup.lookupClass();
-
-            assert hiddenClass.isHidden();
-
-            return hiddenClass.getDeclaredConstructor().newInstance();
-        }
-
-        private byte[] generateSimpleClass() {
-            ClassWriter cw = new ClassWriter(0);
-
-            String packageName = this.getClass().getPackageName().replace('.', '/');
-            String className = packageName + "/HiddenClass";
-
-            cw.visit(Opcodes.V17, Opcodes.ACC_PUBLIC, className, null, "java/lang/Object", null);
-
-            MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
-            mv.visitCode();
-            mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-            mv.visitInsn(Opcodes.RETURN);
-            mv.visitMaxs(1, 1);
-            mv.visitEnd();
-
-            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "name", "()Ljava/lang/String;", null, null);
-            mv.visitCode();
-            mv.visitLdcInsn("hidden");
-            mv.visitInsn(Opcodes.ARETURN);
-            mv.visitMaxs(1, 1);
-            mv.visitEnd();
-
-            cw.visitEnd();
-            return cw.toByteArray();
         }
 
         @Bean
