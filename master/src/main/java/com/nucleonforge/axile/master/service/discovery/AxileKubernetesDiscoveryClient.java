@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
-import com.nucleonforge.axile.master.utils.CollectionUtils;
+import com.nucleonforge.axile.common.utils.CollectionUtils;
 
 /**
  * Axile Kubernetes implementation of {@link DiscoveryClient}.

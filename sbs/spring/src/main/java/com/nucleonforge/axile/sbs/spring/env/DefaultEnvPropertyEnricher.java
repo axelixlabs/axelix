@@ -7,12 +7,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDescriptor;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertyValueDescriptor;
 import org.springframework.core.env.Environment;
 
-import com.nucleonforge.axile.sbs.spring.configprops.ServiceConfigurationProperties;
+import com.nucleonforge.axile.common.utils.BeanNameUtils;
+import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxileEnvironmentDescriptor;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertySourceDescriptor;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertyValueDescriptor;
@@ -26,21 +30,27 @@ import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePrope
 public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
     private final Environment environment;
-    private final ServiceConfigurationProperties serviceConfigurationProperties;
+    private final EnvironmentPropertyNameNormalizer propertyNameNormalizer;
+
+    @Nullable
+    private final ConfigurationPropertiesCache configurationPropertiesCache;
 
     public DefaultEnvPropertyEnricher(
-            Environment environment, ServiceConfigurationProperties serviceConfigurationProperties) {
-        this.serviceConfigurationProperties = serviceConfigurationProperties;
+            Environment environment,
+            EnvironmentPropertyNameNormalizer propertyNameNormalizer,
+            ObjectProvider<ConfigurationPropertiesCache> cache) {
+        this.propertyNameNormalizer = propertyNameNormalizer;
+        this.configurationPropertiesCache = cache.getIfAvailable();
         this.environment = environment;
     }
 
     @Override
     public AxileEnvironmentDescriptor enrich(EnvironmentDescriptor originalDescriptor) {
         Map<String, String> primarySourceMap = buildPrimarySourceMap(originalDescriptor);
-        Map<String, String> properties = enrichPropertiesToBeanName();
+        Map<String, String> configPropsMapping = buildConfigPropsMappingMap();
 
         List<AxilePropertySourceDescriptor> enrichedSources = originalDescriptor.getPropertySources().stream()
-                .map(source -> enrichPropertySource(source, primarySourceMap, properties))
+                .map(source -> enrichPropertySource(source, primarySourceMap, configPropsMapping))
                 .toList();
 
         return new AxileEnvironmentDescriptor(
@@ -63,32 +73,39 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     }
 
     private AxilePropertySourceDescriptor enrichPropertySource(
-            PropertySourceDescriptor source, Map<String, String> primarySourceMap, Map<String, String> properties) {
+            PropertySourceDescriptor source,
+            Map<String, String> primaryPropertySourceMap,
+            Map<String, String> configPropsMapping) {
 
         Map<String, AxilePropertyValueDescriptor> enrichedProperties = source.getProperties().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                     PropertyValueDescriptor original = entry.getValue();
-                    boolean isPrimary = Objects.equals(primarySourceMap.get(entry.getKey()), source.getName());
+
+                    boolean isPrimary = Objects.equals(primaryPropertySourceMap.get(entry.getKey()), source.getName());
 
                     return new AxileEnvironmentEndpoint.AxilePropertyValueDescriptor(
                             original.getValue(),
                             original.getOrigin(),
                             isPrimary,
-                            properties.getOrDefault(entry.getKey(), null));
+                            configPropsMapping.getOrDefault(propertyNameNormalizer.normalize(entry.getKey()), null));
                 }));
 
         return new AxilePropertySourceDescriptor(source.getName(), enrichedProperties);
     }
 
-    private Map<String, String> enrichPropertiesToBeanName() {
+    private Map<String, String> buildConfigPropsMappingMap() {
+        if (configurationPropertiesCache == null) {
+            return Map.of();
+        }
+
         Map<String, String> propertyToBeanName = new HashMap<>();
 
-        serviceConfigurationProperties
+        configurationPropertiesCache
                 .getConfigurationProperties()
                 .getContexts()
                 .values()
                 .forEach(context -> context.getBeans().forEach((beanName, bean) -> {
-                    String cleanBeanName = stripBeanName(beanName);
+                    String cleanBeanName = BeanNameUtils.stripConfigPropsPrefix(beanName);
                     flatten(bean.getPrefix(), bean.getProperties(), propertyToBeanName, cleanBeanName);
                 }));
 
@@ -104,22 +121,8 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
             if (value instanceof Map<?, ?> map) {
                 flatten(fullKey, (Map<String, Object>) map, propertyToBeanName, beanName);
             } else {
-                propertyToBeanName.put(fullKey, beanName);
+                propertyToBeanName.put(propertyNameNormalizer.normalize(fullKey), beanName);
             }
         });
-    }
-
-    /**
-     * The bean name of the configprops bean as returned by the actuator, for some reason, contains
-     * the dash at the very beginning. I do not know why. We do not want to show it in the bean name.
-     */
-    private static String stripBeanName(String beanName) {
-        int indexOfDash = beanName.indexOf("-");
-
-        if (indexOfDash != -1 && indexOfDash < beanName.length() - 1) {
-            return beanName.substring(indexOfDash + 1);
-        } else {
-            return beanName;
-        }
     }
 }

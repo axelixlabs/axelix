@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.convert.utils;
+package com.nucleonforge.axile.common.utils;
 
 /**
  * Utilities to work with bean names.

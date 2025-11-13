@@ -2,6 +2,7 @@ package com.nucleonforge.axile.sbs.spring.env;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
@@ -11,7 +12,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
-import com.nucleonforge.axile.sbs.spring.configprops.ServiceConfigurationProperties;
+import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxileEnvironmentDescriptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,15 +55,22 @@ class DefaultEnvPropertyEnricherTest {
     @TestConfiguration
     static class DefaultEnvPropertyEnricherTestConfiguration {
         @Bean
-        public ServiceConfigurationProperties serviceConfigurationProperties(
+        public ConfigurationPropertiesCache serviceConfigurationProperties(
                 ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
-            return new ServiceConfigurationProperties(configurationPropertiesReportEndpoint);
+            return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
+        }
+
+        @Bean
+        EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
+            return new DefaultEnvironmentPropertyNameNormalizer();
         }
 
         @Bean
         public EnvPropertyEnricher envPropertyEnricher(
-                Environment environment, ServiceConfigurationProperties serviceConfigurationProperties) {
-            return new DefaultEnvPropertyEnricher(environment, serviceConfigurationProperties);
+                Environment environment,
+                ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache,
+                EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
+            return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, configurationPropertiesCache);
         }
     }
 }

@@ -12,20 +12,20 @@ import org.springframework.context.annotation.Bean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link ServiceConfigurationProperties}.
+ * Integration tests for {@link ConfigurationPropertiesCache}.
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ServiceConfigurationPropertiesTest {
+public class ConfigurationPropertiesCacheTest {
 
     @Autowired
-    ServiceConfigurationProperties serviceConfigurationProperties;
+    ConfigurationPropertiesCache configurationPropertiesCache;
 
     @Test
     void shouldReturnConfigurationProperties() {
-        assertThat(serviceConfigurationProperties.getConfigurationProperties())
+        assertThat(configurationPropertiesCache.getConfigurationProperties())
                 .isNotNull()
                 .isInstanceOf(ConfigurationPropertiesDescriptor.class);
     }
@@ -34,15 +34,15 @@ public class ServiceConfigurationPropertiesTest {
     static class ServiceConfigurationPropertiesTestConfiguration {
 
         @Bean
-        public ServiceConfigurationProperties serviceConfigurationProperties(
+        public ConfigurationPropertiesCache serviceConfigurationProperties(
                 ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
-            return new ServiceConfigurationProperties(configurationPropertiesReportEndpoint);
+            return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
         }
 
         @Bean
         public AxileConfigurationPropertiesEndpoint axileConfigurationPropertiesEndpoint(
-                ServiceConfigurationProperties serviceConfigurationProperties) {
-            return new AxileConfigurationPropertiesEndpoint(serviceConfigurationProperties);
+                ConfigurationPropertiesCache configurationPropertiesCache) {
+            return new AxileConfigurationPropertiesEndpoint(configurationPropertiesCache);
         }
     }
 }
