@@ -4,13 +4,13 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -39,7 +39,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 21.10.2025
  * @author Nikita Kirillov
  */
-@Disabled
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         args = {"--axile.env.test.prop3=fromCommandLine"},
@@ -137,6 +136,11 @@ class AxileEnvironmentEndpointTest {
 
     @TestConfiguration
     static class AxileEnvironmentEndpointTestConfiguration {
+        @Bean
+        public ServiceConfigurationProperties serviceConfigurationProperties(
+                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
+            return new ServiceConfigurationProperties(configurationPropertiesReportEndpoint);
+        }
 
         @Bean
         public EnvPropertyEnricher envPropertyEnricher(

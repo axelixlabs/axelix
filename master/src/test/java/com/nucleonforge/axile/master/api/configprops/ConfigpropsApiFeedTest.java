@@ -309,7 +309,7 @@ public class ConfigpropsApiFeedTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/configprops")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axile-configprops")) {
                     return new MockResponse()
                             .setBody(jsonBeansFeedResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -322,8 +322,7 @@ public class ConfigpropsApiFeedTest {
 
     @Test
     void shouldReturnJSONConfigpropsFeed() {
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         // when.
         ResponseEntity<String> response =

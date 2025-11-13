@@ -78,11 +78,13 @@ class EnvironmentEndpointProberTest {
               "properties": {
                 "java.specification.version": {
                   "value": "17",
-                  "isPrimary": true
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
                 },
                 "java.vm.vendor": {
                   "value": "BellSoft",
-                  "isPrimary": true
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
                 }
               }
             },
@@ -92,7 +94,8 @@ class EnvironmentEndpointProberTest {
                 "JAVA_HOME": {
                   "value": "Java_Liberica_jdk/17.0.16-12/x64",
                   "origin": "System Environment Property \\"JAVA_HOME\\"",
-                  "isPrimary": true
+                  "isPrimary": true,
+                  "configPropsBeanName": null
                 }
               }
             },
@@ -102,7 +105,8 @@ class EnvironmentEndpointProberTest {
                 "com.example.cache.max-size": {
                   "value": "1000",
                   "origin": "class path resource [application.properties]",
-                  "isPrimary": true
+                  "isPrimary": true,
+                  "configPropsBeanName": null
                 }
               }
             }
@@ -116,7 +120,7 @@ class EnvironmentEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/axile-env")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axile-env")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -129,8 +133,7 @@ class EnvironmentEndpointProberTest {
 
     @Test
     void shouldReturnEnvironmentFeed() {
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         EnvironmentFeed feed =
                 environmentEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
@@ -158,11 +161,15 @@ class EnvironmentEndpointProberTest {
         assertThat(javaSpecVersion.value()).isEqualTo("17");
         assertThat(javaSpecVersion.origin()).isNull();
         assertThat(javaSpecVersion.isPrimary()).isTrue();
+        assertThat(javaSpecVersion.configPropsBeanName())
+                .isEqualTo("org.springframework.boot.test.property.SystemProperties");
 
         AxilePropertyValue javaVmVendor = systemProperties.properties().get("java.vm.vendor");
         assertThat(javaVmVendor.value()).isEqualTo("BellSoft");
         assertThat(javaVmVendor.origin()).isNull();
         assertThat(javaVmVendor.isPrimary()).isTrue();
+        assertThat(javaVmVendor.configPropsBeanName())
+                .isEqualTo("org.springframework.boot.test.property.SystemProperties");
 
         EnvironmentFeed.PropertySource systemEnvironment = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemEnvironment"))
@@ -174,6 +181,7 @@ class EnvironmentEndpointProberTest {
         assertThat(javaHome.value()).isEqualTo("Java_Liberica_jdk/17.0.16-12/x64");
         assertThat(javaHome.origin()).isEqualTo("System Environment Property \"JAVA_HOME\"");
         assertThat(javaHome.isPrimary()).isTrue();
+        assertThat(javaHome.configPropsBeanName()).isNull();
 
         EnvironmentFeed.PropertySource configResource = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("Config resource classpath:actuate/env/"))
@@ -185,6 +193,7 @@ class EnvironmentEndpointProberTest {
         assertThat(cacheMaxSize.value()).isEqualTo("1000");
         assertThat(cacheMaxSize.origin()).isEqualTo("class path resource [application.properties]");
         assertThat(cacheMaxSize.isPrimary()).isTrue();
+        assertThat(cacheMaxSize.configPropsBeanName()).isNull();
     }
 
     @Test

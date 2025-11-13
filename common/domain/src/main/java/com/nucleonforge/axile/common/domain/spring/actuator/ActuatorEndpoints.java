@@ -52,7 +52,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint CONDITIONS = of("/conditions", HttpMethod.GET);
 
     // @ConfigurationProperties beans
-    public static final ActuatorEndpoint CONFIG_PROPS = of("/configprops", HttpMethod.GET);
+    public static final ActuatorEndpoint CONFIG_PROPS = of("/axile-configprops", HttpMethod.GET);
     public static final ActuatorEndpoint CONFIG_PROPS_BY_PREFIX = of("/configprops/{prefix}", HttpMethod.GET);
 
     // Environment

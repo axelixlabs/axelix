@@ -113,7 +113,7 @@ public class ConfigpropsByPrefixEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/configprops/spring.jackson")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/configprops/spring.jackson")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -129,8 +129,7 @@ public class ConfigpropsByPrefixEndpointProberTest {
     void shouldReturnConfigpropsSingleBean() {
         // when.
         String prefix = "spring.jackson";
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
         HttpPayload payload = new DefaultHttpPayload(Map.of("prefix", prefix));
 
         // then.

@@ -1,10 +1,10 @@
 package com.nucleonforge.axile.sbs.spring.env;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
@@ -24,7 +24,6 @@ import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePrope
  * @author Nikita Kirillov
  */
 public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
-    private final Map<String, String> propertyToBeanName = new ConcurrentHashMap<>();
 
     private final Environment environment;
     private final ServiceConfigurationProperties serviceConfigurationProperties;
@@ -33,15 +32,15 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
             Environment environment, ServiceConfigurationProperties serviceConfigurationProperties) {
         this.serviceConfigurationProperties = serviceConfigurationProperties;
         this.environment = environment;
-        initPropertiesToBeanName();
     }
 
     @Override
     public AxileEnvironmentDescriptor enrich(EnvironmentDescriptor originalDescriptor) {
         Map<String, String> primarySourceMap = buildPrimarySourceMap(originalDescriptor);
+        Map<String, String> properties = enrichPropertiesToBeanName();
 
         List<AxilePropertySourceDescriptor> enrichedSources = originalDescriptor.getPropertySources().stream()
-                .map(source -> enrichPropertySource(source, primarySourceMap))
+                .map(source -> enrichPropertySource(source, primarySourceMap, properties))
                 .toList();
 
         return new AxileEnvironmentDescriptor(
@@ -64,7 +63,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     }
 
     private AxilePropertySourceDescriptor enrichPropertySource(
-            PropertySourceDescriptor source, Map<String, String> primarySourceMap) {
+            PropertySourceDescriptor source, Map<String, String> primarySourceMap, Map<String, String> properties) {
 
         Map<String, AxilePropertyValueDescriptor> enrichedProperties = source.getProperties().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
@@ -75,24 +74,39 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                             original.getValue(),
                             original.getOrigin(),
                             isPrimary,
-                            propertyToBeanName.getOrDefault(entry.getKey(), null));
+                            properties.getOrDefault(entry.getKey(), null));
                 }));
 
         return new AxilePropertySourceDescriptor(source.getName(), enrichedProperties);
     }
 
-    private void initPropertiesToBeanName() {
+    private Map<String, String> enrichPropertiesToBeanName() {
+        Map<String, String> propertyToBeanName = new HashMap<>();
+
         serviceConfigurationProperties
                 .getConfigurationProperties()
                 .getContexts()
                 .values()
                 .forEach(context -> context.getBeans().forEach((beanName, bean) -> {
-                    bean.getProperties().keySet().forEach(prop -> {
-                        String property = bean.getPrefix() + "." + prop;
-                        String stripBeanName = stripBeanName(beanName);
-                        propertyToBeanName.put(property, stripBeanName);
-                    });
+                    String cleanBeanName = stripBeanName(beanName);
+                    flatten(bean.getPrefix(), bean.getProperties(), propertyToBeanName, cleanBeanName);
                 }));
+
+        return propertyToBeanName;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void flatten(
+            String prefix, Map<String, Object> properties, Map<String, String> propertyToBeanName, String beanName) {
+        properties.forEach((key, value) -> {
+            String fullKey = prefix + "." + key;
+
+            if (value instanceof Map<?, ?> map) {
+                flatten(fullKey, (Map<String, Object>) map, propertyToBeanName, beanName);
+            } else {
+                propertyToBeanName.put(fullKey, beanName);
+            }
+        });
     }
 
     /**

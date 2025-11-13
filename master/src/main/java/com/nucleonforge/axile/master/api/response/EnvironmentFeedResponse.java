@@ -31,11 +31,14 @@ public record EnvironmentFeedResponse(
         /**
          * Represents a property with its value and whether it is the primary ("winning") property.
          *
-         * @param name       the property name
-         * @param value     the property value
-         * @param isPrimary whether this property value is primary (i.e. this value takes precedence over
-         *                  the other values from other property sources)
+         * @param name                  the property name
+         * @param value                 the property value
+         * @param isPrimary             whether this property value is primary (i.e. this value takes precedence over
+         *                              the other values from other property sources)
+         * @param configPropsBeanName   when the property exists in the {@code @Configuration Properties},
+         *                              specify the name of the bean it belongs to, otherwise, specify {@code null}
          */
-        public record PropertyEntry(String name, @Nullable String value, boolean isPrimary) {}
+        public record PropertyEntry(
+                String name, @Nullable String value, boolean isPrimary, @Nullable String configPropsBeanName) {}
     }
 }

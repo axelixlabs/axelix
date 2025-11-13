@@ -105,7 +105,8 @@ class StateExportApiTest {
                   "properties": {
                     "java.vm.vendor": {
                       "value": "BellSoft",
-                      "isPrimary": true
+                      "isPrimary": true,
+                      "configPropsBeanName": "test.property.systemProperties"
                     }
                   }
                 }
@@ -233,7 +234,7 @@ class StateExportApiTest {
                     return new MockResponse()
                             .setBody(jsonCacheResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/configprops")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axile-configprops")) {
                     return new MockResponse()
                             .setBody(jsonConfigpropsResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

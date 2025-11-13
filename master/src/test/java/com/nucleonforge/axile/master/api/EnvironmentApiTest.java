@@ -56,12 +56,14 @@ class EnvironmentApiTest {
                 {
                   "name": "java.vm.vendor",
                   "value": "BellSoft",
-                  "isPrimary": true
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
                 },
                 {
                   "name": "java.specification.version",
                   "value": "17",
-                  "isPrimary": true
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
                 }
               ]
             },
@@ -71,7 +73,8 @@ class EnvironmentApiTest {
                 {
                   "name": "JAVA_HOME",
                   "value": "/opt/hostedtoolcache/Java_Liberica_jdk/17.0.16-12/x64",
-                  "isPrimary": true
+                  "isPrimary": true,
+                  "configPropsBeanName": null
                 }
               ]
             }
@@ -137,11 +140,13 @@ class EnvironmentApiTest {
                   "properties": {
                     "java.vm.vendor": {
                       "value": "BellSoft",
-                      "isPrimary": true
+                      "isPrimary": true,
+                      "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
                     },
                     "java.specification.version": {
                       "value": "17",
-                      "isPrimary": true
+                      "isPrimary": true,
+                      "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
                     }
                   }
                 },
@@ -151,7 +156,8 @@ class EnvironmentApiTest {
                     "JAVA_HOME": {
                       "value": "/opt/hostedtoolcache/Java_Liberica_jdk/17.0.16-12/x64",
                       "origin": "System Environment Property \\"JAVA_HOME\\"",
-                      "isPrimary": true
+                      "isPrimary": true,
+                      "configPropsBeanName": null
                     }
                   }
                 }

@@ -10,13 +10,19 @@ import org.springframework.context.annotation.Bean;
 import com.nucleonforge.axile.sbs.spring.configprops.AxileConfigurationPropertiesEndpoint;
 import com.nucleonforge.axile.sbs.spring.configprops.ServiceConfigurationProperties;
 
+/**
+ * Auto-configuration for the {@link AxileConfigurationPropertiesEndpoint}.
+ *
+ * @since 13.11.2025
+ * @author Sergey Cherkasov
+ */
 @AutoConfiguration(after = ConfigurationPropertiesReportEndpointAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = ConfigurationPropertiesReportEndpoint.class)
 public class AxileConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ServiceConfigurationProperties inMemoryConfigurationProperties(
+    public ServiceConfigurationProperties serviceConfigurationProperties(
             ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
         return new ServiceConfigurationProperties(configurationPropertiesReportEndpoint);
     }

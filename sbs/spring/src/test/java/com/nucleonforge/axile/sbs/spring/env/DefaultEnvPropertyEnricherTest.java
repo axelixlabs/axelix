@@ -1,9 +1,9 @@
 package com.nucleonforge.axile.sbs.spring.env;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 21.10.2025
  * @author Nikita Kirillov
  */
-@Disabled
 @SpringBootTest
 class DefaultEnvPropertyEnricherTest {
 
@@ -54,6 +53,11 @@ class DefaultEnvPropertyEnricherTest {
 
     @TestConfiguration
     static class DefaultEnvPropertyEnricherTestConfiguration {
+        @Bean
+        public ServiceConfigurationProperties serviceConfigurationProperties(
+                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
+            return new ServiceConfigurationProperties(configurationPropertiesReportEndpoint);
+        }
 
         @Bean
         public EnvPropertyEnricher envPropertyEnricher(
