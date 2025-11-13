@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
@@ -24,7 +25,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
-import com.nucleonforge.axile.sbs.spring.configprops.ServiceConfigurationProperties;
+import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -136,16 +137,24 @@ class AxileEnvironmentEndpointTest {
 
     @TestConfiguration
     static class AxileEnvironmentEndpointTestConfiguration {
+
         @Bean
-        public ServiceConfigurationProperties serviceConfigurationProperties(
+        public ConfigurationPropertiesCache serviceConfigurationProperties(
                 ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
-            return new ServiceConfigurationProperties(configurationPropertiesReportEndpoint);
+            return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
+        }
+
+        @Bean
+        public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
+            return new DefaultEnvironmentPropertyNameNormalizer();
         }
 
         @Bean
         public EnvPropertyEnricher envPropertyEnricher(
-                Environment environment, ServiceConfigurationProperties serviceConfigurationProperties) {
-            return new DefaultEnvPropertyEnricher(environment, serviceConfigurationProperties);
+                Environment environment,
+                EnvironmentPropertyNameNormalizer propertyNameNormalizer,
+                ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache) {
+            return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, configurationPropertiesCache);
         }
 
         @Bean

@@ -35,8 +35,8 @@ public record EnvironmentFeedResponse(
          * @param value                 the property value
          * @param isPrimary             whether this property value is primary (i.e. this value takes precedence over
          *                              the other values from other property sources)
-         * @param configPropsBeanName   when the property exists in the {@code @Configuration Properties},
-         *                              specify the name of the bean it belongs to, otherwise, specify {@code null}
+         * @param configPropsBeanName   the name of the configprops (if any) bean onto which this property maps,
+         *                              {@code null} otherwise
          */
         public record PropertyEntry(
                 String name, @Nullable String value, boolean isPrimary, @Nullable String configPropsBeanName) {}

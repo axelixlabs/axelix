@@ -11,8 +11,8 @@ import org.jspecify.annotations.Nullable;
  * @param origin               the origin of the property if available (e.g. location in a file), may be {@code null}
  * @param isPrimary            whether this property value is primary (i.e. this value takes precedence over the other values
  *                             from other property sources)
- * @param configPropsBeanName  when the property exists in the {@code @Configuration Properties},
- *                             specify the name of the bean it belongs to, otherwise, specify {@code null}
+ * @param configPropsBeanName  the name of the configprops (if any) bean onto which this property maps,
+ *          *                  {@code null} otherwise
  *
  * @see EnvironmentFeed
  * @since 21.10.2025

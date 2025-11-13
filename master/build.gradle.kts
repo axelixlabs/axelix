@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":common:domain"))
     implementation(project(":common:api"))
     implementation(project(":common_auth"))
+    implementation(project(":common:utils"))
 
     // Impl
     implementation("org.springframework:spring-jdbc")

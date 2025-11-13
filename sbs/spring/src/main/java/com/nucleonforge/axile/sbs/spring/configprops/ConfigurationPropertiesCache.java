@@ -1,8 +1,5 @@
 package com.nucleonforge.axile.sbs.spring.configprops;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
 
@@ -13,18 +10,26 @@ import org.springframework.boot.actuate.context.properties.ConfigurationProperti
  * @since 13.11.2025
  * @author Sergey Cherkasov
  */
-public class ServiceConfigurationProperties {
-    private static final String CACHE_NAME = "axile-configprops";
+public class ConfigurationPropertiesCache {
 
     private final ConfigurationPropertiesReportEndpoint delegate;
-    private final ConcurrentMap<String, ConfigurationPropertiesDescriptor> source;
 
-    public ServiceConfigurationProperties(ConfigurationPropertiesReportEndpoint delegate) {
+    @SuppressWarnings("NullAway")
+    private volatile ConfigurationPropertiesDescriptor cachedResult;
+
+    public ConfigurationPropertiesCache(ConfigurationPropertiesReportEndpoint delegate) {
         this.delegate = delegate;
-        this.source = new ConcurrentHashMap<>();
     }
 
     public ConfigurationPropertiesDescriptor getConfigurationProperties() {
-        return source.computeIfAbsent(CACHE_NAME, k -> delegate.configurationProperties());
+        if (cachedResult == null) {
+            synchronized (this) {
+                if (cachedResult == null) {
+                    cachedResult = delegate.configurationProperties();
+                }
+            }
+        }
+
+        return cachedResult;
     }
 }

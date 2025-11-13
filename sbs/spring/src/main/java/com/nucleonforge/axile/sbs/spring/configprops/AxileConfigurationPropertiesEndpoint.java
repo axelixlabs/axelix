@@ -14,9 +14,9 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 @Endpoint(id = "axile-configprops")
 public class AxileConfigurationPropertiesEndpoint {
 
-    private final ServiceConfigurationProperties service;
+    private final ConfigurationPropertiesCache service;
 
-    public AxileConfigurationPropertiesEndpoint(ServiceConfigurationProperties service) {
+    public AxileConfigurationPropertiesEndpoint(ConfigurationPropertiesCache service) {
         this.service = service;
     }
 

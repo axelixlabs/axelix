@@ -7,10 +7,10 @@ import java.util.Map;
 import org.jspecify.annotations.NonNull;
 
 import com.nucleonforge.axile.common.api.ConfigpropsFeed;
+import com.nucleonforge.axile.common.utils.BeanNameUtils;
 import com.nucleonforge.axile.master.api.response.KeyValue;
 import com.nucleonforge.axile.master.api.response.configprops.ConfigpropsProfile;
 import com.nucleonforge.axile.master.service.convert.Converter;
-import com.nucleonforge.axile.master.service.convert.utils.BeanNameUtils;
 
 /**
  * Abstract {@link Converter} for the Configprops endpoint,

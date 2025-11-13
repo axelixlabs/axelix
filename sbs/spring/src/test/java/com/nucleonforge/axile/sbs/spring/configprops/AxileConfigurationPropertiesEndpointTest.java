@@ -36,15 +36,15 @@ public class AxileConfigurationPropertiesEndpointTest {
     static class AxileConfigurationPropertiesTestConfiguration {
 
         @Bean
-        public ServiceConfigurationProperties serviceConfigurationProperties(
+        public ConfigurationPropertiesCache serviceConfigurationProperties(
                 ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
-            return new ServiceConfigurationProperties(configurationPropertiesReportEndpoint);
+            return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
         }
 
         @Bean
         public AxileConfigurationPropertiesEndpoint axileConfigurationPropertiesEndpoint(
-                ServiceConfigurationProperties serviceConfigurationProperties) {
-            return new AxileConfigurationPropertiesEndpoint(serviceConfigurationProperties);
+                ConfigurationPropertiesCache configurationPropertiesCache) {
+            return new AxileConfigurationPropertiesEndpoint(configurationPropertiesCache);
         }
     }
 }
