@@ -97,17 +97,8 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
                     .getRawClass();
         }
 
-        Object source = beanDefinition.getSource();
-        if (source != null && result == null) {
-            if (source instanceof StandardMethodMetadata metadata) {
-                Method introspectedMethod = metadata.getIntrospectedMethod();
-                return introspectedMethod.getDeclaringClass();
-            } else if (source instanceof MethodMetadata metadata) {
-                try {
-                    return Class.forName(metadata.getDeclaringClassName());
-                } catch (Exception ignored) {
-                }
-            }
+        if (result == null) {
+            result = extractClassFromSource(beanDefinition.getSource());
         }
 
         if (result == null) {
@@ -120,6 +111,26 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
             }
         }
         return result;
+    }
+
+    @Nullable
+    private Class<?> extractClassFromSource(@Nullable Object source) {
+        if (source == null) {
+            return null;
+        }
+
+        if (source instanceof StandardMethodMetadata metadata) {
+            Method introspectedMethod = metadata.getIntrospectedMethod();
+            return introspectedMethod.getDeclaringClass();
+        } else if (source instanceof MethodMetadata metadata) {
+            try {
+                return Class.forName(metadata.getDeclaringClassName());
+            } catch (Exception ignored) {
+                return null;
+            }
+        }
+
+        return null;
     }
 
     private boolean isFactoryBeanClass(String className) {
