@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.common.api.BeansFeed.ComponentVariant;
 
+import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.ANONYMOUS_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.CONFIGURATION_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.CUSTOM_DATABASE_QUALIFIER_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.LAZY_COMPONENT;
@@ -54,6 +56,7 @@ import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtract
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.QUALIFIED_COMPONENT;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.REGULAR_COMPONENT;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.SPRING_DATA_REPOSITORY;
+import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.STATIC_BFPP_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.TRANSACTIONAL_BEAN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -135,7 +138,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.qualifiers()).isEmpty();
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
             assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(bs -> {
-                assertThat(bs.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
+                assertThat(bs.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
                 assertThat(bs.methodName()).isEqualTo("lazyPrimaryBean");
             });
         });
@@ -152,7 +155,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.qualifiers()).contains(QUALIFIED_BEAN_METHOD);
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
             assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(bs -> {
-                assertThat(bs.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
+                assertThat(bs.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
                 assertThat(bs.methodName()).isEqualTo(QUALIFIED_BEAN_METHOD);
             });
         });
@@ -211,6 +214,38 @@ class DefaultBeanMetaInfoExtractorTest {
         });
     }
 
+    @Test
+    void shouldExtractBeanFromAnonymousClass() {
+        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract(ANONYMOUS_BEAN, testBeanFactory);
+
+        assertThat(beanMetaInfo).satisfies(it -> {
+            assertThat(it.isLazyInit()).isFalse();
+            assertThat(it.isPrimary()).isFalse();
+            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+
+            BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
+            assertThat(source.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
+            assertThat(source.methodName()).isEqualTo(ANONYMOUS_BEAN);
+        });
+    }
+
+    @Test
+    void shouldExtractJdkProxyBean() {
+        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract(STATIC_BFPP_BEAN, testBeanFactory);
+
+        assertThat(beanMetaInfo).satisfies(it -> {
+            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.isLazyInit()).isFalse();
+            assertThat(it.isPrimary()).isFalse();
+            assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+
+            BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
+            assertThat(source.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
+            assertThat(source.methodName()).isEqualTo(STATIC_BFPP_BEAN);
+        });
+    }
+
     @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
     @Retention(RetentionPolicy.RUNTIME)
     @Qualifier(CUSTOM_DATABASE_QUALIFIER_BEAN)
@@ -245,6 +280,10 @@ class DefaultBeanMetaInfoExtractorTest {
         static final String SPRING_DATA_REPOSITORY = "MyRepository";
 
         static final String CUSTOM_DATABASE_QUALIFIER_BEAN = "CustomDatabaseQualifierBean";
+
+        static final String ANONYMOUS_BEAN = "anonymousBean";
+
+        static final String STATIC_BFPP_BEAN = "staticBFPPBean";
 
         @Service(REGULAR_COMPONENT)
         static class FromServiceAnnotation {}
@@ -338,5 +377,20 @@ class DefaultBeanMetaInfoExtractorTest {
         @Service(CUSTOM_DATABASE_QUALIFIER_BEAN)
         @CustomDatabaseQualifier
         static class CustomDatabaseQualifierBean {}
+
+        // IMPORTANT! Intentionally using explicit anonymous class `new Runnable()`
+        // instead of lambda to ensure Class.isAnonymousClass() returns true. Don't use hotkey - `Replace with lambda`
+        @Bean(ANONYMOUS_BEAN)
+        public Runnable anonymousBean() {
+            return new Runnable() {
+                @Override
+                public void run() {}
+            };
+        }
+
+        @Bean(STATIC_BFPP_BEAN)
+        public static BeanFactoryPostProcessor staticBFPPBean() {
+            return beanFactory -> {};
+        }
     }
 }

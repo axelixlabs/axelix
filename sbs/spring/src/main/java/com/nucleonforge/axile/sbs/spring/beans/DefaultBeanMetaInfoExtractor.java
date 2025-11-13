@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.core.type.MethodMetadata;
 import org.springframework.core.type.StandardMethodMetadata;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
@@ -51,7 +52,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     private BeansFeed.ProxyType analyzeProxyType(Class<?> beanType) {
         if (Proxy.isProxyClass(beanType)) {
             return BeansFeed.ProxyType.JDK_PROXY;
-        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
+        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR) && !beanType.isHidden()) {
             return BeansFeed.ProxyType.CGLIB;
         }
         return BeansFeed.ProxyType.NO_PROXYING;
@@ -59,12 +60,12 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
 
     private BeansFeed.BeanSource analyzeBeanSource(BeanDefinition beanDefinition, String beanName) {
         if (beanDefinition.getFactoryMethodName() != null) {
-            Class<?> enclosingClassName = extractEnclosingClassName(beanDefinition, beanName);
+            Class<?> enclosingClass = extractEnclosingClass(beanDefinition, beanName);
 
             return new BeansFeed.BeanMethod(
-                    Optional.ofNullable(enclosingClassName)
+                    Optional.ofNullable(enclosingClass)
                             .map(ClassUtils::getUserClass)
-                            .map(Class::getName)
+                            .map(Class::getSimpleName)
                             .orElse(null),
                     beanDefinition.getFactoryMethodName());
         }
@@ -87,28 +88,40 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     }
 
     @Nullable
-    private Class<?> extractEnclosingClassName(BeanDefinition beanDefinition, String beanName) {
-        if (beanDefinition.getFactoryBeanName() != null) {
-            return beanFactory
-                    .getBeanDefinition(beanDefinition.getFactoryBeanName())
-                    .getResolvableType()
-                    .getRawClass();
+    private Class<?> extractEnclosingClass(BeanDefinition beanDefinition, String beanName) {
+        Class<?> result = extractClassFromSource(beanDefinition.getSource());
+
+        if (result == null) {
+            try {
+                result = beanFactory.getType(beanName);
+                if (Proxy.isProxyClass(result)) {
+                    result = Class.forName(beanDefinition.getBeanClassName());
+                }
+            } catch (Exception ignored) {
+            }
         }
 
-        if (beanDefinition.getSource() instanceof StandardMethodMetadata metadata) {
+        return result;
+    }
+
+    @Nullable
+    private Class<?> extractClassFromSource(@Nullable Object source) {
+        if (source == null) {
+            return null;
+        }
+
+        if (source instanceof StandardMethodMetadata metadata) {
             Method introspectedMethod = metadata.getIntrospectedMethod();
             return introspectedMethod.getDeclaringClass();
+        } else if (source instanceof MethodMetadata metadata) {
+            try {
+                return Class.forName(metadata.getDeclaringClassName());
+            } catch (Exception ignored) {
+                return null;
+            }
         }
 
-        if (beanDefinition.getBeanClassName() != null) {
-            return null;
-        }
-
-        try {
-            return beanFactory.getType(beanName);
-        } catch (Exception e) {
-            return null;
-        }
+        return null;
     }
 
     private boolean isFactoryBeanClass(String className) {
