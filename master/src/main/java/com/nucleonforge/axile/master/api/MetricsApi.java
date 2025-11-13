@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.master.api;
 
+import java.util.Map;
 import java.util.Objects;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,14 +16,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 import com.nucleonforge.axile.common.api.metrics.MetricsList;
+import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.loggers.GroupProfileResponse;
 import com.nucleonforge.axile.master.api.response.metrics.MetricsListResponse;
+import com.nucleonforge.axile.master.api.response.metrics.SingleMetricProfileResponse;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.transport.metrics.GetAllMetricsEndpointProber;
+import com.nucleonforge.axile.master.service.transport.metrics.GetSingleMetricProfileEndpointProber;
 
 @Tag(name = "Metrics API Controller", description = "The endpoint that provides access to the metrics of the instances")
 @RestController
@@ -30,13 +35,19 @@ import com.nucleonforge.axile.master.service.transport.metrics.GetAllMetricsEndp
 public class MetricsApi {
 
     private final GetAllMetricsEndpointProber getAllMetricsEndpointProber;
-    private final Converter<MetricsList, MetricsListResponse> converter;
+    private final GetSingleMetricProfileEndpointProber getSingleMetricProfileEndpointProber;
+    private final Converter<MetricsList, MetricsListResponse> allMetricsConverter;
+    private final Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter;
 
     public MetricsApi(
             GetAllMetricsEndpointProber getAllMetricsEndpointProber,
-            Converter<MetricsList, MetricsListResponse> converter) {
+            GetSingleMetricProfileEndpointProber getSingleMetricProfileEndpointProber,
+            Converter<MetricsList, MetricsListResponse> allMetricsConverter,
+            Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter) {
         this.getAllMetricsEndpointProber = getAllMetricsEndpointProber;
-        this.converter = converter;
+        this.getSingleMetricProfileEndpointProber = getSingleMetricProfileEndpointProber;
+        this.allMetricsConverter = allMetricsConverter;
+        this.singleMetricConverter = singleMetricConverter;
     }
 
     @Operation(
@@ -73,6 +84,47 @@ public class MetricsApi {
     @GetMapping(path = ApiPaths.MetricsApi.INSTANCE_ID)
     public MetricsListResponse getAllMetrics(@PathVariable("instanceId") String instanceId) {
         MetricsList metricsList = getAllMetricsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(converter.convert(metricsList));
+        return Objects.requireNonNull(allMetricsConverter.convert(metricsList));
+    }
+
+    @Operation(
+            summary = "Returns a single metric profile inside the given instance",
+            responses = {
+                @ApiResponse(
+                        description = "OK",
+                        responseCode = "200",
+                        links = {
+                            @Link(
+                                    name = "Actuator/Metrics",
+                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/metrics.html")
+                        },
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SingleMetricProfileResponse.class))),
+                @ApiResponse(
+                        description = "Bad Request",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
+            })
+    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
+    @Parameter(name = "metricName", description = "The name of the metric to fetch profile for", required = true)
+    @GetMapping(path = ApiPaths.MetricsApi.METRIC_NAME)
+    public SingleMetricProfileResponse getSingleMetric(
+            @PathVariable("instanceId") String instanceId, @PathVariable("metric") String metricName) {
+        MetricProfile metricProfile = getSingleMetricProfileEndpointProber.invoke(
+                InstanceId.of(instanceId), new DefaultHttpPayload(Map.of("metric.name", metricName)));
+
+        return Objects.requireNonNull(singleMetricConverter.convert(metricProfile));
     }
 }
