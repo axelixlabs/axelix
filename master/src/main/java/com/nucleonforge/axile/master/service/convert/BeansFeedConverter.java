@@ -66,7 +66,7 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
                     String processedDepName =
                             isConfigPropsDep ? BeanNameUtils.stripConfigPropsPrefix(dep.name()) : dep.name();
 
-                    return new BeanShortProfile.BeanDependencyProfile(processedDepName, isConfigPropsDep);
+                    return new BeanDependencyProfile(processedDepName, isConfigPropsDep);
                 })
                 .collect(Collectors.toSet());
     }
@@ -82,6 +82,7 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
                         ((BeansFeed.BeanMethod) beanSource).enclosingClassName(),
                         ((BeansFeed.BeanMethod) beanSource).methodName());
             case FACTORY_BEAN -> new FactoryBean(((BeansFeed.FactoryBean) beanSource).factoryBeanName());
+            case SYNTHETIC_BEAN -> new BeanShortProfile.SyntheticBean();
             case UNKNOWN -> new UnknownBean();
         };
     }

@@ -16,10 +16,14 @@ import jakarta.persistence.Table;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -57,6 +61,7 @@ import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtract
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.REGULAR_COMPONENT;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.SPRING_DATA_REPOSITORY;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.STATIC_BFPP_BEAN;
+import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.SYNTHETIC_BEAN_DEFINITION;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.TRANSACTIONAL_BEAN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -231,7 +236,7 @@ class DefaultBeanMetaInfoExtractorTest {
     }
 
     @Test
-    void shouldExtractJdkProxyBean() {
+    void shouldExtractInfoForStaticBeanFactoryPostProcessorBean() {
         BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract(STATIC_BFPP_BEAN, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
@@ -243,6 +248,18 @@ class DefaultBeanMetaInfoExtractorTest {
             BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
             assertThat(source.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
             assertThat(source.methodName()).isEqualTo(STATIC_BFPP_BEAN);
+        });
+    }
+
+    @Test
+    void shouldExtractInfoForSyntheticallyGeneratedBean() {
+        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract(SYNTHETIC_BEAN_DEFINITION, testBeanFactory);
+
+        assertThat(beanMetaInfo).satisfies(it -> {
+            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.isLazyInit()).isFalse();
+            assertThat(it.isPrimary()).isFalse();
+            assertThat(it.beanSource()).isInstanceOf(BeansFeed.SyntheticBean.class);
         });
     }
 
@@ -284,6 +301,10 @@ class DefaultBeanMetaInfoExtractorTest {
         static final String ANONYMOUS_BEAN = "anonymousBean";
 
         static final String STATIC_BFPP_BEAN = "staticBFPPBean";
+
+        static final String BEAN_DEFINITION_REGISTRY_BEAN = "BEAN_DEFINITION_REGISTRY_BEAN";
+
+        static final String SYNTHETIC_BEAN_DEFINITION = "SYNTHETIC_BEAN_DEFINITION";
 
         @Service(REGULAR_COMPONENT)
         static class FromServiceAnnotation {}
@@ -379,7 +400,7 @@ class DefaultBeanMetaInfoExtractorTest {
         static class CustomDatabaseQualifierBean {}
 
         // IMPORTANT! Intentionally using explicit anonymous class `new Runnable()`
-        // instead of lambda to ensure Class.isAnonymousClass() returns true. Don't use hotkey - `Replace with lambda`
+        // instead of lambda to ensure Class.isAnonymousClass() returns true.
         @Bean(ANONYMOUS_BEAN)
         public Runnable anonymousBean() {
             return new Runnable() {
@@ -391,6 +412,24 @@ class DefaultBeanMetaInfoExtractorTest {
         @Bean(STATIC_BFPP_BEAN)
         public static BeanFactoryPostProcessor staticBFPPBean() {
             return beanFactory -> {};
+        }
+
+        @Bean(BEAN_DEFINITION_REGISTRY_BEAN)
+        public static BeanDefinitionRegistryPostProcessor beanDefinitionRegistryPostProcessor() {
+
+            return new BeanDefinitionRegistryPostProcessor() {
+
+                @Override
+                public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+                    RootBeanDefinition beanDefinition = new RootBeanDefinition();
+                    beanDefinition.setSynthetic(true);
+                    beanDefinition.setBeanClass(Object.class);
+                    registry.registerBeanDefinition(SYNTHETIC_BEAN_DEFINITION, beanDefinition);
+                }
+
+                @Override
+                public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {}
+            };
         }
     }
 }

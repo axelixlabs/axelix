@@ -102,6 +102,21 @@ class BeansApiTest {
                 "factoryBeanName": "org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean",
                 "origin": "FACTORY_BEAN"
               }
+            },
+            {
+              "beanName": "syntheticBeanDefinition",
+              "scope": "singleton",
+              "className": "SomeClass",
+              "aliases": [],
+              "proxyType" : "NO_PROXYING",
+              "dependencies": [],
+              "isPrimary": false,
+              "isLazyInit": false,
+              "isConfigPropsBean": false,
+              "qualifiers": [],
+              "beanSource": {
+                  "origin": "SYNTHETIC_BEAN"
+               }
             }
           ]
         }
@@ -156,7 +171,6 @@ class BeansApiTest {
                   "scope": "prototype",
                   "type": "Jackson2ObjectMapperBuilder",
                   "proxyType" : "JDK_PROXY",
-                  "resource": "class path resource JacksonObjectMapperBuilderConfiguration.class",
                   "aliases": [],
                   "dependencies": [
                     {
@@ -182,7 +196,6 @@ class BeansApiTest {
                   "scope": "session",
                   "type": "TestSessionBean",
                   "proxyType" : "NO_PROXYING",
-                  "resource": "class path resource [org.example.com]",
                   "aliases": ["sessionBeanForProberTest"],
                   "dependencies": [],
                   "isLazyInit": false,
@@ -193,6 +206,20 @@ class BeansApiTest {
                     "factoryBeanName": "org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean",
                     "origin": "FACTORY_BEAN"
                   }
+                },
+                "syntheticBeanDefinition" : {
+                  "scope": "singleton",
+                  "type": "SomeClass",
+                  "proxyType" : "NO_PROXYING",
+                  "aliases": [],
+                  "dependencies": [],
+                  "isPrimary": false,
+                  "isLazyInit": false,
+                  "isConfigPropsBean": false,
+                  "qualifiers": [],
+                  "beanSource": {
+                      "origin": "SYNTHETIC_BEAN"
+                   }
                 }
               }
             }

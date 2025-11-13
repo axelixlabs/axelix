@@ -97,10 +97,11 @@
           "titles" : {
             "main" : "Происхождение",
             "beanMethod" : "Bean метод",
-            "enclosingClass" : "Внешний @Configuration класс",
+            "enclosingClass" : "Декларирущий класс",
             "factoryBeanName" : "Имя FactoryBean бина"
           },
-          "COMPONENT_ANNOTATION" : "@Component аннотация или аналоги",
+          "COMPONENT_ANNOTATION" : "@Component или аналоги",
+          "SYNTHETIC_BEAN" : "Синтетический bean",
           "UNKNOWN" : "Незивестно",
           "FACTORY_BEAN" : "Создан другим FactoryBean-ом",
           "BEAN_METHOD" : "@Bean метод"

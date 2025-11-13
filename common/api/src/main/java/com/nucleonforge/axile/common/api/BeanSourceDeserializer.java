@@ -27,6 +27,7 @@ public class BeanSourceDeserializer extends JsonDeserializer<BeanSource> {
             case COMPONENT_ANNOTATION -> new BeansFeed.ComponentVariant();
             case BEAN_METHOD -> ctxt.readTreeAsValue(node, BeansFeed.BeanMethod.class);
             case FACTORY_BEAN -> ctxt.readTreeAsValue(node, BeansFeed.FactoryBean.class);
+            case SYNTHETIC_BEAN -> ctxt.readTreeAsValue(node, BeansFeed.SyntheticBean.class);
             case UNKNOWN -> new BeansFeed.UnknownBean();
         };
     }

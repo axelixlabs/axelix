@@ -80,13 +80,19 @@ public record BeanShortProfile(
         FACTORY_BEAN,
 
         /**
+         * This is the "synthetic" bean. It means that, most likely, this Bean was created programmatically inside the
+         * Spring Framework, but it might be also created programmatically by some library that uses Spring as well.
+         */
+        SYNTHETIC_BEAN,
+
+        /**
          * We do not know the origin of this bean. As of now, beans registered programmatically via {@link BeanDefinitionRegistry}
          * or anything similar are going to reside here. It is going to be fixed in the future versions.
          */
         UNKNOWN
     }
 
-    public sealed interface BeanSource permits BeanMethod, ComponentVariant, FactoryBean, UnknownBean {
+    public sealed interface BeanSource permits BeanMethod, ComponentVariant, FactoryBean, SyntheticBean, UnknownBean {
 
         @JsonGetter("origin")
         BeanOrigin origin();
@@ -117,6 +123,14 @@ public record BeanShortProfile(
         @Override
         public BeanOrigin origin() {
             return BeanOrigin.FACTORY_BEAN;
+        }
+    }
+
+    public record SyntheticBean() implements BeanSource {
+
+        @Override
+        public BeanOrigin origin() {
+            return BeanOrigin.SYNTHETIC_BEAN;
         }
     }
 

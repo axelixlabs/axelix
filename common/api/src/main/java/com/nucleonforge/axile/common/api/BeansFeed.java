@@ -72,10 +72,11 @@ public record BeansFeed(Map<String, Context> contexts) {
         COMPONENT_ANNOTATION,
         BEAN_METHOD,
         FACTORY_BEAN,
-        UNKNOWN
+        SYNTHETIC_BEAN,
+        UNKNOWN,
     }
 
-    public sealed interface BeanSource permits BeanMethod, ComponentVariant, FactoryBean, UnknownBean {
+    public sealed interface BeanSource permits BeanMethod, ComponentVariant, FactoryBean, SyntheticBean, UnknownBean {
 
         @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
         BeanOrigin origin();
@@ -98,6 +99,16 @@ public record BeansFeed(Map<String, Context> contexts) {
         @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
         public BeanOrigin origin() {
             return BeanOrigin.FACTORY_BEAN;
+        }
+    }
+
+    @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
+    public record SyntheticBean() implements BeanSource {
+
+        @Override
+        @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)
+        public BeanOrigin origin() {
+            return BeanOrigin.SYNTHETIC_BEAN;
         }
     }
 
