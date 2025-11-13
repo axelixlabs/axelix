@@ -118,12 +118,12 @@ public class MetricsApi {
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
-    @Parameter(name = "metricName", description = "The name of the metric to fetch profile for", required = true)
+    @Parameter(name = "metric", description = "The name of the metric to fetch profile for", required = true)
     @GetMapping(path = ApiPaths.MetricsApi.METRIC_NAME)
     public SingleMetricProfileResponse getSingleMetric(
-            @PathVariable("instanceId") String instanceId, @PathVariable("metric") String metricName) {
+            @PathVariable("instanceId") String instanceId, @PathVariable("metric") String metric) {
         MetricProfile metricProfile = getSingleMetricProfileEndpointProber.invoke(
-                InstanceId.of(instanceId), new DefaultHttpPayload(Map.of("metric.name", metricName)));
+                InstanceId.of(instanceId), new DefaultHttpPayload(Map.of("metric.name", metric)));
 
         return Objects.requireNonNull(singleMetricConverter.convert(metricProfile));
     }
