@@ -237,7 +237,7 @@ public final class ApiPaths {
         /**
          * Retrieve a given metric within a given {@link Instance}.
          */
-        public static final String CACHE_NAME = "/{instanceId}/{metric}";
+        public static final String METRIC_NAME = "/{instanceId}/{metric}";
     }
 
     public static final class ScheduledTasksApi {
