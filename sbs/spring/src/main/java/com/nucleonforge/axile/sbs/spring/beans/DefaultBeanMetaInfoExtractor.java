@@ -52,7 +52,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     private BeansFeed.ProxyType analyzeProxyType(Class<?> beanType) {
         if (Proxy.isProxyClass(beanType)) {
             return BeansFeed.ProxyType.JDK_PROXY;
-        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
+        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR) && !beanType.isHidden()) {
             return BeansFeed.ProxyType.CGLIB;
         }
         return BeansFeed.ProxyType.NO_PROXYING;
@@ -89,17 +89,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
 
     @Nullable
     private Class<?> extractEnclosingClass(BeanDefinition beanDefinition, String beanName) {
-        Class<?> result = null;
-        if (beanDefinition.getFactoryBeanName() != null) {
-            result = beanFactory
-                    .getBeanDefinition(beanDefinition.getFactoryBeanName())
-                    .getResolvableType()
-                    .getRawClass();
-        }
-
-        if (result == null) {
-            result = extractClassFromSource(beanDefinition.getSource());
-        }
+        Class<?> result = extractClassFromSource(beanDefinition.getSource());
 
         if (result == null) {
             try {
@@ -110,6 +100,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
             } catch (Exception ignored) {
             }
         }
+
         return result;
     }
 

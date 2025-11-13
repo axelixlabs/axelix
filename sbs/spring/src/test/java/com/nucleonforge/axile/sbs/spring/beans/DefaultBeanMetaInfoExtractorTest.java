@@ -4,8 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Proxy;
-import java.util.function.Supplier;
 
 import javax.sql.DataSource;
 
@@ -22,9 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -54,7 +49,6 @@ import com.nucleonforge.axile.common.api.BeansFeed.ComponentVariant;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.ANONYMOUS_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.CONFIGURATION_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.CUSTOM_DATABASE_QUALIFIER_BEAN;
-import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.JDK_PROXY_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.LAZY_COMPONENT;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.LAZY_PRIMARY_BEAN_METHOD;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.PRIMARY_COMPONENT;
@@ -62,6 +56,7 @@ import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtract
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.QUALIFIED_COMPONENT;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.REGULAR_COMPONENT;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.SPRING_DATA_REPOSITORY;
+import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.STATIC_BFPP_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.TRANSACTIONAL_BEAN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -237,17 +232,17 @@ class DefaultBeanMetaInfoExtractorTest {
 
     @Test
     void shouldExtractJdkProxyBean() {
-        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract(JDK_PROXY_BEAN, testBeanFactory);
+        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract(STATIC_BFPP_BEAN, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.JDK_PROXY);
+            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
 
             BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
             assertThat(source.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
-            assertThat(source.methodName()).isEqualTo(JDK_PROXY_BEAN);
+            assertThat(source.methodName()).isEqualTo(STATIC_BFPP_BEAN);
         });
     }
 
@@ -288,7 +283,7 @@ class DefaultBeanMetaInfoExtractorTest {
 
         static final String ANONYMOUS_BEAN = "anonymousBean";
 
-        static final String JDK_PROXY_BEAN = "jdkProxyBean";
+        static final String STATIC_BFPP_BEAN = "staticBFPPBean";
 
         @Service(REGULAR_COMPONENT)
         static class FromServiceAnnotation {}
@@ -393,34 +388,9 @@ class DefaultBeanMetaInfoExtractorTest {
             };
         }
 
-        @Bean
-        public BeanFactoryPostProcessor proxyBeanRegistrar() {
-            return beanFactory -> {
-                if (beanFactory instanceof BeanDefinitionRegistry registry) {
-                    RootBeanDefinition factoryDef = new RootBeanDefinition();
-                    factoryDef.setInstanceSupplier(() -> (Supplier<?>) this::createProxy);
-
-                    registry.registerBeanDefinition("proxyFactory", factoryDef);
-
-                    GenericBeanDefinition beanDef = new GenericBeanDefinition();
-                    beanDef.setBeanClass(DefaultBeanAnalyzerTestConfig.class);
-                    beanDef.setFactoryBeanName("proxyFactory");
-                    beanDef.setFactoryMethodName(JDK_PROXY_BEAN);
-                    beanDef.setInstanceSupplier(this::createProxy);
-
-                    registry.registerBeanDefinition("jdkProxyBean", beanDef);
-                }
-            };
-        }
-
-        private Runnable createProxy() {
-            return (Runnable) Proxy.newProxyInstance(
-                    Runnable.class.getClassLoader(), new Class[] {Runnable.class}, (proxy, method, args) -> {
-                        if (method.getName().equals("hashCode") && args == null) {
-                            return System.identityHashCode(proxy);
-                        }
-                        return null;
-                    });
+        @Bean(STATIC_BFPP_BEAN)
+        public static BeanFactoryPostProcessor staticBFPPBean() {
+            return beanFactory -> {};
         }
     }
 }
