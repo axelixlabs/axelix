@@ -55,21 +55,21 @@ class DefaultEnvPropertyEnricherTest {
     @TestConfiguration
     static class DefaultEnvPropertyEnricherTestConfiguration {
         @Bean
-        public ConfigurationPropertiesCache serviceConfigurationProperties(
+        public ConfigurationPropertiesCache configurationPropertiesCache(
                 ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
             return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
         }
 
         @Bean
-        EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
+        public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
             return new DefaultEnvironmentPropertyNameNormalizer();
         }
 
         @Bean
         public EnvPropertyEnricher envPropertyEnricher(
                 Environment environment,
-                ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache,
-                EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
+                DefaultEnvironmentPropertyNameNormalizer propertyNameNormalizer,
+                ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache) {
             return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, configurationPropertiesCache);
         }
     }

@@ -32,16 +32,17 @@ public class AxileEnvironmentEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
+        return new DefaultEnvironmentPropertyNameNormalizer();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public EnvPropertyEnricher envPropertyEnricher(
             Environment environment,
             EnvironmentPropertyNameNormalizer propertyNameNormalizer,
             ObjectProvider<ConfigurationPropertiesCache> cache) {
         return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, cache);
-    }
-
-    @Bean
-    public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
-        return new DefaultEnvironmentPropertyNameNormalizer();
     }
 
     @Bean

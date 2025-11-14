@@ -8,6 +8,7 @@ import org.springframework.boot.actuate.context.properties.ConfigurationProperti
  * data from the standard Spring Boot Actuator endpoint.
  *
  * @since 13.11.2025
+ * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
 public class ConfigurationPropertiesCache {
