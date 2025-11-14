@@ -1,5 +1,7 @@
 package com.nucleonforge.axile.master.api;
 
+import java.util.List;
+
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -8,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nucleonforge.axile.master.api.request.StateExportComponent;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.export.StateArchiveFileNameGenerator;
 import com.nucleonforge.axile.master.service.export.ZipArchiveInstanceStateExporter;
@@ -35,7 +39,11 @@ public class StateExportApi {
     }
 
     @GetMapping(path = ApiPaths.StateExportApi.INSTANCE_ID)
-    public ResponseEntity<Resource> exportInstanceState(@PathVariable String instanceId) {
+    public ResponseEntity<Resource> exportInstanceState(
+        @RequestParam List<StateExportComponent> components,
+        @PathVariable String instanceId
+    ) {
+        // TODO: Implement exportable components
         byte[] binaryData = exportService.exportInstanceState(instanceId);
         String filename = stateArchiveFileNameGenerator.generate(InstanceId.of(instanceId));
 
