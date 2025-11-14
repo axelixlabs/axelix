@@ -3,13 +3,11 @@ package com.nucleonforge.axile.master.api;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.nucleonforge.axile.master.api.request.StateExportComponent;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -35,7 +33,6 @@ import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 /**
  * Integration tests for {@link StateExportApi}.
@@ -256,8 +253,8 @@ class StateExportApiTest {
     void shouldReturnZipArchiveWithJsonFiles() throws IOException {
         registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
-        ResponseEntity<byte[]> response =
-                restTemplate.getForEntity("/api/axile/export-state/{instanceId}?components=HEAP_DUMP", byte[].class, activeInstanceId);
+        ResponseEntity<byte[]> response = restTemplate.getForEntity(
+                "/api/axile/export-state/{instanceId}?components=HEAP_DUMP", byte[].class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
@@ -292,8 +289,8 @@ class StateExportApiTest {
 
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<?> response =
-                restTemplate.getForEntity("/api/axile/export-state/{instanceId}?components=HEAP_DUMP", Void.class, instanceId, List.of());
+        ResponseEntity<?> response = restTemplate.getForEntity(
+                "/api/axile/export-state/{instanceId}?components=HEAP_DUMP", Void.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -302,8 +299,8 @@ class StateExportApiTest {
     void shouldReturnNotFoundForUnregisteredInstance() {
         String unknownInstanceId = UUID.randomUUID().toString();
 
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/export-state/{instanceId}?components=HEAP_DUMP", String.class, unknownInstanceId, List.of());
+        ResponseEntity<String> response = restTemplate.getForEntity(
+                "/api/axile/export-state/{instanceId}?components=HEAP_DUMP", String.class, unknownInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
