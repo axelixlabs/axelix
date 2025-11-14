@@ -11,6 +11,7 @@ const Conditions = Loadable(lazy(() => import("pages/Conditions")));
 const Wallboard = Loadable(lazy(() => import("pages/Wallboard")));
 const Loggers = Loadable(lazy(() => import("pages/Loggers")));
 const Details = Loadable(lazy(() => import("pages/Details")));
+const Metrics = Loadable(lazy(() => import("pages/Metrics")));
 const Caches = Loadable(lazy(() => import("pages/Caches")));
 const Beans = Loadable(lazy(() => import("pages/Beans")));
 
@@ -25,6 +26,7 @@ export const MainRoutes = () => {
 
             <Route element={<MainLayout />}>
                 <Route path="/instance/:instanceId/details" element={<Details />} />
+                <Route path="/instance/:instanceId/metrics" element={<Metrics />} />
                 <Route path="/instance/:instanceId/environment" element={<Environment />} />
                 <Route path="/instance/:instanceId/beans" element={<Beans />} />
                 <Route path="/instance/:instanceId/config-props" element={<ConfigProps />} />

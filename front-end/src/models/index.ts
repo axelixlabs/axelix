@@ -3,6 +3,7 @@ export * from "./interfaces/environment";
 export * from "./interfaces/configProps";
 export * from "./interfaces/conditions";
 export * from "./interfaces/details.ts";
+export * from "./interfaces/metrics.ts";
 export * from "./interfaces/wallboard";
 export * from "./interfaces/globals";
 export * from "./interfaces/loggers";

@@ -4,6 +4,7 @@ export * from "./configProps";
 export * from "./environment";
 export * from "./details.ts";
 export * from "./globals.ts";
+export * from "./metrics.ts";
 export * from "./wallboard";
 export * from "./loggers";
 export * from "./caches";

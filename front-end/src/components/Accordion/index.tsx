@@ -45,9 +45,11 @@ export const Accordion = ({
                 <img src={ArrowIcon} alt="Arrow icon" className={styles.Icon} />
                 <div className={styles.Header}>{header}</div>
             </div>
-            <div className={styles.ContentWrapper}>
-                <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
-            </div>
+            {open && (
+                <div className={styles.ContentWrapper}>
+                    <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
+                </div>
+            )}
         </div>
     );
 };

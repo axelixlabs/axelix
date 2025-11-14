@@ -68,3 +68,7 @@ export function showErrorNotification(errorCode: string): void {
         showProgress: true,
     });
 }
+
+export const commonNormalize = (string: string): string => {
+    return canonicalize(string);
+};
