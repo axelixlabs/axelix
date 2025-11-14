@@ -10,17 +10,6 @@ public class DefaultEnvironmentPropertyNameNormalizer implements EnvironmentProp
 
     @Override
     public String normalize(String propertyName) {
-
-        int len = propertyName.length();
-        StringBuilder propertyNameNormalizer = new StringBuilder(len);
-
-        for (int i = 0; i < len; i++) {
-            char c = Character.toLowerCase(propertyName.charAt(i));
-            if (Character.isLetterOrDigit(c)) {
-                propertyNameNormalizer.append(c);
-            }
-        }
-
-        return propertyNameNormalizer.toString();
+        return propertyName.replaceAll("[^A-Za-z0-9]", "").toLowerCase();
     }
 }
