@@ -49,24 +49,34 @@ export const MetricBody = ({ metric }: IProps) => {
             <div className={styles.MetricDataWrapper}>
                 <div>{t("Metrics.value")}:</div>
                 <div>{singleMetricFeed.measurements.at(-1)?.value}</div>
-                <div>{t("Metrics.baseUnit")}:</div>
-                <div>{singleMetricFeed.baseUnit}</div>
-                <div>{t("Metrics.tags")}:</div>
-                <div className={styles.TagsWrapper}>
-                    {singleMetricFeed.availableTags.map((availableTag) => (
-                        <>
-                            <div>{availableTag.tag}:</div>
-                            <Select
-                                placeholder={t("Metrics.selectTag")}
-                                options={availableTag.values.map((value) => ({
-                                    value: value,
-                                    label: value,
-                                }))}
-                                className={styles.AvailableTagSelect}
-                            />
-                        </>
-                    ))}
-                </div>
+
+                {singleMetricFeed.baseUnit && (
+                    <>
+                        <div>{t("Metrics.baseUnit")}:</div>
+                        <div>{singleMetricFeed.baseUnit}</div>
+                    </>
+                )}
+
+                {!!singleMetricFeed.availableTags.length && (
+                    <>
+                        <div>{t("Metrics.tags")}:</div>
+                        <div className={styles.TagsWrapper}>
+                            {singleMetricFeed.availableTags.map((availableTag) => (
+                                <>
+                                    <div>{availableTag.tag}:</div>
+                                    <Select
+                                        placeholder={t("Metrics.selectTag")}
+                                        options={availableTag.values.map((value) => ({
+                                            value: value,
+                                            label: value,
+                                        }))}
+                                        className={styles.AvailableTagSelect}
+                                    />
+                                </>
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
             <MetricChart measurements={singleMetricFeed.measurements} />
         </div>
