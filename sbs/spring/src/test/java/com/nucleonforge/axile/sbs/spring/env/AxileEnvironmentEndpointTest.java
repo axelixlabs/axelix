@@ -139,7 +139,7 @@ class AxileEnvironmentEndpointTest {
     static class AxileEnvironmentEndpointTestConfiguration {
 
         @Bean
-        public ConfigurationPropertiesCache serviceConfigurationProperties(
+        public ConfigurationPropertiesCache configurationPropertiesCache(
                 ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
             return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
         }

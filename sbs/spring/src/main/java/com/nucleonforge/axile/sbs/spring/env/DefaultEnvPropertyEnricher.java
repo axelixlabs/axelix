@@ -1,14 +1,11 @@
 package com.nucleonforge.axile.sbs.spring.env;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
@@ -17,9 +14,9 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDescriptor;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertyValueDescriptor;
-import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.core.env.Environment;
 
+import com.nucleonforge.axile.common.utils.BeanNameUtils;
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxileEnvironmentDescriptor;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertySourceDescriptor;
@@ -38,22 +35,30 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     @Nullable
     private final ConfigurationPropertiesCache configurationPropertiesCache;
 
-    public DefaultEnvPropertyEnricher(Environment environment, ObjectProvider<ConfigurationPropertiesCache> cache) {
+    private final EnvironmentPropertyNameNormalizer propertyNameNormalizer;
+
+    public DefaultEnvPropertyEnricher(
+            Environment environment,
+            EnvironmentPropertyNameNormalizer propertyNameNormalizer,
+            ObjectProvider<ConfigurationPropertiesCache> cache) {
         this.configurationPropertiesCache = cache.getIfAvailable();
+        this.propertyNameNormalizer = propertyNameNormalizer;
         this.environment = environment;
     }
 
     @Override
     public AxileEnvironmentDescriptor enrich(EnvironmentDescriptor originalDescriptor) {
         Map<String, String> primarySourceMap = buildPrimarySourceMap(originalDescriptor);
-        Map<ConfigurationPropertyName, String> configPropsMapping = buildConfigPropsMappingMap();
+        Map<String, String> configPropsMapping = buildConfigPropsMappingMap();
 
         List<AxilePropertySourceDescriptor> enrichedSources = originalDescriptor.getPropertySources().stream()
                 .map(source -> enrichPropertySource(source, primarySourceMap, configPropsMapping))
                 .toList();
 
         return new AxileEnvironmentDescriptor(
-                originalDescriptor.getActiveProfiles(), List.of(environment.getDefaultProfiles()), enrichedSources);
+                originalDescriptor.getActiveProfiles(),
+                Arrays.stream(environment.getDefaultProfiles()).toList(),
+                enrichedSources);
     }
 
     private Map<String, String> buildPrimarySourceMap(EnvironmentDescriptor descriptor) {
@@ -74,7 +79,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     private AxilePropertySourceDescriptor enrichPropertySource(
             PropertySourceDescriptor source,
             Map<String, String> primaryPropertySourceMap,
-            Map<ConfigurationPropertyName, String> configPropsMapping) {
+            Map<String, String> configPropsMapping) {
 
         Map<String, AxilePropertyValueDescriptor> enrichedProperties = source.getProperties().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
@@ -82,79 +87,46 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
                     boolean isPrimary = Objects.equals(primaryPropertySourceMap.get(entry.getKey()), source.getName());
 
-                    System.out.println(findBeanName(configPropsMapping, entry.getKey()));
-
                     return new AxileEnvironmentEndpoint.AxilePropertyValueDescriptor(
                             original.getValue(),
                             original.getOrigin(),
                             isPrimary,
-                            findBeanName(configPropsMapping, entry.getKey()));
+                            configPropsMapping.getOrDefault(propertyNameNormalizer.normalize(entry.getKey()), null));
                 }));
 
         return new AxilePropertySourceDescriptor(source.getName(), enrichedProperties);
     }
 
-    private Map<ConfigurationPropertyName, String> buildConfigPropsMappingMap() {
+    private Map<String, String> buildConfigPropsMappingMap() {
         if (configurationPropertiesCache == null) {
             return Map.of();
         }
 
-        Map<ConfigurationPropertyName, String> propertyToBeanName = new HashMap<>();
+        Map<String, String> propertyToBeanName = new HashMap<>();
 
-        configurationPropertiesCache.getConfigurationProperties()
-            .getContexts()
-            .values()
-            .forEach(context -> context.getBeans().forEach((beanName, bean) -> {
-                String cleanBeanName = stripConfigPropsPrefix(beanName);
-                flatten(bean.getPrefix(), bean.getProperties(), propertyToBeanName, cleanBeanName);
-            }));
+        configurationPropertiesCache
+                .getConfigurationProperties()
+                .getContexts()
+                .values()
+                .forEach(context -> context.getBeans().forEach((beanName, bean) -> {
+                    String cleanBeanName = BeanNameUtils.stripConfigPropsPrefix(beanName);
+                    flatten(bean.getPrefix(), bean.getProperties(), propertyToBeanName, cleanBeanName);
+                }));
 
         return propertyToBeanName;
     }
 
     @SuppressWarnings("unchecked")
-    private void flatten(String prefix, Map<String, Object> properties,
-                         Map<ConfigurationPropertyName, String> propertyToBeanName, String beanName) {
+    private void flatten(
+            String prefix, Map<String, Object> properties, Map<String, String> propertyToBeanName, String beanName) {
         properties.forEach((key, value) -> {
-            String fullKey = prefix + "." + key;
+            String propertiesName = prefix + "." + key;
 
             if (value instanceof Map<?, ?> map) {
-                flatten(fullKey, (Map<String, Object>) map, propertyToBeanName, beanName);
+                flatten(propertiesName, (Map<String, Object>) map, propertyToBeanName, beanName);
             } else {
-                Set<ConfigurationPropertyName> aliases = generateAliases(fullKey);
-                for (ConfigurationPropertyName alias : aliases) {
-                    propertyToBeanName.put(alias, beanName);
-                }
+                propertyToBeanName.put(propertyNameNormalizer.normalize(propertiesName), beanName);
             }
         });
-    }
-
-    public static String stripConfigPropsPrefix(String beanName) {
-        int indexOfDash = beanName.indexOf("-");
-
-        if (indexOfDash != -1 && indexOfDash < beanName.length() - 1) {
-            return beanName.substring(indexOfDash + 1);
-        } else {
-            return beanName;
-        }
-    }
-
-    private Set<ConfigurationPropertyName> generateAliases(String property) {
-        Set<ConfigurationPropertyName> aliases = new HashSet<>();
-        aliases.add(ConfigurationPropertyName.adapt(property, '.'));
-        aliases.add(ConfigurationPropertyName.adapt(property, '_'));
-        aliases.add(ConfigurationPropertyName.adapt(property, '-'));
-        return aliases;
-    }
-
-    public static @Nullable String findBeanName(Map<ConfigurationPropertyName, String> map,
-                                                String envProperty) {
-        for (char sep : new char[]{'.', '_', '-'}) {
-            ConfigurationPropertyName adapted = ConfigurationPropertyName.adapt(envProperty, sep);
-            if (map.containsKey(adapted)) {
-                return map.get(adapted);
-            }
-        }
-        return null;
     }
 }

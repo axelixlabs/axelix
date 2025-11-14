@@ -14,14 +14,14 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 @Endpoint(id = "axile-configprops")
 public class AxileConfigurationPropertiesEndpoint {
 
-    private final ConfigurationPropertiesCache service;
+    private final ConfigurationPropertiesCache configurationPropertiesCache;
 
-    public AxileConfigurationPropertiesEndpoint(ConfigurationPropertiesCache service) {
-        this.service = service;
+    public AxileConfigurationPropertiesEndpoint(ConfigurationPropertiesCache cache) {
+        this.configurationPropertiesCache = cache;
     }
 
     @ReadOperation
     public ConfigurationPropertiesDescriptor configurationProperties() {
-        return service.getConfigurationProperties();
+        return configurationPropertiesCache.getConfigurationProperties();
     }
 }

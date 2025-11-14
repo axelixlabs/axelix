@@ -9,7 +9,7 @@ package com.nucleonforge.axile.sbs.spring.env;
 public interface EnvironmentPropertyNameNormalizer {
 
     /**
-     * @param propertyName inbound property name, to be normilized
+     * @param propertyName inbound property name, to be normalized
      * @return normalized property name
      */
     String normalize(String propertyName);

@@ -22,7 +22,7 @@ public class AxileConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ConfigurationPropertiesCache serviceConfigurationProperties(
+    public ConfigurationPropertiesCache configurationPropertiesCaches(
             ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
         return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
     }
