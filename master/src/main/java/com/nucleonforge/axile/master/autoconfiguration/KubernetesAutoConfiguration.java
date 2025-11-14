@@ -30,8 +30,7 @@ import com.nucleonforge.axile.master.service.discovery.AxileKubernetesDiscoveryC
  *
  * @author Mikhail Polivakha
  */
-@AutoConfiguration
-@AutoConfigureBefore(KubernetesDiscoveryClientAutoConfiguration.class)
+@AutoConfiguration(before = KubernetesDiscoveryClientAutoConfiguration.class)
 @ConditionalOnCloudPlatform(CloudPlatform.KUBERNETES)
 @EnableConfigurationProperties({KubernetesDiscoveryProperties.class})
 @Import(KubernetesAutoConfiguration.KubernetesExclusionConfiguration.class)
