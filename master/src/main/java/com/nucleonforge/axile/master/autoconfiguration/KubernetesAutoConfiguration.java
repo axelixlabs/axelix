@@ -10,13 +10,18 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnCloudPlatform;
 import org.springframework.boot.cloud.CloudPlatform;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClientAutoConfiguration;
 import org.springframework.cloud.kubernetes.commons.discovery.KubernetesDiscoveryProperties;
 import org.springframework.cloud.kubernetes.fabric8.discovery.KubernetesDiscoveryClientAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 import com.nucleonforge.axile.master.service.discovery.AxileKubernetesDiscoveryClient;
 
@@ -25,9 +30,11 @@ import com.nucleonforge.axile.master.service.discovery.AxileKubernetesDiscoveryC
  *
  * @author Mikhail Polivakha
  */
-@AutoConfiguration(before = KubernetesDiscoveryClientAutoConfiguration.class)
+@AutoConfiguration
+@AutoConfigureBefore(KubernetesDiscoveryClientAutoConfiguration.class)
 @ConditionalOnCloudPlatform(CloudPlatform.KUBERNETES)
 @EnableConfigurationProperties({KubernetesDiscoveryProperties.class})
+@Import(KubernetesAutoConfiguration.KubernetesExclusionConfiguration.class)
 public class KubernetesAutoConfiguration {
 
     // TODO:
@@ -55,4 +62,11 @@ public class KubernetesAutoConfiguration {
             KubernetesClient kubernetesClient, KubernetesDiscoveryProperties discoveryProperties) {
         return new AxileKubernetesDiscoveryClient(kubernetesClient, discoveryProperties.namespaces());
     }
+
+    /**
+     * Explicitly excludes Spring Boot's composite discovery client auto-configuration.
+     */
+    @Configuration
+    @EnableAutoConfiguration(exclude = CompositeDiscoveryClientAutoConfiguration.class)
+    static class KubernetesExclusionConfiguration {}
 }
