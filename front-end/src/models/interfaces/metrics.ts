@@ -55,7 +55,7 @@ export interface ISingleMetricResponseBody {
     /**
      * Base unit of the metric
      */
-    baseUnit: string;
+    baseUnit: string | null;
 
     /**
      * Measurements for the metric
