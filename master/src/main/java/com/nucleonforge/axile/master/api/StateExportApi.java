@@ -40,9 +40,7 @@ public class StateExportApi {
 
     @GetMapping(path = ApiPaths.StateExportApi.INSTANCE_ID)
     public ResponseEntity<Resource> exportInstanceState(
-        @RequestParam List<StateExportComponent> components,
-        @PathVariable String instanceId
-    ) {
+            @RequestParam List<StateExportComponent> components, @PathVariable String instanceId) {
         // TODO: Implement exportable components
         byte[] binaryData = exportService.exportInstanceState(instanceId);
         String filename = stateArchiveFileNameGenerator.generate(InstanceId.of(instanceId));
