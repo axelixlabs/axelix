@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
+import com.nucleonforge.axile.common.utils.BeanNameUtils;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanDependencyProfile;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanMethod;
@@ -18,7 +19,6 @@ import com.nucleonforge.axile.master.api.response.BeanShortProfile.FactoryBean;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile.ProxyType;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile.UnknownBean;
 import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
-import com.nucleonforge.axile.master.service.convert.utils.BeanNameUtils;
 
 /**
  * The {@link Converter} from {@link BeansFeed} to {@link BeansFeedResponse}.

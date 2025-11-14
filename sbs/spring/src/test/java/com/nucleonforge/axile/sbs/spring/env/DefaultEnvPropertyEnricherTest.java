@@ -2,7 +2,9 @@ package com.nucleonforge.axile.sbs.spring.env;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +12,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
+import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxileEnvironmentDescriptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,10 +54,23 @@ class DefaultEnvPropertyEnricherTest {
 
     @TestConfiguration
     static class DefaultEnvPropertyEnricherTestConfiguration {
+        @Bean
+        public ConfigurationPropertiesCache configurationPropertiesCache(
+                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
+            return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
+        }
 
         @Bean
-        public EnvPropertyEnricher envPropertyEnricher(Environment environment) {
-            return new DefaultEnvPropertyEnricher(environment);
+        public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
+            return new DefaultEnvironmentPropertyNameNormalizer();
+        }
+
+        @Bean
+        public EnvPropertyEnricher envPropertyEnricher(
+                Environment environment,
+                DefaultEnvironmentPropertyNameNormalizer propertyNameNormalizer,
+                ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache) {
+            return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, configurationPropertiesCache);
         }
     }
 }

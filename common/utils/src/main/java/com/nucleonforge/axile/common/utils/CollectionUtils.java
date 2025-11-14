@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.utils;
+package com.nucleonforge.axile.common.utils;
 
 import java.util.Set;
 

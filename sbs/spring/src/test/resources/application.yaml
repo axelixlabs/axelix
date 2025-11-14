@@ -25,6 +25,8 @@ management:
           - beans
           - env
           - axile-env
+          - configprops
+          - axile-configprops
 
 logging:
   level:

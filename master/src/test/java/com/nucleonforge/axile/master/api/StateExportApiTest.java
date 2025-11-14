@@ -105,7 +105,8 @@ class StateExportApiTest {
                   "properties": {
                     "java.vm.vendor": {
                       "value": "BellSoft",
-                      "isPrimary": true
+                      "isPrimary": true,
+                      "configPropsBeanName": "test.property.systemProperties"
                     }
                   }
                 }
@@ -233,7 +234,7 @@ class StateExportApiTest {
                     return new MockResponse()
                             .setBody(jsonCacheResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/configprops")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axile-configprops")) {
                     return new MockResponse()
                             .setBody(jsonConfigpropsResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -252,8 +253,8 @@ class StateExportApiTest {
     void shouldReturnZipArchiveWithJsonFiles() throws IOException {
         registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
-        ResponseEntity<byte[]> response =
-                restTemplate.getForEntity("/api/axile/export-state/{instanceId}", byte[].class, activeInstanceId);
+        ResponseEntity<byte[]> response = restTemplate.getForEntity(
+                "/api/axile/export-state/{instanceId}?components=HEAP_DUMP", byte[].class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
@@ -288,8 +289,8 @@ class StateExportApiTest {
 
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<?> response =
-                restTemplate.getForEntity("/api/axile/export-state/{instanceId}", Void.class, instanceId);
+        ResponseEntity<?> response = restTemplate.getForEntity(
+                "/api/axile/export-state/{instanceId}?components=HEAP_DUMP", Void.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -298,8 +299,8 @@ class StateExportApiTest {
     void shouldReturnNotFoundForUnregisteredInstance() {
         String unknownInstanceId = UUID.randomUUID().toString();
 
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/export-state/{instanceId}", String.class, unknownInstanceId);
+        ResponseEntity<String> response = restTemplate.getForEntity(
+                "/api/axile/export-state/{instanceId}?components=HEAP_DUMP", String.class, unknownInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

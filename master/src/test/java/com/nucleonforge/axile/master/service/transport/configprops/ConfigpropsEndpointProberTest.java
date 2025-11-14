@@ -129,7 +129,7 @@ public class ConfigpropsEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/configprops")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axile-configprops")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -144,8 +144,7 @@ public class ConfigpropsEndpointProberTest {
     @SuppressWarnings("unchecked")
     void shouldReturnConfigpropsFeed() {
         // when.
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         // then
         ConfigpropsFeed feed =

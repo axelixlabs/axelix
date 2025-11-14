@@ -284,11 +284,11 @@ public class ConfigpropsApiByPrefixTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/configprops/spring.jackson")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/configprops/spring.jackson")) {
                     return new MockResponse()
                             .setBody(jsonSingleBeanByPrefixResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/configprops/spring.web")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/configprops/spring.web")) {
                     return new MockResponse()
                             .setBody(jsonDoubleContextBeanByPrefixResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -298,8 +298,7 @@ public class ConfigpropsApiByPrefixTest {
             }
         });
 
-        registry.register(createInstanceWithUrl(
-                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
     }
 
     @AfterEach

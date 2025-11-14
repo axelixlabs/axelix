@@ -40,15 +40,18 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                   "properties": {
                     "java.specification.version": {
                       "value": "17",
-                      "isPrimary": true
+                      "isPrimary": true,
+                      "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
                     },
                     "java.class.path": {
                       "value": "gradle-worker.jar",
-                      "isPrimary": true
+                      "isPrimary": true,
+                      "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
                     },
                     "java.vm.vendor": {
                       "value": "BellSoft",
-                      "isPrimary": true
+                      "isPrimary": true,
+                      "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
                     }
                   }
                 },
@@ -58,7 +61,8 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                     "JAVA_HOME": {
                       "value": "/opt/Java_Liberica_jdk/17.0.16-12/x64",
                       "origin": "System Environment Property \\"JAVA_HOME\\"",
-                      "isPrimary": false
+                      "isPrimary": false,
+                      "configPropsBeanName": null
                     }
                   }
                 },
@@ -68,7 +72,8 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                     "com.example.cache.max-size": {
                       "value": "1000",
                       "origin": "class path resource [/env/application.properties]",
-                      "isPrimary": false
+                      "isPrimary": false,
+                      "configPropsBeanName": null
                     }
                   }
                 }
@@ -102,16 +107,20 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                 .satisfies(pv -> {
                     assertThat(pv.value()).isEqualTo("17");
                     assertThat(pv.isPrimary()).isTrue();
+                    assertThat(pv.configPropsBeanName())
+                            .isEqualTo("org.springframework.boot.test.property.SystemProperties");
                 });
 
         assertThat(systemProps.properties()).extractingByKey("java.class.path").satisfies(pv -> {
             assertThat(pv.value()).isEqualTo("gradle-worker.jar");
             assertThat(pv.isPrimary()).isTrue();
+            assertThat(pv.configPropsBeanName()).isEqualTo("org.springframework.boot.test.property.SystemProperties");
         });
 
         assertThat(systemProps.properties()).extractingByKey("java.vm.vendor").satisfies(pv -> {
             assertThat(pv.value()).isEqualTo("BellSoft");
             assertThat(pv.isPrimary()).isTrue();
+            assertThat(pv.configPropsBeanName()).isEqualTo("org.springframework.boot.test.property.SystemProperties");
         });
 
         EnvironmentFeed.PropertySource systemEnv = environmentFeed.propertySources().stream()
@@ -126,6 +135,7 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                     assertThat(pv.value()).isEqualTo("/opt/Java_Liberica_jdk/17.0.16-12/x64");
                     assertThat(pv.origin()).isEqualTo("System Environment Property \"JAVA_HOME\"");
                     assertThat(pv.isPrimary()).isFalse();
+                    assertThat(pv.configPropsBeanName()).isNull();
                 });
 
         EnvironmentFeed.PropertySource configProps = environmentFeed.propertySources().stream()
@@ -140,6 +150,7 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                     assertThat(pv.value()).isEqualTo("1000");
                     assertThat(pv.origin()).isEqualTo("class path resource [/env/application.properties]");
                     assertThat(pv.isPrimary()).isFalse();
+                    assertThat(pv.configPropsBeanName()).isNull();
                 });
     }
 }

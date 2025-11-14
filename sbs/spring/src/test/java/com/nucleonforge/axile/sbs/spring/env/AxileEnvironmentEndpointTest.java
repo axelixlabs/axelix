@@ -9,7 +9,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -22,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
+
+import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -135,8 +139,22 @@ class AxileEnvironmentEndpointTest {
     static class AxileEnvironmentEndpointTestConfiguration {
 
         @Bean
-        public EnvPropertyEnricher envPropertyEnricher(Environment environment) {
-            return new DefaultEnvPropertyEnricher(environment);
+        public ConfigurationPropertiesCache configurationPropertiesCache(
+                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
+            return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
+        }
+
+        @Bean
+        public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
+            return new DefaultEnvironmentPropertyNameNormalizer();
+        }
+
+        @Bean
+        public EnvPropertyEnricher envPropertyEnricher(
+                Environment environment,
+                EnvironmentPropertyNameNormalizer propertyNameNormalizer,
+                ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache) {
+            return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, configurationPropertiesCache);
         }
 
         @Bean

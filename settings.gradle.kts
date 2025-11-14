@@ -16,5 +16,6 @@ include(
     ":sbs:spring",
     ":common",
     ":common:api",
-    ":common:domain"
+    ":common:domain",
+    ":common:utils",
 )
