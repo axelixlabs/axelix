@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.auth.spi.provider;
+package com.nucleonforge.axile.master.service.auth;
 
 /**
  * Configuration properties for database table names used by the authentication module.

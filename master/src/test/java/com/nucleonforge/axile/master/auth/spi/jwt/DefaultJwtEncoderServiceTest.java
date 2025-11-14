@@ -28,9 +28,9 @@ import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
-import com.nucleonforge.axile.master.auth.spi.jwt.service.DefaultJwtEncoderService;
-import com.nucleonforge.axile.master.auth.spi.jwt.service.JwtEncoderService;
-import com.nucleonforge.axile.master.auth.spi.jwt.service.JwtTokenGenerationException;
+import com.nucleonforge.axile.master.exception.auth.JwtTokenGenerationException;
+import com.nucleonforge.axile.master.service.auth.DefaultJwtEncoderService;
+import com.nucleonforge.axile.master.service.auth.JwtEncoderService;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;

@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.auth.spi.jwt.service;
+package com.nucleonforge.axile.master.service.auth;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -16,8 +16,9 @@ import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
 import com.nucleonforge.axile.common.auth.spi.jwt.TokenClaim;
-import com.nucleonforge.axile.master.auth.spi.jwt.singing.JwtSigningStrategy;
-import com.nucleonforge.axile.master.auth.spi.jwt.singing.JwtSigningStrategyFactory;
+import com.nucleonforge.axile.master.exception.auth.JwtTokenGenerationException;
+import com.nucleonforge.axile.master.service.auth.sign.JwtSigningStrategy;
+import com.nucleonforge.axile.master.service.auth.sign.JwtSigningStrategyFactory;
 
 /**
  * Service responsible for generating JWT tokens from {@link User} instances.

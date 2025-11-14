@@ -1,7 +1,7 @@
-package com.nucleonforge.axile.master.auth.spi.provider;
+package com.nucleonforge.axile.master.exception.auth;
 
 import com.nucleonforge.axile.common.auth.core.User;
-import com.nucleonforge.axile.master.auth.AuthenticationException;
+import com.nucleonforge.axile.master.service.auth.provider.UserProvider;
 
 /**
  * Thrown in case the {@link User} is not found by {@link UserProvider}.

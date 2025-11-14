@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.auth;
+package com.nucleonforge.axile.master.exception.auth;
 
 /**
  * The exception that happened during the authentication

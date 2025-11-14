@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.auth.spi.provider;
+package com.nucleonforge.axile.master.service.auth.provider;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +19,8 @@ import com.nucleonforge.axile.common.auth.core.DefaultRole;
 import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
+import com.nucleonforge.axile.master.exception.auth.UserNotFoundException;
+import com.nucleonforge.axile.master.service.auth.JdbcAuthConfig;
 
 /**
  * {@link UserProvider} that is capable to load user from RDBMS database.

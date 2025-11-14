@@ -1,8 +1,8 @@
-package com.nucleonforge.axile.master.auth.spi.jwt.singing;
+package com.nucleonforge.axile.master.service.auth.sign;
 
 import io.jsonwebtoken.JwtBuilder;
 
-import com.nucleonforge.axile.master.auth.spi.jwt.service.JwtTokenGenerationException;
+import com.nucleonforge.axile.master.exception.auth.JwtTokenGenerationException;
 
 /**
  * Strategy interface for signing JWT tokens with a specific signing key.

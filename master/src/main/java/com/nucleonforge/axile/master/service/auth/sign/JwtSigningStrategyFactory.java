@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.auth.spi.jwt.singing;
+package com.nucleonforge.axile.master.service.auth.sign;
 
 import java.util.Objects;
 

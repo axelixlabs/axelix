@@ -1,4 +1,6 @@
-package com.nucleonforge.axile.master.auth.spi.jwt.service;
+package com.nucleonforge.axile.master.exception.auth;
+
+import com.nucleonforge.axile.master.service.auth.JwtEncoderService;
 
 /**
  * The exception that happened during the JWT token generation process.

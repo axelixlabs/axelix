@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.auth.spi.jwt.singing;
+package com.nucleonforge.axile.master.service.auth.sign;
 
 import java.nio.charset.StandardCharsets;
 
@@ -9,7 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.MacAlgorithm;
 import io.jsonwebtoken.security.WeakKeyException;
 
-import com.nucleonforge.axile.master.auth.spi.jwt.service.JwtTokenGenerationException;
+import com.nucleonforge.axile.master.exception.auth.JwtTokenGenerationException;
 
 /**
  * {@link JwtSigningStrategy} implementation that signs JWT tokens using HMAC-SHA algorithms.

@@ -1,6 +1,7 @@
-package com.nucleonforge.axile.master.auth.spi.provider;
+package com.nucleonforge.axile.master.service.auth.provider;
 
 import com.nucleonforge.axile.common.auth.core.User;
+import com.nucleonforge.axile.master.exception.auth.UserNotFoundException;
 
 /**
  * SPI interface that is capable to load the {@link User} by his/her username.

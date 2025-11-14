@@ -1,6 +1,7 @@
-package com.nucleonforge.axile.master.auth.spi.jwt.service;
+package com.nucleonforge.axile.master.service.auth;
 
 import com.nucleonforge.axile.common.auth.core.User;
+import com.nucleonforge.axile.master.exception.auth.JwtTokenGenerationException;
 
 /**
  * Contract for generating signed JWT tokens from {@link User} representations.
