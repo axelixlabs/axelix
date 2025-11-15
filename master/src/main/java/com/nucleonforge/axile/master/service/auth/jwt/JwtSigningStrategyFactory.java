@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.auth.sign;
+package com.nucleonforge.axile.master.service.auth.jwt;
 
 import java.util.Objects;
 

@@ -20,7 +20,7 @@ import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.master.exception.auth.UserNotFoundException;
-import com.nucleonforge.axile.master.service.auth.JdbcAuthConfig;
+import com.nucleonforge.axile.master.service.auth.jwt.JdbcAuthConfig;
 
 /**
  * {@link UserProvider} that is capable to load user from RDBMS database.
@@ -47,7 +47,7 @@ public class JdbcUserProvider implements UserProvider {
             List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, params);
 
             if (rows.isEmpty()) {
-                throw new UserNotFoundException("User not found: " + username);
+                throw new UserNotFoundException(username);
             }
 
             Map<Integer, RoleBuilder> roleBuilders = new HashMap<>();
@@ -59,7 +59,8 @@ public class JdbcUserProvider implements UserProvider {
 
             Set<Role> rootRoles = buildRootRoles(roleBuilders);
 
-            return new DefaultUser(username, rootRoles);
+            // TODO: We need to revisit this class in general, not only the password taking
+            return new DefaultUser(username, "", rootRoles);
 
         } catch (Exception e) {
             throw new UserNotFoundException("Failed to load user: " + username, e);

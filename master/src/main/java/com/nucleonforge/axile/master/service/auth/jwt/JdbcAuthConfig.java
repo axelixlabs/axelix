@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.auth;
+package com.nucleonforge.axile.master.service.auth.jwt;
 
 /**
  * Configuration properties for database table names used by the authentication module.

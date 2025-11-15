@@ -8,10 +8,9 @@ import org.junit.jupiter.api.Test;
 import com.nucleonforge.axile.common.auth.core.AuthorizationRequest;
 import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axile.common.auth.core.DefaultRole;
-import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.Role;
-import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.sbs.auth.AuthorizationException;
+import com.nucleonforge.axile.sbs.auth.model.DecodedUser;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,7 +28,7 @@ class DefaultAuthorizerTest {
     void shouldAuthorize_UserHasRequiredAuthorities() {
         Role role = new DefaultRole(
                 "testRole", Set.of(DefaultAuthority.BEANS, DefaultAuthority.HEALTH), Collections.emptySet());
-        User user = new DefaultUser("testUser", Set.of(role));
+        DecodedUser user = new DecodedUser("testUser", Set.of(role));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.HEALTH));
 
@@ -42,7 +41,7 @@ class DefaultAuthorizerTest {
                 new DefaultRole("firstTestRole", Set.of(DefaultAuthority.CACHE_DISPATCHER), Collections.emptySet());
         Role role2 =
                 new DefaultRole("secondTestRole", Set.of(DefaultAuthority.PROFILE_MANAGEMENT), Collections.emptySet());
-        User user = new DefaultUser("testUser", Set.of(role1, role2));
+        DecodedUser user = new DecodedUser("testUser", Set.of(role1, role2));
 
         assertThatNoException()
                 .isThrownBy(() -> authorizer.authorize(
@@ -61,7 +60,7 @@ class DefaultAuthorizerTest {
         Role innerRole2 = new DefaultRole("secondInnerTestRole", Set.of(DefaultAuthority.PROFILE_MANAGEMENT), Set.of());
         Role role2 = new DefaultRole("secondTestRole", null, Set.of(innerRole2));
 
-        User user = new DefaultUser("testUser", Set.of(role1, role2));
+        DecodedUser user = new DecodedUser("testUser", Set.of(role1, role2));
 
         assertThatNoException()
                 .isThrownBy(() -> authorizer.authorize(
@@ -76,7 +75,7 @@ class DefaultAuthorizerTest {
     void shouldAuthorize_UserWithEmptyAndValidRole_WhenValidRoleHasRequiredAuthority() {
         Role emptyRole = new DefaultRole("emptyRole", Set.of(), Collections.emptySet());
         Role role = new DefaultRole("testRole", Set.of(DefaultAuthority.HEALTH), Collections.emptySet());
-        User user = new DefaultUser("testUser", Set.of(emptyRole, role));
+        DecodedUser user = new DecodedUser("testUser", Set.of(emptyRole, role));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.HEALTH));
 
@@ -86,7 +85,7 @@ class DefaultAuthorizerTest {
     @Test
     void shouldThrowAuthorizationException_UserWithoutRequiredAuthorities() {
         Role role = new DefaultRole("testRole", Set.of(DefaultAuthority.BEANS), Set.of());
-        User user = new DefaultUser("testUser", Set.of(role));
+        DecodedUser user = new DecodedUser("testUser", Set.of(role));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.METRICS));
 
@@ -98,7 +97,7 @@ class DefaultAuthorizerTest {
 
     @Test
     void shouldThrowAuthorizationException_WhenUserHasNoAuthoritiesAndRequestRequiresThem() {
-        User user = new DefaultUser("testUserWithEmptyAuthorities", Set.of());
+        DecodedUser user = new DecodedUser("testUserWithEmptyAuthorities", Set.of());
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(DefaultAuthority.CACHE_DISPATCHER));
 

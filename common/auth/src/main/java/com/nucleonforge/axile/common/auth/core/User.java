@@ -19,6 +19,11 @@ public interface User {
     String username();
 
     /**
+     * Password of the given user.
+     */
+    String password();
+
+    /**
      * Set of {@link Role roles} that are assigned to this User.
      */
     Set<Role> roles();

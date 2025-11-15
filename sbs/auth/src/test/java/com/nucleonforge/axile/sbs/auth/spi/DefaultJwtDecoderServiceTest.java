@@ -9,14 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
 import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axile.common.auth.core.DefaultRole;
-import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.Role;
-import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
+import com.nucleonforge.axile.sbs.auth.model.DecodedUser;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.exception.InvalidJwtTokenException;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.service.DefaultJwtDecoderService;
@@ -31,8 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Nikita Kirillov
  * @since 22.07.2025
  */
-@SpringBootTest
-@Import(DefaultJwtDecoderServiceTest.JwtDecoderServiceConfig.class)
+@SpringBootTest(classes = DefaultJwtDecoderServiceTest.JwtDecoderServiceConfig.class)
 class DefaultJwtDecoderServiceTest {
 
     @Autowired
@@ -64,7 +61,7 @@ class DefaultJwtDecoderServiceTest {
 
     @Test
     void shouldDecodeValidJwtToken() {
-        User decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithTwoRole);
+        DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithTwoRole);
 
         Role userRole = decodedUser.roles().stream()
                 .filter(role -> role.name().equals("ROLE_USER"))
@@ -82,7 +79,7 @@ class DefaultJwtDecoderServiceTest {
 
     @Test
     void shouldDecodeValidJwtToken_WithRoleHierarchy() {
-        User decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithAdminRoleHierarchy);
+        DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithAdminRoleHierarchy);
 
         Role rootRole = decodedUser.roles().stream()
                 .filter(role -> role.name().equals("ROLE_ROOT"))
@@ -121,10 +118,10 @@ class DefaultJwtDecoderServiceTest {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
         JwtDecoderService decoder256 = new DefaultJwtDecoderService(JwtAlgorithm.HMAC256, key256);
 
-        User expectedUser = new DefaultUser(
+        DecodedUser expectedUser = new DecodedUser(
                 "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(DefaultAuthority.MAPPINGS), Set.of())));
 
-        User decodedUser = decoder256.decodeTokenToUser(tokenWithHs256Algorithm);
+        DecodedUser decodedUser = decoder256.decodeTokenToUser(tokenWithHs256Algorithm);
 
         assertThat(decodedUser).usingRecursiveComparison().isEqualTo(expectedUser);
     }
@@ -135,17 +132,17 @@ class DefaultJwtDecoderServiceTest {
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
         JwtDecoderService decoder384 = new DefaultJwtDecoderService(JwtAlgorithm.HMAC384, key384);
 
-        User expectedUser = new DefaultUser(
+        DecodedUser expectedUser = new DecodedUser(
                 "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(DefaultAuthority.BEANS), Set.of())));
 
-        User decodedUser = decoder384.decodeTokenToUser(tokenWithHs384Algorithm);
+        DecodedUser decodedUser = decoder384.decodeTokenToUser(tokenWithHs384Algorithm);
 
         assertThat(decodedUser).usingRecursiveComparison().isEqualTo(expectedUser);
     }
 
     @Test
     void shouldOmitInvalidAuthority() {
-        User decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithUnrecognizedAuthorities);
+        DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithUnrecognizedAuthorities);
 
         assertThat(decodedUser.roles())
                 .first()
@@ -154,7 +151,7 @@ class DefaultJwtDecoderServiceTest {
 
     @Test
     void shouldDecodeValidJwtTokenWithoutUserRoles() {
-        User decodedUser = jwtDecoderService.decodeTokenToUser(tokenWithEmptyRoles);
+        DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenWithEmptyRoles);
 
         assertThat(decodedUser.username()).isEqualTo("userWithEmptyRoles");
         assertThat(decodedUser.roles()).isEmpty();

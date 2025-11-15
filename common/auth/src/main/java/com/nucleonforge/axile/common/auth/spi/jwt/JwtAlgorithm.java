@@ -1,5 +1,7 @@
 package com.nucleonforge.axile.common.auth.spi.jwt;
 
+import java.util.Arrays;
+
 /**
  * Enum representing supported JWT signing algorithms,
  * along with their required minimum key lengths.
@@ -25,6 +27,18 @@ public enum JwtAlgorithm {
     JwtAlgorithm(int minKeyLength, String algorithmName) {
         this.minKeyLength = minKeyLength;
         this.algorithmName = algorithmName;
+    }
+
+    public static JwtAlgorithm parse(String input) throws IllegalArgumentException {
+        for (JwtAlgorithm value : values()) {
+            if (value.algorithmName.equalsIgnoreCase(input) || value.name().equalsIgnoreCase(input)) {
+                return value;
+            }
+        }
+
+        throw new IllegalArgumentException(
+                "Unrecognized value of the Jwt signature generation algorithm '%s'. Supported values are : %s"
+                        .formatted(input, Arrays.toString(values())));
     }
 
     public int getMinKeyLength() {

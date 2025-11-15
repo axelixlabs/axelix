@@ -18,11 +18,10 @@ import org.slf4j.LoggerFactory;
 import com.nucleonforge.axile.common.auth.core.Authority;
 import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axile.common.auth.core.DefaultRole;
-import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.Role;
-import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
 import com.nucleonforge.axile.common.auth.spi.jwt.TokenClaim;
+import com.nucleonforge.axile.sbs.auth.model.DecodedUser;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.exception.InvalidJwtTokenException;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.exception.JwtParsingException;
@@ -50,12 +49,12 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
     }
 
     @Override
-    public User decodeTokenToUser(String token)
+    public DecodedUser decodeTokenToUser(String token)
             throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtTokenDecodingException, JwtParsingException {
 
         try {
             Claims claims = parseClaims(token).getPayload();
-            return new DefaultUser(claims.getSubject(), extractRoles(claims));
+            return new DecodedUser(claims.getSubject(), extractRoles(claims));
         } catch (JwtParsingException e) {
             throw e;
         } catch (ExpiredJwtException e) {

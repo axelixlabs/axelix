@@ -18,8 +18,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.nucleonforge.axile.common.auth.core.Authority;
 import com.nucleonforge.axile.common.auth.core.AuthorizationRequest;
-import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.sbs.auth.AuthorizationException;
+import com.nucleonforge.axile.sbs.auth.model.DecodedUser;
 import com.nucleonforge.axile.sbs.auth.spi.Authorizer;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.exception.InvalidJwtTokenException;
@@ -70,7 +70,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String requestPath = request.getRequestURI();
 
         try {
-            User user = jwtDecoderService.decodeTokenToUser(token);
+            DecodedUser user = jwtDecoderService.decodeTokenToUser(token);
             Optional<Authority> requiredOpt = defaultAuthorityResolver.resolve(requestPath);
 
             AuthorizationRequest authorizationRequest =

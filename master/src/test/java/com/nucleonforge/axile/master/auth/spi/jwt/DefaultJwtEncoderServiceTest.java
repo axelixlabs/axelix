@@ -17,10 +17,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
 import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axile.common.auth.core.DefaultRole;
@@ -28,9 +26,10 @@ import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
+import com.nucleonforge.axile.master.autoconfiguration.SecurityAutoConfiguration;
 import com.nucleonforge.axile.master.exception.auth.JwtTokenGenerationException;
-import com.nucleonforge.axile.master.service.auth.DefaultJwtEncoderService;
-import com.nucleonforge.axile.master.service.auth.JwtEncoderService;
+import com.nucleonforge.axile.master.service.auth.jwt.DefaultJwtEncoderService;
+import com.nucleonforge.axile.master.service.auth.jwt.JwtEncoderService;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
@@ -43,8 +42,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Nikita Kirillov
  * @since 22.07.2025
  */
-@SpringBootTest
-@Import(DefaultJwtEncoderServiceTest.JwtEncoderServiceConfig.class)
+@EnableConfigurationProperties
+@SpringBootTest(classes = SecurityAutoConfiguration.JwtAutoConfiguration.class)
 class DefaultJwtEncoderServiceTest {
 
     @Autowired
@@ -58,7 +57,7 @@ class DefaultJwtEncoderServiceTest {
 
     @Test
     void shouldGenerateTokenWithRequiredClaims() {
-        User user = new DefaultUser("testUser", Collections.emptySet());
+        User user = new DefaultUser("testUser", "testPassword", Collections.emptySet());
         String token = jwtEncoderService.generateToken(user);
 
         Jws<Claims> claims = Jwts.parser()
@@ -75,7 +74,7 @@ class DefaultJwtEncoderServiceTest {
     void shouldGenerateValidJwtToken() {
         Role role = new DefaultRole(
                 "testRole", Set.of(DefaultAuthority.ENV, DefaultAuthority.BEANS), Collections.emptySet());
-        User user = new DefaultUser("testUser", Set.of(role));
+        User user = new DefaultUser("testUser", "testPassword", Set.of(role));
 
         String token = jwtEncoderService.generateToken(user);
         String responsePayload = getPayload(token);
@@ -105,7 +104,7 @@ class DefaultJwtEncoderServiceTest {
                 "firstTestRole", Set.of(DefaultAuthority.HEALTH, DefaultAuthority.INFO), Collections.emptySet());
         Role role2 = new DefaultRole("secondTestRole", Set.of(DefaultAuthority.BEANS), Collections.emptySet());
 
-        User user = new DefaultUser("multiRoleUser", Set.of(role1, role2));
+        User user = new DefaultUser("multiRoleUser", "testPassword", Set.of(role1, role2));
 
         String token = jwtEncoderService.generateToken(user);
         String responsePayload = getPayload(token);
@@ -140,7 +139,7 @@ class DefaultJwtEncoderServiceTest {
     void shouldGenerateValidJwtTokenWithRoleHierarchy() {
         Role adminRole = createAdminRoleHierarchy();
         Role rootRole = new DefaultRole("rootRole", Set.of(DefaultAuthority.HEALTH), Set.of(adminRole));
-        User user = new DefaultUser("multiRoleUser", Set.of(rootRole));
+        User user = new DefaultUser("multiRoleUser", "testPassword", Set.of(rootRole));
 
         String token = jwtEncoderService.generateToken(user);
         String responsePayload = getPayload(token);
@@ -197,7 +196,7 @@ class DefaultJwtEncoderServiceTest {
 
     @Test
     void shouldContainCorrectExpirationTime() throws JsonProcessingException {
-        User user = new DefaultUser("expUser", Set.of());
+        User user = new DefaultUser("expUser", "testPassword", Set.of());
 
         String token = jwtEncoderService.generateToken(user);
         String payload = getPayload(token);
@@ -216,14 +215,14 @@ class DefaultJwtEncoderServiceTest {
 
     @Test
     void shouldThrowWhenUsernameIsNull() {
-        User user = new DefaultUser(null, Set.of());
+        User user = new DefaultUser(null, "testPassword", Set.of());
 
         assertThatThrownBy(() -> jwtEncoderService.generateToken(user)).isInstanceOf(JwtTokenGenerationException.class);
     }
 
     @Test
     void shouldGenerateTokenForUserWithoutRoles() {
-        User user = new DefaultUser("userWithoutRoles", null);
+        User user = new DefaultUser("userWithoutRoles", "testPassword", null);
 
         String token = jwtEncoderService.generateToken(user);
         String responsePayload = getPayload(token);
@@ -244,7 +243,7 @@ class DefaultJwtEncoderServiceTest {
     void shouldGenerateTokenForUserWithRoleThatHasNoAuthoritiesAndNoComponents() {
         Role roleWithoutAuthorities =
                 new DefaultRole("roleWithoutAuthorities", Collections.emptySet(), Collections.emptySet());
-        User user = new DefaultUser("userWithEmptyAuthorities", Set.of(roleWithoutAuthorities));
+        User user = new DefaultUser("userWithEmptyAuthorities", "testPassword", Set.of(roleWithoutAuthorities));
 
         String token = jwtEncoderService.generateToken(user);
         String responsePayload = getPayload(token);
@@ -271,7 +270,7 @@ class DefaultJwtEncoderServiceTest {
         JwtAlgorithm jwtAlgorithm = JwtAlgorithm.HMAC256;
         DefaultJwtEncoderService invalidService = new DefaultJwtEncoderService(jwtAlgorithm, shortSecretKey, lifespan);
 
-        User user = new DefaultUser("invalidKeyUser", Set.of());
+        User user = new DefaultUser("invalidKeyUser", "testPassword", Set.of());
 
         assertThatThrownBy(() -> invalidService.generateToken(user)).isInstanceOf(JwtTokenGenerationException.class);
     }
@@ -283,7 +282,7 @@ class DefaultJwtEncoderServiceTest {
         JwtEncoderService encoder = new DefaultJwtEncoderService(algorithm, hs256Key, lifespan);
 
         Role role = new DefaultRole("role", Set.of(DefaultAuthority.HEALTH, DefaultAuthority.INFO), null);
-        User user = new DefaultUser("hs256User", Set.of(role));
+        User user = new DefaultUser("hs256User", "testPassword", Set.of(role));
 
         String token = encoder.generateToken(user);
         String responseHeader = getHeader(token);
@@ -323,7 +322,7 @@ class DefaultJwtEncoderServiceTest {
         JwtAlgorithm algorithm = JwtAlgorithm.HMAC384;
         JwtEncoderService encoder = new DefaultJwtEncoderService(algorithm, hs384Key, lifespan);
 
-        User user = new DefaultUser("hs384User", Set.of());
+        User user = new DefaultUser("hs384User", "testPassword", Set.of());
 
         String token = encoder.generateToken(user);
         String responseHeader = getHeader(token);
@@ -350,7 +349,7 @@ class DefaultJwtEncoderServiceTest {
 
     @Test
     void shouldGenerateProperlyFormattedToken() {
-        User user = new DefaultUser("formatTest", Set.of());
+        User user = new DefaultUser("formatTest", "testPassword", Set.of());
         String token = jwtEncoderService.generateToken(user);
 
         assertThat(token.split("\\.")).hasSize(3);
@@ -377,22 +376,22 @@ class DefaultJwtEncoderServiceTest {
         return new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
     }
 
-    /**
-     * Minimal test configuration for {@link JwtEncoderService} integration testing.
-     *
-     * <p>Registers a {@link JwtEncoderService} bean for use in test cases. Relies on external configuration
-     * properties {@code axile.master.auth.jwt.algorithm}, {@code axile.master.auth.jwt.signing_key}
-     * and {@code axile.master.auth.jwt.lifespan} to initialize the service.</p>
-     */
-    @TestConfiguration
-    public static class JwtEncoderServiceConfig {
+    //    /**
+    //     * Minimal test configuration for {@link JwtEncoderService} integration testing.
+    //     *
+    //     * <p>Registers a {@link JwtEncoderService} bean for use in test cases. Relies on external configuration
+    //     * properties {@code axile.master.auth.jwt.algorithm}, {@code axile.master.auth.jwt.signing_key}
+    //     * and {@code axile.master.auth.jwt.lifespan} to initialize the service.</p>
+    //     */
+    //    @TestConfiguration
+    //    public static class JwtEncoderServiceConfig {
 
-        @Bean
-        public JwtEncoderService jwtEncoderService(
-                final @Value("${axile.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-                final @Value("${axile.master.auth.jwt.signing_key}") String signingKey,
-                final @Value("${axile.master.auth.jwt.lifespan}") Duration lifespan) {
-            return new DefaultJwtEncoderService(algorithm, signingKey, lifespan);
-        }
-    }
+    //        @Bean
+    //        public JwtEncoderService jwtEncoderService(
+    //                final @Value("${axile.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
+    //                final @Value("${axile.master.auth.jwt.signing_key}") String signingKey,
+    //                final @Value("${axile.master.auth.jwt.lifespan}") Duration lifespan) {
+    //            return new DefaultJwtEncoderService(algorithm, signingKey, lifespan);
+    //        }
+    //    }
 }

@@ -20,7 +20,7 @@ import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.master.exception.auth.UserNotFoundException;
-import com.nucleonforge.axile.master.service.auth.JdbcAuthConfig;
+import com.nucleonforge.axile.master.service.auth.jwt.JdbcAuthConfig;
 import com.nucleonforge.axile.master.service.auth.provider.JdbcUserProvider;
 import com.nucleonforge.axile.master.service.auth.provider.UserProvider;
 

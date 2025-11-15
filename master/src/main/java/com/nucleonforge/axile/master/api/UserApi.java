@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.request.LoginRequest;
 import com.nucleonforge.axile.master.api.response.UserProfileResponse;
+import com.nucleonforge.axile.master.service.auth.UserLoginService;
 
 /**
  * The API for working with users.
@@ -32,6 +34,12 @@ import com.nucleonforge.axile.master.api.response.UserProfileResponse;
 @RestController
 @RequestMapping(path = ApiPaths.UsersApi.MAIN)
 public class UserApi {
+
+    private final UserLoginService userLoginService;
+
+    public UserApi(UserLoginService userLoginService) {
+        this.userLoginService = userLoginService;
+    }
 
     /**
      * Login the user.
@@ -73,9 +81,10 @@ public class UserApi {
     @Parameter(name = "loginRequest", description = "Request for login", required = true)
     @PostMapping(path = ApiPaths.UsersApi.LOGIN)
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        // TODO: handle login logic later
-        return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer TOKEN")
+        String token = userLoginService.login(loginRequest.username(), loginRequest.password());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .build();
     }
 

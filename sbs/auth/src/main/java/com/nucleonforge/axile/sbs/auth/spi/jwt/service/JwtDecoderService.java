@@ -1,6 +1,7 @@
 package com.nucleonforge.axile.sbs.auth.spi.jwt.service;
 
 import com.nucleonforge.axile.common.auth.core.User;
+import com.nucleonforge.axile.sbs.auth.model.DecodedUser;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.exception.InvalidJwtTokenException;
 import com.nucleonforge.axile.sbs.auth.spi.jwt.exception.JwtParsingException;
@@ -24,6 +25,6 @@ public interface JwtDecoderService {
      * @throws JwtTokenDecodingException if an unexpected error occurs during token decoding
      * @throws JwtParsingException if the token cannot be parsed or contains insufficient data
      */
-    User decodeTokenToUser(String token)
+    DecodedUser decodeTokenToUser(String token)
             throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtTokenDecodingException, JwtParsingException;
 }

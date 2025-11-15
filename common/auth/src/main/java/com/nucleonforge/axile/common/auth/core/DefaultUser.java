@@ -10,7 +10,7 @@ import java.util.Set;
  * @since 16.07.2025
  * @author Nikita Kirillov
  */
-public record DefaultUser(String username, Set<Role> roles) implements User {
+public record DefaultUser(String username, String password, Set<Role> roles) implements User {
 
     public DefaultUser {
         if (roles == null) {

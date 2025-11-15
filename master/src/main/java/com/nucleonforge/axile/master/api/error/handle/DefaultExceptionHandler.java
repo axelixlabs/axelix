@@ -17,15 +17,16 @@ import com.nucleonforge.axile.master.api.error.SimpleApiError;
  */
 public class DefaultExceptionHandler implements ExceptionHandler<Exception> {
 
-    public static final DefaultExceptionHandler INSTANCE = new DefaultExceptionHandler();
+    private static final String INTERNAL_SERVER_ERROR_CODE = "INTERNAL_SERVER_ERROR";
 
+    public static final DefaultExceptionHandler INSTANCE = new DefaultExceptionHandler();
     private static final Logger log = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
     @Override
     public ResponseEntity<ApiError> handle(Exception exception) {
         log.warn("Default exception handler received an exception", exception);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new SimpleApiError("INTERNAL_SERVER_ERROR"));
+                .body(new SimpleApiError(INTERNAL_SERVER_ERROR_CODE));
     }
 
     @Override

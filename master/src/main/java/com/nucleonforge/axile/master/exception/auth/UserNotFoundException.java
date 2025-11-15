@@ -12,8 +12,8 @@ import com.nucleonforge.axile.master.service.auth.provider.UserProvider;
  */
 public class UserNotFoundException extends AuthenticationException {
 
-    public UserNotFoundException(final String message) {
-        super(message);
+    public UserNotFoundException(final String username) {
+        super("User with username '%s' is not found".formatted(username));
     }
 
     public UserNotFoundException(final String message, final Throwable cause) {

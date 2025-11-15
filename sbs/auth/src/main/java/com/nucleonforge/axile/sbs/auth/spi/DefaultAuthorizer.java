@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import com.nucleonforge.axile.common.auth.core.Authority;
 import com.nucleonforge.axile.common.auth.core.AuthorizationRequest;
 import com.nucleonforge.axile.common.auth.core.Role;
-import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.sbs.auth.AuthorizationException;
+import com.nucleonforge.axile.sbs.auth.model.DecodedUser;
 
 /**
  * Default implementation of {@link Authorizer}.
@@ -19,7 +19,7 @@ import com.nucleonforge.axile.sbs.auth.AuthorizationException;
 public class DefaultAuthorizer implements Authorizer {
 
     @Override
-    public void authorize(User user, AuthorizationRequest authorizationRequest) throws AuthorizationException {
+    public void authorize(DecodedUser user, AuthorizationRequest authorizationRequest) throws AuthorizationException {
         Set<Authority> requiredAuthorities = authorizationRequest.requiredAuthorities();
 
         if (requiredAuthorities.isEmpty()) {

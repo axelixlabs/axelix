@@ -28,6 +28,16 @@ management:
         include: [ "health" ]
 axile:
   master:
+    auth:
+      jwt:
+        algorithm: HMAC512
+        lifespan: 12h
+        signing-key: 22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff
+      static-admin:
+        credentials:
+          password: admin
+          username: admin
+      type: static-admin
     discovery:
       auto: true
       execution-environment: k8s
