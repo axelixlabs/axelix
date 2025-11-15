@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import io.fabric8.kubernetes.client.KubernetesClient;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -41,7 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(
         properties = {
             "axile.master.discovery.auto=true",
-            "axile.master.discovery.execution-environment=k8s",
+            "axile.master.discovery.platform=kubernetes",
             "axile.master.discovery.polling.fixed-delay=1000",
             "axile.master.discovery.polling.initial-delay=0"
         })
@@ -51,6 +52,9 @@ class ShortPollingInstanceDiscoverySchedulerTest {
 
     @Autowired
     private ShortPollingInstanceDiscoveryScheduler subject;
+
+    @MockBean
+    private KubernetesClient kubernetesClient;
 
     @Autowired
     private InstanceRegistry instanceRegistry;

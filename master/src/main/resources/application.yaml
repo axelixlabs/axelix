@@ -8,18 +8,6 @@ spring:
   mvc:
     servlet:
       path: /api/${spring.application.name}
-  cloud:
-    discovery:
-      enabled: true
-      blocking:
-        enabled: true
-    kubernetes:
-      discovery:
-        enabled: true
-        discovery-server-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}
-      # See the doc https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/
-      sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
-      ca-cert-path: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
 management:
   endpoints:
@@ -28,6 +16,15 @@ management:
         include: [ "health" ]
 axile:
   master:
+    discovery:
+      auto: true
+      platform: kubernetes
+      kubernetes:
+        kube-apiserver-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}
+        sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
+        ca-cert-path: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        filters:
+          namespaces: default
     auth:
       jwt:
         algorithm: HMAC512
@@ -38,6 +35,3 @@ axile:
           password: admin
           username: admin
       type: static-admin
-    discovery:
-      auto: true
-      execution-environment: k8s

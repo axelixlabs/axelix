@@ -1,12 +1,12 @@
-spring:
-  main:
-    cloud-platform: kubernetes
-  cloud:
-    kubernetes:
-      discovery:
-        # Public IP of the k8s cluster control plane
-        discovery-server-url: https://158.160.194.14:443
-        namespaces: default
-      # Should be set-up in local .env file or by any other means
-      sa-token-path: ${LOCAL_TOKEN_PATH:}
-      ca-cert-path: ${LOCAL_CA_PATH:}
+axile:
+  master:
+    discovery:
+      auto: true
+      platform: kubernetes
+      kubernetes:
+        kube-apiserver-url: https://158.160.194.14:443
+        # Should be set-up in local .env file or by any other means
+        sa-token-path: ${LOCAL_TOKEN_PATH:}
+        ca-cert-path: ${LOCAL_CA_PATH:}
+        filters:
+          namespaces: default

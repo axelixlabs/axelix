@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.User;
-import com.nucleonforge.axile.master.autoconfiguration.StaticAdminCredentialsProperties;
+import com.nucleonforge.axile.master.autoconfiguration.auth.StaticAdminCredentialsProperties;
 import com.nucleonforge.axile.master.exception.auth.UserNotFoundException;
 import com.nucleonforge.axile.master.service.auth.UserLoginService;
 

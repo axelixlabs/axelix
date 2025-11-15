@@ -26,7 +26,7 @@ import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
-import com.nucleonforge.axile.master.autoconfiguration.SecurityAutoConfiguration;
+import com.nucleonforge.axile.master.autoconfiguration.auth.SecurityAutoConfiguration;
 import com.nucleonforge.axile.master.exception.auth.JwtTokenGenerationException;
 import com.nucleonforge.axile.master.service.auth.jwt.DefaultJwtEncoderService;
 import com.nucleonforge.axile.master.service.auth.jwt.JwtEncoderService;

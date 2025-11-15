@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.autoconfiguration;
+package com.nucleonforge.axile.master.autoconfiguration.auth;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

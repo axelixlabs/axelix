@@ -6,9 +6,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.master.exception.InstanceAlreadyRegisteredException;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
@@ -22,8 +20,6 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
  * @since 29.10.2025
  * @author Nikita Kirillov
  */
-@Service
-@ConditionalOnProperty(prefix = "axile.master.discovery", name = "auto", havingValue = "true")
 public class ShortPollingInstanceDiscoveryScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(ShortPollingInstanceDiscoveryScheduler.class);

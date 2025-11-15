@@ -9,11 +9,9 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.kubernetes.commons.discovery.KubernetesServiceInstance;
-import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axile.master.model.instance.Instance;
@@ -27,16 +25,9 @@ import com.nucleonforge.axile.master.service.transport.ManagedServiceMetadataEnd
  *
  * @author Mikhail Polivakha
  */
-@Service
-@ConditionalOnProperty(prefix = "axile.master.discovery", name = "execution-environment", havingValue = "k8s")
 public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
 
     private static final Logger log = LoggerFactory.getLogger(KubernetesInstanceDiscoverer.class);
-
-    /**
-     * The string key in K8S pod's metadata that signifies the pod's name.
-     */
-    public static final String POD_NAME = "name";
 
     /**
      * The string key that represent the pod's creation timestamp.

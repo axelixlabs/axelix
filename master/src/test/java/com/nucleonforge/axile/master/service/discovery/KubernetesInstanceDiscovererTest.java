@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -16,15 +17,23 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axile.master.service.state.InMemoryInstanceRegistry;
+import com.nucleonforge.axile.master.service.state.InstanceRegistry;
+import com.nucleonforge.axile.master.service.transport.ManagedServiceMetadataEndpointProber;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,24 +44,50 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @since 21.09.2025
  */
-@SpringBootTest(properties = {"axile.master.discovery.auto=true", "axile.master.discovery.execution-environment=k8s"})
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = KubernetesInstanceDiscovererTest.CurrentConfig.class)
 class KubernetesInstanceDiscovererTest {
 
     private static MockWebServer mockWebServer;
 
-    @Autowired
-    private KubernetesInstanceDiscoverer subject;
-
     @MockBean
     private DiscoveryClient discoveryClient;
 
+    @Autowired
+    private ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber;
+
     private URI uri;
+
+    private KubernetesInstanceDiscoverer subject;
+
+    @TestConfiguration
+    static class CurrentConfig {
+
+        @Bean
+        public ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber(
+                InstanceRegistry instanceRegistry,
+                MetadataJacksonMessageDeserializationStrategy deserializationStrategy) {
+            return new ManagedServiceMetadataEndpointProber(instanceRegistry, deserializationStrategy);
+        }
+
+        @Bean
+        public InstanceRegistry instanceRegistry() {
+            return new InMemoryInstanceRegistry();
+        }
+
+        @Bean
+        public MetadataJacksonMessageDeserializationStrategy deserializationStrategy() {
+            return new MetadataJacksonMessageDeserializationStrategy(new ObjectMapper());
+        }
+    }
 
     @BeforeEach
     void startServer() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
+
+        subject = new KubernetesInstanceDiscoverer(discoveryClient, managedServiceMetadataEndpointProber);
     }
 
     @AfterEach

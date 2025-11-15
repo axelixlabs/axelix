@@ -1,2 +1,2 @@
-com.nucleonforge.axile.master.autoconfiguration.KubernetesAutoConfiguration
-com.nucleonforge.axile.master.autoconfiguration.SecurityAutoConfiguration
+com.nucleonforge.axile.master.autoconfiguration.discovery.DiscoveryAutoConfiguration
+com.nucleonforge.axile.master.autoconfiguration.auth.SecurityAutoConfiguration

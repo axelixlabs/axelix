@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.autoconfiguration;
+package com.nucleonforge.axile.master.autoconfiguration.auth;
 
 /**
  * Configuration for static-admin for the Axile Master - the username/password pair.
