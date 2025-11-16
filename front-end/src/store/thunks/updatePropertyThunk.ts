@@ -1,8 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+import { extractErrorCode } from "helpers";
 import type { IUpdatePropertyRequestData } from "models";
 import { updateProperty } from "services";
-import { UNKNOWN_ERROR } from "utils";
 
 // todo replace any with real type in future
 export const updatePropertyThunk = createAsyncThunk<void, IUpdatePropertyRequestData, { rejectValue: any }>(
@@ -14,7 +14,7 @@ export const updatePropertyThunk = createAsyncThunk<void, IUpdatePropertyRequest
             // todo replace any with real type in future
         } catch (error: any) {
             return rejectWithValue({
-                code: error.response?.data?.code ?? UNKNOWN_ERROR,
+                code: extractErrorCode(error?.response?.data),
             });
         }
     },

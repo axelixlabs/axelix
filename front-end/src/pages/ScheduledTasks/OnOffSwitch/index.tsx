@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
+import { extractErrorCode } from "helpers";
 import { type IErrorResponse, type IRunnable, StatelessRequest } from "models";
 import { updateScheduledTasksStatus } from "services";
-import { UNKNOWN_ERROR } from "utils";
 
 interface IProps {
     /**
@@ -36,7 +36,7 @@ export const OnOffSwitch = ({ runnable }: IProps) => {
                 setMutationRequest(StatelessRequest.success());
             })
             .catch((error: AxiosError<IErrorResponse>) => {
-                setMutationRequest(StatelessRequest.error(error?.response?.data?.code ?? UNKNOWN_ERROR));
+                setMutationRequest(StatelessRequest.error(extractErrorCode(error?.response?.data)));
             });
     };
 

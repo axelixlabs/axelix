@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 
-import { showErrorNotification } from "helpers";
+import { extractErrorCode, showErrorNotification } from "helpers";
 import type { IErrorResponse } from "models";
 
 const apiFetch = axios.create({
@@ -25,7 +25,7 @@ apiFetch.interceptors.response.use(
     (response) => response,
 
     (error: AxiosError<IErrorResponse>) => {
-        const errorCode: string | undefined = error?.response?.data?.code;
+        const errorCode: string | undefined = extractErrorCode(error?.response?.data);
 
         showErrorNotification(errorCode);
 

@@ -5,10 +5,9 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterCacheManagers } from "helpers";
+import { extractErrorCode, fetchData, filterCacheManagers } from "helpers";
 import { type ICachesResponseBody, type IErrorResponse, StatefulRequest, StatelessRequest } from "models";
 import { clearAllCachesData, getCachesData } from "services";
-import { UNKNOWN_ERROR } from "utils";
 
 import { CacheManagerSection } from "./CacheManagerSection";
 import styles from "./styles.module.css";
@@ -49,7 +48,7 @@ export const Caches = () => {
                     }
                 })
                 .catch((error: AxiosError<IErrorResponse>) => {
-                    setClearAllCaches(StatelessRequest.error(error?.response?.data?.code ?? UNKNOWN_ERROR));
+                    setClearAllCaches(StatelessRequest.error(extractErrorCode(error?.response?.data)));
                 });
         }
     };

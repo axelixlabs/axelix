@@ -7,9 +7,9 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
+import { extractErrorCode } from "helpers";
 import { type ICacheData, type IErrorResponse, StatelessRequest } from "models";
 import { clearCacheData } from "services";
-import { UNKNOWN_ERROR } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -43,7 +43,7 @@ export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
                 message.success(t("Caches.cleared"));
             })
             .catch((error: AxiosError<IErrorResponse>) => {
-                setClearSingleCache(StatelessRequest.error(error?.response?.data?.code ?? UNKNOWN_ERROR));
+                setClearSingleCache(StatelessRequest.error(extractErrorCode(error?.response?.data)));
             });
     };
 

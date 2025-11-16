@@ -3,9 +3,9 @@ import type { Dispatch, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
 import { Accordion, TooltipWithCopy } from "components";
+import { extractErrorCode } from "helpers";
 import { type IErrorResponse, type ILoggerGroup, StatelessRequest } from "models";
 import { changeLoggerGroupLevel } from "services";
-import { UNKNOWN_ERROR } from "utils";
 
 import { Levels } from "../Levels";
 
@@ -48,9 +48,7 @@ export const LoggerGroups = ({ loggerGroups, levels, setUpdateLoggerGroupLevel }
                             }
                         })
                         .catch((error: AxiosError<IErrorResponse>) => {
-                            setUpdateLoggerGroupLevel(
-                                StatelessRequest.error(error?.response?.data?.code ?? UNKNOWN_ERROR),
-                            );
+                            setUpdateLoggerGroupLevel(StatelessRequest.error(extractErrorCode(error?.response?.data)));
                         });
                 };
 

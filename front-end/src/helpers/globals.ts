@@ -29,7 +29,7 @@ export async function fetchData<S>(setDataState: SetRequestState<S>, dataFetcher
         setDataState(() => StatefulRequest.success(result.data));
         // TODO: Fix type in future
     } catch (error: any) {
-        const errorCode = error?.response?.data?.code ?? UNKNOWN_ERROR;
+        const errorCode = extractErrorCode(error?.response?.data);
         setDataState(() => StatefulRequest.error(errorCode));
     }
 }
@@ -38,6 +38,13 @@ export const getPropertiesCount = <T extends IEnvironmentPropertySource | IConfi
     propertySourcesList: T[],
 ): number => {
     return propertySourcesList.reduce((result, { properties }) => result + properties.length, 0);
+};
+
+/**
+ * @param data any JSON response body that was received from the server
+ */
+export const extractErrorCode = (data: any): string => {
+    return data?.code ?? UNKNOWN_ERROR;
 };
 
 /**
@@ -52,10 +59,12 @@ export const normalizeHtmlElementId = (elementId: string): string => {
     return canonicalize(elementId);
 };
 
-export function showErrorNotification(errorCode: string | undefined): void {
+export function showErrorNotification(errorCode: string): void {
     notification.error({
-        message: t("ErrorCodes.error"),
-        description: !errorCode ? t(`ErrorCodes.${UNKNOWN_ERROR}`) : t(`ErrorCodes.${errorCode}`),
+        message: t("Error.title"),
+        description: t(`Error.codes.${errorCode}`),
         placement: "top",
+        duration: 4.5,
+        showProgress: true,
     });
 }
