@@ -128,11 +128,12 @@ asciidoctorj {
 }
 
 val docsDir = layout.projectDirectory.dir("docs")
-val outputDir = layout.buildDirectory.dir("build/docs")
+val outputDirectory = layout.buildDirectory.dir("build/docs")
 
 tasks.withType<AsciidoctorTask> {
     attributes(
         mapOf(
+            "source-highlighter" to "rouge",
             "toc" to "left",        // Positions the table of contents on the left side
             "icons" to "font",      // Uses font-based icons rather than image icons or text
             "imagesdir" to "images" // Default directory for images
@@ -151,7 +152,7 @@ docTypes.forEach { docType ->
         description = "Builds docs for $docType"
 
         sourceDir(docsDir.dir(docType))
-        setOutputDir(file("$outputDir"))
+        setOutputDir(file(outputDirectory))
     }
 }
 

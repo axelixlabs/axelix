@@ -27,8 +27,17 @@ IMPORTANT: Although the starter itself is broken into modules internally, by des
 
 == Just Spring is not Enough
 
-The starter itself is written with heavy reliance on Spring Boot, and it's Auto Configuration mechanisms. So we require Spring Boot
-autoconfiguration to be in place. Check the xref:../versions.adoc#compatibility_matrix[Compatibility Matrix] for more information.
+The starter itself is written with heavy reliance on Spring Boot, and it's Auto Configuration mechanisms. In particular, as we would see further, Axile works by either by:
+
+- Using Spring Boot's native Actuator endpoints
+- Extending Spring Boot's native Actuator endpoints
+- Or even providing some brand-new Actuator endpoints
+
+So, therefore, *Axile starter requires Spring Boot to be present in the classpath*.
+
+== Compatibility Matrix
+
+Check the xref:../versions.adoc#compatibility_matrix[Compatibility Matrix] for more information.
 
 
 

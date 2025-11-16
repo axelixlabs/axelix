@@ -1,0 +1,14 @@
+= Axile
+
+Welcome to Axile documentation!
+
+This pages serves as the landing page for the documentation of the Axile project. From here, you can navigate to the pages that are actually of your interest.
+
+== GE
+
+- xref:about/overview.adoc[What is Axile?]
+- xref:about/sbs.adoc[How to ]
+
+== Configuration
+
+Below are the documentation pages that focus on the configuration of the Axile
