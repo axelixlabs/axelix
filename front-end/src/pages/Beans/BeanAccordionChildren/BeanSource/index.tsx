@@ -16,7 +16,9 @@ export const BeanSource = ({ beanSource }: IProps) => {
     const { t } = useTranslation();
 
     const statelessBeanSource =
-        beanSource.origin === EBeanOrigin.UNKNOWN || beanSource.origin === EBeanOrigin.COMPONENT_ANNOTATION;
+        beanSource.origin === EBeanOrigin.UNKNOWN ||
+        beanSource.origin === EBeanOrigin.COMPONENT_ANNOTATION ||
+        beanSource.origin === EBeanOrigin.FACTORY_BEAN;
 
     const translatedTitle = t(`Beans.beanSource.${beanSource.origin}`);
 
