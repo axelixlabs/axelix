@@ -18,4 +18,5 @@ export * from "./types/antd";
 export * from "./enums/conditions.ts";
 export * from "./enums/details.ts";
 export * from "./enums/loggers.ts";
-export * from "./enums/beans";
+export * from "./enums/beans.ts";
+export * from "./enums/metrics.ts";

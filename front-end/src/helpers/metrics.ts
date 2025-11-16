@@ -1,4 +1,4 @@
-import type { IMetricsGroup } from "models";
+import { type IMetricsGroup } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./global";
@@ -22,7 +22,7 @@ export const reduceDisplayedNumber = (value: unknown): string => {
             return sign + String(absoluteValue);
         }
 
-        return sign + absoluteValue.toFixed(3).replace(/\.0+$|(?<=\.[0-9]*?)0+$/g, "");
+        return sign + (Math.trunc(absoluteValue * 100) / 100).toString();
     }
 
     if (absoluteValue >= trillion) {
