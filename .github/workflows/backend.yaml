@@ -126,7 +126,7 @@ jobs:
           touch ~/.kube/config
           echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
           chmod 600 ~/.kube/config
-          helm upgrade --install master . -f values.yaml -n test-namespace
+          helm upgrade --install master . -f values.yaml
 
   dispatch:
     needs: [build-deploy-source]
