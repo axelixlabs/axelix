@@ -1,6 +1,6 @@
 .AccordionBody {
   display: grid;
-  grid-template-columns: 140px 70%;
+  grid-template-columns: max-content 1fr;
   gap: 20px;
 }
 
