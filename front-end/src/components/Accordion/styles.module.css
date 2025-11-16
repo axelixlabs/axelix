@@ -2,14 +2,14 @@
   border-bottom: 1px solid var(--axile-medium-grey);
 }
 
-.Open .ContentWrapper {
+.Open>.ContentWrapper {
   display: block;
   animation: slidein 0.4s;
   animation-fill-mode: forwards;
   height: 0%;
 }
 
-.Open .Icon {
+.MainWrapper.Open>.HeaderWrapper>.Icon {
   transform: rotate(180deg);
   transition: transform 0.3s;
 }

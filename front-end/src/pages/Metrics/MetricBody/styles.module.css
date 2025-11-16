@@ -1,0 +1,23 @@
+.MainWrapper {
+    display: grid;
+    align-items: flex-start;
+    grid-template-columns: 1fr 2fr;
+    column-gap: 20px;
+}
+
+.MetricDataWrapper {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 20px
+}
+
+.TagsWrapper{
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    align-items: center;
+    gap: 8px;
+}
+
+.AvailableTagSelect{
+    width: 200px;
+}
