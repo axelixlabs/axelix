@@ -3,3 +3,4 @@ export * from "./loggersColors";
 export * from "./siderMenu";
 export * from "./details";
 export * from "./beans";
+export * from "./globals";

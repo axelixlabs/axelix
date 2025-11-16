@@ -1,6 +1,6 @@
 import type { IEnvironmentPropertySource } from "models";
 
-import { canonicalize } from "./global";
+import { canonicalize } from "./globals";
 
 export const filterPropertySources = (
     propertySources: IEnvironmentPropertySource[],

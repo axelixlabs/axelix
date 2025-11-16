@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+import { extractErrorCode } from "helpers";
 import type { IUpdatePropertyRequestData } from "models";
 import { updateProperty } from "services";
 
@@ -13,7 +14,7 @@ export const updatePropertyThunk = createAsyncThunk<void, IUpdatePropertyRequest
             // todo replace any with real type in future
         } catch (error: any) {
             return rejectWithValue({
-                status: error.response?.status,
+                code: extractErrorCode(error?.response?.data),
             });
         }
     },

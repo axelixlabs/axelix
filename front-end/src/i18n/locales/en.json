@@ -8,33 +8,33 @@
     "Details": {
         "downloadState": "Download state",
         "spring" : {
-          "springBootVersion" : "Spring Boot",
-          "springFrameworkVersion" : "Spring Framework",
-          "springCloudVersion" : "Spring Cloud"
+            "springBootVersion" : "Spring Boot",
+            "springFrameworkVersion" : "Spring Framework",
+            "springCloudVersion": "Spring Cloud"
         },
-        "runtime" : {
-          "javaVersion" : "Java",
-          "kotlinVersion" : "Kotlin",
-          "jdkVendor" : "JDK Vendor",
-          "garbageCollector" : "Garbage Collector"
+        "runtime": {
+            "javaVersion": "Java",
+            "kotlinVersion": "Kotlin",
+            "jdkVendor": "JDK Vendor",
+            "garbageCollector": "Garbage Collector"
         },
-        "os" : {
-          "name" : "OS Family",
-          "version" : "Kernel Version",
-          "arch" : "CPU Architecture"
+        "os": {
+            "name": "OS Family",
+            "version": "Kernel Version",
+            "arch": "CPU Architecture"
         },
-        "build" : {
-          "group" : "Group ID",
-          "version" : "Version",
-          "artifact" : "Artifact ID",
-          "time" : "Build Timestamp"
+        "build": {
+            "group": "Group ID",
+            "version": "Version",
+            "artifact": "Artifact ID",
+            "time": "Build Timestamp"
         },
-        "git" : {
-          "commitShaShort" : "Commit SHA",
-          "branch" : "Branch",
-          "authorName" : "Commit's Author",
-          "authorEmail" : "Author's Email",
-          "commitTimestamp" : "Commit's Timestamp"
+        "git": {
+            "commitShaShort": "Commit SHA",
+            "branch": "Branch",
+            "authorName": "Commit's Author",
+            "authorEmail": "Author's Email",
+            "commitTimestamp": "Commit's Timestamp"
         }
     },
     "Environments": {
@@ -120,5 +120,13 @@
         "fixedRate": "Fixed rate",
         "enabled": "Task enabled",
         "disabled": "Task disabled"
+    },
+    "Error": {
+      "title" : "Error",
+      "codes" : {
+        "UNKNOWN_ERROR": "Unknown error. Please refresh the page or try again later.",
+        "INTERNAL_SERVER_ERROR": "Unexpected server error. Please, re-try request later.",
+        "INSTANCE_NOT_FOUND": "Requested application instance is not found. The most likely reason is that the state of the environment has changed since the last request from your browser to the server. Hence, you can just refresh the page and get the actual data."
+      }
     }
 }

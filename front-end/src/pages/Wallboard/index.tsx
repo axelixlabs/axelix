@@ -20,9 +20,8 @@ export const Wallboard = () => {
         return <Loader />;
     }
 
-    // todo fix this in future
     if (wallboard.error) {
-        return wallboard.error;
+        return <EmptyHandler isEmpty />;
     }
 
     const instanceCards = wallboard.response!.instances;

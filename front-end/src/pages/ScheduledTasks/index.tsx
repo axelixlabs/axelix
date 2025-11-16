@@ -28,7 +28,7 @@ const ScheduledTasks = () => {
     }
 
     if (scheduledTasks.error) {
-        return scheduledTasks.error;
+        return <EmptyHandler isEmpty />;
     }
 
     const scheduledTasksData = scheduledTasks.response!;

@@ -1,11 +1,12 @@
 import { Button, message } from "antd";
+import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterCacheManagers } from "helpers";
-import { type ICachesResponseBody, StatefulRequest, StatelessRequest } from "models";
+import { extractErrorCode, fetchData, filterCacheManagers } from "helpers";
+import { type ICachesResponseBody, type IErrorResponse, StatefulRequest, StatelessRequest } from "models";
 import { clearAllCachesData, getCachesData } from "services";
 
 import { CacheManagerSection } from "./CacheManagerSection";
@@ -29,9 +30,8 @@ export const Caches = () => {
         return <Loader />;
     }
 
-    // todo fix this in future
     if (cacheData.error) {
-        return cacheData.error;
+        return <EmptyHandler isEmpty />;
     }
 
     const clearAllCachesClickHandler = (): void => {
@@ -47,8 +47,8 @@ export const Caches = () => {
                         setClearAllCaches(StatelessRequest.error(""));
                     }
                 })
-                .catch(() => {
-                    setClearAllCaches(StatelessRequest.error(""));
+                .catch((error: AxiosError<IErrorResponse>) => {
+                    setClearAllCaches(StatelessRequest.error(extractErrorCode(error?.response?.data)));
                 });
         }
     };

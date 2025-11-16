@@ -1,7 +1,10 @@
+import { notification } from "antd";
 import type { AxiosResponse } from "axios";
+import { t } from "i18next";
 import type { Dispatch, SetStateAction } from "react";
 
 import { type IConfigPropsBean, type IEnvironmentPropertySource, type MenuItem, StatefulRequest } from "models";
+import { UNKNOWN_ERROR } from "utils";
 
 export const findOpenKeys = (items: MenuItem[], path: string): string[] => {
     const parent = items.find(
@@ -24,8 +27,10 @@ export async function fetchData<S>(setDataState: SetRequestState<S>, dataFetcher
         const result = await dataFetcher();
 
         setDataState(() => StatefulRequest.success(result.data));
-    } catch {
-        setDataState(() => StatefulRequest.error("Some error"));
+        // TODO: Fix type in future
+    } catch (error: any) {
+        const errorCode = extractErrorCode(error?.response?.data);
+        setDataState(() => StatefulRequest.error(errorCode));
     }
 }
 
@@ -33,6 +38,13 @@ export const getPropertiesCount = <T extends IEnvironmentPropertySource | IConfi
     propertySourcesList: T[],
 ): number => {
     return propertySourcesList.reduce((result, { properties }) => result + properties.length, 0);
+};
+
+/**
+ * @param data any JSON response body that was received from the server
+ */
+export const extractErrorCode = (data: any): string => {
+    return data?.code ?? UNKNOWN_ERROR;
 };
 
 /**
@@ -46,3 +58,13 @@ export const canonicalize = (string: string): string => {
 export const normalizeHtmlElementId = (elementId: string): string => {
     return canonicalize(elementId);
 };
+
+export function showErrorNotification(errorCode: string): void {
+    notification.error({
+        message: t("Error.title"),
+        description: t(`Error.codes.${errorCode}`),
+        placement: "top",
+        duration: 4.5,
+        showProgress: true,
+    });
+}
