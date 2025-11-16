@@ -23,7 +23,7 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
   # Namespace where the ServiceAccount will be created.
-  namespace: "default"
+  namespace: "kube-system"
 
 rbac:
   # List of namespaces where the application needs read access to pods, services and endpoints.
