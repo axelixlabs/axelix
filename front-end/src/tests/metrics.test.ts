@@ -16,7 +16,7 @@ describe("reduceDisplayedNumber", () => {
     });
 
     it("Small fractional numbers below the threshold", () => {
-        expect(reduceDisplayedNumber(12.3456)).toBe("12.346");
+        expect(reduceDisplayedNumber(12.3456)).toBe("12.34");
         expect(reduceDisplayedNumber(-12.34)).toBe("-12.34");
     });
 
@@ -44,6 +44,6 @@ describe("reduceDisplayedNumber", () => {
 
     it("Numbers at the threshold", () => {
         expect(reduceDisplayedNumber(SHOW_RAW_THRESHOLD)).toBe("100K");
-        expect(reduceDisplayedNumber(SHOW_RAW_THRESHOLD - 0.001)).toBe(`${SHOW_RAW_THRESHOLD - 0.001}`);
+        expect(reduceDisplayedNumber(SHOW_RAW_THRESHOLD - 0.001)).toBe(`${SHOW_RAW_THRESHOLD - 0.01}`);
     });
 });

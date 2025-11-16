@@ -57,7 +57,7 @@ export const MetricBody = ({ metric }: IProps) => {
                     </>
                 )}
 
-                {!!singleMetricFeed.availableTags.length && (
+                {singleMetricFeed.availableTags.length > 0 && (
                     <>
                         <div>{t("Metrics.tags")}:</div>
                         <div className={styles.TagsWrapper}>

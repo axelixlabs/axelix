@@ -1,3 +1,5 @@
+import { EStatisticType } from "../enums/metrics.ts";
+
 export interface IMetricsGroup {
     /**
      * Metrics Group нame
@@ -14,7 +16,7 @@ export interface IMeasurement {
     /**
      * Statistic name
      */
-    statistic: string;
+    statistic: EStatisticType;
 
     /**
      * Value of the measurement
