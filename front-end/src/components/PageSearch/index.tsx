@@ -1,4 +1,4 @@
-import { Input } from "antd";
+import { AutoComplete, type AutoCompleteProps, Input } from "antd";
 import classNames from "classnames";
 import { type Dispatch, type SetStateAction, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -20,20 +20,50 @@ interface IProps {
      * Optional text to display after the search field
      */
     addonAfter?: string;
+
+    /**
+     * Options for the autocomplete input.
+     */
+    autocompleteOptions?: AutoCompleteProps["options"];
 }
 
-export const PageSearch = ({ setSearch, addonAfter, hasBottomGutter = true }: IProps) => {
+export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, hasBottomGutter = true }: IProps) => {
     const { t } = useTranslation();
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const scheduleSetSearch = (value: string): void => {
         if (debounceRef.current) {
             clearTimeout(debounceRef.current);
         }
 
-        debounceRef.current = setTimeout(() => setSearch(e.target.value), 500);
+        debounceRef.current = setTimeout(() => setSearch(value), 500);
     };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        scheduleSetSearch(e.target.value);
+    };
+
+    const handleSearch = (value: string): void => {
+        scheduleSetSearch(value);
+    };
+
+    const handleSelect = (value: string): void => {
+        setSearch(value);
+    };
+
+    if (autocompleteOptions) {
+        return (
+            <AutoComplete
+                options={autocompleteOptions}
+                onChange={handleSearch}
+                onSelect={handleSelect}
+                filterOption
+                className={classNames(styles.Search, { [styles.BottomGutter]: hasBottomGutter })}
+            >
+                <Input placeholder={t("search")} addonAfter={addonAfter} />
+            </AutoComplete>
+        );
+    }
 
     return (
         <Input
