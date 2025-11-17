@@ -1,5 +1,5 @@
 .Search {
-    max-width: 400px;
+    width: min(400px, 100%);
 }
 
 .BottomGutter {

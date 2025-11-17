@@ -1,7 +1,7 @@
 import { type IMetricsGroup } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
-import { commonNormalize } from "./global";
+import { commonNormalize } from "./globals";
 
 export const reduceDisplayedNumber = (value: unknown): string => {
     if (value === null || value === undefined) {
