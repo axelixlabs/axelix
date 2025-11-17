@@ -1,0 +1,26 @@
+.AccordionWrapper {
+    margin-bottom: 40px;
+    scroll-margin-top: 150px;
+}
+
+.AccordionHeader {
+    font-weight: 600;
+}
+
+.HeaderStyles {
+    background-color: var(--axile-primary-light-green);
+    padding: 16px;
+}
+
+.ContentStyles {
+    padding: 0;
+}
+
+.KeyChunk {
+    column-gap: 8px;
+}
+
+.ValueChunk {
+    display: flex;
+    justify-content: flex-end;
+}

@@ -1,17 +1,12 @@
 import { Accordion } from "components/Accordion";
 import { TooltipWithCopy } from "components/TooltipWithCopy";
 import type { PropsWithChildren } from "react";
-import { Link, useParams } from "react-router-dom";
 
+import { EmptyHandler, TablePropertyValue } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import type { ITableRow } from "models";
 
-import { EmptyHandler } from "../EmptyHandler";
-
-import { TablePropertyValue } from "./TablePropertyValue";
 import styles from "./styles.module.css";
-
-import LinkIcon from "assets/icons/link.svg";
 
 interface IProps {
     /**
@@ -25,9 +20,7 @@ interface IProps {
     properties: ITableRow[];
 }
 
-export const ModifiableTableSection = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
-    const { instanceId } = useParams();
-
+export const ConfigPropsModifiableTable = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
     return (
         <div className={`AccordionsWrapper ${styles.AccordionWrapper}`} id={normalizeHtmlElementId(headerName)}>
             <Accordion
@@ -42,25 +35,13 @@ export const ModifiableTableSection = ({ headerName, properties, children }: Pro
                 accordionExpanded
             >
                 <EmptyHandler isEmpty={!properties.length}>
-                    {properties.map(({ key, displayKey, displayValue, isPrimary, configPropsBeanName }) => (
+                    {properties.map(({ key, displayKey, displayValue }) => (
                         <div key={key} className="TableRow">
-                            <div className={`RowChunk ${styles.KeyChunk}`}>
+                            <div className="RowChunk">
                                 <TooltipWithCopy text={displayKey} />
-                                {configPropsBeanName && (
-                                    <Link
-                                        to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <img src={LinkIcon} alt="Link icon" />
-                                    </Link>
-                                )}
                             </div>
                             <div className={`RowChunk ${styles.ValueChunk}`}>
-                                <TablePropertyValue
-                                    propertyName={key}
-                                    propertyValue={displayValue}
-                                    isPrimary={isPrimary}
-                                />
+                                <TablePropertyValue propertyName={key} propertyValue={displayValue} />
                             </div>
                         </div>
                     ))}

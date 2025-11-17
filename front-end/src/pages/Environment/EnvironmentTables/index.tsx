@@ -1,8 +1,10 @@
 import { useState } from "react";
 
-import { EmptyHandler, ModifiableTableSection, PageSearch } from "components";
+import { EmptyHandler, PageSearch } from "components";
 import { filterPropertySources, getPropertiesCount } from "helpers";
 import type { IEnvironmentPropertySource } from "models";
+
+import { EnvironmentModifiableTable } from "../EnvironmentModifiableTable";
 
 interface IProps {
     /**
@@ -31,7 +33,7 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
             <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
                 <>
                     {effectivePropertySources.map(({ name, properties }) => (
-                        <ModifiableTableSection
+                        <EnvironmentModifiableTable
                             headerName={name}
                             properties={properties.map((property) => ({
                                 key: property.name,
