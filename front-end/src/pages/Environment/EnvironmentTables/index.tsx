@@ -38,6 +38,7 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
                                 displayKey: property.name,
                                 displayValue: property.value,
                                 isPrimary: property.isPrimary,
+                                configPropsBeanName: property.configPropsBeanName,
                             }))}
                             key={name}
                         />

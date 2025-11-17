@@ -113,6 +113,10 @@ export interface ITableRow {
      * True if propertyValue is primary, false otherwise
      */
     isPrimary?: boolean;
+    /**
+     * flag that designates that the bean is the config props bean.
+     */
+    configPropsBeanName?: string | null;
 }
 
 export interface IUpdatePropertyRequestData {
