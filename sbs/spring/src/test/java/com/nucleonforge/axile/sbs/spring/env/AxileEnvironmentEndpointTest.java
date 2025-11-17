@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -92,8 +91,7 @@ class AxileEnvironmentEndpointTest {
 
     @ParameterizedTest(name = "Property ''{0}'' should resolve from highest-precedence source")
     @MethodSource("propertyExpectations")
-    void shouldSelectPrimaryPropertyFromHighestPrecedenceSource(String propertyName, String expectedValue)
-            throws JsonProcessingException {
+    void shouldSelectPrimaryPropertyFromHighestPrecedenceSource(String propertyName, String expectedValue) {
         ResponseEntity<AxileEnvironmentEndpoint.AxileEnvironmentDescriptor> response = restTemplate.getForEntity(
                 "/actuator/axile-env", AxileEnvironmentEndpoint.AxileEnvironmentDescriptor.class);
 
@@ -110,17 +108,16 @@ class AxileEnvironmentEndpointTest {
 
         assertThat(propertyAppearances).isNotEmpty();
 
-        var primary = propertyAppearances.stream()
-                .filter(e -> e.getValue().isPrimary())
-                .findFirst()
-                .orElseThrow();
+        assertThat(propertyAppearances)
+                .filteredOn(e -> e.getValue().isPrimary())
+                .hasSize(1)
+                .first()
+                .extracting(e -> e.getValue().value())
+                .isEqualTo(expectedValue);
 
-        assertThat(primary.getValue().value()).isEqualTo(expectedValue);
-
-        if (propertyAppearances.size() > 1) {
-            assertThat(propertyAppearances.stream().anyMatch(e -> !e.getValue().isPrimary()))
-                    .isTrue();
-        }
+        assertThat(propertyAppearances)
+                .filteredOn(e -> !e.getValue().isPrimary())
+                .hasSizeGreaterThanOrEqualTo(1);
     }
 
     private static Stream<Arguments> propertyExpectations() {
@@ -167,6 +164,7 @@ class AxileEnvironmentEndpointTest {
 
         AxileEnvironmentEndpoint.AxileEnvironmentDescriptor body = response.getBody();
         assertThat(body).isNotNull();
+        System.out.println(body);
 
         var propertyAppearances = body.propertySources().stream()
                 .flatMap(src -> src.properties().entrySet().stream()
