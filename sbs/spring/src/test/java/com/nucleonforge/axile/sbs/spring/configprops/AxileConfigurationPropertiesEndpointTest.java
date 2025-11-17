@@ -36,7 +36,7 @@ public class AxileConfigurationPropertiesEndpointTest {
     static class AxileConfigurationPropertiesTestConfiguration {
 
         @Bean
-        public ConfigurationPropertiesCache serviceConfigurationProperties(
+        public ConfigurationPropertiesCache configurationPropertiesCache(
                 ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
             return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
         }
