@@ -31,10 +31,10 @@ public class ConfigurationPropertiesCacheTest {
     }
 
     @TestConfiguration
-    static class ServiceConfigurationPropertiesTestConfiguration {
+    static class ConfigurationPropertiesCacheTestConfiguration {
 
         @Bean
-        public ConfigurationPropertiesCache serviceConfigurationProperties(
+        public ConfigurationPropertiesCache configurationPropertiesCache(
                 ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
             return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
         }

@@ -1,8 +1,10 @@
 package com.nucleonforge.axile.sbs.spring.env;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,6 +15,8 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -30,10 +34,6 @@ import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCach
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
-// TODO:
-//  I'm not sure this test does what it is supposed to do. When debugging it, I found out that
-//  different properties, such as 'axile.env.test.prop1' for instance, are present only in one
-//  property source, which is almost certainly not the desirable behavior
 /**
  * Integration tests for {@link AxileEnvironmentEndpoint}.
  *
@@ -44,11 +44,32 @@ import static org.assertj.core.api.Assertions.assertThat;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         args = {"--axile.env.test.prop3=fromCommandLine"},
         properties = {
-            "axile.env.test.prop1=systemValue1",
             "axile.env.test.prop2=systemValue2",
-            "management.endpoint.env.show-values=always"
+            "management.endpoint.env.show-values=always",
         })
-@TestPropertySource(properties = {"axile.env.test.prop1=fromTestSource"})
+@TestPropertySource(
+        properties = {
+            // properties -> shouldSelectPrimaryPropertyFromHighestPrecedenceSource
+            "axile.env.test.prop1=fromTestSource",
+
+            // properties -> shouldReturnTheBeanNameThatMatchesTheConfigProps
+            "axile.prop.test.tags.environment=test",
+            "axile.prop.test.tags.version=1.0.0",
+            "axile.prop.test.enabled-contexts[0]=user-service",
+            "axile.prop.test.enabled-contexts[1]=payment-service",
+            "axile.prop.test.http-client.requests[0].name=user-api",
+            "axile.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
+            "axile.prop.test.http-client.requests[0].methods[0].type=GET",
+            "axile.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
+            "axile.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
+            "axile.prop.test.http-client.requests[0].methods[1].type=POST",
+            "axile.prop.test.http-client.requests[1].name=payment-api",
+            "axile.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
+            "axile.prop.test.http-client.requests[1].methods[0].type=PUT",
+            "axile.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
+            "axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
+        })
+@EnableConfigurationProperties(AxileEnvironmentEndpointTest.AxilePropTest.class)
 class AxileEnvironmentEndpointTest {
 
     @Autowired
@@ -59,7 +80,9 @@ class AxileEnvironmentEndpointTest {
 
     @BeforeEach
     void before() {
+        environment.getSystemProperties().put("axile.env.test.prop1", "systemValue");
         environment.getSystemProperties().put("axile.env.test.prop2", "systemValue");
+        environment.getSystemProperties().put("axile.env.test.prop3", "systemValue");
     }
 
     @DynamicPropertySource
@@ -69,7 +92,8 @@ class AxileEnvironmentEndpointTest {
 
     @ParameterizedTest(name = "Property ''{0}'' should resolve from highest-precedence source")
     @MethodSource("propertyExpectations")
-    void shouldSelectPrimaryPropertyFromHighestPrecedenceSource(String propertyName, String expectedValue) {
+    void shouldSelectPrimaryPropertyFromHighestPrecedenceSource(String propertyName, String expectedValue)
+            throws JsonProcessingException {
         ResponseEntity<AxileEnvironmentEndpoint.AxileEnvironmentDescriptor> response = restTemplate.getForEntity(
                 "/actuator/axile-env", AxileEnvironmentEndpoint.AxileEnvironmentDescriptor.class);
 
@@ -133,6 +157,61 @@ class AxileEnvironmentEndpointTest {
                                 .containsKey("isPrimary") // isPrimary flag should always present in response
                                 .node("isPrimary")
                                 .isBoolean()));
+    }
+
+    @ParameterizedTest()
+    @MethodSource("propertyName")
+    void shouldReturnTheBeanNameThatMatchesTheConfigProps(String propertyName) {
+        ResponseEntity<AxileEnvironmentEndpoint.AxileEnvironmentDescriptor> response = restTemplate.getForEntity(
+                "/actuator/axile-env", AxileEnvironmentEndpoint.AxileEnvironmentDescriptor.class);
+
+        AxileEnvironmentEndpoint.AxileEnvironmentDescriptor body = response.getBody();
+        assertThat(body).isNotNull();
+
+        var propertyAppearances = body.propertySources().stream()
+                .flatMap(src -> src.properties().entrySet().stream()
+                        .filter(e -> e.getKey().equals(propertyName))
+                        .map(e -> Map.entry(src.name(), e.getValue())))
+                .toList();
+
+        // At this stage, we’re not concerned with the full bean name,
+        // what matters is that when a property exists both in
+        // the Environment and in @ConfigurationProperties,
+        // we obtain the bean name and the field configPropsBeanName is not null.
+        assertThat(propertyAppearances)
+                .extracting(e -> e.getValue().configPropsBeanName())
+                .doesNotContainNull();
+    }
+
+    private static Stream<Arguments> propertyName() {
+        return Stream.of(
+                Arguments.of("axile.prop.test.tags.environment"),
+                Arguments.of("axile.prop.test.tags.version"),
+                Arguments.of("axile.prop.test.enabled-contexts[0]"),
+                Arguments.of("axile.prop.test.enabled-contexts[1]"),
+                Arguments.of("axile.prop.test.http-client.requests[0].name"),
+                Arguments.of("axile.prop.test.http-client.requests[0].base-url"),
+                Arguments.of("axile.prop.test.http-client.requests[0].methods[0].type"),
+                Arguments.of("axile.prop.test.http-client.requests[0].methods[0].retries[0].count"),
+                Arguments.of("axile.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout"),
+                Arguments.of("axile.prop.test.http-client.requests[0].methods[1].type"),
+                Arguments.of("axile.prop.test.http-client.requests[1].name"),
+                Arguments.of("axile.prop.test.http-client.requests[1].base-url"),
+                Arguments.of("axile.prop.test.http-client.requests[1].methods[0].type"),
+                Arguments.of("axile.prop.test.http-client.requests[1].methods[0].retries[0].count"),
+                Arguments.of("axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
+    }
+
+    @ConfigurationProperties(prefix = "axile.prop.test")
+    public record AxilePropTest(Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
+
+        public record HttpClient(List<Request> requests) {}
+
+        public record Request(String name, String baseUrl, List<Method> methods) {}
+
+        public record Method(String type, List<Retry> retries) {}
+
+        public record Retry(Integer count, Map<String, Object> parameters) {}
     }
 
     @TestConfiguration
