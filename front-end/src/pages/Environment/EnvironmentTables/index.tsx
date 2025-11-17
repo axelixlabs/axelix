@@ -20,9 +20,13 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
 
     const addonAfter = `${filteredPropertiesCount} / ${totalPropertiesCount}`;
 
+    const autocompleteOptions = propertySources.flatMap(({ properties }) =>
+        properties.map(({ name }) => ({ value: name })),
+    );
+
     return (
         <>
-            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
+            <PageSearch addonAfter={addonAfter} setSearch={setSearch} autocompleteOptions={autocompleteOptions} />
 
             <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
                 <>
