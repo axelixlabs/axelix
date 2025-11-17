@@ -31,6 +31,7 @@ export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, hasBott
     const { t } = useTranslation();
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     const scheduleSetSearch = (value: string): void => {
         if (debounceRef.current) {
             clearTimeout(debounceRef.current);
@@ -39,24 +40,12 @@ export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, hasBott
         debounceRef.current = setTimeout(() => setSearch(value), 500);
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        scheduleSetSearch(e.target.value);
-    };
-
-    const handleSearch = (value: string): void => {
-        scheduleSetSearch(value);
-    };
-
-    const handleSelect = (value: string): void => {
-        setSearch(value);
-    };
-
     if (autocompleteOptions) {
         return (
             <AutoComplete
                 options={autocompleteOptions}
-                onChange={handleSearch}
-                onSelect={handleSelect}
+                onChange={(value) => scheduleSetSearch(value)}
+                onSelect={(value) => setSearch(value)}
                 filterOption
                 className={classNames(styles.Search, { [styles.BottomGutter]: hasBottomGutter })}
             >
@@ -69,7 +58,7 @@ export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, hasBott
         <Input
             placeholder={t("search")}
             addonAfter={addonAfter}
-            onChange={handleChange}
+            onChange={(e) => scheduleSetSearch(e.target.value)}
             className={classNames(styles.Search, { [styles.BottomGutter]: hasBottomGutter })}
         />
     );
