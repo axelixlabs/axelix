@@ -1,4 +1,4 @@
-export { ModifiableTableSection } from "./ModifiableTableSection";
+export { TablePropertyValue } from "./TablePropertyValue";
 export { LanguageSwitcher } from "./LanguageSwitcher";
 export { TooltipWithCopy } from "./TooltipWithCopy";
 export { LinearProgress } from "./LinearProgress";

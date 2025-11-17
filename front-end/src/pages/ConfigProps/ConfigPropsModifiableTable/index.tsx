@@ -2,12 +2,10 @@ import { Accordion } from "components/Accordion";
 import { TooltipWithCopy } from "components/TooltipWithCopy";
 import type { PropsWithChildren } from "react";
 
+import { EmptyHandler, TablePropertyValue } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import type { ITableRow } from "models";
 
-import { EmptyHandler } from "../EmptyHandler";
-
-import { TablePropertyValue } from "./TablePropertyValue";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -22,7 +20,7 @@ interface IProps {
     properties: ITableRow[];
 }
 
-export const ModifiableTableSection = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
+export const ConfigPropsModifiableTable = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
     return (
         <div className={`AccordionsWrapper ${styles.AccordionWrapper}`} id={normalizeHtmlElementId(headerName)}>
             <Accordion
@@ -37,17 +35,13 @@ export const ModifiableTableSection = ({ headerName, properties, children }: Pro
                 accordionExpanded
             >
                 <EmptyHandler isEmpty={!properties.length}>
-                    {properties.map(({ key, displayKey, displayValue, isPrimary }) => (
+                    {properties.map(({ key, displayKey, displayValue }) => (
                         <div key={key} className="TableRow">
                             <div className="RowChunk">
                                 <TooltipWithCopy text={displayKey} />
                             </div>
-                            <div className="RowChunk">
-                                <TablePropertyValue
-                                    propertyName={key}
-                                    propertyValue={displayValue}
-                                    isPrimary={isPrimary}
-                                />
+                            <div className={`RowChunk ${styles.ValueChunk}`}>
+                                <TablePropertyValue propertyName={key} propertyValue={displayValue} />
                             </div>
                         </div>
                     ))}

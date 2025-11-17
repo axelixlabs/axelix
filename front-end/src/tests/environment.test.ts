@@ -16,11 +16,13 @@ describe("Filter propertySources", () => {
                     name: "java.specification.version",
                     value: "17",
                     isPrimary: true,
+                    configPropsBeanName: null,
                 },
                 {
                     name: "sun.jnu.encoding",
                     value: "UTF-8",
                     isPrimary: false,
+                    configPropsBeanName: null,
                 },
             ],
         },

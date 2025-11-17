@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-import { EmptyHandler, ModifiableTableSection } from "components";
+import { EmptyHandler } from "components";
 import type { IConfigPropsBean } from "models";
+
+import { ConfigPropsModifiableTable } from "../ConfigPropsModifiableTable";
 
 import styles from "./styles.module.css";
 
@@ -40,7 +42,7 @@ export const ConfigPropsTables = ({ effectiveConfigProps, loading }: IProps) => 
         <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
             <>
                 {effectiveConfigProps.map(({ beanName, prefix, properties }) => (
-                    <ModifiableTableSection
+                    <ConfigPropsModifiableTable
                         headerName={beanName}
                         properties={properties.map((property) => {
                             return {
@@ -56,7 +58,7 @@ export const ConfigPropsTables = ({ effectiveConfigProps, loading }: IProps) => 
                                 <span className={styles.PrefixTitle}>Prefix:</span> {prefix}
                             </div>
                         )}
-                    </ModifiableTableSection>
+                    </ConfigPropsModifiableTable>
                 ))}
             </>
         </EmptyHandler>

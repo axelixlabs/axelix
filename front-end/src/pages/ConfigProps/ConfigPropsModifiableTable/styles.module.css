@@ -12,6 +12,15 @@
     padding: 16px;
 }
 
-.ContentStyles{
+.ContentStyles {
     padding: 0;
+}
+
+.KeyChunk {
+    column-gap: 8px;
+}
+
+.ValueChunk {
+    display: flex;
+    justify-content: flex-end;
 }

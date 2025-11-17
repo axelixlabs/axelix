@@ -1,3 +1,5 @@
+import type { ITableRow } from "./globals";
+
 interface IProperties {
     /**
      * The property name
@@ -11,6 +13,10 @@ interface IProperties {
      * True if propertyValue is primary, false otherwise
      */
     isPrimary: boolean;
+    /**
+     * flag that designates that the bean is the config props bean.
+     */
+    configPropsBeanName: string | null;
 }
 
 export interface IEnvironmentPropertySource {
@@ -38,4 +44,16 @@ export interface IEnvironmentResponseBody {
      * Environment property sources list
      */
     propertySources: IEnvironmentPropertySource[];
+}
+
+export interface IEnvironmentTableRow extends ITableRow {
+    /**
+     * True if propertyValue is primary, false otherwise
+     */
+    isPrimary: boolean;
+
+    /**
+     * flag that designates that the bean is the config props bean.
+     */
+    configPropsBeanName: string | null;
 }

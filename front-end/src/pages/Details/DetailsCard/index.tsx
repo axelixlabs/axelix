@@ -38,7 +38,7 @@ export const DetailsCard = ({ icon, i18nPropertiesPrefix, title, records }: IPro
             {records.map(({ key, value }) => (
                 <div className="TableRow" key={key}>
                     <div className="RowChunk">{t(`${i18nPropertiesPrefix}.${key}`)}</div>
-                    <div className="RowChunk">
+                    <div className={`RowChunk ${styles.ValueChunk}`}>
                         <div className={styles.ValueWrapper}>{value}</div>
                     </div>
                 </div>

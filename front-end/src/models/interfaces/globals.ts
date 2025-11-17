@@ -108,11 +108,6 @@ export interface ITableRow {
      * The value to be displayed
      */
     displayValue: string;
-
-    /**
-     * True if propertyValue is primary, false otherwise
-     */
-    isPrimary?: boolean;
 }
 
 export interface IUpdatePropertyRequestData {
