@@ -1,0 +1,30 @@
+name: Check Linked Issues
+
+on:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-linked-issues:
+    if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip duplicate runs
+        uses: fkirc/skip-duplicate-actions@v5
+        id: skip_duplicate
+        with:
+          github_token: ${{ github.token }}
+          concurrent_skipping: true
+
+      - name: Run linked issues check
+        if: ${{ steps.skip_duplicate.outputs.skipped != 'true' }}
+        uses: nearform-actions/github-action-check-linked-issues@v1
+        with:
+          exclude-labels: "refactoring"
+
+      - name: No-op step to mark success if skipped
+        if: ${{ steps.skip_duplicate.outputs.skipped == 'true' }}
+        run: echo "Skipped run but marked as success to get green checkmark"
