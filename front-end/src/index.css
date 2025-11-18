@@ -71,3 +71,11 @@ a {
     border-radius: var(--axile-border-radius-large);
     overflow: hidden;
 }
+
+.ant-switch {
+    transition: all 0.15s ease;
+}
+
+.ant-switch-handle {
+    transition: all 0.15s ease;
+}
