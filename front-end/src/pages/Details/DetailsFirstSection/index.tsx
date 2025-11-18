@@ -65,7 +65,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                 centered
             >
                 <List
-                    header={<div className={styles.ListHeader}>{t("Details.listOfStateComponents")}</div>}
+                    header={<div className={styles.ListHeader}>{t("Details.exportConfiguration")}</div>}
                     bordered
                     dataSource={detailsDownloadStateComponents}
                     renderItem={(component) => (
