@@ -4,10 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+
+import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache.AxileConfigurationPropertiesDescriptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,18 +26,25 @@ public class ConfigurationPropertiesCacheTest {
 
     @Test
     void shouldReturnConfigurationProperties() {
-        assertThat(configurationPropertiesCache.getConfigurationProperties())
+        assertThat(configurationPropertiesCache.getAxileConfigProps())
                 .isNotNull()
-                .isInstanceOf(ConfigurationPropertiesDescriptor.class);
+                .isInstanceOf(AxileConfigurationPropertiesDescriptor.class);
     }
 
     @TestConfiguration
-    static class ConfigurationPropertiesCacheTestConfiguration {
+    static class ServiceConfigurationPropertiesTestConfiguration {
 
         @Bean
-        public ConfigurationPropertiesCache configurationPropertiesCache(
-                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
-            return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
+        public ConfigurationPropertiesConverter configurationPropertiesConverter() {
+            return new DefaultConfigurationPropertiesConverter();
+        }
+
+        @Bean
+        public ConfigurationPropertiesCache serviceConfigurationProperties(
+                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
+                ConfigurationPropertiesConverter configurationPropertiesConverter) {
+            return new ConfigurationPropertiesCache(
+                    configurationPropertiesReportEndpoint, configurationPropertiesConverter);
         }
 
         @Bean

@@ -29,6 +29,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
+import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesConverter;
+import com.nucleonforge.axile.sbs.spring.configprops.DefaultConfigurationPropertiesConverter;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -199,9 +201,16 @@ class AxileEnvironmentEndpointTest {
     static class AxileEnvironmentEndpointTestConfiguration {
 
         @Bean
+        public ConfigurationPropertiesConverter configurationPropertiesConverter() {
+            return new DefaultConfigurationPropertiesConverter();
+        }
+
+        @Bean
         public ConfigurationPropertiesCache configurationPropertiesCache(
-                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
-            return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
+                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
+                ConfigurationPropertiesConverter configurationPropertiesConverter) {
+            return new ConfigurationPropertiesCache(
+                    configurationPropertiesReportEndpoint, configurationPropertiesConverter);
         }
 
         @Bean

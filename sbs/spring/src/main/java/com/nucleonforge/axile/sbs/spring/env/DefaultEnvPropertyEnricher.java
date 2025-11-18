@@ -16,7 +16,7 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDe
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertyValueDescriptor;
 import org.springframework.core.env.Environment;
 
-import com.nucleonforge.axile.common.utils.BeanNameUtils;
+import com.nucleonforge.axile.common.api.KeyValue;
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxileEnvironmentDescriptor;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertySourceDescriptor;
@@ -104,39 +104,19 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
         Map<String, String> configPropsMapping = new HashMap<>();
 
-        configurationPropertiesCache
-                .getConfigurationProperties()
-                .getContexts()
-                .values()
-                .forEach(context -> context.getBeans().forEach((beanName, bean) -> {
-                    String cleanBeanName = BeanNameUtils.stripConfigPropsPrefix(beanName);
-                    flatten(bean.getPrefix(), bean.getProperties(), configPropsMapping, cleanBeanName);
+        configurationPropertiesCache.getAxileConfigProps().contexts().values().forEach(context -> context.beans()
+                .forEach((beanName, bean) -> {
+                    applyPrefixAndProperty(bean.prefix(), bean.properties(), configPropsMapping, beanName);
                 }));
 
         return configPropsMapping;
     }
 
-    private void flatten(String prefix, Object value, Map<String, String> configPropsMapping, String beanName) {
-        if (value instanceof Map<?, ?> map) {
-            flattenMap(prefix, map, configPropsMapping, beanName);
-        } else if (value instanceof List<?> list) {
-            flattenList(prefix, list, configPropsMapping, beanName);
-        } else {
-            configPropsMapping.put(propertyNameNormalizer.normalize(prefix), beanName);
-        }
-    }
-
-    private void flattenMap(String prefix, Map<?, ?> map, Map<String, String> configPropsMapping, String beanName) {
-        for (Map.Entry<?, ?> entry : map.entrySet()) {
-            String fullPrefix = prefix + entry.getKey();
-            flatten(fullPrefix, entry.getValue(), configPropsMapping, beanName);
-        }
-    }
-
-    private void flattenList(String prefix, List<?> list, Map<String, String> configPropsMapping, String beanName) {
-        for (int i = 0; i < list.size(); i++) {
-            String prefixCount = prefix + i;
-            flatten(prefixCount, list.get(i), configPropsMapping, beanName);
+    private void applyPrefixAndProperty(
+            String prefix, List<KeyValue> properties, Map<String, String> configPropsMapping, String beanName) {
+        for (var property : properties) {
+            String fullProperty = propertyNameNormalizer.normalize(prefix + property.key());
+            configPropsMapping.put(fullProperty, beanName);
         }
     }
 }
