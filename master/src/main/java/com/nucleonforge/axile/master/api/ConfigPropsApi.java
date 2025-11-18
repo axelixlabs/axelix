@@ -17,17 +17,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nucleonforge.axile.common.api.ConfigpropsFeed;
+import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
-import com.nucleonforge.axile.master.api.response.configprops.ConfigpropsByPrefixResponse;
-import com.nucleonforge.axile.master.api.response.configprops.ConfigpropsFeedResponse;
+import com.nucleonforge.axile.master.api.response.configprops.ConfigPropsFeedResponse;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.Converter;
-import com.nucleonforge.axile.master.service.transport.confogprops.ConfigpropsByPrefixEndpointProber;
-import com.nucleonforge.axile.master.service.transport.confogprops.ConfigpropsEndpointProber;
+import com.nucleonforge.axile.master.service.transport.confogprops.ConfigPropsByPrefixEndpointProber;
+import com.nucleonforge.axile.master.service.transport.confogprops.ConfigPropsEndpointProber;
 
 /**
  * The API for managing configprops.
@@ -39,23 +38,21 @@ import com.nucleonforge.axile.master.service.transport.confogprops.ConfigpropsEn
         description =
                 "The configprops endpoint provides information about the application’s @ConfigurationProperties beans.")
 @RestController
-@RequestMapping(path = ApiPaths.ConfigpropsApi.MAIN)
-public class ConfigpropsApi {
+@RequestMapping(path = ApiPaths.ConfigPropsApi.MAIN)
+public class ConfigPropsApi {
 
-    private final ConfigpropsEndpointProber configpropsEndpointProber;
-    private final ConfigpropsByPrefixEndpointProber configpropsByPrefixEndpointProber;
-    private final Converter<ConfigpropsFeed, ConfigpropsFeedResponse> configpropsFeedConverter;
-    private final Converter<ConfigpropsFeed, ConfigpropsByPrefixResponse> configpropsByPrefixResponseConverter;
+    private final ConfigPropsEndpointProber configpropsEndpointProber;
+    private final ConfigPropsByPrefixEndpointProber configpropsByPrefixEndpointProber;
+    private final Converter<AxileConfigPropsFeed, ConfigPropsFeedResponse> configpropsFeedConverter;
 
-    public ConfigpropsApi(
-            ConfigpropsEndpointProber configpropsEndpointProber,
-            ConfigpropsByPrefixEndpointProber configpropsByPrefixEndpointProber,
-            Converter<ConfigpropsFeed, ConfigpropsFeedResponse> configpropsFeedConverter,
-            Converter<ConfigpropsFeed, ConfigpropsByPrefixResponse> configpropsByPrefixResponseConverter) {
+    public ConfigPropsApi(
+            ConfigPropsEndpointProber configpropsEndpointProber,
+            ConfigPropsByPrefixEndpointProber configpropsByPrefixEndpointProber,
+            Converter<AxileConfigPropsFeed, ConfigPropsFeedResponse> configpropsFeedConverter,
+            Converter<AxileConfigPropsFeed, ConfigPropsFeedResponse> configpropsByPrefixResponseConverter) {
         this.configpropsEndpointProber = configpropsEndpointProber;
         this.configpropsByPrefixEndpointProber = configpropsByPrefixEndpointProber;
         this.configpropsFeedConverter = configpropsFeedConverter;
-        this.configpropsByPrefixResponseConverter = configpropsByPrefixResponseConverter;
     }
 
     @Operation(
@@ -73,7 +70,7 @@ public class ConfigpropsApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        schema = @Schema(implementation = ConfigpropsFeedResponse.class))),
+                                        schema = @Schema(implementation = ConfigPropsFeedResponse.class))),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -90,9 +87,10 @@ public class ConfigpropsApi {
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
-    @GetMapping(path = ApiPaths.ConfigpropsApi.FEED)
-    public ConfigpropsFeedResponse getConfigpropsFeed(@PathVariable("instanceId") String instanceId) {
-        ConfigpropsFeed result = configpropsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+    @GetMapping(path = ApiPaths.ConfigPropsApi.FEED)
+    public ConfigPropsFeedResponse getConfigpropsFeed(@PathVariable("instanceId") String instanceId) {
+        AxileConfigPropsFeed result =
+                configpropsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(configpropsFeedConverter.convert(result));
     }
 
@@ -111,7 +109,7 @@ public class ConfigpropsApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        schema = @Schema(implementation = ConfigpropsByPrefixResponse.class))),
+                                        schema = @Schema(implementation = ConfigPropsFeedResponse.class))),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -134,11 +132,11 @@ public class ConfigpropsApi {
                 description = "The prefix of @ConfigurationProperties beans to find",
                 required = true)
     })
-    @GetMapping(path = ApiPaths.ConfigpropsApi.BEAN_BY_PREFIX)
-    public ConfigpropsByPrefixResponse getBeanByPrefixProfile(
+    @GetMapping(path = ApiPaths.ConfigPropsApi.BEAN_BY_PREFIX)
+    public ConfigPropsFeedResponse getBeanByPrefixProfile(
             @PathVariable("instanceId") String instanceId, @PathVariable("prefix") String prefix) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("prefix", prefix));
-        ConfigpropsFeed result = configpropsByPrefixEndpointProber.invoke(InstanceId.of(instanceId), payload);
-        return Objects.requireNonNull(configpropsByPrefixResponseConverter.convert(result));
+        AxileConfigPropsFeed result = configpropsByPrefixEndpointProber.invoke(InstanceId.of(instanceId), payload);
+        return Objects.requireNonNull(configpropsFeedConverter.convert(result));
     }
 }
