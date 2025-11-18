@@ -8,7 +8,7 @@ import ru from "./locales/ru.json";
 i18n.use(LanguageDetector)
     .use(initReactI18next)
     .init({
-        fallbackLng: "ru",
+        fallbackLng: "en",
         resources: {
             ru: {
                 translation: ru,
