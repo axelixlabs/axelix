@@ -22,12 +22,12 @@ public class KubernetesDiscoveryProperties {
     /**
      * The path inside the K8S Axile Master pod where the Service Account token resides.
      */
-    private String tokenPath = "/var/run/secrets/kubernetes.io/serviceaccount/token";
+    private String saTokenPath = "/var/run/secrets/kubernetes.io/serviceaccount/token";
 
     /**
      * The path inside the K8S Axile Master pod where the certificate of the kube-apiserver resides.
      */
-    private String caCertFile = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt";
+    private String caCertPath = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt";
 
     private DiscoveryFilters filters;
 
@@ -76,21 +76,21 @@ public class KubernetesDiscoveryProperties {
         return this;
     }
 
-    public String getTokenPath() {
-        return tokenPath;
+    public String getSaTokenPath() {
+        return saTokenPath;
     }
 
-    public KubernetesDiscoveryProperties setTokenPath(String tokenPath) {
-        this.tokenPath = tokenPath;
+    public KubernetesDiscoveryProperties setSaTokenPath(String saTokenPath) {
+        this.saTokenPath = saTokenPath;
         return this;
     }
 
-    public String getCaCertFile() {
-        return caCertFile;
+    public String getCaCertPath() {
+        return caCertPath;
     }
 
-    public KubernetesDiscoveryProperties setCaCertFile(String caCertFile) {
-        this.caCertFile = caCertFile;
+    public KubernetesDiscoveryProperties setCaCertPath(String caCertPath) {
+        this.caCertPath = caCertPath;
         return this;
     }
 
