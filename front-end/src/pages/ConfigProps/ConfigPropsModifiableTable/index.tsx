@@ -1,8 +1,6 @@
-import { Accordion } from "components/Accordion";
-import { TooltipWithCopy } from "components/TooltipWithCopy";
 import type { PropsWithChildren } from "react";
 
-import { EmptyHandler, TablePropertyValue } from "components";
+import { Accordion, EmptyHandler, TablePropertyValue, TooltipWithCopy } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import type { ITableRow } from "models";
 
