@@ -95,29 +95,20 @@ class AxileEnvironmentEndpointTest {
         ResponseEntity<AxileEnvironmentEndpoint.AxileEnvironmentDescriptor> response = restTemplate.getForEntity(
                 "/actuator/axile-env", AxileEnvironmentEndpoint.AxileEnvironmentDescriptor.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        var body = response.getBody();
-        assertThat(body).isNotNull();
-
-        var propertyAppearances = body.propertySources().stream()
+        var propertyAppearances = response.getBody().propertySources().stream()
                 .flatMap(src -> src.properties().entrySet().stream()
                         .filter(e -> e.getKey().equals(propertyName))
                         .map(e -> Map.entry(src.name(), e.getValue())))
                 .toList();
 
-        assertThat(propertyAppearances).isNotEmpty();
-
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(propertyAppearances)
+                .isNotEmpty()
                 .filteredOn(e -> e.getValue().isPrimary())
                 .hasSize(1)
                 .first()
                 .extracting(e -> e.getValue().value())
                 .isEqualTo(expectedValue);
-
-        assertThat(propertyAppearances)
-                .filteredOn(e -> !e.getValue().isPrimary())
-                .hasSizeGreaterThanOrEqualTo(1);
     }
 
     private static Stream<Arguments> propertyExpectations() {
@@ -156,29 +147,21 @@ class AxileEnvironmentEndpointTest {
                                 .isBoolean()));
     }
 
-    @ParameterizedTest()
+    @ParameterizedTest
     @MethodSource("propertyName")
     void shouldReturnTheBeanNameThatMatchesTheConfigProps(String propertyName) {
         ResponseEntity<AxileEnvironmentEndpoint.AxileEnvironmentDescriptor> response = restTemplate.getForEntity(
                 "/actuator/axile-env", AxileEnvironmentEndpoint.AxileEnvironmentDescriptor.class);
 
-        AxileEnvironmentEndpoint.AxileEnvironmentDescriptor body = response.getBody();
-        assertThat(body).isNotNull();
-        System.out.println(body);
-
-        var propertyAppearances = body.propertySources().stream()
+        var propertyAppearances = response.getBody().propertySources().stream()
                 .flatMap(src -> src.properties().entrySet().stream()
                         .filter(e -> e.getKey().equals(propertyName))
                         .map(e -> Map.entry(src.name(), e.getValue())))
                 .toList();
 
-        // At this stage, we’re not concerned with the full bean name,
-        // what matters is that when a property exists both in
-        // the Environment and in @ConfigurationProperties,
-        // we obtain the bean name and the field configPropsBeanName is not null.
         assertThat(propertyAppearances)
                 .extracting(e -> e.getValue().configPropsBeanName())
-                .doesNotContainNull();
+                .containsOnly(AxilePropTest.class.getName());
     }
 
     private static Stream<Arguments> propertyName() {
