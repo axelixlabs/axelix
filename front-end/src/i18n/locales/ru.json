@@ -8,7 +8,7 @@
     "cancel": "Отмена",
     "Details": {
         "downloadState": "Выгрузить состояние",
-        "listOfStateComponents": "Список компонентов состояния для экспорта",
+        "exportConfiguration": "Список компонентов состояния для экспорта",
         "Components": {
             "HEAP_DUMP": "Дамп кучи",
             "BEANS": "Beans",

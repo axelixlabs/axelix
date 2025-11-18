@@ -8,7 +8,7 @@
     "cancel": "Cancel",
     "Details": {
         "downloadState": "Download state",
-        "listOfStateComponents": "List of state export components",
+        "exportConfiguration": "List of state export components",
         "Components": {
             "HEAP_DUMP": "Heap dump",
             "BEANS": "Beans",
