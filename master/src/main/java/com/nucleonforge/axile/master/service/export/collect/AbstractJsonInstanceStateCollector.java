@@ -9,12 +9,12 @@ import org.slf4j.LoggerFactory;
 import com.nucleonforge.axile.master.exception.StateExportException;
 
 /**
- * Abstract {@link JsonInstanceStateCollector} that applies common marshalling and exception
+ * Abstract {@link InstanceStateCollector} that applies common marshalling and exception
  * handling logic.
  *
  * @author Mikhail Polivakha
  */
-public abstract class AbstractJsonInstanceStateCollector implements JsonInstanceStateCollector {
+public abstract class AbstractJsonInstanceStateCollector implements InstanceStateCollector {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractJsonInstanceStateCollector.class);
 
@@ -26,12 +26,12 @@ public abstract class AbstractJsonInstanceStateCollector implements JsonInstance
     }
 
     @Override
-    public String collect(String instanceId) throws StateExportException {
+    public byte[] collect(String instanceId) throws StateExportException {
         Object state = collectInternal(instanceId);
         try {
-            return objectMapper.writeValueAsString(state);
+            return objectMapper.writeValueAsBytes(state);
         } catch (JsonProcessingException e) {
-            log.warn("Unable to serialize state provided by collector : {}", this.getName(), e);
+            log.warn("Unable to serialize state provided by collector responsible for : {}", this.responsibleFor(), e);
             throw new StateExportException(instanceId, e);
         }
     }

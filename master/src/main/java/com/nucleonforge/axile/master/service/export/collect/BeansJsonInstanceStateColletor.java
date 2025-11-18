@@ -21,8 +21,8 @@ public class BeansJsonInstanceStateColletor extends AbstractJsonInstanceStateCol
     }
 
     @Override
-    public String getName() {
-        return "beans";
+    public StateComponent responsibleFor() {
+        return StateComponent.BEANS;
     }
 
     @Override

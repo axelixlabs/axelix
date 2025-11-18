@@ -21,12 +21,12 @@ public class ConfigpropsContributorJsonInstance extends AbstractJsonInstanceStat
     }
 
     @Override
-    public String getName() {
-        return "configprops";
+    protected Object collectInternal(String instanceId) {
+        return configpropsApi.getConfigpropsFeed(instanceId);
     }
 
     @Override
-    protected Object collectInternal(String instanceId) {
-        return configpropsApi.getConfigpropsFeed(instanceId);
+    public StateComponent responsibleFor() {
+        return StateComponent.CONFIG_PROPS;
     }
 }

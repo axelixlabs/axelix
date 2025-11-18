@@ -21,8 +21,8 @@ public class ConditionsContributorJsonInstance extends AbstractJsonInstanceState
     }
 
     @Override
-    public String getName() {
-        return "conditions";
+    public StateComponent responsibleFor() {
+        return StateComponent.CONDITIONS;
     }
 
     @Override

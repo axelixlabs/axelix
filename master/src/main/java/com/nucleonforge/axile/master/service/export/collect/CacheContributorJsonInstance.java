@@ -21,8 +21,8 @@ public class CacheContributorJsonInstance extends AbstractJsonInstanceStateColle
     }
 
     @Override
-    public String getName() {
-        return "cache";
+    public StateComponent responsibleFor() {
+        return StateComponent.CACHES;
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.nucleonforge.axile.master.service.export;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -13,7 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.master.exception.StateExportException;
-import com.nucleonforge.axile.master.service.export.collect.JsonInstanceStateCollector;
+import com.nucleonforge.axile.master.service.export.collect.InstanceStateCollector;
+import com.nucleonforge.axile.master.service.export.collect.StateComponent;
 
 /**
  * Default implementation of {@link InstanceStateExporter}.
@@ -26,41 +26,47 @@ public class ZipArchiveInstanceStateExporter implements InstanceStateExporter {
 
     private static final Logger log = LoggerFactory.getLogger(ZipArchiveInstanceStateExporter.class);
 
-    private final List<JsonInstanceStateCollector> collectors;
+    private final List<InstanceStateCollector> collectors;
 
-    public ZipArchiveInstanceStateExporter(List<JsonInstanceStateCollector> collectors) {
+    public ZipArchiveInstanceStateExporter(List<InstanceStateCollector> collectors) {
         this.collectors = collectors;
     }
 
     @Override
-    public byte[] exportInstanceState(String instanceId) throws StateExportException {
+    public byte[] exportInstanceState(StateExportRequest request) throws StateExportException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
-            for (JsonInstanceStateCollector collector : collectors) {
-                addCollectorDataToZip(zos, instanceId, collector);
+            for (InstanceStateCollector collector : collectors) {
+                if (shouldExport(request, collector)) {
+                    addCollectorDataToZip(zos, request.instanceId().instanceId(), collector);
+                }
             }
         } catch (IOException e) {
             log.error(
                     "Failed to assemble state export archive for instance: {}. Error: {}",
-                    instanceId,
+                    request.instanceId().instanceId(),
                     e.getMessage(),
                     e);
-            throw new StateExportException(instanceId, e);
+            throw new StateExportException(request.instanceId().instanceId(), e);
         }
 
         return baos.toByteArray();
     }
 
-    private void addCollectorDataToZip(ZipOutputStream zos, String instanceId, JsonInstanceStateCollector collector)
-            throws IOException {
-        String collectorName = collector.getName();
-        String stateEntry = collector.collect(instanceId);
+    private static boolean shouldExport(StateExportRequest request, InstanceStateCollector collector) {
+        return request.stateComponents().isEmpty() || request.stateComponents().contains(collector.responsibleFor());
+    }
 
-        zos.putNextEntry(new ZipEntry(collectorName + ".json"));
-        zos.write(stateEntry.getBytes(StandardCharsets.UTF_8));
+    private void addCollectorDataToZip(ZipOutputStream zos, String instanceId, InstanceStateCollector collector)
+            throws IOException {
+        StateComponent stateComponent = collector.responsibleFor();
+        byte[] state = collector.collect(instanceId);
+
+        zos.putNextEntry(new ZipEntry(stateComponent.name().toLowerCase() + ".json"));
+        zos.write(state);
         zos.closeEntry();
 
-        log.debug("Collector {} successfully collected state data for instance: {}", collectorName, instanceId);
+        log.debug("Collector {} successfully collected state data for instance: {}", stateComponent, instanceId);
     }
 }

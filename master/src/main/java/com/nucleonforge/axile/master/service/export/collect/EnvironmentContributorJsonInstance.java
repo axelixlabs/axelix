@@ -21,12 +21,12 @@ public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStat
     }
 
     @Override
-    public String getName() {
-        return "environment";
+    protected Object collectInternal(String instanceId) {
+        return environmentApi.getEnvironment(instanceId);
     }
 
     @Override
-    protected Object collectInternal(String instanceId) {
-        return environmentApi.getEnvironment(instanceId);
+    public StateComponent responsibleFor() {
+        return StateComponent.ENV;
     }
 }

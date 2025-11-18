@@ -21,12 +21,12 @@ public class ScheduledTasksContributorJsonInstance extends AbstractJsonInstanceS
     }
 
     @Override
-    public String getName() {
-        return "scheduled";
+    protected Object collectInternal(String instanceId) {
+        return scheduledTasksApi.getAllScheduledTasks(instanceId);
     }
 
     @Override
-    protected Object collectInternal(String instanceId) {
-        return scheduledTasksApi.getAllScheduledTasks(instanceId);
+    public StateComponent responsibleFor() {
+        return StateComponent.SCHEDULED_TASKS;
     }
 }
