@@ -65,7 +65,6 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                 centered
             >
                 <List
-                    header={<div className={styles.ListHeader}>{t("Details.exportConfiguration")}</div>}
                     bordered
                     dataSource={detailsDownloadStateComponents}
                     renderItem={(component) => (
@@ -73,6 +72,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                             {t(`Details.Components.${component}`)}
                         </List.Item>
                     )}
+                    className={styles.List}
                 />
             </Modal>
         </div>

@@ -72,10 +72,7 @@ a {
     overflow: hidden;
 }
 
-.ant-switch {
-    transition: all 0.15s ease;
-}
-
+.ant-switch,
 .ant-switch-handle {
-    transition: all 0.15s ease;
+    transition: all 0.15s ease !important;
 }

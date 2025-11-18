@@ -24,8 +24,8 @@
     width: 16px;
 }
 
-.ListHeader {
-    margin-bottom: 20px;
+.List {
+    margin-block: 30px;
 }
 
 @media all and (max-width: 1220px) {
