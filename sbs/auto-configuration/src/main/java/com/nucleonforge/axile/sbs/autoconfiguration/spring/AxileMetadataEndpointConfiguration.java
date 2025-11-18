@@ -19,7 +19,6 @@ import com.nucleonforge.axile.sbs.spring.master.ShortBuildInfoProvider;
 
 /**
  * Auto-configuration for the {@link AxileMetadataEndpoint}.
- * <p>
  *
  * @since 18.09.2025
  * @author Nikita Kirillov

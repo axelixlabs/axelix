@@ -1,22 +1,22 @@
 package com.nucleonforge.axile.common.api.metrics;
 
 import java.util.List;
-import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
 /**
- * The metric profile as returned by the Actuator API.
+ * The metric profile filtered by specific tags as returned by the Actuator API.
  *
  * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/metrics.html#metrics.retrieving-metric">Metrics Actuator API</a>
- * @author Mikhail Polivakha
+ * @since 18.11.2025
+ * @author Nikita Kirillov
  */
-public record MetricProfile(
+public record MetricProfileByTags(
         String name,
         @Nullable String description,
         String baseUnit,
         List<Measurement> measurements,
-        List<Map<String, String>> validTagCombinations) {
+        List<AvailableTag> availableTags) {
 
     /**
      * Single metric value, measured at a particular point in time.
@@ -25,4 +25,12 @@ public record MetricProfile(
      * @param value     the value of the given metric.
      */
     public record Measurement(String statistic, double value) {}
+
+    /**
+     * Tags that are available for this metric.
+     *
+     * @param tag    the tag name.
+     * @param values the tag value.
+     */
+    public record AvailableTag(String tag, List<String> values) {}
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 import com.nucleonforge.axile.master.api.response.metrics.SingleMetricProfileResponse;
-import com.nucleonforge.axile.master.api.response.metrics.SingleMetricProfileResponse.AvailableTag;
 import com.nucleonforge.axile.master.api.response.metrics.SingleMetricProfileResponse.Measurement;
 import com.nucleonforge.axile.master.service.convert.Converter;
 
@@ -23,13 +22,11 @@ public class SingleMetricConverter implements Converter<MetricProfile, SingleMet
     @Override
     public @NonNull SingleMetricProfileResponse convertInternal(@NonNull MetricProfile source) {
         return new SingleMetricProfileResponse(
-                source.name(), source.description(), source.baseUnit(), mapMeasurements(source), mapTags(source));
-    }
-
-    private static List<AvailableTag> mapTags(MetricProfile source) {
-        return source.availableTags().stream()
-                .map(it -> new AvailableTag(it.tag(), it.values()))
-                .toList();
+                source.name(),
+                source.description(),
+                source.baseUnit(),
+                mapMeasurements(source),
+                source.validTagCombinations());
     }
 
     private static List<Measurement> mapMeasurements(MetricProfile source) {
