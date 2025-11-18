@@ -30,8 +30,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
     const handleOk = (): void => {
         setIsModalOpen(false);
         const baseURL = `${import.meta.env.VITE_APP_API_URL}/api/axile/export-state/${instanceId}`;
-        const fullURL = stateComponents.length ? `${baseURL}?components=${stateComponents.join(",")}` : baseURL;
-        window.location.href = fullURL;
+        window.location.href = stateComponents.length ? `${baseURL}?components=${stateComponents.join(",")}` : baseURL;
     };
 
     const handleCancel = (): void => {
@@ -58,7 +57,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                 {t("Details.downloadState")}
             </Button>
             <Modal
-                title={t("Details.downloadState")}
+                title={t("Details.exportConfiguration")}
                 cancelText={t("cancel")}
                 open={isModalOpen}
                 onOk={handleOk}
@@ -66,7 +65,6 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                 centered
             >
                 <List
-                    header={<div>{t("Details.listOfStateComponents")}</div>}
                     bordered
                     dataSource={detailsDownloadStateComponents}
                     renderItem={(component) => (
