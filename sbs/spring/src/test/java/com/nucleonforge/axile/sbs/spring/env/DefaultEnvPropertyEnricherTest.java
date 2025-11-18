@@ -42,20 +42,6 @@ class DefaultEnvPropertyEnricherTest {
         assertThat(axileEnvironmentDescriptor.activeProfiles()).isNotNull();
         assertThat(axileEnvironmentDescriptor.defaultProfiles()).isNotNull();
         assertThat(axileEnvironmentDescriptor.propertySources()).isNotEmpty();
-
-        axileEnvironmentDescriptor.propertySources().forEach(source -> {
-            source.properties().forEach((key, value) -> {
-                assertThat(value.isPrimary())
-                        .as("isPrimary flag for key '%s' should be either true or false", key)
-                        .isIn(true, false);
-                assertThat(value.configPropsBeanName())
-                        .as(
-                                "configPropsBeanName for the key '%s' must contain the BeanName (not null), otherwise, null",
-                                key)
-                        .satisfiesAnyOf(beanName -> assertThat(beanName).isNull(), beanName -> assertThat(beanName)
-                                .isNotNull());
-            });
-        });
     }
 
     @TestConfiguration
