@@ -45,7 +45,7 @@ describe("Filter propertySources", () => {
         const findedPropertySource = result[0];
         expect(findedPropertySource.name).toBe(propertySources[1].name);
         expect(findedPropertySource.properties).toEqual([
-            { name: "java.specification.version", value: "17", isPrimary: true },
+            { name: "java.specification.version", value: "17", isPrimary: true, configPropsBeanName: null },
         ]);
     });
 
