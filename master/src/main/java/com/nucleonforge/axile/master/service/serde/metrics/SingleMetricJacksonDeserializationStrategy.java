@@ -10,7 +10,7 @@ import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axile.master.service.serde.JacksonMessageDeserializationStrategy;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for the {@link ActuatorEndpoints#METRICS} API.
+ * {@link JacksonMessageDeserializationStrategy} for the {@link ActuatorEndpoints#SINGLE_METRIC} API.
  *
  * @author Mikhail Polivakha
  */
