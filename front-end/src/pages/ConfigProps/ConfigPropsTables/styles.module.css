@@ -6,3 +6,17 @@
 .PrefixTitle {
     color: var(--axile-primary-green);
 }
+
+.Highlight {
+    animation: highlightFade 4s;
+}
+
+@keyframes highlightFade {
+    0% {
+        background-color: var(--axile-primary-green);
+    }
+
+    100% {
+        background-color: var(--axile-primary-light-green);
+    }
+}

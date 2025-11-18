@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { EmptyHandler } from "components";
 import type { IConfigPropsBean } from "models";
 
+import accordionStyles from "../../../components/Accordion/styles.module.css";
 import { ConfigPropsModifiableTable } from "../ConfigPropsModifiableTable";
 
 import styles from "./styles.module.css";
@@ -30,10 +31,14 @@ export const ConfigPropsTables = ({ effectiveConfigProps, loading }: IProps) => 
     //  to re-navigate to the requested 'hash', and therefore we have to do it manually here.
     useEffect(() => {
         if (!loading && hash) {
-            const elementToScroll = document.querySelector(hash);
+            const element = document.querySelector(hash);
+            if (element) {
+                element.scrollIntoView();
 
-            if (elementToScroll) {
-                elementToScroll.scrollIntoView();
+                const header = element.querySelector(`.${accordionStyles.HeaderWrapper}`);
+                if (header) {
+                    header.classList.add(styles.Highlight);
+                }
             }
         }
     }, [loading, hash]);
