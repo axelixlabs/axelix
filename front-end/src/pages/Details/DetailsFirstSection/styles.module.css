@@ -24,6 +24,10 @@
     width: 16px;
 }
 
+.List {
+    margin-block: 30px;
+}
+
 @media all and (max-width: 1220px) {
     .MainTitle {
         text-align: left;

@@ -5,8 +5,19 @@
     "copyFailed": "Не удалось скопировать",
     "propertyChangedSuccessfully": "Свойство Изменено",
     "saved": "Сохранено",
+    "cancel": "Отмена",
     "Details": {
         "downloadState": "Выгрузить состояние",
+        "exportConfiguration": "Список компонентов состояния для экспорта",
+        "Components": {
+            "HEAP_DUMP": "Дамп кучи",
+            "BEANS": "Beans",
+            "CACHES": "Кэши",
+            "CONDITIONS": "Условия",
+            "CONFIG_PROPS": "Свойства конфигурации",
+            "ENV": "Окружение",
+            "SCHEDULED_TASKS": "Запланированные задачи"
+        },
         "spring": {
             "springBootVersion": "Spring Boot",
             "springFrameworkVersion": "Spring Framework",
@@ -93,18 +104,18 @@
         "cglibProxy": "CGLIB",
         "jdkProxy": "JDK Динамический Прокси",
         "noProxy": "Не проксирован",
-        "beanSource" : {
-          "titles" : {
-            "main" : "Происхождение",
-            "beanMethod" : "Bean метод",
-            "enclosingClass" : "Декларирущий класс",
-            "factoryBeanName" : "Имя FactoryBean бина"
-          },
-          "COMPONENT_ANNOTATION" : "@Component или аналоги",
-          "SYNTHETIC_BEAN" : "Синтетический bean",
-          "UNKNOWN" : "Незивестно",
-          "FACTORY_BEAN" : "Создан другим FactoryBean-ом",
-          "BEAN_METHOD" : "@Bean метод"
+        "beanSource": {
+            "titles": {
+                "main": "Происхождение",
+                "beanMethod": "Bean метод",
+                "enclosingClass": "Декларирущий класс",
+                "factoryBeanName": "Имя FactoryBean бина"
+            },
+            "COMPONENT_ANNOTATION": "@Component или аналоги",
+            "SYNTHETIC_BEAN": "Синтетический bean",
+            "UNKNOWN": "Незивестно",
+            "FACTORY_BEAN": "Создан другим FactoryBean-ом",
+            "BEAN_METHOD": "@Bean метод"
         }
     },
     "ScheduledTasks": {
@@ -122,12 +133,12 @@
         "disabled": "Задача выключена"
     },
     "Error": {
-      "title": "Ошибка",
-      "codes": {
-        "UNKNOWN_ERROR": "Неизвестная ошибка. Попробуйте обновить страницу или повторить действие позже.",
-        "INTERNAL_SERVER_ERROR": "Непредвиденная ошибка сервера. Повторите запрос позднее.",
-        "INSTANCE_NOT_FOUND": "Запрашиваемый экземпляр сервиса не найден. Скорее всего это связано с тем, что с момента отправки последнего запроса на сервер, состояние окружения поменялось. Поэтому просто перезапустите страничку."
-      }
+        "title": "Ошибка",
+        "codes": {
+            "UNKNOWN_ERROR": "Неизвестная ошибка. Попробуйте обновить страницу или повторить действие позже.",
+            "INTERNAL_SERVER_ERROR": "Непредвиденная ошибка сервера. Повторите запрос позднее.",
+            "INSTANCE_NOT_FOUND": "Запрашиваемый экземпляр сервиса не найден. Скорее всего это связано с тем, что с момента отправки последнего запроса на сервер, состояние окружения поменялось. Поэтому просто перезапустите страничку."
+        }
     },
     "Metrics": {
         "value": "Значение",
