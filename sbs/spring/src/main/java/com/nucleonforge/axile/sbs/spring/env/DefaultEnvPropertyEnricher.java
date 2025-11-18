@@ -102,7 +102,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
             return Map.of();
         }
 
-        Map<String, String> propertyToBeanName = new HashMap<>();
+        Map<String, String> configPropsMapping = new HashMap<>();
 
         configurationPropertiesCache
                 .getConfigurationProperties()
@@ -110,23 +110,33 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                 .values()
                 .forEach(context -> context.getBeans().forEach((beanName, bean) -> {
                     String cleanBeanName = BeanNameUtils.stripConfigPropsPrefix(beanName);
-                    flatten(bean.getPrefix(), bean.getProperties(), propertyToBeanName, cleanBeanName);
+                    flatten(bean.getPrefix(), bean.getProperties(), configPropsMapping, cleanBeanName);
                 }));
 
-        return propertyToBeanName;
+        return configPropsMapping;
     }
 
-    @SuppressWarnings("unchecked")
-    private void flatten(
-            String prefix, Map<String, Object> properties, Map<String, String> propertyToBeanName, String beanName) {
-        properties.forEach((key, value) -> {
-            String propertiesName = prefix + "." + key;
+    private void flatten(String prefix, Object value, Map<String, String> configPropsMapping, String beanName) {
+        if (value instanceof Map<?, ?> map) {
+            flattenMap(prefix, map, configPropsMapping, beanName);
+        } else if (value instanceof List<?> list) {
+            flattenList(prefix, list, configPropsMapping, beanName);
+        } else {
+            configPropsMapping.put(propertyNameNormalizer.normalize(prefix), beanName);
+        }
+    }
 
-            if (value instanceof Map<?, ?> map) {
-                flatten(propertiesName, (Map<String, Object>) map, propertyToBeanName, beanName);
-            } else {
-                propertyToBeanName.put(propertyNameNormalizer.normalize(propertiesName), beanName);
-            }
-        });
+    private void flattenMap(String prefix, Map<?, ?> map, Map<String, String> configPropsMapping, String beanName) {
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            String fullPrefix = prefix + entry.getKey();
+            flatten(fullPrefix, entry.getValue(), configPropsMapping, beanName);
+        }
+    }
+
+    private void flattenList(String prefix, List<?> list, Map<String, String> configPropsMapping, String beanName) {
+        for (int i = 0; i < list.size(); i++) {
+            String prefixCount = prefix + i;
+            flatten(prefixCount, list.get(i), configPropsMapping, beanName);
+        }
     }
 }
