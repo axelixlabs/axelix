@@ -12,11 +12,11 @@ import com.nucleonforge.axile.master.api.BeansApi;
  * @author Nikita Kirillov
  */
 @Component
-public class BeansJsonInstanceStateColletor extends AbstractJsonInstanceStateCollector {
+public class BeansContributorJsonInstance extends AbstractJsonInstanceStateCollector {
 
     private final BeansApi beansApi;
 
-    public BeansJsonInstanceStateColletor(BeansApi beansApi) {
+    public BeansContributorJsonInstance(BeansApi beansApi) {
         this.beansApi = beansApi;
     }
 

@@ -268,7 +268,19 @@ public final class ApiPaths {
          */
         public static final String MAIN = "/details";
         /**
-         * Details endpoint with instance ID
+         * Details endpoint with instance ID.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+    }
+
+    public static final class ThreadDumpApi {
+
+        /**
+         * Base path for thread dump APIs.
+         */
+        public static final String MAIN = "/thread-dump";
+        /**
+         * Thread dump endpoint with instance ID.
          */
         public static final String INSTANCE_ID = "/{instanceId}";
     }
