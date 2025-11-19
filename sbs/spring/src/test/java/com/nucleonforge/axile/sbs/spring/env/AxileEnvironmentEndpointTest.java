@@ -56,8 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             // properties -> shouldReturnTheBeanNameThatMatchesTheConfigProps
             "axile.prop.test.tags.environment=test",
             "axile.prop.test.tags.version=1.0.0",
-            "axile.prop.test.enabled-contexts[0]=user-service",
-            "axile.prop.test.enabled-contexts[1]=payment-service",
+            "axile.prop.test.enabled-contexts=user-service,payment-service",
             "axile.prop.test.http-client.requests[0].name=user-api",
             "axile.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
             "axile.prop.test.http-client.requests[0].methods[0].type=GET",
@@ -170,8 +169,7 @@ class AxileEnvironmentEndpointTest {
         return Stream.of(
                 Arguments.of("axile.prop.test.tags.environment"),
                 Arguments.of("axile.prop.test.tags.version"),
-                Arguments.of("axile.prop.test.enabled-contexts[0]"),
-                Arguments.of("axile.prop.test.enabled-contexts[1]"),
+                Arguments.of("axile.prop.test.enabled-contexts"),
                 Arguments.of("axile.prop.test.http-client.requests[0].name"),
                 Arguments.of("axile.prop.test.http-client.requests[0].base-url"),
                 Arguments.of("axile.prop.test.http-client.requests[0].methods[0].type"),

@@ -9,11 +9,9 @@ import org.springframework.boot.actuate.context.properties.ConfigurationProperti
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ContextConfigurationPropertiesDescriptor;
 
+import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
 import com.nucleonforge.axile.common.api.KeyValue;
 import com.nucleonforge.axile.common.utils.BeanNameUtils;
-import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache.AxileConfigurationPropertiesBeanDescriptor;
-import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache.AxileConfigurationPropertiesDescriptor;
-import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache.AxileContextConfigurationPropertiesDescriptor;
 
 /**
  * Default implementation {@link ConfigurationPropertiesConverter}
@@ -23,25 +21,24 @@ import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCach
 public class DefaultConfigurationPropertiesConverter implements ConfigurationPropertiesConverter {
 
     @Override
-    public AxileConfigurationPropertiesDescriptor convert(ConfigurationPropertiesDescriptor originalDescriptor) {
-        Map<String, AxileContextConfigurationPropertiesDescriptor> ctx =
-                originalDescriptor.getContexts().entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, e -> enrichContext(e.getValue())));
+    public AxileConfigPropsFeed convert(ConfigurationPropertiesDescriptor originalDescriptor) {
+        Map<String, AxileConfigPropsFeed.Context> context = originalDescriptor.getContexts().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> convertContext(e.getValue())));
 
-        return new AxileConfigurationPropertiesDescriptor(ctx);
+        return new AxileConfigPropsFeed(context);
     }
 
-    private AxileContextConfigurationPropertiesDescriptor enrichContext(ContextConfigurationPropertiesDescriptor src) {
+    private AxileConfigPropsFeed.Context convertContext(ContextConfigurationPropertiesDescriptor source) {
 
-        Map<String, AxileConfigurationPropertiesBeanDescriptor> beans = src.getBeans().entrySet().stream()
+        Map<String, AxileConfigPropsFeed.Bean> beans = source.getBeans().entrySet().stream()
                 .collect(Collectors.toMap(
-                        b -> BeanNameUtils.stripConfigPropsPrefix(b.getKey()), e -> enrichBean(e.getValue())));
+                        b -> BeanNameUtils.stripConfigPropsPrefix(b.getKey()), e -> convertBean(e.getValue())));
 
-        return new AxileContextConfigurationPropertiesDescriptor(src.getParentId(), beans);
+        return new AxileConfigPropsFeed.Context(beans, source.getParentId());
     }
 
-    private AxileConfigurationPropertiesBeanDescriptor enrichBean(ConfigurationPropertiesBeanDescriptor src) {
-        return new AxileConfigurationPropertiesBeanDescriptor(
+    private AxileConfigPropsFeed.Bean convertBean(ConfigurationPropertiesBeanDescriptor src) {
+        return new AxileConfigPropsFeed.Bean(
                 src.getPrefix(), flatten("", src.getProperties()), flatten("", src.getInputs()));
     }
 

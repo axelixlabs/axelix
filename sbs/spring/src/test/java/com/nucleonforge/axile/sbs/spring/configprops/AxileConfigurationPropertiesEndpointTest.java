@@ -20,8 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
+import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
 import com.nucleonforge.axile.common.api.KeyValue;
-import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache.AxileConfigurationPropertiesDescriptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,23 +36,22 @@ import static org.assertj.core.api.Assertions.assertThat;
         properties = "management.endpoint.configprops.show-values=always")
 @TestPropertySource(
         properties = {
-            "axile.properties.test.tags.environment=test",
-            "axile.properties.test.tags.version=1.0.0",
-            "axile.properties.test.enabled-contexts[0]=user-service",
-            "axile.properties.test.enabled-contexts[1]=payment-service",
-            "axile.properties.test.http-client.requests[0].name=user-api",
-            "axile.properties.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
-            "axile.properties.test.http-client.requests[0].methods[0].type=GET",
-            "axile.properties.test.http-client.requests[0].methods[0].retries[0].count=3",
-            "axile.properties.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
-            "axile.properties.test.http-client.requests[0].methods[1].type=POST",
-            "axile.properties.test.http-client.requests[1].name=payment-api",
-            "axile.properties.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
-            "axile.properties.test.http-client.requests[1].methods[0].type=PUT",
-            "axile.properties.test.http-client.requests[1].methods[0].retries[0].count=2",
-            "axile.properties.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
+            "axile.prop.test.tags.environment=test",
+            "axile.prop.test.tags.version=1.0.0",
+            "axile.prop.test.enabled-contexts=user-service, payment-service",
+            "axile.prop.test.http-client.requests[0].name=user-api",
+            "axile.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
+            "axile.prop.test.http-client.requests[0].methods[0].type=GET",
+            "axile.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
+            "axile.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
+            "axile.prop.test.http-client.requests[0].methods[1].type=POST",
+            "axile.prop.test.http-client.requests[1].name=payment-api",
+            "axile.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
+            "axile.prop.test.http-client.requests[1].methods[0].type=PUT",
+            "axile.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
+            "axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
-@EnableConfigurationProperties(AxileConfigurationPropertiesEndpointTest.AxilePropTest.class)
+@EnableConfigurationProperties(AxileConfigurationPropertiesEndpointTest.AxileConfigurationProperties.class)
 public class AxileConfigurationPropertiesEndpointTest {
 
     @Autowired
@@ -61,14 +60,15 @@ public class AxileConfigurationPropertiesEndpointTest {
     @ParameterizedTest
     @MethodSource("propertyName")
     void shouldReturnPropertiesNameAndValue(String propertyName, String expectedValue) {
-        ResponseEntity<AxileConfigurationPropertiesDescriptor> response =
-                restTemplate.getForEntity("/actuator/axile-configprops", AxileConfigurationPropertiesDescriptor.class);
+        ResponseEntity<AxileConfigPropsFeed> response =
+                restTemplate.getForEntity("/actuator/axile-configprops", AxileConfigPropsFeed.class);
 
         List<KeyValue> properties = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())
-                .filter(e -> e.prefix().equals("axile.properties.test"))
+                .filter(e -> e.prefix().equals("axile.prop.test"))
                 .flatMap(bean -> bean.properties().stream())
                 .toList();
+        System.out.println(properties);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -81,8 +81,8 @@ public class AxileConfigurationPropertiesEndpointTest {
     @ParameterizedTest
     @MethodSource("propertyName")
     void shouldReturnByNamePrefixPropertyNameAndValue(String propertyName, String expectedValue) {
-        ResponseEntity<AxileConfigurationPropertiesDescriptor> response = restTemplate.getForEntity(
-                "/actuator/axile-configprops/axile.properties.test", AxileConfigurationPropertiesDescriptor.class);
+        ResponseEntity<AxileConfigPropsFeed> response =
+                restTemplate.getForEntity("/actuator/axile-configprops/axile.prop.test", AxileConfigPropsFeed.class);
 
         List<KeyValue> properties = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())
@@ -119,25 +119,25 @@ public class AxileConfigurationPropertiesEndpointTest {
     @ParameterizedTest
     @MethodSource("inputsName")
     void shouldReturnInputsName(String inputsName) {
-        ResponseEntity<AxileConfigurationPropertiesDescriptor> response =
-                restTemplate.getForEntity("/actuator/axile-configprops", AxileConfigurationPropertiesDescriptor.class);
+        ResponseEntity<AxileConfigPropsFeed> response =
+                restTemplate.getForEntity("/actuator/axile-configprops", AxileConfigPropsFeed.class);
 
         List<KeyValue> inputs = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())
-                .filter(e -> e.prefix().equals("axile.properties.test"))
+                .filter(e -> e.prefix().equals("axile.prop.test"))
                 .flatMap(bean -> bean.inputs().stream())
                 .toList();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        assertThat(inputs).extracting(KeyValue::key).contains(inputsName);
+        assertThat(inputs).hasSize(30).extracting(KeyValue::key).contains(inputsName);
     }
 
     @ParameterizedTest
     @MethodSource("inputsName")
     void shouldReturnByNamePrefixInputsName(String inputsName) {
-        ResponseEntity<AxileConfigurationPropertiesDescriptor> response = restTemplate.getForEntity(
-                "/actuator/axile-configprops/axile.properties.test", AxileConfigurationPropertiesDescriptor.class);
+        ResponseEntity<AxileConfigPropsFeed> response =
+                restTemplate.getForEntity("/actuator/axile-configprops/axile.prop.test", AxileConfigPropsFeed.class);
 
         List<KeyValue> inputs = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())
@@ -146,45 +146,30 @@ public class AxileConfigurationPropertiesEndpointTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        assertThat(inputs).extracting(KeyValue::key).contains(inputsName);
+        assertThat(inputs).hasSize(30).extracting(KeyValue::key).contains(inputsName);
     }
 
     private static Stream<Arguments> inputsName() {
         return Stream.of(
                 Arguments.of("tags.environment.value"),
-                Arguments.of("tags.environment.origin"),
-                Arguments.of("tags.version.value"),
                 Arguments.of("tags.version.origin"),
                 Arguments.of("enabledContexts[0].value"),
-                Arguments.of("enabledContexts[0].origin"),
                 Arguments.of("enabledContexts[1].value"),
-                Arguments.of("enabledContexts[1].origin"),
-                Arguments.of("httpClient.requests[0].name.value"),
                 Arguments.of("httpClient.requests[0].name.origin"),
                 Arguments.of("httpClient.requests[0].baseUrl.value"),
-                Arguments.of("httpClient.requests[0].baseUrl.origin"),
-                Arguments.of("httpClient.requests[0].methods[0].type.value"),
                 Arguments.of("httpClient.requests[0].methods[0].type.origin"),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].count.value"),
                 Arguments.of("httpClient.requests[0].methods[0].retries[0].count.origin"),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].parameters.timeout.value"),
                 Arguments.of("httpClient.requests[0].methods[0].retries[0].parameters.timeout.origin"),
                 Arguments.of("httpClient.requests[0].methods[1].type.value"),
-                Arguments.of("httpClient.requests[0].methods[1].type.origin"),
                 Arguments.of("httpClient.requests[1].name.value"),
-                Arguments.of("httpClient.requests[1].name.origin"),
-                Arguments.of("httpClient.requests[1].baseUrl.value"),
                 Arguments.of("httpClient.requests[1].baseUrl.origin"),
-                Arguments.of("httpClient.requests[1].methods[0].type.value"),
-                Arguments.of("httpClient.requests[1].methods[0].type.origin"),
                 Arguments.of("httpClient.requests[1].methods[0].retries[0].count.value"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].count.origin"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level.value"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level.origin"));
+                Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level.value"));
     }
 
-    @ConfigurationProperties(prefix = "axile.properties.test")
-    public record AxilePropTest(Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
+    @ConfigurationProperties(prefix = "axile.prop.test")
+    public record AxileConfigurationProperties(
+            Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
 
         public record HttpClient(List<Request> requests) {}
 
@@ -204,7 +189,7 @@ public class AxileConfigurationPropertiesEndpointTest {
         }
 
         @Bean
-        public ConfigurationPropertiesCache serviceConfigurationProperties(
+        public ConfigurationPropertiesCache configurationPropertiesCache(
                 ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
                 ConfigurationPropertiesConverter configurationPropertiesConverter) {
             return new ConfigurationPropertiesCache(

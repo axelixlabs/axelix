@@ -1,11 +1,10 @@
 package com.nucleonforge.axile.sbs.spring.configprops;
 
-import java.util.List;
-import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 
-import com.nucleonforge.axile.common.api.KeyValue;
+import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
 
 /**
  * Service caching the application's {@code @ConfigurationProperties}
@@ -21,8 +20,8 @@ public class ConfigurationPropertiesCache {
 
     private final ConfigurationPropertiesConverter configurationPropertiesConverter;
 
-    @SuppressWarnings("NullAway")
-    private volatile AxileConfigurationPropertiesDescriptor cachedResult;
+    @Nullable
+    private volatile AxileConfigPropsFeed cachedResult;
 
     public ConfigurationPropertiesCache(
             ConfigurationPropertiesReportEndpoint delegate,
@@ -31,7 +30,7 @@ public class ConfigurationPropertiesCache {
         this.configurationPropertiesConverter = configurationPropertiesConverter;
     }
 
-    public AxileConfigurationPropertiesDescriptor getAxileConfigProps() {
+    public AxileConfigPropsFeed getAxileConfigProps() {
         if (cachedResult == null) {
             synchronized (this) {
                 if (cachedResult == null) {
@@ -42,16 +41,7 @@ public class ConfigurationPropertiesCache {
         return cachedResult;
     }
 
-    public AxileConfigurationPropertiesDescriptor getAxileConfigPropsByPrefix(String prefix) {
+    public AxileConfigPropsFeed getAxileConfigPropsByPrefix(String prefix) {
         return configurationPropertiesConverter.convert(delegate.configurationPropertiesWithPrefix(prefix));
     }
-
-    public record AxileConfigurationPropertiesDescriptor(
-            Map<String, AxileContextConfigurationPropertiesDescriptor> contexts) {}
-
-    public record AxileContextConfigurationPropertiesDescriptor(
-            String parentId, Map<String, AxileConfigurationPropertiesBeanDescriptor> beans) {}
-
-    public record AxileConfigurationPropertiesBeanDescriptor(
-            String prefix, List<KeyValue> properties, List<KeyValue> inputs) {}
 }
