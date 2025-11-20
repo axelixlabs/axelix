@@ -113,7 +113,9 @@ public record BeansFeed(Map<String, Context> contexts) {
     }
 
     @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
-    public record BeanMethod(@Nullable String enclosingClassName, String methodName) implements BeanSource {
+    public record BeanMethod(
+            @Nullable String enclosingClassName, @Nullable String enclosingClassFullName, String methodName)
+            implements BeanSource {
 
         @Override
         @JsonGetter(BeanSourceDeserializer.ORIGIN_FIELD)

@@ -82,7 +82,8 @@ class BeansApiTest {
               "isConfigPropsBean": true,
               "qualifiers": ["primaryMapper"],
               "beanSource": {
-                "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
+                "enclosingClassName": "HibernateJpaConfiguration",
+                "enclosingClassFullName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
                 "methodName": "entityManagerFactoryBuilder",
                 "origin": "BEAN_METHOD"
               }
@@ -187,7 +188,8 @@ class BeansApiTest {
                   "isConfigPropsBean": true,
                   "qualifiers": ["primaryMapper"],
                   "beanSource": {
-                    "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
+                    "enclosingClassName": "HibernateJpaConfiguration",
+                    "enclosingClassFullName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
                     "methodName": "entityManagerFactoryBuilder",
                     "origin": "BEAN_METHOD"
                   }
