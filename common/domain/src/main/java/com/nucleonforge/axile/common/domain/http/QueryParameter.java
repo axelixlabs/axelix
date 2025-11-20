@@ -6,7 +6,7 @@ package com.nucleonforge.axile.common.domain.http;
  * @param <T> the type of the parameter value
  * @author Mikhail Polivakha
  */
-public sealed interface QueryParameter<T> permits SingleValueQueryParameter {
+public sealed interface QueryParameter<T> permits SingleValueQueryParameter, MultiValueQueryParameter {
 
     /**
      * @return the key under which the parameter resides
