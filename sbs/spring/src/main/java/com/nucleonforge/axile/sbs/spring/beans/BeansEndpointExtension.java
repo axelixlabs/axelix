@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.beans.BeansEndpoint;
+import org.springframework.boot.actuate.beans.BeansEndpoint.BeanDescriptor;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
 import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
@@ -22,6 +23,8 @@ import org.springframework.util.ClassUtils;
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.common.api.BeansFeed.Bean;
 import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
+import com.nucleonforge.axile.common.api.BeansFeed.BeanMethod;
+import com.nucleonforge.axile.common.api.BeansFeed.BeanSource;
 import com.nucleonforge.axile.common.api.BeansFeed.Context;
 
 /**
@@ -67,12 +70,13 @@ public class BeansEndpointExtension {
                     Set<BeanDependency> enrichedDependencies =
                             enrichDependencies(beanDescriptor.getDependencies(), configPropsBeanMap);
 
+                    String beanType = resolveBeanTypeName(beanDescriptor, metaInfo.beanSource());
+
                     beans.put(
                             beanName,
                             new Bean(
                                     beanDescriptor.getScope(),
-                                    ClassUtils.getUserClass(beanDescriptor.getType())
-                                            .getName(),
+                                    beanType,
                                     metaInfo.proxyType(),
                                     toSet(beanDescriptor.getAliases()),
                                     enrichedDependencies,
@@ -121,5 +125,15 @@ public class BeansEndpointExtension {
                 .filter(dep -> !dep.trim().isEmpty())
                 .map(depName -> new BeanDependency(depName, configPropsBeanMap.containsKey(depName)))
                 .collect(Collectors.toSet());
+    }
+
+    private String resolveBeanTypeName(BeanDescriptor beanDescriptor, BeanSource beanSource) {
+        Class<?> clazz = beanDescriptor.getType();
+
+        if (clazz.isHidden() && beanSource instanceof BeanMethod && clazz.getInterfaces().length > 0) {
+            return clazz.getInterfaces()[0].getName();
+        }
+
+        return ClassUtils.getUserClass(clazz).getName();
     }
 }
