@@ -238,12 +238,6 @@ public final class ApiPaths {
          * Retrieve a given metric within a given {@link Instance}.
          */
         public static final String METRIC_NAME = "/{instanceId}/{metric}";
-
-        /**
-         * Retrieve a given metric filtered by specific tags within a given {@link Instance}.
-         * Example: /api/axile/metrics/{instanceId}/jvm.memory.used/tags?tag=area:nonheap&tag=id:Metaspace
-         */
-        public static final String METRIC_NAME_BY_TAGS = "/{instanceId}/{metric}/tags";
     }
 
     public static final class ScheduledTasksApi {

@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
-import com.nucleonforge.axile.common.api.metrics.MetricProfileByTags;
 import com.nucleonforge.axile.common.api.metrics.MetricsList;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
@@ -30,14 +29,18 @@ import com.nucleonforge.axile.common.domain.http.SingleValueQueryParameter;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.loggers.GroupProfileResponse;
 import com.nucleonforge.axile.master.api.response.metrics.MetricsListResponse;
-import com.nucleonforge.axile.master.api.response.metrics.SingleMetricProfileByTagsResponse;
 import com.nucleonforge.axile.master.api.response.metrics.SingleMetricProfileResponse;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.transport.metrics.GetAllMetricsEndpointProber;
-import com.nucleonforge.axile.master.service.transport.metrics.GetSingleMetricByTagsProfileEndpointProber;
 import com.nucleonforge.axile.master.service.transport.metrics.GetSingleMetricProfileEndpointProber;
 
+/**
+ * The API for managing metrics.
+ *
+ * @since 19.11.2025
+ * @author Nikita Kirillov
+ */
 @Tag(name = "Metrics API Controller", description = "The endpoint that provides access to the metrics of the instances")
 @RestController
 @RequestMapping(path = ApiPaths.MetricsApi.MAIN)
@@ -45,24 +48,18 @@ public class MetricsApi {
 
     private final GetAllMetricsEndpointProber getAllMetricsEndpointProber;
     private final GetSingleMetricProfileEndpointProber getSingleMetricProfileEndpointProber;
-    private final GetSingleMetricByTagsProfileEndpointProber getSingleMetricByTagsProfileEndpointProber;
     private final Converter<MetricsList, MetricsListResponse> allMetricsConverter;
     private final Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter;
-    private final Converter<MetricProfileByTags, SingleMetricProfileByTagsResponse> singleMetricByTagsConverter;
 
     public MetricsApi(
             GetAllMetricsEndpointProber getAllMetricsEndpointProber,
             GetSingleMetricProfileEndpointProber getSingleMetricProfileEndpointProber,
-            GetSingleMetricByTagsProfileEndpointProber getSingleMetricByTagsProfileEndpointProber,
             Converter<MetricsList, MetricsListResponse> allMetricsConverter,
-            Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter,
-            Converter<MetricProfileByTags, SingleMetricProfileByTagsResponse> singleMetricByTagsConverter) {
+            Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter) {
         this.getAllMetricsEndpointProber = getAllMetricsEndpointProber;
         this.getSingleMetricProfileEndpointProber = getSingleMetricProfileEndpointProber;
-        this.getSingleMetricByTagsProfileEndpointProber = getSingleMetricByTagsProfileEndpointProber;
         this.allMetricsConverter = allMetricsConverter;
         this.singleMetricConverter = singleMetricConverter;
-        this.singleMetricByTagsConverter = singleMetricByTagsConverter;
     }
 
     @Operation(
@@ -134,64 +131,24 @@ public class MetricsApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @Parameter(name = "metric", description = "The name of the metric to fetch profile for", required = true)
-    @GetMapping(path = ApiPaths.MetricsApi.METRIC_NAME)
-    public SingleMetricProfileResponse getSingleMetric(
-            @PathVariable("instanceId") String instanceId, @PathVariable("metric") String metric) {
-        MetricProfile metricProfile = getSingleMetricProfileEndpointProber.invoke(
-                InstanceId.of(instanceId), new DefaultHttpPayload(Map.of("metric.name", metric)));
-
-        return Objects.requireNonNull(singleMetricConverter.convert(metricProfile));
-    }
-
-    @Operation(
-            summary = "Returns a single metric profile filtered by specific tags inside the given instance",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Metrics - Drilling Down",
-                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/metrics.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SingleMetricProfileByTagsResponse.class))),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
-    @Parameter(name = "metric", description = "The name of the metric to fetch profile for", required = true)
     @Parameter(
             name = "tag",
-            description = "Tags to filter the metric by. Multiple tags can be provided. Format: key:value",
-            required = true,
+            description = "Tag to filter the metric by. Multiple tags can be provided. Format: key:value",
             array = @ArraySchema(schema = @Schema(type = "string", example = "area:nonheap")))
-    @GetMapping(path = ApiPaths.MetricsApi.METRIC_NAME_BY_TAGS)
-    public SingleMetricProfileByTagsResponse getSingleMetricByTags(
+    @GetMapping(path = ApiPaths.MetricsApi.METRIC_NAME)
+    public SingleMetricProfileResponse getSingleMetric(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("metric") String metric,
-            @RequestParam("tag") List<String> tags) {
+            @RequestParam(value = "tag", required = false) List<String> tags) {
 
         List<QueryParameter<?>> queryParameters = new ArrayList<>();
-        tags.forEach(tag -> queryParameters.add(new SingleValueQueryParameter("tag", tag)));
+        if (tags != null && !tags.isEmpty()) {
+            tags.forEach(tag -> queryParameters.add(new SingleValueQueryParameter("tag", tag)));
+        }
 
-        MetricProfileByTags result = getSingleMetricByTagsProfileEndpointProber.invoke(
+        MetricProfile result = getSingleMetricProfileEndpointProber.invoke(
                 InstanceId.of(instanceId), new DefaultHttpPayload(queryParameters, Map.of("metric.name", metric)));
 
-        return Objects.requireNonNull(singleMetricByTagsConverter.convert(result));
+        return Objects.requireNonNull(singleMetricConverter.convert(result));
     }
 }

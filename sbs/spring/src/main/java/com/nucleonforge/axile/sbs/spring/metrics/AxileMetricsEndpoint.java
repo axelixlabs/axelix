@@ -15,6 +15,7 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint.MetricDescriptor;
+import org.springframework.lang.Nullable;
 
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile.Measurement;
@@ -36,9 +37,10 @@ public class AxileMetricsEndpoint {
         this.registry = registry;
     }
 
+    // IMPORTANT! For Spring Actuator endpoints @Endpoint, we must use org.springframework.lang.Nullable.
     @ReadOperation
-    public MetricProfile metric(@Selector String requiredMetricName) {
-        MetricDescriptor originalDescriptor = delegate.metric(requiredMetricName, null);
+    public MetricProfile metric(@Selector String requiredMetricName, @Nullable List<String> tag) {
+        MetricDescriptor originalDescriptor = delegate.metric(requiredMetricName, tag);
 
         return new MetricProfile(
                 originalDescriptor.getName(),
