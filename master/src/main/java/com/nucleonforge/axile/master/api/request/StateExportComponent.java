@@ -8,10 +8,12 @@ package com.nucleonforge.axile.master.api.request;
  */
 public enum StateExportComponent {
     HEAP_DUMP,
+    THREAD_DUMP,
     BEANS,
     CACHES,
     CONDITIONS,
     CONFIG_PROPS,
     ENV,
+    LOG_FILE,
     SCHEDULED_TASKS
 }

@@ -63,7 +63,7 @@ public class ZipArchiveInstanceStateExporter implements InstanceStateExporter {
         StateComponent stateComponent = collector.responsibleFor();
         byte[] state = collector.collect(instanceId);
 
-        zos.putNextEntry(new ZipEntry(stateComponent.name().toLowerCase() + ".json"));
+        zos.putNextEntry(new ZipEntry(stateComponent.getFilename()));
         zos.write(state);
         zos.closeEntry();
 

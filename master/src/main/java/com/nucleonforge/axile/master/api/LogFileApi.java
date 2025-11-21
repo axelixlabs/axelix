@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -87,7 +88,7 @@ public class LogFileApi {
     @GetMapping(path = ApiPaths.LogFileApi.INSTANCE_ID, produces = MediaType.TEXT_PLAIN_VALUE)
     public Resource getLogFile(
             @PathVariable("instanceId") String instanceId,
-            @RequestHeader(value = "Range", required = false) String rangeHeader) {
+            @RequestHeader(value = "Range", required = false) @Nullable String rangeHeader) {
 
         List<HttpHeader> headers = new ArrayList<>();
 
