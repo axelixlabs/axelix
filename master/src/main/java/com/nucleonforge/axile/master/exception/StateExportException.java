@@ -16,4 +16,8 @@ public class StateExportException extends RuntimeException {
     public StateExportException(String instanceId, Throwable cause) {
         super("State export failed for instance: " + instanceId, cause);
     }
+
+    public StateExportException(String instanceId, String message) {
+        super(String.format("State export failed for instance: %s. %s", instanceId, message));
+    }
 }
