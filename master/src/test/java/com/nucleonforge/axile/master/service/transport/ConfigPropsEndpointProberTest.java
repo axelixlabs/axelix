@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.service.transport.configprops;
+package com.nucleonforge.axile.master.service.transport;
 
 import java.io.IOException;
 import java.util.Map;
@@ -17,15 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 import com.nucleonforge.axile.common.api.KeyValue;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
-import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
-import com.nucleonforge.axile.master.service.transport.confogprops.ConfigPropsEndpointProber;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
@@ -152,14 +150,14 @@ public class ConfigPropsEndpointProberTest {
         registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         // when.
-        AxileConfigPropsFeed configPropsFeed =
+        ConfigPropsFeed configPropsFeed =
                 configPropsEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
         // then.
-        Map<String, AxileConfigPropsFeed.Context> context = configPropsFeed.contexts();
+        Map<String, ConfigPropsFeed.Context> context = configPropsFeed.contexts();
 
         // bean1
-        AxileConfigPropsFeed.Bean bean1 =
+        ConfigPropsFeed.Bean bean1 =
                 getBeanByName(context, "org.springframework.boot.actuate.autoconfigure.endpoint.web.Bean1");
 
         // bean1 -> prefix
@@ -186,7 +184,7 @@ public class ConfigPropsEndpointProberTest {
                         new KeyValue("allowedMethods", null));
 
         // bean2
-        AxileConfigPropsFeed.Bean bean2 = getBeanByName(context, "org.springframework.boot.autoconfigure.web.Bean2");
+        ConfigPropsFeed.Bean bean2 = getBeanByName(context, "org.springframework.boot.autoconfigure.web.Bean2");
 
         // bean2 -> prefix
         assertThat(bean2.prefix()).isEqualTo("spring.web");
@@ -247,10 +245,9 @@ public class ConfigPropsEndpointProberTest {
                 .isInstanceOf(InstanceNotFoundException.class);
     }
 
-    private static AxileConfigPropsFeed.Bean getBeanByName(
-            Map<String, AxileConfigPropsFeed.Context> context, String beanName) {
+    private static ConfigPropsFeed.Bean getBeanByName(Map<String, ConfigPropsFeed.Context> context, String beanName) {
         return context.values().stream()
-                .map(AxileConfigPropsFeed.Context::beans)
+                .map(ConfigPropsFeed.Context::beans)
                 .findFirst()
                 .map(beansMap -> beansMap.get(beanName))
                 .get();

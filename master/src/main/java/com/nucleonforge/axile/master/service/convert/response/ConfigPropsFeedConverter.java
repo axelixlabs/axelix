@@ -4,20 +4,20 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
-import com.nucleonforge.axile.master.api.response.configprops.ConfigPropsFeedResponse;
-import com.nucleonforge.axile.master.api.response.configprops.ConfigPropsProfile;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
+import com.nucleonforge.axile.master.api.response.ConfigPropsFeedResponse;
+import com.nucleonforge.axile.master.api.response.ConfigPropsFeedResponse.ConfigPropsProfile;
 
 /**
- * The {@link Converter} from {@link AxileConfigPropsFeed} to {@link ConfigPropsFeedResponse}.
+ * The {@link Converter} from {@link ConfigPropsFeed} to {@link ConfigPropsFeedResponse}.
  *
  * @author Sergey Cherkasov
  */
 @Service
-public class AxileConfigPropsFeedConverter implements Converter<AxileConfigPropsFeed, ConfigPropsFeedResponse> {
+public class ConfigPropsFeedConverter implements Converter<ConfigPropsFeed, ConfigPropsFeedResponse> {
 
     @Override
-    public @NonNull ConfigPropsFeedResponse convertInternal(@NonNull AxileConfigPropsFeed source) {
+    public @NonNull ConfigPropsFeedResponse convertInternal(@NonNull ConfigPropsFeed source) {
         ConfigPropsFeedResponse response = new ConfigPropsFeedResponse();
 
         source.contexts().values().forEach(context -> {

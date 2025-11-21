@@ -2,7 +2,7 @@ package com.nucleonforge.axile.sbs.spring.configprops;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 
 /**
  * Interface that is capable to convert values from type {@code ConfigurationPropertiesDescriptor}
@@ -19,5 +19,5 @@ public interface ConfigurationPropertiesConverter {
      * @param originalDescriptor the original {@code @ConfigurationProperties} descriptor from Spring Boot
      * @return converted {@code @ConfigurationProperties} descriptor
      */
-    AxileConfigPropsFeed convert(ConfigurationPropertiesDescriptor originalDescriptor);
+    ConfigPropsFeed convert(ConfigurationPropertiesDescriptor originalDescriptor);
 }
