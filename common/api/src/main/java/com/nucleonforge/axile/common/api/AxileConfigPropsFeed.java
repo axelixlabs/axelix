@@ -10,7 +10,7 @@ import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 /**
  * The response to axile-configprops actuator endpoint.
  *
- * @param contexts  The application contexts keyed by id.
+ * @param contexts  The application contexts keyed by context id.
  *
  * @see ActuatorEndpoint
  * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/configprops.html">Сonfigprops Endpoint</a>
@@ -23,6 +23,7 @@ public record AxileConfigPropsFeed(@JsonProperty("contexts") Map<String, Context
      * DTO that encapsulates the context of the given artifact.
      *
      * @param beans     The unified map of beans that contains beans from one or more contexts.
+     *                  The key is the bean name (with potentially stripped config-props prefix), value is the profile of the given bean.
      * @param parentId  The id of the parent application context, if any.
      */
     public record Context(@JsonProperty("beans") Map<String, Bean> beans, @JsonProperty("parentId") String parentId) {}

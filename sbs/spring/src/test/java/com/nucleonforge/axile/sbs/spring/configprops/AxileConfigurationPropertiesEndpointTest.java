@@ -68,7 +68,6 @@ public class AxileConfigurationPropertiesEndpointTest {
                 .filter(e -> e.prefix().equals("axile.prop.test"))
                 .flatMap(bean -> bean.properties().stream())
                 .toList();
-        System.out.println(properties);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
