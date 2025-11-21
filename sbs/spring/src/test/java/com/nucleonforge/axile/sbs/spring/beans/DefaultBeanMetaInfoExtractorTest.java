@@ -144,6 +144,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
             assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(bs -> {
                 assertThat(bs.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
+                assertThat(bs.enclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
                 assertThat(bs.methodName()).isEqualTo("lazyPrimaryBean");
             });
         });
@@ -161,6 +162,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
             assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(bs -> {
                 assertThat(bs.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
+                assertThat(bs.enclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
                 assertThat(bs.methodName()).isEqualTo(QUALIFIED_BEAN_METHOD);
             });
         });
@@ -231,6 +233,7 @@ class DefaultBeanMetaInfoExtractorTest {
 
             BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
             assertThat(source.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
+            assertThat(source.enclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
             assertThat(source.methodName()).isEqualTo(ANONYMOUS_BEAN);
         });
     }
@@ -247,6 +250,7 @@ class DefaultBeanMetaInfoExtractorTest {
 
             BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
             assertThat(source.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
+            assertThat(source.enclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
             assertThat(source.methodName()).isEqualTo(STATIC_BFPP_BEAN);
         });
     }

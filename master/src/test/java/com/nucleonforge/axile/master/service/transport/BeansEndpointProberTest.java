@@ -108,7 +108,8 @@ class BeansEndpointProberTest {
                      "isConfigPropsBean": false,
                      "qualifiers": ["primaryMapper"],
                      "beanSource": {
-                       "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
+                       "enclosingClassName": "HibernateJpaConfiguration",
+                       "enclosingClassFullName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
                        "methodName": "entityManagerFactoryBuilder",
                        "origin": "BEAN_METHOD"
                      }
@@ -198,6 +199,9 @@ class BeansEndpointProberTest {
         assertThat(jacksonBuilder.beanSource()).isInstanceOf(BeanMethod.class);
         assertThat((BeanMethod) jacksonBuilder.beanSource())
                 .extracting(BeanMethod::enclosingClassName)
+                .isEqualTo("HibernateJpaConfiguration");
+        assertThat((BeanMethod) jacksonBuilder.beanSource())
+                .extracting(BeanMethod::enclosingClassFullName)
                 .isEqualTo("org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration");
         assertThat((BeanMethod) jacksonBuilder.beanSource())
                 .extracting(BeanMethod::methodName)
