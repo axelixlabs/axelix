@@ -114,7 +114,7 @@ public final class ApiPaths {
         public static final String FEED = "/feed/{instanceId}";
     }
 
-    public static final class ConfigpropsApi {
+    public static final class ConfigPropsApi {
 
         /**
          * Base path for configprops APIs.

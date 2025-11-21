@@ -169,14 +169,14 @@ class StateExportApiTest {
               "beans" : {
                 "management.endpoints.web.cors-org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties" : {
                   "prefix" : "management.endpoints.web.cors",
-                  "properties" : {
-                    "allowedOrigins" : [ ],
-                    "maxAge" : "PT30M"
-                  },
-                  "inputs" : {
-                    "allowedOrigins" : [ ],
-                    "maxAge" : { }
-                  }
+                  "properties": [
+                        { "key": "allowedOrigins", "value": null },
+                        { "key": "maxAge", "value": "PT30M" }
+                      ],
+                      "inputs": [
+                        { "key": "allowedOrigins", "value": null },
+                        { "key": "maxAge", "value": null }
+                      ]
                 }
               }
             }

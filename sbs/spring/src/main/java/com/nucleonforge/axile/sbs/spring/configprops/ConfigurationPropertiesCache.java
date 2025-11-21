@@ -1,7 +1,10 @@
 package com.nucleonforge.axile.sbs.spring.configprops;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
+
+import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
 
 /**
  * Service caching the application's {@code @ConfigurationProperties}
@@ -15,22 +18,30 @@ public class ConfigurationPropertiesCache {
 
     private final ConfigurationPropertiesReportEndpoint delegate;
 
-    @SuppressWarnings("NullAway")
-    private volatile ConfigurationPropertiesDescriptor cachedResult;
+    private final ConfigurationPropertiesConverter configurationPropertiesConverter;
 
-    public ConfigurationPropertiesCache(ConfigurationPropertiesReportEndpoint delegate) {
+    @Nullable
+    private volatile AxileConfigPropsFeed cachedResult;
+
+    public ConfigurationPropertiesCache(
+            ConfigurationPropertiesReportEndpoint delegate,
+            ConfigurationPropertiesConverter configurationPropertiesConverter) {
         this.delegate = delegate;
+        this.configurationPropertiesConverter = configurationPropertiesConverter;
     }
 
-    public ConfigurationPropertiesDescriptor getConfigurationProperties() {
+    public AxileConfigPropsFeed getAxileConfigProps() {
         if (cachedResult == null) {
             synchronized (this) {
                 if (cachedResult == null) {
-                    cachedResult = delegate.configurationProperties();
+                    cachedResult = configurationPropertiesConverter.convert(delegate.configurationProperties());
                 }
             }
         }
-
         return cachedResult;
+    }
+
+    public AxileConfigPropsFeed getAxileConfigPropsByPrefix(String prefix) {
+        return configurationPropertiesConverter.convert(delegate.configurationPropertiesWithPrefix(prefix));
     }
 }

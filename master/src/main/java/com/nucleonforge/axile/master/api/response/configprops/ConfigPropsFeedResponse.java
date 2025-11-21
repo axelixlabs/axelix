@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The feed of @ConfigurationProperties beans used in the application.
+ * The feed of {@code @ConfigurationProperties} beans used in the application.
  *
  * @param beans  The unified list of beans that contains beans from one or more contexts.
  *
  * @author Sergey Cherkasov
  */
-public record ConfigpropsFeedResponse(List<ConfigpropsProfile> beans) {
+public record ConfigPropsFeedResponse(List<ConfigPropsProfile> beans) {
 
-    public ConfigpropsFeedResponse() {
+    public ConfigPropsFeedResponse() {
         this(new ArrayList<>());
     }
 
-    public ConfigpropsFeedResponse addBean(ConfigpropsProfile beanProfile) {
+    public ConfigPropsFeedResponse addBean(ConfigPropsProfile beanProfile) {
         this.beans.add(beanProfile);
         return this;
     }

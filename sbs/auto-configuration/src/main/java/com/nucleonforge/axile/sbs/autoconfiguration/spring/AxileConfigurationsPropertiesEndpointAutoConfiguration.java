@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axile.sbs.spring.configprops.AxileConfigurationPropertiesEndpoint;
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
+import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesConverter;
+import com.nucleonforge.axile.sbs.spring.configprops.DefaultConfigurationPropertiesConverter;
 
 /**
  * Auto-configuration for the {@link AxileConfigurationPropertiesEndpoint}.
@@ -22,9 +24,17 @@ public class AxileConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public ConfigurationPropertiesConverter configurationPropertiesConverter() {
+        return new DefaultConfigurationPropertiesConverter();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public ConfigurationPropertiesCache configurationPropertiesCaches(
-            ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
-        return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
+            ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
+            ConfigurationPropertiesConverter configurationPropertiesConverter) {
+        return new ConfigurationPropertiesCache(
+                configurationPropertiesReportEndpoint, configurationPropertiesConverter);
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.api.response;
+package com.nucleonforge.axile.common.api;
 
 import org.jspecify.annotations.Nullable;
 

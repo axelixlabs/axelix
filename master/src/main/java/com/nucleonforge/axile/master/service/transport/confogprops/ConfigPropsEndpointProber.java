@@ -4,7 +4,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axile.common.api.ConfigpropsFeed;
+import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
@@ -12,16 +12,16 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.AbstractEndpointProber;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#CONFIG_PROPS /configprops} endpoint.
+ * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#CONFIG_PROPS /axile-configprops} endpoint.
  *
  * @author Sergey Cherkasov
  */
 @Service
-public class ConfigpropsEndpointProber extends AbstractEndpointProber<ConfigpropsFeed> {
+public class ConfigPropsEndpointProber extends AbstractEndpointProber<AxileConfigPropsFeed> {
 
-    public ConfigpropsEndpointProber(
+    public ConfigPropsEndpointProber(
             InstanceRegistry instanceRegistry,
-            MessageDeserializationStrategy<ConfigpropsFeed> messageDeserializationStrategy) {
+            MessageDeserializationStrategy<AxileConfigPropsFeed> messageDeserializationStrategy) {
         super(instanceRegistry, messageDeserializationStrategy);
     }
 

@@ -29,6 +29,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
+import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesConverter;
+import com.nucleonforge.axile.sbs.spring.configprops.DefaultConfigurationPropertiesConverter;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,8 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             // properties -> shouldReturnTheBeanNameThatMatchesTheConfigProps
             "axile.prop.test.tags.environment=test",
             "axile.prop.test.tags.version=1.0.0",
-            "axile.prop.test.enabled-contexts[0]=user-service",
-            "axile.prop.test.enabled-contexts[1]=payment-service",
+            "axile.prop.test.enabled-contexts=user-service,payment-service",
             "axile.prop.test.http-client.requests[0].name=user-api",
             "axile.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
             "axile.prop.test.http-client.requests[0].methods[0].type=GET",
@@ -168,8 +169,7 @@ class AxileEnvironmentEndpointTest {
         return Stream.of(
                 Arguments.of("axile.prop.test.tags.environment"),
                 Arguments.of("axile.prop.test.tags.version"),
-                Arguments.of("axile.prop.test.enabled-contexts[0]"),
-                Arguments.of("axile.prop.test.enabled-contexts[1]"),
+                Arguments.of("axile.prop.test.enabled-contexts"),
                 Arguments.of("axile.prop.test.http-client.requests[0].name"),
                 Arguments.of("axile.prop.test.http-client.requests[0].base-url"),
                 Arguments.of("axile.prop.test.http-client.requests[0].methods[0].type"),
@@ -199,9 +199,16 @@ class AxileEnvironmentEndpointTest {
     static class AxileEnvironmentEndpointTestConfiguration {
 
         @Bean
+        public ConfigurationPropertiesConverter configurationPropertiesConverter() {
+            return new DefaultConfigurationPropertiesConverter();
+        }
+
+        @Bean
         public ConfigurationPropertiesCache configurationPropertiesCache(
-                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint) {
-            return new ConfigurationPropertiesCache(configurationPropertiesReportEndpoint);
+                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
+                ConfigurationPropertiesConverter configurationPropertiesConverter) {
+            return new ConfigurationPropertiesCache(
+                    configurationPropertiesReportEndpoint, configurationPropertiesConverter);
         }
 
         @Bean
