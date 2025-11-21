@@ -114,6 +114,8 @@ class BeansFeedConverterTest {
                     .satisfies(beanSource -> {
                         BeanShortProfile.BeanMethod beanMethod = (BeanShortProfile.BeanMethod) beanSource;
                         assertThat(beanMethod.enclosingClassName()).isEqualTo("enclosingClass");
+                        assertThat(beanMethod.enclosingClassFullName())
+                                .isEqualTo("org.springframework.boot.enclosingClass");
                         assertThat(beanMethod.methodName()).isEqualTo("factoryMethod");
                     });
         });
@@ -176,6 +178,7 @@ class BeansFeedConverterTest {
                         true,
                         true,
                         List.of("one", "two"),
-                        new BeansFeed.BeanMethod("enclosingClass", "factoryMethod")));
+                        new BeansFeed.BeanMethod(
+                                "enclosingClass", "org.springframework.boot.enclosingClass", "factoryMethod")));
     }
 }

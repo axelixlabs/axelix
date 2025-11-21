@@ -142,7 +142,9 @@ public record BeanShortProfile(
      *
      * @author Mikhail Polivakha
      */
-    public record BeanMethod(@Nullable String enclosingClassName, String methodName) implements BeanSource {
+    public record BeanMethod(
+            @Nullable String enclosingClassName, @Nullable String enclosingClassFullName, String methodName)
+            implements BeanSource {
 
         @Override
         public BeanOrigin origin() {

@@ -64,7 +64,8 @@ class BeansJacksonMessageDeserializationStrategyTest {
                   "isConfigPropsBean": false,
                   "qualifiers" : [ ],
                   "beanSource": {
-                    "enclosingClassName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
+                    "enclosingClassName": "HibernateJpaConfiguration",
+                    "enclosingClassFullName": "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration",
                     "methodName": "entityManagerFactoryBuilder",
                     "origin": "BEAN_METHOD"
                   }
@@ -145,6 +146,10 @@ class BeansJacksonMessageDeserializationStrategyTest {
 
             assertThat((BeansFeed.BeanMethod) second.beanSource())
                     .extracting(BeansFeed.BeanMethod::enclosingClassName)
+                    .isEqualTo("HibernateJpaConfiguration");
+
+            assertThat((BeansFeed.BeanMethod) second.beanSource())
+                    .extracting(BeansFeed.BeanMethod::enclosingClassFullName)
                     .isEqualTo("org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration");
 
             BeansFeed.Bean third = context.beans()

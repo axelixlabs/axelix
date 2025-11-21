@@ -68,6 +68,10 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
                             .map(ClassUtils::getUserClass)
                             .map(Class::getSimpleName)
                             .orElse(null),
+                    Optional.ofNullable(enclosingClass)
+                            .map(ClassUtils::getUserClass)
+                            .map(Class::getName)
+                            .orElse(null),
                     beanDefinition.getFactoryMethodName());
         }
 

@@ -80,6 +80,7 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
             case BEAN_METHOD ->
                 new BeanMethod(
                         ((BeansFeed.BeanMethod) beanSource).enclosingClassName(),
+                        ((BeansFeed.BeanMethod) beanSource).enclosingClassFullName(),
                         ((BeansFeed.BeanMethod) beanSource).methodName());
             case FACTORY_BEAN -> new FactoryBean(((BeansFeed.FactoryBean) beanSource).factoryBeanName());
             case SYNTHETIC_BEAN -> new BeanShortProfile.SyntheticBean();
