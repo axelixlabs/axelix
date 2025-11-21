@@ -45,7 +45,10 @@ export const BeanSource = ({ beanSource }: IProps) => {
                                 <div
                                     className={`${styles.BeanTreeItem} ${styles.BeanTreeItemHover}`}
                                     onClick={() =>
-                                        scrollToAccordionById(beanSource.enclosingClassName!, ESearchSubject.BEAN_CLASS)
+                                        scrollToAccordionById(
+                                            beanSource.enclosingClassFullName!,
+                                            ESearchSubject.BEAN_CLASS,
+                                        )
                                     }
                                 >
                                     <div className={styles.BeanTreeLabel}>

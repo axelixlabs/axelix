@@ -100,6 +100,10 @@ export interface IBeanSource {
      * is equal to {@link BeanOrigin.BEAN_METHOD}
      */
     enclosingClassName?: string;
+    /**
+     * Full name of the enclosing class’s name
+     */
+    enclosingClassFullName?: string;
 
     /**
      * Optional name of the factory bean name. Present in response from the server only if
