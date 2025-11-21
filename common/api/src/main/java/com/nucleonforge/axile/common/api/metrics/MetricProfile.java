@@ -1,6 +1,9 @@
 package com.nucleonforge.axile.common.api.metrics;
 
 import java.util.List;
+import java.util.Map;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * The metric profile as returned by the Actuator API.
@@ -10,10 +13,10 @@ import java.util.List;
  */
 public record MetricProfile(
         String name,
-        String description,
+        @Nullable String description,
         String baseUnit,
         List<Measurement> measurements,
-        List<AvailableTag> availableTags) {
+        List<Map<String, String>> validTagCombinations) {
 
     /**
      * Single metric value, measured at a particular point in time.
@@ -22,12 +25,4 @@ public record MetricProfile(
      * @param value     the value of the given metric.
      */
     public record Measurement(String statistic, double value) {}
-
-    /**
-     * Tags that are available for this metric.
-     *
-     * @param tag    the tag name.
-     * @param values the tag value.
-     */
-    public record AvailableTag(String tag, List<String> values) {}
 }

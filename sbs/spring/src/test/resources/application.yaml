@@ -25,6 +25,7 @@ management:
           - beans
           - env
           - axile-env
+          - axile-metrics
           - configprops
           - axile-configprops
 

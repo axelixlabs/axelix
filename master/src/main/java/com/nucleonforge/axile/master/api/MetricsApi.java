@@ -1,11 +1,13 @@
 package com.nucleonforge.axile.master.api;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.links.Link;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,11 +16,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 import com.nucleonforge.axile.common.api.metrics.MetricsList;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
+import com.nucleonforge.axile.common.domain.http.MultiValueQueryParameter;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.loggers.GroupProfileResponse;
@@ -29,6 +33,12 @@ import com.nucleonforge.axile.master.service.convert.Converter;
 import com.nucleonforge.axile.master.service.transport.metrics.GetAllMetricsEndpointProber;
 import com.nucleonforge.axile.master.service.transport.metrics.GetSingleMetricProfileEndpointProber;
 
+/**
+ * The API for managing metrics.
+ *
+ * @since 19.11.2025
+ * @author Nikita Kirillov
+ */
 @Tag(name = "Metrics API Controller", description = "The endpoint that provides access to the metrics of the instances")
 @RestController
 @RequestMapping(path = ApiPaths.MetricsApi.MAIN)
@@ -119,12 +129,21 @@ public class MetricsApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @Parameter(name = "metric", description = "The name of the metric to fetch profile for", required = true)
+    @Parameter(
+            name = "tag",
+            description = "Tag to filter the metric by. Multiple tags can be provided. Format: key:value",
+            array = @ArraySchema(schema = @Schema(type = "string", example = "area:nonheap")))
     @GetMapping(path = ApiPaths.MetricsApi.METRIC_NAME)
     public SingleMetricProfileResponse getSingleMetric(
-            @PathVariable("instanceId") String instanceId, @PathVariable("metric") String metric) {
-        MetricProfile metricProfile = getSingleMetricProfileEndpointProber.invoke(
-                InstanceId.of(instanceId), new DefaultHttpPayload(Map.of("metric.name", metric)));
+            @PathVariable("instanceId") String instanceId,
+            @PathVariable("metric") String metric,
+            @RequestParam(value = "tag", required = false) List<String> tags) {
 
-        return Objects.requireNonNull(singleMetricConverter.convert(metricProfile));
+        MetricProfile result = getSingleMetricProfileEndpointProber.invoke(
+                InstanceId.of(instanceId),
+                new DefaultHttpPayload(
+                        List.of(new MultiValueQueryParameter("tag", tags)), Map.of("metric.name", metric)));
+
+        return Objects.requireNonNull(singleMetricConverter.convert(result));
     }
 }

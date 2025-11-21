@@ -105,7 +105,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     // Metric
     public static final ActuatorEndpoint METRICS = of("/metrics", HttpMethod.GET);
-    public static final ActuatorEndpoint SINGLE_METRIC = of("/metrics/{metric.name}", HttpMethod.GET);
+    public static final ActuatorEndpoint SINGLE_METRIC = of("/axile-metrics/{metric.name}", HttpMethod.GET);
 
     // ProfileManagement
     public static final ActuatorEndpoint PROFILE_MANAGEMENT = of("/profile-management", HttpMethod.POST);
