@@ -37,7 +37,10 @@ public class AxileMetricsEndpoint {
         this.registry = registry;
     }
 
-    // IMPORTANT! For Spring Actuator endpoints @Endpoint, we must use org.springframework.lang.Nullable.
+    // IMPORTANT!
+    // For Spring Actuator endpoints @Endpoint, we must use org.springframework.lang.Nullable.
+    // Spring Boot 3 does not recognize the Jspecify's @Nullable here, but we still need to tell
+    // Spring that tags are optional
     @ReadOperation
     public MetricProfile metric(@Selector String requiredMetricName, @Nullable List<String> tag) {
         MetricDescriptor originalDescriptor = delegate.metric(requiredMetricName, tag);
