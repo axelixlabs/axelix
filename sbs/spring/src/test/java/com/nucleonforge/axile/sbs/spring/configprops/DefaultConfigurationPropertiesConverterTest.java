@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 import com.nucleonforge.axile.common.api.KeyValue;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,7 +53,7 @@ public class DefaultConfigurationPropertiesConverterTest {
     void getConfigPropsDescriptor() {
         ConfigurationPropertiesDescriptor defaultDescriptor = endpoint.configurationProperties();
 
-        AxileConfigPropsFeed axileConfPropDescriptor = enricher.convert(defaultDescriptor);
+        ConfigPropsFeed axileConfPropDescriptor = enricher.convert(defaultDescriptor);
 
         assertThat(axileConfPropDescriptor).isNotNull();
 

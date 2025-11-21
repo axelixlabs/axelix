@@ -5,23 +5,23 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for {@link AxileConfigPropsFeed}.
+ * {@link JacksonMessageDeserializationStrategy} for {@link ConfigPropsFeed}.
  *
  * @author Sergey Cherkasov
  */
 @Component
 public class ConfigPropsJacksonMessageDeserializationStrategy
-        extends JacksonMessageDeserializationStrategy<AxileConfigPropsFeed> {
+        extends JacksonMessageDeserializationStrategy<ConfigPropsFeed> {
 
     public ConfigPropsJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
     @Override
-    public @NonNull Class<AxileConfigPropsFeed> supported() {
-        return AxileConfigPropsFeed.class;
+    public @NonNull Class<ConfigPropsFeed> supported() {
+        return ConfigPropsFeed.class;
     }
 }

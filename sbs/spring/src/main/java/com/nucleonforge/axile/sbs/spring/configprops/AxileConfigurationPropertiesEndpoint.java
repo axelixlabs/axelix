@@ -2,9 +2,8 @@ package com.nucleonforge.axile.sbs.spring.configprops;
 
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-import org.springframework.boot.actuate.endpoint.annotation.Selector;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 
 /**
  * Custom Actuator endpoint exposing the application's {@code @ConfigurationProperties}
@@ -23,12 +22,7 @@ public class AxileConfigurationPropertiesEndpoint {
     }
 
     @ReadOperation
-    public AxileConfigPropsFeed configurationProperties() {
+    public ConfigPropsFeed configurationProperties() {
         return configurationPropertiesCache.getAxileConfigProps();
-    }
-
-    @ReadOperation
-    public AxileConfigPropsFeed configurationPropertiesByPrefix(@Selector String prefix) {
-        return configurationPropertiesCache.getAxileConfigPropsByPrefix(prefix);
     }
 }

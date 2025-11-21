@@ -9,7 +9,7 @@ import org.springframework.boot.actuate.context.properties.ConfigurationProperti
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ContextConfigurationPropertiesDescriptor;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 import com.nucleonforge.axile.common.api.KeyValue;
 import com.nucleonforge.axile.common.utils.BeanNameUtils;
 
@@ -21,24 +21,24 @@ import com.nucleonforge.axile.common.utils.BeanNameUtils;
 public class DefaultConfigurationPropertiesConverter implements ConfigurationPropertiesConverter {
 
     @Override
-    public AxileConfigPropsFeed convert(ConfigurationPropertiesDescriptor originalDescriptor) {
-        Map<String, AxileConfigPropsFeed.Context> context = originalDescriptor.getContexts().entrySet().stream()
+    public ConfigPropsFeed convert(ConfigurationPropertiesDescriptor originalDescriptor) {
+        Map<String, ConfigPropsFeed.Context> context = originalDescriptor.getContexts().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> convertContext(e.getValue())));
 
-        return new AxileConfigPropsFeed(context);
+        return new ConfigPropsFeed(context);
     }
 
-    private AxileConfigPropsFeed.Context convertContext(ContextConfigurationPropertiesDescriptor source) {
+    private ConfigPropsFeed.Context convertContext(ContextConfigurationPropertiesDescriptor source) {
 
-        Map<String, AxileConfigPropsFeed.Bean> beans = source.getBeans().entrySet().stream()
+        Map<String, ConfigPropsFeed.Bean> beans = source.getBeans().entrySet().stream()
                 .collect(Collectors.toMap(
                         b -> BeanNameUtils.stripConfigPropsPrefix(b.getKey()), e -> convertBean(e.getValue())));
 
-        return new AxileConfigPropsFeed.Context(beans, source.getParentId());
+        return new ConfigPropsFeed.Context(beans, source.getParentId());
     }
 
-    private AxileConfigPropsFeed.Bean convertBean(ConfigurationPropertiesBeanDescriptor src) {
-        return new AxileConfigPropsFeed.Bean(
+    private ConfigPropsFeed.Bean convertBean(ConfigurationPropertiesBeanDescriptor src) {
+        return new ConfigPropsFeed.Bean(
                 src.getPrefix(), flatten("", src.getProperties()), flatten("", src.getInputs()));
     }
 
