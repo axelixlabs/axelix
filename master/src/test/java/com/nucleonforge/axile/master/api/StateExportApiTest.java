@@ -2,6 +2,7 @@ package com.nucleonforge.axile.master.api;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -65,6 +66,7 @@ class StateExportApiTest {
         mockWebServer.shutdown();
     }
 
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     @BeforeEach
     void prepare() {
         // language=json
@@ -213,6 +215,57 @@ class StateExportApiTest {
         }
         """;
 
+        // language=json
+        String jsonThreadDumpResponse =
+                """
+    {
+       "threads" : [ {
+         "threadName" : "Test worker",
+         "threadId" : 1,
+         "blockedTime" : -1,
+         "blockedCount" : 37,
+         "waitedTime" : -1,
+         "waitedCount" : 109,
+         "lockOwnerId" : -1,
+         "daemon" : false,
+         "inNative" : false,
+         "suspended" : false,
+         "threadState" : "RUNNABLE",
+         "priority" : 5,
+         "stackTrace" : [ {
+           "moduleName" : "java.management",
+           "moduleVersion" : "17.0.17",
+           "methodName" : "dumpThreads0",
+           "fileName" : "ThreadImpl.java",
+           "lineNumber" : -2,
+           "nativeMethod" : true,
+           "className" : "sun.management.ThreadImpl"
+         }, {
+           "moduleName" : "java.management",
+           "moduleVersion" : "17.0.17",
+           "methodName" : "dumpAllThreads",
+           "fileName" : "ThreadImpl.java",
+           "lineNumber" : 528,
+           "nativeMethod" : false,
+           "className" : "sun.management.ThreadImpl"
+         } ],
+         "lockedMonitors" : [ ],
+         "lockedSynchronizers" : [ ]
+       } ]
+    }
+    """;
+
+        String mockLogFileResponse =
+                """
+             2025-11-12T14:05:13.795+05:00  INFO 1868 --- [main] o.s.s.petclinic.PetClinicApplication: Starting PetClinicApplication using Java 17.0.16 with PID 1868 (C:\\Project\\spring-petclinic\\target\\classes started in C:\\Project\\spring-petclinic)
+             2025-11-12T14:05:13.795+05:00  INFO 1868 --- [main] o.s.s.petclinic.PetClinicApplication     : No active profile set, falling back to 1 default profile: "default"
+             2025-11-12T14:05:14.382+05:00  INFO 1868 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+             2025-11-12T14:05:14.429+05:00  INFO 1868 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 30 ms. Found 3 JPA repository interfaces.
+             2025-11-12T14:05:14.531+05:00  INFO 1868 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=4c03ca02-57eb-3d79-a155-785dae504167
+             """;
+
+        byte[] mockHeapDumpResponse = "Mock HPROF binary data".getBytes();
+
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
@@ -243,6 +296,18 @@ class StateExportApiTest {
                     return new MockResponse()
                             .setBody(jsonSchedulesTasksResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/threaddump")) {
+                    return new MockResponse()
+                            .setBody(jsonThreadDumpResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/heapdump")) {
+                    return new MockResponse()
+                            .setBody(Arrays.toString(mockHeapDumpResponse))
+                            .addHeader("Content-Type", "application/octet-stream");
+                } else if (path.equals("/" + activeInstanceId + "/actuator/logfile")) {
+                    return new MockResponse()
+                            .setBody(mockLogFileResponse)
+                            .addHeader("Content-Type", "text/plain;charset=UTF-8");
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
@@ -279,7 +344,10 @@ class StateExportApiTest {
                             "conditions.json",
                             "config_props.json",
                             "env.json",
-                            "scheduled_tasks.json");
+                            "scheduled_tasks.json",
+                            "thread_dump.json",
+                            "heap_dump.hprof",
+                            "log_file.log");
         }
     }
 
