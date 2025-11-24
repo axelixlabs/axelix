@@ -63,10 +63,9 @@ interface IStateExportComponent {
 /**
  * The {@link IStateExportComponent} specifically for heap dumps.
  */
-// eslint-disable-next-line  @typescript-eslint/no-unused-vars
-interface IHeapStateComponent extends IStateExportComponent {
-    sanitized: boolean;
-}
+// interface IHeapStateComponent extends IStateExportComponent {
+//     sanitized: boolean;
+// }
 
 /**
  * Body of an http request for state export
