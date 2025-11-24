@@ -10,6 +10,7 @@ import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axile.common.api.loggers.ServiceLoggers;
 import com.nucleonforge.axile.master.api.response.loggers.LoggersResponse;
+import com.nucleonforge.axile.master.service.convert.response.loggers.ServiceLoggersConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

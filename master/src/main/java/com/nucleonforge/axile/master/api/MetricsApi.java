@@ -29,7 +29,7 @@ import com.nucleonforge.axile.master.api.response.loggers.GroupProfileResponse;
 import com.nucleonforge.axile.master.api.response.metrics.MetricsListResponse;
 import com.nucleonforge.axile.master.api.response.metrics.SingleMetricProfileResponse;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
-import com.nucleonforge.axile.master.service.convert.Converter;
+import com.nucleonforge.axile.master.service.convert.response.Converter;
 import com.nucleonforge.axile.master.service.transport.metrics.GetAllMetricsEndpointProber;
 import com.nucleonforge.axile.master.service.transport.metrics.GetSingleMetricProfileEndpointProber;
 

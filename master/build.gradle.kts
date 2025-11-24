@@ -5,6 +5,7 @@ plugins {
 
 val testcontainersVersion = "1.21.3"
 val springDocSwaggerVersion = "2.0.4"
+val heapDumpToolVersion = "1.3.3"
 
 dependencies {
     // Self
@@ -20,6 +21,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
+    implementation("com.paypal:heap-dump-tool:${heapDumpToolVersion}")
 
     // Runtime
     runtimeOnly("ch.qos.logback:logback-classic")

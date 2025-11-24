@@ -3,6 +3,8 @@ package com.nucleonforge.axile.master.service.export.collect;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.master.api.EnvironmentApi;
+import com.nucleonforge.axile.master.service.export.StateComponent;
+import com.nucleonforge.axile.master.service.export.settings.EnvStateComponentSettings;
 
 /**
  * Collects Spring Environment information for application state export.
@@ -12,7 +14,7 @@ import com.nucleonforge.axile.master.api.EnvironmentApi;
  * @author Nikita Kirillov
  */
 @Component
-public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStateCollector {
+public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStateCollector<EnvStateComponentSettings> {
 
     private final EnvironmentApi environmentApi;
 
@@ -21,12 +23,12 @@ public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStat
     }
 
     @Override
-    protected Object collectInternal(String instanceId) {
-        return environmentApi.getEnvironment(instanceId);
+    public StateComponent responsibleFor() {
+        return StateComponent.ENV;
     }
 
     @Override
-    public StateComponent responsibleFor() {
-        return StateComponent.ENV;
+    protected Object collectInternal(String instanceId, EnvStateComponentSettings settings) {
+        return environmentApi.getEnvironment(instanceId);
     }
 }

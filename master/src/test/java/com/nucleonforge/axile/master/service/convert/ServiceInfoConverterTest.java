@@ -20,13 +20,13 @@ import com.nucleonforge.axile.master.api.response.info.components.JavaProfile;
 import com.nucleonforge.axile.master.api.response.info.components.OSProfile;
 import com.nucleonforge.axile.master.api.response.info.components.ProcessProfile;
 import com.nucleonforge.axile.master.api.response.info.components.SSLProfile;
-import com.nucleonforge.axile.master.service.convert.info.ServiceInfoConverter;
-import com.nucleonforge.axile.master.service.convert.info.components.BuildInfoConverter;
-import com.nucleonforge.axile.master.service.convert.info.components.GitInfoConverter;
-import com.nucleonforge.axile.master.service.convert.info.components.JavaInfoConverter;
-import com.nucleonforge.axile.master.service.convert.info.components.OSInfoConverter;
-import com.nucleonforge.axile.master.service.convert.info.components.ProcessInfoConverter;
-import com.nucleonforge.axile.master.service.convert.info.components.SSLInfoConverter;
+import com.nucleonforge.axile.master.service.convert.response.info.ServiceInfoConverter;
+import com.nucleonforge.axile.master.service.convert.response.info.components.BuildInfoConverter;
+import com.nucleonforge.axile.master.service.convert.response.info.components.GitInfoConverter;
+import com.nucleonforge.axile.master.service.convert.response.info.components.JavaInfoConverter;
+import com.nucleonforge.axile.master.service.convert.response.info.components.OSInfoConverter;
+import com.nucleonforge.axile.master.service.convert.response.info.components.ProcessInfoConverter;
+import com.nucleonforge.axile.master.service.convert.response.info.components.SSLInfoConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

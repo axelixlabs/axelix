@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.metrics.MetricsList;
 import com.nucleonforge.axile.master.api.response.metrics.MetricsListResponse;
+import com.nucleonforge.axile.master.service.convert.response.metrics.GetAllMetricsConverter;
 
 /**
  * Unit test for {@link GetAllMetricsConverter}.

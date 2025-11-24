@@ -21,8 +21,8 @@ import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.OSProfile
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.RuntimeProfile;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse.SpringProfile;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
-import com.nucleonforge.axile.master.service.convert.details.AxileDetailsConverter;
-import com.nucleonforge.axile.master.service.convert.details.DetailsConversionRequest;
+import com.nucleonforge.axile.master.service.convert.response.details.AxileDetailsConverter;
+import com.nucleonforge.axile.master.service.convert.response.details.DetailsConversionRequest;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
