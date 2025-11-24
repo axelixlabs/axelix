@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -63,7 +64,7 @@ public class StateExportComponentDeserializer extends JsonDeserializer<List<Stat
             switch (stateExportComponent) {
                 case HEAP_DUMP -> {
                     // TODO: can we make it better? Like via readValue or smth
-                    boolean sanitized = childNode.get(SANITIZED_FIELD).asBoolean(true);
+                    boolean sanitized = extractSanitizedFlag(childNode);
                     var heapDumpStateComponentSettings = new HeapDumpStateComponentSettings(sanitized);
                     results.add(heapDumpStateComponentSettings);
                 }
@@ -78,6 +79,12 @@ public class StateExportComponentDeserializer extends JsonDeserializer<List<Stat
             }
         }
         return results;
+    }
+
+    private static Boolean extractSanitizedFlag(JsonNode childNode) {
+        return Optional.ofNullable(childNode.get(SANITIZED_FIELD))
+                .map(it -> it.asBoolean(true))
+                .orElse(true);
     }
 
     private static void throwUnexpectedStateExportValue(JsonParser p, String stateComponentAsText)
