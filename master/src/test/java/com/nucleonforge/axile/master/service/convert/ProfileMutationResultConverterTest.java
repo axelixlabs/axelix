@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.ProfileMutationResult;
 import com.nucleonforge.axile.master.api.response.ProfileUpdateResponse;
+import com.nucleonforge.axile.master.service.convert.response.ProfileMutationResultConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

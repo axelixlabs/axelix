@@ -3,6 +3,8 @@ package com.nucleonforge.axile.master.service.export.collect;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.master.api.ThreadDumpApi;
+import com.nucleonforge.axile.master.service.export.StateComponent;
+import com.nucleonforge.axile.master.service.export.settings.ThreadDumpStateComponentSettings;
 
 /**
  * Collects Thread Dump information for application state export.
@@ -12,7 +14,8 @@ import com.nucleonforge.axile.master.api.ThreadDumpApi;
  * @author Nikita Kirillov
  */
 @Component
-public class ThreadDumpContributorJsonInstance extends AbstractJsonInstanceStateCollector {
+public class ThreadDumpContributorJsonInstance
+        extends AbstractJsonInstanceStateCollector<ThreadDumpStateComponentSettings> {
 
     private final ThreadDumpApi threadDumpApi;
 
@@ -21,12 +24,12 @@ public class ThreadDumpContributorJsonInstance extends AbstractJsonInstanceState
     }
 
     @Override
-    protected Object collectInternal(String instanceId) {
-        return threadDumpApi.getThreadDump(instanceId);
+    public StateComponent responsibleFor() {
+        return StateComponent.THREAD_DUMP;
     }
 
     @Override
-    public StateComponent responsibleFor() {
-        return StateComponent.THREAD_DUMP;
+    protected Object collectInternal(String instanceId, ThreadDumpStateComponentSettings settings) {
+        return threadDumpApi.getThreadDump(instanceId);
     }
 }

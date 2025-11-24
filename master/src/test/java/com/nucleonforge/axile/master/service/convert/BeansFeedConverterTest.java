@@ -12,6 +12,7 @@ import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile;
 import com.nucleonforge.axile.master.api.response.BeanShortProfile.BeanDependencyProfile;
 import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
+import com.nucleonforge.axile.master.service.convert.response.BeansFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

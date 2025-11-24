@@ -15,11 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
+import com.nucleonforge.axile.master.service.export.HeapDumpAnonymizer;
 import com.nucleonforge.axile.master.service.transport.HeapDumpEndpointProber;
 
 /**
@@ -34,8 +36,11 @@ public class HeapDumpApi {
 
     private final HeapDumpEndpointProber heapDumpEndpointProber;
 
-    public HeapDumpApi(HeapDumpEndpointProber heapDumpEndpointProber) {
+    private final HeapDumpAnonymizer heapDumpAnonymizer;
+
+    public HeapDumpApi(HeapDumpEndpointProber heapDumpEndpointProber, HeapDumpAnonymizer heapDumpAnonymizer) {
         this.heapDumpEndpointProber = heapDumpEndpointProber;
+        this.heapDumpAnonymizer = heapDumpAnonymizer;
     }
 
     @Operation(
@@ -72,9 +77,15 @@ public class HeapDumpApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.HeapDumpApi.INSTANCE_ID)
-    public ResponseEntity<Resource> getHeapDump(@PathVariable("instanceId") String instanceId) {
+    public ResponseEntity<Resource> getHeapDump(
+            @PathVariable("instanceId") String instanceId,
+            @RequestParam(defaultValue = "true", required = false) boolean sanitizeHeapDump) {
 
         Resource resource = heapDumpEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+
+        if (sanitizeHeapDump) {
+            resource = heapDumpAnonymizer.anonymize(resource);
+        }
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)

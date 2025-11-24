@@ -1,7 +1,7 @@
 package com.nucleonforge.axile.master.api;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Base64;
 import java.util.UUID;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -16,7 +16,10 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,12 +27,15 @@ import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axile.master.service.export.HeapDumpAnonymizer;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests for {@link HeapDumpApi}.
@@ -52,6 +58,9 @@ class HeapDumpApiTest {
     @Autowired
     private InstanceRegistry registry;
 
+    @MockBean
+    private HeapDumpAnonymizer heapDumpAnonymizer;
+
     @BeforeAll
     static void startServer() throws IOException {
         mockWebServer = new MockWebServer();
@@ -71,15 +80,30 @@ class HeapDumpApiTest {
                 String path = request.getPath();
                 assert path != null;
 
+                String base64Data = Base64.getEncoder().encodeToString(mockHeapDump);
+
                 if (path.equals("/" + activeInstanceId + "/actuator/heapdump")) {
                     return new MockResponse()
-                            .setBody(Arrays.toString(mockHeapDump))
+                            .setBody(base64Data)
                             .addHeader("Content-Type", "application/octet-stream")
                             .setResponseCode(200);
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
             }
+        });
+
+        when(heapDumpAnonymizer.anonymize(any(Resource.class))).thenAnswer(invocation -> {
+            Resource originalResource = invocation.getArgument(0);
+            String base64Content = new String(originalResource.getInputStream().readAllBytes());
+            byte[] decodedData = Base64.getDecoder().decode(base64Content);
+
+            return new ByteArrayResource(decodedData) {
+                @Override
+                public String getFilename() {
+                    return "heapdump.hprof";
+                }
+            };
         });
     }
 
@@ -99,7 +123,7 @@ class HeapDumpApiTest {
         assertThat(contentDisposition).contains("filename=\"heapdump.hprof\"");
 
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).contains(Arrays.toString(mockHeapDump).getBytes());
+        assertThat(response.getBody()).contains(mockHeapDump);
     }
 
     @Test

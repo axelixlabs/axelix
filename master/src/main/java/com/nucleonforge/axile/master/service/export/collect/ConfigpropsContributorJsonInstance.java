@@ -3,6 +3,8 @@ package com.nucleonforge.axile.master.service.export.collect;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.master.api.ConfigPropsApi;
+import com.nucleonforge.axile.master.service.export.StateComponent;
+import com.nucleonforge.axile.master.service.export.settings.ConfigPropsStateComponentSettings;
 
 /**
  * Collects Spring Configuration Properties information for application state export.
@@ -12,7 +14,8 @@ import com.nucleonforge.axile.master.api.ConfigPropsApi;
  * @author Nikita Kirillov
  */
 @Component
-public class ConfigpropsContributorJsonInstance extends AbstractJsonInstanceStateCollector {
+public class ConfigpropsContributorJsonInstance
+        extends AbstractJsonInstanceStateCollector<ConfigPropsStateComponentSettings> {
 
     private final ConfigPropsApi configpropsApi;
 
@@ -21,12 +24,12 @@ public class ConfigpropsContributorJsonInstance extends AbstractJsonInstanceStat
     }
 
     @Override
-    protected Object collectInternal(String instanceId) {
-        return configpropsApi.getConfigpropsFeed(instanceId);
+    public StateComponent responsibleFor() {
+        return StateComponent.CONFIG_PROPS;
     }
 
     @Override
-    public StateComponent responsibleFor() {
-        return StateComponent.CONFIG_PROPS;
+    protected Object collectInternal(String instanceId, ConfigPropsStateComponentSettings settings) {
+        return configpropsApi.getConfigpropsFeed(instanceId);
     }
 }

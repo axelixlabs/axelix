@@ -3,6 +3,7 @@ package com.nucleonforge.axile.master.service.export;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -12,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.master.exception.StateExportException;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.export.collect.InstanceStateCollector;
-import com.nucleonforge.axile.master.service.export.collect.StateComponent;
 
 /**
  * Default implementation of {@link InstanceStateExporter}.
@@ -26,42 +27,56 @@ public class ZipArchiveInstanceStateExporter implements InstanceStateExporter {
 
     private static final Logger log = LoggerFactory.getLogger(ZipArchiveInstanceStateExporter.class);
 
-    private final List<InstanceStateCollector> collectors;
+    private final List<InstanceStateCollector<?>> collectors;
 
-    public ZipArchiveInstanceStateExporter(List<InstanceStateCollector> collectors) {
+    public ZipArchiveInstanceStateExporter(List<InstanceStateCollector<?>> collectors) {
         this.collectors = collectors;
     }
 
     @Override
-    public byte[] exportInstanceState(StateExportRequest request) throws StateExportException {
+    public byte[] exportInstanceState(StateExport stateExportRequest, InstanceId instanceId)
+            throws StateExportException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
-            for (InstanceStateCollector collector : collectors) {
-                if (shouldExport(request, collector)) {
-                    addCollectorDataToZip(zos, request.instanceId().instanceId(), collector);
-                }
+            for (InstanceStateCollector<?> collector : collectors) {
+                findSettingsForExport(stateExportRequest, collector).ifPresent(settings -> {
+                    try {
+                        addCollectorDataToZip(zos, settings, instanceId.instanceId(), collector);
+                    } catch (IOException e) {
+                        log.error(
+                                "Exception in state collection for instance : {}. State collector responsible for {} thrown an error. Skipping this collector",
+                                instanceId.instanceId(),
+                                collector.responsibleFor(),
+                                e);
+                    }
+                });
             }
         } catch (IOException e) {
             log.error(
                     "Failed to assemble state export archive for instance: {}. Error: {}",
-                    request.instanceId().instanceId(),
+                    instanceId.instanceId(),
                     e.getMessage(),
                     e);
-            throw new StateExportException(request.instanceId().instanceId(), e);
+            throw new StateExportException(instanceId.instanceId(), e);
         }
 
         return baos.toByteArray();
     }
 
-    private static boolean shouldExport(StateExportRequest request, InstanceStateCollector collector) {
-        return request.stateComponents().isEmpty() || request.stateComponents().contains(collector.responsibleFor());
+    private static Optional<StateComponentSettings> findSettingsForExport(
+            StateExport stateExportRequest, InstanceStateCollector<?> collector) {
+        return stateExportRequest.components().stream()
+                .filter(it -> it.component().equals(collector.responsibleFor()))
+                .findFirst();
     }
 
-    private void addCollectorDataToZip(ZipOutputStream zos, String instanceId, InstanceStateCollector collector)
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void addCollectorDataToZip(
+            ZipOutputStream zos, StateComponentSettings settings, String instanceId, InstanceStateCollector collector)
             throws IOException {
         StateComponent stateComponent = collector.responsibleFor();
-        byte[] state = collector.collect(instanceId);
+        byte[] state = collector.collect(instanceId, settings);
 
         zos.putNextEntry(new ZipEntry(stateComponent.getFilename()));
         zos.write(state);

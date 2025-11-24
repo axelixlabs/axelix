@@ -1,7 +1,6 @@
 package com.nucleonforge.axile.master.api;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,19 +13,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
-import com.nucleonforge.axile.master.api.request.StateExportComponent;
+import com.nucleonforge.axile.master.api.request.state.StateExportRequest;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
+import com.nucleonforge.axile.master.service.convert.request.StateExportRequestConverter;
 import com.nucleonforge.axile.master.service.export.StateArchiveFileNameGenerator;
-import com.nucleonforge.axile.master.service.export.StateExportRequest;
+import com.nucleonforge.axile.master.service.export.StateExport;
 import com.nucleonforge.axile.master.service.export.ZipArchiveInstanceStateExporter;
-import com.nucleonforge.axile.master.service.export.collect.StateComponent;
 
 /**
  * The API for exporting the state of a given instance.
@@ -40,12 +39,15 @@ public class StateExportApi {
 
     private final ZipArchiveInstanceStateExporter exportService;
     private final StateArchiveFileNameGenerator stateArchiveFileNameGenerator;
+    private final StateExportRequestConverter stateExportRequestConverter;
 
     public StateExportApi(
             ZipArchiveInstanceStateExporter exportService,
-            StateArchiveFileNameGenerator stateArchiveFileNameGenerator) {
+            StateArchiveFileNameGenerator stateArchiveFileNameGenerator,
+            StateExportRequestConverter stateExportRequestConverter) {
         this.exportService = exportService;
         this.stateArchiveFileNameGenerator = stateArchiveFileNameGenerator;
+        this.stateExportRequestConverter = stateExportRequestConverter;
     }
 
     @Operation(
@@ -71,17 +73,18 @@ public class StateExportApi {
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
-    @Parameter(
-            name = "components",
-            description = "List of state export components",
-            schema = @Schema(type = "array", implementation = StateExportComponent.class))
-    @GetMapping(path = ApiPaths.StateExportApi.INSTANCE_ID)
+    @PostMapping(path = ApiPaths.StateExportApi.INSTANCE_ID)
     public ResponseEntity<Resource> exportInstanceState(
-            @RequestParam(required = false) List<StateExportComponent> components, @PathVariable String instanceId) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody @RequestBody StateExportRequest request,
+            @PathVariable String instanceId) {
 
-        byte[] binaryData = exportService.exportInstanceState(buildRequest(components, instanceId));
+        InstanceId id = InstanceId.of(instanceId);
 
-        String filename = stateArchiveFileNameGenerator.generate(InstanceId.of(instanceId));
+        StateExport convertedRequest = stateExportRequestConverter.convert(request);
+
+        byte[] binaryData = exportService.exportInstanceState(Objects.requireNonNull(convertedRequest), id);
+
+        String filename = stateArchiveFileNameGenerator.generate(id);
 
         ByteArrayResource resource = new ByteArrayResource(binaryData);
 
@@ -94,22 +97,5 @@ public class StateExportApi {
                                 .build()
                                 .toString())
                 .body(resource);
-    }
-
-    // TODO:
-    //  For now, building request here if fine. Later, if the logic would become more complicated, it would
-    //  make sense to introduce dedicated mapper for it
-    private static StateExportRequest buildRequest(List<StateExportComponent> components, String instanceId) {
-        // spotless:off
-        return new StateExportRequest(
-                InstanceId.of(instanceId),
-                Optional
-                    .ofNullable(components)
-                    .orElse(List.of())
-                    .stream()
-                    .map(it -> StateComponent.valueOf(it.name()))
-                    .toList()
-        );
-        // spotless:on
     }
 }

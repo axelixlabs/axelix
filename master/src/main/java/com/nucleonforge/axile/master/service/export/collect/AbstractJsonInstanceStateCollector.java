@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nucleonforge.axile.master.exception.StateExportException;
+import com.nucleonforge.axile.master.service.export.StateComponentSettings;
 
 /**
  * Abstract {@link InstanceStateCollector} that applies common marshalling and exception
@@ -14,7 +15,8 @@ import com.nucleonforge.axile.master.exception.StateExportException;
  *
  * @author Mikhail Polivakha
  */
-public abstract class AbstractJsonInstanceStateCollector implements InstanceStateCollector {
+public abstract class AbstractJsonInstanceStateCollector<T extends StateComponentSettings>
+        implements InstanceStateCollector<T> {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractJsonInstanceStateCollector.class);
 
@@ -26,8 +28,8 @@ public abstract class AbstractJsonInstanceStateCollector implements InstanceStat
     }
 
     @Override
-    public byte[] collect(String instanceId) throws StateExportException {
-        Object state = collectInternal(instanceId);
+    public byte[] collect(String instanceId, T settings) throws StateExportException {
+        Object state = collectInternal(instanceId, settings);
         try {
             return objectMapper.writeValueAsBytes(state);
         } catch (JsonProcessingException e) {
@@ -41,5 +43,5 @@ public abstract class AbstractJsonInstanceStateCollector implements InstanceStat
      *
      * @return the JSON marshalling-capable object that represents the price of state of the particular application.
      */
-    protected abstract Object collectInternal(String instanceId);
+    protected abstract Object collectInternal(String instanceId, T settings);
 }

@@ -2,7 +2,7 @@ package com.nucleonforge.axile.master.api;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -22,20 +22,27 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
+import com.nucleonforge.axile.master.service.export.HeapDumpAnonymizer;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-// TODO: Actualize test. Add tests for the 'components' request param
 /**
  * Integration tests for {@link StateExportApi}.
  *
@@ -49,11 +56,48 @@ class StateExportApiTest {
 
     private static MockWebServer mockWebServer;
 
+    @MockBean
+    private HeapDumpAnonymizer heapDumpAnonymizer;
+
     @Autowired
     private TestRestTemplate restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
+
+    // language=json
+    private static final String HTTP_REQUEST_BODY =
+            """
+            {
+                "components" : [
+                    {
+                        "component" : "BEANS"
+                    },
+                    {
+                        "component" : "CACHES"
+                    },
+                    {
+                        "component" : "CONDITIONS"
+                    },
+                    {
+                        "component" : "CONFIG_PROPS"
+                    },
+                    {
+                        "component" : "ENV"
+                    },
+                    {
+                        "component" : "SCHEDULED_TASKS"
+                    },
+                    {
+                        "component" : "THREAD_DUMP"
+                    },
+                    {
+                        "component" : "HEAP_DUMP",
+                        "sanitized" : true
+                    }
+                ]
+            }
+            """;
 
     @BeforeAll
     static void startServer() throws IOException {
@@ -264,8 +308,6 @@ class StateExportApiTest {
              2025-11-12T14:05:14.531+05:00  INFO 1868 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=4c03ca02-57eb-3d79-a155-785dae504167
              """;
 
-        byte[] mockHeapDumpResponse = "Mock HPROF binary data".getBytes();
-
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
@@ -302,8 +344,8 @@ class StateExportApiTest {
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
                 } else if (path.equals("/" + activeInstanceId + "/actuator/heapdump")) {
                     return new MockResponse()
-                            .setBody(Arrays.toString(mockHeapDumpResponse))
-                            .addHeader("Content-Type", "application/octet-stream");
+                            .setBody("Mock HPROF binary data")
+                            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
                 } else if (path.equals("/" + activeInstanceId + "/actuator/logfile")) {
                     return new MockResponse()
                             .setBody(mockLogFileResponse)
@@ -316,11 +358,55 @@ class StateExportApiTest {
     }
 
     @Test
+    @DisplayName("Should return 500 on EndpointInvocationError")
+    void shouldReturnInternalServerError() {
+        String instanceId = UUID.randomUUID().toString();
+
+        registry.register(createInstance(instanceId));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+        ResponseEntity<?> response = restTemplate.postForEntity(
+                "/api/axile/export-state/{instanceId}",
+                new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                Void.class,
+                instanceId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void shouldReturnNotFoundForUnregisteredInstance() {
+        String unknownInstanceId = UUID.randomUUID().toString();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                "/api/axile/export-state/{instanceId}",
+                new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                String.class,
+                unknownInstanceId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
     void shouldReturnZipArchiveWithJsonFiles() throws IOException {
+        when(heapDumpAnonymizer.anonymize(any(Resource.class)))
+                .thenReturn(new ByteArrayResource("sanitized".getBytes()));
+
         registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
-        ResponseEntity<byte[]> response =
-                restTemplate.getForEntity("/api/axile/export-state/{instanceId}", byte[].class, activeInstanceId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+        ResponseEntity<byte[]> response = restTemplate.postForEntity(
+                "/api/axile/export-state/{instanceId}",
+                new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                byte[].class,
+                activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
@@ -329,14 +415,27 @@ class StateExportApiTest {
         byte[] zipData = response.getBody();
         assertThat(zipData).isNotEmpty();
 
+        assertZipArchiveContent(zipData);
+    }
+
+    private static void assertZipArchiveContent(byte[] zipData) throws IOException {
+        String hprofData = null;
+
         try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipData))) {
             Set<String> zipEntriesNames = new HashSet<>();
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 zipEntriesNames.add(entry.getName());
+
+                if (entry.getName().equals("heap_dump.hprof")) {
+                    byte[] buffer = zis.readAllBytes();
+                    hprofData = new String(buffer, StandardCharsets.UTF_8);
+                }
+
                 zis.closeEntry();
             }
 
+            assertThat(hprofData).isEqualTo("sanitized");
             assertThat(zipEntriesNames)
                     .containsOnly(
                             "beans.json",
@@ -346,31 +445,7 @@ class StateExportApiTest {
                             "env.json",
                             "scheduled_tasks.json",
                             "thread_dump.json",
-                            "heap_dump.hprof",
-                            "log_file.log");
+                            "heap_dump.hprof");
         }
-    }
-
-    @Test
-    @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerError() {
-        String instanceId = UUID.randomUUID().toString();
-
-        registry.register(createInstance(instanceId));
-
-        ResponseEntity<?> response =
-                restTemplate.getForEntity("/api/axile/export-state/{instanceId}", Void.class, instanceId);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Test
-    void shouldReturnNotFoundForUnregisteredInstance() {
-        String unknownInstanceId = UUID.randomUUID().toString();
-
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/export-state/{instanceId}", String.class, unknownInstanceId);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }

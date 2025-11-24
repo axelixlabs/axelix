@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.ThreadDumpFeed;
 import com.nucleonforge.axile.master.api.response.ThreadDumpFeedResponse;
+import com.nucleonforge.axile.master.service.convert.response.ThreadDumpFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
