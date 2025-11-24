@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.nucleonforge.axile.master.api.response.InstancesGridResponse.InstanceShortProfile;
 import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.service.convert.response.InstancesToShortProfileConverter;
 
 /**
  * Unit tests for {@link InstancesToShortProfileConverter}.

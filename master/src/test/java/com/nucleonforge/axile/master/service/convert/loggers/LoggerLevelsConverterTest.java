@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axile.master.api.response.loggers.LoggerProfileResponse;
+import com.nucleonforge.axile.master.service.convert.response.loggers.LoggerLevelsConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

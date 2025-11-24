@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.master.api.HeapDumpApi;
 import com.nucleonforge.axile.master.exception.StateExportException;
+import com.nucleonforge.axile.master.service.export.StateComponent;
+import com.nucleonforge.axile.master.service.export.settings.HeapDumpStateComponentSettings;
 
 /**
  * Collect Heap Dump information for application state export.
@@ -15,7 +17,8 @@ import com.nucleonforge.axile.master.exception.StateExportException;
  * @author Nikita Kirillov
  */
 @Component
-public class HeapDumpContributorBinaryInstance extends AbstractBinaryInstanceStateCollector {
+public class HeapDumpContributorBinaryInstance
+        extends AbstractBinaryInstanceStateCollector<HeapDumpStateComponentSettings> {
 
     private final HeapDumpApi heapDumpApi;
 
@@ -24,8 +27,9 @@ public class HeapDumpContributorBinaryInstance extends AbstractBinaryInstanceSta
     }
 
     @Override
-    protected Resource collectBinaryResource(String instanceId) throws StateExportException {
-        ResponseEntity<Resource> heapDump = heapDumpApi.getHeapDump(instanceId, false);
+    protected Resource collectBinaryResource(String instanceId, HeapDumpStateComponentSettings settings)
+            throws StateExportException {
+        ResponseEntity<Resource> heapDump = heapDumpApi.getHeapDump(instanceId, settings.sanitized());
         if (heapDump.getBody() == null) {
             throw new StateExportException(
                     instanceId, "Heap dump endpoint returned successful status but empty content");

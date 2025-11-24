@@ -9,6 +9,7 @@ import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
 import com.nucleonforge.axile.common.api.KeyValue;
 import com.nucleonforge.axile.master.api.response.configprops.ConfigPropsFeedResponse;
 import com.nucleonforge.axile.master.api.response.configprops.ConfigPropsProfile;
+import com.nucleonforge.axile.master.service.convert.response.AxileConfigPropsFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

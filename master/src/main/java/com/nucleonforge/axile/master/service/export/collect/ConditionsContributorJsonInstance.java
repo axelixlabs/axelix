@@ -3,6 +3,8 @@ package com.nucleonforge.axile.master.service.export.collect;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.master.api.ConditionsApi;
+import com.nucleonforge.axile.master.service.export.StateComponent;
+import com.nucleonforge.axile.master.service.export.settings.ConditionsStateComponentSettings;
 
 /**
  * Collects Spring Conditions information for application state export.
@@ -12,7 +14,8 @@ import com.nucleonforge.axile.master.api.ConditionsApi;
  * @author Nikita Kirillov
  */
 @Component
-public class ConditionsContributorJsonInstance extends AbstractJsonInstanceStateCollector {
+public class ConditionsContributorJsonInstance
+        extends AbstractJsonInstanceStateCollector<ConditionsStateComponentSettings> {
 
     private final ConditionsApi conditionsApi;
 
@@ -26,7 +29,7 @@ public class ConditionsContributorJsonInstance extends AbstractJsonInstanceState
     }
 
     @Override
-    protected Object collectInternal(String instanceId) {
+    protected Object collectInternal(String instanceId, ConditionsStateComponentSettings settings) {
         return conditionsApi.getConditionsFeed(instanceId);
     }
 }

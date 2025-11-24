@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axile.master.api.LogFileApi;
 import com.nucleonforge.axile.master.exception.StateExportException;
+import com.nucleonforge.axile.master.service.export.StateComponent;
+import com.nucleonforge.axile.master.service.export.settings.LogFileStateComponentSettings;
 
 /**
  * Collect log-file for application state export.
@@ -14,7 +16,8 @@ import com.nucleonforge.axile.master.exception.StateExportException;
  * @author Nikita Kirillov
  */
 @Component
-public class LogFileContributorBinaryInstance extends AbstractBinaryInstanceStateCollector {
+public class LogFileContributorBinaryInstance
+        extends AbstractBinaryInstanceStateCollector<LogFileStateComponentSettings> {
 
     private final LogFileApi logFileApi;
 
@@ -23,12 +26,13 @@ public class LogFileContributorBinaryInstance extends AbstractBinaryInstanceStat
     }
 
     @Override
-    protected Resource collectBinaryResource(String instanceId) throws StateExportException {
-        return logFileApi.getLogFile(instanceId, null);
+    public StateComponent responsibleFor() {
+        return StateComponent.LOG_FILE;
     }
 
     @Override
-    public StateComponent responsibleFor() {
-        return StateComponent.LOG_FILE;
+    protected Resource collectBinaryResource(String instanceId, LogFileStateComponentSettings settings)
+            throws StateExportException {
+        return logFileApi.getLogFile(instanceId, null);
     }
 }

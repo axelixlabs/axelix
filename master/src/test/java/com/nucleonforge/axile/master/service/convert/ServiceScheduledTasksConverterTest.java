@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.ServiceScheduledTasks;
 import com.nucleonforge.axile.master.api.response.ScheduledTasksResponse;
+import com.nucleonforge.axile.master.service.convert.response.ServiceScheduledTasksConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

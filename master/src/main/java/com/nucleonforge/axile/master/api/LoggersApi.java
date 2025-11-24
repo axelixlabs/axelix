@@ -32,7 +32,7 @@ import com.nucleonforge.axile.master.api.response.loggers.GroupProfileResponse;
 import com.nucleonforge.axile.master.api.response.loggers.LoggerProfileResponse;
 import com.nucleonforge.axile.master.api.response.loggers.LoggersResponse;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
-import com.nucleonforge.axile.master.service.convert.Converter;
+import com.nucleonforge.axile.master.service.convert.response.Converter;
 import com.nucleonforge.axile.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axile.master.service.transport.loggers.AllLoggersEndpointProber;
 import com.nucleonforge.axile.master.service.transport.loggers.ClearForLoggerEndpointProber;

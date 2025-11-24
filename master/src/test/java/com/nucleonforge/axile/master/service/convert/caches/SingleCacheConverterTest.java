@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.caches.SingleCache;
 import com.nucleonforge.axile.master.api.response.caches.CacheProfileResponse;
+import com.nucleonforge.axile.master.service.convert.response.caches.SingleCacheConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

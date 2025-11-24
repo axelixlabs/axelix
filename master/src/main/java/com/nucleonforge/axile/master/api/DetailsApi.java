@@ -20,8 +20,8 @@ import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.AxileDetailsResponse;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
-import com.nucleonforge.axile.master.service.convert.Converter;
-import com.nucleonforge.axile.master.service.convert.details.DetailsConversionRequest;
+import com.nucleonforge.axile.master.service.convert.response.Converter;
+import com.nucleonforge.axile.master.service.convert.response.details.DetailsConversionRequest;
 import com.nucleonforge.axile.master.service.transport.DetailsEndpointProber;
 
 /**

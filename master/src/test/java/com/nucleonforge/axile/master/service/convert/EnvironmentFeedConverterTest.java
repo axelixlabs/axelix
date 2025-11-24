@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import com.nucleonforge.axile.common.api.env.AxilePropertyValue;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse;
-import com.nucleonforge.axile.master.service.convert.environment.EnvironmentFeedConverter;
+import com.nucleonforge.axile.master.service.convert.response.environment.EnvironmentFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

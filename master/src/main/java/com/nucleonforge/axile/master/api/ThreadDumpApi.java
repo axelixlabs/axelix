@@ -11,7 +11,7 @@ import com.nucleonforge.axile.common.api.ThreadDumpFeed;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.response.ThreadDumpFeedResponse;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
-import com.nucleonforge.axile.master.service.convert.Converter;
+import com.nucleonforge.axile.master.service.convert.response.Converter;
 import com.nucleonforge.axile.master.service.transport.ThreadDumpEndpointProber;
 
 /**

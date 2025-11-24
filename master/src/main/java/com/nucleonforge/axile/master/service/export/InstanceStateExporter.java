@@ -2,6 +2,7 @@ package com.nucleonforge.axile.master.service.export;
 
 import com.nucleonforge.axile.master.exception.StateExportException;
 import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.export.collect.InstanceStateCollector;
 
 /**
@@ -21,5 +22,5 @@ public interface InstanceStateExporter {
      * @return byte array containing the exported state data.
      * @throws StateExportException if export process fails.
      */
-    byte[] exportInstanceState(StateExportRequest request) throws StateExportException;
+    byte[] exportInstanceState(StateExport request, InstanceId instanceId) throws StateExportException;
 }
