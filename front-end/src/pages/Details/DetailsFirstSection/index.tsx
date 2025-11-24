@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { detailsDownloadStateComponents } from "utils";
+import { EExportableComponent } from "models";
+import { exportStateData } from "services";
 
 import styles from "./styles.module.css";
 
@@ -21,7 +22,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
     const { t } = useTranslation();
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [stateComponents, setStateComponents] = useState<string[]>([]);
+    const [stateComponents, setStateComponents] = useState<EExportableComponent[]>([]);
 
     const showModal = (): void => {
         setIsModalOpen(true);
@@ -29,15 +30,23 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
 
     const handleOk = (): void => {
         setIsModalOpen(false);
-        const baseURL = `${import.meta.env.VITE_APP_API_URL}/api/axile/export-state/${instanceId}`;
-        window.location.href = stateComponents.length ? `${baseURL}?components=${stateComponents.join(",")}` : baseURL;
+        exportStateData({
+            instanceId: instanceId!,
+            body: {
+                components: stateComponents.map((value) => {
+                    return {
+                        component: value,
+                    };
+                }),
+            },
+        });
     };
 
     const handleCancel = (): void => {
         setIsModalOpen(false);
     };
 
-    const handleChange = (stateComponent: string): void => {
+    const handleChange = (stateComponent: EExportableComponent): void => {
         setStateComponents((prev) =>
             prev.includes(stateComponent)
                 ? prev.filter((component) => component !== stateComponent)
@@ -66,7 +75,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
             >
                 <List
                     bordered
-                    dataSource={detailsDownloadStateComponents}
+                    dataSource={Object.values(EExportableComponent)}
                     renderItem={(component) => (
                         <List.Item actions={[<Switch onChange={() => handleChange(component)} />]}>
                             {t(`Details.Components.${component}`)}
