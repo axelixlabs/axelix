@@ -34,4 +34,37 @@ public interface CacheManagerAdapter {
      * @param key       the key to evict
      */
     boolean clear(String cacheName, Object key);
+
+    /**
+     * Enable the cache manager, allowing it to perform caching operations.
+     * This will activate all caching functionality managed by this instance.
+     */
+    void enableCacheManager();
+
+    /**
+     * Disable the cache manager, preventing it from performing caching operations.
+     * This will deactivate all caching functionality managed by this instance.
+     */
+    void disableCacheManager();
+
+    /**
+     * Enable a specific cache by name.
+     * This activates caching operations for the specified cache only.
+     *
+     * @param cacheName the name of the cache to enable
+     */
+    void enableCache(String cacheName);
+
+    /**
+     * Disable a specific cache by name.
+     * This deactivates caching operations for the specified cache only.
+     *
+     * @param cacheName the name of the cache to disable
+     */
+    void disableCache(String cacheName);
+
+    /**
+     * Enable all cacheManagers in cache manager.
+     */
+    void enableAllCache();
 }
