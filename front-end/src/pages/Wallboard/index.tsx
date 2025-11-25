@@ -23,7 +23,7 @@ import { getWallboardData } from "services";
 import { WallboardCard } from "./WallboardCard";
 import styles from "./styles.module.css";
 
-export const Wallboard = () => {
+const Wallboard = () => {
     const [search, setSearch] = useState<string>("");
     const [wallboard, setWallboard] = useState(StatefulRequest.loading<IServiceCardsResponseBody>());
 

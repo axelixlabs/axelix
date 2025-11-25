@@ -1,0 +1,31 @@
+.MainWrapper {
+    display: flex;
+    column-gap: 75px;
+    position: relative;
+}
+
+.MainWrapper::after {
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #000000;
+}
+
+.TimeSlot {
+    font-weight: 600;
+    position: relative;
+}
+
+.TimeSlot::after {
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 10px;
+    background-color: #000000;
+}

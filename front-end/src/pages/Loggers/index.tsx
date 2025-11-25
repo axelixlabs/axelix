@@ -27,7 +27,7 @@ import { Logger } from "./Logger";
 import { LoggerGroups } from "./LoggerGroups";
 import styles from "./styles.module.css";
 
-export const Loggers = () => {
+const Loggers = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const [activeKey, setActiveKey] = useState<ELoggersTabs>(ELoggersTabs.LOGGERS);

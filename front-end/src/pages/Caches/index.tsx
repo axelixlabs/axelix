@@ -27,7 +27,7 @@ import { clearAllCachesData, getCachesData } from "services";
 import { CacheManagerSection } from "./CacheManagerSection";
 import styles from "./styles.module.css";
 
-export const Caches = () => {
+const Caches = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const [messageApi, contextHolder] = message.useMessage();

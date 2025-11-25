@@ -1,0 +1,31 @@
+import { useEffect, useState } from "react";
+
+import type { IThread } from "models";
+import { threadDumpStateLetters } from "utils";
+
+import { ThreadDumpTimeline } from "../ThreadDumpStatusTimeline";
+
+import styles from "./styles.module.css";
+
+interface IProps {
+    threadDump: IThread;
+}
+
+export const ThreadDumpAccordionHeader = ({ threadDump }: IProps) => {
+    const [history, setHistory] = useState<IThread[]>([]);
+
+    useEffect(() => {
+        setHistory((prev) => [...prev, threadDump]);
+    }, [threadDump]);
+
+    return (
+        <div className={styles.HeaderWrapper}>
+            {/* TODO: Add tooltip in future */}
+            <div className={`${styles.ThreadNameAvatar} ${styles[threadDump.threadState]}`}>
+                {threadDumpStateLetters[threadDump.threadState]}
+            </div>
+            <div>{threadDump.threadName}</div>
+            <ThreadDumpTimeline history={history} />
+        </div>
+    );
+};
