@@ -1,9 +1,9 @@
 package com.nucleonforge.axile.sbs.spring.cache;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.Selector;
-import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
-import org.springframework.lang.Nullable;
+import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * Custom Spring Boot Actuator endpoint
@@ -23,7 +23,7 @@ import org.springframework.lang.Nullable;
  * @since 24.06.2025
  * @author Nikita Kirillov
  */
-@Endpoint(id = "cache-dispatcher")
+@RestControllerEndpoint(id = "cache-dispatcher")
 public class CacheDispatcherEndpoint {
 
     private final CacheDispatcher dispatcher;
@@ -32,17 +32,45 @@ public class CacheDispatcherEndpoint {
         this.dispatcher = dispatcher;
     }
 
-    @WriteOperation
+    @PostMapping("/{cacheManagerName}/{cacheName}/clear")
     public CacheClearResponse clearKey(
-            @Selector String cacheManagerName, @Selector String cacheName, @Nullable Object key) {
+            @PathVariable String cacheManagerName,
+            @PathVariable String cacheName,
+            @RequestBody(required = false) Object key) {
+
         boolean result = key == null
                 ? dispatcher.clear(cacheManagerName, cacheName)
                 : dispatcher.clear(cacheManagerName, cacheName, key);
         return new CacheClearResponse(result);
     }
 
-    @WriteOperation
-    public CacheClearResponse clearAll(@Selector String cacheManagerName) {
+    @PostMapping("/{cacheManagerName}/clear-all")
+    public CacheClearResponse clearAll(@PathVariable String cacheManagerName) {
         return new CacheClearResponse(dispatcher.clearAll(cacheManagerName));
+    }
+
+    @PostMapping("/{cacheManagerName}/enable")
+    public void enableManager(@PathVariable String cacheManagerName) {
+        dispatcher.enableCacheManager(cacheManagerName);
+    }
+
+    @PostMapping("/{cacheManagerName}/disable")
+    public void disableManager(@PathVariable String cacheManagerName) {
+        dispatcher.disableCacheManager(cacheManagerName);
+    }
+
+    @PostMapping("/{cacheManagerName}/{cacheName}/enable")
+    public void enableCache(@PathVariable String cacheManagerName, @PathVariable String cacheName) {
+        dispatcher.enableCache(cacheManagerName, cacheName);
+    }
+
+    @PostMapping("/{cacheManagerName}/{cacheName}/disable")
+    public void disableCache(@PathVariable String cacheManagerName, @PathVariable String cacheName) {
+        dispatcher.disableCache(cacheManagerName, cacheName);
+    }
+
+    @PostMapping("/enable-all-cache")
+    public void enableAllCache() {
+        dispatcher.enableAllCache();
     }
 }

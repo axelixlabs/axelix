@@ -43,4 +43,46 @@ public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
         }
         return false;
     }
+
+    public void enableCacheManager() {
+        if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
+            enhancedCacheManager.enableCacheManager();
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public void disableCacheManager() {
+        if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
+            enhancedCacheManager.disableCacheManager();
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public void enableCache(String cacheName) {
+        if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
+            enhancedCacheManager.enableCache(cacheName);
+            this.clearAll();
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public void disableCache(String cacheName) {
+        if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
+            enhancedCacheManager.disableCache(cacheName);
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public void enableAllCache() {
+        if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
+            enhancedCacheManager.enableAllCache();
+        }
+    }
 }

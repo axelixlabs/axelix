@@ -13,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axile.Main;
 
@@ -37,7 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
-@TestPropertySource(properties = {"spring.cache.type=simple"})
 @Import({CacheDispatcherEndpoint.class, DefaultCacheDispatcher.class})
 class CacheDispatcherEndpointTest {
 
