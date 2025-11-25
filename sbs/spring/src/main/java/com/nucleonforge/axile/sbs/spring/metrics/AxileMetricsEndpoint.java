@@ -17,6 +17,7 @@ import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint.MetricDescriptor;
 import org.springframework.lang.Nullable;
 
+import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile.Measurement;
 
@@ -31,10 +32,20 @@ public class AxileMetricsEndpoint {
 
     private final MetricsEndpoint delegate;
     private final MeterRegistry registry;
+    private final ServiceMetricsGroupsAssembler defaultMetricsGroupsAssembler;
 
-    public AxileMetricsEndpoint(MetricsEndpoint delegate, MeterRegistry registry) {
+    public AxileMetricsEndpoint(
+            MetricsEndpoint delegate,
+            MeterRegistry registry,
+            ServiceMetricsGroupsAssembler defaultMetricsGroupsAssembler) {
         this.delegate = delegate;
         this.registry = registry;
+        this.defaultMetricsGroupsAssembler = defaultMetricsGroupsAssembler;
+    }
+
+    @ReadOperation
+    public AxileMetricsGroups metricsGroups() {
+        return defaultMetricsGroupsAssembler.assemble();
     }
 
     // IMPORTANT!
