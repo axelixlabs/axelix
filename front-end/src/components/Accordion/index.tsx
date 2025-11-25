@@ -39,6 +39,11 @@ interface IProps {
      * Indicates whether the accordion is expanded
      */
     accordionExpanded?: boolean;
+
+    /**
+     * If true, the arrow icon will not be displayed.
+     */
+    hideArrowIcon?: boolean;
 }
 
 export const Accordion = ({
@@ -47,6 +52,7 @@ export const Accordion = ({
     headerStyles,
     contentStyles,
     accordionExpanded = false,
+    hideArrowIcon = false,
 }: PropsWithChildren<IProps>) => {
     const [open, setOpen] = useState<boolean>(accordionExpanded);
 
@@ -57,7 +63,7 @@ export const Accordion = ({
     return (
         <div className={`${styles.MainWrapper} ${open ? styles.Open : ""}`}>
             <div className={`${styles.HeaderWrapper} ${headerStyles}`} onClick={handlerClick}>
-                <img src={ArrowIcon} alt="Arrow icon" className={styles.Icon} />
+                {!hideArrowIcon && <img src={ArrowIcon} alt="Arrow icon" className={styles.Icon} />}
                 <div className={styles.Header}>{header}</div>
             </div>
             {open && (

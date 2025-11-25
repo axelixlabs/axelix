@@ -2,12 +2,11 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { EmptyHandler, Loader } from "components";
+import { Accordion, EmptyHandler, Loader } from "components";
 import { fetchData } from "helpers";
 import { type IThreadDumpResponseBody, StatefulRequest } from "models";
 import { getThreadDumpData } from "services";
 
-import { ThreadDumpAccordion } from "./ThreadDumpAccordion";
 import { ThreadDumpAccordionBody } from "./ThreadDumpAccordionBody";
 import { ThreadDumpAccordionHeader } from "./ThreadDumpAccordionHeader";
 import { ThreadDumpTimeLine } from "./ThreadDumpTimeLine";
@@ -53,9 +52,13 @@ const ThreadDump = () => {
 
             <div className="AccordionsWrapper">
                 {sortedThreadDump.map((threadDump) => (
-                    <ThreadDumpAccordion header={<ThreadDumpAccordionHeader threadDump={threadDump} />}>
+                    <Accordion
+                        header={<ThreadDumpAccordionHeader threadDump={threadDump} />}
+                        key={threadDump.threadId}
+                        hideArrowIcon
+                    >
                         <ThreadDumpAccordionBody threadDump={threadDump} />
-                    </ThreadDumpAccordion>
+                    </Accordion>
                 ))}
             </div>
         </>

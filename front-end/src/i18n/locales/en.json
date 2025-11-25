@@ -194,6 +194,7 @@
         "identityHashCode": "Identity hash code",
         "priority": "Priority",
         "daemon": "Daemon",
-        "lockInfo": "Lock info"
+        "lockInfo": "Lock info",
+        "stacktrace": "Stacktrace"
     }
 }

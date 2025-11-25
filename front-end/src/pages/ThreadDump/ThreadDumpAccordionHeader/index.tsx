@@ -8,6 +8,9 @@ import { ThreadDumpTimeline } from "../ThreadDumpStatusTimeline";
 import styles from "./styles.module.css";
 
 interface IProps {
+    /**
+     *  An object representing the thread dump.
+     */
     threadDump: IThread;
 }
 

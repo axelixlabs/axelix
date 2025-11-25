@@ -25,7 +25,7 @@
     bottom: -20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 2px;
+    width: 4px;
     height: 10px;
     background-color: #000000;
 }

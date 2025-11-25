@@ -1,4 +1,5 @@
 .TitleAndTimelineWrapper {
+    height: 58px;
     position: sticky;
     top: var(--axile-header-height);
     background-color: #ffffff;

@@ -6,6 +6,9 @@ import type { IThread } from "models";
 import styles from "./styles.module.css";
 
 interface IProps {
+    /**
+     *  An object representing the thread dump.
+     */
     threadDump: IThread;
 }
 
@@ -15,7 +18,7 @@ export const ThreadDumpLockInfo = ({ threadDump }: IProps) => {
     const treeData = [
         {
             title: threadDump.lockName,
-            key: "0-0",
+            key: threadDump.threadId,
             children: [
                 {
                     title: (
@@ -24,7 +27,7 @@ export const ThreadDumpLockInfo = ({ threadDump }: IProps) => {
                             <div>{threadDump.lockInfo.className}</div>
                         </div>
                     ),
-                    key: "0-0-0",
+                    key: `${threadDump.threadId} ${threadDump.lockInfo.className}`,
                 },
                 {
                     title: (
@@ -33,7 +36,7 @@ export const ThreadDumpLockInfo = ({ threadDump }: IProps) => {
                             <div>{threadDump.lockOwnerId}</div>
                         </div>
                     ),
-                    key: "0-0-1",
+                    key: `${threadDump.threadId} ${threadDump.lockOwnerId}`,
                 },
                 {
                     title: (
@@ -42,7 +45,7 @@ export const ThreadDumpLockInfo = ({ threadDump }: IProps) => {
                             <div>{threadDump.lockOwnerName}</div>
                         </div>
                     ),
-                    key: "0-0-2",
+                    key: `${threadDump.threadId} ${threadDump.lockOwnerName}`,
                 },
                 {
                     title: (
@@ -51,7 +54,7 @@ export const ThreadDumpLockInfo = ({ threadDump }: IProps) => {
                             <div>{threadDump.lockInfo.identityHashCode}</div>
                         </div>
                     ),
-                    key: "0-0-3",
+                    key: `${threadDump.threadId} ${threadDump.lockInfo.identityHashCode}`,
                 },
             ],
         },
