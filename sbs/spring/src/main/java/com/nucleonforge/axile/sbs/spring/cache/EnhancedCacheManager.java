@@ -12,7 +12,8 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.support.NoOpCache;
 
 /**
- *
+ * CacheManager implementation that provides dynamic control over cache operations.
+ * Allows enabling/disabling individual caches or the entire manager at runtime.
  *
  * @since 24.11.2025
  * @author Nikita Kirillov
@@ -40,7 +41,12 @@ public class EnhancedCacheManager implements CacheManager {
             return new NoOpCache(name);
         }
 
-        return delegate.getCache(name);
+        Cache result = delegate.getCache(name);
+        if (result != null) {
+            return new SwitchableCache(result, name, this);
+        }
+
+        return null;
     }
 
     @Override
@@ -68,5 +74,9 @@ public class EnhancedCacheManager implements CacheManager {
     public void enableAllCache() {
         this.enabled = true;
         this.cacheNamesDisabled.clear();
+    }
+
+    public boolean isCacheDisabled(String cacheName) {
+        return !enabled && cacheNamesDisabled.contains(cacheName);
     }
 }

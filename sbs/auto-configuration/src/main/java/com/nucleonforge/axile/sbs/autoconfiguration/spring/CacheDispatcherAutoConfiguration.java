@@ -52,7 +52,7 @@ public class CacheDispatcherAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
+    public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
         return new CacheManagerBeanPostProcessor();
     }
 }

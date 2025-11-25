@@ -63,8 +63,10 @@ public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
     @Override
     public void enableCache(String cacheName) {
         if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
-            enhancedCacheManager.enableCache(cacheName);
-            this.clearAll();
+            Cache cache = enhancedCacheManager.getCache(cacheName);
+            if (cache != null) {
+                enhancedCacheManager.enableCache(cacheName);
+            }
         } else {
             throw new UnsupportedOperationException();
         }
@@ -73,7 +75,10 @@ public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
     @Override
     public void disableCache(String cacheName) {
         if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
-            enhancedCacheManager.disableCache(cacheName);
+            Cache cache = enhancedCacheManager.getCache(cacheName);
+            if (cache != null) {
+                enhancedCacheManager.disableCache(cacheName);
+            }
         } else {
             throw new UnsupportedOperationException();
         }

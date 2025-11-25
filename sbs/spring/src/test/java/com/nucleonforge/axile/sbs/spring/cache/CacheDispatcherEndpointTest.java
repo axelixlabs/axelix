@@ -19,18 +19,7 @@ import com.nucleonforge.axile.Main;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link CacheDispatcherEndpoint} using {@link TestRestTemplate}
- * and a real HTTP context with web environment.
- *
- * <p>These tests verify that the actuator endpoint {@code /actuator/cache-dispatcher}
- * responds correctly to various operations such as clearing caches, evicting keys,
- * and handling invalid CacheManager names.
- *
- * <p>To be discoverable and enabled during tests, the actuator endpoint should either be:
- * <ul>
- *     <li>Explicitly included via {@code management.endpoints.web.exposure.include=cache-dispatcher}, or</li>
- *     <li>Configured as part of auto-configuration in the test application context.</li>
- * </ul>
+ * Integration tests for {@link CacheDispatcherEndpoint}.
  *
  * @since 24.06.2025
  * @author Nikita Kirillov
@@ -55,7 +44,7 @@ class CacheDispatcherEndpointTest {
         assertThat(cache.get(key)).isNotNull();
 
         CacheClearResponse response = testRestTemplate.postForObject(
-                path("/cacheManager/cache?key=key"), defaultEntity(), CacheClearResponse.class);
+                path("/cacheManager/cache/clear?key=key"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache.get(key)).isNull();
@@ -73,7 +62,7 @@ class CacheDispatcherEndpointTest {
         assertThat(cache.get(key2)).isNotNull();
 
         CacheClearResponse response = testRestTemplate.postForObject(
-                path("/cacheManager/cache?key=key2"), defaultEntity(), CacheClearResponse.class);
+                path("/cacheManager/cache/clear?key=key2"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache.get(key2)).isNull();
@@ -89,8 +78,8 @@ class CacheDispatcherEndpointTest {
         cache.put(key, "value");
         assertThat(cache.get(key)).isNotNull();
 
-        CacheClearResponse response =
-                testRestTemplate.postForObject(path("/cacheManager/cache"), defaultEntity(), CacheClearResponse.class);
+        CacheClearResponse response = testRestTemplate.postForObject(
+                path("/cacheManager/cache/clear"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache.get(key)).isNull();
@@ -129,8 +118,8 @@ class CacheDispatcherEndpointTest {
         assertThat(cache1.get(key1)).isNotNull();
         assertThat(cache2.get(key2)).isNotNull();
 
-        CacheClearResponse response =
-                testRestTemplate.postForObject(path("/cacheManager"), defaultEntity(), CacheClearResponse.class);
+        CacheClearResponse response = testRestTemplate.postForObject(
+                path("/cacheManager/clear-all"), defaultEntity(), CacheClearResponse.class);
 
         assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache1.get(key1)).isNull();
