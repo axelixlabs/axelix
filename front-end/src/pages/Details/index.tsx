@@ -34,17 +34,19 @@ const Details = () => {
     }
 
     const buildValues = (data: DetailsBuildValuesData): IDetailsCardRecord[] => {
-        return Object.entries(data).map(([key, value]) => {
-            return {
-                key: key,
-                value: (
-                    <>
-                        {value as string}
-                        {isCopyableField(key as string) && <Copy text={value} />}
-                    </>
-                ),
-            };
-        });
+        return Object.entries(data)
+            .filter(([, value]) => value !== undefined)
+            .map(([key, value]) => {
+                return {
+                    key: key,
+                    value: (
+                        <>
+                            {value as string}
+                            {isCopyableField(key as string) && <Copy text={value} />}
+                        </>
+                    ),
+                };
+            });
     };
 
     const { serviceName, git, build, spring, runtime, os } = dataState.response!;

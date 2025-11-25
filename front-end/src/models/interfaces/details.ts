@@ -14,13 +14,13 @@ export interface IDetailsRuntime {
     javaVersion: string;
     jdkVendor: string;
     garbageCollector: string;
-    kotlinVersion: string;
+    kotlinVersion?: string;
 }
 
 export interface IDetailsSpring {
     springBootVersion: string;
-    SpringFrameworkVersion: string;
-    SpringCloudVersion: string;
+    springFrameworkVersion: string;
+    springCloudVersion?: string;
 }
 
 export interface IDetailsBuild {
