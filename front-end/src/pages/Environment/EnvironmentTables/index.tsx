@@ -13,6 +13,17 @@ interface IProps {
     propertySources: IEnvironmentPropertySource[];
 }
 
+/**
+ * Applies deduplication in case the property name is present in multiple property sources with the same name
+ */
+function buildAutoCompleteOptions(propertySources: IEnvironmentPropertySource[]) {
+    return [...new Set(propertySources.flatMap(({ properties }) => properties).map((p) => p.name))].map((value) => {
+        return {
+            value: value,
+        };
+    });
+}
+
 export const EnvironmentTables = ({ propertySources }: IProps) => {
     const [search, setSearch] = useState<string>("");
     const effectivePropertySources = search ? filterPropertySources(propertySources, search) : propertySources;
@@ -22,9 +33,7 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
 
     const addonAfter = `${filteredPropertiesCount} / ${totalPropertiesCount}`;
 
-    const autocompleteOptions = propertySources.flatMap(({ properties }) =>
-        properties.map(({ name }) => ({ value: name })),
-    );
+    const autocompleteOptions = buildAutoCompleteOptions(effectivePropertySources);
 
     return (
         <>
