@@ -19,18 +19,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
-import com.nucleonforge.axile.common.api.metrics.MetricsList;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.MultiValueQueryParameter;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
-import com.nucleonforge.axile.master.api.response.loggers.GroupProfileResponse;
-import com.nucleonforge.axile.master.api.response.metrics.MetricsListResponse;
+import com.nucleonforge.axile.master.api.response.metrics.MetricsGroupsResponse;
 import com.nucleonforge.axile.master.api.response.metrics.SingleMetricProfileResponse;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.response.Converter;
-import com.nucleonforge.axile.master.service.transport.metrics.GetAllMetricsEndpointProber;
+import com.nucleonforge.axile.master.service.transport.metrics.GetMetricsGroupsEndpointProber;
 import com.nucleonforge.axile.master.service.transport.metrics.GetSingleMetricProfileEndpointProber;
 
 /**
@@ -44,19 +43,19 @@ import com.nucleonforge.axile.master.service.transport.metrics.GetSingleMetricPr
 @RequestMapping(path = ApiPaths.MetricsApi.MAIN)
 public class MetricsApi {
 
-    private final GetAllMetricsEndpointProber getAllMetricsEndpointProber;
+    private final GetMetricsGroupsEndpointProber getMetricsGroupsEndpointProber;
     private final GetSingleMetricProfileEndpointProber getSingleMetricProfileEndpointProber;
-    private final Converter<MetricsList, MetricsListResponse> allMetricsConverter;
+    private final Converter<AxileMetricsGroups, MetricsGroupsResponse> axileMetricsGroupsConverter;
     private final Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter;
 
     public MetricsApi(
-            GetAllMetricsEndpointProber getAllMetricsEndpointProber,
+            GetMetricsGroupsEndpointProber getMetricsGroupsEndpointProber,
             GetSingleMetricProfileEndpointProber getSingleMetricProfileEndpointProber,
-            Converter<MetricsList, MetricsListResponse> allMetricsConverter,
+            Converter<AxileMetricsGroups, MetricsGroupsResponse> axileMetricsGroupsConverter,
             Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter) {
-        this.getAllMetricsEndpointProber = getAllMetricsEndpointProber;
+        this.getMetricsGroupsEndpointProber = getMetricsGroupsEndpointProber;
         this.getSingleMetricProfileEndpointProber = getSingleMetricProfileEndpointProber;
-        this.allMetricsConverter = allMetricsConverter;
+        this.axileMetricsGroupsConverter = axileMetricsGroupsConverter;
         this.singleMetricConverter = singleMetricConverter;
     }
 
@@ -74,7 +73,7 @@ public class MetricsApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        schema = @Schema(implementation = GroupProfileResponse.class))),
+                                        schema = @Schema(implementation = MetricsGroupsResponse.class))),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -92,9 +91,10 @@ public class MetricsApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.MetricsApi.INSTANCE_ID)
-    public MetricsListResponse getAllMetrics(@PathVariable("instanceId") String instanceId) {
-        MetricsList metricsList = getAllMetricsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(allMetricsConverter.convert(metricsList));
+    public MetricsGroupsResponse getMetricsGroups(@PathVariable("instanceId") String instanceId) {
+        AxileMetricsGroups metricsList =
+                getMetricsGroupsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        return Objects.requireNonNull(axileMetricsGroupsConverter.convert(metricsList));
     }
 
     @Operation(

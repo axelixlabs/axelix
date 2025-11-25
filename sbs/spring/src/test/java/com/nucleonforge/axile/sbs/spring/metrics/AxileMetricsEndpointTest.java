@@ -1,22 +1,39 @@
 package com.nucleonforge.axile.sbs.spring.metrics;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.binder.MeterBinder;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
+import com.nucleonforge.axile.common.api.KeyValue;
+import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Integration tests for {@link AxileMetricsEndpoint}.
+ *
+ * @author Nikita Kirillov
+ * @author Sergey Cherkasov
+ */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({AxileMetricsEndpoint.class, MetricsEndpoint.class})
+@Import({AxileMetricsEndpoint.class, MetricsEndpoint.class, DefaultServiceMetricsGroupsAssembler.class})
 class AxileMetricsEndpointTest {
 
     @Autowired
@@ -60,5 +77,86 @@ class AxileMetricsEndpointTest {
                         Map.of(
                                 "area", "heap",
                                 "id", "G1 Survivor Space"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("metricsGroups")
+    void shouldReturnGroupedMetricsWithDescriptions(String groupName, String metricName, String metricDescription) {
+        // when.
+        ResponseEntity<AxileMetricsGroups> response =
+                testRestTemplate.getForEntity("/actuator/axile-metrics", AxileMetricsGroups.class);
+
+        // then.
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        AxileMetricsGroups metricsGroups = response.getBody();
+
+        assertThat(metricsGroups.metricsGroups())
+                // metrics group
+                .filteredOn(group -> group.groupName().equals(groupName))
+                .first()
+                .satisfies(group -> {
+                    List<KeyValue> metrics = group.metrics();
+
+                    // metric name
+                    assertThat(metrics).extracting(KeyValue::key).contains(metricName);
+
+                    // metric description
+                    assertThat(metrics).extracting(KeyValue::value).contains(metricDescription);
+                });
+    }
+
+    private static Stream<Arguments> metricsGroups() {
+        return Stream.of(
+                Arguments.of(
+                        "axileMetrics",
+                        "axileMetrics.test.metric1",
+                        "Test metric belonging to the `axileMetrics` group with a description"),
+                Arguments.of(
+                        "axileMetrics",
+                        "axileMetrics.test.metric2",
+                        "Test metric belonging to the `axileMetrics` group with a description"),
+                Arguments.of("axileMetrics", "axileMetrics.test.metric3", null),
+                Arguments.of(
+                        "testMetrics",
+                        "testMetrics.axile.metric1",
+                        "Test metric belonging to the `testMetrics` group with a description"),
+                Arguments.of(
+                        "testMetrics",
+                        "testMetrics.axile.metric2",
+                        "Test metric belonging to the `testMetrics` group with a description"),
+                Arguments.of(
+                        "Others",
+                        "standalone",
+                        "Test metric belonging to the 'Others' group without a prefix and with a description"));
+    }
+
+    @TestConfiguration
+    static class AxileMetricsEndpointTestConfiguration {
+
+        @Bean
+        public MeterBinder groupingMetrics() {
+            return registry -> {
+                Counter.builder("axileMetrics.test.metric1")
+                        .description("Test metric belonging to the `axileMetrics` group with a description")
+                        .register(registry);
+
+                Counter.builder("axileMetrics.test.metric2")
+                        .description("Test metric belonging to the `axileMetrics` group with a description")
+                        .register(registry);
+
+                Counter.builder("axileMetrics.test.metric3").register(registry);
+
+                Counter.builder("testMetrics.axile.metric1")
+                        .description("Test metric belonging to the `testMetrics` group with a description")
+                        .register(registry);
+
+                Counter.builder("testMetrics.axile.metric2").register(registry);
+
+                Counter.builder("standalone")
+                        .description(
+                                "Test metric belonging to the 'Others' group without a prefix and with a description")
+                        .register(registry);
+            };
+        }
     }
 }
