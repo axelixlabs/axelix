@@ -24,7 +24,7 @@ import { getBeansData } from "services";
 import { BeanAccordionChildren } from "./BeanAccordionChildren";
 import { BeanAccordionLabels } from "./BeanAccordionLabels";
 
-export const Beans = () => {
+const Beans = () => {
     const { instanceId } = useParams();
 
     const [dataState, setDataState] = useState(StatefulRequest.loading<IBeansResponseBody>());

@@ -16,6 +16,7 @@
 export * from "./scheduledTasks";
 export * from "./environment";
 export * from "./configProps";
+export * from "./threadDump";
 export * from "./conditions";
 export * from "./wallboard";
 export * from "./dashboard";

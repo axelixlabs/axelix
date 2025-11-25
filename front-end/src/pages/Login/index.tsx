@@ -25,7 +25,7 @@ import { IS_AUTH } from "utils";
 
 import styles from "./styles.module.css";
 
-export const Login = () => {
+const Login = () => {
     const { t } = useTranslation();
     const [loginData, setLoginData] = useState(StatelessRequest.inactive());
 
