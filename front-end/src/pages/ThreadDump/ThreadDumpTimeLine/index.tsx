@@ -28,8 +28,10 @@ export const ThreadDumpTimeLine = () => {
 
     return (
         <div className={styles.MainWrapper}>
-            {timeSlots.map((timeSlot) => (
-                <span className={styles.TimeSlot}>{timeSlot.toLocaleTimeString([], { hour12: false })}</span>
+            {timeSlots.map((timeSlot, index) => (
+                <span className={styles.TimeSlot} key={index}>
+                    {timeSlot.toLocaleTimeString([], { hour12: false })}
+                </span>
             ))}
         </div>
     );

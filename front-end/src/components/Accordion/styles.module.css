@@ -13,6 +13,10 @@
   height: 0%;
 }
 
+.Icon {
+    margin-right: 12px;
+}
+
 .MainWrapper.Open > .HeaderWrapper > .Icon {
   transform: rotate(180deg);
   transition: transform 0.3s;
@@ -29,7 +33,6 @@
 }
 
 .Header {
-  margin-left: 12px;
   width: 100%;
   min-width: 0;
 }

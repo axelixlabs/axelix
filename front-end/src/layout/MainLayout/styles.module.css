@@ -24,3 +24,11 @@
     margin-top: var(--axile-header-height);
     padding: 24px;
 }
+
+.ThreadDumpContentLayout {
+    min-width: 3366px
+}
+
+.ThreadDumpContent {
+    min-width: 3048px;
+}
