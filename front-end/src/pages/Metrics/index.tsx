@@ -37,9 +37,15 @@ const Metrics = () => {
 
     const addonAfter = `${filteredMetricsCount} / ${totalMetricsCount}`;
 
+    const autocompleteOptions = effectiveMetricsGroups
+        .flatMap((metrics) => metrics.metrics)
+        .map((metric) => ({
+            value: metric,
+        }));
+
     return (
         <>
-            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
+            <PageSearch addonAfter={addonAfter} setSearch={setSearch} autocompleteOptions={autocompleteOptions} />
 
             <EmptyHandler isEmpty={!filteredMetricsCount}>
                 {effectiveMetricsGroups.map(({ groupName, metrics }) => (
