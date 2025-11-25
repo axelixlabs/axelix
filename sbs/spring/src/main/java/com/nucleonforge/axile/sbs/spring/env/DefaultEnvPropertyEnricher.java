@@ -70,7 +70,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
         // simple putIfAbsent is sufficient.
         for (PropertySourceDescriptor source : descriptor.getPropertySources()) {
             for (String key : source.getProperties().keySet()) {
-                primaryMap.putIfAbsent(key, source.getName());
+                primaryMap.putIfAbsent(propertyNameNormalizer.normalize(key), source.getName());
             }
         }
         return primaryMap;
@@ -85,7 +85,9 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                     PropertyValueDescriptor original = entry.getValue();
 
-                    boolean isPrimary = Objects.equals(primaryPropertySourceMap.get(entry.getKey()), source.getName());
+                    boolean isPrimary = Objects.equals(
+                            primaryPropertySourceMap.get(propertyNameNormalizer.normalize(entry.getKey())),
+                            source.getName());
 
                     return new AxileEnvironmentEndpoint.AxilePropertyValueDescriptor(
                             original.getValue(),
