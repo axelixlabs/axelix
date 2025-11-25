@@ -4,17 +4,16 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 
 import com.nucleonforge.axile.sbs.spring.context.ContextRestarter;
 import com.nucleonforge.axile.sbs.spring.env.DefaultEnvironmentPropertyNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.properties.ContextReloadingPropertyMutator;
-import com.nucleonforge.axile.sbs.spring.properties.DefaultPropertyDiscoverer;
+import com.nucleonforge.axile.sbs.spring.properties.DefaultPropertyNameDiscoverer;
 import com.nucleonforge.axile.sbs.spring.properties.DefaultPropertySourceDescriber;
-import com.nucleonforge.axile.sbs.spring.properties.PropertyDiscoverer;
 import com.nucleonforge.axile.sbs.spring.properties.PropertyManagementEndpoint;
 import com.nucleonforge.axile.sbs.spring.properties.PropertyMutator;
+import com.nucleonforge.axile.sbs.spring.properties.PropertyNameDiscoverer;
 import com.nucleonforge.axile.sbs.spring.properties.PropertySourceDescriber;
 
 /**
@@ -26,7 +25,7 @@ import com.nucleonforge.axile.sbs.spring.properties.PropertySourceDescriber;
  * <p>Beans registered by this auto-configuration (if missing) include:</p>
  * <ul>
  *   <li>{@link PropertyMutator} — responsible for updating property values and triggering application context restarts.</li>
- *   <li>{@link PropertyDiscoverer} — responsible for locating properties within the Spring Environment.</li>
+ *   <li>{@link PropertyNameDiscoverer} — responsible for locating properties name within the Spring Environment.</li>
  *   <li>{@link PropertyManagementEndpoint} — actuator endpoint exposing property management operations.</li>
  *   <li>{@link PropertySourceDescriber} - Provides metadata descriptions of property sources.</li>
  * </ul>
@@ -54,16 +53,16 @@ public class PropertyManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public PropertyDiscoverer propertyDiscoverer(
-            Environment environment, EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
-        return new DefaultPropertyDiscoverer(environment, propertyNameNormalizer);
+    public PropertyNameDiscoverer propertyNameDiscoverer(
+            ConfigurableEnvironment environment, EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
+        return new DefaultPropertyNameDiscoverer(environment, propertyNameNormalizer);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public PropertyManagementEndpoint propertyManagementEndpoint(
-            PropertyMutator propertyMutator, PropertyDiscoverer propertyDiscoverer) {
-        return new PropertyManagementEndpoint(propertyMutator, propertyDiscoverer);
+            PropertyMutator propertyMutator, PropertyNameDiscoverer propertyNameDiscoverer) {
+        return new PropertyManagementEndpoint(propertyMutator, propertyNameDiscoverer);
     }
 
     @Bean

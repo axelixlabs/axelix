@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axile.sbs.spring.env.DefaultEnvironmentPropertyNameNormalizer;
@@ -19,13 +21,14 @@ import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link DefaultPropertyDiscoverer}.
+ * Integration tests for {@link DefaultPropertyNameDiscoverer}.
  *
  * @author Sergey Cherkasov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
         properties = {
+            "axile.prop.test.dynamic-properties=dynamicValue",
             "axile.prop.test.enabled-contexts=user-service, payment-service",
             "axile.prop.test.http-client.requests[0].name=user-api",
             "axile.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
@@ -39,10 +42,15 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axile.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
             "axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
-public class DefaultPropertyDiscovererTest {
+public class DefaultPropertyNameDiscovererTest {
 
     @Autowired
-    private PropertyDiscoverer discoverer;
+    private PropertyNameDiscoverer discoverer;
+
+    @DynamicPropertySource
+    static void registerDynamic(DynamicPropertyRegistry registry) {
+        registry.add("axile.prop.test.dynamicProperties", () -> "dynamicValue");
+    }
 
     @ParameterizedTest
     @MethodSource("propertyName")
@@ -53,6 +61,7 @@ public class DefaultPropertyDiscovererTest {
     private static Stream<Arguments> propertyName() {
         return Stream.of(
                 Arguments.of("axile.property.not-found", null),
+                Arguments.of("axile.prop.test.dynamic-properties", "axile.prop.test.dynamicProperties"),
                 Arguments.of("AXILE_PROP_TEST_ENABLED_CONTEXTS", "axile.prop.test.enabled-contexts"),
                 Arguments.of(
                         "axile.prop.test.httpClient.requests.name", "axile.prop.test.http-client.requests[0].name"),
@@ -96,9 +105,10 @@ public class DefaultPropertyDiscovererTest {
         }
 
         @Bean
-        public PropertyDiscoverer propertyDiscoverer(
-                Environment environment, EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
-            return new DefaultPropertyDiscoverer(environment, propertyNameNormalizer);
+        public PropertyNameDiscoverer propertyNameDiscoverer(
+                ConfigurableEnvironment configurableEnvironment,
+                EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
+            return new DefaultPropertyNameDiscoverer(configurableEnvironment, propertyNameNormalizer);
         }
     }
 }

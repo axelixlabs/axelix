@@ -1,70 +1,51 @@
 package com.nucleonforge.axile.sbs.spring.properties;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
-import org.springframework.core.env.StandardEnvironment;
-
-import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
 
 /**
- * Default {@link PropertyDiscoverer}. Looks up property by inspecting the {@link Environment}.
+ * Default {@link PropertyDiscoverer}. Looks up {@link Property} by inspecting the {@link ConfigurableEnvironment}.
  *
  * @since 04.07.25
  * @author Mikhail Polivakha
- * @author Sergey Cherkasov
  */
 public class DefaultPropertyDiscoverer implements PropertyDiscoverer {
 
-    private final Environment environment;
-    private final EnvironmentPropertyNameNormalizer propertyNameNormalizer;
+    private final ConfigurableEnvironment environment;
 
-    public DefaultPropertyDiscoverer(
-            Environment environment, EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
+    public DefaultPropertyDiscoverer(ConfigurableEnvironment environment) {
         this.environment = environment;
-        this.propertyNameNormalizer = propertyNameNormalizer;
     }
 
     @Override
     @Nullable
-    public String discover(String propertyName) {
-        Map<String, String> envPropsMapping = buildConfigEnvMappingMap();
+    public Property discover(String propertyName) {
 
-        return envPropsMapping.getOrDefault(propertyNameNormalizer.normalize(propertyName), null);
-    }
+        MutablePropertySources propertySources = environment.getPropertySources();
+        Property property = null;
 
-    private Map<String, String> buildConfigEnvMappingMap() {
-        Map<String, String> propertyNames = new HashMap<>();
-        for (PropertySource<?> source : getPropertySources()) {
-            extractPropertyNames(source, propertyNames);
-        }
-        return propertyNames;
-    }
-
-    private void extractPropertyNames(PropertySource<?> source, Map<String, String> propertyNames) {
-        if (source instanceof CompositePropertySource composite) {
-            for (PropertySource<?> nest : composite.getPropertySources()) {
-                extractPropertyNames(nest, propertyNames);
+        // We rely on the ordering of PropertySources: the first source containing the property
+        // is chosen as providerSource
+        for (PropertySource<?> propertySource : propertySources) {
+            if (!propertySource.containsProperty(propertyName)) {
+                continue;
             }
-        } else if (source instanceof EnumerablePropertySource<?> enumerable) {
-            for (String name : enumerable.getPropertyNames()) {
-                propertyNames.put(propertyNameNormalizer.normalize(name), name);
-            }
-        }
-    }
 
-    private MutablePropertySources getPropertySources() {
-        if (this.environment instanceof ConfigurableEnvironment configurableEnvironment) {
-            return configurableEnvironment.getPropertySources();
+            if (property == null) {
+                property = new Property(propertyName);
+                Object value = propertySource.getProperty(propertyName);
+                property.setValue(value != null ? value.toString() : null);
+                if (value != null) {
+                    property.setProviderSource(propertySource);
+                }
+            }
+
+            property.addHoldingPropertySource(propertySource);
         }
-        return new StandardEnvironment().getPropertySources();
+
+        return property;
     }
 }

@@ -3,7 +3,7 @@ package com.nucleonforge.axile.sbs.spring.properties;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The interface that can discover the properties by their names
+ * The interface that can discover the {@link Property properties} by their names
  *
  * @since 07.04.25
  * @author Mikhail Polivakha
@@ -14,8 +14,8 @@ public interface PropertyDiscoverer {
      * Actual discovery method
      *
      * @param propertyName the name of the property to be discovered
-     * @return discovered {@code propertyName}, or {@code null} if no property with the given name is not found
+     * @return discovered {@link Property}, or {@code null} if no property with the given name is not found
      */
     @Nullable
-    String discover(String propertyName);
+    Property discover(String propertyName);
 }

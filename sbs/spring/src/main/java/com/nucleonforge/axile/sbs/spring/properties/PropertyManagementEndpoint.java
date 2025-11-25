@@ -24,11 +24,11 @@ public class PropertyManagementEndpoint {
 
     private final PropertyMutator propertyMutator;
 
-    private final PropertyDiscoverer propertyDiscoverer;
+    private final PropertyNameDiscoverer propertyNameDiscoverer;
 
-    public PropertyManagementEndpoint(PropertyMutator propertyMutator, PropertyDiscoverer propertyDiscoverer) {
+    public PropertyManagementEndpoint(PropertyMutator propertyMutator, PropertyNameDiscoverer propertyNameDiscoverer) {
         this.propertyMutator = propertyMutator;
-        this.propertyDiscoverer = propertyDiscoverer;
+        this.propertyNameDiscoverer = propertyNameDiscoverer;
     }
 
     @PostMapping
@@ -40,7 +40,7 @@ public class PropertyManagementEndpoint {
             return ResponseEntity.badRequest().build();
         }
 
-        String discoveredPropertyName = propertyDiscoverer.discover(propertyName);
+        String discoveredPropertyName = propertyNameDiscoverer.discover(propertyName);
 
         propertyMutator.mutate(Objects.requireNonNullElse(discoveredPropertyName, propertyName), request.newValue());
 

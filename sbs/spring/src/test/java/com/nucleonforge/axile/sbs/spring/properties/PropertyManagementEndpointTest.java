@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
@@ -61,6 +63,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         properties = {
             "axile.my-empty.property= ",
             "axile.not-empty.property=not-empty",
+            "axile.prop.test.dynamic-properties=old-dynamic-value",
             "AXILE_ENABLED_CONTEXT=old-value-context",
             "axile.http-client.requests[0].name=old-value-name",
             "axile.http-client.requests[0].base-url=old-value-baseUrl",
@@ -77,7 +80,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     PropertyManagementEndpoint.class,
     ContextReloadingPropertyMutator.class,
     DefaultEnvironmentPropertyNameNormalizer.class,
-    DefaultPropertyDiscoverer.class,
+    DefaultPropertyNameDiscoverer.class,
     DefaultContextRestarter.class,
     RestartListener.class
 })
@@ -86,8 +89,10 @@ class PropertyManagementEndpointTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
-    private DefaultPropertyDiscoverer propertyDiscoverer;
+    @DynamicPropertySource
+    static void registerDynamic(DynamicPropertyRegistry registry) {
+        registry.add("axile.prop.test.dynamicProperties", () -> "new-dynamic-value");
+    }
 
     @ParameterizedTest
     @MethodSource("updateProperty")
@@ -109,6 +114,8 @@ class PropertyManagementEndpointTest {
         return Stream.of(
                 Arguments.of("axile.my-empty.property", "axile.myEmpty.property", "new-value"),
                 Arguments.of("axile.not-empty.property", "axile.notEmpty.property", ""),
+                Arguments.of(
+                        "axile.prop.test.dynamicProperties", "axile.prop.test.dynamic-properties", "new-dynamic-value"),
                 Arguments.of("AXILE_ENABLED_CONTEXT", "AXILE_ENABLED_CONTEXT", "new-value-context"),
                 Arguments.of("axile.http-client.requests[0].name", "axile.httpClient.requests.name", "new-value-name"),
                 Arguments.of(
