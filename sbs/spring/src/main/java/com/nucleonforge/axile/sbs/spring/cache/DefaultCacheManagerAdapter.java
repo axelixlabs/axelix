@@ -46,7 +46,7 @@ public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
 
     public void enableCacheManager() {
         if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
-            enhancedCacheManager.enableCacheManager();
+            enhancedCacheManager.enableAllCaches();
         } else {
             throw new UnsupportedOperationException();
         }
@@ -54,7 +54,7 @@ public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
 
     public void disableCacheManager() {
         if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
-            enhancedCacheManager.disableCacheManager();
+            enhancedCacheManager.disabledAllCaches();
         } else {
             throw new UnsupportedOperationException();
         }
@@ -87,7 +87,7 @@ public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
     @Override
     public void enableAllCache() {
         if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
-            enhancedCacheManager.enableAllCache();
+            enhancedCacheManager.enableAllCaches();
         }
     }
 }
