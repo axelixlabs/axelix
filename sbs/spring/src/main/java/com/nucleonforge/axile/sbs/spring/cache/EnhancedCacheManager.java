@@ -66,6 +66,11 @@ public final class EnhancedCacheManager implements CacheManager {
         }
     }
 
+    /**
+     * Disable cache, if exists.
+     *
+     * @param cacheName cache name to enable.
+     */
     public void disableCache(String cacheName) {
         Cache cache = this.getCache(cacheName);
 
@@ -74,18 +79,30 @@ public final class EnhancedCacheManager implements CacheManager {
         }
     }
 
+    /**
+     * Enable all caches managed by this cache manager.
+     */
     public void enableAllCaches() {
         for (String cacheName : getCacheNames()) {
             enableCache(cacheName);
         }
     }
 
-    public void disabledAllCaches() {
+    /**
+     * Disable all caches managed by this cache manager.
+     */
+    public void disableAllCaches() {
         for (String cacheName : getCacheNames()) {
             disableCache(cacheName);
         }
     }
 
+    /**
+     * Check if the specified cache is currently enabled.
+     *
+     * @param cacheName the name of the cache to check.
+     * @return {@code true} if the cache exists and is enabled, {@code false} otherwise.
+     */
     public boolean isEnabled(String cacheName) {
         Cache cache = getCache(cacheName);
 

@@ -89,7 +89,7 @@ public class DefaultCacheDispatcher implements CacheDispatcher {
     @Override
     public void enableAllCache() {
         for (CacheManagerAdapter adapter : adapters.values()) {
-            adapter.enableAllCache();
+            adapter.enableCacheManager();
         }
     }
 }

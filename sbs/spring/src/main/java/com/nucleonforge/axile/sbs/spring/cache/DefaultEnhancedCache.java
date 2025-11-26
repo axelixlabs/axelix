@@ -2,6 +2,7 @@ package com.nucleonforge.axile.sbs.spring.cache;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
@@ -48,6 +49,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
     }
 
     @Override
+    @NonNull
     public Object getNativeCache() {
         return delegate.getNativeCache();
     }
@@ -88,6 +90,20 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Nullable
     private <T> T getIfEnabledOrElseNull(Supplier<T> supplier) {
         return enabled.get() ? supplier.get() : null;
+    }
+
+    @Override
+    public boolean invalidate() {
+        return executeIfEnabledOrElseFalse(delegate::invalidate);
+    }
+
+    @Override
+    public boolean evictIfPresent(@NonNull Object key) {
+        return executeIfEnabledOrElseFalse(() -> delegate.evictIfPresent(key));
+    }
+
+    private boolean executeIfEnabledOrElseFalse(BooleanSupplier supplier) {
+        return enabled.get() && supplier.getAsBoolean();
     }
 
     private void executeIfEnabled(Runnable runnable) {

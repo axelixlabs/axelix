@@ -21,11 +21,13 @@ class NonExistentEnhancedCache implements EnhancedCache {
     private NonExistentEnhancedCache() {}
 
     @Override
+    @NonNull
     public String getName() {
         return "";
     }
 
     @Override
+    @NonNull
     public Object getNativeCache() {
         return this;
     }

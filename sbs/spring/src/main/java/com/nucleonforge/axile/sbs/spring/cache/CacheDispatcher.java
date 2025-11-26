@@ -39,16 +39,16 @@ public interface CacheDispatcher {
     boolean clearAll(String cacheManagerName);
 
     /**
-     * Enables the specified cache manager by name.
-     * This activates all caching operations for the given cache manager.
+     * Enables all caches in the specified cache manager by name.
+     * This activates caching operations for all caches in the given cache manager.
      *
      * @param managerName the name of the cache manager to enable
      */
     void enableCacheManager(String managerName);
 
     /**
-     * Disables the specified cache manager by name.
-     * This deactivates all caching operations for the given cache manager.
+     * Disables all caches in the specified cache manager by name.
+     * This deactivates caching operations for all caches in the given cache manager.
      *
      * @param managerName the name of the cache manager to disable
      */

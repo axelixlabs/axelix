@@ -36,14 +36,12 @@ public interface CacheManagerAdapter {
     boolean clear(String cacheName, Object key);
 
     /**
-     * Enable the cache manager, allowing it to perform caching operations.
-     * This will activate all caching functionality managed by this instance.
+     * Enable all caches in this cache manager, allowing them to perform caching operations.
      */
     void enableCacheManager();
 
     /**
-     * Disable the cache manager, preventing it from performing caching operations.
-     * This will deactivate all caching functionality managed by this instance.
+     * Disable all caches in this cache manager, preventing them from performing caching operations.
      */
     void disableCacheManager();
 
@@ -62,9 +60,4 @@ public interface CacheManagerAdapter {
      * @param cacheName the name of the cache to disable
      */
     void disableCache(String cacheName);
-
-    /**
-     * Enable all cacheManagers in cache manager.
-     */
-    void enableAllCache();
 }
