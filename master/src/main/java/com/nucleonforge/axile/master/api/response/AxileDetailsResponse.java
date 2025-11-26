@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.master.api.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -38,20 +39,24 @@ public record AxileDetailsResponse(
      * The profile of a given runtime.
      *
      * @param javaVersion       The version of the java.
-     * @param kotlinVersion     The version of the kotlin.
+     * @param kotlinVersion     The version of the kotlin, if any.
      * @param jdkVendor         The name of the vendor.
      * @param garbageCollector  The name of the garbage collector.
      */
-    public record RuntimeProfile(String javaVersion, String kotlinVersion, String jdkVendor, String garbageCollector) {}
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record RuntimeProfile(
+            String javaVersion, @Nullable String kotlinVersion, String jdkVendor, String garbageCollector) {}
 
     /**
      * The profile of a given spring.
      *
      * @param springBootVersion       The version of the Spring Boot.
      * @param springFrameworkVersion  The version of the Spring Framework.
-     * @param springCloudVersion      The version of the Spring Cloud.
+     * @param springCloudVersion      The version of the Spring Cloud, if any.
      */
-    public record SpringProfile(String springBootVersion, String springFrameworkVersion, String springCloudVersion) {}
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record SpringProfile(
+            String springBootVersion, String springFrameworkVersion, @Nullable String springCloudVersion) {}
 
     /**
      * The profile of a given build.

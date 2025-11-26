@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.sbs.spring.details;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
@@ -64,7 +65,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
                 emptyIfNull(gitCommitInfo.commitShaShort()),
                 emptyIfNull(gitCommitInfo.branch()),
                 new CommitAuthor(emptyIfNull(commitAuthor.name()), emptyIfNull(commitAuthor.email())),
-                emptyIfNull(gitCommitInfo.commitTimestamp()));
+                formatCommitTimeToInstantString(gitCommitInfo.commitTimestamp()));
     }
 
     private SpringDetails getSpringDetails() {
@@ -72,7 +73,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
         var springBootVersion = libraryDiscoverer.getLibraryVersion("spring-boot", "org.springframework.boot");
         var springVersion = libraryDiscoverer.getLibraryVersion("spring-core", "org.springframework");
         var springCloudVersion = libraryDiscoverer.getLibraryVersion("spring-cloud-commons", "org.springframework.cloud");
-        return new SpringDetails(springBootVersion.orElse(""), springVersion.orElse(""), springCloudVersion.orElse(""));
+        return new SpringDetails(springBootVersion.orElse(""), springVersion.orElse(""), springCloudVersion.orElse(null));
         // spotless:on
     }
 
@@ -84,7 +85,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
         String garbageCollector = getGarbageCollectorInfo();
         Optional<String> kotlinVersion = libraryDiscoverer.getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin");
 
-        return new RuntimeDetails(javaVersion, jdkVendor, garbageCollector, kotlinVersion.orElse(""));
+        return new RuntimeDetails(javaVersion, jdkVendor, garbageCollector, kotlinVersion.orElse(null));
     }
 
     private BuildDetails getBuildDetails() {
@@ -104,5 +105,17 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
                 emptyIfNull(System.getProperty("os.name")),
                 emptyIfNull(System.getProperty("os.version")),
                 emptyIfNull(System.getProperty("os.arch")));
+    }
+
+    private String formatCommitTimeToInstantString(String commitTime) {
+        if (commitTime == null || commitTime.isBlank()) {
+            return "";
+        }
+
+        try {
+            return Instant.ofEpochMilli(Long.parseLong(commitTime)).toString();
+        } catch (NumberFormatException ex) {
+            return "";
+        }
     }
 }

@@ -63,7 +63,7 @@ public class AxileDetailsConverterTest {
         assertThat(git.branch()).isEqualTo("local/local-test");
         assertThat(git.authorName()).isEqualTo("sergeycherkasovv");
         assertThat(git.authorEmail()).isEqualTo("sergeycherkasovv@github.com");
-        assertThat(git.commitTimestamp()).isEqualTo("1761249922000");
+        assertThat(git.commitTimestamp()).isEqualTo("2025-11-23T02:25:22Z");
 
         SpringProfile spring = response.spring();
         assertThat(spring.springBootVersion()).isEqualTo("3.5.0");
@@ -74,7 +74,7 @@ public class AxileDetailsConverterTest {
         assertThat(runtime.javaVersion()).isEqualTo("17.0.16");
         assertThat(runtime.jdkVendor()).isEqualTo("Corretto-17.0.16.8.1");
         assertThat(runtime.garbageCollector()).isEqualTo("G1 GC");
-        assertThat(runtime.kotlinVersion()).isEqualTo("1.9.0");
+        assertThat(runtime.kotlinVersion()).isEqualTo(null);
 
         BuildProfile build = response.build();
         assertThat(build).isNotNull();
@@ -94,12 +94,12 @@ public class AxileDetailsConverterTest {
                 new AxileDetails.GitDetails.CommitAuthor("sergeycherkasovv", "sergeycherkasovv@github.com");
 
         GitDetails gitDetails =
-                new AxileDetails.GitDetails("7a663cb", "local/local-test", commitAuthor, "1761249922000");
+                new AxileDetails.GitDetails("7a663cb", "local/local-test", commitAuthor, "2025-11-23T02:25:22Z");
 
         SpringDetails springDetails = new AxileDetails.SpringDetails("3.5.0", "7.0", "2023.0.1");
 
         RuntimeDetails runtimeDetails =
-                new AxileDetails.RuntimeDetails("17.0.16", "Corretto-17.0.16.8.1", "G1 GC", "1.9.0");
+                new AxileDetails.RuntimeDetails("17.0.16", "Corretto-17.0.16.8.1", "G1 GC", null);
 
         BuildDetails buildDetails = new AxileDetails.BuildDetails(
                 "spring-petclinic", "3.5.0-SNAPSHOT", "org.springframework.samples", "2025-10-29T15:10:54.770Z");

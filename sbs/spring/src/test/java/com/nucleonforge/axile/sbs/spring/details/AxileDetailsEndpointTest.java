@@ -56,7 +56,7 @@ class AxileDetailsEndpointTest {
                 .contains(
                         entry("commitShaShort", "a8b0929"),
                         entry("branch", "main"),
-                        entry("commitTimestamp", "2025-09-28T13:50:13+03:00"))
+                        entry("commitTimestamp", "2025-10-23T20:05:22Z"))
                 .containsKeys("commitAuthor", "commitTimestamp");
 
         assertThatJson(responseBody)
@@ -72,16 +72,19 @@ class AxileDetailsEndpointTest {
         assertThatJson(responseBody)
                 .inPath("spring")
                 .isObject()
-                .containsOnly(
-                        entry("springBootVersion", "3.5.0"),
-                        entry("springFrameworkVersion", "6.2.7"),
-                        entry("springCloudVersion", ""));
+                // .containsKey("springCloudVersion") Here, there is an issue with the presence of the
+                //                                    "springCloudVersion" field, if we get Spring Cloud version
+                //                                    information, the field is present in the response body,
+                //                                    otherwise, it is absent.
+                .contains(entry("springBootVersion", "3.5.0"), entry("springFrameworkVersion", "6.2.7"));
 
         assertThatJson(responseBody)
                 .inPath("runtime")
                 .isObject()
-                .containsOnlyKeys("javaVersion", "jdkVendor", "garbageCollector", "kotlinVersion")
-                .contains(entry("kotlinVersion", ""));
+                // .containsKey("kotlinVersion") Here, there is an issue with the presence of the "kotlinVersion" field,
+                //                               if we get Kotlin version information, the field is present in the
+                //                               response body, otherwise, it is absent.
+                .containsKeys("javaVersion", "jdkVendor", "garbageCollector");
 
         assertThatJson(responseBody).node("build").isNotNull();
         assertThatJson(responseBody)
@@ -117,14 +120,14 @@ class AxileDetailsEndpointTest {
         SpringDetails spring = details.spring();
         assertThat(spring.springBootVersion()).isEqualTo("3.5.0");
         assertThat(spring.springFrameworkVersion()).isEqualTo("6.2.7");
-        assertThat(spring.springCloudVersion()).isEqualTo("");
+        assertThat(spring.springCloudVersion()).isNull();
 
         RuntimeDetails runtime = details.runtime();
         assertThat(runtime).isNotNull();
         assertThat(runtime.javaVersion()).isNotBlank();
         assertThat(runtime.jdkVendor()).isNotBlank();
         assertThat(runtime.garbageCollector()).isNotBlank();
-        assertThat(runtime.kotlinVersion()).isBlank();
+        assertThat(runtime.kotlinVersion()).isNull();
 
         BuildDetails build = details.build();
         assertThat(build).isNotNull();
