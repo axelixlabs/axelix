@@ -154,7 +154,7 @@ class PropertyManagementEndpointTest {
 
     @ParameterizedTest
     @MethodSource("emptyPropertyName")
-    void matate_shouldReturnBadRequest_whenPropertyNameIsEmpty(String emptyProperty) {
+    void mutate_shouldReturnBadRequest_whenPropertyNameIsEmpty(String emptyProperty) {
         PropertyMutationRequest request = new PropertyMutationRequest(emptyProperty, "someValue");
 
         ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);

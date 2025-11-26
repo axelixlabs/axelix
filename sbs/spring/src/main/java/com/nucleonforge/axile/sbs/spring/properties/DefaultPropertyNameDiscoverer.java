@@ -10,7 +10,7 @@ import org.springframework.core.env.PropertySource;
 import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
 
 /**
- * Default {@link PropertyNameDiscoverer}. Looks up property name by inspecting the {@link ConfigurableEnvironment}.
+ * Default {@link PropertyNameDiscoverer}.
  *
  * @author Sergey Cherkasov
  */
