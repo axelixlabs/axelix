@@ -47,6 +47,11 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint GET_SINGLE_CACHE = of("/caches/{name}", HttpMethod.GET);
     public static final ActuatorEndpoint CLEAR_ALL_CACHES = of("/caches", HttpMethod.DELETE);
     public static final ActuatorEndpoint CLEAR_SINGLE_CACHES = of("/caches/{name}", HttpMethod.DELETE);
+    public static final ActuatorEndpoint ENABLE_CACHE = of("/cache-dispatcher/{cacheManagerName}/{cacheName}/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint DISABLE_CACHE = of("/cache-dispatcher/{cacheManagerName}/{cacheName}/disable", HttpMethod.POST);
+    public static final ActuatorEndpoint ENABLE_CACHE_MANAGER = of("/cache-dispatcher/{cacheManagerName}/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint DISABLE_CACHES_MANAGER = of("/cache-dispatcher/{cacheManagerName}/disable", HttpMethod.POST);
+    public static final ActuatorEndpoint ENABLE_ALL_CACHE = of("/cache-dispatcher/enable-all-cache", HttpMethod.POST);
 
     // Conditions
     public static final ActuatorEndpoint CONDITIONS = of("/conditions", HttpMethod.GET);
@@ -155,6 +160,11 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 GET_SINGLE_CACHE,
                 CLEAR_ALL_CACHES,
                 CLEAR_SINGLE_CACHES,
+                ENABLE_CACHE,
+                DISABLE_CACHE,
+                ENABLE_CACHE_MANAGER,
+                DISABLE_CACHES_MANAGER,
+                ENABLE_ALL_CACHE,
                 CONDITIONS,
                 CONFIG_PROPS,
                 CONFIG_PROPS_BY_PREFIX,

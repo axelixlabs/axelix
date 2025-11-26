@@ -53,6 +53,16 @@ class HttpUrlTest {
                     new SingleValueQueryParameter("key2", "value2")
                 }),
                 of("/health/data", "/health/data", Map.of(), new QueryParameter[] {}),
-                of("/{cache.name}", "/my-cache", Map.of("cache.name", "my-cache"), new QueryParameter[] {}));
+                of("/{cache.name}", "/my-cache", Map.of("cache.name", "my-cache"), new QueryParameter[] {}),
+                of(
+                        "/{cacheManager}/{cacheName}/clear",
+                        "/myManager/myCache/clear",
+                        Map.of("cacheManager", "myManager", "cacheName", "myCache"),
+                        new QueryParameter[] {}),
+                of(
+                        "/{first}/{second}/{first}/{third}",
+                        "/A/B/A/C",
+                        Map.of("first", "A", "second", "B", "third", "C"),
+                        new QueryParameter[] {}));
     }
 }

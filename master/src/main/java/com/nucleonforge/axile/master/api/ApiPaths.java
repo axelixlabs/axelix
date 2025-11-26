@@ -220,6 +220,31 @@ public final class ApiPaths {
          * Endpoint to retrieve a specific cache by name from an instance.
          */
         public static final String CACHE_NAME = "/{instanceId}/cache/{cacheName}";
+
+        /**
+         * Endpoint to enable a specific cache in a cache manager.
+         */
+        public static final String ENABLE_CACHE = "/{instanceId}/{cacheManagerName}/{cacheName}/enable";
+
+        /**
+         * Endpoint to disable a specific cache in a cache manager.
+         */
+        public static final String DISABLE_CACHE = "/{instanceId}/{cacheManagerName}/{cacheName}/disable";
+
+        /**
+         * Endpoint to enable all caches in a cache manager.
+         */
+        public static final String ENABLE_CACHE_MANAGER = "/{instanceId}/{cacheManagerName}/enable";
+
+        /**
+         * Endpoint to disable all caches in a cache manager.
+         */
+        public static final String DISABLE_CACHE_MANAGER = "/{instanceId}/{cacheManagerName}/disable";
+
+        /**
+         * Endpoint to enable all cache managers and their caches in the application.
+         */
+        public static final String ENABLE_ALL_CACHE = "/{instanceId}/enable-all-cache";
     }
 
     public static final class MetricsApi {
