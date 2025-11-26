@@ -37,7 +37,7 @@ public class DetailsJacksonMessageDeserializationStrategyTest {
                      "name": "Mikhail Polivakha",
                      "email": "mikhailpolivakha@github.com"
                  },
-                 "commitTimestamp": "1761249922000"
+                 "commitTimestamp": "2025-11-23T02:25:22Z"
              },
              "spring": {
                  "springBootVersion": "3.5.0",
@@ -72,7 +72,7 @@ public class DetailsJacksonMessageDeserializationStrategyTest {
         assertThat(git.branch()).isEqualTo("local/local-test");
         assertThat(git.commitAuthor().name()).isEqualTo("Mikhail Polivakha");
         assertThat(git.commitAuthor().email()).isEqualTo("mikhailpolivakha@github.com");
-        assertThat(git.commitTimestamp()).isEqualTo("1761249922000");
+        assertThat(git.commitTimestamp()).isEqualTo("2025-11-23T02:25:22Z");
 
         SpringDetails spring = axileDetails.spring();
         assertThat(spring.springBootVersion()).isEqualTo("3.5.0");

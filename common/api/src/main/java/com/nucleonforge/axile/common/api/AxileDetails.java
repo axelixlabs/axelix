@@ -1,6 +1,8 @@
 package com.nucleonforge.axile.common.api;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The response returned by the custom Axile details endpoint.
@@ -48,26 +50,28 @@ public record AxileDetails(
      *
      * @param springBootVersion       The version of the Spring Boot.
      * @param springFrameworkVersion  The version of the Spring Framework.
-     * @param springCloudVersion      The version of the Spring Cloud.
+     * @param springCloudVersion      The version of the Spring Cloud, if any.
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record SpringDetails(
             @JsonProperty("springBootVersion") String springBootVersion,
             @JsonProperty("springFrameworkVersion") String springFrameworkVersion,
-            @JsonProperty("springCloudVersion") String springCloudVersion) {}
+            @JsonProperty("springCloudVersion") @Nullable String springCloudVersion) {}
 
     /**
      * DTO that encapsulates the Runtime information of the given artifact.
      *
      * @param javaVersion       The version of the java.
-     * @param kotlinVersion     The version of the kotlin.
+     * @param kotlinVersion     The version of the kotlin, if any.
      * @param jdkVendor         The name of the vendor.
      * @param garbageCollector  The name of the garbage collector.
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record RuntimeDetails(
             @JsonProperty("javaVersion") String javaVersion,
             @JsonProperty("jdkVendor") String jdkVendor,
             @JsonProperty("garbageCollector") String garbageCollector,
-            @JsonProperty("kotlinVersion") String kotlinVersion) {}
+            @JsonProperty("kotlinVersion") @Nullable String kotlinVersion) {}
 
     /**
      * DTO that encapsulates the build information of the given artifact.

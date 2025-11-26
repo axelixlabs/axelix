@@ -33,7 +33,7 @@ class CommitIdPluginGitInformationProviderTest {
         assertThat(gitCommitInfo).isNotNull();
         assertThat(gitCommitInfo.branch()).isEqualTo("main");
         assertThat(gitCommitInfo.commitShaShort()).isEqualTo("a8b0929");
-        assertThat(gitCommitInfo.commitTimestamp()).isEqualTo("2025-09-28T13:50:13+03:00");
+        assertThat(gitCommitInfo.commitTimestamp()).isEqualTo("1761249922000");
 
         assertThat(gitCommitInfo.commitAuthor())
                 .extracting(GitInfo.CommitAuthor::email)
