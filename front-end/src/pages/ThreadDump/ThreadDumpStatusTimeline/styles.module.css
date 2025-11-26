@@ -2,6 +2,8 @@
     display: flex;
     border-radius: var(--axile-border-radius-small);
     overflow: hidden;
+    /* Our timeline grows by 5px for each thread. Since our monitoring lasts 10 minutes, that’s 10 * 60 * 5 = 3000 */
+    width: 3000px;
 }
 
 .SingleHistoryChunk {

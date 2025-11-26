@@ -1,4 +1,4 @@
-.HeaderWrapper {
+.MainWrapper {
     display: grid;
     grid-template-columns: 30px 450px max-content;
     align-items: center;

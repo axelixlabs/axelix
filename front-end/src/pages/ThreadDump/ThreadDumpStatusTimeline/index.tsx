@@ -1,5 +1,5 @@
 import { threadStateColor } from "helpers";
-import { type IThread } from "models";
+import { EThreadDumpStateColors, type IThread } from "models";
 
 import styles from "./styles.module.css";
 
@@ -15,7 +15,7 @@ export const ThreadDumpTimeline = ({ history }: IProps) => {
         <div className={styles.MainWrapper}>
             {history.map((singleHistory, index) => (
                 <div
-                    className={`${styles.SingleHistoryChunk} ${styles[threadStateColor(singleHistory)]}`}
+                    className={`${styles.SingleHistoryChunk} ${styles[threadStateColor(singleHistory) as EThreadDumpStateColors]}`}
                     key={index}
                 />
             ))}

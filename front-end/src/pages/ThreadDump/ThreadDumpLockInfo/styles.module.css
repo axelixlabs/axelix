@@ -2,15 +2,11 @@
     margin-left: -5px;
 }
 
-.TreeItem {
+.ContentWrapper {
     display: flex;
     column-gap: 8px;
 }
 
-.TreeLabel {
+.ContentLabel {
     flex-shrink: 0;
-}
-
-.TreeValue {
-    word-break: break-all;
 }

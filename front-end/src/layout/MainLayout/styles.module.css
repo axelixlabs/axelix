@@ -26,9 +26,10 @@
 }
 
 .ThreadDumpContentLayout {
-    min-width: 3366px
+    min-width: max-content;
 }
 
 .ThreadDumpContent {
-    min-width: 3048px;
+    width: max-content;
+    min-width: 100vw;
 }
