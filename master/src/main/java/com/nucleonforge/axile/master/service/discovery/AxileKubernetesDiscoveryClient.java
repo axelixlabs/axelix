@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -15,6 +16,8 @@ import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
+import io.fabric8.kubernetes.client.dsl.ServiceResource;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -24,6 +27,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 import com.nucleonforge.axile.common.utils.CollectionUtils;
+import com.nucleonforge.axile.master.autoconfiguration.discovery.KubernetesDiscoveryProperties.DiscoveryFilters;
 
 /**
  * Axile Kubernetes implementation of {@link DiscoveryClient}.
@@ -37,10 +41,14 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
 
     private final KubernetesClient kubernetesClient;
     private final Set<String> namespaces;
+    private final Map<String, String> labels;
+    private final List<String> keyOnlyLabels;
 
-    public AxileKubernetesDiscoveryClient(KubernetesClient kubernetesClient, Set<String> namespaces) {
-        this.namespaces = CollectionUtils.defaultIfEmpty(namespaces, kubernetesClient.getNamespace());
+    public AxileKubernetesDiscoveryClient(KubernetesClient kubernetesClient, DiscoveryFilters filters) {
         this.kubernetesClient = kubernetesClient;
+        this.namespaces = CollectionUtils.defaultIfEmpty(filters.getNamespaces(), kubernetesClient.getNamespace());
+        this.labels = extractKeyValueLabels(filters.getLabels());
+        this.keyOnlyLabels = extractKeyOnlyLabels(filters.getLabels());
     }
 
     @Override
@@ -93,10 +101,20 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
 
     @Nullable
     private Service getService(String namespace, String serviceId) {
+        FilterWatchListDeletable<Service, ServiceList, ServiceResource<Service>> serviceOperation =
+                kubernetesClient.services().inNamespace(namespace);
+
+        if (!this.labels.isEmpty()) {
+            serviceOperation = serviceOperation.withLabels(this.labels);
+        }
+
+        for (String key : this.keyOnlyLabels) {
+            serviceOperation = serviceOperation.withLabel(key);
+        }
 
         // Yeah, that sucks, but we have to query all services and filter in memory since K8S API
         // does not allow to query by the resource UID for some reason.
-        return kubernetesClient.services().inNamespace(namespace).list().getItems().stream()
+        return serviceOperation.list().getItems().stream()
                 .filter(service ->
                         serviceId.equalsIgnoreCase(service.getMetadata().getUid()))
                 .findFirst()
@@ -185,5 +203,23 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
                 """
                             .formatted(serviceId));
         }
+    }
+
+    private Map<String, String> extractKeyValueLabels(Map<String, String> labels) {
+        return labels.entrySet().stream()
+                .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private List<String> extractKeyOnlyLabels(Map<String, String> labels) {
+        if (labels == null || labels.isEmpty()) {
+            return List.of();
+        }
+
+        return labels.entrySet().stream()
+                .filter(entry ->
+                        entry.getValue() == null || entry.getValue().trim().isEmpty())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 }
