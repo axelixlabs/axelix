@@ -11,12 +11,15 @@
         "exportConfiguration": "Список компонентов состояния для экспорта",
         "Components": {
             "HEAP_DUMP": "Дамп кучи",
+            "THREAD_DUMP": "Дамп потоков",
             "BEANS": "Beans",
             "CACHES": "Кэши",
             "CONDITIONS": "Условия",
             "CONFIG_PROPS": "Свойства конфигурации",
             "ENV": "Окружение",
-            "SCHEDULED_TASKS": "Запланированные задачи"
+            "SCHEDULED_TASKS": "Запланированные задачи",
+            "LOG_FILE": "Файл логов",
+            "Sanitize": "Очистить перед экспортом"
         },
         "spring": {
             "springBootVersion": "Spring Boot",
