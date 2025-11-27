@@ -1,5 +1,8 @@
 package com.nucleonforge.axile.sbs.spring.cache;
 
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+
 /**
  * Dispatcher interface for executing cache operations
  * (such as evicting entries or clearing caches) across different CacheManager instances.
@@ -49,6 +52,12 @@ public interface CacheDispatcher {
     /**
      * Disables all caches in the specified cache manager by name.
      * This deactivates caching operations for all caches in the given cache manager.
+     * <p>
+     * Please note, that this API disabled all the caches inside the given cache manager
+     * that are only known by the time of this exact invocation. Some underlying {@link CacheManager}
+     * implementations (such as {@link ConcurrentMapCacheManager} for instance) support the dynamic
+     * addition of {@link org.springframework.cache.Cache caches}. The caches that are going to be added
+     * dynamically later after the given invocation of this method will not be disabled.
      *
      * @param managerName the name of the cache manager to disable
      */
@@ -71,9 +80,4 @@ public interface CacheDispatcher {
      * @param cacheName the name of the cache to disable
      */
     void disableCache(String managerName, String cacheName);
-
-    /**
-     * Enable all cache managers in the application, activates caching functionality across all cache manager instances.
-     */
-    void enableAllCache();
 }

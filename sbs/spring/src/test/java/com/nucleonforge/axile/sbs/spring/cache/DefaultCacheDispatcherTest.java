@@ -167,30 +167,6 @@ class DefaultCacheDispatcherTest {
     }
 
     @Test
-    void enableAllCache_shouldEnableAllManagers() {
-        Cache cache1 = cacheManager1.getCache("cache1");
-        Cache cache2 = cacheManager2.getCache("cache2");
-        assert cache1 != null;
-        assert cache2 != null;
-
-        dispatcher.disableCacheManager("cacheManager1");
-        dispatcher.disableCacheManager("cacheManager2");
-
-        cache1.put("key1", "value1");
-        cache2.put("key2", "value2");
-        assertThat(cache1.get("key1")).isNull();
-        assertThat(cache2.get("key2")).isNull();
-
-        dispatcher.enableAllCache();
-
-        cache1.put("key3", "value3");
-        cache2.put("key4", "value4");
-
-        assertThat(cache1.get("key3")).isNotNull();
-        assertThat(cache2.get("key4")).isNotNull();
-    }
-
-    @Test
     void disableCache_shouldNotAffectOtherCachesInSameManager() {
         Cache cache1 = cacheManager1.getCache("cache1");
         Cache cache2 = cacheManager1.getCache("cache2");

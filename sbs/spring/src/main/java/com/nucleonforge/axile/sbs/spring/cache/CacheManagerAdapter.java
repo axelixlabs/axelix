@@ -1,6 +1,7 @@
 package com.nucleonforge.axile.sbs.spring.cache;
 
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 /**
  * Adapter to Spring's {@link CacheManager}.
@@ -42,6 +43,12 @@ public interface CacheManagerAdapter {
 
     /**
      * Disable all caches in this cache manager, preventing them from performing caching operations.
+     * <p>
+     * Please note, that this API disabled all the caches inside the given cache manager
+     * that are only known by the time of this exact invocation. Some underlying {@link CacheManager}
+     * implementations (such as {@link ConcurrentMapCacheManager} for instance) support the dynamic
+     * addition of {@link org.springframework.cache.Cache caches}. The caches that are going to be added
+     * dynamically later after the given invocation of this method will not be disabled.
      */
     void disableCacheManager();
 

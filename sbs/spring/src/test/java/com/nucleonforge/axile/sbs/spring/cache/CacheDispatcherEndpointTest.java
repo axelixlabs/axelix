@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 
 import com.nucleonforge.axile.Main;
 
@@ -32,6 +33,11 @@ import static org.assertj.core.api.Assertions.assertThat;
     DefaultCacheDispatcher.class,
     CacheDispatcherEndpointTest.CacheDispatcherEndpointTestConfiguration.class
 })
+
+// TODO:
+//  This is required since we tinker with caches. However, ideally, we should clean everything up in
+//  BeforeEach callback or some sort.
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CacheDispatcherEndpointTest {
 
     @Autowired
@@ -134,39 +140,50 @@ class CacheDispatcherEndpointTest {
 
     @Test
     void disableManager_shouldDisableCacheManager() {
-        Cache cache = cacheManager.getCache("cache");
-        assert cache != null;
-        cache.put("key", "value");
-        assertThat(cache.get("key")).isNotNull();
+        // given.
+        Cache cache1 = cacheManager.getCache("cache1");
+        Cache cache2 = cacheManager.getCache("cache2");
 
+        cache1.put("key1", "value1");
+        cache2.put("key2", "value2");
+
+        // when.
         testRestTemplate.postForObject(path("/cacheManager/disable"), defaultEntity(), Void.class);
+        cache1.put("key3", "value2");
+        cache2.put("key4", "value2");
 
-        cache.put("key2", "value2");
-        assertThat(cache.get("key2")).isNull();
+        // then.
+        assertThat(cache1.get("key1")).isNull();
+        assertThat(cache1.get("key3")).isNull();
+        assertThat(cache2.get("key2")).isNull();
+        assertThat(cache2.get("key4")).isNull();
+        assertThat(cacheManager.getCacheNames()).containsOnly("cache1", "cache2");
     }
 
     @Test
     void enableManager_shouldEnableCacheManager() {
+        // given.
         Cache cache = cacheManager.getCache("cache");
-        assert cache != null;
 
+        // when.
         testRestTemplate.postForObject(path("/cacheManager/disable"), defaultEntity(), Void.class);
-
         testRestTemplate.postForObject(path("/cacheManager/enable"), defaultEntity(), Void.class);
-
         cache.put("key", "value");
+
+        // then.
         assertThat(cache.get("key")).isNotNull();
     }
 
     @Test
     void enableCache_shouldEnableSpecificCache() {
+        // given.
         Cache cache = cacheManager.getCache("cache");
-        assert cache != null;
 
+        // when.
         testRestTemplate.postForObject(path("/cacheManager/cache/disable"), defaultEntity(), Void.class);
-
         testRestTemplate.postForObject(path("/cacheManager/cache/enable"), defaultEntity(), Void.class);
 
+        // then.
         cache.put("key", "value");
         assertThat(cache.get("key")).isNotNull();
     }
@@ -192,30 +209,7 @@ class CacheDispatcherEndpointTest {
         assertThat(disabledCache.get("key2")).isNull();
     }
 
-    @Test
-    void enableAllCache_shouldEnableAllCaches() {
-        Cache cache1 = cacheManager.getCache("cache1");
-        Cache cache2 = cacheManager.getCache("cache2");
-        assert cache1 != null;
-        assert cache2 != null;
-
-        testRestTemplate.postForObject(path("/cacheManager/disable"), defaultEntity(), Void.class);
-
-        cache1.put("key1", "value1");
-        cache2.put("key2", "value2");
-
-        assertThat(cache1.get("key1")).isNull();
-        assertThat(cache2.get("key2")).isNull();
-
-        testRestTemplate.postForObject(path("/enable-all-cache"), defaultEntity(), Void.class);
-
-        cache1.put("key1", "value1");
-        cache2.put("key2", "value2");
-
-        assertThat(cache1.get("key1")).isNotNull();
-        assertThat(cache2.get("key2")).isNotNull();
-    }
-
+    // TODO: I'm not sure that this return 200 OK is the correct way of handling the non existent cache
     @Test
     void enableCache_shouldHandleNonExistentCache() {
         ResponseEntity<Void> response = testRestTemplate.postForEntity(
