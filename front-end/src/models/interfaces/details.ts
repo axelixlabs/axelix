@@ -58,6 +58,7 @@ export interface IDetailsCardRecord {
  */
 interface IStateExportComponent {
     component: EExportableComponent;
+    sanitize?: boolean;
 }
 
 /**

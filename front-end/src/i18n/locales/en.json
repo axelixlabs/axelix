@@ -11,12 +11,15 @@
         "exportConfiguration": "List of state export components",
         "Components": {
             "HEAP_DUMP": "Heap dump",
+            "THREAD_DUMP": "Thread dump",
             "BEANS": "Beans",
             "CACHES": "Caches",
             "CONDITIONS": "Conditions",
             "CONFIG_PROPS": "Configuration properties",
             "ENV": "Environment",
-            "SCHEDULED_TASKS": "Scheduled tasks"
+            "SCHEDULED_TASKS": "Scheduled tasks",
+            "LOG_FILE": "Logger File",
+            "Sanitize": "Sanitize before export"
         },
         "spring": {
             "springBootVersion": "Spring Boot",

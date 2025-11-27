@@ -8,5 +8,7 @@ export const getDetailsData = (instanceId: string) => {
 export const exportStateData = (request: IStateExportRequest) => {
     const { instanceId, body } = request;
 
-    return apiFetch.post(`export-state/${instanceId}`, body);
+    return apiFetch.post(`export-state/${instanceId}`, body, {
+        responseType: "blob",
+    });
 };
