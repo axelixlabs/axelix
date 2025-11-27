@@ -53,7 +53,7 @@ public class DetailsApiTest {
              "branch": "local/local-test",
              "authorName": "NikitaKirilloff",
              "authorEmail": "NikitaKirilloff@github.com",
-             "commitTimestamp": "1761249922000"
+             "commitTimestamp": "2025-11-23T02:25:22Z"
            },
            "runtime": {
              "javaVersion": "17.0.16",
@@ -152,7 +152,7 @@ public class DetailsApiTest {
                      "name": "NikitaKirilloff",
                      "email": "NikitaKirilloff@github.com"
                  },
-                 "commitTimestamp": "1761249922000"
+                 "commitTimestamp": "2025-11-23T02:25:22Z"
              },
              "spring": {
                  "springBootVersion": "3.5.0",

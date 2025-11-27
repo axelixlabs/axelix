@@ -56,7 +56,7 @@ class AxileDetailsEndpointTest {
                 .contains(
                         entry("commitShaShort", "a8b0929"),
                         entry("branch", "main"),
-                        entry("commitTimestamp", "2025-09-28T13:50:13+03:00"))
+                        entry("commitTimestamp", "1761249922000"))
                 .containsKeys("commitAuthor", "commitTimestamp");
 
         assertThatJson(responseBody)
@@ -72,16 +72,12 @@ class AxileDetailsEndpointTest {
         assertThatJson(responseBody)
                 .inPath("spring")
                 .isObject()
-                .containsOnly(
-                        entry("springBootVersion", "3.5.0"),
-                        entry("springFrameworkVersion", "6.2.7"),
-                        entry("springCloudVersion", ""));
+                .contains(entry("springBootVersion", "3.5.0"), entry("springFrameworkVersion", "6.2.7"));
 
         assertThatJson(responseBody)
                 .inPath("runtime")
                 .isObject()
-                .containsOnlyKeys("javaVersion", "jdkVendor", "garbageCollector", "kotlinVersion")
-                .contains(entry("kotlinVersion", ""));
+                .containsKeys("javaVersion", "jdkVendor", "garbageCollector");
 
         assertThatJson(responseBody).node("build").isNotNull();
         assertThatJson(responseBody)
@@ -117,14 +113,14 @@ class AxileDetailsEndpointTest {
         SpringDetails spring = details.spring();
         assertThat(spring.springBootVersion()).isEqualTo("3.5.0");
         assertThat(spring.springFrameworkVersion()).isEqualTo("6.2.7");
-        assertThat(spring.springCloudVersion()).isEqualTo("");
+        assertThat(spring.springCloudVersion()).isNull();
 
         RuntimeDetails runtime = details.runtime();
         assertThat(runtime).isNotNull();
         assertThat(runtime.javaVersion()).isNotBlank();
         assertThat(runtime.jdkVendor()).isNotBlank();
         assertThat(runtime.garbageCollector()).isNotBlank();
-        assertThat(runtime.kotlinVersion()).isBlank();
+        assertThat(runtime.kotlinVersion()).isNull();
 
         BuildDetails build = details.build();
         assertThat(build).isNotNull();

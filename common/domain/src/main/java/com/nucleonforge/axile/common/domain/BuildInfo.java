@@ -8,22 +8,12 @@ package com.nucleonforge.axile.common.domain;
 public class BuildInfo {
 
     /**
-     * The information about deployed commit.
-     */
-    private final CommitInfo commitInfo;
-
-    /**
      * ClassPath of the application.
      */
     private final ClassPath classPath;
 
-    public BuildInfo(CommitInfo commitInfo, ClassPath classPath) {
-        this.commitInfo = commitInfo;
+    public BuildInfo(ClassPath classPath) {
         this.classPath = classPath;
-    }
-
-    public CommitInfo getCommitInfo() {
-        return commitInfo;
     }
 
     public ClassPath getClassPath() {

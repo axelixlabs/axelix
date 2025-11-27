@@ -64,7 +64,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
                 emptyIfNull(gitCommitInfo.commitShaShort()),
                 emptyIfNull(gitCommitInfo.branch()),
                 new CommitAuthor(emptyIfNull(commitAuthor.name()), emptyIfNull(commitAuthor.email())),
-                emptyIfNull(gitCommitInfo.commitTimestamp()));
+                gitCommitInfo.commitTimestamp());
     }
 
     private SpringDetails getSpringDetails() {
@@ -72,7 +72,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
         var springBootVersion = libraryDiscoverer.getLibraryVersion("spring-boot", "org.springframework.boot");
         var springVersion = libraryDiscoverer.getLibraryVersion("spring-core", "org.springframework");
         var springCloudVersion = libraryDiscoverer.getLibraryVersion("spring-cloud-commons", "org.springframework.cloud");
-        return new SpringDetails(springBootVersion.orElse(""), springVersion.orElse(""), springCloudVersion.orElse(""));
+        return new SpringDetails(springBootVersion.orElse(""), springVersion.orElse(""), springCloudVersion.orElse(null));
         // spotless:on
     }
 
@@ -84,7 +84,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
         String garbageCollector = getGarbageCollectorInfo();
         Optional<String> kotlinVersion = libraryDiscoverer.getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin");
 
-        return new RuntimeDetails(javaVersion, jdkVendor, garbageCollector, kotlinVersion.orElse(""));
+        return new RuntimeDetails(javaVersion, jdkVendor, garbageCollector, kotlinVersion.orElse(null));
     }
 
     private BuildDetails getBuildDetails() {

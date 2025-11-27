@@ -71,18 +71,16 @@ public class DetailsEndpointProberTest {
                      "name": "Ashot Sargsyan",
                      "email": "AshotSargsyan@github.com"
                  },
-                 "commitTimestamp": "1761249922000"
+                 "commitTimestamp": "2025-11-23T02:25:22Z"
              },
              "spring": {
                  "springBootVersion": "3.5.0",
-                 "springFrameworkVersion": "7.0",
-                 "springCloudVersion": "2023.0.1"
+                 "springFrameworkVersion": "7.0"
              },
              "runtime": {
                  "javaVersion": "17.0.16",
                  "jdkVendor": "Corretto-17.0.16.8.1",
-                 "garbageCollector": "G1 GC",
-                 "kotlinVersion": "1.9.0"
+                 "garbageCollector": "G1 GC"
              },
              "build": {
                  "artifact": "spring-petclinic",
@@ -127,18 +125,18 @@ public class DetailsEndpointProberTest {
         assertThat(git.branch()).isEqualTo("local/local-test");
         assertThat(git.commitAuthor().name()).isEqualTo("Ashot Sargsyan");
         assertThat(git.commitAuthor().email()).isEqualTo("AshotSargsyan@github.com");
-        assertThat(git.commitTimestamp()).isEqualTo("1761249922000");
+        assertThat(git.commitTimestamp()).isEqualTo("2025-11-23T02:25:22Z");
 
         SpringDetails spring = axileDetails.spring();
         assertThat(spring.springBootVersion()).isEqualTo("3.5.0");
         assertThat(spring.springFrameworkVersion()).isEqualTo("7.0");
-        assertThat(spring.springCloudVersion()).isEqualTo("2023.0.1");
+        assertThat(spring.springCloudVersion()).isNull();
 
         RuntimeDetails runtime = axileDetails.runtime();
         assertThat(runtime.javaVersion()).isEqualTo("17.0.16");
         assertThat(runtime.jdkVendor()).isEqualTo("Corretto-17.0.16.8.1");
         assertThat(runtime.garbageCollector()).isEqualTo("G1 GC");
-        assertThat(runtime.kotlinVersion()).isEqualTo("1.9.0");
+        assertThat(runtime.kotlinVersion()).isNull();
 
         BuildDetails build = axileDetails.build();
         assertThat(build.artifact()).isEqualTo("spring-petclinic");

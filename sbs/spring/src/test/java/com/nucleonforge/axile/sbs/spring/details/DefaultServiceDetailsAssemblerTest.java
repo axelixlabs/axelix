@@ -52,20 +52,20 @@ class DefaultServiceDetailsAssemblerTest {
         assertThat(git.branch()).isEqualTo("main");
         assertThat(git.commitAuthor().name()).isEqualTo("Mikhail Polivakha");
         assertThat(git.commitAuthor().email()).isEqualTo("mikhailpolivakha@email.com");
-        assertThat(git.commitTimestamp()).isEqualTo("2025-09-28T13:50:13+03:00");
+        assertThat(git.commitTimestamp()).isEqualTo("1761249922000");
 
         SpringDetails spring = result.spring();
         assertThat(spring).isNotNull();
         assertThat(spring.springBootVersion()).isNotBlank();
         assertThat(spring.springFrameworkVersion()).isNotBlank();
-        assertThat(spring.springCloudVersion()).isBlank();
+        assertThat(spring.springCloudVersion()).isNull();
 
         RuntimeDetails runtime = result.runtime();
         assertThat(runtime).isNotNull();
         assertThat(runtime.javaVersion()).isNotBlank();
         assertThat(runtime.jdkVendor()).isNotBlank();
         assertThat(runtime.garbageCollector()).isNotBlank();
-        assertThat(runtime.kotlinVersion()).isBlank();
+        assertThat(runtime.kotlinVersion()).isNull();
 
         BuildDetails build = result.build();
         assertThat(build.artifact()).isEqualTo("axile-sbs");
