@@ -1,6 +1,5 @@
 package com.nucleonforge.axile.sbs.spring.details;
 
-import java.time.Instant;
 import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
@@ -65,7 +64,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
                 emptyIfNull(gitCommitInfo.commitShaShort()),
                 emptyIfNull(gitCommitInfo.branch()),
                 new CommitAuthor(emptyIfNull(commitAuthor.name()), emptyIfNull(commitAuthor.email())),
-                formatCommitTimeToInstantString(gitCommitInfo.commitTimestamp()));
+                gitCommitInfo.commitTimestamp());
     }
 
     private SpringDetails getSpringDetails() {
@@ -105,17 +104,5 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
                 emptyIfNull(System.getProperty("os.name")),
                 emptyIfNull(System.getProperty("os.version")),
                 emptyIfNull(System.getProperty("os.arch")));
-    }
-
-    private String formatCommitTimeToInstantString(String commitTime) {
-        if (commitTime == null || commitTime.isBlank()) {
-            return "";
-        }
-
-        try {
-            return Instant.ofEpochMilli(Long.parseLong(commitTime)).toString();
-        } catch (NumberFormatException ex) {
-            return "";
-        }
     }
 }

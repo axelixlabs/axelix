@@ -52,7 +52,7 @@ class DefaultServiceDetailsAssemblerTest {
         assertThat(git.branch()).isEqualTo("main");
         assertThat(git.commitAuthor().name()).isEqualTo("Mikhail Polivakha");
         assertThat(git.commitAuthor().email()).isEqualTo("mikhailpolivakha@email.com");
-        assertThat(git.commitTimestamp()).isEqualTo("2025-10-23T20:05:22Z");
+        assertThat(git.commitTimestamp()).isEqualTo("1761249922000");
 
         SpringDetails spring = result.spring();
         assertThat(spring).isNotNull();

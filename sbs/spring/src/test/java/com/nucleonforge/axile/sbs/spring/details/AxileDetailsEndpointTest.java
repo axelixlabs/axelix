@@ -56,7 +56,7 @@ class AxileDetailsEndpointTest {
                 .contains(
                         entry("commitShaShort", "a8b0929"),
                         entry("branch", "main"),
-                        entry("commitTimestamp", "2025-10-23T20:05:22Z"))
+                        entry("commitTimestamp", "1761249922000"))
                 .containsKeys("commitAuthor", "commitTimestamp");
 
         assertThatJson(responseBody)
@@ -72,15 +72,11 @@ class AxileDetailsEndpointTest {
         assertThatJson(responseBody)
                 .inPath("spring")
                 .isObject()
-                // .containsKey("springCloudVersion") At this stage, 'Spring Cloud' is not integrated,
-                //                                    so this field is absent from the response body
                 .contains(entry("springBootVersion", "3.5.0"), entry("springFrameworkVersion", "6.2.7"));
 
         assertThatJson(responseBody)
                 .inPath("runtime")
                 .isObject()
-                // .containsKey("kotlinVersion") At this stage, 'kotlin-stdlib' is not integrated,
-                //                               so this field is absent from the response body
                 .containsKeys("javaVersion", "jdkVendor", "garbageCollector");
 
         assertThatJson(responseBody).node("build").isNotNull();
