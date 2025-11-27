@@ -17,13 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.ApiPaths;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.transport.caches.DisableCacheEndpointProber;
 import com.nucleonforge.axile.master.service.transport.caches.DisableCacheManagerEndpointProber;
-import com.nucleonforge.axile.master.service.transport.caches.EnableAllCacheEndpointProber;
 import com.nucleonforge.axile.master.service.transport.caches.EnableCacheEndpointProber;
 import com.nucleonforge.axile.master.service.transport.caches.EnableCacheManagerEndpointProber;
 
@@ -44,19 +42,16 @@ public class CachesManagementApi {
     private final DisableCacheEndpointProber disableCacheEndpointProber;
     private final EnableCacheManagerEndpointProber enableCacheManagerEndpointProber;
     private final DisableCacheManagerEndpointProber disableCacheManagerEndpointProber;
-    private final EnableAllCacheEndpointProber enableAllCacheEndpointProber;
 
     public CachesManagementApi(
             EnableCacheEndpointProber enableCacheEndpointProber,
             DisableCacheEndpointProber disableCacheEndpointProber,
             EnableCacheManagerEndpointProber enableCacheManagerEndpointProber,
-            DisableCacheManagerEndpointProber disableCacheManagerEndpointProber,
-            EnableAllCacheEndpointProber enableAllCacheEndpointProber) {
+            DisableCacheManagerEndpointProber disableCacheManagerEndpointProber) {
         this.enableCacheEndpointProber = enableCacheEndpointProber;
         this.disableCacheEndpointProber = disableCacheEndpointProber;
         this.enableCacheManagerEndpointProber = enableCacheManagerEndpointProber;
         this.disableCacheManagerEndpointProber = disableCacheManagerEndpointProber;
-        this.enableAllCacheEndpointProber = enableAllCacheEndpointProber;
     }
 
     @Operation(
@@ -186,32 +181,6 @@ public class CachesManagementApi {
             @PathVariable("instanceId") String instanceId, @PathVariable("cacheManagerName") String cacheManagerName) {
         disableCacheManagerEndpointProber.invoke(
                 InstanceId.of(instanceId), createCacheManagerPayload(cacheManagerName));
-    }
-
-    @Operation(
-            summary = "Enable all cache managers in the application",
-            description = "Activates caching operations for all cache managers and their caches in the application.",
-            responses = {
-                @ApiResponse(description = "All cache managers enabled successfully", responseCode = "200"),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
-    @PostMapping(ApiPaths.CachesApi.ENABLE_ALL_CACHE)
-    public void enableAllCache(@PathVariable("instanceId") String instanceId) {
-        enableAllCacheEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
     }
 
     private HttpPayload createCachePayload(String cacheManagerName, String cacheName) {

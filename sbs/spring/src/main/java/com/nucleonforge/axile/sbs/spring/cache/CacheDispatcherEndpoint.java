@@ -56,9 +56,4 @@ public class CacheDispatcherEndpoint {
     public void disableCache(@PathVariable String cacheManagerName, @PathVariable String cacheName) {
         dispatcher.disableCache(cacheManagerName, cacheName);
     }
-
-    @PostMapping("/enable-all-cache")
-    public void enableAllCache() {
-        dispatcher.enableAllCache();
-    }
 }

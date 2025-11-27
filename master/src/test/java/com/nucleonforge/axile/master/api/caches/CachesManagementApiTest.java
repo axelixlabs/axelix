@@ -136,17 +136,6 @@ class CachesManagementApiTest {
     }
 
     @Test
-    void shouldEnableAllCaches() {
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axile/caches/{instanceId}/enable-all-cache",
-                null,
-                Void.class,
-                Map.of("instanceId", activeInstanceId));
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
     void shouldReturnInternalServerErrorWhenInstanceReturns404() {
         ResponseEntity<Void> response = restTemplate.postForEntity(
                 "/api/axile/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
