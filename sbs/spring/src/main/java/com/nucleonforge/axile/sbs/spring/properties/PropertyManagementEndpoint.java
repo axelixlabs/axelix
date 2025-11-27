@@ -1,5 +1,7 @@
 package com.nucleonforge.axile.sbs.spring.properties;
 
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +24,11 @@ public class PropertyManagementEndpoint {
 
     private final PropertyMutator propertyMutator;
 
-    public PropertyManagementEndpoint(PropertyMutator propertyMutator) {
+    private final PropertyNameDiscoverer propertyNameDiscoverer;
+
+    public PropertyManagementEndpoint(PropertyMutator propertyMutator, PropertyNameDiscoverer propertyNameDiscoverer) {
         this.propertyMutator = propertyMutator;
+        this.propertyNameDiscoverer = propertyNameDiscoverer;
     }
 
     @PostMapping
@@ -35,7 +40,10 @@ public class PropertyManagementEndpoint {
             return ResponseEntity.badRequest().build();
         }
 
-        propertyMutator.mutate(propertyName, request.newValue());
+        String discoveredPropertyName = propertyNameDiscoverer.discover(propertyName);
+
+        propertyMutator.mutate(Objects.requireNonNullElse(discoveredPropertyName, propertyName), request.newValue());
+
         return ResponseEntity.noContent().build();
     }
 }
