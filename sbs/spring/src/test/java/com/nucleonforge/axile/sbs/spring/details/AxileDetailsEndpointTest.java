@@ -72,18 +72,15 @@ class AxileDetailsEndpointTest {
         assertThatJson(responseBody)
                 .inPath("spring")
                 .isObject()
-                // .containsKey("springCloudVersion") Here, there is an issue with the presence of the
-                //                                    "springCloudVersion" field, if we get Spring Cloud version
-                //                                    information, the field is present in the response body,
-                //                                    otherwise, it is absent.
+                // .containsKey("springCloudVersion") At this stage, 'Spring Cloud' is not integrated,
+                //                                    so this field is absent from the response body
                 .contains(entry("springBootVersion", "3.5.0"), entry("springFrameworkVersion", "6.2.7"));
 
         assertThatJson(responseBody)
                 .inPath("runtime")
                 .isObject()
-                // .containsKey("kotlinVersion") Here, there is an issue with the presence of the "kotlinVersion" field,
-                //                               if we get Kotlin version information, the field is present in the
-                //                               response body, otherwise, it is absent.
+                // .containsKey("kotlinVersion") At this stage, 'kotlin-stdlib' is not integrated,
+                //                               so this field is absent from the response body
                 .containsKeys("javaVersion", "jdkVendor", "garbageCollector");
 
         assertThatJson(responseBody).node("build").isNotNull();
