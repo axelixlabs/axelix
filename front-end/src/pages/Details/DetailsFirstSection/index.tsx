@@ -52,6 +52,9 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
             });
 
             const file = response.data;
+
+            // We have to manually download the file here since the request to the server is a POST http
+            // request and therefore the browser might not catch up the possible Content-Disposition header
             downloadFile(file);
         }
     };
