@@ -58,15 +58,7 @@ export interface IDetailsCardRecord {
  */
 interface IStateExportComponent {
     component: EExportableComponent;
-    sanitize?: boolean;
 }
-
-/**
- * The {@link IStateExportComponent} specifically for heap dumps.
- */
-// interface IHeapStateComponent extends IStateExportComponent {
-//     sanitized: boolean;
-// }
 
 /**
  * Body of an http request for state export

@@ -113,11 +113,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                                                 <Switch
                                                     checked={stateComponents.includes(component)}
                                                     onChange={(checked) => {
-                                                        setStateComponents((prev) =>
-                                                            checked
-                                                                ? [...prev, component]
-                                                                : prev.filter((c) => c !== component),
-                                                        );
+                                                        handleChange(component);
                                                         setHeapDumpExpanded(checked);
                                                     }}
                                                 />
