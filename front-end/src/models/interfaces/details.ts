@@ -61,13 +61,6 @@ interface IStateExportComponent {
 }
 
 /**
- * The {@link IStateExportComponent} specifically for heap dumps.
- */
-// interface IHeapStateComponent extends IStateExportComponent {
-//     sanitized: boolean;
-// }
-
-/**
  * Body of an http request for state export
  */
 export interface IStateExportRequestBody {
