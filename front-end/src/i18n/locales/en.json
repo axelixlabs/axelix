@@ -10,13 +10,16 @@
         "downloadState": "Download state",
         "exportConfiguration": "List of state export components",
         "Components": {
-            "HEAP_DUMP": "Heap dump",
+            "HEAP_DUMP": "Heap Dump",
+            "THREAD_DUMP": "Thread Dump",
             "BEANS": "Beans",
             "CACHES": "Caches",
             "CONDITIONS": "Conditions",
-            "CONFIG_PROPS": "Configuration properties",
+            "CONFIG_PROPS": "Configuration Properties",
             "ENV": "Environment",
-            "SCHEDULED_TASKS": "Scheduled tasks"
+            "SCHEDULED_TASKS": "Scheduled Tasks",
+            "LOG_FILE": "Log File",
+            "Sanitize": "Sanitize Before Export"
         },
         "spring": {
             "springBootVersion": "Spring Boot",
