@@ -10,16 +10,16 @@
         "downloadState": "Выгрузить состояние",
         "exportConfiguration": "Список компонентов состояния для экспорта",
         "Components": {
-            "HEAP_DUMP": "Дамп кучи",
-            "THREAD_DUMP": "Дамп потоков",
+            "HEAP_DUMP": "Дамп Кучи",
+            "THREAD_DUMP": "Дамп Потоков",
             "BEANS": "Beans",
             "CACHES": "Кэши",
             "CONDITIONS": "Условия",
-            "CONFIG_PROPS": "Свойства конфигурации",
+            "CONFIG_PROPS": "Свойства Конфигурации",
             "ENV": "Окружение",
-            "SCHEDULED_TASKS": "Запланированные задачи",
-            "LOG_FILE": "Файл логов",
-            "Sanitize": "Очистить перед экспортом"
+            "SCHEDULED_TASKS": "Запланированные Задачи",
+            "LOG_FILE": "Лог файл",
+            "Sanitize": "Обезличить Перед Экспортом"
         },
         "spring": {
             "springBootVersion": "Spring Boot",
