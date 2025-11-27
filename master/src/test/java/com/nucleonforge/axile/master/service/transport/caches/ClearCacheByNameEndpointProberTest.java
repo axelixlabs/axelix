@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
-public class ClearGetCacheByNameEndpointProberTest {
+public class ClearCacheByNameEndpointProberTest {
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;

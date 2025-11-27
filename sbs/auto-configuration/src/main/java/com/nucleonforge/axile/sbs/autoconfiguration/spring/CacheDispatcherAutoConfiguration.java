@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axile.sbs.spring.cache.CacheDispatcher;
 import com.nucleonforge.axile.sbs.spring.cache.CacheDispatcherEndpoint;
+import com.nucleonforge.axile.sbs.spring.cache.CacheManagerBeanPostProcessor;
 import com.nucleonforge.axile.sbs.spring.cache.DefaultCacheDispatcher;
 
 /**
@@ -47,5 +48,11 @@ public class CacheDispatcherAutoConfiguration {
     @ConditionalOnMissingBean
     public CacheDispatcherEndpoint cacheDispatcherEndpoint(CacheDispatcher dispatcher) {
         return new CacheDispatcherEndpoint(dispatcher);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
+        return new CacheManagerBeanPostProcessor();
     }
 }

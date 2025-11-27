@@ -9,10 +9,6 @@ import org.springframework.cache.CacheManager;
  * Central component responsible for dispatching
  * cache-related operations to the appropriate {@link CacheManager} based on its name.
  *
- * <p>It maintains a map of available CacheManager, each associated with a unique name.
- * The dispatcher provides methods to clear entire caches, remove specific entries,
- * or clear all caches for a given CacheManager.
- *
  * @since 26.06.2025
  * @author Nikita Kirillov
  */
@@ -42,5 +38,51 @@ public class DefaultCacheDispatcher implements CacheDispatcher {
     public boolean clearAll(String cacheManagerName) {
         CacheManagerAdapter adapter = adapters.get(cacheManagerName);
         return adapter != null && adapter.clearAll();
+    }
+
+    @Override
+    public void enableCacheManager(String cacheManagerName) {
+        CacheManagerAdapter adapter = adapters.get(cacheManagerName);
+        if (adapter != null) {
+            adapter.enableCacheManager();
+        } else {
+            throw new CacheManagerAdapterNotFoundException(String.format(
+                    "Adapter for cache manager '%s' not found. Cannot enable cache manager.", cacheManagerName));
+        }
+    }
+
+    @Override
+    public void disableCacheManager(String cacheManagerName) {
+        CacheManagerAdapter adapter = adapters.get(cacheManagerName);
+        if (adapter != null) {
+            adapter.disableCacheManager();
+        } else {
+            throw new CacheManagerAdapterNotFoundException(String.format(
+                    "Adapter for cache manager '%s' not found. Cannot disable cache manager.", cacheManagerName));
+        }
+    }
+
+    @Override
+    public void enableCache(String cacheManagerName, String cacheName) {
+        CacheManagerAdapter adapter = adapters.get(cacheManagerName);
+        if (adapter != null) {
+            adapter.enableCache(cacheName);
+        } else {
+            throw new CacheManagerAdapterNotFoundException(String.format(
+                    "Adapter for cache manager '%s' not found. Cannot enable cache '%s'.",
+                    cacheManagerName, cacheName));
+        }
+    }
+
+    @Override
+    public void disableCache(String cacheManagerName, String cacheName) {
+        CacheManagerAdapter adapter = adapters.get(cacheManagerName);
+        if (adapter != null) {
+            adapter.disableCache(cacheName);
+        } else {
+            throw new CacheManagerAdapterNotFoundException(String.format(
+                    "Adapter for cache manager '%s' not found. Cannot disable cache '%s'.",
+                    cacheManagerName, cacheName));
+        }
     }
 }

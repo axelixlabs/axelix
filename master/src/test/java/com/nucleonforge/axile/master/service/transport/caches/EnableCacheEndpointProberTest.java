@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.api.caches;
+package com.nucleonforge.axile.master.service.transport.caches;
 
 import java.io.IOException;
 import java.util.Map;
@@ -8,7 +8,7 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,32 +17,36 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 
+import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
+import com.nucleonforge.axile.common.domain.http.HttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
+import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Integration tests for {@link CachesClearApi}
- *
- * @author Sergey Cherkasov
+ * Integration tests for {@link EnableCacheEndpointProber}.
+ * *
+ * @since 26.11.2025
+ * @author Nikita Kirillov
  */
-@SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CachesClearApiTest {
+@SpringBootTest(classes = ApplicationEntrypoint.class)
+class EnableCacheEndpointProberTest {
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private InstanceRegistry registry;
 
     @Autowired
-    private InstanceRegistry registry;
+    private EnableCacheEndpointProber enableCacheEndpointProber;
 
     @BeforeAll
     static void startServer() throws IOException {
@@ -59,13 +63,11 @@ public class CachesClearApiTest {
     void prepare() {
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
-            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+            public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/caches")) {
-                    return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/actuator/caches/cities?cacheManager=cacheManager")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/cache-dispatcher/cacheManager/vets/enable")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -82,28 +84,19 @@ public class CachesClearApiTest {
     }
 
     @Test
-    void shouldClearAllCaches() throws InterruptedException {
-        // when
-        restTemplate.delete("/api/axile/caches/{instanceId}", activeInstanceId);
+    void shouldEnableCache() {
+        HttpPayload payload = new DefaultHttpPayload(Map.of("cacheManagerName", "cacheManager", "cacheName", "vets"));
 
-        // then.
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/actuator/caches");
+        assertThatNoException()
+                .isThrownBy(() -> enableCacheEndpointProber.invoke(InstanceId.of(activeInstanceId), payload));
     }
 
     @Test
-    void shouldClearSpecificCache() throws InterruptedException {
-        String cacheName = "cities";
+    void shouldThrowExceptionWhenInstanceNotFound() {
+        HttpPayload payload = new DefaultHttpPayload(Map.of("cacheManagerName", "cacheManager", "cacheName", "vets"));
+        InstanceId unregisteredInstanceId = InstanceId.of(UUID.randomUUID().toString());
 
-        // when
-        restTemplate.delete(
-                "/api/axile/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
-                Map.of("instanceId", activeInstanceId, "cacheName", cacheName));
-        // then.
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
-        assertThat(recordedRequest.getPath())
-                .isEqualTo("/" + activeInstanceId + "/actuator/caches/cities?cacheManager=cacheManager");
+        assertThatThrownBy(() -> enableCacheEndpointProber.invoke(unregisteredInstanceId, payload))
+                .isInstanceOf(InstanceNotFoundException.class);
     }
 }

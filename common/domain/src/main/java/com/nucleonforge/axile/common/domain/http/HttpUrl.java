@@ -1,6 +1,7 @@
 package com.nucleonforge.axile.common.domain.http;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -39,13 +40,17 @@ public final class HttpUrl {
     public String expand(Map<String, String> pathVariableValues, List<QueryParameter<?>> queryParameters) {
         StringBuilder result = new StringBuilder(originalUrl);
 
-        pathVariables.forEach(pathVariable -> {
+        List<PathVariable> reversed = new ArrayList<>(pathVariables);
+        Collections.reverse(reversed);
+
+        for (PathVariable pathVariable : reversed) {
             String variableValue = pathVariableValues.get(pathVariable.name());
-            result.replace(pathVariable.starts(), pathVariable.ends(), variableValue);
-        });
+            if (variableValue != null) {
+                result.replace(pathVariable.starts(), pathVariable.ends(), variableValue);
+            }
+        }
 
         String queryString = QueryStringRenderer.renderQueryString(queryParameters);
-
         return result.append(queryString).toString();
     }
 

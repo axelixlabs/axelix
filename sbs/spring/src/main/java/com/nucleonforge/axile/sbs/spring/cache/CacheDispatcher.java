@@ -1,13 +1,11 @@
 package com.nucleonforge.axile.sbs.spring.cache;
 
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+
 /**
  * Dispatcher interface for executing cache operations
  * (such as evicting entries or clearing caches) across different CacheManager instances.
- *
- * <p>
- * All methods return {@code true} if the cache operation was successfully performed,
- * and {@code false} if no changes were made (e.g., the manager or cache was not found,
- * or the key was missing).
  *
  * @since 26.06.2025
  * @author Nikita Kirillov
@@ -42,4 +40,44 @@ public interface CacheDispatcher {
      * {@code false} if the manager was not found or no caches could be cleared
      */
     boolean clearAll(String cacheManagerName);
+
+    /**
+     * Enables all caches in the specified cache manager by name.
+     * This activates caching operations for all caches in the given cache manager.
+     *
+     * @param managerName the name of the cache manager to enable
+     */
+    void enableCacheManager(String managerName);
+
+    /**
+     * Disables all caches in the specified cache manager by name.
+     * This deactivates caching operations for all caches in the given cache manager.
+     * <p>
+     * Please note, that this API disabled all the caches inside the given cache manager
+     * that are only known by the time of this exact invocation. Some underlying {@link CacheManager}
+     * implementations (such as {@link ConcurrentMapCacheManager} for instance) support the dynamic
+     * addition of {@link org.springframework.cache.Cache caches}. The caches that are going to be added
+     * dynamically later after the given invocation of this method will not be disabled.
+     *
+     * @param managerName the name of the cache manager to disable
+     */
+    void disableCacheManager(String managerName);
+
+    /**
+     * Enables a specific cache within the specified cache manager.
+     * This activates caching operations for the given cache only.
+     *
+     * @param managerName the name of the cache manager
+     * @param cacheName the name of the cache to enable
+     */
+    void enableCache(String managerName, String cacheName);
+
+    /**
+     * Disables a specific cache within the specified cache manager.
+     * This deactivates caching operations for the given cache only.
+     *
+     * @param managerName the name of the cache manager
+     * @param cacheName the name of the cache to disable
+     */
+    void disableCache(String managerName, String cacheName);
 }
