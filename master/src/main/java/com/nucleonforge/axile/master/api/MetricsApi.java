@@ -1,5 +1,6 @@
 package com.nucleonforge.axile.master.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,6 +25,7 @@ import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.MultiValueQueryParameter;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axile.common.domain.http.QueryParameter;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.metrics.MetricsGroupsFeedResponse;
 import com.nucleonforge.axile.master.api.response.metrics.SingleMetricProfileResponse;
@@ -139,10 +141,13 @@ public class MetricsApi {
             @PathVariable("metric") String metric,
             @RequestParam(value = "tag", required = false) List<String> tags) {
 
+        List<QueryParameter<?>> queryParameters = new ArrayList<>();
+        if (tags != null && !tags.isEmpty()) {
+            queryParameters.add(new MultiValueQueryParameter("tag", tags));
+        }
+
         MetricProfile result = getSingleMetricProfileEndpointProber.invoke(
-                InstanceId.of(instanceId),
-                new DefaultHttpPayload(
-                        List.of(new MultiValueQueryParameter("tag", tags)), Map.of("metric.name", metric)));
+                InstanceId.of(instanceId), new DefaultHttpPayload(queryParameters, Map.of("metric.name", metric)));
 
         return Objects.requireNonNull(singleMetricConverter.convert(result));
     }
