@@ -28,11 +28,12 @@ export const ConditionsAccordionEntry = ({ items }: IProps) => {
             {items.map(({ message, condition, status }) => (
                 <Accordion
                     header={
-                        <div className={styles.LabelWrapper} key={`${message} ${condition}`}>
+                        <div className={styles.LabelWrapper}>
                             {findNeededIcon(status)}
                             {condition}
                         </div>
                     }
+                    key={`${message} ${condition}`}
                 >
                     <div className={styles.Message}>{message}</div>
                 </Accordion>

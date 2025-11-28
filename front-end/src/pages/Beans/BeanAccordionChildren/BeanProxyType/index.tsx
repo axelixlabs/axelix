@@ -19,7 +19,7 @@ export const BeanProxyType = ({ proxyType }: IProps) => {
     return (
         <>
             <div className={styles.AccordionBodyChunkTitle}>{t("Beans.beanProxyType")}:</div>
-            <span>{resolveProxying(t, proxyType)}</span>
+            <div>{resolveProxying(t, proxyType)}</div>
         </>
     );
 };

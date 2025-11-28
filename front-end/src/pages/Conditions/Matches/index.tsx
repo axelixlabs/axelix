@@ -12,8 +12,7 @@ interface IProps {
 export const Matches = ({ title, children }: PropsWithChildren<IProps>) => {
     return (
         <>
-            <div className={`MediumTitle ${styles.ConditionsMainTitle}`}>{title}</div>
-
+            <div className={`TextMedium ${styles.ConditionsMainTitle}`}>{title}</div>
             {children}
         </>
     );

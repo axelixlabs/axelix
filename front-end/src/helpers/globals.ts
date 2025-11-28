@@ -61,7 +61,7 @@ export const normalizeHtmlElementId = (elementId: string): string => {
 
 export function showErrorNotification(errorCode: string): void {
     notification.error({
-        message: t("Error.title"),
+        title: t("Error.title"),
         description: t(`Error.codes.${errorCode}`),
         placement: "top",
         duration: 4.5,

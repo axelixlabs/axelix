@@ -23,7 +23,7 @@ export const FixedTasks = ({ taskTitle, fixedTasks }: IProps) => {
     return (
         <>
             <div className={styles.SectionWrapper}>
-                <div className={`MediumTitle ${styles.TaskType}`}>{taskTitle}</div>
+                <div className={`TextMedium ${styles.TaskType}`}>{taskTitle}</div>
 
                 <div className="CustomizedAntdTable">
                     <FixedTaskTableHeader />
