@@ -19,6 +19,7 @@ import org.springframework.lang.Nullable;
 
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile.Measurement;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.
@@ -31,10 +32,20 @@ public class AxileMetricsEndpoint {
 
     private final MetricsEndpoint delegate;
     private final MeterRegistry registry;
+    private final ServiceMetricsGroupsAssembler defaultMetricsGroupsAssembler;
 
-    public AxileMetricsEndpoint(MetricsEndpoint delegate, MeterRegistry registry) {
+    public AxileMetricsEndpoint(
+            MetricsEndpoint delegate,
+            MeterRegistry registry,
+            ServiceMetricsGroupsAssembler defaultMetricsGroupsAssembler) {
         this.delegate = delegate;
         this.registry = registry;
+        this.defaultMetricsGroupsAssembler = defaultMetricsGroupsAssembler;
+    }
+
+    @ReadOperation
+    public MetricsGroupsFeed metricsGroups() {
+        return defaultMetricsGroupsAssembler.assemble();
     }
 
     // IMPORTANT!
