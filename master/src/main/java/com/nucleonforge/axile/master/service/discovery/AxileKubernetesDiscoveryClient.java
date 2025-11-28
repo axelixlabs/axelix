@@ -15,6 +15,8 @@ import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServiceSpec;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
+import io.fabric8.kubernetes.client.dsl.ServiceResource;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 import com.nucleonforge.axile.common.utils.CollectionUtils;
+import com.nucleonforge.axile.master.autoconfiguration.discovery.KubernetesDiscoveryProperties.DiscoveryFilters;
 
 /**
  * Axile Kubernetes implementation of {@link DiscoveryClient}.
@@ -37,10 +40,12 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
 
     private final KubernetesClient kubernetesClient;
     private final Set<String> namespaces;
+    private final Map<String, String> labels;
 
-    public AxileKubernetesDiscoveryClient(KubernetesClient kubernetesClient, Set<String> namespaces) {
-        this.namespaces = CollectionUtils.defaultIfEmpty(namespaces, kubernetesClient.getNamespace());
+    public AxileKubernetesDiscoveryClient(KubernetesClient kubernetesClient, DiscoveryFilters filters) {
         this.kubernetesClient = kubernetesClient;
+        this.namespaces = CollectionUtils.defaultIfEmpty(filters.getNamespaces(), kubernetesClient.getNamespace());
+        this.labels = filters.getLabels();
     }
 
     @Override
@@ -93,10 +98,20 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
 
     @Nullable
     private Service getService(String namespace, String serviceId) {
+        FilterWatchListDeletable<Service, ServiceList, ServiceResource<Service>> serviceOperation =
+                kubernetesClient.services().inNamespace(namespace);
+
+        for (var entry : labels.entrySet()) {
+            if (entry.getValue() == null || entry.getValue().isEmpty()) {
+                serviceOperation = serviceOperation.withLabel(entry.getKey(), entry.getValue());
+            } else {
+                serviceOperation = serviceOperation.withLabel(entry.getKey());
+            }
+        }
 
         // Yeah, that sucks, but we have to query all services and filter in memory since K8S API
         // does not allow to query by the resource UID for some reason.
-        return kubernetesClient.services().inNamespace(namespace).list().getItems().stream()
+        return serviceOperation.list().getItems().stream()
                 .filter(service ->
                         serviceId.equalsIgnoreCase(service.getMetadata().getUid()))
                 .findFirst()

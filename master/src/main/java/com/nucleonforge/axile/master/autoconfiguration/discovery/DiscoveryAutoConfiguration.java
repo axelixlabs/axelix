@@ -69,9 +69,7 @@ public class DiscoveryAutoConfiguration {
         @Bean
         public DiscoveryClient discoveryClient(
                 KubernetesClient kubernetesClient, KubernetesDiscoveryProperties kubernetesDiscoveryProperties) {
-            // TODO: Implement filtering by labels
-            return new AxileKubernetesDiscoveryClient(
-                    kubernetesClient, kubernetesDiscoveryProperties.getFilters().getNamespaces());
+            return new AxileKubernetesDiscoveryClient(kubernetesClient, kubernetesDiscoveryProperties.getFilters());
         }
 
         @Bean
