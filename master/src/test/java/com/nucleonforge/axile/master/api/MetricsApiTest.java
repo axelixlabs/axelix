@@ -49,20 +49,20 @@ public class MetricsApiTest {
               "groupName": "jvm",
               "metrics": [
                 {
-                  "key": "jvm.gc.memory.allocated",
-                  "value": "Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next"
+                  "metricName": "jvm.gc.memory.allocated",
+                  "description": "Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next"
                 },
                 {
-                  "key": "jvm.memory.usage.after.gc",
-                  "value": "The percentage of long-lived heap pool used after the last GC event, in the range [0..1]"
+                  "metricName": "jvm.memory.usage.after.gc",
+                  "description": "The percentage of long-lived heap pool used after the last GC event, in the range [0..1]"
                 },
                 {
-                  "key": "jvm.memory.used",
-                  "value": "The amount of used memory"
+                  "metricName": "jvm.memory.used",
+                  "description": "The amount of used memory"
                 },
                 {
-                  "key": "jvm.threads.daemon",
-                  "value": "The current number of live daemon threads"
+                  "metricName": "jvm.threads.daemon",
+                  "description": "The current number of live daemon threads"
                 }
               ]
             },
@@ -70,12 +70,12 @@ public class MetricsApiTest {
               "groupName": "process",
               "metrics": [
                 {
-                  "key": "process.cpu.time",
-                  "value": "The \\"cpu time\\" used by the Java Virtual Machine process"
+                  "metricName": "process.cpu.time",
+                  "description": "The \\"cpu time\\" used by the Java Virtual Machine process"
                 },
                 {
-                  "key": "process.cpu.usage",
-                  "value": "The \\"recent cpu usage\\" for the Java Virtual Machine process"
+                  "metricName": "process.cpu.usage",
+                  "description": "The \\"recent cpu usage\\" for the Java Virtual Machine process"
                 }
               ]
             },
@@ -83,12 +83,12 @@ public class MetricsApiTest {
               "groupName": "tomcat",
               "metrics": [
                 {
-                  "key": "tomcat.sessions.active.current",
-                  "value": null
+                  "metricName": "tomcat.sessions.active.current",
+                  "description": null
                 },
                 {
-                  "key": "tomcat.sessions.active.max",
-                  "value": null
+                  "metricName": "tomcat.sessions.active.max",
+                  "description": null
                 }
               ]
             }
@@ -128,20 +128,20 @@ public class MetricsApiTest {
                   "groupName": "jvm",
                   "metrics": [
                     {
-                      "key": "jvm.gc.memory.allocated",
-                      "value": "Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next"
+                      "metricName": "jvm.gc.memory.allocated",
+                      "description": "Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next"
                     },
                     {
-                      "key": "jvm.memory.usage.after.gc",
-                      "value": "The percentage of long-lived heap pool used after the last GC event, in the range [0..1]"
+                      "metricName": "jvm.memory.usage.after.gc",
+                      "description": "The percentage of long-lived heap pool used after the last GC event, in the range [0..1]"
                     },
                     {
-                      "key": "jvm.memory.used",
-                      "value": "The amount of used memory"
+                      "metricName": "jvm.memory.used",
+                      "description": "The amount of used memory"
                     },
                     {
-                      "key": "jvm.threads.daemon",
-                      "value": "The current number of live daemon threads"
+                      "metricName": "jvm.threads.daemon",
+                      "description": "The current number of live daemon threads"
                     }
                   ]
                 },
@@ -149,12 +149,12 @@ public class MetricsApiTest {
                   "groupName": "process",
                   "metrics": [
                     {
-                      "key": "process.cpu.time",
-                      "value": "The \\"cpu time\\" used by the Java Virtual Machine process"
+                      "metricName": "process.cpu.time",
+                      "description": "The \\"cpu time\\" used by the Java Virtual Machine process"
                     },
                     {
-                      "key": "process.cpu.usage",
-                      "value": "The \\"recent cpu usage\\" for the Java Virtual Machine process"
+                      "metricName": "process.cpu.usage",
+                      "description": "The \\"recent cpu usage\\" for the Java Virtual Machine process"
                     }
                   ]
                 },
@@ -162,12 +162,12 @@ public class MetricsApiTest {
                   "groupName": "tomcat",
                   "metrics": [
                     {
-                      "key": "tomcat.sessions.active.current",
-                      "value": null
+                      "metricName": "tomcat.sessions.active.current",
+                      "description": null
                     },
                     {
-                      "key": "tomcat.sessions.active.max",
-                      "value": null
+                      "metricName": "tomcat.sessions.active.max",
+                      "description": null
                     }
                   ]
                 }

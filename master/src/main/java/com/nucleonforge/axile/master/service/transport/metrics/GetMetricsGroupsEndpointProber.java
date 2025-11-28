@@ -4,7 +4,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
@@ -17,11 +17,11 @@ import com.nucleonforge.axile.master.service.transport.AbstractEndpointProber;
  * @author Mikhail Polivakha
  */
 @Component
-public class GetMetricsGroupsEndpointProber extends AbstractEndpointProber<AxileMetricsGroups> {
+public class GetMetricsGroupsEndpointProber extends AbstractEndpointProber<MetricsGroupsFeed> {
 
     protected GetMetricsGroupsEndpointProber(
             InstanceRegistry instanceRegistry,
-            MessageDeserializationStrategy<AxileMetricsGroups> messageDeserializationStrategy) {
+            MessageDeserializationStrategy<MetricsGroupsFeed> messageDeserializationStrategy) {
         super(instanceRegistry, messageDeserializationStrategy);
     }
 

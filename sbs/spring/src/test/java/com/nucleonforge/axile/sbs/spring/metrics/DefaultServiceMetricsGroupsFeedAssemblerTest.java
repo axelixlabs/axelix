@@ -10,8 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axile.common.api.KeyValue;
-import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,45 +22,45 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 @SpringBootTest
-public class DefaultServiceMetricsGroupsAssemblerTest {
+public class DefaultServiceMetricsGroupsFeedAssemblerTest {
 
     @Autowired
     ServiceMetricsGroupsAssembler assembler;
 
     @Test
     void shouldReturnGroupedMetricsWithDescriptions() {
-        AxileMetricsGroups metricsGroups = assembler.assemble();
+        MetricsGroupsFeed metricsGroups = assembler.assemble();
 
-        AxileMetricsGroups.MetricsGroup axile = getMetricsGroup(metricsGroups, "axileMetrics");
+        MetricsGroup axile = getMetricsGroup(metricsGroups, "axileMetrics");
         assertThat(axile.groupName()).isEqualTo("axileMetrics");
         assertThat(axile.metrics())
                 .containsOnly(
-                        new KeyValue(
+                        new MetricDescription(
                                 "axileMetrics.test.metric1",
                                 "Test metric belonging to the `axileMetrics` group with a description"),
-                        new KeyValue(
+                        new MetricDescription(
                                 "axileMetrics.test.metric2",
                                 "Test metric belonging to the `axileMetrics` group with a description"),
-                        new KeyValue("axileMetrics.test.metric3", null));
+                        new MetricDescription("axileMetrics.test.metric3", null));
 
-        AxileMetricsGroups.MetricsGroup test = getMetricsGroup(metricsGroups, "testMetrics");
+        MetricsGroup test = getMetricsGroup(metricsGroups, "testMetrics");
         assertThat(test.groupName()).isEqualTo("testMetrics");
         assertThat(test.metrics())
                 .containsOnly(
-                        new KeyValue(
+                        new MetricDescription(
                                 "testMetrics.axile.metric1",
                                 "Test metric belonging to the `testMetrics` group with a description"),
-                        new KeyValue("testMetrics.axile.metric2", null));
+                        new MetricDescription("testMetrics.axile.metric2", null));
 
-        AxileMetricsGroups.MetricsGroup other = getMetricsGroup(metricsGroups, "Others");
+        MetricsGroup other = getMetricsGroup(metricsGroups, "Others");
         assertThat(other.groupName()).isEqualTo("Others");
         assertThat(other.metrics())
-                .contains(new KeyValue(
+                .contains(new MetricDescription(
                         "standalone",
                         "Test metric belonging to the 'Others' group without a prefix and with a description"));
     }
 
-    private AxileMetricsGroups.MetricsGroup getMetricsGroup(AxileMetricsGroups response, String groupName) {
+    private MetricsGroup getMetricsGroup(MetricsGroupsFeed response, String groupName) {
         return response.metricsGroups().stream()
                 .filter(group -> group.groupName().equals(groupName))
                 .findFirst()

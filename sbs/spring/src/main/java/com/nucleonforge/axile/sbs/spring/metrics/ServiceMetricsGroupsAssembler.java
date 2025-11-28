@@ -1,6 +1,6 @@
 package com.nucleonforge.axile.sbs.spring.metrics;
 
-import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 
 /**
  * Assembles the metrics groups about this particular service.
@@ -10,7 +10,7 @@ import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
 public interface ServiceMetricsGroupsAssembler {
 
     /**
-     * @return assembled {@link AxileMetricsGroups}.
+     * @return assembled {@link MetricsGroupsFeed}.
      */
-    AxileMetricsGroups assemble();
+    MetricsGroupsFeed assemble();
 }
