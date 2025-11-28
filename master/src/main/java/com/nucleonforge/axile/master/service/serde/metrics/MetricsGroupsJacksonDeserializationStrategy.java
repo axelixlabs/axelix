@@ -5,7 +5,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axile.master.service.serde.JacksonMessageDeserializationStrategy;
 
@@ -16,14 +16,14 @@ import com.nucleonforge.axile.master.service.serde.JacksonMessageDeserialization
  */
 @Component
 public class MetricsGroupsJacksonDeserializationStrategy
-        extends JacksonMessageDeserializationStrategy<AxileMetricsGroups> {
+        extends JacksonMessageDeserializationStrategy<MetricsGroupsFeed> {
 
     public MetricsGroupsJacksonDeserializationStrategy(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
     @Override
-    public @NonNull Class<AxileMetricsGroups> supported() {
-        return AxileMetricsGroups.class;
+    public @NonNull Class<MetricsGroupsFeed> supported() {
+        return MetricsGroupsFeed.class;
     }
 }

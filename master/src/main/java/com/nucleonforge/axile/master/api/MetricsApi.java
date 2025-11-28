@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.MultiValueQueryParameter;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
-import com.nucleonforge.axile.master.api.response.metrics.MetricsGroupsResponse;
+import com.nucleonforge.axile.master.api.response.metrics.MetricsGroupsFeedResponse;
 import com.nucleonforge.axile.master.api.response.metrics.SingleMetricProfileResponse;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.convert.response.Converter;
@@ -45,17 +45,17 @@ public class MetricsApi {
 
     private final GetMetricsGroupsEndpointProber getMetricsGroupsEndpointProber;
     private final GetSingleMetricProfileEndpointProber getSingleMetricProfileEndpointProber;
-    private final Converter<AxileMetricsGroups, MetricsGroupsResponse> axileMetricsGroupsConverter;
+    private final Converter<MetricsGroupsFeed, MetricsGroupsFeedResponse> metricsGroupsFeedConverter;
     private final Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter;
 
     public MetricsApi(
             GetMetricsGroupsEndpointProber getMetricsGroupsEndpointProber,
             GetSingleMetricProfileEndpointProber getSingleMetricProfileEndpointProber,
-            Converter<AxileMetricsGroups, MetricsGroupsResponse> axileMetricsGroupsConverter,
+            Converter<MetricsGroupsFeed, MetricsGroupsFeedResponse> metricsGroupsFeedConverter,
             Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter) {
         this.getMetricsGroupsEndpointProber = getMetricsGroupsEndpointProber;
         this.getSingleMetricProfileEndpointProber = getSingleMetricProfileEndpointProber;
-        this.axileMetricsGroupsConverter = axileMetricsGroupsConverter;
+        this.metricsGroupsFeedConverter = metricsGroupsFeedConverter;
         this.singleMetricConverter = singleMetricConverter;
     }
 
@@ -73,7 +73,7 @@ public class MetricsApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        schema = @Schema(implementation = MetricsGroupsResponse.class))),
+                                        schema = @Schema(implementation = MetricsGroupsFeedResponse.class))),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -91,10 +91,10 @@ public class MetricsApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.MetricsApi.INSTANCE_ID)
-    public MetricsGroupsResponse getMetricsGroups(@PathVariable("instanceId") String instanceId) {
-        AxileMetricsGroups metricsList =
+    public MetricsGroupsFeedResponse getMetricsGroups(@PathVariable("instanceId") String instanceId) {
+        MetricsGroupsFeed metricsList =
                 getMetricsGroupsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(axileMetricsGroupsConverter.convert(metricsList));
+        return Objects.requireNonNull(metricsGroupsFeedConverter.convert(metricsList));
     }
 
     @Operation(

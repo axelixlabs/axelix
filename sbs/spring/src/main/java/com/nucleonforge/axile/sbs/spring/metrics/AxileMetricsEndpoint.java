@@ -17,9 +17,9 @@ import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint.MetricDescriptor;
 import org.springframework.lang.Nullable;
 
-import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile.Measurement;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.
@@ -44,7 +44,7 @@ public class AxileMetricsEndpoint {
     }
 
     @ReadOperation
-    public AxileMetricsGroups metricsGroups() {
+    public MetricsGroupsFeed metricsGroups() {
         return defaultMetricsGroupsAssembler.assemble();
     }
 

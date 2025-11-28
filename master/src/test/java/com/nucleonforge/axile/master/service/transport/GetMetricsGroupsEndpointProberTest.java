@@ -16,8 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axile.common.api.KeyValue;
-import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
@@ -71,16 +72,16 @@ public class GetMetricsGroupsEndpointProberTest {
                   "groupName": "jvm",
                   "metrics": [
                     {
-                      "key": "jvm.gc.memory.allocated",
-                      "value": "Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next"
+                      "metricName": "jvm.gc.memory.allocated",
+                      "description": "Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next"
                     },
                     {
-                      "key": "jvm.memory.usage.after.gc",
-                      "value": "The percentage of long-lived heap pool used after the last GC event, in the range [0..1]"
+                      "metricName": "jvm.memory.usage.after.gc",
+                      "description": "The percentage of long-lived heap pool used after the last GC event, in the range [0..1]"
                     },
                     {
-                      "key": "jvm.memory.used",
-                      "value": "The amount of used memory"
+                      "metricName": "jvm.memory.used",
+                      "description": "The amount of used memory"
                     }
                   ]
                 },
@@ -88,12 +89,12 @@ public class GetMetricsGroupsEndpointProberTest {
                   "groupName": "process",
                   "metrics": [
                     {
-                      "key": "process.cpu.time",
-                      "value": "The \\"cpu time\\" used by the Java Virtual Machine process"
+                      "metricName": "process.cpu.time",
+                      "description": "The \\"cpu time\\" used by the Java Virtual Machine process"
                     },
                     {
-                      "key": "process.cpu.usage",
-                      "value": "The \\"recent cpu usage\\" for the Java Virtual Machine process"
+                      "metricName": "process.cpu.usage",
+                      "description": "The \\"recent cpu usage\\" for the Java Virtual Machine process"
                     }
                   ]
                 },
@@ -101,12 +102,12 @@ public class GetMetricsGroupsEndpointProberTest {
                   "groupName": "tomcat",
                   "metrics": [
                     {
-                      "key": "tomcat.sessions.active.current",
-                      "value": null
+                      "metricName": "tomcat.sessions.active.current",
+                      "description": null
                     },
                     {
-                      "key": "tomcat.sessions.active.max",
-                      "value": null
+                      "metricName": "tomcat.sessions.active.max",
+                      "description": null
                     }
                   ]
                 }
@@ -136,41 +137,42 @@ public class GetMetricsGroupsEndpointProberTest {
         registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         // when.
-        AxileMetricsGroups metricsGroups =
+        MetricsGroupsFeed metricsGroups =
                 getMetricsGroupsEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
         // then.
         assertThat(metricsGroups.metricsGroups()).isNotEmpty().hasSize(3);
 
         // jvm
-        AxileMetricsGroups.MetricsGroup jvmGroup = getMetricsGroup(metricsGroups, "jvm");
+        MetricsGroup jvmGroup = getMetricsGroup(metricsGroups, "jvm");
         assertThat(jvmGroup.groupName()).isEqualTo("jvm");
         assertThat(jvmGroup.metrics())
                 .containsOnly(
-                        new KeyValue(
+                        new MetricDescription(
                                 "jvm.gc.memory.allocated",
                                 "Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next"),
-                        new KeyValue(
+                        new MetricDescription(
                                 "jvm.memory.usage.after.gc",
                                 "The percentage of long-lived heap pool used after the last GC event, in the range [0..1]"),
-                        new KeyValue("jvm.memory.used", "The amount of used memory"));
+                        new MetricDescription("jvm.memory.used", "The amount of used memory"));
 
         // process
-        AxileMetricsGroups.MetricsGroup processGroup = getMetricsGroup(metricsGroups, "process");
+        MetricsGroup processGroup = getMetricsGroup(metricsGroups, "process");
         assertThat(processGroup.groupName()).isEqualTo("process");
         assertThat(processGroup.metrics())
                 .containsOnly(
-                        new KeyValue("process.cpu.time", "The \"cpu time\" used by the Java Virtual Machine process"),
-                        new KeyValue(
+                        new MetricDescription(
+                                "process.cpu.time", "The \"cpu time\" used by the Java Virtual Machine process"),
+                        new MetricDescription(
                                 "process.cpu.usage", "The \"recent cpu usage\" for the Java Virtual Machine process"));
 
         // tomcat
-        AxileMetricsGroups.MetricsGroup tomcatGroup = getMetricsGroup(metricsGroups, "tomcat");
+        MetricsGroup tomcatGroup = getMetricsGroup(metricsGroups, "tomcat");
         assertThat(tomcatGroup.groupName()).isEqualTo("tomcat");
         assertThat(tomcatGroup.metrics())
                 .containsOnly(
-                        new KeyValue("tomcat.sessions.active.current", null),
-                        new KeyValue("tomcat.sessions.active.max", null));
+                        new MetricDescription("tomcat.sessions.active.current", null),
+                        new MetricDescription("tomcat.sessions.active.max", null));
     }
 
     @Test
@@ -194,7 +196,7 @@ public class GetMetricsGroupsEndpointProberTest {
                 .isInstanceOf(InstanceNotFoundException.class);
     }
 
-    private AxileMetricsGroups.MetricsGroup getMetricsGroup(AxileMetricsGroups response, String groupName) {
+    private MetricsGroup getMetricsGroup(MetricsGroupsFeed response, String groupName) {
         return response.metricsGroups().stream()
                 .filter(group -> group.groupName().equals(groupName))
                 .findFirst()

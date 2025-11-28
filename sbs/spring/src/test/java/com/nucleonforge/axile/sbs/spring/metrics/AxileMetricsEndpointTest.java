@@ -20,9 +20,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
-import com.nucleonforge.axile.common.api.KeyValue;
-import com.nucleonforge.axile.common.api.metrics.AxileMetricsGroups;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
+import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -83,25 +83,29 @@ class AxileMetricsEndpointTest {
     @MethodSource("metricsGroups")
     void shouldReturnGroupedMetricsWithDescriptions(String groupName, String metricName, String metricDescription) {
         // when.
-        ResponseEntity<AxileMetricsGroups> response =
-                testRestTemplate.getForEntity("/actuator/axile-metrics", AxileMetricsGroups.class);
+        ResponseEntity<MetricsGroupsFeed> response =
+                testRestTemplate.getForEntity("/actuator/axile-metrics", MetricsGroupsFeed.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        AxileMetricsGroups metricsGroups = response.getBody();
+        MetricsGroupsFeed metricsGroups = response.getBody();
 
         assertThat(metricsGroups.metricsGroups())
                 // metrics group
                 .filteredOn(group -> group.groupName().equals(groupName))
                 .first()
                 .satisfies(group -> {
-                    List<KeyValue> metrics = group.metrics();
+                    List<MetricDescription> metrics = group.metrics();
 
                     // metric name
-                    assertThat(metrics).extracting(KeyValue::key).contains(metricName);
+                    assertThat(metrics)
+                            .extracting(MetricDescription::metricName)
+                            .contains(metricName);
 
                     // metric description
-                    assertThat(metrics).extracting(KeyValue::value).contains(metricDescription);
+                    assertThat(metrics)
+                            .extracting(MetricDescription::description)
+                            .contains(metricDescription);
                 });
     }
 
