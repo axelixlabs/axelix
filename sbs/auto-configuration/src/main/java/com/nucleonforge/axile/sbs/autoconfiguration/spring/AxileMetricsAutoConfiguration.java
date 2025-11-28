@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axile.sbs.spring.metrics.AxileMetricsEndpoint;
+import com.nucleonforge.axile.sbs.spring.metrics.DefaultServiceMetricsGroupsAssembler;
+import com.nucleonforge.axile.sbs.spring.metrics.ServiceMetricsGroupsAssembler;
 
 /**
  * Auto-configuration for the {@link AxileMetricsEndpoint}.
@@ -23,7 +25,16 @@ public class AxileMetricsAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxileMetricsEndpoint axileMetricsEndpoint(MetricsEndpoint metricsEndpoint, MeterRegistry registry) {
-        return new AxileMetricsEndpoint(metricsEndpoint, registry);
+    public AxileMetricsEndpoint axileMetricsEndpoint(
+            MetricsEndpoint metricsEndpoint,
+            MeterRegistry registry,
+            ServiceMetricsGroupsAssembler serviceMetricsGroupsAssembler) {
+        return new AxileMetricsEndpoint(metricsEndpoint, registry, serviceMetricsGroupsAssembler);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ServiceMetricsGroupsAssembler defaultMetricsGroupsAssembler(MeterRegistry registry) {
+        return new DefaultServiceMetricsGroupsAssembler(registry);
     }
 }

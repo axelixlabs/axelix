@@ -110,7 +110,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint METADATA = of("/axile-metadata", HttpMethod.GET);
 
     // Metric
-    public static final ActuatorEndpoint METRICS = of("/metrics", HttpMethod.GET);
+    public static final ActuatorEndpoint METRICS_GROUP = of("/axile-metrics", HttpMethod.GET);
     public static final ActuatorEndpoint SINGLE_METRIC = of("/axile-metrics/{metric.name}", HttpMethod.GET);
 
     // ProfileManagement
@@ -190,7 +190,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 CLEAR_FOR_LOGGER,
                 MAPPINGS,
                 METADATA,
-                METRICS,
+                METRICS_GROUP,
                 SINGLE_METRIC,
                 PROFILE_MANAGEMENT,
                 PROMETHEUS,
