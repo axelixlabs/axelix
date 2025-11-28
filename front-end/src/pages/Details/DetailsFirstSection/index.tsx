@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { downloadFile } from "helpers";
-import { EExportableComponent } from "models";
+import { Loader } from "components";
+import { downloadFile, fetchData } from "helpers";
+import { EExportableComponent, StatefulRequest } from "models";
 import { exportStateData } from "services";
 
 import styles from "./styles.module.css";
@@ -22,10 +23,14 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
+    const [dataState, setDataState] = useState(StatefulRequest.loading<Blob>(false));
+
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [stateComponents, setStateComponents] = useState<EExportableComponent[]>([]);
     const [heapDumpExpanded, setHeapDumpExpanded] = useState<boolean>(false);
     const [sanitizeHeapDump, setSanitizeHeapDump] = useState<boolean>(true);
+    const file = dataState.response;
+    const loading = dataState.loading;
 
     useEffect(() => {
         if (heapDumpExpanded) {
@@ -33,15 +38,26 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
         }
     }, [heapDumpExpanded]);
 
+    useEffect(() => {
+        if (file) {
+            // We have to manually download the file here since the request to the server is a POST http
+            // request and therefore the browser might not catch up the possible Content-Disposition header
+            downloadFile(file);
+        }
+    }, [file]);
+
     const showModal = (): void => {
         setIsModalOpen(true);
     };
 
     const handleOk = async (): Promise<void> => {
-        setIsModalOpen(false);
+        if (!stateComponents.length) {
+            setIsModalOpen(false);
+        }
 
-        if (stateComponents.length) {
-            const response = await exportStateData({
+        setDataState(StatefulRequest.loading());
+        await fetchData(setDataState, () =>
+            exportStateData({
                 instanceId: instanceId!,
                 body: {
                     components: stateComponents.map((value) => ({
@@ -49,14 +65,10 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                         ...(value === EExportableComponent.HEAP_DUMP && { sanitize: sanitizeHeapDump }),
                     })),
                 },
-            });
+            }),
+        );
 
-            const file = response.data;
-
-            // We have to manually download the file here since the request to the server is a POST http
-            // request and therefore the browser might not catch up the possible Content-Disposition header
-            downloadFile(file);
-        }
+        setIsModalOpen(false);
     };
 
     const handleCancel = (): void => {
@@ -89,58 +101,66 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                 onOk={handleOk}
                 onCancel={handleCancel}
                 centered
+                okButtonProps={{ disabled: loading }}
+                cancelButtonProps={{ disabled: loading }}
             >
-                <List
-                    bordered
-                    dataSource={Object.values(EExportableComponent)}
-                    renderItem={(component) =>
-                        component !== EExportableComponent.HEAP_DUMP ? (
-                            <List.Item actions={[<Switch onChange={() => handleChange(component)} />]}>
-                                {t(`Details.Components.${component}`)}
-                            </List.Item>
-                        ) : (
-                            <Collapse
-                                expandIcon={() => false}
-                                activeKey={heapDumpExpanded ? [component] : []}
-                                items={[
-                                    {
-                                        key: component,
-                                        label: (
-                                            <div
-                                                onClick={(e) => e.stopPropagation()}
-                                                className={styles.HeapDumpAccordionHeader}
-                                            >
-                                                <span className={styles.Component}>
-                                                    {t(`Details.Components.${component}`)}
-                                                </span>
-                                                <Switch
-                                                    checked={stateComponents.includes(component)}
-                                                    onChange={(checked) => {
-                                                        handleChange(component);
-                                                        setHeapDumpExpanded(checked);
-                                                    }}
-                                                />
-                                            </div>
-                                        ),
-                                        children: (
-                                            <div className={styles.HeapDumpAccordionBody}>
-                                                {t("Details.Components.Sanitize")}:
-                                                <div>
-                                                    <Checkbox
-                                                        checked={sanitizeHeapDump}
-                                                        onChange={() => setSanitizeHeapDump(!sanitizeHeapDump)}
+                {loading ? (
+                    <div className={styles.LoaderWrapper}>
+                        <Loader />
+                    </div>
+                ) : (
+                    <List
+                        bordered
+                        dataSource={Object.values(EExportableComponent)}
+                        renderItem={(component) =>
+                            component !== EExportableComponent.HEAP_DUMP ? (
+                                <List.Item actions={[<Switch onChange={() => handleChange(component)} />]}>
+                                    {t(`Details.Components.${component}`)}
+                                </List.Item>
+                            ) : (
+                                <Collapse
+                                    expandIcon={() => false}
+                                    activeKey={heapDumpExpanded ? [component] : []}
+                                    items={[
+                                        {
+                                            key: component,
+                                            label: (
+                                                <div
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className={styles.HeapDumpAccordionHeader}
+                                                >
+                                                    <span className={styles.Component}>
+                                                        {t(`Details.Components.${component}`)}
+                                                    </span>
+                                                    <Switch
+                                                        checked={stateComponents.includes(component)}
+                                                        onChange={(checked) => {
+                                                            handleChange(component);
+                                                            setHeapDumpExpanded(checked);
+                                                        }}
                                                     />
                                                 </div>
-                                            </div>
-                                        ),
-                                    },
-                                ]}
-                                className={styles.Collapse}
-                            />
-                        )
-                    }
-                    className={styles.List}
-                />
+                                            ),
+                                            children: (
+                                                <div className={styles.HeapDumpAccordionBody}>
+                                                    {t("Details.Components.Sanitize")}:
+                                                    <div>
+                                                        <Checkbox
+                                                            checked={sanitizeHeapDump}
+                                                            onChange={() => setSanitizeHeapDump(!sanitizeHeapDump)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ),
+                                        },
+                                    ]}
+                                    className={styles.Collapse}
+                                />
+                            )
+                        }
+                        className={styles.List}
+                    />
+                )}
             </Modal>
         </div>
     );

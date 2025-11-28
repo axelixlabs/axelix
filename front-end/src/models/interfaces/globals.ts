@@ -26,8 +26,8 @@ export class StatefulRequest<T> implements IRequest {
         public response: T | null,
     ) {}
 
-    public static loading<U>(): StatefulRequest<U> {
-        return new StatefulRequest<U>(true, "", null);
+    public static loading<U>(state: boolean = true): StatefulRequest<U> {
+        return new StatefulRequest<U>(state, "", null);
     }
 
     public static success<U>(response: U): StatefulRequest<U> {
