@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -42,13 +41,11 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
     private final KubernetesClient kubernetesClient;
     private final Set<String> namespaces;
     private final Map<String, String> labels;
-    private final List<String> keyOnlyLabels;
 
     public AxileKubernetesDiscoveryClient(KubernetesClient kubernetesClient, DiscoveryFilters filters) {
         this.kubernetesClient = kubernetesClient;
         this.namespaces = CollectionUtils.defaultIfEmpty(filters.getNamespaces(), kubernetesClient.getNamespace());
-        this.labels = extractKeyValueLabels(filters.getLabels());
-        this.keyOnlyLabels = extractKeyOnlyLabels(filters.getLabels());
+        this.labels = filters.getLabels();
     }
 
     @Override
@@ -104,12 +101,12 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
         FilterWatchListDeletable<Service, ServiceList, ServiceResource<Service>> serviceOperation =
                 kubernetesClient.services().inNamespace(namespace);
 
-        if (!this.labels.isEmpty()) {
-            serviceOperation = serviceOperation.withLabels(this.labels);
-        }
-
-        for (String key : this.keyOnlyLabels) {
-            serviceOperation = serviceOperation.withLabel(key);
+        for (var entry : labels.entrySet()) {
+            if (entry.getValue() == null || entry.getValue().isEmpty()) {
+                serviceOperation = serviceOperation.withLabel(entry.getKey(), entry.getValue());
+            } else {
+                serviceOperation = serviceOperation.withLabel(entry.getKey());
+            }
         }
 
         // Yeah, that sucks, but we have to query all services and filter in memory since K8S API
@@ -203,23 +200,5 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
                 """
                             .formatted(serviceId));
         }
-    }
-
-    private Map<String, String> extractKeyValueLabels(Map<String, String> labels) {
-        return labels.entrySet().stream()
-                .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    private List<String> extractKeyOnlyLabels(Map<String, String> labels) {
-        if (labels == null || labels.isEmpty()) {
-            return List.of();
-        }
-
-        return labels.entrySet().stream()
-                .filter(entry ->
-                        entry.getValue() == null || entry.getValue().trim().isEmpty())
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
     }
 }
