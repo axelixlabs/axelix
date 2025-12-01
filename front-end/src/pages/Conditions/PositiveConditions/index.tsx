@@ -26,13 +26,17 @@ export const PositiveConditions = ({ positiveMatches }: IProps) => {
 
                 return (
                     <Fragment key={className + methodName}>
-                        <div className={styles.TargetWrapper}>
-                            <div>Class: {className}</div>
-                            <Copy text={className} />
+                        <div className={styles.ConditionHeaderWrapper}>
+                            <div className={styles.ConditionHeaderSection}>
+                                <span style={{ fontWeight: 300 }}>Class:</span> {className}
+                                <Copy text={className} />
+                            </div>
                             {methodName && (
                                 <>
-                                    <div>Method: {methodName}</div>
-                                    <Copy text={methodName} />
+                                    <div className={styles.ConditionHeaderSection}>
+                                        <span style={{ fontWeight: 300 }}>Method:</span> {methodName}
+                                        <Copy text={className} />
+                                    </div>
                                 </>
                             )}
                         </div>
