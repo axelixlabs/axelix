@@ -6,6 +6,7 @@
     "propertyChangedSuccessfully": "Property Changed",
     "saved": "Saved",
     "cancel": "Cancel",
+    "configPropsBeanLink": "Open this bean on the \"Configuration Properties\" page",
     "Details": {
         "downloadState": "Download state",
         "exportConfiguration": "List of state export components",
@@ -108,17 +109,17 @@
         "jdkProxy": "JDK Dynamic Proxy",
         "noProxy": "No Proxying",
         "beanSource" : {
-          "titles" : {
-            "main" : "Origin",
-            "beanMethod" : "Bean method",
-            "enclosingClass" : "Declaring class",
-            "factoryBeanName" : "FactoryBean name"
-          },
-          "COMPONENT_ANNOTATION" : "@Component or its variants",
-          "SYNTHETIC_BEAN" : "Synthetic bean",
-          "UNKNOWN" : "Unknown",
-          "FACTORY_BEAN" : "Produced by the FactoryBean",
-          "BEAN_METHOD" : "@Bean method"
+            "titles" : {
+                "main" : "Origin",
+                "beanMethod" : "Bean method",
+                "enclosingClass" : "Declaring class",
+                "factoryBeanName" : "FactoryBean name"
+            },
+            "COMPONENT_ANNOTATION" : "@Component or its variants",
+            "SYNTHETIC_BEAN" : "Synthetic bean",
+            "UNKNOWN" : "Unknown",
+            "FACTORY_BEAN" : "Produced by the FactoryBean",
+            "BEAN_METHOD" : "@Bean method"
         }
     },
     "ScheduledTasks": {

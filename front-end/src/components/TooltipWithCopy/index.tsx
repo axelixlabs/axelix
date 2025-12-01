@@ -18,16 +18,7 @@ interface IProps {
 export const TooltipWithCopy = ({ text, onClick }: IProps) => {
     return (
         <>
-            <Tooltip
-                title={text}
-                styles={{
-                    root: {
-                        maxWidth: 600,
-                        whiteSpace: "normal",
-                    },
-                }}
-                className={styles.Tooltip}
-            >
+            <Tooltip title={text} className={styles.Tooltip}>
                 <div className={styles.TextWrapper}>
                     <div className={styles.Text} onClick={onClick}>
                         {text}

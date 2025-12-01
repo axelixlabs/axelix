@@ -6,6 +6,7 @@
     "propertyChangedSuccessfully": "Свойство Изменено",
     "saved": "Сохранено",
     "cancel": "Отмена",
+    "configPropsBeanLink": "Откройте этот bean на странице \"Свойства конфигурации\"",
     "Details": {
         "downloadState": "Выгрузить состояние",
         "exportConfiguration": "Список компонентов состояния для экспорта",

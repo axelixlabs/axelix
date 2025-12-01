@@ -1,3 +1,5 @@
+import { Tooltip } from "antd";
+import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
@@ -19,6 +21,8 @@ export const BeanAccordionLabels = ({ bean }: IProps) => {
     const { beanName, className, scope, aliases, isConfigPropsBean } = bean;
     const { instanceId } = useParams();
 
+    const { t } = useTranslation();
+
     return (
         <div
             data-bean-entry
@@ -31,12 +35,14 @@ export const BeanAccordionLabels = ({ bean }: IProps) => {
                 <div className={styles.BeanNameWrapper}>
                     <TooltipWithCopy text={beanName} />
                     {isConfigPropsBean && (
-                        <Link
-                            to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(beanName)}`}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <img src={LinkIcon} alt="Link icon" />
-                        </Link>
+                        <Tooltip title={t("configPropsBeanLink")}>
+                            <Link
+                                to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(beanName)}`}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <img src={LinkIcon} alt="Link icon" />
+                            </Link>
+                        </Tooltip>
                     )}
                 </div>
                 <div className={styles.ClassName}>
