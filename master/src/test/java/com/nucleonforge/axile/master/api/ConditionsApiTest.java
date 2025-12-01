@@ -47,7 +47,8 @@ class ConditionsApiTest {
     {
       "positiveMatches": [
         {
-          "target": "EndpointAutoConfiguration#propertiesEndpointAccessResolver",
+          "className" : "EndpointAutoConfiguration",
+          "methodName" : "propertiesEndpointAccessResolver",
           "matched": [
             {
               "condition": "OnBeanCondition",
@@ -56,7 +57,8 @@ class ConditionsApiTest {
           ]
         },
         {
-          "target": "EndpointAutoConfiguration#endpointCachingOperationInvokerAdvisor",
+          "className" : "EndpointAutoConfiguration",
+          "methodName" : "endpointCachingOperationInvokerAdvisor",
           "matched": [
             {
               "condition": "OnBeanCondition",
@@ -67,7 +69,8 @@ class ConditionsApiTest {
       ],
       "negativeMatches": [
         {
-          "target": "WebFluxEndpointManagementContextConfiguration",
+          "className": "WebFluxEndpointManagementContextConfiguration",
+          "methodName": null,
           "notMatched": [
             {
               "condition": "OnWebApplicationCondition",
@@ -82,7 +85,8 @@ class ConditionsApiTest {
           ]
         },
         {
-          "target": "GsonHttpMessageConvertersConfiguration.GsonHttpMessageConverterConfiguration",
+          "className": "GsonHttpMessageConvertersConfiguration.GsonHttpMessageConverterConfiguration",
+          "methodName": null,
           "notMatched": [
             {
               "condition": "GsonHttpMessageConvertersConfiguration.PreferGsonOrJacksonAndJsonbUnavailableCondition",

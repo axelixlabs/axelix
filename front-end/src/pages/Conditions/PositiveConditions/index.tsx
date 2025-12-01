@@ -16,7 +16,7 @@ interface IProps {
 export const PositiveConditions = ({ positiveMatches }: IProps) => {
     return (
         <>
-            {positiveMatches.map(({ target, matched }) => {
+            {positiveMatches.map(({ className, methodName, matched }) => {
                 const items = matched.map((item) => {
                     return {
                         ...item,
@@ -25,10 +25,16 @@ export const PositiveConditions = ({ positiveMatches }: IProps) => {
                 });
 
                 return (
-                    <Fragment key={target}>
+                    <Fragment key={className + methodName}>
                         <div className={styles.TargetWrapper}>
-                            <div>{target}</div>
-                            <Copy text={target} />
+                            <div>Class: {className}</div>
+                            <Copy text={className} />
+                            {methodName && (
+                                <>
+                                    <div>Method: {methodName}</div>
+                                    <Copy text={methodName} />
+                                </>
+                            )}
                         </div>
                         <ConditionsAccordionEntry items={items} />
                     </Fragment>

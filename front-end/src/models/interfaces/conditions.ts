@@ -10,7 +10,24 @@ export interface ICondition {
  * Positive condition matches
  */
 export interface IConditionBeanPositive {
-    target: string;
+    /**
+     * The short name of the autoconfiguration class.
+     */
+    className: string;
+
+    /**
+     * The name of the method inside the autoconfiguration class that produced the bean.
+     * It might not present in case the condition is defined for the class as a whole, not
+     * for the method.
+     *
+     * Example can be found here:
+     * {@link https://github.com/spring-cloud/spring-cloud-openfeign/blob/main/spring-cloud-openfeign-core/src/main/java/org/springframework/cloud/openfeign/FeignAutoConfiguration.java#L89 Spring Cloud's FeignAutoConfiguration}
+     */
+    methodName?: string;
+
+    /**
+     * The list of Spring Boot's autoconfiguration conditions that did match
+     */
     matched: ICondition[];
 }
 
@@ -18,6 +35,9 @@ export interface IConditionBeanPositive {
  * Negative condition matches
  */
 export interface IConditionBeanNegative extends IConditionBeanPositive {
+    /**
+     * The list of Spring Boot's autoconfiguration conditions that did not match
+     */
     notMatched: ICondition[];
 }
 
