@@ -117,7 +117,8 @@ public class CachesReadApiTest {
               "caches": [
                 {
                   "name": "countries",
-                  "target": "java.util.concurrent.ConcurrentHashMap"
+                  "target": "java.util.concurrent.ConcurrentHashMap",
+                  "enabled" : true
                 }
               ]
             },
@@ -126,11 +127,13 @@ public class CachesReadApiTest {
               "caches": [
                 {
                   "name": "cities",
-                  "target": "java.util.concurrent.ConcurrentHashMap"
+                  "target": "java.util.concurrent.ConcurrentHashMap",
+                  "enabled" : true
                 },
                 {
                   "name": "countries",
-                  "target": "java.util.concurrent.ConcurrentHashMap"
+                  "target": "java.util.concurrent.ConcurrentHashMap",
+                  "enabled" : true
                 }
               ]
             }

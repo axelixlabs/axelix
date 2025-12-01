@@ -10,6 +10,8 @@ import com.nucleonforge.axile.common.api.caches.ServiceCaches;
 import com.nucleonforge.axile.master.api.response.caches.CachesResponse;
 import com.nucleonforge.axile.master.service.convert.response.Converter;
 
+import static com.nucleonforge.axile.master.api.response.caches.CachesResponse.CacheManagers.*;
+
 /**
  * The {@link Converter} from {@link ServiceCaches} to {@link CachesResponse}.
  *
@@ -33,10 +35,12 @@ public class ServiceCachesConverter implements Converter<ServiceCaches, CachesRe
                 .toList();
     }
 
-    private List<CachesResponse.CacheManagers.Caches> convertCache(ServiceCaches.CacheManagers cacheManagers) {
+    private List<Caches> convertCache(ServiceCaches.CacheManagers cacheManagers) {
+        // TODO:
+        //  Replace inline 'true' flag with actual value once
+        //  https://github.com/Nucleon-Forge/axile/issues/410 is resolved
         return cacheManagers.caches().entrySet().stream()
-                .map(c -> new CachesResponse.CacheManagers.Caches(
-                        c.getKey(), c.getValue().target()))
+                .map(c -> new Caches(c.getKey(), c.getValue().target(), true))
                 .toList();
     }
 }

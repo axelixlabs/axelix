@@ -34,6 +34,6 @@ public record CachesResponse(List<CacheManagers> cacheManagers) {
          *
          * @author Sergey Cherkasov
          */
-        public record Caches(String name, String target) {}
+        public record Caches(String name, String target, boolean enabled) {}
     }
 }
