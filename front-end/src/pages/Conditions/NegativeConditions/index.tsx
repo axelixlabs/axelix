@@ -16,17 +16,23 @@ interface IProps {
 export const NegativeConditions = ({ negativeMatches }: IProps) => {
     return (
         <>
-            {negativeMatches.map(({ target, matched, notMatched }) => {
+            {negativeMatches.map(({ className, methodName, matched, notMatched }) => {
                 const itemsWithStatus = [
                     ...notMatched.map((item) => ({ ...item, status: EConditionStatus.NOT_MATCHED })),
                     ...matched.map((item) => ({ ...item, status: EConditionStatus.MATCHED })),
                 ];
 
                 return (
-                    <Fragment key={target}>
+                    <Fragment key={className + methodName}>
                         <div className={styles.TargetWrapper}>
-                            <div>{target}</div>
-                            <Copy text={target} />
+                            <div>Class: {className}</div>
+                            <Copy text={className} />
+                            {methodName && (
+                                <>
+                                    <div>Method: {methodName}</div>
+                                    <Copy text={className} />
+                                </>
+                            )}
                         </div>
                         <ConditionsAccordionEntry items={itemsWithStatus} />
                     </Fragment>

@@ -3,6 +3,8 @@ package com.nucleonforge.axile.master.api.response;
 import java.util.Collections;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * The feed of the conditions in the application.
  *
@@ -26,10 +28,13 @@ public record ConditionsFeedResponse(List<PositiveCondition> positiveMatches, Li
     /**
      * Represents a configuration class where all conditions matched successfully.
      *
-     * @param target a short identifier of the configuration element, typically a class or method name
-     * @param matched list of conditions that were evaluated and matched
+     * @param className  the class name of the class on which either the conditional annotation resided, or
+     *                   that contained the {@link #methodName} on which the conditional annotation resided.
+     *                   Guaranteed to be present.
+     * @param methodName the name of the method on which the conditional annotation was put.
+     * @param matched    list of conditions that were evaluated and matched
      */
-    public record PositiveCondition(String target, List<ConditionMatch> matched) {
+    public record PositiveCondition(String className, @Nullable String methodName, List<ConditionMatch> matched) {
 
         public PositiveCondition {
             if (matched == null) {
@@ -41,11 +46,18 @@ public record ConditionsFeedResponse(List<PositiveCondition> positiveMatches, Li
     /**
      * Represents a configuration class where some conditions did not match.
      *
-     * @param target a short identifier of the configuration element, typically a class or method name
+     * @param className  the class name of the class on which either the conditional annotation resided, or
+     *                   that contained the {@link #methodName} on which the conditional annotation resided.
+     *                   Guaranteed to be present.
+     * @param methodName the name of the method on which the conditional annotation was put.
      * @param notMatched list of conditions that were not matched
      * @param matched list of conditions that were matched
      */
-    public record NegativeCondition(String target, List<ConditionMatch> notMatched, List<ConditionMatch> matched) {
+    public record NegativeCondition(
+            String className,
+            @Nullable String methodName,
+            List<ConditionMatch> notMatched,
+            List<ConditionMatch> matched) {
 
         public NegativeCondition {
             if (notMatched == null) {

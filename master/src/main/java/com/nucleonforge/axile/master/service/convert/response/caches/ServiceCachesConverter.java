@@ -8,9 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.nucleonforge.axile.common.api.caches.ServiceCaches;
 import com.nucleonforge.axile.master.api.response.caches.CachesResponse;
+import com.nucleonforge.axile.master.api.response.caches.CachesResponse.CacheManagers.Caches;
 import com.nucleonforge.axile.master.service.convert.response.Converter;
-
-import static com.nucleonforge.axile.master.api.response.caches.CachesResponse.CacheManagers.*;
 
 /**
  * The {@link Converter} from {@link ServiceCaches} to {@link CachesResponse}.

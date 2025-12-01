@@ -1,6 +1,7 @@
 package com.nucleonforge.axile.master.service.convert;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,23 +32,27 @@ class ConditionFeedConverterTest {
         assertThat(conditionsFeedResponse.positiveMatches()).hasSize(2);
 
         var positive1 = getPositiveByTarget(
-                conditionsFeedResponse, "EndpointAutoConfiguration#propertiesEndpointAccessResolver");
-        assertThat(positive1.target()).isEqualTo("EndpointAutoConfiguration#propertiesEndpointAccessResolver");
+                conditionsFeedResponse, "EndpointAutoConfiguration", "propertiesEndpointAccessResolver");
+        assertThat(positive1.className()).isEqualTo("EndpointAutoConfiguration");
+        assertThat(positive1.methodName()).isEqualTo("propertiesEndpointAccessResolver");
         assertThat(positive1.matched()).hasSize(1);
         assertThat(positive1.matched().get(0).condition()).isEqualTo("OnBeanCondition");
         assertThat(positive1.matched().get(0).message()).contains("@ConditionalOnMissingBean");
 
         var positive2 = getPositiveByTarget(
-                conditionsFeedResponse, "EndpointAutoConfiguration#endpointCachingOperationInvokerAdvisor");
-        assertThat(positive2.target()).isEqualTo("EndpointAutoConfiguration#endpointCachingOperationInvokerAdvisor");
+                conditionsFeedResponse, "EndpointAutoConfiguration", "endpointCachingOperationInvokerAdvisor");
+        assertThat(positive2.className()).isEqualTo("EndpointAutoConfiguration");
+        assertThat(positive2.methodName()).isEqualTo("endpointCachingOperationInvokerAdvisor");
         assertThat(positive2.matched()).hasSize(1);
         assertThat(positive2.matched().get(0).condition()).isEqualTo("OnBeanCondition");
         assertThat(positive2.matched().get(0).message()).contains("CachingOperationInvokerAdvisor");
 
         assertThat(conditionsFeedResponse.negativeMatches()).hasSize(2);
 
-        var negative1 = getNegativeByTarget(conditionsFeedResponse, "WebFluxEndpointManagementContextConfiguration");
-        assertThat(negative1.target()).isEqualTo("WebFluxEndpointManagementContextConfiguration");
+        var negative1 =
+                getNegativeByTarget(conditionsFeedResponse, "WebFluxEndpointManagementContextConfiguration", null);
+        assertThat(negative1.className()).isEqualTo("WebFluxEndpointManagementContextConfiguration");
+        assertThat(negative1.methodName()).isEqualTo(null);
         assertThat(negative1.notMatched()).hasSize(1);
         assertThat(negative1.notMatched().get(0).condition()).isEqualTo("OnWebApplicationCondition");
         assertThat(negative1.notMatched().get(0).message()).isEqualTo("not a reactive web application");
@@ -56,9 +61,12 @@ class ConditionFeedConverterTest {
         assertThat(negative1.matched().get(0).message()).contains("DispatcherHandler");
 
         var negative2 = getNegativeByTarget(
-                conditionsFeedResponse, "GsonHttpMessageConvertersConfiguration.GsonHttpMessageConverterConfiguration");
-        assertThat(negative2.target())
+                conditionsFeedResponse,
+                "GsonHttpMessageConvertersConfiguration.GsonHttpMessageConverterConfiguration",
+                null);
+        assertThat(negative2.className())
                 .isEqualTo("GsonHttpMessageConvertersConfiguration.GsonHttpMessageConverterConfiguration");
+        assertThat(negative2.methodName()).isNull();
         assertThat(negative2.notMatched()).hasSize(1);
         assertThat(negative2.notMatched().get(0).condition())
                 .isEqualTo("GsonHttpMessageConvertersConfiguration.PreferGsonOrJacksonAndJsonbUnavailableCondition");
@@ -67,17 +75,17 @@ class ConditionFeedConverterTest {
     }
 
     private static ConditionsFeedResponse.PositiveCondition getPositiveByTarget(
-            ConditionsFeedResponse response, String target) {
+            ConditionsFeedResponse response, String className, String methodName) {
         return response.positiveMatches().stream()
-                .filter(c -> c.target().equals(target))
+                .filter(c -> Objects.equals(c.methodName(), methodName) && Objects.equals(c.className(), className))
                 .findFirst()
                 .orElseThrow();
     }
 
     private static ConditionsFeedResponse.NegativeCondition getNegativeByTarget(
-            ConditionsFeedResponse response, String target) {
+            ConditionsFeedResponse response, String className, String methodName) {
         return response.negativeMatches().stream()
-                .filter(c -> c.target().equals(target))
+                .filter(c -> Objects.equals(c.methodName(), methodName) && Objects.equals(c.className(), className))
                 .findFirst()
                 .orElseThrow();
     }
