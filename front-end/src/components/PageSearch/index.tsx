@@ -46,7 +46,6 @@ export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, hasBott
                 options={autocompleteOptions}
                 onChange={(value) => scheduleSetSearch(value)}
                 onSelect={(value) => setSearch(value)}
-                filterOption
                 className={classNames(styles.Search, { [styles.BottomGutter]: hasBottomGutter })}
             >
                 <Input placeholder={t("search")} addonAfter={addonAfter} />

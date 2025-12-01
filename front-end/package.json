@@ -13,9 +13,9 @@
         "cy:open": "cypress open"
     },
     "dependencies": {
-        "@ant-design/v5-patch-for-react-19": "^1.0.3",
+        "@ant-design/icons": "^6.1.0",
         "@reduxjs/toolkit": "^2.9.0",
-        "antd": "^5.27.3",
+        "antd": "^6.0.0",
         "axios": "^1.12.2",
         "classnames": "^2.5.1",
         "i18next": "^25.5.2",

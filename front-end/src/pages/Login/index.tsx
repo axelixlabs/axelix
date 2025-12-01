@@ -28,7 +28,7 @@ export const Login = () => {
 
     return (
         <div className={styles.LoginFormWrapper}>
-            <h1 className={classNames("MediumTitle", styles.LoginTitle)}>{t("Authentication.login")}</h1>
+            <h1 className={classNames("TextMedium", styles.LoginTitle)}>{t("Authentication.login")}</h1>
             <Form layout="vertical" onFinish={onFinish} autoComplete="off">
                 <Form.Item
                     key="username"

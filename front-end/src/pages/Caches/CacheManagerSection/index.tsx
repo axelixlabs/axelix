@@ -18,7 +18,7 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
     return (
         <div className={styles.CacheManagerWrapper}>
             <div className={styles.CacheManagerTopSection}>
-                <div className={classNames("MediumTitle", styles.CacheManagerName)}>{cacheManager.name}</div>
+                <div className={classNames("TextMedium", styles.CacheManagerName)}>{cacheManager.name}</div>
             </div>
             <div className="AccordionsWrapper">
                 {cacheManager.caches.map((cache) => (

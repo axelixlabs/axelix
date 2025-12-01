@@ -38,7 +38,6 @@ export const BeanAccordionChildren = ({ bean }: IProps) => {
                             className={styles.AccordionBodyChunkList}
                             onClick={() => scrollToAccordionById(name, ESearchSubject.BEAN_NAME_OR_ALIAS)}
                         >
-                            {/* TODO: This part we need to be fix after tooltip PR merge */}
                             <div className={styles.Dependency}>
                                 <TooltipWithCopy text={name} />
                                 {isConfigPropsDependency && (

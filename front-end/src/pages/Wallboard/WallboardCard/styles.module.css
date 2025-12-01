@@ -12,7 +12,7 @@
     color: inherit;
 }
 
-.Card:hover > .CardHeader {
+.Card:hover>.CardHeader {
     color: var(--axile-primary-green);
 }
 
@@ -53,6 +53,16 @@
 .CardHeaderUNKNOWN {
     background-color: var(--axile-medium-grey);
     outline: 1px solid var(--axile-bold-grey);
+}
+
+/* TODO: Add correct color in future */
+.CardRELOAD {
+    border: 1px solid red;
+}
+
+.CardHeaderRELOAD {
+    background-color: blueviolet;
+    outline: 1px solid blue;
 }
 
 .CardBody {
