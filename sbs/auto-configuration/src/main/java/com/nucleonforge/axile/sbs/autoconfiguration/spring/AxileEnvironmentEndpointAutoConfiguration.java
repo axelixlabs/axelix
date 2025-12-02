@@ -12,9 +12,9 @@ import org.springframework.core.env.Environment;
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint;
 import com.nucleonforge.axile.sbs.spring.env.DefaultEnvPropertyEnricher;
-import com.nucleonforge.axile.sbs.spring.env.DefaultEnvironmentPropertyNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.env.EnvPropertyEnricher;
-import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.properties.utils.EnvironmentPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.properties.utils.InvalidPropertiesLoader;
 
 /**
  * Auto-configuration for the {@link AxileEnvironmentEndpoint}.
@@ -25,24 +25,20 @@ import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
 @AutoConfiguration(
         after = {
             EnvironmentEndpointAutoConfiguration.class,
-            AxileConfigurationsPropertiesEndpointAutoConfiguration.class
+            AxileConfigurationsPropertiesEndpointAutoConfiguration.class,
+            PropertyUtilsAutoConfiguration.class
         })
 @ConditionalOnAvailableEndpoint(endpoint = EnvironmentEndpoint.class)
 public class AxileEnvironmentEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
-        return new DefaultEnvironmentPropertyNameNormalizer();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public EnvPropertyEnricher envPropertyEnricher(
             Environment environment,
             EnvironmentPropertyNameNormalizer propertyNameNormalizer,
-            ObjectProvider<ConfigurationPropertiesCache> cache) {
-        return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, cache);
+            ObjectProvider<ConfigurationPropertiesCache> cache,
+            InvalidPropertiesLoader invalidPropertiesLoader) {
+        return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, cache, invalidPropertiesLoader);
     }
 
     @Bean

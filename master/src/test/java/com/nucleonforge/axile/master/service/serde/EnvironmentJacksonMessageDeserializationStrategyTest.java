@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -89,14 +90,14 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
         assertThat(environmentFeed.defaultProfiles()).hasSize(2).containsOnly("default", "test");
         assertThat(environmentFeed.propertySources()).hasSize(4);
 
-        EnvironmentFeed.PropertySource servletParams = environmentFeed.propertySources().stream()
+        PropertySource servletParams = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("servletContextInitParams"))
                 .findFirst()
                 .orElseThrow();
 
         assertThat(servletParams.properties()).isEmpty();
 
-        EnvironmentFeed.PropertySource systemProps = environmentFeed.propertySources().stream()
+        PropertySource systemProps = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemProperties"))
                 .findFirst()
                 .orElseThrow();
@@ -123,7 +124,7 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
             assertThat(pv.configPropsBeanName()).isEqualTo("org.springframework.boot.test.property.SystemProperties");
         });
 
-        EnvironmentFeed.PropertySource systemEnv = environmentFeed.propertySources().stream()
+        PropertySource systemEnv = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemEnvironment"))
                 .findFirst()
                 .orElseThrow();
@@ -138,7 +139,7 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                     assertThat(pv.configPropsBeanName()).isNull();
                 });
 
-        EnvironmentFeed.PropertySource configProps = environmentFeed.propertySources().stream()
+        PropertySource configProps = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("Config resource classpath:actuate/env/"))
                 .findFirst()
                 .orElseThrow();

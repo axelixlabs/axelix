@@ -7,6 +7,7 @@ import org.springframework.boot.actuate.context.properties.ConfigurationProperti
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 
@@ -19,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(DefaultConfigurationPropertiesConverterTest.DefaultDefaultConfigurationPropertiesTestConfiguration.class)
 public class ConfigurationPropertiesCacheTest {
 
     @Autowired
@@ -33,11 +35,6 @@ public class ConfigurationPropertiesCacheTest {
 
     @TestConfiguration
     static class ConfigurationPropertiesCacheTestConfiguration {
-
-        @Bean
-        public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-            return new DefaultConfigurationPropertiesConverter();
-        }
 
         @Bean
         public ConfigurationPropertiesCache configurationPropertiesCache(

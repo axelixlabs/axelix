@@ -1,0 +1,11 @@
+spring.datasource.hikari.auto-commit:
+  - value: true
+    description: "Enabling auto-commit in production may cause inconsistent transactional behavior and unintended writes; should be disabled."
+
+spring.jpa.hibernate.ddl-auto:
+  - value: "create"
+    description: "Overridden description from file common-invalid-properties.yml! Should be set validate."
+  - value: "create-drop"
+    description: "Overridden description from file common-invalid-properties.yml! Should be set none."
+  - value: "update"
+    description: "Overridden description from file common-invalid-properties.yml! Should be set default."

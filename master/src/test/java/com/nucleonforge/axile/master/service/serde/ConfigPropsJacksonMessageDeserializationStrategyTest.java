@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.ConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed.Property;
 import com.nucleonforge.axile.common.api.KeyValue;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,12 +35,12 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
                         "org.springframework.boot.actuate.autoconfigure.endpoint.web.Bean1" : {
                           "prefix" : "management.endpoints.web.cors",
                           "properties": [
-                            { "key": "allowedOrigins", "value": null },
-                            { "key": "maxAge", "value": "PT30M" },
-                            { "key": "exposedHeaders", "value": null },
-                            { "key": "allowedOriginPatterns", "value": null },
-                            { "key": "allowedHeaders", "value": null },
-                            { "key": "allowedMethods", "value": null }
+                            { "name": "allowedOrigins", "value": null , "validationMessage": null},
+                            { "name": "maxAge", "value": "PT30M", "validationMessage": "Should set PT10M" },
+                            { "name": "exposedHeaders", "value": null , "validationMessage": null},
+                            { "name": "allowedOriginPatterns", "value": null , "validationMessage": null},
+                            { "name": "allowedHeaders", "value": null , "validationMessage": null},
+                            { "name": "allowedMethods", "value": null , "validationMessage": null}
                           ],
                           "inputs": [
                             { "key": "allowedOrigins", "value": null },
@@ -53,20 +54,20 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
                         "org.springframework.boot.autoconfigure.web.Bean2" : {
                           "prefix" : "spring.web",
                           "properties": [
-                            { "key": "localeResolver", "value": "ACCEPT_HEADER" },
-                            { "key": "resources.staticLocations[0]", "value": "classpath:/META-INF/resources/" },
-                            { "key": "resources.staticLocations[1]", "value": "classpath:/resources/" },
-                            { "key": "resources.staticLocations[2]", "value": "classpath:/static/" },
-                            { "key": "resources.staticLocations[3]", "value": "classpath:/public/" },
-                            { "key": "resources.addMappings", "value": "true" },
-                            { "key": "resources.chain.cache", "value": "true" },
-                            { "key": "resources.chain.compressed", "value": "false" },
-                            { "key": "resources.chain.strategy.fixed.enabled", "value": "false" },
-                            { "key": "resources.chain.strategy.fixed.paths[0]", "value": "/**" },
-                            { "key": "resources.chain.strategy.content.enabled", "value": "false" },
-                            { "key": "resources.chain.strategy.content.paths[0]", "value": "/**" },
-                            { "key": "resources.cache.cachecontrol", "value": null },
-                            { "key": "resources.cache.useLastModified", "value": "true" }
+                            { "name": "localeResolver", "value": "ACCEPT_HEADER" , "validationMessage": null},
+                            { "name": "resources.staticLocations[0]", "value": "classpath:/META-INF/resources/", "validationMessage": null},
+                            { "name": "resources.staticLocations[1]", "value": "classpath:/resources/", "validationMessage": null},
+                            { "name": "resources.staticLocations[2]", "value": "classpath:/static/", "validationMessage": null},
+                            { "name": "resources.staticLocations[3]", "value": "classpath:/public/", "validationMessage": null},
+                            { "name": "resources.addMappings", "value": "true", "validationMessage": null },
+                            { "name": "resources.chain.cache", "value": "true", "validationMessage": null},
+                            { "name": "resources.chain.compressed", "value": "false", "validationMessage": null},
+                            { "name": "resources.chain.strategy.fixed.enabled", "value": "false", "validationMessage": null },
+                            { "name": "resources.chain.strategy.fixed.paths[0]", "value": "/**", "validationMessage": null },
+                            { "name": "resources.chain.strategy.content.enabled", "value": "false", "validationMessage": null },
+                            { "name": "resources.chain.strategy.content.paths[0]", "value": "/**", "validationMessage": null },
+                            { "name": "resources.cache.cachecontrol", "value": null, "validationMessage": null },
+                            { "name": "resources.cache.useLastModified", "value": "true", "validationMessage": null }
                           ],
                           "inputs": [
                             { "key": "localeResolver", "value": null },
@@ -107,12 +108,12 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
         // bean1 -> properties
         assertThat(bean1.properties())
                 .containsOnly(
-                        new KeyValue("allowedOrigins", null),
-                        new KeyValue("maxAge", "PT30M"),
-                        new KeyValue("exposedHeaders", null),
-                        new KeyValue("allowedOriginPatterns", null),
-                        new KeyValue("allowedHeaders", null),
-                        new KeyValue("allowedMethods", null));
+                        new Property("allowedOrigins", null, null),
+                        new Property("maxAge", "PT30M", "Should set PT10M"),
+                        new Property("exposedHeaders", null, null),
+                        new Property("allowedOriginPatterns", null, null),
+                        new Property("allowedHeaders", null, null),
+                        new Property("allowedMethods", null, null));
 
         // bean1 -> inputs
         assertThat(bean1.inputs())
@@ -133,20 +134,20 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
         // bean2 -> properties
         assertThat(bean2.properties())
                 .containsOnly(
-                        new KeyValue("localeResolver", "ACCEPT_HEADER"),
-                        new KeyValue("resources.staticLocations[0]", "classpath:/META-INF/resources/"),
-                        new KeyValue("resources.staticLocations[1]", "classpath:/resources/"),
-                        new KeyValue("resources.staticLocations[2]", "classpath:/static/"),
-                        new KeyValue("resources.staticLocations[3]", "classpath:/public/"),
-                        new KeyValue("resources.addMappings", "true"),
-                        new KeyValue("resources.chain.cache", "true"),
-                        new KeyValue("resources.chain.compressed", "false"),
-                        new KeyValue("resources.chain.strategy.fixed.enabled", "false"),
-                        new KeyValue("resources.chain.strategy.fixed.paths[0]", "/**"),
-                        new KeyValue("resources.chain.strategy.content.enabled", "false"),
-                        new KeyValue("resources.chain.strategy.content.paths[0]", "/**"),
-                        new KeyValue("resources.cache.cachecontrol", null),
-                        new KeyValue("resources.cache.useLastModified", "true"));
+                        new Property("localeResolver", "ACCEPT_HEADER", null),
+                        new Property("resources.staticLocations[0]", "classpath:/META-INF/resources/", null),
+                        new Property("resources.staticLocations[1]", "classpath:/resources/", null),
+                        new Property("resources.staticLocations[2]", "classpath:/static/", null),
+                        new Property("resources.staticLocations[3]", "classpath:/public/", null),
+                        new Property("resources.addMappings", "true", null),
+                        new Property("resources.chain.cache", "true", null),
+                        new Property("resources.chain.compressed", "false", null),
+                        new Property("resources.chain.strategy.fixed.enabled", "false", null),
+                        new Property("resources.chain.strategy.fixed.paths[0]", "/**", null),
+                        new Property("resources.chain.strategy.content.enabled", "false", null),
+                        new Property("resources.chain.strategy.content.paths[0]", "/**", null),
+                        new Property("resources.cache.cachecontrol", null, null),
+                        new Property("resources.cache.useLastModified", "true", null));
 
         // bean2 -> inputs
         assertThat(bean2.inputs())

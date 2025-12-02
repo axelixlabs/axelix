@@ -3,6 +3,8 @@ package com.nucleonforge.axile.master.api.response;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import com.nucleonforge.axile.common.api.KeyValue;
 
 /**
@@ -36,5 +38,12 @@ public record ConfigPropsFeedResponse(List<ConfigPropsProfile> beans) {
      * @author Sergey Cherkasov
      */
     public record ConfigPropsProfile(
-            String beanName, String prefix, List<KeyValue> properties, List<KeyValue> inputs) {}
+            String beanName, String prefix, List<PropertyProfile> properties, List<KeyValue> inputs) {}
+
+    /**
+     * @param name              The name of the property.
+     * @param value             The value of the property.
+     * @param validationMessage The validation warning if value is invalid, if present - value is invalid.
+     */
+    public record PropertyProfile(String name, @Nullable String value, @Nullable String validationMessage) {}
 }

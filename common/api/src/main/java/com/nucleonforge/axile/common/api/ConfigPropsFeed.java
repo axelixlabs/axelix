@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 
@@ -40,6 +41,13 @@ public record ConfigPropsFeed(@JsonProperty("contexts") Map<String, Context> con
      */
     public record Bean(
             @JsonProperty("prefix") String prefix,
-            @JsonProperty("properties") List<KeyValue> properties,
+            @JsonProperty("properties") List<Property> properties,
             @JsonProperty("inputs") List<KeyValue> inputs) {}
+
+    /**
+     * @param name              The name of the property.
+     * @param value             The value of the property.
+     * @param validationMessage The validation warning if value is invalid, if present - value is invalid.
+     */
+    public record Property(String name, @Nullable String value, @Nullable String validationMessage) {}
 }

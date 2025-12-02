@@ -6,8 +6,10 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.ConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed.Property;
 import com.nucleonforge.axile.common.api.KeyValue;
 import com.nucleonforge.axile.master.api.response.ConfigPropsFeedResponse;
+import com.nucleonforge.axile.master.api.response.ConfigPropsFeedResponse.PropertyProfile;
 import com.nucleonforge.axile.master.service.convert.response.ConfigPropsFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,12 +42,12 @@ public class ConfigPropsFeedConverterTest {
         // bean1 -> properties
         assertThat(beanProfile1.properties())
                 .containsOnly(
-                        new KeyValue("allowedOrigins", null),
-                        new KeyValue("maxAge", "PT30M"),
-                        new KeyValue("exposedHeaders", null),
-                        new KeyValue("allowedOriginPatterns", null),
-                        new KeyValue("allowedHeaders", null),
-                        new KeyValue("allowedMethods", null));
+                        new PropertyProfile("allowedOrigins", null, null),
+                        new PropertyProfile("maxAge", "PT30M", "Should set 'PT10M'"),
+                        new PropertyProfile("exposedHeaders", null, null),
+                        new PropertyProfile("allowedOriginPatterns", null, null),
+                        new PropertyProfile("allowedHeaders", null, null),
+                        new PropertyProfile("allowedMethods", null, null));
 
         // bean1 -> inputs
         assertThat(beanProfile1.inputs())
@@ -68,11 +70,11 @@ public class ConfigPropsFeedConverterTest {
         // bean2 -> properties
         assertThat(beanProfile2.properties())
                 .containsOnly(
-                        new KeyValue("pathMapping", null),
-                        new KeyValue("basePath", "/actuator"),
-                        new KeyValue("discovery.enabled", "true"),
-                        new KeyValue("exposure.include[0]", "*"),
-                        new KeyValue("exposure.exclude", null));
+                        new PropertyProfile("pathMapping", null, null),
+                        new PropertyProfile("basePath", "/actuator", null),
+                        new PropertyProfile("discovery.enabled", "true", null),
+                        new PropertyProfile("exposure.include[0]", "*", null),
+                        new PropertyProfile("exposure.exclude", null, null));
 
         // bean2 -> inputs
         assertThat(beanProfile2.inputs())
@@ -97,8 +99,8 @@ public class ConfigPropsFeedConverterTest {
         // application2 -> bean3 ->  properties
         assertThat(beanProfile3.properties())
                 .containsOnly(
-                        new KeyValue("serialization2.INDENT_OUTPUT", "false"),
-                        new KeyValue("defaultPropertyInclusion2", "NON_NULL"));
+                        new PropertyProfile("serialization2.INDENT_OUTPUT", "false", null),
+                        new PropertyProfile("defaultPropertyInclusion2", "NON_NULL", null));
 
         // application2 -> bean3 -> inputs
         assertThat(beanProfile3.inputs())
@@ -119,13 +121,13 @@ public class ConfigPropsFeedConverterTest {
 
     private static Map<String, ConfigPropsFeed.Bean> beansMapContext1() {
         // bean1 -> properties
-        List<KeyValue> bean1Properties = List.of(
-                new KeyValue("allowedOrigins", null),
-                new KeyValue("maxAge", "PT30M"),
-                new KeyValue("exposedHeaders", null),
-                new KeyValue("allowedOriginPatterns", null),
-                new KeyValue("allowedHeaders", null),
-                new KeyValue("allowedMethods", null));
+        List<Property> bean1Properties = List.of(
+                new Property("allowedOrigins", null, null),
+                new Property("maxAge", "PT30M", "Should set 'PT10M'"),
+                new Property("exposedHeaders", null, null),
+                new Property("allowedOriginPatterns", null, null),
+                new Property("allowedHeaders", null, null),
+                new Property("allowedMethods", null, null));
 
         // bean1 -> inputs
         List<KeyValue> bean1Inputs = List.of(
@@ -137,12 +139,12 @@ public class ConfigPropsFeedConverterTest {
                 new KeyValue("allowedMethods", null));
 
         // bean2 -> properties
-        List<KeyValue> bean2Properties = List.of(
-                new KeyValue("pathMapping", null),
-                new KeyValue("basePath", "/actuator"),
-                new KeyValue("discovery.enabled", "true"),
-                new KeyValue("exposure.include[0]", "*"),
-                new KeyValue("exposure.exclude", null));
+        List<Property> bean2Properties = List.of(
+                new Property("pathMapping", null, null),
+                new Property("basePath", "/actuator", null),
+                new Property("discovery.enabled", "true", null),
+                new Property("exposure.include[0]", "*", null),
+                new Property("exposure.exclude", null, null));
 
         // bean2 -> inputs
         List<KeyValue> bean2Inputs = List.of(
@@ -168,9 +170,9 @@ public class ConfigPropsFeedConverterTest {
 
     private static Map<String, ConfigPropsFeed.Bean> beansMapContext2() {
         // bean3 -> properties
-        List<KeyValue> properties = List.of(
-                new KeyValue("serialization2.INDENT_OUTPUT", "false"),
-                new KeyValue("defaultPropertyInclusion2", "NON_NULL"));
+        List<Property> properties = List.of(
+                new Property("serialization2.INDENT_OUTPUT", "false", null),
+                new Property("defaultPropertyInclusion2", "NON_NULL", null));
 
         // bean3 -> inputs
         List<KeyValue> inputs = List.of(

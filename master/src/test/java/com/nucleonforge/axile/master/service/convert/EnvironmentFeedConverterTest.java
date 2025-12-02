@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.env.AxilePropertyValue;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertyValue;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse;
 import com.nucleonforge.axile.master.service.convert.response.environment.EnvironmentFeedConverter;
 
@@ -76,6 +76,7 @@ class EnvironmentFeedConverterTest {
                     assertThat(kv.value()).isEqualTo("org.h2.Driver");
                     assertThat(kv.isPrimary()).isFalse();
                     assertThat(kv.configPropsBeanName()).isNull();
+                    assertThat(kv.invalidValueReason()).isEqualTo("Should set 'validate'");
                 })
                 .anySatisfy(kv -> {
                     assertThat(kv.name()).isEqualTo("spring.jpa.hibernate.ddl-auto");
@@ -131,49 +132,57 @@ class EnvironmentFeedConverterTest {
                 "systemProperties",
                 Map.of(
                         "java.vm.vendor",
-                        new AxilePropertyValue(
+                        new PropertyValue(
                                 "Amazon.com Inc.",
                                 null,
                                 true,
-                                "org.springframework.boot.test.property.SystemProperties"),
+                                "org.springframework.boot.test.property.SystemProperties",
+                                null),
                         "org.jboss.logging.provider",
-                        new AxilePropertyValue("slf4j", null, false, null)));
+                        new PropertyValue("slf4j", null, false, null, null)));
 
         EnvironmentFeed.PropertySource propertySource2 = new EnvironmentFeed.PropertySource(
                 "systemEnvironment",
                 Map.of(
                         "JAVA_HOME",
-                        new AxilePropertyValue(
+                        new PropertyValue(
                                 ".jdks\\corretto-17.0.16",
                                 "System Environment Property \"JAVA_HOME\"",
                                 true,
-                                "org.springframework.boot.test.property.SystemEnvironment")));
+                                "org.springframework.boot.test.property.SystemEnvironment",
+                                null)));
 
         EnvironmentFeed.PropertySource propertySource3 = new EnvironmentFeed.PropertySource(
                 "Config resource class path resource [application.yaml]",
                 Map.of(
                         "spring.datasource.driver-class-sourceName",
-                        new AxilePropertyValue(
-                                "org.h2.Driver", "class path resource [application.yaml] - 4:24", false, null),
+                        new PropertyValue(
+                                "org.h2.Driver",
+                                "class path resource [application.yaml] - 4:24",
+                                false,
+                                null,
+                                "Should set 'validate'"),
                         "spring.jpa.hibernate.ddl-auto",
-                        new AxilePropertyValue(
-                                "create-drop", "class path resource [application.yaml] - 9:17", false, null)));
+                        new PropertyValue(
+                                "create-drop", "class path resource [application.yaml] - 9:17", false, null, null)));
 
         EnvironmentFeed.PropertySource propertySource4 = new EnvironmentFeed.PropertySource(
                 "springCloudClientHostInfo",
                 Map.of(
                         "spring.cloud.client.hostname",
-                        new AxilePropertyValue(
+                        new PropertyValue(
                                 "DESKTOP-111",
                                 null,
                                 false,
-                                "org.springframework.cloud.spring.cloud.client.hostname.SpringCloudClientHostInfo"),
+                                "org.springframework.cloud.spring.cloud.client.hostname.SpringCloudClientHostInfo",
+                                null),
                         "spring.cloud.client.ip-address",
-                        new AxilePropertyValue(
+                        new PropertyValue(
                                 "192.0.0.0",
                                 null,
                                 false,
-                                "org.springframework.cloud.spring.cloud.client.hostname.SpringCloudClientHostInfo")));
+                                "org.springframework.cloud.spring.cloud.client.hostname.SpringCloudClientHostInfo",
+                                null)));
 
         return new ArrayList<>(List.of(propertySource1, propertySource2, propertySource3, propertySource4));
     }
