@@ -57,6 +57,10 @@
     padding-inline: 28px 16px;
 }
 
+.LoaderWrapper{
+    margin-block: 40px;
+}
+
 @media all and (max-width: 1220px) {
     .MainTitle {
         text-align: left;
