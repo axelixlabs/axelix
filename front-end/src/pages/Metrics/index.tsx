@@ -39,8 +39,8 @@ const Metrics = () => {
 
     const autocompleteOptions = effectiveMetricsGroups
         .flatMap((metrics) => metrics.metrics)
-        .map((metric) => ({
-            value: metric,
+        .map(({ metricName }) => ({
+            value: metricName,
         }));
 
     return (
@@ -53,7 +53,7 @@ const Metrics = () => {
                         <Accordion header={groupName} headerStyles={styles.HeaderStyles} accordionExpanded>
                             <div className="AccordionsWrapper">
                                 {metrics.map((metric) => (
-                                    <Accordion header={<MetricHeader name={metric} />} key={metric}>
+                                    <Accordion header={<MetricHeader metric={metric} />} key={metric.metricName}>
                                         <MetricBody metric={metric} />
                                     </Accordion>
                                 ))}

@@ -1,11 +1,16 @@
 import { Select } from "antd";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader } from "components";
-import { fetchData } from "helpers";
-import { type ISingleMetricResponseBody, StatefulRequest } from "models";
+import {
+    buildSelectedTagParams,
+    extractUniqueMetricTagKeys,
+    extractUniqueMetricValuesPerKey,
+    fetchData,
+} from "helpers";
+import { type IMetric, type ISingleMetricResponseBody, type IValidTagCombination, StatefulRequest } from "models";
 import { getSingleMetricData } from "services";
 
 import MetricChart from "../MetricChart";
@@ -14,9 +19,9 @@ import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * Metric name
+     * Single metric
      */
-    metric: string;
+    metric: IMetric;
 }
 
 export const MetricBody = ({ metric }: IProps) => {
@@ -24,15 +29,19 @@ export const MetricBody = ({ metric }: IProps) => {
     const { instanceId } = useParams();
 
     const [singleMetricData, setSingleMetricData] = useState(StatefulRequest.loading<ISingleMetricResponseBody>());
+    const [selectedTags, setSelectedTags] = useState<Record<string, string>>({});
 
     useEffect(() => {
+        setSingleMetricData(StatefulRequest.loading<ISingleMetricResponseBody>());
+        const selectedTagParams = buildSelectedTagParams(selectedTags);
         fetchData(setSingleMetricData, () =>
             getSingleMetricData({
                 instanceId: instanceId!,
-                metric: metric,
+                metric: metric.metricName,
+                tags: selectedTagParams,
             }),
         );
-    }, []);
+    }, [selectedTags]);
 
     if (singleMetricData.loading) {
         return <Loader />;
@@ -43,12 +52,40 @@ export const MetricBody = ({ metric }: IProps) => {
     }
 
     const singleMetricFeed = singleMetricData.response!;
+    const singleMetricFeedMeasurements = singleMetricFeed.measurements;
+    const singleMetricValidTagCombinations = singleMetricFeed.validTagCombinations;
+
+    const validTagCombinations: IValidTagCombination[] = singleMetricValidTagCombinations;
+
+    const uniqueTagKeys = extractUniqueMetricTagKeys(validTagCombinations);
+    const valuesPerKey = extractUniqueMetricValuesPerKey(uniqueTagKeys, validTagCombinations, selectedTags);
+
+    const handleSelectChange = (key: string, value?: string) => {
+        setSelectedTags((prev) => {
+            const next: Record<string, string> = { ...prev };
+
+            if (value) {
+                next[key] = value;
+            } else {
+                delete next[key];
+            }
+
+            const idx = uniqueTagKeys.indexOf(key);
+            if (idx !== -1) {
+                for (let i = idx + 1; i < uniqueTagKeys.length; i++) {
+                    delete next[uniqueTagKeys[i]];
+                }
+            }
+
+            return next;
+        });
+    };
 
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.MetricDataWrapper}>
                 <div>{t("Metrics.value")}:</div>
-                <div>{singleMetricFeed.measurements.at(-1)?.value}</div>
+                <div>{singleMetricFeedMeasurements.at(-1)?.value}</div>
 
                 {singleMetricFeed.baseUnit && (
                     <>
@@ -57,28 +94,40 @@ export const MetricBody = ({ metric }: IProps) => {
                     </>
                 )}
 
-                {singleMetricFeed.availableTags.length > 0 && (
+                {!!uniqueTagKeys.length && (
                     <>
                         <div>{t("Metrics.tags")}:</div>
                         <div className={styles.TagsWrapper}>
-                            {singleMetricFeed.availableTags.map((availableTag) => (
-                                <>
-                                    <div>{availableTag.tag}:</div>
-                                    <Select
-                                        placeholder={t("Metrics.selectTag")}
-                                        options={availableTag.values.map((value) => ({
-                                            value: value,
-                                            label: value,
-                                        }))}
-                                        className={styles.AvailableTagSelect}
-                                    />
-                                </>
-                            ))}
+                            {uniqueTagKeys.map((key, index) => {
+                                const values = valuesPerKey[index] || [];
+                                const prevKey = uniqueTagKeys[index - 1];
+                                const disabled = index && !selectedTags[prevKey];
+                                return (
+                                    <Fragment key={key}>
+                                        <div>{key}:</div>
+                                        <Select
+                                            value={selectedTags[key] || undefined}
+                                            onChange={(value) => handleSelectChange(key, value)}
+                                            placeholder={
+                                                disabled ? t("Metrics.selectPrevFirst") : t("Metrics.selectValue")
+                                            }
+                                            options={values.map((value) => ({
+                                                value: value,
+                                            }))}
+                                            disabled={disabled || !values.length}
+                                            className={styles.TagSelect}
+                                        />
+                                    </Fragment>
+                                );
+                            })}
                         </div>
                     </>
                 )}
             </div>
-            <MetricChart measurements={singleMetricFeed.measurements} />
+
+            <MetricChart measurements={singleMetricFeedMeasurements} />
         </div>
     );
 };
+
+export default MetricBody;
