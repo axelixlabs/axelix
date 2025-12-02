@@ -1,5 +1,17 @@
 import { EStatisticType } from "../enums/metrics.ts";
 
+export interface IMetric {
+    /**
+     * Metric name
+     */
+    metricName: string;
+
+    /**
+     * Metric description
+     */
+    description: string;
+}
+
 export interface IMetricsGroup {
     /**
      * Metrics Group нame
@@ -9,7 +21,7 @@ export interface IMetricsGroup {
     /**
      * List of metrics
      */
-    metrics: string[];
+    metrics: IMetric[];
 }
 
 export interface IMeasurement {
@@ -24,23 +36,18 @@ export interface IMeasurement {
     value: number;
 }
 
-interface IAvailableTag {
-    /**
-     * Tag name
-     */
-    tag: string;
-
-    /**
-     * Available values for the tag
-     */
-    values: string[];
-}
-
 export interface IMetricsResponseBody {
     /**
      * List of metric groups
      */
     metricsGroups: IMetricsGroup[];
+}
+
+/**
+ * Represents a valid combination of tags
+ */
+export interface IValidTagCombination {
+    [key: string]: string;
 }
 
 export interface ISingleMetricResponseBody {
@@ -65,9 +72,9 @@ export interface ISingleMetricResponseBody {
     measurements: IMeasurement[];
 
     /**
-     * Tags available for this metric
+     * Represents a valid combination of tags
      */
-    availableTags: IAvailableTag[];
+    validTagCombinations: IValidTagCombination[];
 }
 
 export interface IGetSingleMetricRequestData {
@@ -80,4 +87,5 @@ export interface IGetSingleMetricRequestData {
      * Metric name
      */
     metric: string;
+    tags: string[];
 }

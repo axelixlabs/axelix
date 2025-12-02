@@ -1,4 +1,4 @@
-import { type IMetricsGroup } from "models";
+import type { IMetricsGroup, IValidTagCombination } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
@@ -57,7 +57,9 @@ export const filterMetrics = (metricsGroups: IMetricsGroup[], search: string): I
             return result;
         }
 
-        const filteredMetrics = metrics.filter((metric) => commonNormalize(metric).includes(formattedSearch));
+        const filteredMetrics = metrics.filter((metric) =>
+            commonNormalize(metric.metricName).includes(formattedSearch),
+        );
 
         if (filteredMetrics.length) {
             result.push({
@@ -72,4 +74,37 @@ export const filterMetrics = (metricsGroups: IMetricsGroup[], search: string): I
 
 export const findMetricsCount = (metricsGroups: IMetricsGroup[]): number => {
     return metricsGroups.reduce((count, group) => count + group.metrics.length, 0);
+};
+
+export const extractUniqueMetricTagKeys = (validTagCombinations: IValidTagCombination[]) => {
+    const allKeys = validTagCombinations.flatMap((validTagCombination) => Object.keys(validTagCombination));
+    const uniqueKeys = new Set(allKeys);
+
+    return Array.from(uniqueKeys);
+};
+
+export const extractUniqueMetricValuesPerKey = (
+    uniqueTagKeys: string[],
+    validTagCombinations: IValidTagCombination[],
+    selected: Record<string, string>,
+): string[][] => {
+    return uniqueTagKeys.map((key, level) => {
+        const previewKeys = uniqueTagKeys.slice(0, level);
+
+        const values = validTagCombinations
+            .filter((combination) =>
+                previewKeys.every((previewKey) => {
+                    const selectedValue = selected[previewKey];
+                    return !selectedValue || (combination[previewKey] ?? "") === selectedValue;
+                }),
+            )
+            .map((combination) => combination[key] ?? "")
+            .filter(Boolean);
+
+        return Array.from(new Set(values));
+    });
+};
+
+export const buildSelectedTagParams = (selectedTags: Record<string, string>): string[] => {
+    return Object.entries(selectedTags).map(([key, value]) => `${key}:${value}`);
 };

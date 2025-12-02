@@ -1,20 +1,29 @@
+import { Tooltip } from "antd";
+
+import type { IMetric } from "models";
+
 import styles from "./styles.module.css";
 
 import QuestionIcon from "assets/icons/question.svg";
 
 interface IProps {
     /**
-     * Metric name
+     * Single metric
      */
-    name: string;
+    metric: IMetric;
 }
 
-export const MetricHeader = ({ name }: IProps) => {
+export const MetricHeader = ({ metric }: IProps) => {
     return (
         <div className={styles.MainWrapper}>
-            <div>{name}</div>
+            <div>{metric.metricName}</div>
+
             {/* TODO: Show tootlip after merging Tooltip PR */}
-            <img src={QuestionIcon} alt="Question icon" />
+            {metric.description && (
+                <Tooltip title={metric.description}>
+                    <img src={QuestionIcon} alt="Question icon" />
+                </Tooltip>
+            )}
         </div>
     );
 };
