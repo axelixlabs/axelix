@@ -16,8 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axile.common.api.env.AxilePropertyValue;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertyValue;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
@@ -143,13 +144,13 @@ class EnvironmentEndpointProberTest {
         assertThat(feed.activeProfiles()).containsOnly("production");
         assertThat(feed.defaultProfiles()).containsOnly("test", "default");
 
-        EnvironmentFeed.PropertySource servletParams = feed.propertySources().stream()
+        PropertySource servletParams = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("servletContextInitParams"))
                 .findFirst()
                 .orElseThrow();
         assertThat(servletParams.properties()).isEmpty();
 
-        EnvironmentFeed.PropertySource systemProperties = feed.propertySources().stream()
+        PropertySource systemProperties = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemProperties"))
                 .findFirst()
                 .orElseThrow();
@@ -157,39 +158,39 @@ class EnvironmentEndpointProberTest {
                 .hasSize(2)
                 .containsKeys("java.specification.version", "java.vm.vendor");
 
-        AxilePropertyValue javaSpecVersion = systemProperties.properties().get("java.specification.version");
+        PropertyValue javaSpecVersion = systemProperties.properties().get("java.specification.version");
         assertThat(javaSpecVersion.value()).isEqualTo("17");
         assertThat(javaSpecVersion.origin()).isNull();
         assertThat(javaSpecVersion.isPrimary()).isTrue();
         assertThat(javaSpecVersion.configPropsBeanName())
                 .isEqualTo("org.springframework.boot.test.property.SystemProperties");
 
-        AxilePropertyValue javaVmVendor = systemProperties.properties().get("java.vm.vendor");
+        PropertyValue javaVmVendor = systemProperties.properties().get("java.vm.vendor");
         assertThat(javaVmVendor.value()).isEqualTo("BellSoft");
         assertThat(javaVmVendor.origin()).isNull();
         assertThat(javaVmVendor.isPrimary()).isTrue();
         assertThat(javaVmVendor.configPropsBeanName())
                 .isEqualTo("org.springframework.boot.test.property.SystemProperties");
 
-        EnvironmentFeed.PropertySource systemEnvironment = feed.propertySources().stream()
+        PropertySource systemEnvironment = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemEnvironment"))
                 .findFirst()
                 .orElseThrow();
         assertThat(systemEnvironment.properties()).containsKey("JAVA_HOME");
 
-        AxilePropertyValue javaHome = systemEnvironment.properties().get("JAVA_HOME");
+        PropertyValue javaHome = systemEnvironment.properties().get("JAVA_HOME");
         assertThat(javaHome.value()).isEqualTo("Java_Liberica_jdk/17.0.16-12/x64");
         assertThat(javaHome.origin()).isEqualTo("System Environment Property \"JAVA_HOME\"");
         assertThat(javaHome.isPrimary()).isTrue();
         assertThat(javaHome.configPropsBeanName()).isNull();
 
-        EnvironmentFeed.PropertySource configResource = feed.propertySources().stream()
+        PropertySource configResource = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("Config resource classpath:actuate/env/"))
                 .findFirst()
                 .orElseThrow();
         assertThat(configResource.properties()).containsKey("com.example.cache.max-size");
 
-        AxilePropertyValue cacheMaxSize = configResource.properties().get("com.example.cache.max-size");
+        PropertyValue cacheMaxSize = configResource.properties().get("com.example.cache.max-size");
         assertThat(cacheMaxSize.value()).isEqualTo("1000");
         assertThat(cacheMaxSize.origin()).isEqualTo("class path resource [application.properties]");
         assertThat(cacheMaxSize.isPrimary()).isTrue();

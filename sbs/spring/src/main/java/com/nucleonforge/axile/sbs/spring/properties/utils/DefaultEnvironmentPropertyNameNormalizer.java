@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.sbs.spring.env;
+package com.nucleonforge.axile.sbs.spring.properties.utils;
 
 /**
  * Default implementation {@link EnvironmentPropertyNameNormalizer}.

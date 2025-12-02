@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.sbs.spring.env;
+package com.nucleonforge.axile.sbs.spring.properties.utils;
 
 /**
  * Interface capable to "normalize" the property name. The normalization is the process that

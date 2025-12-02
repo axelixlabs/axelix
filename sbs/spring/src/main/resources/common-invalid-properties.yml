@@ -1,0 +1,22 @@
+# This file contains a list of invalid or potentially dangerous configuration properties.
+# Each property includes disallowed values along with a short description of the action
+# that should be taken if such a value is detected.
+spring.jpa.open-in-view:
+  - value: true
+    description: "Leaving Open Session in View enabled in production can trigger N+1 queries and unpredictable lazy-loading; should be disabled."
+
+spring.jpa.properties.hibernate.enable_lazy_load_no_trans:
+  - value: true
+    description: "Lazy loading outside an active transaction masks boundary issues and may cause unexpected data access in production; should be disabled."
+
+spring.jpa.hibernate.ddl-auto:
+  - value: "create"
+    description: "Recreates the entire schema on startup, causing guaranteed data loss and unsuitable for production."
+  - value: "create-drop"
+    description: "Automatically creates and drops the schema, leading to data loss and making it incompatible with production use."
+  - value: "update"
+    description: "Applies implicit schema changes at runtime, which is risky in production and should be replaced with controlled migrations."
+
+spring.datasource.hikari.auto-commit:
+  - value: true
+    description: "Enabling auto-commit in production may cause inconsistent transactional behavior and unintended writes; should be disabled."

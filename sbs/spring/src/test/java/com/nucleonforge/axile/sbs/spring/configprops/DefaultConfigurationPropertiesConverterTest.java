@@ -16,7 +16,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axile.common.api.ConfigPropsFeed;
-import com.nucleonforge.axile.common.api.KeyValue;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed.Property;
+import com.nucleonforge.axile.sbs.spring.properties.utils.DefaultEnvironmentPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.properties.utils.EnvironmentPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.properties.utils.InvalidPropertiesLoader;
+import com.nucleonforge.axile.sbs.spring.properties.utils.YamlInvalidPropertiesLoader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -78,19 +82,22 @@ public class DefaultConfigurationPropertiesConverterTest {
                         // properties
                         assertThat(value.properties())
                                 .containsOnly(
-                                        new KeyValue("tags.environment", "test"),
-                                        new KeyValue("tags.version", "1.0.0"),
-                                        new KeyValue("enabledContexts[0]", "user-service"),
-                                        new KeyValue("enabledContexts[1]", "payment-service"),
-                                        new KeyValue("httpClient.requests[0].name", "user-api"),
-                                        new KeyValue(
-                                                "httpClient.requests[0].baseUrl", "https://api.users.example.com/v1"),
-                                        new KeyValue("httpClient.requests[0].methods[0].type", "GET"),
-                                        new KeyValue("httpClient.requests[0].methods[0].retries[0].count", "3"),
-                                        new KeyValue(
+                                        new Property("tags.environment", "test", null),
+                                        new Property("tags.version", "1.0.0", null),
+                                        new Property("enabledContexts[0]", "user-service", null),
+                                        new Property("enabledContexts[1]", "payment-service", null),
+                                        new Property("httpClient.requests[0].name", "user-api", null),
+                                        new Property(
+                                                "httpClient.requests[0].baseUrl",
+                                                "https://api.users.example.com/v1",
+                                                null),
+                                        new Property("httpClient.requests[0].methods[0].type", "GET", null),
+                                        new Property("httpClient.requests[0].methods[0].retries[0].count", "3", null),
+                                        new Property(
                                                 "httpClient.requests[0].methods[0].retries[0].parameters.timeout",
-                                                "5000"),
-                                        new KeyValue("httpClient.requests[0].methods[1].type", "POST"));
+                                                "5000",
+                                                null),
+                                        new Property("httpClient.requests[0].methods[1].type", "POST", null));
 
                         // inputs
                         assertThat(value.inputs())
@@ -129,8 +136,20 @@ public class DefaultConfigurationPropertiesConverterTest {
     static class DefaultDefaultConfigurationPropertiesTestConfiguration {
 
         @Bean
-        public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-            return new DefaultConfigurationPropertiesConverter();
+        public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
+            return new DefaultEnvironmentPropertyNameNormalizer();
+        }
+
+        @Bean
+        public InvalidPropertiesLoader invalidPropertiesLoader(
+                EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
+            return new YamlInvalidPropertiesLoader(propertyNameNormalizer);
+        }
+
+        @Bean
+        public ConfigurationPropertiesConverter configurationPropertiesConverter(
+                InvalidPropertiesLoader invalidPropertiesLoader) {
+            return new DefaultConfigurationPropertiesConverter(invalidPropertiesLoader);
         }
     }
 }

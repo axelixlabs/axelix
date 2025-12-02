@@ -11,6 +11,7 @@ import com.nucleonforge.axile.sbs.spring.configprops.AxileConfigurationPropertie
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesConverter;
 import com.nucleonforge.axile.sbs.spring.configprops.DefaultConfigurationPropertiesConverter;
+import com.nucleonforge.axile.sbs.spring.properties.utils.InvalidPropertiesLoader;
 
 /**
  * Auto-configuration for the {@link AxileConfigurationPropertiesEndpoint}.
@@ -18,14 +19,16 @@ import com.nucleonforge.axile.sbs.spring.configprops.DefaultConfigurationPropert
  * @since 13.11.2025
  * @author Sergey Cherkasov
  */
-@AutoConfiguration(after = ConfigurationPropertiesReportEndpointAutoConfiguration.class)
+@AutoConfiguration(
+        after = {ConfigurationPropertiesReportEndpointAutoConfiguration.class, PropertyUtilsAutoConfiguration.class})
 @ConditionalOnAvailableEndpoint(endpoint = ConfigurationPropertiesReportEndpoint.class)
 public class AxileConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-        return new DefaultConfigurationPropertiesConverter();
+    public ConfigurationPropertiesConverter configurationPropertiesConverter(
+            InvalidPropertiesLoader invalidPropertiesLoader) {
+        return new DefaultConfigurationPropertiesConverter(invalidPropertiesLoader);
     }
 
     @Bean

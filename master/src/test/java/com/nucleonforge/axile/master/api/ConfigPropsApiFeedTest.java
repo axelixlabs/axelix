@@ -48,12 +48,12 @@ public class ConfigPropsApiFeedTest {
               "beanName": "org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
               "prefix": "management.endpoints.web.cors",
               "properties": [
-                { "key": "allowedOrigins", "value": null },
-                { "key": "maxAge", "value": "PT30M" },
-                { "key": "exposedHeaders", "value": null },
-                { "key": "allowedOriginPatterns", "value": null },
-                { "key": "allowedHeaders", "value": null },
-                { "key": "allowedMethods", "value": null }
+                { "name": "allowedOrigins", "value": null, "validationMessage": null },
+                { "name": "maxAge", "value": "PT30M", "validationMessage": null },
+                { "name": "exposedHeaders", "value": null, "validationMessage": null },
+                { "name": "allowedOriginPatterns", "value": null, "validationMessage": null },
+                { "name": "allowedHeaders", "value": null, "validationMessage": null },
+                { "name": "allowedMethods", "value": null, "validationMessage": null }
               ],
               "inputs": [
                 { "key": "allowedOrigins", "value": null },
@@ -68,12 +68,12 @@ public class ConfigPropsApiFeedTest {
               "beanName": "org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
               "prefix": "management.endpoints.web.cors",
               "properties": [
-                { "key": "allowedOrigins", "value": null },
-                { "key": "maxAge", "value": "PT30M" },
-                { "key": "exposedHeaders", "value": null },
-                { "key": "allowedOriginPatterns", "value": null },
-                { "key": "allowedHeaders", "value": null },
-                { "key": "allowedMethods", "value": null }
+                { "name": "allowedOrigins", "value": null, "validationMessage": null },
+                { "name": "maxAge", "value": "PT30M", "validationMessage": null },
+                { "name": "exposedHeaders", "value": null, "validationMessage": null },
+                { "name": "allowedOriginPatterns", "value": null, "validationMessage": null },
+                { "name": "allowedHeaders", "value": null, "validationMessage": null },
+                { "name": "allowedMethods", "value": null, "validationMessage": null }
               ],
               "inputs": [
                 { "key": "allowedOrigins", "value": null },
@@ -88,11 +88,11 @@ public class ConfigPropsApiFeedTest {
               "beanName": "org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties",
               "prefix": "management.endpoints.web",
               "properties": [
-                { "key": "pathMapping", "value": null },
-                { "key": "exposure.include[0]", "value": "*" },
-                { "key": "exposure.exclude", "value": null },
-                { "key": "basePath", "value": "/actuator" },
-                { "key": "discovery.enabled", "value": "true" }
+                { "name": "pathMapping", "value": null, "validationMessage": null },
+                { "name": "exposure.include[0]", "value": "*", "validationMessage": "Should separate endpoints explicitly in production." },
+                { "name": "exposure.exclude", "value": null, "validationMessage": null },
+                { "name": "basePath", "value": "/actuator", "validationMessage": null },
+                { "name": "discovery.enabled", "value": "true", "validationMessage": null }
               ],
               "inputs": [
                 { "key": "pathMapping", "value": null },
@@ -107,20 +107,20 @@ public class ConfigPropsApiFeedTest {
               "beanName": "org.springframework.boot.autoconfigure.web.WebProperties",
               "prefix": "spring.web",
               "properties": [
-                { "key": "localeResolver", "value": "ACCEPT_HEADER" },
-                { "key": "resources.staticLocations[0]", "value": "classpath:/META-INF/resources/" },
-                { "key": "resources.staticLocations[1]", "value": "classpath:/resources/" },
-                { "key": "resources.staticLocations[2]", "value": "classpath:/static/" },
-                { "key": "resources.staticLocations[3]", "value": "classpath:/public/" },
-                { "key": "resources.addMappings", "value": "true" },
-                { "key": "resources.chain.cache", "value": "true" },
-                { "key": "resources.chain.compressed", "value": "false" },
-                { "key": "resources.chain.strategy.fixed.enabled", "value": "false" },
-                { "key": "resources.chain.strategy.fixed.paths[0]", "value": "/**" },
-                { "key": "resources.chain.strategy.content.enabled", "value": "false" },
-                { "key": "resources.chain.strategy.content.paths[0]", "value": "/**" },
-                { "key": "resources.cache.cachecontrol", "value": null },
-                { "key": "resources.cache.useLastModified", "value": "true" }
+                { "name": "localeResolver", "value": "ACCEPT_HEADER", "validationMessage": null },
+                { "name": "resources.staticLocations[0]", "value": "classpath:/META-INF/resources/", "validationMessage": null },
+                { "name": "resources.staticLocations[1]", "value": "classpath:/resources/", "validationMessage": null },
+                { "name": "resources.staticLocations[2]", "value": "classpath:/static/", "validationMessage": null },
+                { "name": "resources.staticLocations[3]", "value": "classpath:/public/", "validationMessage": null },
+                { "name": "resources.addMappings", "value": "true", "validationMessage": null },
+                { "name": "resources.chain.cache", "value": "true", "validationMessage": null },
+                { "name": "resources.chain.compressed", "value": "false", "validationMessage": null },
+                { "name": "resources.chain.strategy.fixed.enabled", "value": "false", "validationMessage": null },
+                { "name": "resources.chain.strategy.fixed.paths[0]", "value": "/**", "validationMessage": null },
+                { "name": "resources.chain.strategy.content.enabled", "value": "false", "validationMessage": null },
+                { "name": "resources.chain.strategy.content.paths[0]", "value": "/**", "validationMessage": null },
+                { "name": "resources.cache.cachecontrol", "value": null, "validationMessage": null },
+                { "name": "resources.cache.useLastModified", "value": "true", "validationMessage": null }
               ],
               "inputs": [
                 { "key": "localeResolver", "value": null },
@@ -176,12 +176,12 @@ public class ConfigPropsApiFeedTest {
                     "org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties" : {
                       "prefix" : "management.endpoints.web.cors",
                       "properties": [
-                        { "key": "allowedOrigins", "value": null },
-                        { "key": "maxAge", "value": "PT30M" },
-                        { "key": "exposedHeaders", "value": null },
-                        { "key": "allowedOriginPatterns", "value": null },
-                        { "key": "allowedHeaders", "value": null },
-                        { "key": "allowedMethods", "value": null }
+                        { "name": "allowedOrigins", "value": null, "validationMessage": null },
+                        { "name": "maxAge", "value": "PT30M", "validationMessage": null },
+                        { "name": "exposedHeaders", "value": null, "validationMessage": null },
+                        { "name": "allowedOriginPatterns", "value": null, "validationMessage": null },
+                        { "name": "allowedHeaders", "value": null, "validationMessage": null },
+                        { "name": "allowedMethods", "value": null, "validationMessage": null }
                       ],
                       "inputs": [
                         { "key": "allowedOrigins", "value": null },
@@ -195,11 +195,11 @@ public class ConfigPropsApiFeedTest {
                     "org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties" : {
                       "prefix" : "management.endpoints.web",
                       "properties": [
-                        { "key": "pathMapping", "value": null },
-                        { "key": "exposure.include[0]", "value": "*" },
-                        { "key": "exposure.exclude", "value": null },
-                        { "key": "basePath", "value": "/actuator" },
-                        { "key": "discovery.enabled", "value": "true" }
+                        { "name": "pathMapping", "value": null, "validationMessage": null },
+                        { "name": "exposure.include[0]", "value": "*", "validationMessage": "Should separate endpoints explicitly in production." },
+                        { "name": "exposure.exclude", "value": null, "validationMessage": null },
+                        { "name": "basePath", "value": "/actuator", "validationMessage": null },
+                        { "name": "discovery.enabled", "value": "true", "validationMessage": null }
                       ],
                       "inputs": [
                         { "key": "pathMapping", "value": null },
@@ -213,20 +213,20 @@ public class ConfigPropsApiFeedTest {
                     "org.springframework.boot.autoconfigure.web.WebProperties" : {
                       "prefix" : "spring.web",
                       "properties": [
-                        { "key": "localeResolver", "value": "ACCEPT_HEADER" },
-                        { "key": "resources.staticLocations[0]", "value": "classpath:/META-INF/resources/" },
-                        { "key": "resources.staticLocations[1]", "value": "classpath:/resources/" },
-                        { "key": "resources.staticLocations[2]", "value": "classpath:/static/" },
-                        { "key": "resources.staticLocations[3]", "value": "classpath:/public/" },
-                        { "key": "resources.addMappings", "value": "true" },
-                        { "key": "resources.chain.cache", "value": "true" },
-                        { "key": "resources.chain.compressed", "value": "false" },
-                        { "key": "resources.chain.strategy.fixed.enabled", "value": "false" },
-                        { "key": "resources.chain.strategy.fixed.paths[0]", "value": "/**" },
-                        { "key": "resources.chain.strategy.content.enabled", "value": "false" },
-                        { "key": "resources.chain.strategy.content.paths[0]", "value": "/**" },
-                        { "key": "resources.cache.cachecontrol", "value": null },
-                        { "key": "resources.cache.useLastModified", "value": "true" }
+                        { "name": "localeResolver", "value": "ACCEPT_HEADER", "validationMessage": null },
+                        { "name": "resources.staticLocations[0]", "value": "classpath:/META-INF/resources/", "validationMessage": null },
+                        { "name": "resources.staticLocations[1]", "value": "classpath:/resources/", "validationMessage": null },
+                        { "name": "resources.staticLocations[2]", "value": "classpath:/static/", "validationMessage": null },
+                        { "name": "resources.staticLocations[3]", "value": "classpath:/public/", "validationMessage": null },
+                        { "name": "resources.addMappings", "value": "true", "validationMessage": null },
+                        { "name": "resources.chain.cache", "value": "true", "validationMessage": null },
+                        { "name": "resources.chain.compressed", "value": "false", "validationMessage": null },
+                        { "name": "resources.chain.strategy.fixed.enabled", "value": "false", "validationMessage": null },
+                        { "name": "resources.chain.strategy.fixed.paths[0]", "value": "/**", "validationMessage": null },
+                        { "name": "resources.chain.strategy.content.enabled", "value": "false", "validationMessage": null },
+                        { "name": "resources.chain.strategy.content.paths[0]", "value": "/**", "validationMessage": null },
+                        { "name": "resources.cache.cachecontrol", "value": null, "validationMessage": null },
+                        { "name": "resources.cache.useLastModified", "value": "true", "validationMessage": null }
                       ],
                       "inputs": [
                         { "key": "localeResolver", "value": null },
@@ -252,12 +252,12 @@ public class ConfigPropsApiFeedTest {
                     "org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties" : {
                       "prefix" : "management.endpoints.web.cors",
                       "properties": [
-                        { "key": "allowedOrigins", "value": null },
-                        { "key": "maxAge", "value": "PT30M" },
-                        { "key": "exposedHeaders", "value": null },
-                        { "key": "allowedOriginPatterns", "value": null },
-                        { "key": "allowedHeaders", "value": null },
-                        { "key": "allowedMethods", "value": null }
+                        { "name": "allowedOrigins", "value": null, "validationMessage": null },
+                        { "name": "maxAge", "value": "PT30M", "validationMessage": null },
+                        { "name": "exposedHeaders", "value": null, "validationMessage": null },
+                        { "name": "allowedOriginPatterns", "value": null, "validationMessage": null },
+                        { "name": "allowedHeaders", "value": null, "validationMessage": null },
+                        { "name": "allowedMethods", "value": null, "validationMessage": null }
                       ],
                       "inputs": [
                         { "key": "allowedOrigins", "value": null },

@@ -57,13 +57,15 @@ class EnvironmentApiTest {
                   "name": "java.vm.vendor",
                   "value": "BellSoft",
                   "isPrimary": true,
-                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "invalidValueReason": null
                 },
                 {
                   "name": "java.specification.version",
                   "value": "17",
                   "isPrimary": true,
-                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "invalidValueReason": null
                 }
               ]
             },
@@ -74,7 +76,8 @@ class EnvironmentApiTest {
                   "name": "JAVA_HOME",
                   "value": "/opt/hostedtoolcache/Java_Liberica_jdk/17.0.16-12/x64",
                   "isPrimary": true,
-                  "configPropsBeanName": null
+                  "configPropsBeanName": null,
+                  "invalidValueReason": null
                 }
               ]
             }

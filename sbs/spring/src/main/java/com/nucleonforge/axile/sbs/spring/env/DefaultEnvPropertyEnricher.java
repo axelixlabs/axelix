@@ -16,11 +16,13 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDe
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertyValueDescriptor;
 import org.springframework.core.env.Environment;
 
-import com.nucleonforge.axile.common.api.KeyValue;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertyValue;
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
-import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxileEnvironmentDescriptor;
-import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertySourceDescriptor;
-import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertyValueDescriptor;
+import com.nucleonforge.axile.sbs.spring.properties.utils.EnvironmentPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.properties.utils.InvalidPropertiesLoader;
 
 /**
  * Default implementation {@link EnvPropertyEnricher}
@@ -37,25 +39,29 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
     private final EnvironmentPropertyNameNormalizer propertyNameNormalizer;
 
+    private final InvalidPropertiesLoader invalidPropertiesLoader;
+
     public DefaultEnvPropertyEnricher(
             Environment environment,
             EnvironmentPropertyNameNormalizer propertyNameNormalizer,
-            ObjectProvider<ConfigurationPropertiesCache> cache) {
+            ObjectProvider<ConfigurationPropertiesCache> cache,
+            InvalidPropertiesLoader invalidPropertiesLoader) {
         this.configurationPropertiesCache = cache.getIfAvailable();
         this.propertyNameNormalizer = propertyNameNormalizer;
         this.environment = environment;
+        this.invalidPropertiesLoader = invalidPropertiesLoader;
     }
 
     @Override
-    public AxileEnvironmentDescriptor enrich(EnvironmentDescriptor originalDescriptor) {
+    public EnvironmentFeed enrich(EnvironmentDescriptor originalDescriptor) {
         Map<String, String> primarySourceMap = buildPrimarySourceMap(originalDescriptor);
         Map<String, String> configPropsMapping = buildConfigPropsMappingMap();
 
-        List<AxilePropertySourceDescriptor> enrichedSources = originalDescriptor.getPropertySources().stream()
+        List<PropertySource> enrichedSources = originalDescriptor.getPropertySources().stream()
                 .map(source -> enrichPropertySource(source, primarySourceMap, configPropsMapping))
                 .toList();
 
-        return new AxileEnvironmentDescriptor(
+        return new EnvironmentFeed(
                 originalDescriptor.getActiveProfiles(),
                 Arrays.stream(environment.getDefaultProfiles()).toList(),
                 enrichedSources);
@@ -76,12 +82,12 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
         return primaryMap;
     }
 
-    private AxilePropertySourceDescriptor enrichPropertySource(
+    private PropertySource enrichPropertySource(
             PropertySourceDescriptor source,
             Map<String, String> primaryPropertySourceMap,
             Map<String, String> configPropsMapping) {
 
-        Map<String, AxilePropertyValueDescriptor> enrichedProperties = source.getProperties().entrySet().stream()
+        Map<String, PropertyValue> enrichedProperties = source.getProperties().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                     PropertyValueDescriptor original = entry.getValue();
 
@@ -89,14 +95,22 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                             primaryPropertySourceMap.get(propertyNameNormalizer.normalize(entry.getKey())),
                             source.getName());
 
-                    return new AxileEnvironmentEndpoint.AxilePropertyValueDescriptor(
-                            original.getValue(),
+                    String validationMessage = null;
+                    Object value = original.getValue();
+                    String stringValue = value == null ? null : value.toString();
+                    if (isPrimary) {
+                        validationMessage = invalidPropertiesLoader.getInvalidPropertyValues(entry.getKey(), value);
+                    }
+
+                    return new PropertyValue(
+                            stringValue,
                             original.getOrigin(),
                             isPrimary,
-                            configPropsMapping.getOrDefault(propertyNameNormalizer.normalize(entry.getKey()), null));
+                            configPropsMapping.getOrDefault(propertyNameNormalizer.normalize(entry.getKey()), null),
+                            validationMessage);
                 }));
 
-        return new AxilePropertySourceDescriptor(source.getName(), enrichedProperties);
+        return new PropertySource(source.getName(), enrichedProperties);
     }
 
     private Map<String, String> buildConfigPropsMappingMap() {
@@ -115,9 +129,12 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     }
 
     private void applyPrefixAndProperty(
-            String prefix, List<KeyValue> properties, Map<String, String> configPropsMapping, String beanName) {
+            String prefix,
+            List<ConfigPropsFeed.Property> properties,
+            Map<String, String> configPropsMapping,
+            String beanName) {
         for (var property : properties) {
-            String fullProperty = propertyNameNormalizer.normalize(prefix + property.key());
+            String fullProperty = propertyNameNormalizer.normalize(prefix + property.name());
             configPropsMapping.put(fullProperty, beanName);
         }
     }
