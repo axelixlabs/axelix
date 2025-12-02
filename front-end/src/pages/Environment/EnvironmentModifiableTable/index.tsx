@@ -1,3 +1,5 @@
+import { Tooltip } from "antd";
+import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
 import { Accordion, EmptyHandler, TablePropertyValue, TooltipWithCopy } from "components";
@@ -23,6 +25,8 @@ interface IProps {
 export const EnvironmentModifiableTable = ({ headerName, properties }: IProps) => {
     const { instanceId } = useParams();
 
+    const { t } = useTranslation();
+
     return (
         <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
             <Accordion
@@ -37,12 +41,14 @@ export const EnvironmentModifiableTable = ({ headerName, properties }: IProps) =
                             <div className={`RowChunk ${styles.KeyChunk}`}>
                                 <TooltipWithCopy text={displayKey} />
                                 {configPropsBeanName && (
-                                    <Link
-                                        to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <img src={LinkIcon} alt="Link icon" />
-                                    </Link>
+                                    <Tooltip title={t("configPropsBeanLink")}>
+                                        <Link
+                                            to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <img src={LinkIcon} alt="Link icon" />
+                                        </Link>
+                                    </Tooltip>
                                 )}
                             </div>
                             <div className={`RowChunk ${styles.ValueChunk}`}>

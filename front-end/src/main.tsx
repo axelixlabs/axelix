@@ -16,7 +16,16 @@ const theme = {
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <ConfigProvider theme={theme}>
+        <ConfigProvider
+            tooltip={{
+                styles: {
+                    root: {
+                        maxWidth: 600,
+                    },
+                },
+            }}
+            theme={theme}
+        >
             <App />
         </ConfigProvider>
     </StrictMode>,
