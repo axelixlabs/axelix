@@ -17,7 +17,7 @@ import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
  *
  * @author Sergey Cherkasov
  */
-public record AxileConfigPropsFeed(@JsonProperty("contexts") Map<String, Context> contexts) {
+public record ConfigPropsFeed(@JsonProperty("contexts") Map<String, Context> contexts) {
 
     /**
      * DTO that encapsulates the context of the given artifact.

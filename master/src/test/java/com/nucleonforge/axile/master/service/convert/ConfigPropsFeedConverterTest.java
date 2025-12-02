@@ -5,32 +5,32 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 import com.nucleonforge.axile.common.api.KeyValue;
-import com.nucleonforge.axile.master.api.response.configprops.ConfigPropsFeedResponse;
-import com.nucleonforge.axile.master.api.response.configprops.ConfigPropsProfile;
-import com.nucleonforge.axile.master.service.convert.response.AxileConfigPropsFeedConverter;
+import com.nucleonforge.axile.master.api.response.ConfigPropsFeedResponse;
+import com.nucleonforge.axile.master.service.convert.response.ConfigPropsFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link AxileConfigPropsFeedConverter}.
+ * Unit tests for {@link ConfigPropsFeedConverter}.
  *
  * @author Sergey Cherkasov
  */
-public class AxileConfigPropsConverterTest {
+public class ConfigPropsFeedConverterTest {
 
-    private final AxileConfigPropsFeedConverter subject = new AxileConfigPropsFeedConverter();
+    private final ConfigPropsFeedConverter subject = new ConfigPropsFeedConverter();
 
     @Test
     void testConvertHappyPath() {
         // when.
-        ConfigPropsFeedResponse configPropsFeedResponse = subject.convertInternal(new AxileConfigPropsFeed(Map.of(
-                "application1", new AxileConfigPropsFeed.Context(beansMapContext1(), "parentId1"),
-                "application2", new AxileConfigPropsFeed.Context(beansMapContext2(), "parentId2"))));
+        ConfigPropsFeedResponse configPropsFeedResponse = subject.convertInternal(new ConfigPropsFeed(Map.of(
+                "application1", new ConfigPropsFeed.Context(beansMapContext1(), "parentId1"),
+                "application2", new ConfigPropsFeed.Context(beansMapContext2(), "parentId2"))));
 
         // bean1
-        ConfigPropsProfile beanProfile1 = getBeanByName(configPropsFeedResponse, "org.springframework.boot.Bean1");
+        ConfigPropsFeedResponse.ConfigPropsProfile beanProfile1 =
+                getBeanByName(configPropsFeedResponse, "org.springframework.boot.Bean1");
 
         assertThat(beanProfile1.beanName()).isEqualTo("org.springframework.boot.Bean1");
 
@@ -58,7 +58,8 @@ public class AxileConfigPropsConverterTest {
                         new KeyValue("allowedMethods", null));
 
         // bean2
-        ConfigPropsProfile beanProfile2 = getBeanByName(configPropsFeedResponse, "org.springframework.boot.Bean2");
+        ConfigPropsFeedResponse.ConfigPropsProfile beanProfile2 =
+                getBeanByName(configPropsFeedResponse, "org.springframework.boot.Bean2");
         assertThat(beanProfile2.beanName()).isEqualTo("org.springframework.boot.Bean2");
 
         // bean2 -> prefix
@@ -86,7 +87,8 @@ public class AxileConfigPropsConverterTest {
                         new KeyValue("exposure.exclude", null));
 
         // bean3
-        ConfigPropsProfile beanProfile3 = getBeanByName(configPropsFeedResponse, "org.springframework.boot.Bean3");
+        ConfigPropsFeedResponse.ConfigPropsProfile beanProfile3 =
+                getBeanByName(configPropsFeedResponse, "org.springframework.boot.Bean3");
         assertThat(beanProfile3.beanName()).isEqualTo("org.springframework.boot.Bean3");
 
         // application2 -> bean3 -> prefix
@@ -107,14 +109,15 @@ public class AxileConfigPropsConverterTest {
                         new KeyValue("defaultPropertyInclusion2.origin", null));
     }
 
-    private static ConfigPropsProfile getBeanByName(ConfigPropsFeedResponse configpropsFeedResponse, String beanName) {
+    private static ConfigPropsFeedResponse.ConfigPropsProfile getBeanByName(
+            ConfigPropsFeedResponse configpropsFeedResponse, String beanName) {
         return configpropsFeedResponse.beans().stream()
                 .filter(profile -> profile.beanName().equals(beanName))
                 .findFirst()
                 .get();
     }
 
-    private static Map<String, AxileConfigPropsFeed.Bean> beansMapContext1() {
+    private static Map<String, ConfigPropsFeed.Bean> beansMapContext1() {
         // bean1 -> properties
         List<KeyValue> bean1Properties = List.of(
                 new KeyValue("allowedOrigins", null),
@@ -156,14 +159,14 @@ public class AxileConfigPropsConverterTest {
         return Map.of(
                 // bean1
                 "org.springframework.boot.Bean1",
-                new AxileConfigPropsFeed.Bean("management.endpoints.web.cors", bean1Properties, bean1Inputs),
+                new ConfigPropsFeed.Bean("management.endpoints.web.cors", bean1Properties, bean1Inputs),
 
                 // bean2
                 "org.springframework.boot.Bean2",
-                new AxileConfigPropsFeed.Bean("management.endpoints.web", bean2Properties, bean2Inputs));
+                new ConfigPropsFeed.Bean("management.endpoints.web", bean2Properties, bean2Inputs));
     }
 
-    private static Map<String, AxileConfigPropsFeed.Bean> beansMapContext2() {
+    private static Map<String, ConfigPropsFeed.Bean> beansMapContext2() {
         // bean3 -> properties
         List<KeyValue> properties = List.of(
                 new KeyValue("serialization2.INDENT_OUTPUT", "false"),
@@ -177,7 +180,6 @@ public class AxileConfigPropsConverterTest {
                 new KeyValue("defaultPropertyInclusion2.origin", null));
 
         // bean3
-        return Map.of(
-                "org.springframework.boot.Bean3", new AxileConfigPropsFeed.Bean("spring.jackson", properties, inputs));
+        return Map.of("org.springframework.boot.Bean3", new ConfigPropsFeed.Bean("spring.jackson", properties, inputs));
     }
 }

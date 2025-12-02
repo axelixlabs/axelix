@@ -20,7 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 import com.nucleonforge.axile.common.api.KeyValue;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,31 +60,12 @@ public class AxileConfigurationPropertiesEndpointTest {
     @ParameterizedTest
     @MethodSource("propertyName")
     void shouldReturnPropertiesNameAndValue(String propertyName, String expectedValue) {
-        ResponseEntity<AxileConfigPropsFeed> response =
-                restTemplate.getForEntity("/actuator/axile-configprops", AxileConfigPropsFeed.class);
+        ResponseEntity<ConfigPropsFeed> response =
+                restTemplate.getForEntity("/actuator/axile-configprops", ConfigPropsFeed.class);
 
         List<KeyValue> properties = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())
                 .filter(e -> e.prefix().equals("axile.prop.test"))
-                .flatMap(bean -> bean.properties().stream())
-                .toList();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        assertThat(properties)
-                .filteredOn(e -> e.key().equals(propertyName))
-                .extracting(KeyValue::value)
-                .containsExactly(expectedValue);
-    }
-
-    @ParameterizedTest
-    @MethodSource("propertyName")
-    void shouldReturnByNamePrefixPropertyNameAndValue(String propertyName, String expectedValue) {
-        ResponseEntity<AxileConfigPropsFeed> response =
-                restTemplate.getForEntity("/actuator/axile-configprops/axile.prop.test", AxileConfigPropsFeed.class);
-
-        List<KeyValue> properties = response.getBody().contexts().values().stream()
-                .flatMap(ctx -> ctx.beans().values().stream())
                 .flatMap(bean -> bean.properties().stream())
                 .toList();
 
@@ -118,28 +99,12 @@ public class AxileConfigurationPropertiesEndpointTest {
     @ParameterizedTest
     @MethodSource("inputsName")
     void shouldReturnInputsName(String inputsName) {
-        ResponseEntity<AxileConfigPropsFeed> response =
-                restTemplate.getForEntity("/actuator/axile-configprops", AxileConfigPropsFeed.class);
+        ResponseEntity<ConfigPropsFeed> response =
+                restTemplate.getForEntity("/actuator/axile-configprops", ConfigPropsFeed.class);
 
         List<KeyValue> inputs = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())
                 .filter(e -> e.prefix().equals("axile.prop.test"))
-                .flatMap(bean -> bean.inputs().stream())
-                .toList();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        assertThat(inputs).hasSize(30).extracting(KeyValue::key).contains(inputsName);
-    }
-
-    @ParameterizedTest
-    @MethodSource("inputsName")
-    void shouldReturnByNamePrefixInputsName(String inputsName) {
-        ResponseEntity<AxileConfigPropsFeed> response =
-                restTemplate.getForEntity("/actuator/axile-configprops/axile.prop.test", AxileConfigPropsFeed.class);
-
-        List<KeyValue> inputs = response.getBody().contexts().values().stream()
-                .flatMap(ctx -> ctx.beans().values().stream())
                 .flatMap(bean -> bean.inputs().stream())
                 .toList();
 

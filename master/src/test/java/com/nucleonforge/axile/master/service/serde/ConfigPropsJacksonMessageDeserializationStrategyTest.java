@@ -6,7 +6,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 import com.nucleonforge.axile.common.api.KeyValue;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,13 +92,13 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
                 """;
 
         // when.
-        AxileConfigPropsFeed configPropsFeed = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
+        ConfigPropsFeed configPropsFeed = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         // then.
-        Map<String, AxileConfigPropsFeed.Context> context = configPropsFeed.contexts();
+        Map<String, ConfigPropsFeed.Context> context = configPropsFeed.contexts();
 
         // bean1
-        AxileConfigPropsFeed.Bean bean1 =
+        ConfigPropsFeed.Bean bean1 =
                 getBeanByName(context, "org.springframework.boot.actuate.autoconfigure.endpoint.web.Bean1");
 
         // bean1 -> prefix
@@ -125,7 +125,7 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
                         new KeyValue("allowedMethods", null));
 
         // bean2
-        AxileConfigPropsFeed.Bean bean2 = getBeanByName(context, "org.springframework.boot.autoconfigure.web.Bean2");
+        ConfigPropsFeed.Bean bean2 = getBeanByName(context, "org.springframework.boot.autoconfigure.web.Bean2");
 
         // bean2 -> prefix
         assertThat(bean2.prefix()).isEqualTo("spring.web");
@@ -167,10 +167,9 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
                         new KeyValue("resources.cache.useLastModified", null));
     }
 
-    private static AxileConfigPropsFeed.Bean getBeanByName(
-            Map<String, AxileConfigPropsFeed.Context> context, String beanName) {
+    private static ConfigPropsFeed.Bean getBeanByName(Map<String, ConfigPropsFeed.Context> context, String beanName) {
         return context.values().stream()
-                .map(AxileConfigPropsFeed.Context::beans)
+                .map(ConfigPropsFeed.Context::beans)
                 .findFirst()
                 .map(beansMap -> beansMap.get(beanName))
                 .get();

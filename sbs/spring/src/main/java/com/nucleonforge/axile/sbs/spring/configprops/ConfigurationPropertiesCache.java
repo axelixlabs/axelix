@@ -4,7 +4,7 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 
-import com.nucleonforge.axile.common.api.AxileConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 
 /**
  * Service caching the application's {@code @ConfigurationProperties}
@@ -21,7 +21,7 @@ public class ConfigurationPropertiesCache {
     private final ConfigurationPropertiesConverter configurationPropertiesConverter;
 
     @Nullable
-    private volatile AxileConfigPropsFeed cachedResult;
+    private volatile ConfigPropsFeed cachedResult;
 
     public ConfigurationPropertiesCache(
             ConfigurationPropertiesReportEndpoint delegate,
@@ -30,7 +30,7 @@ public class ConfigurationPropertiesCache {
         this.configurationPropertiesConverter = configurationPropertiesConverter;
     }
 
-    public AxileConfigPropsFeed getAxileConfigProps() {
+    public ConfigPropsFeed getAxileConfigProps() {
         if (cachedResult == null) {
             synchronized (this) {
                 if (cachedResult == null) {
@@ -39,9 +39,5 @@ public class ConfigurationPropertiesCache {
             }
         }
         return cachedResult;
-    }
-
-    public AxileConfigPropsFeed getAxileConfigPropsByPrefix(String prefix) {
-        return configurationPropertiesConverter.convert(delegate.configurationPropertiesWithPrefix(prefix));
     }
 }

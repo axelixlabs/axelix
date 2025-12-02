@@ -1,4 +1,4 @@
-package com.nucleonforge.axile.master.api.configprops;
+package com.nucleonforge.axile.master.api;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -22,7 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
-import com.nucleonforge.axile.master.api.ConfigPropsApi;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
 
