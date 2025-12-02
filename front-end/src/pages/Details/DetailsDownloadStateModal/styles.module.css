@@ -1,0 +1,36 @@
+.LoaderWrapper {
+    margin-block: 40px;
+}
+
+.HeapDumpAccordionHeader {
+    display: flex;
+    justify-content: space-between;
+    padding-inline: 8px 16px;
+}
+
+.HeapDumpAccordionBody {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 20px;
+    padding-inline: 28px 16px;
+}
+
+.Component {
+    cursor: text;
+}
+
+.Collapse {
+    border: none;
+    border-bottom: 1px solid #0505050f;
+    border-radius: 0;
+    background-color: #ffffff;
+}
+
+.Collapse :global(.ant-collapse-header):hover {
+    cursor: default;
+}
+
+.List {
+    margin-block: 30px;
+    overflow: hidden;
+}
