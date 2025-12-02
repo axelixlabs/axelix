@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { Loader } from "components";
-import { downloadFile, fetchData } from "helpers";
-import { EExportableComponent, StatefulRequest } from "models";
+import { downloadFile } from "helpers";
+import { EExportableComponent } from "models";
 import { exportStateData } from "services";
 
 import styles from "./styles.module.css";
@@ -23,14 +23,12 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
-    const [dataState, setDataState] = useState(StatefulRequest.loading<Blob>(false));
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [stateComponents, setStateComponents] = useState<EExportableComponent[]>([]);
     const [heapDumpExpanded, setHeapDumpExpanded] = useState<boolean>(false);
     const [sanitizeHeapDump, setSanitizeHeapDump] = useState<boolean>(true);
-    const file = dataState.response;
-    const loading = dataState.loading;
 
     useEffect(() => {
         if (heapDumpExpanded) {
@@ -38,41 +36,24 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
         }
     }, [heapDumpExpanded]);
 
-    useEffect(() => {
-        if (file) {
+    const handleOk = async (): Promise<void> => {
+        setLoading(true);
+
+        exportStateData({
+            instanceId: instanceId!,
+            body: {
+                components: stateComponents.map((value) => ({
+                    component: value,
+                    ...(value === EExportableComponent.HEAP_DUMP && { sanitize: sanitizeHeapDump }),
+                })),
+            },
+        }).then((value) => {
+            setIsModalOpen(false);
             // We have to manually download the file here since the request to the server is a POST http
             // request and therefore the browser might not catch up the possible Content-Disposition header
-            downloadFile(file);
-        }
-    }, [file]);
-
-    const showModal = (): void => {
-        setIsModalOpen(true);
-    };
-
-    const handleOk = async (): Promise<void> => {
-        if (!stateComponents.length) {
-            setIsModalOpen(false);
-        }
-
-        setDataState(StatefulRequest.loading());
-        await fetchData(setDataState, () =>
-            exportStateData({
-                instanceId: instanceId!,
-                body: {
-                    components: stateComponents.map((value) => ({
-                        component: value,
-                        ...(value === EExportableComponent.HEAP_DUMP && { sanitize: sanitizeHeapDump }),
-                    })),
-                },
-            }),
-        );
-
-        setIsModalOpen(false);
-    };
-
-    const handleCancel = (): void => {
-        setIsModalOpen(false);
+            downloadFile(value.data);
+            setLoading(false);
+        });
     };
 
     const handleChange = (stateComponent: EExportableComponent): void => {
@@ -89,22 +70,22 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
             <Button
                 type="primary"
                 icon={<img src={DownloadIcon} alt="Download icon" className={styles.DownloadIcon} />}
-                onClick={showModal}
+                onClick={() => setIsModalOpen(true)}
                 className={styles.Download}
             >
                 {t("Details.downloadState")}
             </Button>
             <Modal
-                title={t("Details.exportConfiguration")}
+                title={isLoading ? t("Details.exportConfigurationLoading") : t("Details.exportConfigurationOptions")}
                 cancelText={t("cancel")}
                 open={isModalOpen}
                 onOk={handleOk}
-                onCancel={handleCancel}
+                onCancel={() => setIsModalOpen(false)}
                 centered
-                okButtonProps={{ disabled: loading }}
-                cancelButtonProps={{ disabled: loading }}
+                okButtonProps={{ disabled: isLoading }}
+                cancelButtonProps={{ disabled: isLoading }}
             >
-                {loading ? (
+                {isLoading ? (
                     <div className={styles.LoaderWrapper}>
                         <Loader />
                     </div>

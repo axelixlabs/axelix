@@ -8,7 +8,8 @@
     "cancel": "Cancel",
     "Details": {
         "downloadState": "Download state",
-        "exportConfiguration": "List of state export components",
+        "exportConfigurationOptions": "List of state export components",
+        "exportConfigurationLoading": "Hang tight... We're exporting state...",
         "Components": {
             "HEAP_DUMP": "Heap Dump",
             "THREAD_DUMP": "Thread Dump",

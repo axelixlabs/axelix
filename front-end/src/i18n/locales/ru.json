@@ -8,7 +8,8 @@
     "cancel": "Отмена",
     "Details": {
         "downloadState": "Выгрузить состояние",
-        "exportConfiguration": "Список компонентов состояния для экспорта",
+        "exportConfigurationOptions": "Список компонентов состояния для экспорта",
+        "exportConfigurationLoading" : "Выгружаем состояние... Терпение...",
         "Components": {
             "HEAP_DUMP": "Дамп Кучи",
             "THREAD_DUMP": "Дамп Потоков",
