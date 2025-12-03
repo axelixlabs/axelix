@@ -42,6 +42,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 // TODO:
 //  This is required since we tinker with caches. However, ideally, we should clean everything up in
 //  BeforeEach callback or some sort.
+
+// TODO:
+//  This test has no clear test data to operate upon.
+//  It just relies on whatever cache managers are present in the cotnext right now. That approach
+//  will produce a flaky, unstable and unclear test
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AxileCachesEndpointTest {
 
