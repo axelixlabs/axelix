@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { reduceDisplayedNumber } from "helpers";
+import { extractUniqueTags, reduceDisplayedNumber } from "helpers";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 describe("reduceDisplayedNumber", () => {
@@ -45,5 +45,88 @@ describe("reduceDisplayedNumber", () => {
     it("Numbers at the threshold", () => {
         expect(reduceDisplayedNumber(SHOW_RAW_THRESHOLD)).toBe("100K");
         expect(reduceDisplayedNumber(SHOW_RAW_THRESHOLD - 0.001)).toBe(`${SHOW_RAW_THRESHOLD - 0.01}`);
+    });
+});
+
+describe("extractUniqueTags", () => {
+    it("Should return an empty array on empty valid tag combinations", () => {
+        expect(extractUniqueTags([])).toEqual([]);
+    });
+    it("Should handle case - single tag available", () => {
+        expect(
+            extractUniqueTags([
+                {
+                    area: "heap",
+                },
+                {
+                    area: "nonheap",
+                },
+                {
+                    area: "someOtherArea",
+                },
+            ]),
+        ).toEqual(["area"]);
+    });
+    it("Should handle case - single tag with multiple values available", () => {
+        expect(
+            extractUniqueTags([
+                {
+                    area: "heap",
+                },
+                {
+                    area: "nonheap",
+                },
+                {
+                    area: "someOtherArea",
+                },
+            ]),
+        ).toEqual(["area"]);
+    });
+    it("Should handle case - single tag single value available", () => {
+        expect(
+            extractUniqueTags([
+                {
+                    name: "dataSource",
+                },
+            ]),
+        ).toEqual(["name"]);
+    });
+    it("Should handle case - two tags with multiple choices available", () => {
+        expect(
+            extractUniqueTags([
+                {
+                    area: "nonheap",
+                    id: "Compressed Class Space",
+                },
+                {
+                    area: "nonheap",
+                    id: "CodeHeap 'non-profiled nmethods'",
+                },
+                {
+                    area: "heap",
+                    id: "G1 Eden Space",
+                },
+                {
+                    area: "heap",
+                    id: "G1 Survivor Space",
+                },
+                {
+                    area: "nonheap",
+                    id: "CodeHeap 'non-nmethods'",
+                },
+                {
+                    area: "nonheap",
+                    id: "Metaspace",
+                },
+                {
+                    area: "nonheap",
+                    id: "CodeHeap 'profiled nmethods'",
+                },
+                {
+                    area: "heap",
+                    id: "G1 Old Gen",
+                },
+            ]),
+        ).toEqual(["area", "id"]);
     });
 });

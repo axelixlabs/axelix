@@ -1,4 +1,4 @@
-import type { IMetricsGroup, IValidTagCombination } from "models";
+import type { IMetricsGroup, ITagValueOptions, IValidTagCombination } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
@@ -76,35 +76,57 @@ export const findMetricsCount = (metricsGroups: IMetricsGroup[]): number => {
     return metricsGroups.reduce((count, group) => count + group.metrics.length, 0);
 };
 
-export const extractUniqueMetricTagKeys = (validTagCombinations: IValidTagCombination[]) => {
+/**
+ * @param validTagCombinations the array of valid tag combinations for the given metric.
+ * @returns array of all possible tags that can be used based on the given metric's
+ *          valid tag combinations. Returned array will not contain duplicates.
+ */
+export const extractUniqueTags = (validTagCombinations: IValidTagCombination[]): string[] => {
     const allKeys = validTagCombinations.flatMap((validTagCombination) => Object.keys(validTagCombination));
     const uniqueKeys = new Set(allKeys);
 
     return Array.from(uniqueKeys);
 };
 
+/**
+ * Returns possible tag values options. Contains possible values for all the tags.
+ *
+ * If the given tag already has a selected value, then the array of possible values for the given tag
+ * will contain the only value - the selected value.
+ *
+ * This would make it impossible to distinguish two cases:
+ * - The selected that already has a selected value
+ * - Tag that possibly can have only a single value (considering the values fo other tags of course)
+ *
+ * But we do not need to distinguish these two cases.
+ *
+ * @param validTagCombinations valid tag combinations.
+ * @param selectedTags tags that are currently selected.
+ */
 export const extractUniqueMetricValuesPerKey = (
-    uniqueTagKeys: string[],
     validTagCombinations: IValidTagCombination[],
     selectedTags: Record<string, string>,
-): string[][] => {
-    return uniqueTagKeys.map((key, index) => {
-        const previewKeys = uniqueTagKeys.slice(0, index);
-
-        const values = validTagCombinations
-            .filter((combination) =>
-                previewKeys.every((previewKey) => {
-                    const selectedValue = selectedTags[previewKey];
-                    return !selectedValue || (combination[previewKey] ?? "") === selectedValue;
-                }),
-            )
-            .map((combination) => combination[key] ?? "")
-            .filter(Boolean);
-
-        const uniqueMetricValues = new Set(values);
-
-        return Array.from(uniqueMetricValues);
-    });
+): ITagValueOptions => {
+    // return uniqueTagKeys.map((key, index) => {
+    //     const previewKeys = uniqueTagKeys.slice(0, index);
+    //
+    //     const values = validTagCombinations
+    //         .filter((combination) =>
+    //             previewKeys.every((previewKey) => {
+    //                 const selectedValue = selectedTags[previewKey];
+    //                 return !selectedValue || (combination[previewKey] ?? "") === selectedValue;
+    //             }),
+    //         )
+    //         .map((combination) => combination[key] ?? "")
+    //         .filter(Boolean);
+    //
+    //     const uniqueMetricValues = new Set(values);
+    //
+    //     return Array.from(uniqueMetricValues);
+    // });
+    return {
+        tagValueOptions: [],
+    };
 };
 
 export const buildSelectedTagParams = (selectedTags: Record<string, string>): string[] => {

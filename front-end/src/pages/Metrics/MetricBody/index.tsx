@@ -4,12 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader } from "components";
-import {
-    buildSelectedTagParams,
-    extractUniqueMetricTagKeys,
-    extractUniqueMetricValuesPerKey,
-    fetchData,
-} from "helpers";
+import { buildSelectedTagParams, extractUniqueMetricValuesPerKey, extractUniqueTags, fetchData } from "helpers";
 import { type IMetric, type ISingleMetricResponseBody, type IValidTagCombination, StatefulRequest } from "models";
 import { getSingleMetricData } from "services";
 
@@ -33,12 +28,12 @@ export const MetricBody = ({ metric }: IProps) => {
 
     useEffect(() => {
         setSingleMetricData(StatefulRequest.loading<ISingleMetricResponseBody>());
-        const selectedTagParams = buildSelectedTagParams(selectedTags);
+
         fetchData(setSingleMetricData, () =>
             getSingleMetricData({
                 instanceId: instanceId!,
                 metric: metric.metricName,
-                selectedTagParams: selectedTagParams,
+                tags: buildSelectedTagParams(selectedTags),
             }),
         );
     }, [selectedTags]);
@@ -55,24 +50,17 @@ export const MetricBody = ({ metric }: IProps) => {
     const singleMetricFeedMeasurements = singleMetricFeed.measurements;
     const validTagCombinations: IValidTagCombination[] = singleMetricFeed.validTagCombinations;
 
-    const uniqueTagKeys = extractUniqueMetricTagKeys(validTagCombinations);
+    const uniqueTagKeys = extractUniqueTags(validTagCombinations);
     const valuesPerKey = extractUniqueMetricValuesPerKey(uniqueTagKeys, validTagCombinations, selectedTags);
 
-    const handleSelectChange = (key: string, selectedValue?: string) => {
+    const handleSelectChange = (tagName: string, selectedValue?: string) => {
         setSelectedTags((prev) => {
             const updatedTags: Record<string, string> = { ...prev };
 
             if (selectedValue) {
-                updatedTags[key] = selectedValue;
+                updatedTags[tagName] = selectedValue;
             } else {
-                delete updatedTags[key];
-            }
-
-            const keyIndex = uniqueTagKeys.indexOf(key);
-            if (keyIndex !== -1) {
-                for (let nextIndex = keyIndex + 1; nextIndex < uniqueTagKeys.length; nextIndex++) {
-                    delete updatedTags[uniqueTagKeys[nextIndex]];
-                }
+                delete updatedTags[tagName];
             }
 
             return updatedTags;
@@ -96,23 +84,20 @@ export const MetricBody = ({ metric }: IProps) => {
                     <>
                         <div>{t("Metrics.tags")}:</div>
                         <div className={styles.TagsWrapper}>
-                            {uniqueTagKeys.map((key, index) => {
-                                const values = valuesPerKey[index] || [];
-                                const prevKey = uniqueTagKeys[index - 1];
-                                const disabled = index && !selectedTags[prevKey];
+                            {uniqueTagKeys.map((tagName) => {
+                                const values =
+                                    valuesPerKey.tagValueOptions.find((value) => value.tag == tagName)?.values ?? [];
+
                                 return (
-                                    <Fragment key={key}>
-                                        <div>{key}:</div>
+                                    <Fragment key={tagName}>
+                                        <div>{tagName}:</div>
                                         <Select
-                                            value={selectedTags[key] || undefined}
-                                            onChange={(value) => handleSelectChange(key, value)}
-                                            placeholder={
-                                                disabled ? t("Metrics.selectPrevFirst") : t("Metrics.selectValue")
-                                            }
+                                            value={selectedTags[tagName] || undefined}
+                                            onChange={(value) => handleSelectChange(tagName, value)}
+                                            placeholder={t("Metrics.selectValue")}
                                             options={values.map((value) => ({
                                                 value: value,
                                             }))}
-                                            disabled={disabled || !values.length}
                                             className={styles.TagSelect}
                                         />
                                     </Fragment>
