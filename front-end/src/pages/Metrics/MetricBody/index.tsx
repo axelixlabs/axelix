@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader } from "components";
-import { buildSelectedTagParams, extractUniqueMetricValuesPerKey, extractUniqueTags, fetchData } from "helpers";
+import { buildSelectedTagParams, extractUniqueMetricValuesPerKey, fetchData } from "helpers";
 import { type IMetric, type ISingleMetricResponseBody, type IValidTagCombination, StatefulRequest } from "models";
 import { getSingleMetricData } from "services";
 
@@ -50,8 +50,7 @@ export const MetricBody = ({ metric }: IProps) => {
     const singleMetricFeedMeasurements = singleMetricFeed.measurements;
     const validTagCombinations: IValidTagCombination[] = singleMetricFeed.validTagCombinations;
 
-    const uniqueTagKeys = extractUniqueTags(validTagCombinations);
-    const valuesPerKey = extractUniqueMetricValuesPerKey(uniqueTagKeys, validTagCombinations, selectedTags);
+    const valuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
 
     const handleSelectChange = (tagName: string, selectedValue?: string) => {
         setSelectedTags((prev) => {
@@ -80,29 +79,25 @@ export const MetricBody = ({ metric }: IProps) => {
                     </>
                 )}
 
-                {!!uniqueTagKeys.length && (
+                {validTagCombinations.length && (
                     <>
                         <div>{t("Metrics.tags")}:</div>
                         <div className={styles.TagsWrapper}>
-                            {uniqueTagKeys.map((tagName) => {
-                                const values =
-                                    valuesPerKey.tagValueOptions.find((value) => value.tag == tagName)?.values ?? [];
-
-                                return (
-                                    <Fragment key={tagName}>
-                                        <div>{tagName}:</div>
-                                        <Select
-                                            value={selectedTags[tagName] || undefined}
-                                            onChange={(value) => handleSelectChange(tagName, value)}
-                                            placeholder={t("Metrics.selectValue")}
-                                            options={values.map((value) => ({
-                                                value: value,
-                                            }))}
-                                            className={styles.TagSelect}
-                                        />
-                                    </Fragment>
-                                );
-                            })}
+                            {Object.entries(valuesPerKey).map(([tagName, possibleValues]) => (
+                                <Fragment key={tagName}>
+                                    <div>{tagName}:</div>
+                                    <Select
+                                        value={selectedTags[tagName] || undefined}
+                                        onChange={(value) => handleSelectChange(tagName, value)}
+                                        placeholder={t("Metrics.selectValue")}
+                                        options={possibleValues.map((value) => ({
+                                            value: value,
+                                        }))}
+                                        allowClear
+                                        className={styles.TagSelect}
+                                    />
+                                </Fragment>
+                            ))}
                         </div>
                     </>
                 )}

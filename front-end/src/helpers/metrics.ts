@@ -1,4 +1,4 @@
-import type { IMetricsGroup, ITagValueOptions, IValidTagCombination } from "models";
+import type { IMetricsGroup, IValidTagCombination } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
@@ -76,16 +76,31 @@ export const findMetricsCount = (metricsGroups: IMetricsGroup[]): number => {
     return metricsGroups.reduce((count, group) => count + group.metrics.length, 0);
 };
 
-/**
- * @param validTagCombinations the array of valid tag combinations for the given metric.
- * @returns array of all possible tags that can be used based on the given metric's
- *          valid tag combinations. Returned array will not contain duplicates.
- */
-export const extractUniqueTags = (validTagCombinations: IValidTagCombination[]): string[] => {
-    const allKeys = validTagCombinations.flatMap((validTagCombination) => Object.keys(validTagCombination));
-    const uniqueKeys = new Set(allKeys);
+const getValidTagCombinationsByFilters = (
+    validTagCombinations: IValidTagCombination[],
+    selectedTags: IValidTagCombination,
+) => {
+    const filterKeyAndValue = Object.entries(selectedTags);
+    return validTagCombinations.filter((validTagCombination) => {
+        return filterKeyAndValue.every(([key, value]) => validTagCombination[key] === value);
+    });
+};
 
-    return Array.from(uniqueKeys);
+const getPossibleValuesofValidTagCombinationFields = (validTagCombinations: IValidTagCombination[]) => {
+    const uniques: Record<string, string[]> = {};
+    validTagCombinations.forEach((validTagCombination) => {
+        const validTagCombinationEntries = Object.entries(validTagCombination);
+        validTagCombinationEntries.forEach(([key, value]) => {
+            if (!(key in uniques)) {
+                uniques[key] = [];
+            }
+
+            if (!uniques[key].includes(value)) {
+                uniques[key].push(value);
+            }
+        });
+    });
+    return uniques;
 };
 
 /**
@@ -105,28 +120,12 @@ export const extractUniqueTags = (validTagCombinations: IValidTagCombination[]):
  */
 export const extractUniqueMetricValuesPerKey = (
     validTagCombinations: IValidTagCombination[],
-    selectedTags: Record<string, string>,
-): ITagValueOptions => {
-    // return uniqueTagKeys.map((key, index) => {
-    //     const previewKeys = uniqueTagKeys.slice(0, index);
-    //
-    //     const values = validTagCombinations
-    //         .filter((combination) =>
-    //             previewKeys.every((previewKey) => {
-    //                 const selectedValue = selectedTags[previewKey];
-    //                 return !selectedValue || (combination[previewKey] ?? "") === selectedValue;
-    //             }),
-    //         )
-    //         .map((combination) => combination[key] ?? "")
-    //         .filter(Boolean);
-    //
-    //     const uniqueMetricValues = new Set(values);
-    //
-    //     return Array.from(uniqueMetricValues);
-    // });
-    return {
-        tagValueOptions: [],
-    };
+    selectedTags: IValidTagCombination,
+) => {
+    const validTagCombinationsByFilter = getValidTagCombinationsByFilters(validTagCombinations, selectedTags);
+    const validTagCombinationFieldsPossibleUniqueValues =
+        getPossibleValuesofValidTagCombinationFields(validTagCombinationsByFilter);
+    return validTagCombinationFieldsPossibleUniqueValues;
 };
 
 export const buildSelectedTagParams = (selectedTags: Record<string, string>): string[] => {

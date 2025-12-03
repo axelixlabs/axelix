@@ -94,13 +94,6 @@ export interface IGetSingleMetricRequestData {
     tags: string[];
 }
 
-export interface ITagValueOptions {
-    /**
-     * Possible values for the given tags
-     */
-    tagValueOptions: ITagValueOption[];
-}
-
 export interface ITagValueOption {
     /**
      * The name of the tag

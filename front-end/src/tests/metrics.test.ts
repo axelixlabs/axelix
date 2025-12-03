@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { extractUniqueTags, reduceDisplayedNumber } from "helpers";
+import { extractUniqueMetricValuesPerKey, reduceDisplayedNumber } from "helpers";
+import type { IValidTagCombination } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
-describe("reduceDisplayedNumber", () => {
+describe("Check reduceDisplayedNumber function", () => {
     it("Returns an empty string if the value is null or undefined", () => {
         expect(reduceDisplayedNumber(null)).toBe("");
         expect(reduceDisplayedNumber(undefined)).toBe("");
@@ -48,85 +49,111 @@ describe("reduceDisplayedNumber", () => {
     });
 });
 
-describe("extractUniqueTags", () => {
-    it("Should return an empty array on empty valid tag combinations", () => {
-        expect(extractUniqueTags([])).toEqual([]);
+const validTagCombinations: IValidTagCombination[] = [
+    {
+        "code.function": "area",
+        "code.namespace": "org.springframework",
+        error: "none",
+        exception: "none",
+        outcome: "SUCCESS",
+    },
+    {
+        "code.function": "cronTask",
+        "code.namespace": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+        error: "none",
+        exception: "none",
+        outcome: "SUCCESS",
+    },
+    {
+        "code.function": "cronTask",
+        "code.namespace": "org.springframework.samples.petclinic",
+        error: "1",
+        exception: "none",
+        outcome: "SUCCESS",
+    },
+    {
+        "code.function": "alive",
+        "code.namespace": "org",
+        error: "none",
+        exception: "none",
+        outcome: "SUCCESS",
+    },
+    {
+        "code.function": "fixedDelayTask",
+        "code.namespace": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+        error: "none",
+        exception: "none",
+        outcome: "SUCCESS",
+    },
+];
+
+describe("Check extractUniqueMetricValuesPerKey function", () => {
+    it("Returns all unique values for each key when no selected keys are provided", () => {
+        const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, {});
+
+        expect(uniqueMetricValuesPerKey).toEqual({
+            "code.function": ["area", "cronTask", "alive", "fixedDelayTask"],
+            "code.namespace": [
+                "org.springframework",
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+                "org.springframework.samples.petclinic",
+                "org",
+            ],
+            error: ["none", "1"],
+            exception: ["none"],
+            outcome: ["SUCCESS"],
+        });
     });
-    it("Should handle case - single tag available", () => {
-        expect(
-            extractUniqueTags([
-                {
-                    area: "heap",
-                },
-                {
-                    area: "nonheap",
-                },
-                {
-                    area: "someOtherArea",
-                },
-            ]),
-        ).toEqual(["area"]);
+
+    it("Filters combinations by single selected tag", () => {
+        const selectedTags = { "code.function": "cronTask" };
+        const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
+
+        expect(uniqueMetricValuesPerKey).toEqual({
+            "code.function": ["cronTask"],
+            "code.namespace": [
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+                "org.springframework.samples.petclinic",
+            ],
+            error: ["none", "1"],
+            exception: ["none"],
+            outcome: ["SUCCESS"],
+        });
     });
-    it("Should handle case - single tag with multiple values available", () => {
-        expect(
-            extractUniqueTags([
-                {
-                    area: "heap",
-                },
-                {
-                    area: "nonheap",
-                },
-                {
-                    area: "someOtherArea",
-                },
-            ]),
-        ).toEqual(["area"]);
+
+    it("Filters by multiple selected tags", () => {
+        const selectedTags = {
+            "code.function": "cronTask",
+            "code.namespace": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+        };
+        const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
+
+        expect(uniqueMetricValuesPerKey).toEqual({
+            "code.function": ["cronTask"],
+            "code.namespace": ["org.springframework.samples.petclinic.scheduled.SchedulerTestConfig"],
+            error: ["none"],
+            exception: ["none"],
+            outcome: ["SUCCESS"],
+        });
     });
-    it("Should handle case - single tag single value available", () => {
-        expect(
-            extractUniqueTags([
-                {
-                    name: "dataSource",
-                },
-            ]),
-        ).toEqual(["name"]);
-    });
-    it("Should handle case - two tags with multiple choices available", () => {
-        expect(
-            extractUniqueTags([
-                {
-                    area: "nonheap",
-                    id: "Compressed Class Space",
-                },
-                {
-                    area: "nonheap",
-                    id: "CodeHeap 'non-profiled nmethods'",
-                },
-                {
-                    area: "heap",
-                    id: "G1 Eden Space",
-                },
-                {
-                    area: "heap",
-                    id: "G1 Survivor Space",
-                },
-                {
-                    area: "nonheap",
-                    id: "CodeHeap 'non-nmethods'",
-                },
-                {
-                    area: "nonheap",
-                    id: "Metaspace",
-                },
-                {
-                    area: "nonheap",
-                    id: "CodeHeap 'profiled nmethods'",
-                },
-                {
-                    area: "heap",
-                    id: "G1 Old Gen",
-                },
-            ]),
-        ).toEqual(["area", "id"]);
+
+    it("Filters by fully selected tags", () => {
+        const selectedTags = {
+            "code.function": "cronTask",
+            "code.namespace": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
+            error: "none",
+            exception: "none",
+            outcome: "SUCCESS",
+        };
+
+        const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
+
+        expect(uniqueMetricValuesPerKey).toEqual({
+            "code.function": ["cronTask"],
+            "code.namespace": ["org.springframework.samples.petclinic.scheduled.SchedulerTestConfig"],
+            error: ["none"],
+            exception: ["none"],
+            outcome: ["SUCCESS"],
+        });
     });
 });
