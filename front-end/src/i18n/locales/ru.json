@@ -6,6 +6,9 @@
     "propertyChangedSuccessfully": "Свойство Изменено",
     "saved": "Сохранено",
     "cancel": "Отмена",
+    "status": "Статус",
+    "on": "ВКЛ",
+    "off": "ВЫКЛ",
     "Details": {
         "downloadState": "Выгрузить состояние",
         "exportConfigurationOptions": "Список компонентов состояния для экспорта",
@@ -82,7 +85,10 @@
         "clearAll": "Очистить все кэши",
         "target": "Реализация",
         "name": "Имя",
-        "cleared": "Очищено"
+        "cleared": "Очищено",
+        "clear": "Очистить",
+        "enabled": "Кэш включён",
+        "disabled": "Кэш выключен"
     },
     "Authentication": {
         "login": "Вход",
@@ -125,11 +131,8 @@
     "ScheduledTasks": {
         "runnable": "Метод",
         "expression": "Cron выражение",
-        "status": "Статус",
         "initialDelay": "Начальная <br /> задержка (мс)",
         "interval": "Интервал (мс)",
-        "on": "ВКЛ",
-        "off": "ВЫКЛ",
         "cron": "Cron",
         "fixedDelay": "Fixed delay",
         "fixedRate": "Fixed rate",

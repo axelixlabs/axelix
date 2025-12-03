@@ -1,5 +1,4 @@
 import { Button, Form, Input } from "antd";
-import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 
 import { useAppDispatch, useAppSelector } from "hooks";
@@ -28,7 +27,7 @@ export const Login = () => {
 
     return (
         <div className={styles.LoginFormWrapper}>
-            <h1 className={classNames("TextMedium", styles.LoginTitle)}>{t("Authentication.login")}</h1>
+            <h1 className={`TextMedium ${styles.LoginTitle}`}>{t("Authentication.login")}</h1>
             <Form layout="vertical" onFinish={onFinish} autoComplete="off">
                 <Form.Item
                     key="username"

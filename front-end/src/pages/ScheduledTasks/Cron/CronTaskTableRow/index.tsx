@@ -1,7 +1,7 @@
 import { TooltipWithCopy } from "components";
 import { type ICron } from "models";
 
-import { OnOffSwitch } from "../../OnOffSwitch";
+import { ScheduledTasksStatusSwitch } from "../../ScheduledTasksStatusSwitch";
 
 import styles from "./styles.module.css";
 
@@ -20,7 +20,7 @@ export const CronTaskTableRow = ({ task }: IProps) => {
             </div>
             <div className="RowChunk">{task.expression}</div>
             <div className="RowChunk">
-                <OnOffSwitch runnable={task} />
+                <ScheduledTasksStatusSwitch runnable={task} />
             </div>
         </div>
     );

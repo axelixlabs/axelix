@@ -1,5 +1,4 @@
 import { AutoComplete, type AutoCompleteProps, Input } from "antd";
-import classNames from "classnames";
 import { type Dispatch, type SetStateAction, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -14,7 +13,7 @@ interface IProps {
     /**
      * Whether to add a bottom gutter to the search field
      */
-    hasBottomGutter?: boolean;
+    removeBottomGutter?: boolean;
 
     /**
      * Optional text to display after the search field
@@ -27,7 +26,7 @@ interface IProps {
     autocompleteOptions?: AutoCompleteProps["options"];
 }
 
-export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, hasBottomGutter = true }: IProps) => {
+export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, removeBottomGutter }: IProps) => {
     const { t } = useTranslation();
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -46,7 +45,7 @@ export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, hasBott
                 options={autocompleteOptions}
                 onChange={(value) => scheduleSetSearch(value)}
                 onSelect={(value) => setSearch(value)}
-                className={classNames(styles.Search, { [styles.BottomGutter]: hasBottomGutter })}
+                className={`${styles.Search} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}
             >
                 <Input placeholder={t("search")} addonAfter={addonAfter} />
             </AutoComplete>
@@ -58,7 +57,7 @@ export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, hasBott
             placeholder={t("search")}
             addonAfter={addonAfter}
             onChange={(e) => scheduleSetSearch(e.target.value)}
-            className={classNames(styles.Search, { [styles.BottomGutter]: hasBottomGutter })}
+            className={`${styles.Search} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}
         />
     );
 };

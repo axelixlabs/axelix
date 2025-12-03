@@ -5,17 +5,21 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { extractErrorCode } from "helpers";
-import { type IErrorResponse, type IRunnable, StatelessRequest } from "models";
-import { updateScheduledTasksStatus } from "services";
+import { type ICacheData, type IErrorResponse, StatelessRequest } from "models";
+import { updateCacheStatus } from "services";
 
 interface IProps {
     /**
-     * Any runnable task that can be turned off or turned on
+     * Name of the cache manager
      */
-    runnable: IRunnable;
+    cacheManagerName: string;
+    /**
+     * Single cache data
+     */
+    cache: ICacheData;
 }
 
-export const OnOffSwitch = ({ runnable }: IProps) => {
+export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const [messageApi, contextHolder] = message.useMessage();
@@ -24,15 +28,15 @@ export const OnOffSwitch = ({ runnable }: IProps) => {
     const switchTaskStatus = () => {
         setMutationRequest(StatelessRequest.loading());
 
-        updateScheduledTasksStatus({
-            force: false,
+        updateCacheStatus({
             instanceId: instanceId!,
-            statusType: runnable.enabled ? "disable" : "enable",
-            targetScheduledTask: runnable.runnable.target,
+            cacheManagerName: cacheManagerName,
+            cacheName: cache.name,
+            statusType: cache.enabled ? "disable" : "enable",
         })
             .then(() => {
-                messageApi.success(t(`${runnable.enabled ? "ScheduledTasks.disabled" : "ScheduledTasks.enabled"}`));
-                runnable.enabled = !runnable.enabled;
+                messageApi.success(t(`${cache.enabled ? "Caches.disabled" : "Caches.enabled"}`));
+                cache.enabled = !cache.enabled;
                 setMutationRequest(StatelessRequest.success());
             })
             .catch((error: AxiosError<IErrorResponse>) => {
@@ -44,11 +48,11 @@ export const OnOffSwitch = ({ runnable }: IProps) => {
         <>
             {contextHolder}
             <Switch
-                checkedChildren={t("ScheduledTasks.on")}
-                unCheckedChildren={t("ScheduledTasks.off")}
+                checkedChildren={t("on")}
+                unCheckedChildren={t("off")}
                 onChange={() => switchTaskStatus()}
                 loading={mutationRequest.loading}
-                checked={runnable.enabled}
+                checked={cache.enabled}
             />
         </>
     );

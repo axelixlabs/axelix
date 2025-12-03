@@ -18,3 +18,31 @@ export const clearCacheData = (data: IClearCacheRequestData) => {
         },
     });
 };
+
+interface IUpdateCacheStatusRequestData {
+    /**
+     * Instance id of service
+     */
+    instanceId: string;
+
+    /**
+     * Name of the cache manager
+     */
+    cacheManagerName: string;
+
+    /**
+     * Name of the cache
+     */
+    cacheName: string;
+
+    /**
+     * Cache capabilities
+     */
+    statusType: "enable" | "disable";
+}
+
+export const updateCacheStatus = (data: IUpdateCacheStatusRequestData) => {
+    const { instanceId, cacheManagerName, statusType, cacheName } = data;
+
+    return apiFetch.post(`caches/${instanceId}/${cacheManagerName}/${cacheName}/${statusType}`);
+};

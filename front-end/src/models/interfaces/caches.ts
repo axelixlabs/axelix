@@ -7,6 +7,10 @@ export interface ICacheData {
      * Target of the cache
      */
     target: string;
+    /**
+     * When true, caching is active; when false, caching is inactive
+     */
+    enabled: boolean;
 }
 
 export interface ICachesManager {

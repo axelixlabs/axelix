@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import { useTranslation } from "react-i18next";
 
 import { Accordion } from "components";
 import type { ICachesManager } from "models";
@@ -15,19 +15,24 @@ interface IProps {
 }
 
 export const CacheManagerSection = ({ cacheManager }: IProps) => {
+    const { t } = useTranslation();
+
     return (
         <div className={styles.CacheManagerWrapper}>
-            <div className={styles.CacheManagerTopSection}>
-                <div className={classNames("TextMedium", styles.CacheManagerName)}>{cacheManager.name}</div>
-            </div>
-            <div className="AccordionsWrapper">
+            <div className="CustomizedAntdTable">
+                <div className={`TableHeader ${styles.CacheManagerHeader}`}>
+                    <div className={`RowChunk ${styles.CacheManagerName}`}>
+                        {t("Caches.target")}: {cacheManager.name}
+                    </div>
+                    <div className={`RowChunk ${styles.RowChunk}`}>{t("Caches.clear")}</div>
+                    <div className={`RowChunk ${styles.RowChunk}`}>{t("status")}</div>
+                </div>
                 {cacheManager.caches.map((cache) => (
                     <Accordion
                         header={<CacheAccordionHeader cacheManagerName={cacheManager.name} cache={cache} />}
+                        headerStyles={styles.HeaderStyles}
                         children={<></>}
                         key={cache.name}
-                        // todo add handler in future
-                        // onChange={(key) => setActiveKey(key)}
                     />
                 ))}
             </div>

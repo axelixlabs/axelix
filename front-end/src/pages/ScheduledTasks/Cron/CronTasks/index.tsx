@@ -19,7 +19,7 @@ export const CronTasks = ({ cronTasks }: IProps) => {
 
     return (
         <>
-            <div key="cron" className={styles.SectionWrapper}>
+            <div className={styles.SectionWrapper}>
                 <div className={`TextMedium ${styles.TaskType}`}>{t("ScheduledTasks.cron")}</div>
 
                 <div className="CustomizedAntdTable">
