@@ -85,4 +85,12 @@ public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
             throw new UnsupportedOperationException();
         }
     }
+
+    public boolean isCacheEnabled(String cacheName) {
+        if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
+            return enhancedCacheManager.isCacheEnabled(cacheName);
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
 }

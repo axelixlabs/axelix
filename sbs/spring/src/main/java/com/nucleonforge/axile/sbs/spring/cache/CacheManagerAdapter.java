@@ -67,4 +67,12 @@ public interface CacheManagerAdapter {
      * @param cacheName the name of the cache to disable
      */
     void disableCache(String cacheName);
+
+    /**
+     * Check if a specific cache is currently enabled.
+     *
+     * @param cacheName the name of the cache to check
+     * @return {@code true} if the cache is enabled, {@code false} if it's disabled
+     */
+    boolean isCacheEnabled(String cacheName);
 }

@@ -4,7 +4,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axile.common.api.caches.ServiceCaches;
+import com.nucleonforge.axile.common.api.caches.CachesFeed;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
@@ -17,10 +17,10 @@ import com.nucleonforge.axile.master.service.transport.AbstractEndpointProber;
  * @author Sergey Cherkasov
  */
 @Service
-public class GetAllCachesEndpointProber extends AbstractEndpointProber<ServiceCaches> {
+public class GetAllCachesEndpointProber extends AbstractEndpointProber<CachesFeed> {
     public GetAllCachesEndpointProber(
             InstanceRegistry instanceRegistry,
-            MessageDeserializationStrategy<ServiceCaches> messageDeserializationStrategy) {
+            MessageDeserializationStrategy<CachesFeed> messageDeserializationStrategy) {
         super(instanceRegistry, messageDeserializationStrategy);
     }
 

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nucleonforge.axile.common.api.caches.ServiceCaches;
+import com.nucleonforge.axile.common.api.caches.CachesFeed;
 import com.nucleonforge.axile.common.api.caches.SingleCache;
 import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axile.common.domain.http.HttpPayload;
@@ -46,17 +46,17 @@ public class CachesReadApi {
 
     private final GetAllCachesEndpointProber getAllCachesEndpointProber;
     private final GetCacheByNameEndpointProber getCacheByNameEndpointProber;
-    private final Converter<ServiceCaches, CachesResponse> serviceCachesConverter;
+    private final Converter<CachesFeed, CachesResponse> cachesFeedConverter;
     private final Converter<SingleCache, CacheProfileResponse> singleCacheConverter;
 
     public CachesReadApi(
             GetAllCachesEndpointProber getAllCachesEndpointProber,
             GetCacheByNameEndpointProber getCacheByNameEndpointProber,
-            Converter<ServiceCaches, CachesResponse> serviceCachesConverter,
+            Converter<CachesFeed, CachesResponse> cachesFeedConverter,
             Converter<SingleCache, CacheProfileResponse> singleCacheConverter) {
         this.getAllCachesEndpointProber = getAllCachesEndpointProber;
         this.getCacheByNameEndpointProber = getCacheByNameEndpointProber;
-        this.serviceCachesConverter = serviceCachesConverter;
+        this.cachesFeedConverter = cachesFeedConverter;
         this.singleCacheConverter = singleCacheConverter;
     }
 
@@ -93,8 +93,8 @@ public class CachesReadApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.CachesApi.INSTANCE_ID)
     public CachesResponse getAllCaches(@PathVariable("instanceId") String instanceId) {
-        ServiceCaches response = getAllCachesEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(serviceCachesConverter.convert(response));
+        CachesFeed response = getAllCachesEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        return Objects.requireNonNull(cachesFeedConverter.convert(response));
     }
 
     @Operation(

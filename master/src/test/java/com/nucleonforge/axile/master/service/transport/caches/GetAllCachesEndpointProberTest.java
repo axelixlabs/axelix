@@ -1,7 +1,7 @@
 package com.nucleonforge.axile.master.service.transport.caches;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axile.common.api.caches.ServiceCaches;
+import com.nucleonforge.axile.common.api.caches.CachesFeed;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
@@ -61,28 +61,36 @@ public class GetAllCachesEndpointProberTest {
         // language=json
         String jsonResponse =
                 """
-                    {
-                   "cacheManagers" : {
-                     "anotherCacheManager" : {
-                       "caches" : {
-                         "countries" : {
-                           "target" : "java.util.concurrent.ConcurrentHashMap"
-                         }
-                       }
-                     },
-                     "cacheManager" : {
-                       "caches" : {
-                         "cities" : {
-                           "target" : "java.util.concurrent.ConcurrentHashMap"
-                         },
-                         "countries" : {
-                           "target" : "java.util.concurrent.ConcurrentHashMap"
-                         }
-                       }
-                     }
-                   }
-                 }
-                """;
+        {
+          "cacheManagers" : [
+            {
+              "name": "anotherCacheManager",
+              "caches": [
+                {
+                  "name": "countries",
+                  "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "enabled": true
+                }
+              ]
+            },
+            {
+            "name": "cacheManager",
+              "caches": [
+                {
+                  "name": "cities",
+                  "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "enabled": false
+                },
+                {
+                  "name": "countries",
+                  "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "enabled": true
+                }
+              ]
+            }
+          ]
+        }
+        """;
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -90,7 +98,7 @@ public class GetAllCachesEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/caches")) {
+                if (path.equals("/" + activeInstanceId + "/axile-caches")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -107,27 +115,46 @@ public class GetAllCachesEndpointProberTest {
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
         // when.
-        ServiceCaches caches =
-                getAllCachesEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
+        CachesFeed caches = getAllCachesEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
         // ServiceCaches -> CacheManagers
-        Map<String, ServiceCaches.CacheManagers> cacheManagers = caches.cacheManagers();
-        assertThat(cacheManagers).hasSize(2).containsKeys("anotherCacheManager", "cacheManager");
+        List<CachesFeed.CacheManagers> cacheManagersList = caches.cacheManagers();
+        assertThat(cacheManagersList).hasSize(2);
 
-        // CacheManagers -> "anotherCacheManager"
-        ServiceCaches.CacheManagers another = cacheManagers.get("anotherCacheManager");
-        assertThat(another.caches()).hasSize(1).containsKey("countries");
+        CachesFeed.CacheManagers another = cacheManagersList.stream()
+                .filter(cm -> "anotherCacheManager".equals(cm.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(another.caches()).hasSize(1);
+
+        CachesFeed.CacheManagers main = cacheManagersList.stream()
+                .filter(cm -> "cacheManager".equals(cm.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(main.caches()).hasSize(2);
 
         // "anotherCacheManager" -> Caches -> "countries"
-        assertThat(another.caches().get("countries").target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
-
-        // CacheManagers -> "cacheManager"
-        ServiceCaches.CacheManagers main = cacheManagers.get("cacheManager");
-        assertThat(main.caches()).hasSize(2).containsKeys("cities", "countries");
+        CachesFeed.Caches anotherCountries = another.caches().stream()
+                .filter(c -> "countries".equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(anotherCountries.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        assertThat(anotherCountries.enabled()).isTrue();
 
         // "cacheManager" -> Caches -> "countries"
-        assertThat(main.caches().get("cities").target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        CachesFeed.Caches mainCountries = main.caches().stream()
+                .filter(c -> "countries".equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(mainCountries.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        assertThat(mainCountries.enabled()).isTrue();
+
         // "cacheManager" -> Caches -> "cities"
-        assertThat(main.caches().get("countries").target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        CachesFeed.Caches mainCities = main.caches().stream()
+                .filter(c -> "cities".equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(mainCities.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        assertThat(mainCities.enabled()).isFalse();
     }
 }
