@@ -12,6 +12,7 @@ const theme = {
         fontFamily: "'Golos', sans-serif",
         fontSize: 15,
     },
+    components: { Tooltip: { zIndexPopup: 500, maxWidth: 600 } },
 };
 
 createRoot(document.getElementById("root")!).render(
