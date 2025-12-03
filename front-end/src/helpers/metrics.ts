@@ -86,22 +86,24 @@ export const extractUniqueMetricTagKeys = (validTagCombinations: IValidTagCombin
 export const extractUniqueMetricValuesPerKey = (
     uniqueTagKeys: string[],
     validTagCombinations: IValidTagCombination[],
-    selected: Record<string, string>,
+    selectedTags: Record<string, string>,
 ): string[][] => {
-    return uniqueTagKeys.map((key, level) => {
-        const previewKeys = uniqueTagKeys.slice(0, level);
+    return uniqueTagKeys.map((key, index) => {
+        const previewKeys = uniqueTagKeys.slice(0, index);
 
         const values = validTagCombinations
             .filter((combination) =>
                 previewKeys.every((previewKey) => {
-                    const selectedValue = selected[previewKey];
+                    const selectedValue = selectedTags[previewKey];
                     return !selectedValue || (combination[previewKey] ?? "") === selectedValue;
                 }),
             )
             .map((combination) => combination[key] ?? "")
             .filter(Boolean);
 
-        return Array.from(new Set(values));
+        const uniqueMetricValues = new Set(values);
+
+        return Array.from(uniqueMetricValues);
     });
 };
 
