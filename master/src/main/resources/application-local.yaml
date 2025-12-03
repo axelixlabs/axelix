@@ -1,15 +1,8 @@
+server:
+  port: 8080
+
 axelix:
   master:
-    discovery:
-      auto: true
-      platform: kubernetes
-      kubernetes:
-        kube-apiserver-url: https://158.160.194.14:443
-        # Should be set-up in local .env file or by any other means
-        sa-token-path: ${LOCAL_TOKEN_PATH:}
-        ca-cert-path: ${LOCAL_CA_PATH:}
-        filters:
-          namespaces: default
     auth:
       jwt:
         algorithm: HMAC512
@@ -32,3 +25,36 @@ management:
     web:
       exposure:
         include: [ "health" ]
+---
+spring:
+  profiles:
+    active: kubernetes
+
+axelix:
+  master:
+    discovery:
+      auto: true
+      platform: kubernetes
+      kubernetes:
+        kube-apiserver-url: https://158.160.194.14:443
+        # Should be set-up in local .env file or by any other means
+        sa-token-path: ${LOCAL_TOKEN_PATH:}
+        ca-cert-path: ${LOCAL_CA_PATH:}
+        filters:
+          namespaces: default
+
+---
+spring:
+  profiles:
+    active: docker
+
+axelix:
+  master:
+    discovery:
+      auto: true
+      platform: docker
+      docker:
+        filters:
+          networks-name:
+            - bridge
+            - draft

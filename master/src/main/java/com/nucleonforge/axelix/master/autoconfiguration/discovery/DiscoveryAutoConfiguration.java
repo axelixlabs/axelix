@@ -20,7 +20,15 @@ package com.nucleonforge.axelix.master.autoconfiguration.discovery;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.DockerClientImpl;
+import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.nucleonforge.axelix.master.service.discovery.docker.DockerDiscoveryClient;
+import com.nucleonforge.axelix.master.service.discovery.docker.DockerInstanceDiscoverer;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
@@ -93,6 +101,48 @@ public class DiscoveryAutoConfiguration {
                 AxelixVersionDiscoverer axelixVersionDiscoverer) {
             return new KubernetesInstanceDiscoverer(
                     discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
+        }
+    }
+
+    @AutoConfiguration
+    @ConditionalOnProperty(prefix = "axile.master.discovery", name = "platform", havingValue = "docker")
+    static class DockerDiscoveryAutoConfiguration {
+        @Bean
+        @ConfigurationProperties(prefix = "axile.master.discovery.docker")
+        public DockerDiscoveryProperties dockerDiscoveryProperties() {
+            return new DockerDiscoveryProperties();
+        }
+
+        @Bean
+        public DockerClient dockerClient() {
+            // We may encounter issues described in this article
+            // https://javanexus.com/blog/docker-rest-api-issues-java-developers
+            DockerClientConfig config =
+                DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+
+            ApacheDockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
+                .dockerHost(config.getDockerHost())
+                .sslConfig(config.getSSLConfig())
+                .maxConnections(100)
+                .connectionTimeout(Duration.ofSeconds(30))
+                .responseTimeout(Duration.ofSeconds(45))
+                .maxConnections(200)
+                .build();
+
+            return DockerClientImpl.getInstance(config, httpClient);
+        }
+
+        @Bean
+        public DiscoveryClient dockerDiscoveryClient(
+            DockerClient dockerClient, DockerDiscoveryProperties dockerDiscoveryProperties) {
+            return new DockerDiscoveryClient(dockerClient, dockerDiscoveryProperties.getFilters());
+        }
+
+        @Bean
+        public DockerInstanceDiscoverer dockerInstanceDiscoverer(
+            DiscoveryClient discoveryClient,
+            ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber) {
+            return new DockerInstanceDiscoverer(discoveryClient, managedServiceMetadataEndpointProber);
         }
     }
 }

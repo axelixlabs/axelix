@@ -24,6 +24,11 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.paypal:heap-dump-tool:${heapDumpToolVersion}")
 
+    implementation("com.github.docker-java:docker-java:3.6.0")
+    implementation("com.github.docker-java:docker-java-transport-httpclient5:3.6.0")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
+    implementation("org.apache.httpcomponents.core5:httpcore5:5.3.6")
+
     // Runtime
     runtimeOnly("ch.qos.logback:logback-classic")
 
