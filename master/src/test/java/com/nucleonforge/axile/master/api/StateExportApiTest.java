@@ -193,16 +193,19 @@ class StateExportApiTest {
         String jsonCacheResponse =
                 // language=json
                 """
+    {
+      "cacheManagers" : [
         {
-      "cacheManagers" : {
-        "cacheManager" : {
-          "caches" : {
-            "cities" : {
-              "target" : "java.util.concurrent.ConcurrentHashMap"
+          "name": "anotherCacheManager",
+          "caches": [
+            {
+              "name": "countries",
+              "target" : "java.util.concurrent.ConcurrentHashMap",
+              "enabled": true
             }
-          }
+          ]
         }
-      }
+      ]
     }
     """;
 
@@ -326,7 +329,7 @@ class StateExportApiTest {
                     return new MockResponse()
                             .setBody(jsonConditionsResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/caches")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axile-caches")) {
                     return new MockResponse()
                             .setBody(jsonCacheResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

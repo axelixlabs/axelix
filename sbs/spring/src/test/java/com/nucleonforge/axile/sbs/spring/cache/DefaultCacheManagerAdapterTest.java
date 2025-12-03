@@ -242,4 +242,81 @@ class DefaultCacheManagerAdapterTest {
         assertThat(cache1.get("key3")).isNotNull();
         assertThat(cache2.get("key4")).isNotNull();
     }
+
+    @Test
+    void isCacheEnabled_shouldReturnTrueForEnabledCacheInEnhancedCacheManager() {
+        EnhancedCacheManager enhancedCacheManager = new EnhancedCacheManager(cacheManager);
+        CacheManagerAdapter enhancedAdapter = new DefaultCacheManagerAdapter(enhancedCacheManager);
+
+        String cacheName = "cache";
+        enhancedCacheManager.getCache(cacheName);
+
+        assertThat(enhancedAdapter.isCacheEnabled(cacheName)).isTrue();
+    }
+
+    @Test
+    void isCacheEnabled_shouldReturnFalseForDisabledCacheInEnhancedCacheManager() {
+        EnhancedCacheManager enhancedCacheManager = new EnhancedCacheManager(cacheManager);
+        CacheManagerAdapter enhancedAdapter = new DefaultCacheManagerAdapter(enhancedCacheManager);
+
+        String cacheName = "cache";
+        enhancedCacheManager.getCache(cacheName);
+        enhancedCacheManager.disableCache(cacheName);
+
+        assertThat(enhancedAdapter.isCacheEnabled(cacheName)).isFalse();
+    }
+
+    @Test
+    void isCacheEnabled_shouldReturnTrueAfterEnableDisableCacheInEnhancedCacheManager() {
+        EnhancedCacheManager enhancedCacheManager = new EnhancedCacheManager(cacheManager);
+        CacheManagerAdapter enhancedAdapter = new DefaultCacheManagerAdapter(enhancedCacheManager);
+
+        String cacheName = "cache";
+        enhancedCacheManager.disableCache(cacheName);
+        enhancedCacheManager.enableCache(cacheName);
+
+        assertThat(enhancedAdapter.isCacheEnabled(cacheName)).isTrue();
+    }
+
+    @Test
+    void isCacheEnabled_shouldReturnFalseWhenCacheManagerDisabledInEnhancedCacheManager() {
+        EnhancedCacheManager enhancedCacheManager = new EnhancedCacheManager(cacheManager);
+        CacheManagerAdapter enhancedAdapter = new DefaultCacheManagerAdapter(enhancedCacheManager);
+
+        String cacheName1 = "cache1";
+        String cacheName2 = "cache2";
+        enhancedCacheManager.getCache(cacheName1);
+        enhancedCacheManager.getCache(cacheName2);
+        enhancedCacheManager.disableAllCaches();
+
+        assertThat(enhancedAdapter.isCacheEnabled(cacheName1)).isFalse();
+        assertThat(enhancedAdapter.isCacheEnabled(cacheName2)).isFalse();
+    }
+
+    @Test
+    void isCacheEnabled_shouldWorkWithMultipleCachesInEnhancedCacheManager() {
+        EnhancedCacheManager enhancedCacheManager = new EnhancedCacheManager(cacheManager);
+        CacheManagerAdapter enhancedAdapter = new DefaultCacheManagerAdapter(enhancedCacheManager);
+
+        String[] cacheNames = {"cache1", "cache2", "cache3"};
+
+        for (String cacheName : cacheNames) {
+            enhancedCacheManager.getCache(cacheName);
+        }
+
+        enhancedCacheManager.disableCache("cache2");
+
+        assertThat(enhancedAdapter.isCacheEnabled("cache1")).isTrue();
+        assertThat(enhancedAdapter.isCacheEnabled("cache2")).isFalse();
+        assertThat(enhancedAdapter.isCacheEnabled("cache3")).isTrue();
+    }
+
+    @Test
+    void isCacheEnabled_shouldThrowExceptionWhenNotEnhancedCacheManager() {
+        CacheManager regularCacheManager = new ConcurrentMapCacheManager();
+        CacheManagerAdapter regularAdapter = new DefaultCacheManagerAdapter(regularCacheManager);
+
+        assertThatThrownBy(() -> regularAdapter.isCacheEnabled("cache"))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
 }

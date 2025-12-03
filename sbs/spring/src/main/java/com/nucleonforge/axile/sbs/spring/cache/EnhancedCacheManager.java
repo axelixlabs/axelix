@@ -96,4 +96,20 @@ public final class EnhancedCacheManager implements CacheManager {
             disableCache(cacheName);
         }
     }
+
+    /**
+     * Check if a specific cache is currently enabled.
+     *
+     * @param cacheName the name of the cache to check
+     * @return {@code true} if the cache exists and is enabled, {@code false} otherwise
+     */
+    public boolean isCacheEnabled(String cacheName) {
+        Cache cache = this.getCache(cacheName);
+
+        if (cache != null) {
+            return ((EnhancedCache) cache).isEnabled();
+        }
+
+        return false;
+    }
 }

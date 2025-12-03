@@ -65,26 +65,34 @@ public class CachesReadApiTest {
         String responseFromManagedService =
                 // language=json
                 """
+        {
+          "cacheManagers" : [
             {
-          "cacheManagers" : {
-            "anotherCacheManager" : {
-              "caches" : {
-                "countries" : {
-                  "target" : "java.util.concurrent.ConcurrentHashMap"
+              "name": "anotherCacheManager",
+              "caches": [
+                {
+                  "name": "countries",
+                  "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "enabled": true
                 }
-              }
+              ]
             },
-            "cacheManager" : {
-              "caches" : {
-                "cities" : {
-                  "target" : "java.util.concurrent.ConcurrentHashMap"
+            {
+            "name": "cacheManager",
+              "caches": [
+                {
+                  "name": "cities",
+                  "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "enabled": false
                 },
-                "countries" : {
-                  "target" : "java.util.concurrent.ConcurrentHashMap"
+                {
+                  "name": "countries",
+                  "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "enabled": true
                 }
-              }
+              ]
             }
-          }
+          ]
         }
         """;
 
@@ -94,7 +102,7 @@ public class CachesReadApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/actuator/caches")) {
+                if (path.equals("/actuator/axile-caches")) {
                     return new MockResponse()
                             .setBody(responseFromManagedService)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -128,7 +136,7 @@ public class CachesReadApiTest {
                 {
                   "name": "cities",
                   "target": "java.util.concurrent.ConcurrentHashMap",
-                  "enabled" : true
+                  "enabled" : false
                 },
                 {
                   "name": "countries",

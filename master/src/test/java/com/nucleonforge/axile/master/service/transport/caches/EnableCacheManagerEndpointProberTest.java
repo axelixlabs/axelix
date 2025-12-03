@@ -67,7 +67,7 @@ class EnableCacheManagerEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/cache-dispatcher/cacheManager/enable")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axile-caches/cacheManager/enable")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);

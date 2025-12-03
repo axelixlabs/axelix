@@ -209,6 +209,71 @@ class DefaultCacheDispatcherTest {
     }
 
     @Test
+    void isCacheEnabled_shouldReturnTrueForEnabledCache() {
+        String cacheManagerName = "cacheManager1";
+        String cacheName = "cache";
+        Cache cache = cacheManager1.getCache(cacheName);
+        assertThat(cache).isNotNull();
+
+        assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName)).isTrue();
+    }
+
+    @Test
+    void isCacheEnabled_shouldReturnFalseForDisabledCache() {
+        String cacheManagerName = "cacheManager1";
+        String cacheName = "cache";
+        Cache cache = cacheManager1.getCache(cacheName);
+        assertThat(cache).isNotNull();
+
+        dispatcher.disableCache(cacheManagerName, cacheName);
+
+        assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName)).isFalse();
+    }
+
+    @Test
+    void isCacheEnabled_shouldReturnTrueAfterDisableEnableCache() {
+        String cacheManagerName = "cacheManager1";
+        String cacheName = "cache";
+        Cache cache = cacheManager1.getCache(cacheName);
+        assertThat(cache).isNotNull();
+
+        dispatcher.disableCache(cacheManagerName, cacheName);
+        dispatcher.enableCache(cacheManagerName, cacheName);
+
+        assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName)).isTrue();
+    }
+
+    @Test
+    void isCacheEnabled_shouldReturnFalseWhenCacheManagerDisabled() {
+        String cacheManagerName = "cacheManager1";
+        String cacheName1 = "cache1";
+        cacheManager1.getCache(cacheName1);
+        String cacheName2 = "cache2";
+        cacheManager1.getCache(cacheName2);
+
+        dispatcher.disableCacheManager(cacheManagerName);
+
+        assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName1)).isFalse();
+        assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName2)).isFalse();
+    }
+
+    @Test
+    void isCacheEnabled_shouldReturnTrueWhenCacheManagerDisableEnable() {
+        String cacheManagerName = "cacheManager1";
+        String cacheName = "cache";
+        Cache cache = cacheManager1.getCache(cacheName);
+        assertThat(cache).isNotNull();
+
+        dispatcher.disableCacheManager(cacheManagerName);
+
+        assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName)).isFalse();
+
+        dispatcher.enableCacheManager(cacheManagerName);
+
+        assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName)).isTrue();
+    }
+
+    @Test
     void enableCacheManager_shouldThrowExceptionForNonExistentManager() {
         assertThatThrownBy(() -> dispatcher.enableCacheManager("nonExistentManager"))
                 .isInstanceOf(CacheManagerAdapterNotFoundException.class)

@@ -20,7 +20,6 @@ management:
           - health
           - axile-metadata
           - property-management
-          - cache-dispatcher
           - profile-management
           - beans
           - env
@@ -28,6 +27,7 @@ management:
           - axile-metrics
           - configprops
           - axile-configprops
+          - axile-caches
 
 logging:
   level:
