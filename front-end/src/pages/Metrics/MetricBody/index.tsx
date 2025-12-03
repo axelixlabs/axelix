@@ -38,7 +38,7 @@ export const MetricBody = ({ metric }: IProps) => {
             getSingleMetricData({
                 instanceId: instanceId!,
                 metric: metric.metricName,
-                tags: selectedTagParams,
+                selectedTagParams: selectedTagParams,
             }),
         );
     }, [selectedTags]);
@@ -53,31 +53,29 @@ export const MetricBody = ({ metric }: IProps) => {
 
     const singleMetricFeed = singleMetricData.response!;
     const singleMetricFeedMeasurements = singleMetricFeed.measurements;
-    const singleMetricValidTagCombinations = singleMetricFeed.validTagCombinations;
-
-    const validTagCombinations: IValidTagCombination[] = singleMetricValidTagCombinations;
+    const validTagCombinations: IValidTagCombination[] = singleMetricFeed.validTagCombinations;
 
     const uniqueTagKeys = extractUniqueMetricTagKeys(validTagCombinations);
     const valuesPerKey = extractUniqueMetricValuesPerKey(uniqueTagKeys, validTagCombinations, selectedTags);
 
-    const handleSelectChange = (key: string, value?: string) => {
+    const handleSelectChange = (key: string, selectedValue?: string) => {
         setSelectedTags((prev) => {
-            const next: Record<string, string> = { ...prev };
+            const updatedTags: Record<string, string> = { ...prev };
 
-            if (value) {
-                next[key] = value;
+            if (selectedValue) {
+                updatedTags[key] = selectedValue;
             } else {
-                delete next[key];
+                delete updatedTags[key];
             }
 
-            const idx = uniqueTagKeys.indexOf(key);
-            if (idx !== -1) {
-                for (let i = idx + 1; i < uniqueTagKeys.length; i++) {
-                    delete next[uniqueTagKeys[i]];
+            const keyIndex = uniqueTagKeys.indexOf(key);
+            if (keyIndex !== -1) {
+                for (let nextIndex = keyIndex + 1; nextIndex < uniqueTagKeys.length; nextIndex++) {
+                    delete updatedTags[uniqueTagKeys[nextIndex]];
                 }
             }
 
-            return next;
+            return updatedTags;
         });
     };
 

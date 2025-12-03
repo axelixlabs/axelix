@@ -87,5 +87,9 @@ export interface IGetSingleMetricRequestData {
      * Metric name
      */
     metric: string;
-    tags: string[];
+
+    /**
+     * List of selected tag params
+     */
+    selectedTagParams: string[];
 }
