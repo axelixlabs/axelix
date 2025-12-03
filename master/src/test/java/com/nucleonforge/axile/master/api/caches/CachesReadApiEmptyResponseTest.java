@@ -65,7 +65,7 @@ public class CachesReadApiEmptyResponseTest {
         // language=json
         String jsonResponse = """
             {
-              "cacheManagers" : {}
+              "cacheManagers" : []
             }
             """;
 
@@ -75,7 +75,7 @@ public class CachesReadApiEmptyResponseTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/caches")) {
+                if (path.equals("/" + activeInstanceId + "/axile-caches")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

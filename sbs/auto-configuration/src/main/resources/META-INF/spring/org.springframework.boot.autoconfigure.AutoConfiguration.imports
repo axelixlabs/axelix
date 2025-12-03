@@ -1,5 +1,5 @@
 com.nucleonforge.axile.sbs.autoconfiguration.spring.BeanAnalyzerAutoConfiguration
-com.nucleonforge.axile.sbs.autoconfiguration.spring.CacheDispatcherAutoConfiguration
+com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileCachesEndpointAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.spring.SpringCloudFeignAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.spring.ContextRestarterAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.spring.PropertyManagementAutoConfiguration

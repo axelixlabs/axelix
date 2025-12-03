@@ -3,6 +3,7 @@ package com.nucleonforge.axile.sbs.spring.cache;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.cache.CachesEndpoint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -18,27 +19,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.nucleonforge.axile.Main;
+import com.nucleonforge.axile.common.api.caches.CachesFeed;
+import com.nucleonforge.axile.common.api.caches.CachesFeed.CacheManagers;
+import com.nucleonforge.axile.common.api.caches.CachesFeed.Caches;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link CacheDispatcherEndpoint}.
+ * Integration tests for {@link AxileCachesEndpoint}.
  *
  * @since 24.06.2025
  * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
 @Import({
-    CacheDispatcherEndpoint.class,
+    AxileCachesEndpoint.class,
     DefaultCacheDispatcher.class,
-    CacheDispatcherEndpointTest.CacheDispatcherEndpointTestConfiguration.class
+    AxileCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class,
+    CachesEndpoint.class
 })
 
 // TODO:
 //  This is required since we tinker with caches. However, ideally, we should clean everything up in
 //  BeforeEach callback or some sort.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class CacheDispatcherEndpointTest {
+class AxileCachesEndpointTest {
 
     @Autowired
     private CacheManager cacheManager;
@@ -209,6 +214,146 @@ class CacheDispatcherEndpointTest {
         assertThat(disabledCache.get("key2")).isNull();
     }
 
+    @Test
+    void caches_shouldReturnAllCachesWithEnabledStatus() {
+        cacheManager.getCache("cache1");
+        cacheManager.getCache("cache2");
+
+        ResponseEntity<CachesFeed> response = testRestTemplate.getForEntity(path(""), CachesFeed.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        CachesFeed cachesFeed = response.getBody();
+
+        CacheManagers cacheManagers = cachesFeed.cacheManagers().stream()
+                .filter(cm -> "cacheManager".equals(cm.name()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(cacheManagers.caches()).hasSize(2);
+
+        Caches cache1Info = cacheManagers.caches().stream()
+                .filter(c -> "cache1".equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(cache1Info.enabled()).isTrue();
+        assertThat(cache1Info.target()).isNotNull();
+
+        Caches cache2Info = cacheManagers.caches().stream()
+                .filter(c -> "cache2".equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(cache2Info.enabled()).isTrue();
+        assertThat(cache2Info.target()).isNotNull();
+    }
+
+    @Test
+    void caches_shouldShowDisableEnabledCache() {
+        cacheManager.getCache("cache");
+
+        testRestTemplate.postForObject(path("/cacheManager/cache/disable"), defaultEntity(), Void.class);
+
+        ResponseEntity<CachesFeed> afterDisablingResponse = testRestTemplate.getForEntity(path(""), CachesFeed.class);
+        assertThat(afterDisablingResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        CacheManagers disabledCacheManager = afterDisablingResponse.getBody().cacheManagers().stream()
+                .filter(cm -> "cacheManager".equals(cm.name()))
+                .findFirst()
+                .orElseThrow();
+
+        Caches disabledCache = disabledCacheManager.caches().stream()
+                .filter(c -> "cache".equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(disabledCache.enabled()).isFalse();
+
+        testRestTemplate.postForObject(path("/cacheManager/cache/enable"), defaultEntity(), Void.class);
+
+        ResponseEntity<CachesFeed> afterEnablingResponse = testRestTemplate.getForEntity(path(""), CachesFeed.class);
+        assertThat(afterEnablingResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        CacheManagers enabledCacheManager = afterEnablingResponse.getBody().cacheManagers().stream()
+                .filter(cm -> "cacheManager".equals(cm.name()))
+                .findFirst()
+                .orElseThrow();
+
+        Caches enabledCache = enabledCacheManager.caches().stream()
+                .filter(c -> "cache".equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(enabledCache.enabled()).isTrue();
+    }
+
+    @Test
+    void caches_shouldShowAllCachesDisabledWhenManagerIsDisabled() {
+        cacheManager.getCache("cache1");
+        cacheManager.getCache("cache2");
+
+        testRestTemplate.postForObject(path("/cacheManager/disable"), defaultEntity(), Void.class);
+
+        ResponseEntity<CachesFeed> response = testRestTemplate.getForEntity(path(""), CachesFeed.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        CacheManagers cacheManagers = response.getBody().cacheManagers().stream()
+                .filter(cm -> "cacheManager".equals(cm.name()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(cacheManagers.caches())
+                .allSatisfy(cacheInfo -> assertThat(cacheInfo.enabled()).isFalse());
+    }
+
+    @Test
+    void caches_shouldShowMixedEnabledStatusWhenSomeCachesAreDisabled() {
+        cacheManager.getCache("cache1");
+        cacheManager.getCache("cache2");
+
+        testRestTemplate.postForObject(path("/cacheManager/cache1/disable"), defaultEntity(), Void.class);
+
+        ResponseEntity<CachesFeed> response = testRestTemplate.getForEntity(path(""), CachesFeed.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        CacheManagers cacheManagers = response.getBody().cacheManagers().stream()
+                .filter(cm -> "cacheManager".equals(cm.name()))
+                .findFirst()
+                .orElseThrow();
+
+        Caches cache1Info = cacheManagers.caches().stream()
+                .filter(c -> "cache1".equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(cache1Info.enabled()).isFalse();
+
+        Caches cache2Info = cacheManagers.caches().stream()
+                .filter(c -> "cache2".equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(cache2Info.enabled()).isTrue();
+    }
+
+    @Test
+    void caches_shouldIncludeTargetInformation() {
+        cacheManager.getCache("cache");
+
+        ResponseEntity<CachesFeed> response = testRestTemplate.getForEntity(path(""), CachesFeed.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        CachesFeed.CacheManagers cacheManagers = response.getBody().cacheManagers().stream()
+                .filter(cm -> "cacheManager".equals(cm.name()))
+                .findFirst()
+                .orElseThrow();
+
+        Caches cacheInfo = cacheManagers.caches().stream()
+                .filter(c -> "cache".equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(cacheInfo.target()).isNotNull().isNotEmpty().contains("ConcurrentHashMap");
+    }
+
     // TODO: I'm not sure that this return 200 OK is the correct way of handling the non existent cache
     @Test
     void enableCache_shouldHandleNonExistentCache() {
@@ -280,7 +425,7 @@ class CacheDispatcherEndpointTest {
     }
 
     private String path(String relative) {
-        return "/actuator/cache-dispatcher" + relative;
+        return "/actuator/axile-caches" + relative;
     }
 
     @TestConfiguration

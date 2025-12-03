@@ -85,4 +85,16 @@ public class DefaultCacheDispatcher implements CacheDispatcher {
                     cacheManagerName, cacheName));
         }
     }
+
+    @Override
+    public boolean isCacheEnabled(String cacheManagerName, String cacheName) {
+        CacheManagerAdapter adapter = adapters.get(cacheManagerName);
+        if (adapter != null) {
+            return adapter.isCacheEnabled(cacheName);
+        } else {
+            throw new CacheManagerAdapterNotFoundException(String.format(
+                    "Adapter for cache manager '%s' not found. Cannot check enabled status for cache '%s'.",
+                    cacheManagerName, cacheName));
+        }
+    }
 }
