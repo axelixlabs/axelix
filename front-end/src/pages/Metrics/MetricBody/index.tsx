@@ -83,15 +83,15 @@ export const MetricBody = ({ metric }: IProps) => {
                     <>
                         <div>{t("Metrics.tags")}:</div>
                         <div className={styles.TagsWrapper}>
-                            {Object.entries(valuesPerKey).map(([tagName, possibleValues]) => (
-                                <Fragment key={tagName}>
-                                    <div>{tagName}:</div>
+                            {valuesPerKey.map((options) => (
+                                <Fragment key={options.tag}>
+                                    <div>{options.tag}:</div>
                                     <Select
-                                        value={selectedTags[tagName] || undefined}
-                                        onChange={(value) => handleSelectChange(tagName, value)}
+                                        value={selectedTags[options.tag] || undefined}
+                                        onChange={(it) => handleSelectChange(options.tag, it)}
                                         placeholder={t("Metrics.selectValue")}
-                                        options={possibleValues.map((value) => ({
-                                            value: value,
+                                        options={options.values.map((it) => ({
+                                            value: it,
                                         }))}
                                         allowClear
                                         className={styles.TagSelect}

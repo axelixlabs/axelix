@@ -1,4 +1,4 @@
-import type { IMetricsGroup, IValidTagCombination } from "models";
+import type { IMetricsGroup, ITagValueOption, IValidTagCombination } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
@@ -76,33 +76,6 @@ export const findMetricsCount = (metricsGroups: IMetricsGroup[]): number => {
     return metricsGroups.reduce((count, group) => count + group.metrics.length, 0);
 };
 
-const getValidTagCombinationsByFilters = (
-    validTagCombinations: IValidTagCombination[],
-    selectedTags: IValidTagCombination,
-) => {
-    const filterKeyAndValue = Object.entries(selectedTags);
-    return validTagCombinations.filter((validTagCombination) => {
-        return filterKeyAndValue.every(([key, value]) => validTagCombination[key] === value);
-    });
-};
-
-const getPossibleValuesofValidTagCombinationFields = (validTagCombinations: IValidTagCombination[]) => {
-    const uniques: Record<string, string[]> = {};
-    validTagCombinations.forEach((validTagCombination) => {
-        const validTagCombinationEntries = Object.entries(validTagCombination);
-        validTagCombinationEntries.forEach(([key, value]) => {
-            if (!(key in uniques)) {
-                uniques[key] = [];
-            }
-
-            if (!uniques[key].includes(value)) {
-                uniques[key].push(value);
-            }
-        });
-    });
-    return uniques;
-};
-
 /**
  * Returns possible tag values options. Contains possible values for all the tags.
  *
@@ -121,11 +94,31 @@ const getPossibleValuesofValidTagCombinationFields = (validTagCombinations: IVal
 export const extractUniqueMetricValuesPerKey = (
     validTagCombinations: IValidTagCombination[],
     selectedTags: IValidTagCombination,
-) => {
-    const validTagCombinationsByFilter = getValidTagCombinationsByFilters(validTagCombinations, selectedTags);
-    const validTagCombinationFieldsPossibleUniqueValues =
-        getPossibleValuesofValidTagCombinationFields(validTagCombinationsByFilter);
-    return validTagCombinationFieldsPossibleUniqueValues;
+): ITagValueOption[] => {
+    const selected = Object.entries(selectedTags);
+
+    const tagsPossibleValues = new Map<string, string[]>();
+
+    validTagCombinations
+        .filter((combination) => {
+            return selected.every(([key, value]) => combination[key] === value);
+        })
+        .forEach((combination) => {
+            Object.entries(combination).forEach(([tag, val]) => {
+                const values = tagsPossibleValues.get(tag) ?? [];
+                if (!values.includes(val)) {
+                    values.push(val);
+                }
+                tagsPossibleValues.set(tag, values);
+            });
+        });
+
+    return [...tagsPossibleValues.entries()].map(([tagName, tagValues]) => {
+        return {
+            tag: tagName,
+            values: tagValues,
+        };
+    });
 };
 
 export const buildSelectedTagParams = (selectedTags: Record<string, string>): string[] => {

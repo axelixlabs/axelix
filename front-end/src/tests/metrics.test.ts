@@ -51,39 +51,29 @@ describe("Check reduceDisplayedNumber function", () => {
 
 const validTagCombinations: IValidTagCombination[] = [
     {
-        "code.function": "area",
-        "code.namespace": "org.springframework",
-        error: "none",
-        exception: "none",
-        outcome: "SUCCESS",
+        a: "1",
+        b: "1",
+        c: "3",
     },
     {
-        "code.function": "cronTask",
-        "code.namespace": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
-        error: "none",
-        exception: "none",
-        outcome: "SUCCESS",
+        a: "1",
+        b: "1",
+        c: "4",
     },
     {
-        "code.function": "cronTask",
-        "code.namespace": "org.springframework.samples.petclinic",
-        error: "1",
-        exception: "none",
-        outcome: "SUCCESS",
+        a: "1",
+        b: "2",
+        c: "2",
     },
     {
-        "code.function": "alive",
-        "code.namespace": "org",
-        error: "none",
-        exception: "none",
-        outcome: "SUCCESS",
+        a: "1",
+        b: "2",
+        c: "3",
     },
     {
-        "code.function": "fixedDelayTask",
-        "code.namespace": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
-        error: "none",
-        exception: "none",
-        outcome: "SUCCESS",
+        a: "2",
+        b: "2",
+        c: "2",
     },
 ];
 
@@ -91,69 +81,59 @@ describe("Check extractUniqueMetricValuesPerKey function", () => {
     it("Returns all unique values for each key when no selected keys are provided", () => {
         const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, {});
 
-        expect(uniqueMetricValuesPerKey).toEqual({
-            "code.function": ["area", "cronTask", "alive", "fixedDelayTask"],
-            "code.namespace": [
-                "org.springframework",
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
-                "org.springframework.samples.petclinic",
-                "org",
-            ],
-            error: ["none", "1"],
-            exception: ["none"],
-            outcome: ["SUCCESS"],
-        });
+        expect(uniqueMetricValuesPerKey).toEqual([
+            {
+                tag: "a",
+                values: ["1", "2"],
+            },
+            {
+                tag: "b",
+                values: ["1", "2"],
+            },
+            {
+                tag: "c",
+                values: ["3", "4", "2"],
+            },
+        ]);
     });
 
     it("Filters combinations by single selected tag", () => {
-        const selectedTags = { "code.function": "cronTask" };
+        const selectedTags = { a: "1" };
         const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
 
-        expect(uniqueMetricValuesPerKey).toEqual({
-            "code.function": ["cronTask"],
-            "code.namespace": [
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
-                "org.springframework.samples.petclinic",
-            ],
-            error: ["none", "1"],
-            exception: ["none"],
-            outcome: ["SUCCESS"],
-        });
+        expect(uniqueMetricValuesPerKey).toEqual([
+            {
+                tag: "a",
+                values: ["1"],
+            },
+            {
+                tag: "b",
+                values: ["1", "2"],
+            },
+            {
+                tag: "c",
+                values: ["3", "4", "2"],
+            },
+        ]);
     });
 
     it("Filters by multiple selected tags", () => {
-        const selectedTags = {
-            "code.function": "cronTask",
-            "code.namespace": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
-        };
+        const selectedTags = { a: "1", b: "2" };
         const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
 
-        expect(uniqueMetricValuesPerKey).toEqual({
-            "code.function": ["cronTask"],
-            "code.namespace": ["org.springframework.samples.petclinic.scheduled.SchedulerTestConfig"],
-            error: ["none"],
-            exception: ["none"],
-            outcome: ["SUCCESS"],
-        });
-    });
-
-    it("Filters by fully selected tags", () => {
-        const selectedTags = {
-            "code.function": "cronTask",
-            "code.namespace": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig",
-            error: "none",
-            exception: "none",
-            outcome: "SUCCESS",
-        };
-
-        const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
-
-        expect(uniqueMetricValuesPerKey).toEqual({
-            "code.function": ["cronTask"],
-            "code.namespace": ["org.springframework.samples.petclinic.scheduled.SchedulerTestConfig"],
-            error: ["none"],
-            exception: ["none"],
-            outcome: ["SUCCESS"],
-        });
+        expect(uniqueMetricValuesPerKey).toEqual([
+            {
+                tag: "a",
+                values: ["1"],
+            },
+            {
+                tag: "b",
+                values: ["2"],
+            },
+            {
+                tag: "c",
+                values: ["2", "3"],
+            },
+        ]);
     });
 });
