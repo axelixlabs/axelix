@@ -12,6 +12,7 @@ import org.springframework.boot.actuate.context.properties.ConfigurationProperti
 import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 import com.nucleonforge.axile.common.api.KeyValue;
 import com.nucleonforge.axile.common.utils.BeanNameUtils;
+import com.nucleonforge.axile.sbs.spring.properties.utils.InvalidPropertiesLoader;
 
 /**
  * Default implementation {@link ConfigurationPropertiesConverter}
@@ -19,6 +20,12 @@ import com.nucleonforge.axile.common.utils.BeanNameUtils;
  * @author Sergey Cherkasov
  */
 public class DefaultConfigurationPropertiesConverter implements ConfigurationPropertiesConverter {
+
+    private final InvalidPropertiesLoader invalidPropertiesLoader;
+
+    public DefaultConfigurationPropertiesConverter(InvalidPropertiesLoader invalidPropertiesLoader) {
+        this.invalidPropertiesLoader = invalidPropertiesLoader;
+    }
 
     @Override
     public ConfigPropsFeed convert(ConfigurationPropertiesDescriptor originalDescriptor) {
@@ -38,8 +45,20 @@ public class DefaultConfigurationPropertiesConverter implements ConfigurationPro
     }
 
     private ConfigPropsFeed.Bean convertBean(ConfigurationPropertiesBeanDescriptor src) {
-        return new ConfigPropsFeed.Bean(
-                src.getPrefix(), flatten("", src.getProperties()), flatten("", src.getInputs()));
+        List<KeyValue> flattenedProperties = flatten("", src.getProperties());
+
+        List<ConfigPropsFeed.Property> properties = flattenedProperties.stream()
+                .map(keyValue -> {
+                    String validationMessage = invalidPropertiesLoader.getInvalidPropertyValues(
+                            src.getPrefix() + keyValue.key(), keyValue.value());
+
+                    return new ConfigPropsFeed.Property(keyValue.key(), keyValue.value(), validationMessage);
+                })
+                .collect(Collectors.toList());
+
+        List<KeyValue> inputs = flatten("", src.getInputs());
+
+        return new ConfigPropsFeed.Bean(src.getPrefix(), properties, inputs);
     }
 
     private List<KeyValue> flatten(String key, Map<String, Object> map) {

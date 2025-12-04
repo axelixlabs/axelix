@@ -1,5 +1,7 @@
 package com.nucleonforge.axile.master.service.convert.response;
 
+import java.util.List;
+
 import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 import com.nucleonforge.axile.master.api.response.ConfigPropsFeedResponse;
 import com.nucleonforge.axile.master.api.response.ConfigPropsFeedResponse.ConfigPropsProfile;
+import com.nucleonforge.axile.master.api.response.ConfigPropsFeedResponse.PropertyProfile;
 
 /**
  * The {@link Converter} from {@link ConfigPropsFeed} to {@link ConfigPropsFeedResponse}.
@@ -23,11 +26,21 @@ public class ConfigPropsFeedConverter implements Converter<ConfigPropsFeed, Conf
         source.contexts().values().forEach(context -> {
             if (context != null && context.beans() != null) {
                 context.beans()
-                        .forEach((beanName, bean) -> response.addBean(
-                                new ConfigPropsProfile(beanName, bean.prefix(), bean.properties(), bean.inputs())));
+                        .forEach((beanName, bean) -> response.addBean(new ConfigPropsProfile(
+                                beanName, bean.prefix(), convertProperty(bean.properties()), bean.inputs())));
             }
         });
 
         return response;
+    }
+
+    private List<PropertyProfile> convertProperty(List<ConfigPropsFeed.Property> source) {
+        if (source == null) {
+            return List.of();
+        }
+
+        return source.stream()
+                .map(property -> new PropertyProfile(property.name(), property.value(), property.validationMessage()))
+                .toList();
     }
 }

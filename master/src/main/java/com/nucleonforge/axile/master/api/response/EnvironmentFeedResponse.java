@@ -39,6 +39,10 @@ public record EnvironmentFeedResponse(
          *                              {@code null} otherwise
          */
         public record PropertyEntry(
-                String name, @Nullable String value, boolean isPrimary, @Nullable String configPropsBeanName) {}
+                String name,
+                @Nullable String value,
+                boolean isPrimary,
+                @Nullable String configPropsBeanName,
+                @Nullable String invalidValueReason) {}
     }
 }

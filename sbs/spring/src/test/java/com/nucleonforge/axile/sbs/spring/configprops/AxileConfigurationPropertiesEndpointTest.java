@@ -4,23 +4,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axile.common.api.ConfigPropsFeed;
+import com.nucleonforge.axile.common.api.ConfigPropsFeed.Property;
 import com.nucleonforge.axile.common.api.KeyValue;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,8 +52,13 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axile.prop.test.http-client.requests[1].methods[0].type=PUT",
             "axile.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
             "axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
+            "spring.jpa.open-in-view=true"
         })
 @EnableConfigurationProperties(AxileConfigurationPropertiesEndpointTest.AxileConfigurationProperties.class)
+@Import({
+    DefaultConfigurationPropertiesConverterTest.DefaultDefaultConfigurationPropertiesTestConfiguration.class,
+    ConfigurationPropertiesCacheTest.ConfigurationPropertiesCacheTestConfiguration.class
+})
 public class AxileConfigurationPropertiesEndpointTest {
 
     @Autowired
@@ -63,7 +70,7 @@ public class AxileConfigurationPropertiesEndpointTest {
         ResponseEntity<ConfigPropsFeed> response =
                 restTemplate.getForEntity("/actuator/axile-configprops", ConfigPropsFeed.class);
 
-        List<KeyValue> properties = response.getBody().contexts().values().stream()
+        List<Property> properties = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())
                 .filter(e -> e.prefix().equals("axile.prop.test"))
                 .flatMap(bean -> bean.properties().stream())
@@ -72,8 +79,8 @@ public class AxileConfigurationPropertiesEndpointTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         assertThat(properties)
-                .filteredOn(e -> e.key().equals(propertyName))
-                .extracting(KeyValue::value)
+                .filteredOn(e -> e.name().equals(propertyName))
+                .extracting(Property::value)
                 .containsExactly(expectedValue);
     }
 
@@ -131,6 +138,29 @@ public class AxileConfigurationPropertiesEndpointTest {
                 Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level.value"));
     }
 
+    @Test
+    void shouldReturnValidationMessageForInvalidProperty() {
+        ResponseEntity<ConfigPropsFeed> response =
+                restTemplate.getForEntity("/actuator/axile-configprops", ConfigPropsFeed.class);
+
+        List<Property> properties = response.getBody().contexts().values().stream()
+                .flatMap(ctx -> ctx.beans().values().stream())
+                .flatMap(bean -> bean.properties().stream())
+                .toList();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        assertThat(properties)
+                .filteredOn(p -> p.name().equals("openInView"))
+                .hasSize(1)
+                .allSatisfy(property -> {
+                    assertThat(property.value()).isEqualTo("true");
+                    assertThat(property.validationMessage())
+                            .isEqualTo(
+                                    "Leaving Open Session in View enabled in production can trigger N+1 queries and unpredictable lazy-loading; should be disabled.");
+                });
+    }
+
     @ConfigurationProperties(prefix = "axile.prop.test")
     public record AxileConfigurationProperties(
             Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
@@ -146,19 +176,6 @@ public class AxileConfigurationPropertiesEndpointTest {
 
     @TestConfiguration
     static class AxileConfigurationPropertiesTestConfiguration {
-
-        @Bean
-        public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-            return new DefaultConfigurationPropertiesConverter();
-        }
-
-        @Bean
-        public ConfigurationPropertiesCache configurationPropertiesCache(
-                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
-                ConfigurationPropertiesConverter configurationPropertiesConverter) {
-            return new ConfigurationPropertiesCache(
-                    configurationPropertiesReportEndpoint, configurationPropertiesConverter);
-        }
 
         @Bean
         public AxileConfigurationPropertiesEndpoint axileConfigurationPropertiesEndpoint(

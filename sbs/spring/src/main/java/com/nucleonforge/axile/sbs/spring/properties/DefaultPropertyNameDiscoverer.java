@@ -7,7 +7,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
 
-import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.properties.utils.EnvironmentPropertyNameNormalizer;
 
 /**
  * Default {@link PropertyNameDiscoverer}.

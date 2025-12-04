@@ -6,8 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 import com.nucleonforge.axile.sbs.spring.context.ContextRestarter;
-import com.nucleonforge.axile.sbs.spring.env.DefaultEnvironmentPropertyNameNormalizer;
-import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.properties.ContextReloadingPropertyMutator;
 import com.nucleonforge.axile.sbs.spring.properties.DefaultPropertyNameDiscoverer;
 import com.nucleonforge.axile.sbs.spring.properties.DefaultPropertySourceDescriber;
@@ -15,6 +13,7 @@ import com.nucleonforge.axile.sbs.spring.properties.PropertyManagementEndpoint;
 import com.nucleonforge.axile.sbs.spring.properties.PropertyMutator;
 import com.nucleonforge.axile.sbs.spring.properties.PropertyNameDiscoverer;
 import com.nucleonforge.axile.sbs.spring.properties.PropertySourceDescriber;
+import com.nucleonforge.axile.sbs.spring.properties.utils.EnvironmentPropertyNameNormalizer;
 
 /**
  * Auto-configuration for property management operations via Spring Boot Actuator.
@@ -36,19 +35,13 @@ import com.nucleonforge.axile.sbs.spring.properties.PropertySourceDescriber;
  * @since 10.07.2025
  * @author Nikita Kirillov
  */
-@AutoConfiguration(after = ContextRestarterAutoConfiguration.class)
+@AutoConfiguration(after = {ContextRestarterAutoConfiguration.class, PropertyUtilsAutoConfiguration.class})
 public class PropertyManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
     public PropertyMutator propertyMutator(ConfigurableEnvironment environment, ContextRestarter contextRestarter) {
         return new ContextReloadingPropertyMutator(environment, contextRestarter);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
-        return new DefaultEnvironmentPropertyNameNormalizer();
     }
 
     @Bean

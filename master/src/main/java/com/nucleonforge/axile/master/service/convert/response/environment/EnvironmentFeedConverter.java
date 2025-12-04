@@ -46,7 +46,8 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
                         entry.getKey(),
                         entry.getValue().value(),
                         entry.getValue().isPrimary(),
-                        entry.getValue().configPropsBeanName()));
+                        entry.getValue().configPropsBeanName(),
+                        entry.getValue().validationMessage()));
             }
         }
         return properties;
