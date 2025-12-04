@@ -2,12 +2,19 @@
     margin-bottom: 40px;
 }
 
-.CacheManagerTopSection {
-    width: 100%;
-    display: flex;
+.CacheManagerHeader {
+    display: grid;
+    grid-template-columns: 1fr 110px 110px;
     align-items: center;
     column-gap: 8px;
-    margin-bottom: 20px;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 22px;
+    letter-spacing: 0;
+}
+
+.RowChunk {
+    justify-content: center;
 }
 
 .CacheManagerName {
@@ -17,4 +24,8 @@
 
 .ClearCachesButton {
     flex-shrink: 0;
+}
+
+.HeaderStyles {
+    padding-right: 0;
 }

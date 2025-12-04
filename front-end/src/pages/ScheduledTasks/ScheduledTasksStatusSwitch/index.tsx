@@ -15,7 +15,7 @@ interface IProps {
     runnable: IRunnable;
 }
 
-export const OnOffSwitch = ({ runnable }: IProps) => {
+export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const [messageApi, contextHolder] = message.useMessage();
@@ -44,8 +44,8 @@ export const OnOffSwitch = ({ runnable }: IProps) => {
         <>
             {contextHolder}
             <Switch
-                checkedChildren={t("ScheduledTasks.on")}
-                unCheckedChildren={t("ScheduledTasks.off")}
+                checkedChildren={t("on")}
+                unCheckedChildren={t("off")}
                 onChange={() => switchTaskStatus()}
                 loading={mutationRequest.loading}
                 checked={runnable.enabled}

@@ -1,7 +1,8 @@
 .Search {
     width: min(400px, 100%);
+    margin-bottom: 30px;
 }
 
-.BottomGutter {
-    margin-bottom: 30px;
+.RemovedBottomGutter {
+    margin-bottom: 0;
 }

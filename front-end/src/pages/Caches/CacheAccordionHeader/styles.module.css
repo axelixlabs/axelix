@@ -1,14 +1,18 @@
 .AccordionHeader {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 110px 110px;
     align-items: center;
-    column-gap: 20px;
+    column-gap: 8px;
 }
 
-.Target {
+.TargetWrapper {
     display: flex;
     column-gap: 8px;
     margin-top: 8px;
+}
+
+.Target {
+    flex-shrink: 0;
 }
 
 .CacheName {
@@ -16,10 +20,16 @@
     font-weight: 600;
 }
 
-.ClearCacheButton {
-    flex-shrink: 0;
+.RowChunk {
+    justify-content: center;
+    padding-block: 0;
 }
 
-.HeaderContentWrapper {
-    min-width: 0
+.ContentRowChunkWrapper {
+    min-width: 0;
+    padding-block: 0;
+}
+
+.ContentWrapper {
+    min-width: 0;
 }

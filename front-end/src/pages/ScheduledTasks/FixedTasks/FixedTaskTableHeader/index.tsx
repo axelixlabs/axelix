@@ -10,7 +10,7 @@ export const FixedTaskTableHeader = () => {
             <div className="RowChunk">{t("ScheduledTasks.runnable")}</div>
             <div dangerouslySetInnerHTML={{ __html: t("ScheduledTasks.initialDelay") }} className="RowChunk" />
             <div className="RowChunk">{t("ScheduledTasks.interval")}</div>
-            <div className={`RowChunk ${styles.Status}`}>{t("ScheduledTasks.status")}</div>
+            <div className={`RowChunk ${styles.Status}`}>{t("status")}</div>
         </div>
     );
 };

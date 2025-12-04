@@ -62,7 +62,7 @@ export interface IScheduledTasksResponseBody {
     fixedRate: IFixedTasks[];
 }
 
-export interface IUpdateScheduledTasksRequestData {
+export interface IUpdateScheduledTasksStatusRequestData {
     instanceId: string;
     targetScheduledTask: string;
     force: boolean;

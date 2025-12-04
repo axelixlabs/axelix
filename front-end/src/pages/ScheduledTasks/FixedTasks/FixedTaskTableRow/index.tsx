@@ -1,7 +1,7 @@
 import { TooltipWithCopy } from "components";
 import type { IFixedTasks } from "models";
 
-import { OnOffSwitch } from "../../OnOffSwitch";
+import { ScheduledTasksStatusSwitch } from "../../ScheduledTasksStatusSwitch";
 
 import styles from "./styles.module.css";
 
@@ -21,7 +21,7 @@ export const FixedTaskTableRow = ({ task }: IProps) => {
             <div className="RowChunk">{task.initialDelay}</div>
             <div className="RowChunk">{task.interval}</div>
             <div className="RowChunk">
-                <OnOffSwitch runnable={task} />
+                <ScheduledTasksStatusSwitch runnable={task} />
             </div>
         </div>
     );
