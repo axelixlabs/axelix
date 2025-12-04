@@ -1,4 +1,4 @@
-import { type IMetricsGroup } from "models";
+import type { IMetricsGroup, ITagValueOption, IValidTagCombination } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
@@ -57,7 +57,9 @@ export const filterMetrics = (metricsGroups: IMetricsGroup[], search: string): I
             return result;
         }
 
-        const filteredMetrics = metrics.filter((metric) => commonNormalize(metric).includes(formattedSearch));
+        const filteredMetrics = metrics.filter((metric) =>
+            commonNormalize(metric.metricName).includes(formattedSearch),
+        );
 
         if (filteredMetrics.length) {
             result.push({
@@ -72,4 +74,53 @@ export const filterMetrics = (metricsGroups: IMetricsGroup[], search: string): I
 
 export const findMetricsCount = (metricsGroups: IMetricsGroup[]): number => {
     return metricsGroups.reduce((count, group) => count + group.metrics.length, 0);
+};
+
+/**
+ * Returns possible tag values options. Contains possible values for all the tags.
+ *
+ * If the given tag already has a selected value, then the array of possible values for the given tag
+ * will contain the only value - the selected value.
+ *
+ * This would make it impossible to distinguish two cases:
+ * - The selected that already has a selected value
+ * - Tag that possibly can have only a single value (considering the values fo other tags of course)
+ *
+ * But we do not need to distinguish these two cases.
+ *
+ * @param validTagCombinations valid tag combinations.
+ * @param selectedTags tags that are currently selected.
+ */
+export const extractUniqueMetricValuesPerKey = (
+    validTagCombinations: IValidTagCombination[],
+    selectedTags: IValidTagCombination,
+): ITagValueOption[] => {
+    const selected = Object.entries(selectedTags);
+
+    const tagsPossibleValues = new Map<string, string[]>();
+
+    validTagCombinations
+        .filter((combination) => {
+            return selected.every(([key, value]) => combination[key] === value);
+        })
+        .forEach((combination) => {
+            Object.entries(combination).forEach(([tag, val]) => {
+                const values = tagsPossibleValues.get(tag) ?? [];
+                if (!values.includes(val)) {
+                    values.push(val);
+                }
+                tagsPossibleValues.set(tag, values);
+            });
+        });
+
+    return [...tagsPossibleValues.entries()].map(([tagName, tagValues]) => {
+        return {
+            tag: tagName,
+            values: tagValues,
+        };
+    });
+};
+
+export const buildSelectedTagParams = (selectedTags: Record<string, string>): string[] => {
+    return Object.entries(selectedTags).map(([key, value]) => `${key}:${value}`);
 };

@@ -1,11 +1,11 @@
 import { Select } from "antd";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader } from "components";
-import { fetchData } from "helpers";
-import { type ISingleMetricResponseBody, StatefulRequest } from "models";
+import { buildSelectedTagParams, extractUniqueMetricValuesPerKey, fetchData } from "helpers";
+import { type IMetric, type ISingleMetricResponseBody, type IValidTagCombination, StatefulRequest } from "models";
 import { getSingleMetricData } from "services";
 
 import MetricChart from "../MetricChart";
@@ -14,9 +14,9 @@ import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * Metric name
+     * Single metric
      */
-    metric: string;
+    metric: IMetric;
 }
 
 export const MetricBody = ({ metric }: IProps) => {
@@ -24,15 +24,19 @@ export const MetricBody = ({ metric }: IProps) => {
     const { instanceId } = useParams();
 
     const [singleMetricData, setSingleMetricData] = useState(StatefulRequest.loading<ISingleMetricResponseBody>());
+    const [selectedTags, setSelectedTags] = useState<Record<string, string>>({});
 
     useEffect(() => {
+        setSingleMetricData(StatefulRequest.loading<ISingleMetricResponseBody>());
+
         fetchData(setSingleMetricData, () =>
             getSingleMetricData({
                 instanceId: instanceId!,
-                metric: metric,
+                metric: metric.metricName,
+                tags: buildSelectedTagParams(selectedTags),
             }),
         );
-    }, []);
+    }, [selectedTags]);
 
     if (singleMetricData.loading) {
         return <Loader />;
@@ -43,12 +47,30 @@ export const MetricBody = ({ metric }: IProps) => {
     }
 
     const singleMetricFeed = singleMetricData.response!;
+    const singleMetricFeedMeasurements = singleMetricFeed.measurements;
+    const validTagCombinations: IValidTagCombination[] = singleMetricFeed.validTagCombinations;
+
+    const valuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
+
+    const handleSelectChange = (tagName: string, selectedValue?: string) => {
+        setSelectedTags((prev) => {
+            const updatedTags: Record<string, string> = { ...prev };
+
+            if (selectedValue) {
+                updatedTags[tagName] = selectedValue;
+            } else {
+                delete updatedTags[tagName];
+            }
+
+            return updatedTags;
+        });
+    };
 
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.MetricDataWrapper}>
                 <div>{t("Metrics.value")}:</div>
-                <div>{singleMetricFeed.measurements.at(-1)?.value}</div>
+                <div>{singleMetricFeedMeasurements.at(-1)?.value}</div>
 
                 {singleMetricFeed.baseUnit && (
                     <>
@@ -57,28 +79,33 @@ export const MetricBody = ({ metric }: IProps) => {
                     </>
                 )}
 
-                {singleMetricFeed.availableTags.length > 0 && (
+                {validTagCombinations.length && (
                     <>
                         <div>{t("Metrics.tags")}:</div>
                         <div className={styles.TagsWrapper}>
-                            {singleMetricFeed.availableTags.map((availableTag) => (
-                                <>
-                                    <div>{availableTag.tag}:</div>
+                            {valuesPerKey.map((options) => (
+                                <Fragment key={options.tag}>
+                                    <div>{options.tag}:</div>
                                     <Select
-                                        placeholder={t("Metrics.selectTag")}
-                                        options={availableTag.values.map((value) => ({
-                                            value: value,
-                                            label: value,
+                                        value={selectedTags[options.tag] || undefined}
+                                        onChange={(it) => handleSelectChange(options.tag, it)}
+                                        placeholder={t("Metrics.selectValue")}
+                                        options={options.values.map((it) => ({
+                                            value: it,
                                         }))}
-                                        className={styles.AvailableTagSelect}
+                                        allowClear
+                                        className={styles.TagSelect}
                                     />
-                                </>
+                                </Fragment>
                             ))}
                         </div>
                     </>
                 )}
             </div>
-            <MetricChart measurements={singleMetricFeed.measurements} />
+
+            <MetricChart measurements={singleMetricFeedMeasurements} />
         </div>
     );
 };
+
+export default MetricBody;

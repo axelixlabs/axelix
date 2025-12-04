@@ -6,7 +6,11 @@ export const getMetricsData = (instanceId: string) => {
 };
 
 export const getSingleMetricData = (data: IGetSingleMetricRequestData) => {
-    const { instanceId, metric } = data;
+    const { instanceId, metric, tags } = data;
 
-    return apiFetch.get(`metrics/${instanceId}/${metric}`);
+    const params = {
+        tag: tags,
+    };
+
+    return apiFetch.get(`metrics/${instanceId}/${metric}`, { params: params });
 };
