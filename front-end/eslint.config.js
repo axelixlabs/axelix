@@ -1,6 +1,7 @@
 import js from "@eslint/js";
 
 import eslintConfigPrettier from "eslint-config-prettier";
+import eslintPluginJsonc from "eslint-plugin-jsonc";
 import eslintPluginPrettier from "eslint-plugin-prettier";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
@@ -19,6 +20,7 @@ export default [
             react: react,
             "react-refresh": reactRefresh,
             prettier: eslintPluginPrettier,
+            jsonc: eslintPluginJsonc,
         },
     },
     js.configs.recommended,
@@ -27,6 +29,12 @@ export default [
         files: ["**/*.json"],
         languageOptions: {
             parser: jsoncParser,
+        },
+        rules: {
+            "jsonc/indent": ["error", 4],
+            "jsonc/comma-dangle": ["error", "never"],
+            "jsonc/quote-props": ["error", "always"],
+            "jsonc/quotes": ["error", "double"],
         },
     },
     {
