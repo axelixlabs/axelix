@@ -4,7 +4,7 @@
 
 .CacheManagerHeader {
     display: grid;
-    grid-template-columns: 1fr 170px 110px;
+    grid-template-columns: 1fr 110px 110px;
     align-items: center;
     column-gap: 8px;
     font-weight: 500;

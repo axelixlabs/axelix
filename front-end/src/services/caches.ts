@@ -34,15 +34,16 @@ interface IUpdateCacheStatusRequestData {
      * Name of the cache
      */
     cacheName: string;
-
-    /**
-     * Cache capabilities
-     */
-    statusType: "enable" | "disable";
 }
 
-export const updateCacheStatus = (data: IUpdateCacheStatusRequestData) => {
-    const { instanceId, cacheManagerName, statusType, cacheName } = data;
+export const enableCache = (data: IUpdateCacheStatusRequestData) => {
+    const { instanceId, cacheManagerName, cacheName } = data;
 
-    return apiFetch.post(`caches/${instanceId}/${cacheManagerName}/${cacheName}/${statusType}`);
+    return apiFetch.post(`caches/${instanceId}/${cacheManagerName}/${cacheName}/enable`);
+};
+
+export const disableCache = (data: IUpdateCacheStatusRequestData) => {
+    const { instanceId, cacheManagerName, cacheName } = data;
+
+    return apiFetch.post(`caches/${instanceId}/${cacheManagerName}/${cacheName}/disable`);
 };

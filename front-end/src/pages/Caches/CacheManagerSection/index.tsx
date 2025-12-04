@@ -22,7 +22,7 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
             <div className="CustomizedAntdTable">
                 <div className={`TableHeader ${styles.CacheManagerHeader}`}>
                     <div className={`RowChunk ${styles.CacheManagerName}`}>
-                        {t("Caches.target")}: {cacheManager.name}
+                        {t("Caches.name")}: {cacheManager.name}
                     </div>
                     <div className={`RowChunk ${styles.RowChunk}`}>{t("Caches.clear")}</div>
                     <div className={`RowChunk ${styles.RowChunk}`}>{t("status")}</div>
