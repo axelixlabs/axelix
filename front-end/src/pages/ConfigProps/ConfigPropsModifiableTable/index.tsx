@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import { Accordion, EmptyHandler, TablePropertyValue, TooltipWithCopy } from "components";
+import { Accordion, Copy, EmptyHandler, TablePropertyValue } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import type { ITableRow } from "models";
 
@@ -35,9 +35,9 @@ export const ConfigPropsModifiableTable = ({ headerName, properties, children }:
                 >
                     <EmptyHandler isEmpty={!properties.length}>
                         {properties.map(({ key, displayKey, displayValue }) => (
-                            <div key={key} className="TableRow">
-                                <div className="RowChunk">
-                                    <TooltipWithCopy text={displayKey} />
+                            <div key={key} className="TableRow" >
+                                <div className={`RowChunk ${styles.KeyChunk}`}>
+                                    {displayKey} <Copy text={displayKey} />
                                 </div>
                                 <div className={`RowChunk ${styles.ValueChunk}`}>
                                     <TablePropertyValue propertyName={key} propertyValue={displayValue} />

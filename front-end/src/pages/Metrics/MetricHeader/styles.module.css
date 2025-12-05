@@ -3,3 +3,13 @@
     align-items: center;
     column-gap: 8px
 }
+
+.TooltipContentWrapper {
+    display: flex;
+    align-items: flex-start; 
+    column-gap: 8px;
+}
+
+.InfoIcon {
+    margin-top: 3px;
+}
