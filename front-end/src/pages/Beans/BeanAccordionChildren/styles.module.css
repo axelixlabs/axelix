@@ -4,14 +4,18 @@
   gap: 20px;
 }
 
-.Dependency {
-  cursor: pointer;
+.DependencyWrapper {
   display: flex;
   align-items: center;
   column-gap: 8px;
 }
 
+.Dependency {
+  min-width: 0;
+}
+
 .Dependency:hover {
+  cursor: pointer;
   color: var(--axile-primary-green);
 }
 
@@ -24,18 +28,31 @@
   word-break: break-all;
 }
 
-.AccordionBodyChunkList {
+.AccordionBodyChunkList:not(:last-child) {
   border-bottom: 1px solid var(--axile-medium-grey);
   margin-bottom: 8px;
   padding-bottom: 8px;
 }
 
-.AccordionBodyChunkList:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-
 .SimpleListValue {
   word-break: break-all;
+}
+
+.Flag :global(.ant-wave) {
+  display: none;
+}
+
+.Flag:global(.ant-checkbox-wrapper:hover .ant-checkbox-inner),
+.Flag :global(.ant-checkbox-inner) {
+  border-color: var(--axile-medium-grey) !important;
+}
+
+.Flag:global(.ant-checkbox-wrapper),
+.Flag:global(.ant-checkbox-wrapper *) {
+  cursor: default !important;
+}
+
+.Flag:global(.ant-checkbox-wrapper:hover .ant-checkbox-checked .ant-checkbox-inner),
+.Flag :global(.ant-checkbox-wrapper:hover .ant-checkbox-inner) {
+  background-color: var(--axile-primary-green) !important;
 }
