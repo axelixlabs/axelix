@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 
-import { Accordion, EmptyHandler, TablePropertyValue, TooltipWithCopy } from "components";
+import { Accordion, Copy, EmptyHandler, TablePropertyValue } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import type { IEnvironmentTableRow } from "models";
 
@@ -35,7 +35,7 @@ export const EnvironmentModifiableTable = ({ headerName, properties }: IProps) =
                     {properties.map(({ key, displayKey, displayValue, isPrimary, configPropsBeanName }) => (
                         <div key={key} className="TableRow">
                             <div className={`RowChunk ${styles.KeyChunk}`}>
-                                <TooltipWithCopy text={displayKey} />
+                                {displayKey} <Copy text={displayKey} />
                                 {configPropsBeanName && (
                                     <Link
                                         to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
