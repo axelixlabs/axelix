@@ -11,14 +11,16 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescr
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
 
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesConverter;
 import com.nucleonforge.axile.sbs.spring.configprops.DefaultConfigurationPropertiesConverter;
-import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxileEnvironmentDescriptor;
-import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertySourceDescriptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,35 +48,34 @@ class DefaultEnvPropertyEnricherTest {
     void shouldEnrichAllPropertiesWithPrimaryField() {
         EnvironmentDescriptor defaultDescriptor = environmentEndpoint.environment(null);
 
-        AxileEnvironmentDescriptor axileEnvironmentDescriptor = enricher.enrich(defaultDescriptor);
+        EnvironmentFeed environmentFeed = enricher.enrich(defaultDescriptor);
 
-        assertThat(axileEnvironmentDescriptor).isNotNull();
-        assertThat(axileEnvironmentDescriptor.activeProfiles()).isNotNull();
-        assertThat(axileEnvironmentDescriptor.defaultProfiles()).isNotNull();
-        assertThat(axileEnvironmentDescriptor.propertySources()).isNotEmpty();
+        assertThat(environmentFeed).isNotNull();
+        assertThat(environmentFeed.activeProfiles()).isNotNull();
+        assertThat(environmentFeed.defaultProfiles()).isNotNull();
+        assertThat(environmentFeed.propertySources()).isNotEmpty();
 
         // property from the command line args should win
         // https://docs.spring.io/spring-boot/reference/features/external-config.html
-        assertThat(findPropertySource(
-                                axileEnvironmentDescriptor, StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME)
-                        .properties()
-                        .get("foo.bar")
+        assertThat(findProperty(environmentFeed, StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, "foo.bar")
                         .isPrimary())
                 .isFalse();
 
-        assertThat(findPropertySource(axileEnvironmentDescriptor, "commandLineArgs")
-                        .properties()
-                        .get("fooBar")
-                        .isPrimary())
+        assertThat(findProperty(environmentFeed, "commandLineArgs", "fooBar").isPrimary())
                 .isTrue();
     }
 
-    private static AxilePropertySourceDescriptor findPropertySource(
-            AxileEnvironmentDescriptor axileEnvironmentDescriptor, String propertySourceName) {
-        return axileEnvironmentDescriptor.propertySources().stream()
-                .filter(it -> it.name().equals(propertySourceName))
+    private static Property findProperty(
+            EnvironmentFeed environmentFeed, String propertySourceName, String propertyName) {
+        PropertySource propertySource = environmentFeed.propertySources().stream()
+                .filter(it -> it.sourceName().equals(propertySourceName))
                 .findFirst()
-                .get();
+                .orElseThrow();
+
+        return propertySource.properties().stream()
+                .filter(it -> it.propertyName().equals(propertyName))
+                .findFirst()
+                .orElseThrow();
     }
 
     @TestConfiguration
@@ -94,16 +95,24 @@ class DefaultEnvPropertyEnricherTest {
         }
 
         @Bean
-        public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
-            return new DefaultEnvironmentPropertyNameNormalizer();
+        public PropertyNameNormalizer propertyNameNormalizer() {
+            return new DefaultPropertyNameNormalizer();
+        }
+
+        @Bean
+        public PropertyMetadataExtractor propertyMetadataExtractor(
+                ConfigurableEnvironment environment, PropertyNameNormalizer propertyNameNormalizer) {
+            return new DefaultPropertyMetadataExtractor(environment, propertyNameNormalizer);
         }
 
         @Bean
         public EnvPropertyEnricher envPropertyEnricher(
                 Environment environment,
-                DefaultEnvironmentPropertyNameNormalizer propertyNameNormalizer,
-                ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache) {
-            return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, configurationPropertiesCache);
+                DefaultPropertyNameNormalizer propertyNameNormalizer,
+                ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache,
+                PropertyMetadataExtractor propertyMetadataExtractor) {
+            return new DefaultEnvPropertyEnricher(
+                    environment, propertyNameNormalizer, configurationPropertiesCache, propertyMetadataExtractor);
         }
     }
 }

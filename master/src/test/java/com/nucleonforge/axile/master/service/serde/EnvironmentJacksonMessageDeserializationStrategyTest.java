@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,59 +29,82 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
         // language=json
         String response =
                 """
+        {
+          "activeProfiles": ["production"],
+          "defaultProfiles": ["default", "test"],
+          "propertySources": [
             {
-              "activeProfiles": ["production"],
-              "defaultProfiles": ["default", "test"],
-              "propertySources": [
+              "sourceName": "servletContextInitParams",
+              "properties": []
+            },
+            {
+              "sourceName": "systemProperties",
+              "properties": [
                 {
-                  "name": "servletContextInitParams",
-                  "properties": {}
+                  "propertyName": "java.specification.version",
+                  "value": "17",
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "description": null,
+                  "deprecated": false,
+                  "deprecatedReason": null,
+                  "deprecatedReplacement": null
                 },
                 {
-                  "name": "systemProperties",
-                  "properties": {
-                    "java.specification.version": {
-                      "value": "17",
-                      "isPrimary": true,
-                      "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
-                    },
-                    "java.class.path": {
-                      "value": "gradle-worker.jar",
-                      "isPrimary": true,
-                      "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
-                    },
-                    "java.vm.vendor": {
-                      "value": "BellSoft",
-                      "isPrimary": true,
-                      "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
-                    }
-                  }
+                  "propertyName": "java.vm.vendor",
+                  "value": "BellSoft",
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "description": null,
+                  "deprecated": false,
+                  "deprecatedReason": null,
+                  "deprecatedReplacement": null
+                }
+              ]
+            },
+            {
+              "sourceName": "systemEnvironment",
+              "properties": [
+                {
+                  "propertyName": "JAVA_HOME",
+                  "value": "Java_Liberica_jdk/17.0.16-12/x64",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": "System Environment Property \\"JAVA_HOME\\"",
+                  "deprecated": false,
+                  "deprecatedReason": null,
+                  "deprecatedReplacement": null
                 },
                 {
-                  "name": "systemEnvironment",
-                  "properties": {
-                    "JAVA_HOME": {
-                      "value": "/opt/Java_Liberica_jdk/17.0.16-12/x64",
-                      "origin": "System Environment Property \\"JAVA_HOME\\"",
-                      "isPrimary": false,
-                      "configPropsBeanName": null
-                    }
-                  }
-                },
+                  "propertyName": "logging.path",
+                  "value": "pattern",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": "Location of the log file. For instance, `/var/log`.",
+                  "deprecated": true,
+                  "deprecatedReason": null,
+                  "deprecatedReplacement": "logging.file.path"
+                }
+              ]
+            },
+            {
+              "sourceName": "Config resource classpath:actuate/env/",
+              "properties": [
                 {
-                  "name": "Config resource classpath:actuate/env/",
-                  "properties": {
-                    "com.example.cache.max-size": {
-                      "value": "1000",
-                      "origin": "class path resource [/env/application.properties]",
-                      "isPrimary": false,
-                      "configPropsBeanName": null
-                    }
-                  }
+                  "propertyName": "com.example.cache.max-size",
+                  "value": "1000",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": null,
+                  "deprecated": false,
+                  "deprecatedReason": null,
+                  "deprecatedReplacement": null
                 }
               ]
             }
-            """;
+          ]
+        }
+        """;
 
         // when.
         EnvironmentFeed environmentFeed = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
@@ -89,68 +114,90 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
         assertThat(environmentFeed.defaultProfiles()).hasSize(2).containsOnly("default", "test");
         assertThat(environmentFeed.propertySources()).hasSize(4);
 
-        EnvironmentFeed.PropertySource servletParams = environmentFeed.propertySources().stream()
+        PropertySource servletParams = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("servletContextInitParams"))
                 .findFirst()
                 .orElseThrow();
-
         assertThat(servletParams.properties()).isEmpty();
 
-        EnvironmentFeed.PropertySource systemProps = environmentFeed.propertySources().stream()
+        PropertySource systemProps = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemProperties"))
                 .findFirst()
                 .orElseThrow();
+        assertThat(systemProps.properties()).hasSize(2);
 
-        assertThat(systemProps.properties())
-                .hasSize(3)
-                .extractingByKey("java.specification.version")
-                .satisfies(pv -> {
-                    assertThat(pv.value()).isEqualTo("17");
-                    assertThat(pv.isPrimary()).isTrue();
-                    assertThat(pv.configPropsBeanName())
-                            .isEqualTo("org.springframework.boot.test.property.SystemProperties");
-                });
+        Property javaSpecVersion = systemProps.properties().stream()
+                .filter(pv -> pv.propertyName().equals("java.specification.version"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(javaSpecVersion.value()).isEqualTo("17");
+        assertThat(javaSpecVersion.isPrimary()).isTrue();
+        assertThat(javaSpecVersion.configPropsBeanName())
+                .isEqualTo("org.springframework.boot.test.property.SystemProperties");
+        assertThat(javaSpecVersion.description()).isNull();
+        assertThat(javaSpecVersion.deprecated()).isFalse();
+        assertThat(javaSpecVersion.deprecatedReason()).isNull();
+        assertThat(javaSpecVersion.deprecatedReplacement()).isNull();
 
-        assertThat(systemProps.properties()).extractingByKey("java.class.path").satisfies(pv -> {
-            assertThat(pv.value()).isEqualTo("gradle-worker.jar");
-            assertThat(pv.isPrimary()).isTrue();
-            assertThat(pv.configPropsBeanName()).isEqualTo("org.springframework.boot.test.property.SystemProperties");
-        });
+        Property javaVmVendor = systemProps.properties().stream()
+                .filter(pv -> pv.propertyName().equals("java.vm.vendor"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(javaVmVendor.value()).isEqualTo("BellSoft");
+        assertThat(javaVmVendor.isPrimary()).isTrue();
+        assertThat(javaVmVendor.configPropsBeanName())
+                .isEqualTo("org.springframework.boot.test.property.SystemProperties");
+        assertThat(javaVmVendor.description()).isNull();
+        assertThat(javaVmVendor.deprecated()).isFalse();
+        assertThat(javaVmVendor.deprecatedReason()).isNull();
+        assertThat(javaVmVendor.deprecatedReplacement()).isNull();
 
-        assertThat(systemProps.properties()).extractingByKey("java.vm.vendor").satisfies(pv -> {
-            assertThat(pv.value()).isEqualTo("BellSoft");
-            assertThat(pv.isPrimary()).isTrue();
-            assertThat(pv.configPropsBeanName()).isEqualTo("org.springframework.boot.test.property.SystemProperties");
-        });
-
-        EnvironmentFeed.PropertySource systemEnv = environmentFeed.propertySources().stream()
+        PropertySource systemEnv = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemEnvironment"))
                 .findFirst()
                 .orElseThrow();
+        assertThat(systemEnv.properties()).hasSize(2);
 
-        assertThat(systemEnv.properties())
-                .hasSize(1)
-                .extractingByKey("JAVA_HOME")
-                .satisfies(pv -> {
-                    assertThat(pv.value()).isEqualTo("/opt/Java_Liberica_jdk/17.0.16-12/x64");
-                    assertThat(pv.origin()).isEqualTo("System Environment Property \"JAVA_HOME\"");
-                    assertThat(pv.isPrimary()).isFalse();
-                    assertThat(pv.configPropsBeanName()).isNull();
-                });
+        Property javaHome = systemEnv.properties().stream()
+                .filter(pv -> pv.propertyName().equals("JAVA_HOME"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(javaHome.value()).isEqualTo("Java_Liberica_jdk/17.0.16-12/x64");
+        assertThat(javaHome.isPrimary()).isTrue();
+        assertThat(javaHome.configPropsBeanName()).isNull();
+        assertThat(javaHome.description()).isEqualTo("System Environment Property \"JAVA_HOME\"");
+        assertThat(javaHome.deprecated()).isFalse();
+        assertThat(javaHome.deprecatedReason()).isNull();
+        assertThat(javaHome.deprecatedReplacement()).isNull();
 
-        EnvironmentFeed.PropertySource configProps = environmentFeed.propertySources().stream()
+        Property loggingPath = systemEnv.properties().stream()
+                .filter(pv -> pv.propertyName().equals("logging.path"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(loggingPath.value()).isEqualTo("pattern");
+        assertThat(loggingPath.isPrimary()).isTrue();
+        assertThat(loggingPath.configPropsBeanName()).isNull();
+        assertThat(loggingPath.description()).isEqualTo("Location of the log file. For instance, `/var/log`.");
+        assertThat(loggingPath.deprecated()).isTrue();
+        assertThat(loggingPath.deprecatedReason()).isNull();
+        assertThat(loggingPath.deprecatedReplacement()).isEqualTo("logging.file.path");
+
+        PropertySource configProps = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("Config resource classpath:actuate/env/"))
                 .findFirst()
                 .orElseThrow();
+        assertThat(configProps.properties()).hasSize(1);
 
-        assertThat(configProps.properties())
-                .hasSize(1)
-                .extractingByKey("com.example.cache.max-size")
-                .satisfies(pv -> {
-                    assertThat(pv.value()).isEqualTo("1000");
-                    assertThat(pv.origin()).isEqualTo("class path resource [/env/application.properties]");
-                    assertThat(pv.isPrimary()).isFalse();
-                    assertThat(pv.configPropsBeanName()).isNull();
-                });
+        Property cacheMaxSize = configProps.properties().stream()
+                .filter(pv -> pv.propertyName().equals("com.example.cache.max-size"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(cacheMaxSize.value()).isEqualTo("1000");
+        assertThat(cacheMaxSize.isPrimary()).isTrue();
+        assertThat(cacheMaxSize.configPropsBeanName()).isNull();
+        assertThat(cacheMaxSize.description()).isNull();
+        assertThat(cacheMaxSize.deprecated()).isFalse();
+        assertThat(cacheMaxSize.deprecatedReason()).isNull();
+        assertThat(cacheMaxSize.deprecatedReplacement()).isNull();
     }
 }
