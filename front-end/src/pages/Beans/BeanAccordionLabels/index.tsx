@@ -1,7 +1,8 @@
+import { Tag } from "antd";
 import { Link, useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
-import { normalizeHtmlElementId } from "helpers";
+import { defineBeanScopeColor, normalizeHtmlElementId } from "helpers";
 import type { IBean } from "models";
 
 import styles from "./styles.module.css";
@@ -44,7 +45,9 @@ export const BeanAccordionLabels = ({ bean }: IProps) => {
                     <TooltipWithCopy text={className} />
                 </div>
             </div>
-            <div className={styles.ScopeWrapper}>{scope}</div>
+            <Tag variant="outlined" color={defineBeanScopeColor(scope)} className={styles.Scope}>
+                {scope}
+            </Tag>
         </div>
     );
 };

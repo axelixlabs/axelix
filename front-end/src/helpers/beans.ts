@@ -44,3 +44,24 @@ export const filterBeans = (beans: IBean[], search: string): IBean[] => {
         return aliases.some((alias) => alias.toLowerCase().includes(formattedSearch));
     });
 };
+
+export const defineBeanScopeColor = (scope: string): string => {
+    switch (scope) {
+        case "singleton":
+            return "blue";
+        case "prototype":
+            return "orange";
+        case "request":
+            return "cyan";
+        case "session":
+            return "lime green";
+        case "application":
+            return "gold";
+        case "websocket":
+            return "purple";
+        case "refresh":
+            return "volcano";
+        default:
+            return "magenta";
+    }
+};
