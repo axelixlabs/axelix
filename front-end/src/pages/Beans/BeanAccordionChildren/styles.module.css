@@ -38,6 +38,11 @@
   word-break: break-all;
 }
 
+/*
+ TODO:
+  Jesus, I hope this can be done simpler...
+  Maybe we can just write our own checkbox
+ */
 .Flag :global(.ant-wave) {
   display: none;
 }
