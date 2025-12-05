@@ -33,13 +33,14 @@ export const BeanAccordionChildren = ({ bean }: IProps) => {
                     <span>-</span>
                 ) : (
                     bean.dependencies.map(({ name, isConfigPropsDependency }) => (
-                        <div
-                            key={name}
-                            className={styles.AccordionBodyChunkList}
-                            onClick={() => scrollToAccordionById(name, ESearchSubject.BEAN_NAME_OR_ALIAS)}
-                        >
-                            <div className={styles.Dependency}>
-                                <TooltipWithCopy text={name} />
+                        <div key={name} className={styles.AccordionBodyChunkList}>
+                            <div className={styles.DependencyWrapper}>
+                                <div
+                                    className={styles.Dependency}
+                                    onClick={() => scrollToAccordionById(name, ESearchSubject.BEAN_NAME_OR_ALIAS)}
+                                >
+                                    <TooltipWithCopy text={name} />
+                                </div>
                                 {isConfigPropsDependency && (
                                     <Link to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(name)}`}>
                                         <img src={LinkIcon} alt="Link icon" />
