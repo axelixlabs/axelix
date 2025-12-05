@@ -23,7 +23,9 @@ export const BeanBooleanFlag = ({ value, valueTag }: IProps) => {
     return (
         <>
             <div className={styles.AccordionBodyChunkTitle}>{t(`Beans.${valueTag}`)}:</div>
-            <Checkbox checked={value} />
+            <div>
+                <Checkbox checked={value} className={styles.Flag} />
+            </div>
         </>
     );
 };
