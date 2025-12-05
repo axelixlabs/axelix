@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse;
+import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse.PropertyEntry;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse.PropertySourceShortProfile;
-import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse.PropertySourceShortProfile.PropertyEntry;
 import com.nucleonforge.axile.master.service.convert.response.Converter;
 
 /**
@@ -30,23 +30,27 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
         List<PropertySourceShortProfile> propertySources = new ArrayList<>();
 
         for (PropertySource propertySource : source.propertySources()) {
-            List<PropertyEntry> properties = getPropertyEntries(propertySource);
+            List<PropertyEntry> properties = convertPropertyEntries(propertySource);
             propertySources.add(new PropertySourceShortProfile(propertySource.sourceName(), properties));
         }
 
         return new EnvironmentFeedResponse(activeProfiles, defaultProfiles, propertySources);
     }
 
-    private List<PropertyEntry> getPropertyEntries(PropertySource propertySource) {
+    private List<PropertyEntry> convertPropertyEntries(PropertySource propertySource) {
         List<PropertyEntry> properties = new ArrayList<>();
 
         if (propertySource.properties() != null) {
-            for (var entry : propertySource.properties().entrySet()) {
+            for (EnvironmentFeed.Property property : propertySource.properties()) {
                 properties.add(new PropertyEntry(
-                        entry.getKey(),
-                        entry.getValue().value(),
-                        entry.getValue().isPrimary(),
-                        entry.getValue().configPropsBeanName()));
+                        property.propertyName(),
+                        property.value(),
+                        property.isPrimary(),
+                        property.configPropsBeanName(),
+                        property.description(),
+                        property.deprecated(),
+                        property.deprecatedReason(),
+                        property.deprecatedReplacement()));
             }
         }
         return properties;

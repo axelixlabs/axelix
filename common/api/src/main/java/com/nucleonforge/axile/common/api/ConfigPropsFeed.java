@@ -36,7 +36,6 @@ public record ConfigPropsFeed(@JsonProperty("contexts") Map<String, Context> con
      * @param inputs       The origin and value of each configuration parameter
      *                     — which value was applied and from which source
      *                     — to configure a specific property.
-     *
      */
     public record Bean(
             @JsonProperty("prefix") String prefix,

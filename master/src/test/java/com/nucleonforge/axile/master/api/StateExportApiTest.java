@@ -143,22 +143,27 @@ class StateExportApiTest {
         // language=json
         String envJsonResponse =
                 """
+        {
+          "activeProfiles": ["production"],
+          "defaultProfiles": ["default", "development"],
+          "propertySources": [
             {
-              "activeProfiles": ["production"],
-              "defaultProfiles": ["default","development"],
-              "propertySources": [
+              "name": "systemProperties",
+              "properties": [
                 {
-                  "name": "systemProperties",
-                  "properties": {
-                    "java.vm.vendor": {
-                      "value": "BellSoft",
-                      "isPrimary": true,
-                      "configPropsBeanName": "test.property.systemProperties"
-                    }
-                  }
+                  "name": "java.vm.vendor",
+                  "value": "BellSoft",
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "description": null,
+                  "deprecated": false,
+                  "deprecatedReason": null,
+                  "deprecatedReplacement": null
                 }
               ]
             }
+          ]
+        }
         """;
 
         // language=json

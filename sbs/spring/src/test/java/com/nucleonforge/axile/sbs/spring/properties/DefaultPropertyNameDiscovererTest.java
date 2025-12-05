@@ -15,8 +15,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
-import com.nucleonforge.axile.sbs.spring.env.DefaultEnvironmentPropertyNameNormalizer;
-import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.env.DefaultPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.env.PropertyNameNormalizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -100,14 +100,13 @@ public class DefaultPropertyNameDiscovererTest {
     static class DefaultPropertyDiscovererTestConfiguration {
 
         @Bean
-        public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
-            return new DefaultEnvironmentPropertyNameNormalizer();
+        public PropertyNameNormalizer propertyNameNormalizer() {
+            return new DefaultPropertyNameNormalizer();
         }
 
         @Bean
         public PropertyNameDiscoverer propertyNameDiscoverer(
-                ConfigurableEnvironment configurableEnvironment,
-                EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
+                ConfigurableEnvironment configurableEnvironment, PropertyNameNormalizer propertyNameNormalizer) {
             return new DefaultPropertyNameDiscoverer(configurableEnvironment, propertyNameNormalizer);
         }
     }

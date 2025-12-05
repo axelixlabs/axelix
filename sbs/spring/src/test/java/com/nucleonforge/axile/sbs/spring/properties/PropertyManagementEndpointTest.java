@@ -27,7 +27,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 
 import com.nucleonforge.axile.sbs.spring.context.DefaultContextRestarter;
 import com.nucleonforge.axile.sbs.spring.context.RestartListener;
-import com.nucleonforge.axile.sbs.spring.env.DefaultEnvironmentPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.env.DefaultPropertyNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.utils.ContextKeepAliveTestListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,7 +79,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import({
     PropertyManagementEndpoint.class,
     ContextReloadingPropertyMutator.class,
-    DefaultEnvironmentPropertyNameNormalizer.class,
+    DefaultPropertyNameNormalizer.class,
     DefaultPropertyNameDiscoverer.class,
     DefaultContextRestarter.class,
     RestartListener.class

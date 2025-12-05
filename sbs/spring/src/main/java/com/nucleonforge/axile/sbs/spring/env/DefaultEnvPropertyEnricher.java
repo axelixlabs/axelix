@@ -6,21 +6,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDescriptor;
-import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertyValueDescriptor;
 import org.springframework.core.env.Environment;
 
 import com.nucleonforge.axile.common.api.KeyValue;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
-import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxileEnvironmentDescriptor;
-import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertySourceDescriptor;
-import com.nucleonforge.axile.sbs.spring.env.AxileEnvironmentEndpoint.AxilePropertyValueDescriptor;
 
 /**
  * Default implementation {@link EnvPropertyEnricher}
@@ -35,27 +33,31 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     @Nullable
     private final ConfigurationPropertiesCache configurationPropertiesCache;
 
-    private final EnvironmentPropertyNameNormalizer propertyNameNormalizer;
+    private final PropertyNameNormalizer propertyNameNormalizer;
+
+    private final PropertyMetadataExtractor metadataExtractor;
 
     public DefaultEnvPropertyEnricher(
             Environment environment,
-            EnvironmentPropertyNameNormalizer propertyNameNormalizer,
-            ObjectProvider<ConfigurationPropertiesCache> cache) {
+            PropertyNameNormalizer propertyNameNormalizer,
+            ObjectProvider<ConfigurationPropertiesCache> cache,
+            PropertyMetadataExtractor metadataExtractor) {
         this.configurationPropertiesCache = cache.getIfAvailable();
         this.propertyNameNormalizer = propertyNameNormalizer;
         this.environment = environment;
+        this.metadataExtractor = metadataExtractor;
     }
 
     @Override
-    public AxileEnvironmentDescriptor enrich(EnvironmentDescriptor originalDescriptor) {
+    public EnvironmentFeed enrich(EnvironmentDescriptor originalDescriptor) {
         Map<String, String> primarySourceMap = buildPrimarySourceMap(originalDescriptor);
         Map<String, String> configPropsMapping = buildConfigPropsMappingMap();
 
-        List<AxilePropertySourceDescriptor> enrichedSources = originalDescriptor.getPropertySources().stream()
+        List<PropertySource> enrichedSources = originalDescriptor.getPropertySources().stream()
                 .map(source -> enrichPropertySource(source, primarySourceMap, configPropsMapping))
                 .toList();
 
-        return new AxileEnvironmentDescriptor(
+        return new EnvironmentFeed(
                 originalDescriptor.getActiveProfiles(),
                 Arrays.stream(environment.getDefaultProfiles()).toList(),
                 enrichedSources);
@@ -76,27 +78,47 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
         return primaryMap;
     }
 
-    private AxilePropertySourceDescriptor enrichPropertySource(
+    private PropertySource enrichPropertySource(
             PropertySourceDescriptor source,
             Map<String, String> primaryPropertySourceMap,
             Map<String, String> configPropsMapping) {
 
-        Map<String, AxilePropertyValueDescriptor> enrichedProperties = source.getProperties().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-                    PropertyValueDescriptor original = entry.getValue();
+        List<Property> enrichedProperties = source.getProperties().entrySet().stream()
+                .map(originalDescriptor -> {
+                    String propertyName = originalDescriptor.getKey();
+                    String normalizedName = propertyNameNormalizer.normalize(propertyName);
+                    Object originalValue = originalDescriptor.getValue().getValue();
+                    String stringValue = originalValue == null ? null : originalValue.toString();
 
-                    boolean isPrimary = Objects.equals(
-                            primaryPropertySourceMap.get(propertyNameNormalizer.normalize(entry.getKey())),
-                            source.getName());
+                    boolean isPrimary = Objects.equals(primaryPropertySourceMap.get(normalizedName), source.getName());
+                    String configPropsBeanName = configPropsMapping.getOrDefault(normalizedName, null);
 
-                    return new AxileEnvironmentEndpoint.AxilePropertyValueDescriptor(
-                            original.getValue(),
-                            original.getOrigin(),
+                    String description = null;
+                    boolean deprecated = false;
+                    String deprecationReason = null;
+                    String deprecatedReplacement = null;
+                    PropertyMetadata metadata = metadataExtractor.getMetadata(normalizedName);
+
+                    if (metadata != null) {
+                        description = metadata.description();
+                        deprecated = metadata.deprecated();
+                        deprecationReason = metadata.deprecatedReason();
+                        deprecatedReplacement = metadata.deprecatedReplacement();
+                    }
+
+                    return new Property(
+                            propertyName,
+                            stringValue,
                             isPrimary,
-                            configPropsMapping.getOrDefault(propertyNameNormalizer.normalize(entry.getKey()), null));
-                }));
+                            configPropsBeanName,
+                            description,
+                            deprecated,
+                            deprecationReason,
+                            deprecatedReplacement);
+                })
+                .toList();
 
-        return new AxilePropertySourceDescriptor(source.getName(), enrichedProperties);
+        return new PropertySource(source.getName(), enrichedProperties);
     }
 
     private Map<String, String> buildConfigPropsMappingMap() {
