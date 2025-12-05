@@ -4,8 +4,8 @@ import type { IMetric } from "models";
 
 import styles from "./styles.module.css";
 
-import QuestionIcon from "assets/icons/question.svg";
 import InfoIcon from "assets/icons/info.svg";
+import QuestionIcon from "assets/icons/question.svg";
 
 interface IProps {
     /**
@@ -27,9 +27,7 @@ export const MetricHeader = ({ metric }: IProps) => {
                             <div>
                                 <img src={InfoIcon} alt="Info icon" className={styles.InfoIcon} />
                             </div>
-                            <div>
-                                {metric.description}
-                            </div>
+                            <div>{metric.description}</div>
                         </div>
                     }
                     placement="right"

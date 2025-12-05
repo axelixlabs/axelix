@@ -35,7 +35,7 @@ export const ConfigPropsModifiableTable = ({ headerName, properties, children }:
                 >
                     <EmptyHandler isEmpty={!properties.length}>
                         {properties.map(({ key, displayKey, displayValue }) => (
-                            <div key={key} className="TableRow" >
+                            <div key={key} className="TableRow">
                                 <div className={`RowChunk ${styles.KeyChunk}`}>
                                     {displayKey} <Copy text={displayKey} />
                                 </div>
