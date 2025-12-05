@@ -19,7 +19,7 @@ export const MetricHeader = ({ metric }: IProps) => {
         <div className={styles.MainWrapper}>
             <div>{metric.metricName}</div>
 
-            {/* TODO: Show another Tooltip in future */}
+            {/* TODO: Maybe we would want to extract that into a separate component in the future? */}
             {metric.description && (
                 <Tooltip
                     title={
