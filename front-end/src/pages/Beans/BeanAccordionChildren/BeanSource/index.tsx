@@ -1,7 +1,7 @@
 import { Tree, type TreeDataNode } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { EBeanOrigin, ESearchSubject, type IBeanSource } from "models";
+import { EBeanOrigin, ESearchSubject, type IBean } from "models";
 import { scrollToAccordionById } from "utils";
 
 import sharedStyles from "../styles.module.css";
@@ -9,18 +9,29 @@ import sharedStyles from "../styles.module.css";
 import styles from "./styles.module.css";
 
 interface IProps {
-    beanSource: IBeanSource;
+    /**
+     * The profile of the given bean
+     */
+    bean: IBean;
 }
 
-export const BeanSource = ({ beanSource }: IProps) => {
+export const BeanSource = ({ bean }: IProps) => {
     const { t } = useTranslation();
+
+    const beanSource = bean.beanSource;
 
     const statelessBeanSource =
         beanSource.origin === EBeanOrigin.UNKNOWN ||
         beanSource.origin === EBeanOrigin.COMPONENT_ANNOTATION ||
         beanSource.origin === EBeanOrigin.SYNTHETIC_BEAN;
 
-    const translatedTitle = t(`Beans.beanSource.${beanSource.origin}`);
+    let translatedTitle;
+
+    if (beanSource.origin == EBeanOrigin.UNKNOWN && bean.isConfigPropsBean) {
+        translatedTitle = t(`Beans.beanSource.CONFIG_PROPS_BEAN`);
+    } else {
+        translatedTitle = t(`Beans.beanSource.${beanSource.origin}`);
+    }
 
     const resolveTreeChildren = (): TreeDataNode[] | undefined => {
         if (beanSource.origin === EBeanOrigin.BEAN_METHOD) {

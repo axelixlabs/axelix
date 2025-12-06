@@ -57,7 +57,7 @@ export const BeanAccordionChildren = ({ bean }: IProps) => {
             <BeanProxyType proxyType={bean.proxyType} />
             <BeanBooleanFlag valueTag={"isLazyInitBean"} value={bean.isLazyInit} />
             <BeanBooleanFlag valueTag={"isPrimaryBean"} value={bean.isPrimary} />
-            <BeanSource beanSource={bean.beanSource} />
+            <BeanSource bean={bean} />
         </div>
     );
 };
