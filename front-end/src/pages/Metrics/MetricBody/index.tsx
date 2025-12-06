@@ -79,7 +79,7 @@ export const MetricBody = ({ metric }: IProps) => {
                     </>
                 )}
 
-                {validTagCombinations.length && (
+                {validTagCombinations.length > 0 && (
                     <>
                         <div>{t("Metrics.tags")}:</div>
                         <div className={styles.TagsWrapper}>
