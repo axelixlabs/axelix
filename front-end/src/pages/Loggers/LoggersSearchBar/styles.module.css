@@ -1,0 +1,22 @@
+.SearchBarWrapper {
+    flex-basis: 400px;
+    margin-bottom: 30px;
+}
+
+.SearchFilterTagsWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.SearchFilterTag {
+    border-radius: 16px;
+    padding: 4px 10px;
+    font-size: 15px;
+    border: 1px solid var(--axile-bold-grey);
+}
+
+.SearchFilterTagSelected {
+    border: 1px solid var(--axile-primary-green);
+}

@@ -63,7 +63,9 @@
         "loggerGroups": "Группы логгеров",
         "configuredExplicitly": "Задан явно",
         "loggerLevelUpdated": "Уровень логгера изменён",
-        "reset": "Сбросить"
+        "reset": "Сбросить",
+        "configured": "Настроено",
+        "classOnly": "Только класс"
     },
     "Header": {
         "dashboard": "Дашборд",

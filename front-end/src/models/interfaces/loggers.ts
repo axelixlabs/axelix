@@ -72,3 +72,15 @@ export interface IChangeLoggerGroupLevelRequestData {
      */
     configuredLevel: string;
 }
+
+export interface ILoggersSearchFilters {
+    /**
+     * If true, shows only configured loggers
+     */
+    isConfiguredSearch: boolean;
+
+    /**
+     * If true, shows only class logger
+     */
+    isClassOnlySearch: boolean;
+}

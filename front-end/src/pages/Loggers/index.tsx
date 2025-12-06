@@ -3,13 +3,20 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterLoggerGroups, filterLoggers } from "helpers";
-import { ELoggersTabs, type ILoggersResponseBody, StatefulRequest, StatelessRequest } from "models";
+import { EmptyHandler, Loader } from "components";
+import { fetchData, filterLoggerGroups, filterLoggers, filterLoggersByLoggerName } from "helpers";
+import {
+    ELoggersTabs,
+    type ILoggersResponseBody,
+    type ILoggersSearchFilters,
+    StatefulRequest,
+    StatelessRequest,
+} from "models";
 import { getLoggersData } from "services";
 
 import { Logger } from "./Logger";
 import { LoggerGroups } from "./LoggerGroups";
+import { LoggersSearchBar } from "./LoggersSearchBar";
 import styles from "./styles.module.css";
 
 export const Loggers = () => {
@@ -21,6 +28,10 @@ export const Loggers = () => {
     const [search, setSearch] = useState<string>("");
     const [updateLoggerLevel, setUpdateLoggerLevel] = useState(StatelessRequest.inactive());
     const [updateLoggerGroupLevel, setUpdateLoggerGroupLevel] = useState(StatelessRequest.inactive());
+    const [searchFilters, setSearchFilters] = useState<ILoggersSearchFilters>({
+        isConfiguredSearch: false,
+        isClassOnlySearch: false,
+    });
 
     const fetchLoggersData = (instanceId: string) => fetchData(setLoggersData, () => getLoggersData(instanceId));
 
@@ -55,10 +66,12 @@ export const Loggers = () => {
     const isLoggersTab = activeKey === ELoggersTabs.LOGGERS;
     const isLoggerGroupsTab = activeKey === ELoggersTabs.LOGGER_GROUPS;
 
-    const effectiveLoggers = isLoggersTab && search ? filterLoggers(loggers, search) : loggers;
+    const effectiveLoggers = isLoggersTab && search ? filterLoggersByLoggerName(loggers, search) : loggers;
+    const loggersAfterFilters = filterLoggers(effectiveLoggers, searchFilters);
+
     const effectiveLoggerGroups = isLoggerGroupsTab && search ? filterLoggerGroups(loggerGroups, search) : loggerGroups;
 
-    const loggersAddonAfter = `${effectiveLoggers.length} / ${loggers.length}`;
+    const loggersAddonAfter = `${loggersAfterFilters.length} / ${loggers.length}`;
     const loggerGroupsAddonAffter = `${effectiveLoggerGroups.length} / ${loggerGroups.length}`;
     const addonAfter = isLoggersTab ? loggersAddonAfter : loggerGroupsAddonAffter;
 
@@ -67,8 +80,8 @@ export const Loggers = () => {
             key: ELoggersTabs.LOGGERS,
             label: t("Loggers.loggers"),
             children: (
-                <EmptyHandler isEmpty={effectiveLoggers.length === 0}>
-                    {effectiveLoggers.map((logger) => (
+                <EmptyHandler isEmpty={loggersAfterFilters.length === 0}>
+                    {loggersAfterFilters.map((logger) => (
                         <Logger
                             logger={logger}
                             levels={levels}
@@ -97,12 +110,25 @@ export const Loggers = () => {
     const handleTabChange = (activeKey: string): void => {
         setSearch("");
         setActiveKey(activeKey as ELoggersTabs);
+
+        if (activeKey === ELoggersTabs.LOGGER_GROUPS) {
+            setSearchFilters({
+                isConfiguredSearch: false,
+                isClassOnlySearch: false,
+            });
+        }
     };
 
     return (
         <>
             <div className={styles.FirstSection}>
-                <PageSearch addonAfter={addonAfter} setSearch={setSearch} key={activeKey} />
+                <LoggersSearchBar
+                    activeKey={activeKey}
+                    addonAfter={addonAfter}
+                    searchFilters={searchFilters}
+                    setSearch={setSearch}
+                    setSearchFilters={setSearchFilters}
+                />
                 <Tabs
                     activeKey={activeKey}
                     onChange={handleTabChange}
