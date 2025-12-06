@@ -45,8 +45,7 @@ public record EnvironmentFeed(
             boolean isPrimary,
             @Nullable String configPropsBeanName,
             @Nullable String description,
-            @Nullable Deprecation deprecation) {
-    }
+            @Nullable Deprecation deprecation) {}
 
     public record Deprecation(
             @JsonProperty("reason") @Nullable String reason,
