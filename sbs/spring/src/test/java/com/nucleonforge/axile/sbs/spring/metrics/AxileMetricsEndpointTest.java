@@ -79,6 +79,21 @@ class AxileMetricsEndpointTest {
                                 "id", "G1 Survivor Space"));
     }
 
+    @Test
+    void shouldProduceEmptyValidTagCombinationsArrayInCaseNoTagsArePresent() {
+        // when.
+        String metricName = "jvm.gc.overhead";
+        ResponseEntity<MetricProfile> response =
+                testRestTemplate.getForEntity("/actuator/axile-metrics/" + metricName, MetricProfile.class);
+
+        // then.
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        MetricProfile metricProfile = response.getBody();
+
+        assertThat(metricProfile.name()).isEqualTo(metricName);
+        assertThat(metricProfile.validTagCombinations()).isEmpty();
+    }
+
     @ParameterizedTest
     @MethodSource("metricsGroups")
     void shouldReturnGroupedMetricsWithDescriptions(String groupName, String metricName, String metricDescription) {
