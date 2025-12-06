@@ -63,7 +63,9 @@
         "loggerGroups": "Logger groups",
         "configuredExplicitly": "Configured explicitly",
         "loggerLevelUpdated": "Level has been changed",
-        "reset": "Reset"
+        "reset": "Reset",
+        "configured": "Configured",
+        "classOnly": "Class only"
     },
     "Header": {
         "dashboard": "Dashboard",
