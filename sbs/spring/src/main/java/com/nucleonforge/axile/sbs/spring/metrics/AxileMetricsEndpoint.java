@@ -78,7 +78,9 @@ public class AxileMetricsEndpoint {
                 tagMap.put(tag.getKey(), tag.getValue());
             }
 
-            allCombinations.add(tagMap);
+            if (!tagMap.isEmpty()) {
+                allCombinations.add(tagMap);
+            }
         }
 
         return allCombinations;
