@@ -54,16 +54,18 @@ class EnvironmentApiTest {
               "name": "systemProperties",
               "properties": [
                 {
-                  "name": "java.vm.vendor",
-                  "value": "BellSoft",
-                  "isPrimary": true,
-                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
-                },
-                {
                   "name": "java.specification.version",
                   "value": "17",
                   "isPrimary": true,
-                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "description": null
+                },
+                {
+                  "name": "java.vm.vendor",
+                  "value": "BellSoft",
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "description": null
                 }
               ]
             },
@@ -72,9 +74,33 @@ class EnvironmentApiTest {
               "properties": [
                 {
                   "name": "JAVA_HOME",
-                  "value": "/opt/hostedtoolcache/Java_Liberica_jdk/17.0.16-12/x64",
+                  "value": "Java_Liberica_jdk/17.0.16-12/x64",
                   "isPrimary": true,
-                  "configPropsBeanName": null
+                  "configPropsBeanName": null,
+                  "description": "System Environment Property \\"JAVA_HOME\\""
+                },
+                {
+                  "name": "logging.path",
+                  "value": "pattern",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": "Location of the log file. For instance, `/var/log`.",
+                  "deprecation": {
+                      "reason": null,
+                      "replacement": "logging.file.path"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Config resource classpath:actuate/env/",
+              "properties": [
+                {
+                  "name": "com.example.cache.max-size",
+                  "value": "1000",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": null
                 }
               ]
             }
@@ -131,38 +157,67 @@ class EnvironmentApiTest {
         // language=json
         String jsonEnvResponse =
                 """
+
+                    {
+          "activeProfiles": ["production"],
+          "defaultProfiles": ["default", "development"],
+          "propertySources": [
             {
-              "activeProfiles": ["production"],
-              "defaultProfiles": ["default","development"],
-              "propertySources": [
+              "sourceName": "systemProperties",
+              "properties": [
                 {
-                  "name": "systemProperties",
-                  "properties": {
-                    "java.vm.vendor": {
-                      "value": "BellSoft",
-                      "isPrimary": true,
-                      "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
-                    },
-                    "java.specification.version": {
-                      "value": "17",
-                      "isPrimary": true,
-                      "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
-                    }
-                  }
+                  "propertyName": "java.specification.version",
+                  "value": "17",
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "description": null
                 },
                 {
-                  "name": "systemEnvironment",
-                  "properties": {
-                    "JAVA_HOME": {
-                      "value": "/opt/hostedtoolcache/Java_Liberica_jdk/17.0.16-12/x64",
-                      "origin": "System Environment Property \\"JAVA_HOME\\"",
-                      "isPrimary": true,
-                      "configPropsBeanName": null
-                    }
+                  "propertyName": "java.vm.vendor",
+                  "value": "BellSoft",
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "description": null
+                }
+              ]
+            },
+            {
+              "sourceName": "systemEnvironment",
+              "properties": [
+                {
+                  "propertyName": "JAVA_HOME",
+                  "value": "Java_Liberica_jdk/17.0.16-12/x64",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": "System Environment Property \\"JAVA_HOME\\""
+                },
+                {
+                  "propertyName": "logging.path",
+                  "value": "pattern",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": "Location of the log file. For instance, `/var/log`.",
+                  "deprecation": {
+                      "reason": null,
+                      "replacement": "logging.file.path"
                   }
                 }
               ]
+            },
+            {
+              "sourceName": "Config resource classpath:actuate/env/",
+              "properties": [
+                {
+                  "propertyName": "com.example.cache.max-size",
+                  "value": "1000",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": null
+                }
+              ]
             }
+          ]
+        }
         """;
 
         // language=json

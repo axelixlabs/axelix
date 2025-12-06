@@ -1,10 +1,10 @@
 package com.nucleonforge.axile.common.api.env;
 
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 
@@ -29,14 +29,26 @@ public record EnvironmentFeed(
         this.propertySources = propertySources;
     }
 
-    public record PropertySource(String sourceName, Map<String, AxilePropertyValue> properties) {
+    public record PropertySource(String sourceName, List<Property> properties) {
 
         @JsonCreator
         public PropertySource(
-                @JsonProperty("name") String sourceName,
-                @JsonProperty("properties") Map<String, AxilePropertyValue> properties) {
+                @JsonProperty("sourceName") String sourceName, @JsonProperty("properties") List<Property> properties) {
             this.sourceName = sourceName;
             this.properties = properties;
         }
     }
+
+    public record Property(
+            String propertyName,
+            @Nullable String value,
+            boolean isPrimary,
+            @Nullable String configPropsBeanName,
+            @Nullable String description,
+            @Nullable Deprecation deprecation) {
+    }
+
+    public record Deprecation(
+            @JsonProperty("reason") @Nullable String reason,
+            @JsonProperty("replacement") @Nullable String replacement) {}
 }

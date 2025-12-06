@@ -2,6 +2,7 @@ package com.nucleonforge.axile.master.api.response;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
@@ -24,21 +25,35 @@ public record EnvironmentFeedResponse(
      * Short profile of a given property source.
      *
      * @param name       the sourceName of the property source
-     * @param properties the list of property entries with name, value and primary flag
+     * @param properties the list of property entries
      */
-    public record PropertySourceShortProfile(String name, List<PropertyEntry> properties) {
+    public record PropertySourceShortProfile(String name, List<PropertyEntry> properties) {}
 
-        /**
-         * Represents a property with its value and whether it is the primary ("winning") property.
-         *
-         * @param name                  the property name
-         * @param value                 the property value
-         * @param isPrimary             whether this property value is primary (i.e. this value takes precedence over
-         *                              the other values from other property sources)
-         * @param configPropsBeanName   the name of the configprops (if any) bean onto which this property maps,
-         *                              {@code null} otherwise
-         */
-        public record PropertyEntry(
-                String name, @Nullable String value, boolean isPrimary, @Nullable String configPropsBeanName) {}
-    }
+    /**
+     * Represents a property value returned by the custom Axile environment endpoint.
+     *
+     * @param name                 the property name
+     * @param value                the string representation of the property's value
+     * @param isPrimary            whether this property value is primary (i.e. this value takes precedence over the other values
+     *                             from other property sources)
+     * @param configPropsBeanName  the propertyName of the configprops (if any) bean onto which this property maps,
+     *                             {@code null} otherwise
+     * @param description          the description from spring-configuration-metadata.json
+     * @param deprecation          deprecation related information. If {@code null}, the
+     *                             property is not considered deprecated. If not {@code null},
+     *                             then the property is considered deprecated.
+     */
+    public record PropertyEntry(
+            String name,
+            @Nullable String value,
+            boolean isPrimary,
+            @Nullable String configPropsBeanName,
+            @Nullable String description,
+            @JsonInclude(JsonInclude.Include.NON_NULL) @Nullable Deprecation deprecation) {}
+
+    /**
+     * @param reason the reason why the given property is deprecated.
+     * @param replacement the name of the property that potentially aims to replace the given deprecated property.
+     */
+    public record Deprecation(@Nullable String reason, @Nullable String replacement) {}
 }

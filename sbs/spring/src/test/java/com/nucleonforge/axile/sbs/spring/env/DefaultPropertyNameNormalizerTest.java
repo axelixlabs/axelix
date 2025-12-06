@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link DefaultEnvironmentPropertyNameNormalizer}
+ * Unit tests for {@link DefaultPropertyNameNormalizer}
  *
  * @author Sergey Cherkasov
  */
-public class DefaultEnvironmentPropertyNameNormalizerTest {
-    private final EnvironmentPropertyNameNormalizer nameNormalizer = new DefaultEnvironmentPropertyNameNormalizer();
+public class DefaultPropertyNameNormalizerTest {
+    private final PropertyNameNormalizer nameNormalizer = new DefaultPropertyNameNormalizer();
 
     @Test
     void shouldNormalizePropertyNames() {

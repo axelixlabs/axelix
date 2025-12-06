@@ -7,7 +7,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
 
-import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.env.PropertyNameNormalizer;
 
 /**
  * Default {@link PropertyNameDiscoverer}.
@@ -17,10 +17,10 @@ import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
 public class DefaultPropertyNameDiscoverer implements PropertyNameDiscoverer {
 
     private final ConfigurableEnvironment configurableEnvironment;
-    private final EnvironmentPropertyNameNormalizer propertyNameNormalizer;
+    private final PropertyNameNormalizer propertyNameNormalizer;
 
     public DefaultPropertyNameDiscoverer(
-            ConfigurableEnvironment configurableEnvironment, EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
+            ConfigurableEnvironment configurableEnvironment, PropertyNameNormalizer propertyNameNormalizer) {
         this.configurableEnvironment = configurableEnvironment;
         this.propertyNameNormalizer = propertyNameNormalizer;
     }

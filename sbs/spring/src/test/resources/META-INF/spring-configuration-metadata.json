@@ -1,0 +1,17 @@
+{
+  "properties": [
+    {
+      "name": "prop.test.server.port",
+      "description": "Server HTTP port.",
+      "deprecation": {
+        "reason": "Just because",
+        "replacement": "new.prop.test.server.port"
+      }
+    },
+    {
+      "name": "prop.test.logging.level.root",
+      "description": "Logging level for root logger.",
+      "defaultValue": "INFO"
+    }
+  ]
+}
