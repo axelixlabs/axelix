@@ -66,7 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
 @EnableConfigurationProperties(AxileEnvironmentEndpointTest.AxilePropTest.class)
-@Import({DefaultEnvPropertyEnricherTest.DefaultEnvPropertyEnricherTestConfiguration.class})
+@Import({EnvironmentTestConfig.class})
 class AxileEnvironmentEndpointTest {
 
     @Autowired
@@ -143,14 +143,9 @@ class AxileEnvironmentEndpointTest {
                             .containsKey("isPrimary")
                             .containsKey("value")
                             .containsKey("configPropsBeanName")
-                            .containsKey("description")
-                            .containsKey("deprecated")
-                            .containsKey("deprecatedReason")
-                            .containsKey("deprecatedReplacement");
+                            .containsKey("description");
 
                     assertThatJson(property).node("isPrimary").isBoolean();
-
-                    assertThatJson(property).node("deprecated").isBoolean();
                 }));
     }
 

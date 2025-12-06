@@ -22,5 +22,11 @@ public interface PropertyNameNormalizer {
      */
     String normalize(String propertyName);
 
+    /**
+     * @param propertyNames the collection that holds the names of the properties that needs to be normalized.
+     * @param collectionFactory the {@link Supplier} that will produce a collection into which the properties will be placed.
+     * @return newly created collection that will hold the normalized names of the properties.
+     * @param <C> the exact collection type.
+     */
     <C extends Collection<String>> C normalizeAll(C propertyNames, Supplier<C> collectionFactory);
 }

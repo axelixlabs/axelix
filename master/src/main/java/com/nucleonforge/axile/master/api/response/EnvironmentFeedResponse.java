@@ -2,6 +2,7 @@ package com.nucleonforge.axile.master.api.response;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
@@ -37,10 +38,10 @@ public record EnvironmentFeedResponse(
      *                             from other property sources)
      * @param configPropsBeanName  the propertyName of the configprops (if any) bean onto which this property maps,
      *                             {@code null} otherwise
-     * @param description          the description from spring-configuration-metadata.json, may be {@code null}
-     * @param deprecated           whether this property is marked as deprecated
-     * @param deprecatedReason     the reason why this property was deprecated, may be {@code null}
-     * @param deprecatedReplacement the property that replaces this deprecated property, may be {@code null}
+     * @param description          the description from spring-configuration-metadata.json
+     * @param deprecation          deprecation related information. If {@code null}, the
+     *                             property is not considered deprecated. If not {@code null},
+     *                             then the property is considered deprecated.
      */
     public record PropertyEntry(
             String name,
@@ -48,7 +49,11 @@ public record EnvironmentFeedResponse(
             boolean isPrimary,
             @Nullable String configPropsBeanName,
             @Nullable String description,
-            boolean deprecated,
-            @Nullable String deprecatedReason,
-            @Nullable String deprecatedReplacement) {}
+            @JsonInclude(JsonInclude.Include.NON_NULL) @Nullable Deprecation deprecation) {}
+
+    /**
+     * @param reason the reason why the given property is deprecated.
+     * @param replacement the name of the property that potentially aims to replace the given deprecated property.
+     */
+    public record Deprecation(@Nullable String reason, @Nullable String replacement) {}
 }

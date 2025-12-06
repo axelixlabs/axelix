@@ -45,28 +45,10 @@ public record EnvironmentFeed(
             boolean isPrimary,
             @Nullable String configPropsBeanName,
             @Nullable String description,
-            boolean deprecated,
-            @Nullable String deprecatedReason,
-            @Nullable String deprecatedReplacement) {
-
-        @JsonCreator
-        public Property(
-                @JsonProperty("propertyName") String propertyName,
-                @JsonProperty("value") @Nullable String value,
-                @JsonProperty("isPrimary") boolean isPrimary,
-                @JsonProperty("configPropsBeanName") @Nullable String configPropsBeanName,
-                @JsonProperty("description") @Nullable String description,
-                @JsonProperty("deprecated") boolean deprecated,
-                @JsonProperty("deprecatedReason") @Nullable String deprecatedReason,
-                @JsonProperty("deprecatedReplacement") @Nullable String deprecatedReplacement) {
-            this.propertyName = propertyName;
-            this.value = value;
-            this.isPrimary = isPrimary;
-            this.configPropsBeanName = configPropsBeanName;
-            this.description = description;
-            this.deprecated = deprecated;
-            this.deprecatedReason = deprecatedReason;
-            this.deprecatedReplacement = deprecatedReplacement;
-        }
+            @Nullable Deprecation deprecation) {
     }
+
+    public record Deprecation(
+            @JsonProperty("reason") @Nullable String reason,
+            @JsonProperty("replacement") @Nullable String replacement) {}
 }

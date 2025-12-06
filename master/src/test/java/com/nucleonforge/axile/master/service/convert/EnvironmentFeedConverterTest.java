@@ -49,9 +49,7 @@ class EnvironmentFeedConverterTest {
             assertThat(kv.isPrimary()).isTrue();
             assertThat(kv.configPropsBeanName()).isEqualTo("org.springframework.boot.test.property.SystemProperties");
             assertThat(kv.description()).isNull();
-            assertThat(kv.deprecated()).isFalse();
-            assertThat(kv.deprecatedReason()).isNull();
-            assertThat(kv.deprecatedReplacement()).isNull();
+            assertThat(kv.deprecation()).isNull();
         });
 
         PropertySourceShortProfile propertySource2 =
@@ -62,9 +60,7 @@ class EnvironmentFeedConverterTest {
             assertThat(kv.isPrimary()).isTrue();
             assertThat(kv.configPropsBeanName()).isEqualTo("org.springframework.boot.test.property.SystemEnvironment");
             assertThat(kv.description()).isNull();
-            assertThat(kv.deprecated()).isFalse();
-            assertThat(kv.deprecatedReason()).isNull();
-            assertThat(kv.deprecatedReplacement()).isNull();
+            assertThat(kv.deprecation()).isNull();
         });
 
         PropertySourceShortProfile propertySource3 = getPropertySourceProfileByName(
@@ -77,9 +73,7 @@ class EnvironmentFeedConverterTest {
                     assertThat(kv.isPrimary()).isFalse();
                     assertThat(kv.configPropsBeanName()).isNull();
                     assertThat(kv.description()).isNull();
-                    assertThat(kv.deprecated()).isFalse();
-                    assertThat(kv.deprecatedReason()).isNull();
-                    assertThat(kv.deprecatedReplacement()).isNull();
+                    assertThat(kv.deprecation()).isNull();
                 })
                 .anySatisfy(kv -> {
                     assertThat(kv.name()).isEqualTo("spring.jpa.hibernate.ddl-auto");
@@ -89,9 +83,7 @@ class EnvironmentFeedConverterTest {
                     assertThat(kv.description())
                             .isEqualTo(
                                     "DDL mode. This is actually a shortcut for the \"hibernate.hbm2ddl.auto\" property.");
-                    assertThat(kv.deprecated()).isFalse();
-                    assertThat(kv.deprecatedReason()).isNull();
-                    assertThat(kv.deprecatedReplacement()).isNull();
+                    assertThat(kv.deprecation()).isNull();
                 });
 
         PropertySourceShortProfile propertySource4 =
@@ -106,9 +98,7 @@ class EnvironmentFeedConverterTest {
                             .isEqualTo(
                                     "org.springframework.cloud.spring.cloud.client.hostname.SpringCloudClientHostInfo");
                     assertThat(kv.description()).isNull();
-                    assertThat(kv.deprecated()).isFalse();
-                    assertThat(kv.deprecatedReason()).isNull();
-                    assertThat(kv.deprecatedReplacement()).isNull();
+                    assertThat(kv.deprecation()).isNull();
                 })
                 .anySatisfy(kv -> {
                     assertThat(kv.name()).isEqualTo("logging.path");
@@ -116,9 +106,7 @@ class EnvironmentFeedConverterTest {
                     assertThat(kv.isPrimary()).isFalse();
                     assertThat(kv.configPropsBeanName()).isNull();
                     assertThat(kv.description()).isEqualTo("Location of the log file. For instance, `/var/log`.");
-                    assertThat(kv.deprecated()).isFalse();
-                    assertThat(kv.deprecatedReason()).isNull();
-                    assertThat(kv.deprecatedReplacement()).isEqualTo("logging.file.path");
+                    assertThat(kv.deprecation()).isNull();
                 });
     }
 
@@ -149,8 +137,6 @@ class EnvironmentFeedConverterTest {
                 true,
                 "org.springframework.boot.test.property.SystemProperties",
                 null,
-                false,
-                null,
                 null));
         PropertySource propertySource1 = new PropertySource("systemProperties", properties1);
 
@@ -161,22 +147,19 @@ class EnvironmentFeedConverterTest {
                 true,
                 "org.springframework.boot.test.property.SystemEnvironment",
                 null,
-                false,
-                null,
                 null));
         PropertySource propertySource2 = new PropertySource("systemEnvironment", properties2);
 
         List<Property> properties3 = new ArrayList<>();
-        properties3.add(new Property(
-                "spring.datasource.driver-class-sourceName", "org.h2.Driver", false, null, null, false, null, null));
+        properties3.add(
+                new Property("spring.datasource.driver-class-sourceName", "org.h2.Driver", false, null, null, null));
+
         properties3.add(new Property(
                 "spring.jpa.hibernate.ddl-auto",
                 "create-drop",
                 false,
                 null,
                 "DDL mode. This is actually a shortcut for the \"hibernate.hbm2ddl.auto\" property.",
-                false,
-                null,
                 null));
         PropertySource propertySource3 =
                 new PropertySource("Config resource class path resource [application.yaml]", properties3);
@@ -188,18 +171,10 @@ class EnvironmentFeedConverterTest {
                 false,
                 "org.springframework.cloud.spring.cloud.client.hostname.SpringCloudClientHostInfo",
                 null,
-                false,
-                null,
                 null));
+
         properties4.add(new Property(
-                "logging.path",
-                "pattern",
-                false,
-                null,
-                "Location of the log file. For instance, `/var/log`.",
-                false,
-                null,
-                "logging.file.path"));
+                "logging.path", "pattern", false, null, "Location of the log file. For instance, `/var/log`.", null));
         PropertySource propertySource4 = new PropertySource("springCloudClientHostInfo", properties4);
 
         return new ArrayList<>(List.of(propertySource1, propertySource2, propertySource3, propertySource4));

@@ -155,10 +155,7 @@ class StateExportApiTest {
                   "value": "BellSoft",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null,
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": null
                 }
               ]
             }
