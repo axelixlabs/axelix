@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 import com.nucleonforge.axile.sbs.spring.context.ContextRestarter;
-import com.nucleonforge.axile.sbs.spring.env.DefaultEnvironmentPropertyNameNormalizer;
-import com.nucleonforge.axile.sbs.spring.env.EnvironmentPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.env.DefaultPropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.env.PropertyNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.properties.ContextReloadingPropertyMutator;
 import com.nucleonforge.axile.sbs.spring.properties.DefaultPropertyNameDiscoverer;
 import com.nucleonforge.axile.sbs.spring.properties.DefaultPropertySourceDescriber;
@@ -47,14 +47,14 @@ public class PropertyManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
-        return new DefaultEnvironmentPropertyNameNormalizer();
+    public PropertyNameNormalizer propertyNameNormalizer() {
+        return new DefaultPropertyNameNormalizer();
     }
 
     @Bean
     @ConditionalOnMissingBean
     public PropertyNameDiscoverer propertyNameDiscoverer(
-            ConfigurableEnvironment environment, EnvironmentPropertyNameNormalizer propertyNameNormalizer) {
+            ConfigurableEnvironment environment, PropertyNameNormalizer propertyNameNormalizer) {
         return new DefaultPropertyNameDiscoverer(environment, propertyNameNormalizer);
     }
 

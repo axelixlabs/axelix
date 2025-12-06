@@ -16,8 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axile.common.api.env.AxilePropertyValue;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
@@ -70,45 +71,62 @@ class EnvironmentEndpointProberTest {
           "defaultProfiles": ["default", "test"],
           "propertySources": [
             {
-              "name": "servletContextInitParams",
-              "properties": {}
+              "sourceName": "servletContextInitParams",
+              "properties": []
             },
             {
-              "name": "systemProperties",
-              "properties": {
-                "java.specification.version": {
+              "sourceName": "systemProperties",
+              "properties": [
+                {
+                  "propertyName": "java.specification.version",
                   "value": "17",
                   "isPrimary": true,
-                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "description": null
                 },
-                "java.vm.vendor": {
+                {
+                  "propertyName": "java.vm.vendor",
                   "value": "BellSoft",
                   "isPrimary": true,
-                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties"
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "description": null
                 }
-              }
+              ]
             },
             {
-              "name": "systemEnvironment",
-              "properties": {
-                "JAVA_HOME": {
+              "sourceName": "systemEnvironment",
+              "properties": [
+                {
+                  "propertyName": "JAVA_HOME",
                   "value": "Java_Liberica_jdk/17.0.16-12/x64",
-                  "origin": "System Environment Property \\"JAVA_HOME\\"",
                   "isPrimary": true,
-                  "configPropsBeanName": null
+                  "configPropsBeanName": null,
+                  "description": "System Environment Property \\"JAVA_HOME\\""
+                },
+                {
+                  "propertyName": "logging.path",
+                  "value": "pattern",
+                  "isPrimary": true,
+                  "configPropsBeanName": null,
+                  "description": "Location of the log file. For instance, `/var/log`.",
+                  "deprecation": {
+                    "reason": null,
+                    "replacement": "logging.file.path"
+                  }
                 }
-              }
+              ]
             },
             {
-              "name": "Config resource classpath:actuate/env/",
-              "properties": {
-                "com.example.cache.max-size": {
+              "sourceName": "Config resource classpath:actuate/env/",
+              "properties": [
+                {
+                  "propertyName": "com.example.cache.max-size",
                   "value": "1000",
-                  "origin": "class path resource [application.properties]",
                   "isPrimary": true,
-                  "configPropsBeanName": null
+                  "configPropsBeanName": null,
+                  "description": null
                 }
-              }
+              ]
             }
           ]
         }
@@ -143,57 +161,81 @@ class EnvironmentEndpointProberTest {
         assertThat(feed.activeProfiles()).containsOnly("production");
         assertThat(feed.defaultProfiles()).containsOnly("test", "default");
 
-        EnvironmentFeed.PropertySource servletParams = feed.propertySources().stream()
+        PropertySource servletParams = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("servletContextInitParams"))
                 .findFirst()
                 .orElseThrow();
         assertThat(servletParams.properties()).isEmpty();
 
-        EnvironmentFeed.PropertySource systemProperties = feed.propertySources().stream()
+        PropertySource systemProperties = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemProperties"))
                 .findFirst()
                 .orElseThrow();
-        assertThat(systemProperties.properties())
-                .hasSize(2)
-                .containsKeys("java.specification.version", "java.vm.vendor");
+        assertThat(systemProperties.properties()).hasSize(2);
 
-        AxilePropertyValue javaSpecVersion = systemProperties.properties().get("java.specification.version");
+        Property javaSpecVersion = systemProperties.properties().stream()
+                .filter(pv -> pv.propertyName().equals("java.specification.version"))
+                .findFirst()
+                .orElseThrow();
         assertThat(javaSpecVersion.value()).isEqualTo("17");
-        assertThat(javaSpecVersion.origin()).isNull();
         assertThat(javaSpecVersion.isPrimary()).isTrue();
         assertThat(javaSpecVersion.configPropsBeanName())
                 .isEqualTo("org.springframework.boot.test.property.SystemProperties");
+        assertThat(javaSpecVersion.description()).isNull();
+        assertThat(javaSpecVersion.deprecation()).isNull();
 
-        AxilePropertyValue javaVmVendor = systemProperties.properties().get("java.vm.vendor");
+        Property javaVmVendor = systemProperties.properties().stream()
+                .filter(pv -> pv.propertyName().equals("java.vm.vendor"))
+                .findFirst()
+                .orElseThrow();
         assertThat(javaVmVendor.value()).isEqualTo("BellSoft");
-        assertThat(javaVmVendor.origin()).isNull();
         assertThat(javaVmVendor.isPrimary()).isTrue();
         assertThat(javaVmVendor.configPropsBeanName())
                 .isEqualTo("org.springframework.boot.test.property.SystemProperties");
+        assertThat(javaVmVendor.description()).isNull();
+        assertThat(javaVmVendor.deprecation()).isNull();
 
-        EnvironmentFeed.PropertySource systemEnvironment = feed.propertySources().stream()
+        PropertySource systemEnvironment = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemEnvironment"))
                 .findFirst()
                 .orElseThrow();
-        assertThat(systemEnvironment.properties()).containsKey("JAVA_HOME");
 
-        AxilePropertyValue javaHome = systemEnvironment.properties().get("JAVA_HOME");
+        Property javaHome = systemEnvironment.properties().stream()
+                .filter(pv -> pv.propertyName().equals("JAVA_HOME"))
+                .findFirst()
+                .orElseThrow();
         assertThat(javaHome.value()).isEqualTo("Java_Liberica_jdk/17.0.16-12/x64");
-        assertThat(javaHome.origin()).isEqualTo("System Environment Property \"JAVA_HOME\"");
         assertThat(javaHome.isPrimary()).isTrue();
         assertThat(javaHome.configPropsBeanName()).isNull();
+        assertThat(javaHome.description()).isEqualTo("System Environment Property \"JAVA_HOME\"");
+        assertThat(javaHome.deprecation()).isNull();
 
-        EnvironmentFeed.PropertySource configResource = feed.propertySources().stream()
+        Property loggingPath = systemEnvironment.properties().stream()
+                .filter(pv -> pv.propertyName().equals("logging.path"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(loggingPath.value()).isEqualTo("pattern");
+        assertThat(loggingPath.isPrimary()).isTrue();
+        assertThat(loggingPath.configPropsBeanName()).isNull();
+        assertThat(loggingPath.description()).isEqualTo("Location of the log file. For instance, `/var/log`.");
+        assertThat(loggingPath.deprecation()).isNotNull();
+        assertThat(loggingPath.deprecation().reason()).isNull();
+        assertThat(loggingPath.deprecation().replacement()).isEqualTo("logging.file.path");
+
+        PropertySource configResource = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("Config resource classpath:actuate/env/"))
                 .findFirst()
                 .orElseThrow();
-        assertThat(configResource.properties()).containsKey("com.example.cache.max-size");
 
-        AxilePropertyValue cacheMaxSize = configResource.properties().get("com.example.cache.max-size");
+        Property cacheMaxSize = configResource.properties().stream()
+                .filter(pv -> pv.propertyName().equals("com.example.cache.max-size"))
+                .findFirst()
+                .orElseThrow();
         assertThat(cacheMaxSize.value()).isEqualTo("1000");
-        assertThat(cacheMaxSize.origin()).isEqualTo("class path resource [application.properties]");
         assertThat(cacheMaxSize.isPrimary()).isTrue();
         assertThat(cacheMaxSize.configPropsBeanName()).isNull();
+        assertThat(cacheMaxSize.description()).isNull();
+        assertThat(cacheMaxSize.deprecation()).isNull();
     }
 
     @Test

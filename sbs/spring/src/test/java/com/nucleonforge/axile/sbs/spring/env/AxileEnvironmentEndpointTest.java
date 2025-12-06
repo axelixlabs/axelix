@@ -10,9 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -20,17 +18,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
-import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
-import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesConverter;
-import com.nucleonforge.axile.sbs.spring.configprops.DefaultConfigurationPropertiesConverter;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,6 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
 @EnableConfigurationProperties(AxileEnvironmentEndpointTest.AxilePropTest.class)
+@Import({EnvironmentTestConfig.class})
 class AxileEnvironmentEndpointTest {
 
     @Autowired
@@ -93,13 +90,13 @@ class AxileEnvironmentEndpointTest {
     @ParameterizedTest(name = "Property ''{0}'' should resolve from highest-precedence source")
     @MethodSource("propertyExpectations")
     void shouldSelectPrimaryPropertyFromHighestPrecedenceSource(String propertyName, String expectedValue) {
-        ResponseEntity<AxileEnvironmentEndpoint.AxileEnvironmentDescriptor> response = restTemplate.getForEntity(
-                "/actuator/axile-env", AxileEnvironmentEndpoint.AxileEnvironmentDescriptor.class);
+        ResponseEntity<EnvironmentFeed> response =
+                restTemplate.getForEntity("/actuator/axile-env", EnvironmentFeed.class);
 
         var propertyAppearances = response.getBody().propertySources().stream()
-                .flatMap(src -> src.properties().entrySet().stream()
-                        .filter(e -> e.getKey().equals(propertyName))
-                        .map(e -> Map.entry(src.name(), e.getValue())))
+                .flatMap(src -> src.properties().stream()
+                        .filter(p -> p.propertyName().equals(propertyName))
+                        .map(p -> Map.entry(src.sourceName(), p)))
                 .toList();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -139,25 +136,29 @@ class AxileEnvironmentEndpointTest {
         assertThatJson(responseBody)
                 .inPath("propertySources[*].properties")
                 .isArray()
-                .allSatisfy(properties -> assertThatJson(properties)
-                        .isObject()
-                        .allSatisfy((propertyName, propertyValue) -> assertThatJson(propertyValue)
-                                .isObject()
-                                .containsKey("isPrimary") // isPrimary flag should always present in response
-                                .node("isPrimary")
-                                .isBoolean()));
+                .allSatisfy(properties -> assertThatJson(properties).isArray().allSatisfy(property -> {
+                    assertThatJson(property)
+                            .isObject()
+                            .containsKey("propertyName")
+                            .containsKey("isPrimary")
+                            .containsKey("value")
+                            .containsKey("configPropsBeanName")
+                            .containsKey("description");
+
+                    assertThatJson(property).node("isPrimary").isBoolean();
+                }));
     }
 
     @ParameterizedTest
     @MethodSource("propertyName")
     void shouldReturnTheBeanNameThatMatchesTheConfigProps(String propertyName) {
-        ResponseEntity<AxileEnvironmentEndpoint.AxileEnvironmentDescriptor> response = restTemplate.getForEntity(
-                "/actuator/axile-env", AxileEnvironmentEndpoint.AxileEnvironmentDescriptor.class);
+        ResponseEntity<EnvironmentFeed> response =
+                restTemplate.getForEntity("/actuator/axile-env", EnvironmentFeed.class);
 
         var propertyAppearances = response.getBody().propertySources().stream()
-                .flatMap(src -> src.properties().entrySet().stream()
-                        .filter(e -> e.getKey().equals(propertyName))
-                        .map(e -> Map.entry(src.name(), e.getValue())))
+                .flatMap(src -> src.properties().stream()
+                        .filter(p -> p.propertyName().equals(propertyName))
+                        .map(p -> Map.entry(src.sourceName(), p)))
                 .toList();
 
         assertThat(propertyAppearances)
@@ -197,32 +198,6 @@ class AxileEnvironmentEndpointTest {
 
     @TestConfiguration
     static class AxileEnvironmentEndpointTestConfiguration {
-
-        @Bean
-        public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-            return new DefaultConfigurationPropertiesConverter();
-        }
-
-        @Bean
-        public ConfigurationPropertiesCache configurationPropertiesCache(
-                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
-                ConfigurationPropertiesConverter configurationPropertiesConverter) {
-            return new ConfigurationPropertiesCache(
-                    configurationPropertiesReportEndpoint, configurationPropertiesConverter);
-        }
-
-        @Bean
-        public EnvironmentPropertyNameNormalizer propertyNameNormalizer() {
-            return new DefaultEnvironmentPropertyNameNormalizer();
-        }
-
-        @Bean
-        public EnvPropertyEnricher envPropertyEnricher(
-                Environment environment,
-                EnvironmentPropertyNameNormalizer propertyNameNormalizer,
-                ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache) {
-            return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, configurationPropertiesCache);
-        }
 
         @Bean
         public AxileEnvironmentEndpoint axileEnvironmentEndpoint(
