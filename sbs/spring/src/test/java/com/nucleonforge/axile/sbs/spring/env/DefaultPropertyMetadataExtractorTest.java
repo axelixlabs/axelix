@@ -45,9 +45,9 @@ class DefaultPropertyMetadataExtractorTest {
         PropertyMetadata serverPortMetadata = extractor.getMetadata(normalizer.normalize("prop.test.server.port"));
         assertThat(serverPortMetadata).isNotNull();
         assertThat(serverPortMetadata.description()).isEqualTo("Server HTTP port.");
-        assertThat(serverPortMetadata.deprecated()).isTrue();
-        assertThat(serverPortMetadata.deprecatedReason()).isEqualTo("Just because");
-        assertThat(serverPortMetadata.deprecatedReplacement()).isEqualTo("new.prop.test.server.port");
+        assertThat(serverPortMetadata.deprecation()).isNotNull();
+        assertThat(serverPortMetadata.deprecation().reason()).isEqualTo("Just because");
+        assertThat(serverPortMetadata.deprecation().replacement()).isEqualTo("new.prop.test.server.port");
 
         PropertyMetadata loggingMetadata = extractor.getMetadata(normalizer.normalize("prop.test.logging.level.root"));
         assertThat(loggingMetadata).isNotNull();

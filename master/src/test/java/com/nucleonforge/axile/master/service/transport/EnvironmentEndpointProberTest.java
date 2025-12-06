@@ -82,20 +82,14 @@ class EnvironmentEndpointProberTest {
                   "value": "17",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null,
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": null
                 },
                 {
                   "propertyName": "java.vm.vendor",
                   "value": "BellSoft",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null,
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": null
                 }
               ]
             },
@@ -107,10 +101,7 @@ class EnvironmentEndpointProberTest {
                   "value": "Java_Liberica_jdk/17.0.16-12/x64",
                   "isPrimary": true,
                   "configPropsBeanName": null,
-                  "description": "System Environment Property \\"JAVA_HOME\\"",
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": "System Environment Property \\"JAVA_HOME\\""
                 },
                 {
                   "propertyName": "logging.path",
@@ -118,9 +109,10 @@ class EnvironmentEndpointProberTest {
                   "isPrimary": true,
                   "configPropsBeanName": null,
                   "description": "Location of the log file. For instance, `/var/log`.",
-                  "deprecated": true,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": "logging.file.path"
+                  "deprecation": {
+                    "reason": null,
+                    "replacement": "logging.file.path"
+                  }
                 }
               ]
             },
@@ -132,10 +124,7 @@ class EnvironmentEndpointProberTest {
                   "value": "1000",
                   "isPrimary": true,
                   "configPropsBeanName": null,
-                  "description": null,
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": null
                 }
               ]
             }
@@ -193,9 +182,7 @@ class EnvironmentEndpointProberTest {
         assertThat(javaSpecVersion.configPropsBeanName())
                 .isEqualTo("org.springframework.boot.test.property.SystemProperties");
         assertThat(javaSpecVersion.description()).isNull();
-        assertThat(javaSpecVersion.deprecated()).isFalse();
-        assertThat(javaSpecVersion.deprecatedReason()).isNull();
-        assertThat(javaSpecVersion.deprecatedReplacement()).isNull();
+        assertThat(javaSpecVersion.deprecation()).isNull();
 
         Property javaVmVendor = systemProperties.properties().stream()
                 .filter(pv -> pv.propertyName().equals("java.vm.vendor"))
@@ -206,9 +193,7 @@ class EnvironmentEndpointProberTest {
         assertThat(javaVmVendor.configPropsBeanName())
                 .isEqualTo("org.springframework.boot.test.property.SystemProperties");
         assertThat(javaVmVendor.description()).isNull();
-        assertThat(javaVmVendor.deprecated()).isFalse();
-        assertThat(javaVmVendor.deprecatedReason()).isNull();
-        assertThat(javaVmVendor.deprecatedReplacement()).isNull();
+        assertThat(javaVmVendor.deprecation()).isNull();
 
         PropertySource systemEnvironment = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemEnvironment"))
@@ -223,9 +208,7 @@ class EnvironmentEndpointProberTest {
         assertThat(javaHome.isPrimary()).isTrue();
         assertThat(javaHome.configPropsBeanName()).isNull();
         assertThat(javaHome.description()).isEqualTo("System Environment Property \"JAVA_HOME\"");
-        assertThat(javaHome.deprecated()).isFalse();
-        assertThat(javaHome.deprecatedReason()).isNull();
-        assertThat(javaHome.deprecatedReplacement()).isNull();
+        assertThat(javaHome.deprecation()).isNull();
 
         Property loggingPath = systemEnvironment.properties().stream()
                 .filter(pv -> pv.propertyName().equals("logging.path"))
@@ -235,9 +218,9 @@ class EnvironmentEndpointProberTest {
         assertThat(loggingPath.isPrimary()).isTrue();
         assertThat(loggingPath.configPropsBeanName()).isNull();
         assertThat(loggingPath.description()).isEqualTo("Location of the log file. For instance, `/var/log`.");
-        assertThat(loggingPath.deprecated()).isTrue();
-        assertThat(loggingPath.deprecatedReason()).isNull();
-        assertThat(loggingPath.deprecatedReplacement()).isEqualTo("logging.file.path");
+        assertThat(loggingPath.deprecation()).isNotNull();
+        assertThat(loggingPath.deprecation().reason()).isNull();
+        assertThat(loggingPath.deprecation().replacement()).isEqualTo("logging.file.path");
 
         PropertySource configResource = feed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("Config resource classpath:actuate/env/"))
@@ -252,7 +235,7 @@ class EnvironmentEndpointProberTest {
         assertThat(cacheMaxSize.isPrimary()).isTrue();
         assertThat(cacheMaxSize.configPropsBeanName()).isNull();
         assertThat(cacheMaxSize.description()).isNull();
-        assertThat(cacheMaxSize.deprecated()).isFalse();
+        assertThat(cacheMaxSize.deprecation()).isNull();
     }
 
     @Test

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
@@ -48,11 +49,19 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
                         property.isPrimary(),
                         property.configPropsBeanName(),
                         property.description(),
-                        property.deprecated(),
-                        property.deprecatedReason(),
-                        property.deprecatedReplacement()));
+                        mapDeprecation(property.deprecation())));
             }
         }
+
         return properties;
+    }
+
+    private EnvironmentFeedResponse.@Nullable Deprecation mapDeprecation(
+            EnvironmentFeed.@Nullable Deprecation deprecation) {
+        if (deprecation == null) {
+            return null;
+        }
+
+        return new EnvironmentFeedResponse.Deprecation(deprecation.reason(), deprecation.replacement());
     }
 }

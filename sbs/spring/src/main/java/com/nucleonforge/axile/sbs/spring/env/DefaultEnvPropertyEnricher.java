@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 
@@ -16,6 +17,7 @@ import org.springframework.core.env.Environment;
 
 import com.nucleonforge.axile.common.api.KeyValue;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Deprecation;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCache;
@@ -93,32 +95,32 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                     boolean isPrimary = Objects.equals(primaryPropertySourceMap.get(normalizedName), source.getName());
                     String configPropsBeanName = configPropsMapping.getOrDefault(normalizedName, null);
 
-                    String description = null;
-                    boolean deprecated = false;
-                    String deprecationReason = null;
-                    String deprecatedReplacement = null;
                     PropertyMetadata metadata = metadataExtractor.getMetadata(normalizedName);
-
-                    if (metadata != null) {
-                        description = metadata.description();
-                        deprecated = metadata.deprecated();
-                        deprecationReason = metadata.deprecatedReason();
-                        deprecatedReplacement = metadata.deprecatedReplacement();
-                    }
 
                     return new Property(
                             propertyName,
                             stringValue,
                             isPrimary,
                             configPropsBeanName,
-                            description,
-                            deprecated,
-                            deprecationReason,
-                            deprecatedReplacement);
+                            Optional.ofNullable(metadata)
+                                    .map(PropertyMetadata::description)
+                                    .orElse(null),
+                            buildFromMetadata(metadata));
                 })
                 .toList();
 
         return new PropertySource(source.getName(), enrichedProperties);
+    }
+
+    @Nullable
+    private Deprecation buildFromMetadata(@Nullable PropertyMetadata propertyMetadata) {
+        if (propertyMetadata == null || propertyMetadata.deprecation() == null) {
+            return null;
+        }
+
+        return new Deprecation(
+                propertyMetadata.deprecation().reason(),
+                propertyMetadata.deprecation().replacement());
     }
 
     private Map<String, String> buildConfigPropsMappingMap() {

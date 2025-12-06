@@ -9,6 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -19,6 +21,9 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.util.StringUtils;
+
+import com.nucleonforge.axile.sbs.spring.env.PropertyMetadata.Deprecation;
 
 /**
  * Default implementation of {@link PropertyMetadataExtractor} that loads metadata from Spring Boot
@@ -30,18 +35,23 @@ import org.springframework.scheduling.annotation.Async;
  *
  * @since 04.12.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivkha
  */
 public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtractor {
+
+    private static final Logger log = LoggerFactory.getLogger(DefaultPropertyMetadataExtractor.class);
 
     private final ConfigurableEnvironment configurableEnvironment;
     private final PropertyNameNormalizer propertyNameNormalizer;
     private final Map<String, PropertyMetadata> metadataMap;
+    private final ObjectMapper objectMapper;
 
     public DefaultPropertyMetadataExtractor(
             ConfigurableEnvironment configurableEnvironment, PropertyNameNormalizer propertyNameNormalizer) {
         this.configurableEnvironment = configurableEnvironment;
         this.propertyNameNormalizer = propertyNameNormalizer;
-        metadataMap = new ConcurrentHashMap<>();
+        this.metadataMap = new ConcurrentHashMap<>();
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
@@ -68,13 +78,15 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
             for (Resource resource : resources) {
                 processMetadataResource(resource);
             }
-        } catch (Exception ignored) {
+        } catch (Exception ex) {
+            log.warn(
+                    "Unable to load spring-configuration-metadata.json files from the classpath. That would lead to absence of certain properties-related information",
+                    ex);
         }
     }
 
     private void processMetadataResource(Resource resource) {
         try (InputStream is = resource.getInputStream()) {
-            ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(is);
 
             JsonNode propertiesNode = rootNode.get("properties");
@@ -83,7 +95,10 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
                     processPropertyNode(propertyNode);
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception ex) {
+            log.warn(
+                    "Unable to load resource from the classpath. Properties info specified in the resource will not be loaded",
+                    ex);
         }
     }
 
@@ -98,11 +113,15 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
             return;
         }
 
-        String description = extractTextOrNull(propertyNode, "description");
+        metadataMap.put(normalizedName, buildPropertyMetadata(propertyNode));
+    }
 
+    public @Nullable PropertyMetadata buildPropertyMetadata(JsonNode propertyNode) {
         boolean deprecated = false;
-        String deprecatedReason = null;
-        String deprecatedReplacement = null;
+        String reason = null;
+        String replacement = null;
+
+        String description = extractTextOrNull(propertyNode, "description");
 
         if (propertyNode.has("deprecated") && propertyNode.get("deprecated").isBoolean()) {
             deprecated = propertyNode.get("deprecated").asBoolean();
@@ -112,15 +131,15 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
             JsonNode deprecationNode = propertyNode.get("deprecation");
             if (deprecationNode.isObject()) {
                 deprecated = true;
-                deprecatedReason = extractTextOrNull(deprecationNode, "reason");
-                deprecatedReplacement = extractTextOrNull(deprecationNode, "replacement");
+                reason = extractTextOrNull(deprecationNode, "reason");
+                replacement = extractTextOrNull(deprecationNode, "replacement");
             }
         }
 
-        if (description != null || deprecated) {
-            metadataMap.put(
-                    normalizedName,
-                    new PropertyMetadata(description, deprecated, deprecatedReason, deprecatedReplacement));
+        if (deprecated || StringUtils.hasText(description)) {
+            return new PropertyMetadata(description, deprecated ? new Deprecation(reason, replacement) : null);
+        } else {
+            return null;
         }
     }
 

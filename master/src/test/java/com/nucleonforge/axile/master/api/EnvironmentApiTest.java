@@ -58,20 +58,14 @@ class EnvironmentApiTest {
                   "value": "17",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null,
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": null
                 },
                 {
                   "name": "java.vm.vendor",
                   "value": "BellSoft",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null,
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": null
                 }
               ]
             },
@@ -83,10 +77,7 @@ class EnvironmentApiTest {
                   "value": "Java_Liberica_jdk/17.0.16-12/x64",
                   "isPrimary": true,
                   "configPropsBeanName": null,
-                  "description": "System Environment Property \\"JAVA_HOME\\"",
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": "System Environment Property \\"JAVA_HOME\\""
                 },
                 {
                   "name": "logging.path",
@@ -94,9 +85,10 @@ class EnvironmentApiTest {
                   "isPrimary": true,
                   "configPropsBeanName": null,
                   "description": "Location of the log file. For instance, `/var/log`.",
-                  "deprecated": true,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": "logging.file.path"
+                  "deprecation": {
+                      "reason": null,
+                      "replacement": "logging.file.path"
+                  }
                 }
               ]
             },
@@ -108,10 +100,7 @@ class EnvironmentApiTest {
                   "value": "1000",
                   "isPrimary": true,
                   "configPropsBeanName": null,
-                  "description": null,
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": null
                 }
               ]
             }
@@ -181,20 +170,14 @@ class EnvironmentApiTest {
                   "value": "17",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null,
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": null
                 },
                 {
                   "propertyName": "java.vm.vendor",
                   "value": "BellSoft",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null,
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": null
                 }
               ]
             },
@@ -206,10 +189,7 @@ class EnvironmentApiTest {
                   "value": "Java_Liberica_jdk/17.0.16-12/x64",
                   "isPrimary": true,
                   "configPropsBeanName": null,
-                  "description": "System Environment Property \\"JAVA_HOME\\"",
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": "System Environment Property \\"JAVA_HOME\\""
                 },
                 {
                   "propertyName": "logging.path",
@@ -217,9 +197,10 @@ class EnvironmentApiTest {
                   "isPrimary": true,
                   "configPropsBeanName": null,
                   "description": "Location of the log file. For instance, `/var/log`.",
-                  "deprecated": true,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": "logging.file.path"
+                  "deprecation": {
+                      "reason": null,
+                      "replacement": "logging.file.path"
+                  }
                 }
               ]
             },
@@ -231,10 +212,7 @@ class EnvironmentApiTest {
                   "value": "1000",
                   "isPrimary": true,
                   "configPropsBeanName": null,
-                  "description": null,
-                  "deprecated": false,
-                  "deprecatedReason": null,
-                  "deprecatedReplacement": null
+                  "description": null
                 }
               ]
             }
