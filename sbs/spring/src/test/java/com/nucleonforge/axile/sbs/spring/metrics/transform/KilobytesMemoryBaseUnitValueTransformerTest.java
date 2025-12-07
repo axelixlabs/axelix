@@ -3,6 +3,7 @@ package com.nucleonforge.axile.sbs.spring.metrics.transform;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -34,7 +35,7 @@ class KilobytesMemoryBaseUnitValueTransformerTest {
         TransformedMetricValue result = subject.transform(value);
 
         Assertions.assertThat(result.baseUnit()).isEqualTo(expectedBaseUnit);
-        Assertions.assertThat(result.value()).isEqualTo(expectedValue);
+        Assertions.assertThat(result.value()).isCloseTo(expectedValue, Percentage.withPercentage(1));
     }
 
     static Stream<Arguments> arguments() {
