@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.binder.MeterBinder;
+import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,6 +25,10 @@ import org.springframework.http.ResponseEntity;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
+import com.nucleonforge.axile.sbs.spring.metrics.transform.BaseUnitParser;
+import com.nucleonforge.axile.sbs.spring.metrics.transform.BytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axile.sbs.spring.metrics.transform.KilobytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axile.sbs.spring.metrics.transform.units.MegabytesMemoryBaseUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +39,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({AxileMetricsEndpoint.class, MetricsEndpoint.class, DefaultServiceMetricsGroupsAssembler.class})
+@Import({
+    AxileMetricsEndpoint.class,
+    MetricsEndpoint.class,
+    DefaultServiceMetricsGroupsAssembler.class,
+    BaseUnitParser.class,
+    KilobytesMemoryBaseUnitValueTransformer.class,
+    BytesMemoryBaseUnitValueTransformer.class
+})
 class AxileMetricsEndpointTest {
 
     @Autowired
@@ -77,6 +90,22 @@ class AxileMetricsEndpointTest {
                         Map.of(
                                 "area", "heap",
                                 "id", "G1 Survivor Space"));
+    }
+
+    @Test
+    void shouldApplyValueTransformationsForGivenValue() {
+        // when.
+        String metricName = "for.value.transformations";
+        ResponseEntity<MetricProfile> response =
+                testRestTemplate.getForEntity("/actuator/axile-metrics/" + metricName, MetricProfile.class);
+
+        // then.
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        MetricProfile metricProfile = response.getBody();
+
+        assertThat(metricProfile.name()).isEqualTo(metricName);
+        assertThat(metricProfile.baseUnit()).isEqualTo(MegabytesMemoryBaseUnit.INSTANCE.getDisplayName());
+        assertThat(metricProfile.measurements().get(0).value()).isCloseTo(5.22, Percentage.withPercentage(1));
     }
 
     @Test
@@ -174,6 +203,12 @@ class AxileMetricsEndpointTest {
                 Counter.builder("standalone")
                         .description(
                                 "Test metric belonging to the 'Others' group without a prefix and with a description")
+                        .register(registry);
+
+                Gauge.builder(
+                                "for.value.transformations", () -> 5480079 // ~ 5.22 MB
+                                )
+                        .baseUnit("bytes")
                         .register(registry);
             };
         }

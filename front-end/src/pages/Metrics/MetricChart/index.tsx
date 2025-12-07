@@ -14,7 +14,7 @@ interface IProps {
 
 export default function MetricChart({ measurements }: IProps) {
     const data = measurements.map((measurement) => ({
-        statistic: measurement.statistic,
+        statistic: "value",
         value: measurement.value,
     }));
 

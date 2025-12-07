@@ -31,7 +31,7 @@ public class SingleMetricConverter implements Converter<MetricProfile, SingleMet
 
     private static List<Measurement> mapMeasurements(MetricProfile source) {
         return source.measurements().stream()
-                .map(it -> new Measurement(it.statistic(), it.value()))
+                .map(it -> new Measurement(it.value()))
                 .toList();
     }
 }

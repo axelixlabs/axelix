@@ -1,5 +1,7 @@
 package com.nucleonforge.axile.sbs.autoconfiguration.spring;
 
+import java.util.Set;
+
 import io.micrometer.core.instrument.MeterRegistry;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
@@ -12,6 +14,10 @@ import org.springframework.context.annotation.Bean;
 import com.nucleonforge.axile.sbs.spring.metrics.AxileMetricsEndpoint;
 import com.nucleonforge.axile.sbs.spring.metrics.DefaultServiceMetricsGroupsAssembler;
 import com.nucleonforge.axile.sbs.spring.metrics.ServiceMetricsGroupsAssembler;
+import com.nucleonforge.axile.sbs.spring.metrics.transform.BaseUnitParser;
+import com.nucleonforge.axile.sbs.spring.metrics.transform.BaseUnitValueTransformer;
+import com.nucleonforge.axile.sbs.spring.metrics.transform.BytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axile.sbs.spring.metrics.transform.KilobytesMemoryBaseUnitValueTransformer;
 
 /**
  * Auto-configuration for the {@link AxileMetricsEndpoint}.
@@ -28,8 +34,29 @@ public class AxileMetricsAutoConfiguration {
     public AxileMetricsEndpoint axileMetricsEndpoint(
             MetricsEndpoint metricsEndpoint,
             MeterRegistry registry,
+            BaseUnitParser baseUnitParser,
+            Set<BaseUnitValueTransformer> baseUnitValueTransformers,
             ServiceMetricsGroupsAssembler serviceMetricsGroupsAssembler) {
-        return new AxileMetricsEndpoint(metricsEndpoint, registry, serviceMetricsGroupsAssembler);
+        return new AxileMetricsEndpoint(
+                metricsEndpoint, registry, baseUnitParser, serviceMetricsGroupsAssembler, baseUnitValueTransformers);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public BytesMemoryBaseUnitValueTransformer bytesMemoryBaseUnitValueTransformer() {
+        return new BytesMemoryBaseUnitValueTransformer();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public KilobytesMemoryBaseUnitValueTransformer kilobytesMemoryBaseUnitValueTransformer() {
+        return new KilobytesMemoryBaseUnitValueTransformer();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public BaseUnitParser baseUnitParser() {
+        return new BaseUnitParser();
     }
 
     @Bean

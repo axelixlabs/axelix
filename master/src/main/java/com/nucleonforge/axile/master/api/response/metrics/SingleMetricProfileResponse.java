@@ -20,8 +20,7 @@ public record SingleMetricProfileResponse(
     /**
      * Single metric value, measured at a particular point in time.
      *
-     * @param statistic the statistic of the measurement (we're not sure what it actually is)
      * @param value the value of the given metric.
      */
-    public record Measurement(String statistic, double value) {}
+    public record Measurement(double value) {}
 }
