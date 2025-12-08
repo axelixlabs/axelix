@@ -26,6 +26,7 @@ import globals from "globals";
 import jsoncParser from "jsonc-eslint-parser";
 import tseslint from "typescript-eslint";
 
+// See https://github.com/Stuk/eslint-plugin-header/issues/57
 licenseHeader.rules.header.meta.schema = false;
 
 export default [
