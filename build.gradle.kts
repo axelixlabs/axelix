@@ -1,6 +1,10 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import java.nio.charset.StandardCharsets
+import java.nio.file.Paths
+import kotlin.io.path.readBytes
+import kotlin.io.path.readText
 
 plugins {
     id("java")
@@ -60,6 +64,12 @@ subprojects {
             removeWildcardImports()
             trimTrailingWhitespace()
             toggleOffOn()
+
+            licenseHeader(
+                Paths
+                    .get("${rootDir.path}/LICENSE_HEADER")
+                    .readText(charset = StandardCharsets.UTF_8)
+            )
         }
     }
 
