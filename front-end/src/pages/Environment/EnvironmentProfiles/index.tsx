@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CheckOutlined, DeleteFilled, PlusOutlined } from "@ant-design/icons";
-
-import { Button, Input } from "antd";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
@@ -31,34 +27,13 @@ interface IProps {
 export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
     const { t } = useTranslation();
 
-    const [createProfile, setCreateProfile] = useState(false);
-
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.ProfilesWrapper}>
                 <div className={styles.ProfileTitle}>{t("Environments.activeProfiles")}</div>
                 {activeProfiles.map((activeProfile) => (
-                    <div className={styles.ProfileWrapper} key={activeProfile}>
-                        <div className={styles.ProfileValue}>
-                            {activeProfile}
-                            <DeleteFilled className={styles.DeleteActiveProfileIcon} />
-                        </div>
-                    </div>
+                    <div className={styles.ProfileValue}>{activeProfile}</div>
                 ))}
-                <div>
-                    {createProfile ? (
-                        <div className={styles.CreateProfileWrapper}>
-                            <Input className={styles.CreateProfileInput} />
-                            <Button
-                                icon={<CheckOutlined />}
-                                type="primary"
-                                className={styles.CreateProfileActionsButton}
-                            />
-                        </div>
-                    ) : (
-                        <Button icon={<PlusOutlined />} type="primary" onClick={() => setCreateProfile(true)} />
-                    )}
-                </div>
             </div>
         </div>
     );
