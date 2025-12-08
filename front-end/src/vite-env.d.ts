@@ -1,5 +1,3 @@
-/// <reference types="vite/client" />
-
 /*
  * Copyright 2025-present, Nucleon Forge Software.
  *
@@ -15,3 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/// <reference types="vite/client" />
