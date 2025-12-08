@@ -24,16 +24,22 @@ import "./antdCustomizedTable.css";
 
 const theme = {
     token: {
-        colorPrimary: "#00AB55",
+        colorPrimary: "#00ab55",
         fontFamily: "'Golos', sans-serif",
         fontSize: 15,
     },
-    components: { Tooltip: { zIndexPopup: 500, maxWidth: 600 } },
 };
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <ConfigProvider theme={theme}>
+        <ConfigProvider
+            theme={theme}
+            tooltip={{
+                styles: {
+                    root: { maxWidth: "600px", whiteSpace: "normal" },
+                },
+            }}
+        >
             <App />
         </ConfigProvider>
     </StrictMode>,

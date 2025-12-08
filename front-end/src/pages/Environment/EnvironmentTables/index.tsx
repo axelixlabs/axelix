@@ -57,17 +57,7 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
             <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
                 <>
                     {effectivePropertySources.map(({ name, properties }) => (
-                        <EnvironmentModifiableTable
-                            headerName={name}
-                            properties={properties.map((property) => ({
-                                key: property.name,
-                                displayKey: property.name,
-                                displayValue: property.value,
-                                isPrimary: property.isPrimary,
-                                configPropsBeanName: property.configPropsBeanName,
-                            }))}
-                            key={name}
-                        />
+                        <EnvironmentModifiableTable headerName={name} properties={properties} key={name} />
                     ))}
                 </>
             </EmptyHandler>

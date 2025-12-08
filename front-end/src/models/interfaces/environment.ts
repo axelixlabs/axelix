@@ -13,9 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ITableRow } from "./globals";
+interface IDeprecation {
+    /**
+     * Тhe reason for deprecation
+     */
+    reason: string | null;
+    /**
+     * Deprecated property replacement
+     */
+    replacement: string | null;
+}
 
-interface IProperties {
+export interface IEnvProperties {
     /**
      * The property name
      */
@@ -29,9 +38,17 @@ interface IProperties {
      */
     isPrimary: boolean;
     /**
-     * flag that designates that the bean is the config props bean.
+     * Flag that designates that the bean is the config props bean.
      */
     configPropsBeanName: string | null;
+    /**
+     * The property description
+     */
+    description: string | null;
+    /**
+     * If true, the property is deprecated
+     */
+    deprecation?: IDeprecation;
 }
 
 export interface IEnvironmentPropertySource {
@@ -42,7 +59,7 @@ export interface IEnvironmentPropertySource {
     /**
      * Environment properties list
      */
-    properties: IProperties[];
+    properties: IEnvProperties[];
 }
 
 export interface IEnvironmentResponseBody {
@@ -59,16 +76,4 @@ export interface IEnvironmentResponseBody {
      * Environment property sources list
      */
     propertySources: IEnvironmentPropertySource[];
-}
-
-export interface IEnvironmentTableRow extends ITableRow {
-    /**
-     * True if propertyValue is primary, false otherwise
-     */
-    isPrimary: boolean;
-
-    /**
-     * flag that designates that the bean is the config props bean.
-     */
-    configPropsBeanName: string | null;
 }

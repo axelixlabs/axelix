@@ -1,0 +1,42 @@
+.MainWrapper {
+    padding-right: 20px;
+}
+
+.PropertyValueWrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    column-gap: 20px;
+}
+
+.Deprecation {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.DeprecationValues {
+    word-break: break-all;
+}
+
+.IconPlaceholder {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.EditPropertyField {
+    max-width: 400px;
+}
+
+.EditButton,
+.CloseButton,
+.UpdateButton {
+    flex-shrink: 0;
+}
+
+.EditPropertyWrapper {
+    display: flex;
+    justify-content: flex-end;
+    column-gap: 8px;
+}

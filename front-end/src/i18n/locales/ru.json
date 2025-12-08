@@ -57,7 +57,10 @@
         }
     },
     "Environments": {
-        "activeProfiles": "Профили"
+        "activeProfiles": "Профили",
+        "primaryProperty": "Основной экземпляр",
+        "reason": "Причина",
+        "replacement": "Замена"
     },
     "Loggers": {
         "loggers": "Логгеры",

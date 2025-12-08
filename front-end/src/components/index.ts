@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { TablePropertyValue } from "./TablePropertyValue";
 export { LanguageSwitcher } from "./LanguageSwitcher";
 export { TooltipWithCopy } from "./TooltipWithCopy";
 export { LinearProgress } from "./LinearProgress";

@@ -32,12 +32,14 @@ describe("Filter propertySources", () => {
                     value: "17",
                     isPrimary: true,
                     configPropsBeanName: null,
+                    description: null,
                 },
                 {
                     name: "sun.jnu.encoding",
                     value: "UTF-8",
                     isPrimary: false,
                     configPropsBeanName: null,
+                    description: null,
                 },
             ],
         },
@@ -60,7 +62,13 @@ describe("Filter propertySources", () => {
         const findedPropertySource = result[0];
         expect(findedPropertySource.name).toBe(propertySources[1].name);
         expect(findedPropertySource.properties).toEqual([
-            { name: "java.specification.version", value: "17", isPrimary: true, configPropsBeanName: null },
+            {
+                name: "java.specification.version",
+                value: "17",
+                isPrimary: true,
+                configPropsBeanName: null,
+                description: null,
+            },
         ]);
     });
 

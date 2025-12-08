@@ -15,9 +15,11 @@
  */
 import type { PropsWithChildren } from "react";
 
-import { Accordion, Copy, EmptyHandler, TablePropertyValue } from "components";
+import { Accordion, Copy, EmptyHandler } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import type { ITableRow } from "models";
+
+import { ConfigPropsPropertyValue } from "../ConfigPropsPropertyValue";
 
 import styles from "./styles.module.css";
 
@@ -55,7 +57,7 @@ export const ConfigPropsModifiableTable = ({ headerName, properties, children }:
                                     {displayKey} <Copy text={displayKey} />
                                 </div>
                                 <div className={`RowChunk ${styles.ValueChunk}`}>
-                                    <TablePropertyValue propertyName={key} propertyValue={displayValue} />
+                                    <ConfigPropsPropertyValue propertyName={key} propertyValue={displayValue} />
                                 </div>
                             </div>
                         ))}

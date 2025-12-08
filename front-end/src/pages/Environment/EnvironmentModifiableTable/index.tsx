@@ -15,9 +15,11 @@
  */
 import { Link, useParams } from "react-router-dom";
 
-import { Accordion, Copy, EmptyHandler, TablePropertyValue } from "components";
+import { Accordion, Copy, EmptyHandler } from "components";
 import { normalizeHtmlElementId } from "helpers";
-import type { IEnvironmentTableRow } from "models";
+import type { IEnvProperties } from "models";
+
+import { EnvironmentPropertyValue } from "../EnvironmentPropertyValue";
 
 import styles from "./styles.module.css";
 
@@ -32,7 +34,7 @@ interface IProps {
     /**
      * Table rows data
      */
-    properties: IEnvironmentTableRow[];
+    properties: IEnvProperties[];
 }
 
 export const EnvironmentModifiableTable = ({ headerName, properties }: IProps) => {
@@ -47,28 +49,28 @@ export const EnvironmentModifiableTable = ({ headerName, properties }: IProps) =
                 accordionExpanded
             >
                 <EmptyHandler isEmpty={!properties.length}>
-                    {properties.map(({ key, displayKey, displayValue, isPrimary, configPropsBeanName }) => (
-                        <div key={key} className="TableRow">
-                            <div className={`RowChunk ${styles.KeyChunk}`}>
-                                {displayKey} <Copy text={displayKey} />
-                                {configPropsBeanName && (
-                                    <Link
-                                        to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <img src={LinkIcon} alt="Link icon" />
-                                    </Link>
-                                )}
+                    {properties.map((property) => {
+                        const { name, configPropsBeanName } = property;
+
+                        return (
+                            <div key={name} className="TableRow">
+                                <div className={`RowChunk ${styles.KeyChunk}`}>
+                                    {name} <Copy text={name} />
+                                    {configPropsBeanName && (
+                                        <Link
+                                            to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <img src={LinkIcon} alt="Link icon" />
+                                        </Link>
+                                    )}
+                                </div>
+                                <div className={`RowChunk ${styles.ValueChunk}`}>
+                                    <EnvironmentPropertyValue property={property} />
+                                </div>
                             </div>
-                            <div className={`RowChunk ${styles.ValueChunk}`}>
-                                <TablePropertyValue
-                                    propertyName={key}
-                                    propertyValue={displayValue}
-                                    isPrimary={isPrimary}
-                                />
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </EmptyHandler>
             </Accordion>
         </div>
