@@ -10,10 +10,6 @@
     letter-spacing: 0%;
 }
 
-.ProfileWrapper {
-    display: flex;
-}
-
 .ProfileTitle {
     background: var(--axile-primary-light-green);
     border-radius: var(--axile-border-radius-small);
@@ -27,24 +23,4 @@
 .ProfileTitle,
 .ProfileValue {
     padding: 8px;
-}
-
-.DeleteActiveProfileIcon {
-    margin-left: 8px;
-    cursor: pointer;
-    color: red;
-}
-
-.CreateProfileWrapper {
-    display: flex;
-    column-gap: 8px;
-    flex: 1 1 150px;
-}
-
-.CreateProfileInput {
-    max-width: 120px;
-}
-
-.CreateProfileActionsButton {
-    flex-shrink: 0;
 }
