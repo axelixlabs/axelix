@@ -105,7 +105,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                             Optional.ofNullable(metadata)
                                     .map(PropertyMetadata::description)
                                     .orElse(null),
-                            buildFromMetadata(metadata));
+                            isPrimary ? buildFromMetadata(metadata) : null);
                 })
                 .toList();
 
