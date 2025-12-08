@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CheckOutlined, DeleteFilled, PlusOutlined } from "@ant-design/icons";
-
-import { Button, Input } from "antd";
-import { useState } from "react";
+// TODO: Comment out the code after we decide to restore the logic for adding and removing profiles.
+// import { CheckOutlined, DeleteFilled, PlusOutlined } from "@ant-design/icons";
+// import { Button, Input } from "antd";
+// import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
@@ -31,7 +31,7 @@ interface IProps {
 export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
     const { t } = useTranslation();
 
-    const [createProfile, setCreateProfile] = useState(false);
+    // const [createProfile, setCreateProfile] = useState(false);
 
     return (
         <div className={styles.MainWrapper}>
@@ -41,11 +41,11 @@ export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
                     <div className={styles.ProfileWrapper} key={activeProfile}>
                         <div className={styles.ProfileValue}>
                             {activeProfile}
-                            <DeleteFilled className={styles.DeleteActiveProfileIcon} />
+                            {/* <DeleteFilled className={styles.DeleteActiveProfileIcon} /> */}
                         </div>
                     </div>
                 ))}
-                <div>
+                {/* <div>
                     {createProfile ? (
                         <div className={styles.CreateProfileWrapper}>
                             <Input className={styles.CreateProfileInput} />
@@ -58,7 +58,7 @@ export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
                     ) : (
                         <Button icon={<PlusOutlined />} type="primary" onClick={() => setCreateProfile(true)} />
                     )}
-                </div>
+                </div> */}
             </div>
         </div>
     );
