@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 /*
  * Copyright 2025-present, Nucleon Forge Software.
  *

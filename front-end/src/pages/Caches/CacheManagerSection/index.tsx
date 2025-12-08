@@ -42,7 +42,7 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                     <div className={`RowChunk ${styles.RowChunk}`}>{t("status")}</div>
                 </div>
                 {cacheManager.caches.map((cache) => (
-                    <CacheTableRow cacheManagerName={cacheManager.name} cache={cache} key={cache.name}/>
+                    <CacheTableRow cacheManagerName={cacheManager.name} cache={cache} key={cache.name} />
                 ))}
             </div>
         </div>
