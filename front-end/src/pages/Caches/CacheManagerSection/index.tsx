@@ -15,10 +15,9 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { Accordion } from "components";
 import type { ICachesManager } from "models";
 
-import { CacheAccordionHeader } from "../CacheAccordionHeader";
+import { CacheTableRow } from "../CacheTableRow";
 
 import styles from "./styles.module.css";
 
@@ -43,12 +42,7 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                     <div className={`RowChunk ${styles.RowChunk}`}>{t("status")}</div>
                 </div>
                 {cacheManager.caches.map((cache) => (
-                    <Accordion
-                        header={<CacheAccordionHeader cacheManagerName={cacheManager.name} cache={cache} />}
-                        headerStyles={styles.HeaderStyles}
-                        children={<></>}
-                        key={cache.name}
-                    />
+                    <CacheTableRow cacheManagerName={cacheManager.name} cache={cache} key={cache.name} />
                 ))}
             </div>
         </div>

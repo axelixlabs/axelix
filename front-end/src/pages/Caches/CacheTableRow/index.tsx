@@ -41,7 +41,7 @@ interface IProps {
     cache: ICacheData;
 }
 
-export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
+export const CacheTableRow = ({ cacheManagerName, cache }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
@@ -65,13 +65,12 @@ export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
     };
 
     return (
-        <div className={styles.AccordionHeader}>
+        <div className={`TableRow ${styles.MainWrapper}`}>
             <div className={`RowChunk ${styles.ContentRowChunkWrapper}`}>
                 <div className={styles.ContentWrapper}>
                     <span>{t("Caches.name")}: </span>
                     <span className={styles.CacheName}>{cache.name}</span>
                     <div className={styles.TargetWrapper}>
-                        {/* TODO: This part we need to be fix after tooltip PR merge */}
                         <div className={styles.Target}>{t("Caches.target")}:</div>
                         <TooltipWithCopy text={cache.target} />
                     </div>
