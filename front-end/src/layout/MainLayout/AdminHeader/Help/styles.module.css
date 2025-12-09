@@ -1,0 +1,11 @@
+.MenuWrapper {
+    margin-left: 20px;
+}
+
+.MenuWrapper:hover {
+    color: var(--axile-primary-green);
+}
+
+.CommonIcon {
+    font-size: 18px !important;
+}
