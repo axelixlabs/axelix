@@ -1,3 +1,18 @@
+/*
+ * Copyright 2025-present, Nucleon Forge Software.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.nucleonforge.axile.master.api.response;
 
 import java.util.List;
@@ -13,19 +28,13 @@ import com.nucleonforge.axile.master.api.response.software.DistributionResponse;
  * @author Mikhail Polivakha
  */
 public record DashboardResponse(
-    List<DistributionResponse> distributions,
-    HealthStatus healthStatus,
-    MemoryUsageMap memoryUsage
-) {
+        List<DistributionResponse> distributions, HealthStatus healthStatus, MemoryUsageMap memoryUsage) {
 
     /**
      * @param averageRss the average RSS consumed by average microservice
      * @param totalRss the total RSS consumed by the entire spring microservices' ecosystem.
      */
-    public record MemoryUsageMap(
-        MemoryUsage averageRss,
-        MemoryUsage totalRss
-    ) { }
+    public record MemoryUsageMap(MemoryUsage averageRss, MemoryUsage totalRss) {}
 
     /**
      * @param unit the unit in which the {@link #value()} is measured (MB/GB etc.)
@@ -39,9 +48,7 @@ public record DashboardResponse(
      * @param statuses map that contains the status to the counter, of how
      *                 many instances are in that status.
      */
-    public record HealthStatus(
-        Map<Status, Integer> statuses
-    ) { }
+    public record HealthStatus(Map<Status, Integer> statuses) {}
 
     public enum Status {
         UP,
