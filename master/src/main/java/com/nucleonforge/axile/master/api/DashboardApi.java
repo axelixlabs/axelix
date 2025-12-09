@@ -67,7 +67,7 @@ public class DashboardApi {
                                         mediaType = "application/json",
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
-    @GetMapping(path = ApiPaths.DashboardApi.MAIN)
+    @GetMapping
     public DashboardResponse getDashboard() {
         return new DashboardResponse(
                 List.of(
