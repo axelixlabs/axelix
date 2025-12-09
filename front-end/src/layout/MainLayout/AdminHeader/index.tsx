@@ -21,6 +21,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import { LanguageSwitcher } from "components";
+import { useAppDispatch } from "hooks";
+import { logout } from "store/slices";
 
 import { NavigationBar } from "./NavigationBar";
 import styles from "./styles.module.css";
@@ -30,11 +32,18 @@ import LogoIcon from "assets/icons/logo.png";
 export const AdminHeader = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+
+    const logoutClickHandler = () => {
+        localStorage.removeItem("accessToken");
+        dispatch(logout());
+        window.location.href = "/login";
+    };
 
     const items: MenuProps["items"] = [
         {
             key: "logout",
-            label: <div>{t("Authentication.logout")}</div>,
+            label: <div onClick={logoutClickHandler}>{t("Authentication.logout")}</div>,
         },
     ];
 
