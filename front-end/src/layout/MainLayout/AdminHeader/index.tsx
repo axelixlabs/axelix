@@ -34,20 +34,16 @@ export const AdminHeader = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
+    const logoutClickHandler = () => {
+        localStorage.removeItem("accessToken");
+        dispatch(logout());
+        window.location.href = "/login";
+    };
+
     const items: MenuProps["items"] = [
         {
             key: "logout",
-            label: (
-                <div
-                    onClick={() => {
-                        localStorage.removeItem("accessToken");
-                        dispatch(logout());
-                        window.location.href = "/login";
-                    }}
-                >
-                    {t("Authentication.logout")}
-                </div>
-            ),
+            label: <div onClick={logoutClickHandler}>{t("Authentication.logout")}</div>,
         },
     ];
 
