@@ -64,6 +64,7 @@ export const BeanSource = ({ bean }: IProps) => {
                                     <div className={styles.BeanTreeValue}>{beanSource.methodName}</div>
                                 </div>
                             ),
+                            selectable: false,
                             key: beanSource.methodName!,
                         },
                         {
@@ -105,6 +106,7 @@ export const BeanSource = ({ bean }: IProps) => {
                                     <div className={styles.BeanTreeValue}>{beanSource.factoryBeanName}</div>
                                 </div>
                             ),
+                            selectable: false,
                             key: beanSource.factoryBeanName!,
                         },
                     ],
@@ -119,13 +121,7 @@ export const BeanSource = ({ bean }: IProps) => {
             {statelessBeanSource ? (
                 translatedTitle
             ) : (
-                <Tree
-                    expandAction="click"
-                    showLine
-                    treeData={resolveTreeChildren()}
-                    className={styles.Tree}
-                    selectable={false}
-                />
+                <Tree expandAction="click" showLine treeData={resolveTreeChildren()} className={styles.Tree} />
             )}
         </>
     );
