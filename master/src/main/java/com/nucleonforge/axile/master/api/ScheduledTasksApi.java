@@ -49,9 +49,10 @@ import com.nucleonforge.axile.master.service.transport.scheduled.GetAllScheduled
  * The API for managing scheduled-tasks (i.e. those that are represented by {@link Scheduled @Scheduled} methods).
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @Tag(
-        name = "ScheduledTasks API Controller",
+        name = "ScheduledTasks API",
         description = "The scheduled-tasks endpoint provides information about the application’s scheduled tasks.")
 @RestController
 @RequestMapping(path = ApiPaths.ScheduledTasksApi.MAIN)

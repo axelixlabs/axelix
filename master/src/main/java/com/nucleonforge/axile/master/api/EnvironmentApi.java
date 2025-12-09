@@ -50,9 +50,10 @@ import com.nucleonforge.axile.master.service.transport.EnvironmentPropertyEndpoi
  *
  * @since 27.08.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @Tag(
-        name = "Environment API Controller",
+        name = "Environment API",
         description = "The env endpoint provides information about the application’s Environment.")
 @RestController
 @RequestMapping(path = ApiPaths.EnvironmentApi.MAIN)

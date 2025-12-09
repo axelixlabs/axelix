@@ -41,10 +41,11 @@ import com.nucleonforge.axile.master.service.transport.ConfigPropsEndpointProber
 /**
  * The API for managing configprops.
  *
+ * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
 @Tag(
-        name = "Configprops API Controller",
+        name = "Configprops API",
         description =
                 "The configprops endpoint provides information about the application’s @ConfigurationProperties beans.")
 @RestController

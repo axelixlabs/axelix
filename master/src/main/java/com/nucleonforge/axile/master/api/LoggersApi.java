@@ -60,9 +60,10 @@ import com.nucleonforge.axile.master.service.transport.loggers.SetOneLoggerEndpo
  * The API for managing loggers.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @Tag(
-        name = "Loggers API Controller",
+        name = "Loggers API",
         description =
                 "The loggers endpoint provides access to the application’s loggers and the configuration of their levels.")
 @RestController
