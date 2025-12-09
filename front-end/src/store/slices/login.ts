@@ -27,7 +27,11 @@ const initialState: ILoginSliceState = {
 export const LoginSlice = createSlice({
     name: "login",
     initialState,
-    reducers: {},
+    reducers: {
+        logout: (state) => {
+            state.accessToken = null;
+        },
+    },
     extraReducers: (builder) => {
         builder.addCase(loginThunk.pending, (state) => {
             state.loading = true;
@@ -59,3 +63,5 @@ export const LoginSlice = createSlice({
         });
     },
 });
+
+export const { logout } = LoginSlice.actions;
