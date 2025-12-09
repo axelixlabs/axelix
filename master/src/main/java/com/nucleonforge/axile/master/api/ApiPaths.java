@@ -139,10 +139,14 @@ public final class ApiPaths {
          * The Configprops Feed used in the single instance
          */
         public static final String FEED = "/feed/{instanceId}";
+    }
+
+    public static final class DashboardApi {
+
         /**
-         * Endpoint to retrieve a specific Configprops beans of an instance.
+         * Base path for dashboard APIs.
          */
-        public static final String BEAN_BY_PREFIX = "/{instanceId}/beans/{prefix}";
+        public static final String MAIN = "/dashboard";
     }
 
     public static final class LoggersApi {
