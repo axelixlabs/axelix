@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.kubernetes.commons.discovery.KubernetesServiceInstance;
 
 import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axile.master.model.instance.Instance;
@@ -64,7 +65,7 @@ public class DockerInstanceDiscoverer extends AbstractInstancesDiscoverer {
 
             return new Instance(
                     InstanceId.of(dockerInstance.getInstanceId()),
-                    dockerInstance.serviceName(),
+                    dockerInstance.containerName(),
                     profile.metadata().serviceVersion(),
                     profile.metadata().versions().java(),
                     profile.metadata().versions().springBoot(),
@@ -76,16 +77,12 @@ public class DockerInstanceDiscoverer extends AbstractInstancesDiscoverer {
                     mapStatus(profile),
                     serviceInstance.getUri() + "/actuator");
         } else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(buildErrorMessage(serviceInstance));
         }
     }
 
     private static Instance.InstanceStatus mapStatus(InstanceIntermediateProfile profile) {
         ServiceMetadata.HealthStatus healthStatus = profile.metadata().healthStatus();
-
-        if (healthStatus == null) {
-            return Instance.InstanceStatus.UNKNOWN;
-        }
 
         return switch (healthStatus) {
             case UP -> Instance.InstanceStatus.UP;
@@ -100,7 +97,7 @@ public class DockerInstanceDiscoverer extends AbstractInstancesDiscoverer {
 
         if (deployedAtAsString == null) {
             log.warn(
-                    "The K8S pod's {} {} filed in metadata is null",
+                    "The Docker containers {} {} filed in metadata is null",
                     dockerInstance.getInstanceId(),
                     CONTAINER_CREATION_TIMESTAMP);
             return null;
@@ -112,12 +109,21 @@ public class DockerInstanceDiscoverer extends AbstractInstancesDiscoverer {
         } catch (DateTimeParseException e) {
             log.warn(
                     """
-            Unable to parse the deployment timestamp of the pod : {}.
+            Unable to parse the deployment timestamp of the container : {}.
             That will affect the corresponding service on the wallboard UI
             """,
                     dockerInstance.getInstanceId(),
                     e);
             return null;
         }
+    }
+
+    private static String buildErrorMessage(ServiceInstance serviceInstance) {
+        return "Unable to register Docker container '%s' as a managed instance - expected %s to be an instance of %s, but actually is %s"
+                .formatted(
+                        serviceInstance.getInstanceId(),
+                        ServiceInstance.class.getSimpleName(),
+                        KubernetesServiceInstance.class.getName(),
+                        serviceInstance.getClass().getName());
     }
 }

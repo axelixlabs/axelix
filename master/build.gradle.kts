@@ -7,6 +7,9 @@ plugins {
 val testcontainersVersion = "1.21.3"
 val springDocSwaggerVersion = "2.0.4"
 val heapDumpToolVersion = "1.3.3"
+val dockerJava = "3.6.0"
+val apacheHttpClient5 = "5.5"
+val apacheHttpCore5 = "5.3.6"
 
 dependencies {
     // Self
@@ -24,10 +27,10 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.paypal:heap-dump-tool:${heapDumpToolVersion}")
 
-    implementation("com.github.docker-java:docker-java:3.6.0")
-    implementation("com.github.docker-java:docker-java-transport-httpclient5:3.6.0")
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
-    implementation("org.apache.httpcomponents.core5:httpcore5:5.3.6")
+    implementation("com.github.docker-java:docker-java:${dockerJava}")
+    implementation("com.github.docker-java:docker-java-transport-httpclient5:${dockerJava}")
+    implementation("org.apache.httpcomponents.client5:httpclient5:${apacheHttpClient5}")
+    implementation("org.apache.httpcomponents.core5:httpcore5:${apacheHttpCore5}")
 
     // Runtime
     runtimeOnly("ch.qos.logback:logback-classic")

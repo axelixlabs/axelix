@@ -21,18 +21,13 @@ axelix:
   master:
     discovery:
       auto: true
-      platform: docker
+      platform: kubernetes
       kubernetes:
         kube-apiserver-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}
         sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
         ca-cert-path: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         filters:
           namespaces: default
-      docker:
-        filters:
-          networks-name:
-            - bridge
-            - draft
     auth:
       jwt:
         algorithm: HMAC512

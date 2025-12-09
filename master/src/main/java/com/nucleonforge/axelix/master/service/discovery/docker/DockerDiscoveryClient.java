@@ -15,13 +15,13 @@
  */
 package com.nucleonforge.axelix.master.service.discovery.docker;
 
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,8 +31,6 @@ import com.github.dockerjava.api.model.ContainerNetwork;
 import com.github.dockerjava.api.model.ContainerNetworkSettings;
 import com.github.dockerjava.api.model.ContainerPort;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -46,16 +44,16 @@ import com.nucleonforge.axile.master.autoconfiguration.discovery.DockerDiscovery
  * @author Sergey Cherkasov
  */
 public class DockerDiscoveryClient implements DiscoveryClient {
-    private static final Logger log = LoggerFactory.getLogger(DockerDiscoveryClient.class);
-
     private static final String ALLOWED_STATUS = "running";
+    private static final String COMPOSE_SERVICE = "com.docker.compose.service";
+    private static final String HOSTNAME = "HOSTNAME";
 
     private final DockerClient dockerClient;
-    private final Set<String> filters;
+    private final DockerDiscoveryProperties.DiscoveryFilters filters;
 
     public DockerDiscoveryClient(DockerClient dockerClient, DockerDiscoveryProperties.DiscoveryFilters filters) {
         this.dockerClient = dockerClient;
-        this.filters = filters.getNetworksName();
+        this.filters = filters;
     }
 
     @Override
@@ -72,15 +70,9 @@ public class DockerDiscoveryClient implements DiscoveryClient {
         }
 
         String selfContainerId = getSelfContainerId(containers);
-        Set<String> selfNetworksName = getNetworksName(selfContainerId);
+        Set<String> selfNetworksName = getSelfNetworksName(selfContainerId);
 
-        return containers.stream()
-                .filter(container -> !container.getId().equals(selfContainerId))
-                .filter(this::isAllowedCommand)
-                .filter(container -> container.getState().equals(ALLOWED_STATUS))
-                .filter(container -> isValidNetwork(container, selfNetworksName))
-                .map(container -> createServiceInstance(container, selfNetworksName))
-                .toList();
+        return buildInstances(serviceId, selfContainerId, containers, selfNetworksName);
     }
 
     @Override
@@ -92,23 +84,29 @@ public class DockerDiscoveryClient implements DiscoveryClient {
         }
 
         String selfContainerId = getSelfContainerId(containers);
-        Set<String> selfNetworksName = getNetworksName(selfContainerId);
+        Set<String> selfNetworksName = getSelfNetworksName(selfContainerId);
 
         return containers.stream()
-                .filter(c -> !c.getId().equals(selfContainerId))
+                .filter(container -> !container.getId().equals(selfContainerId))
                 .filter(this::isAllowedCommand)
-                .filter(c -> c.getState().equals(ALLOWED_STATUS))
-                .filter(c -> isValidNetwork(c, selfNetworksName))
-                .map(Container::getImage)
+                .filter(container -> container.getState().equals(ALLOWED_STATUS))
+                .filter(container -> isValidNetwork(container, selfNetworksName))
+                .map(container -> container.getLabels().getOrDefault(COMPOSE_SERVICE, container.getImage()))
                 .toList();
     }
 
     private List<Container> getContainers() {
-        return dockerClient
-                .listContainersCmd()
-                .withShowAll(true)
-                .withShowSize(true)
-                .exec();
+        return dockerClient.listContainersCmd().withShowAll(true).exec();
+    }
+
+    // We need to select only those Docker containers that are actually running a JVM.
+    private boolean isAllowedCommand(Container container) {
+        String command = container.getCommand().toLowerCase();
+
+        return command.matches(".*(^|\\s)java(\\s|$).*")
+                || command.contains(" -jar ")
+                || command.endsWith(".jar")
+                || command.contains(".jar ");
     }
 
     private boolean isValidNetwork(Container container, Set<String> networksName) {
@@ -118,9 +116,44 @@ public class DockerDiscoveryClient implements DiscoveryClient {
                 .orElse(false);
     }
 
-    private Set<String> getNetworksName(String containerId) {
-        if (filters != null) {
-            return filters;
+    // TODO: We cannot guarantee that this code will work on Windows OS
+    // We implemented two mechanisms for obtaining the container ID of the JVM’s host container.
+    // These approaches should be revisited in the future to establish a more reliable solution.
+    private String getSelfContainerId(List<Container> containers) {
+        try {
+            Optional<String> cgroupId = Files.lines(Paths.get("/proc/self/cgroup"))
+                    .map(line -> line.replaceAll(".*\\/docker\\/", ""))
+                    .filter(id -> id.length() == 64)
+                    .findFirst();
+            if (cgroupId.isPresent()) {
+                return cgroupId.get();
+            }
+
+            String hostname = System.getenv(HOSTNAME);
+            String ipAddress = InetAddress.getByName(hostname).getHostAddress();
+
+            return containers.stream()
+                    .filter(container -> {
+                        Map<String, ContainerNetwork> networks = Optional.ofNullable(container.getNetworkSettings())
+                                .map(ContainerNetworkSettings::getNetworks)
+                                .orElse(Map.of());
+                        return networks.values().stream().anyMatch(net -> ipAddress.equals(net.getIpAddress()));
+                    })
+                    .findFirst()
+                    .map(Container::getId)
+                    .orElseThrow(() -> new IllegalStateException(
+                            "It is impossible to determine the container ID on which the JVM is running"));
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // We need to obtain the networks within which the JVM can communicate with other services
+    // if the networks are not specified in the Environment properties.
+    private Set<String> getSelfNetworksName(String containerId) {
+        if (filters != null && filters.getNetworksName() != null) {
+            return filters.getNetworksName();
         }
 
         return dockerClient
@@ -131,71 +164,79 @@ public class DockerDiscoveryClient implements DiscoveryClient {
                 .keySet();
     }
 
-    private String getSelfContainerId(List<Container> containers) {
-        try {
-            String hostname = System.getenv("HOSTNAME");
-            String ipAddress = InetAddress.getByName(hostname).getHostAddress();
-            return containers.stream()
-                    .filter(container -> {
-                        Map<String, ContainerNetwork> networks = Optional.ofNullable(container.getNetworkSettings())
-                                .map(ContainerNetworkSettings::getNetworks)
-                                .orElse(Map.of());
-                        return networks.values().stream().anyMatch(net -> ipAddress.equals(net.getIpAddress()));
-                    })
-                    .findFirst()
-                    .map(Container::getId)
-                    .orElseThrow(() -> new IllegalStateException("Cannot determine current container ID"));
-        } catch (UnknownHostException e) {
-            return "";
-        }
+    private List<ServiceInstance> buildInstances(
+            String serviceId, String selfContainerId, List<Container> containers, Set<String> selfNetworksName) {
+        return containers.stream()
+                .filter(container -> !container.getId().equals(selfContainerId))
+                .filter(this::isAllowedCommand)
+                .filter(container -> container.getState().equals(ALLOWED_STATUS))
+                .filter(container -> container
+                        .getLabels()
+                        .getOrDefault(COMPOSE_SERVICE, container.getImage())
+                        .equals(serviceId))
+                .map(container -> createServiceInstance(serviceId, container, selfNetworksName))
+                .toList();
     }
 
-    private boolean isAllowedCommand(Container c) {
-        String command = c.getCommand().toLowerCase();
+    private ServiceInstance createServiceInstance(String serviceId, Container container, Set<String> selfNetworksName) {
+        String name = container.getNames()[0].replaceFirst("^/", "");
+        Map.Entry<String, String> networkInfo = getNetworkInfo(serviceId, container, selfNetworksName);
+        Map.Entry<String, Integer> portInfo = getPortInfo(serviceId, container);
 
-        return command.matches(".*(^|\\s)java(\\s|$).*")
-                || command.contains(" -jar ")
-                || command.endsWith(".jar")
-                || command.contains(".jar ");
-    }
+        Map<String, String> metadata = Map.of(
+                "networkName", networkInfo.getKey(),
+                "servicePortName", container.getNames()[0],
+                "protocol", portInfo.getKey());
 
-    private ServiceInstance createServiceInstance(Container container, Set<String> selfNetworksName) {
         return new DockerServiceInstance(
                 container.getId(),
-                container.getImageId() != null ? container.getImageId() : container.getId(),
-                container.getImage(),
-                getIpAddressContainer(container, selfNetworksName),
-                getPortContainer(container),
+                container.getLabels().getOrDefault(COMPOSE_SERVICE, container.getImage()),
+                name,
+                networkInfo.getValue(),
+                portInfo.getValue(),
+                false,
+                metadata,
                 getCreatedAt(container));
     }
 
-    private String getCreatedAt(Container container) {
-        return Instant.ofEpochSecond(container.getCreated()).toString();
-    }
-
-    private int getPortContainer(Container container) {
-        return Arrays.stream(container.getPorts())
-                .map(ContainerPort::getPrivatePort)
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(
-                        "Container '%s' has no exposed private ports or none of them are valid."
-                                .formatted(container.getId())));
-    }
-
-    private String getIpAddressContainer(Container container, Set<String> selfNetworksName) {
-        Map<String, ContainerNetwork> containerNets = Optional.ofNullable(container.getNetworkSettings())
+    private Map.Entry<String, String> getNetworkInfo(String serviceId, Container container, Set<String> networksName) {
+        Map<String, ContainerNetwork> containerNetwork = Optional.ofNullable(container.getNetworkSettings())
                 .map(ContainerNetworkSettings::getNetworks)
                 .orElse(Map.of());
 
-        return selfNetworksName.stream()
-                .filter(containerNets::containsKey)
-                .map(containerNets::get)
-                .filter(Objects::nonNull)
-                .map(ContainerNetwork::getIpAddress)
-                .filter(ip -> ip != null && !ip.isBlank())
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(
-                        "Container '%s' has no valid IP address.".formatted(container.getId())));
+        for (String networkName : networksName) {
+            ContainerNetwork net = containerNetwork.get(networkName);
+
+            if (net == null) {
+                continue;
+            }
+            String ip = net.getIpAddress();
+            if (ip != null && !ip.isBlank()) {
+                return Map.entry(networkName, ip);
+            }
+        }
+
+        throw new IllegalStateException(
+                "At the moment, we weren’t able to retrieve a valid ip address for service '%s'".formatted(serviceId));
+    }
+
+    private Map.Entry<String, Integer> getPortInfo(String serviceId, Container container) {
+
+        for (ContainerPort p : container.getPorts()) {
+            if (p.getPrivatePort() != null
+                    && p.getType() != null
+                    && !p.getType().isBlank()) {
+                return Map.entry(p.getType(), p.getPrivatePort());
+            }
+        }
+
+        throw new IllegalStateException(
+                "At the moment, we weren’t able to retrieve a valid private port for service '%s'"
+                        .formatted(serviceId));
+    }
+
+    // Docker stores the container creation time in Unix timestamp format, e.g., (1765261026)
+    private String getCreatedAt(Container container) {
+        return Instant.ofEpochSecond(container.getCreated()).toString();
     }
 }

@@ -20,13 +20,32 @@ import java.util.Map;
 
 import org.springframework.cloud.client.ServiceInstance;
 
+import com.nucleonforge.axile.master.model.instance.Instance;
+import com.nucleonforge.axile.master.service.discovery.AxileKubernetesDiscoveryClient;
+
+/**
+ * Represents a Kubernetes service instance for {@link AxileKubernetesDiscoveryClient}.
+ *
+ * @param instanceId unique identifier (uid) of the pod instance.
+ * @param serviceId id of the Docker Compose Service that managed this {@link Instance}.
+ * @param containerName name of the pod.
+ * @param host container IP address.
+ * @param port service port.
+ * @param secure indicates if the connection should use HTTPS.
+ * @param metadata additional metadata about the instance.
+ * @param deploymentAt timestamp when the pod was created.
+ *
+ * @author Sergey Cherkasov
+ */
 public record DockerServiceInstance(
-        String instanceId, // id
-        String serviceId, // imageId
-        String serviceName, // image
-        String host, // names
-        int port, // ports
-        String deploymentAt) // created
+        String instanceId,
+        String serviceId,
+        String containerName,
+        String host,
+        int port,
+        boolean secure,
+        Map<String, String> metadata,
+        String deploymentAt)
         implements ServiceInstance {
 
     @Override
@@ -51,12 +70,12 @@ public record DockerServiceInstance(
 
     @Override
     public boolean isSecure() {
-        return false;
+        return secure;
     }
 
     @Override
     public URI getUri() {
-        return URI.create("http://%s:%d".formatted(host, port));
+        return URI.create("%s://%s:%d".formatted(secure ? "https" : "http", host, port));
     }
 
     @Override

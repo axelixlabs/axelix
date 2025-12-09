@@ -32,6 +32,7 @@ import com.nucleonforge.axelix.master.service.discovery.docker.DockerInstanceDis
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import org.apache.commons.lang3.SystemUtils;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -52,6 +53,7 @@ import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEn
  * Auto-configuration for K8S related components.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "auto", havingValue = "true")
@@ -117,8 +119,19 @@ public class DiscoveryAutoConfiguration {
         public DockerClient dockerClient() {
             // We may encounter issues described in this article
             // https://javanexus.com/blog/docker-rest-api-issues-java-developers
-            DockerClientConfig config =
-                DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+            DefaultDockerClientConfig.Builder builder = DefaultDockerClientConfig.createDefaultConfigBuilder();
+
+            // TODO: We cannot guarantee that this code will work on Windows OS
+            String envDockerHost = System.getenv("DOCKER_HOST");
+            if (envDockerHost != null && !envDockerHost.isBlank()) {
+                builder.withDockerHost(envDockerHost);
+            } else if (SystemUtils.IS_OS_WINDOWS) {
+                builder.withDockerHost("npipe:////./pipe/docker_engine");
+            } else {
+                builder.withDockerHost("unix:///var/run/docker.sock");
+            }
+
+            DockerClientConfig config = builder.build();
 
             ApacheDockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
                 .dockerHost(config.getDockerHost())
