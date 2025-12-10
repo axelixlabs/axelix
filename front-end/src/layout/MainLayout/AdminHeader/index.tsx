@@ -16,7 +16,6 @@
 import { UserOutlined } from "@ant-design/icons";
 
 import { Avatar, Dropdown, type MenuProps } from "antd";
-import { Header } from "antd/es/layout/layout";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -24,6 +23,7 @@ import { LanguageSwitcher } from "components";
 import { useAppDispatch } from "hooks";
 import { logout } from "store/slices";
 
+import { Help } from "./Help";
 import { NavigationBar } from "./NavigationBar";
 import styles from "./styles.module.css";
 
@@ -48,15 +48,16 @@ export const AdminHeader = () => {
     ];
 
     return (
-        <Header className={styles.Header}>
+        <div className={styles.Header}>
             <img src={LogoIcon} alt="Axile logo" onClick={() => navigate("/wallboard")} className={styles.Logo} />
             <div className={styles.LinksAndAvatarWrapper}>
                 <NavigationBar />
+                <Help />
                 <Dropdown menu={{ items }}>
                     <Avatar size={32} icon={<UserOutlined />} className={styles.Avatar} />
                 </Dropdown>
                 <LanguageSwitcher />
             </div>
-        </Header>
+        </div>
     );
 };
