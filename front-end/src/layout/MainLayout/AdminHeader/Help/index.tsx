@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BookOutlined, CommentOutlined, DownOutlined } from "@ant-design/icons";
+import { BookOutlined, CommentOutlined } from "@ant-design/icons";
 
-import { Dropdown, type MenuProps, Space } from "antd";
+import { Dropdown, type MenuProps } from "antd";
 import AboutIcon from "assets/icons/info-black.svg";
 import { useTranslation } from "react-i18next";
 
@@ -64,12 +64,28 @@ export const Help = () => {
     ];
 
     return (
-        <Dropdown menu={{ items }} className={styles.MainWrapper}>
-            <a onClick={(e) => e.preventDefault()} className={styles.MenuWrapper}>
-                <Space>
+        <Dropdown menu={{ items }}>
+            <a onClick={(e) => e.preventDefault()} className={styles.HelpLabelWrapper}>
+                <div className={styles.HelpLabel}>
                     {t("Header.Help.title")}
-                    <DownOutlined />
-                </Space>
+
+                    {/* TODO: Replace this in future via svgr */}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className={styles.ArrowIcon}
+                    >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </div>
             </a>
         </Dropdown>
     );
