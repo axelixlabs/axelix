@@ -70,7 +70,7 @@ export const BeanSource = ({ bean }: IProps) => {
                         {
                             title: (
                                 <div
-                                    className={`${styles.BeanTreeItem} ${styles.BeanTreeItemHover}`}
+                                    className={`${styles.ClickableBeanTreeItem}`}
                                     onClick={() =>
                                         scrollToAccordionById(
                                             beanSource.enclosingClassFullName!,
@@ -101,7 +101,7 @@ export const BeanSource = ({ bean }: IProps) => {
                             title: (
                                 <div className={styles.BeanTreeItem}>
                                     <div className={styles.BeanTreeLabel}>
-                                        {t("Beans.beanSource.titles.className")}:
+                                        {t("Beans.beanSource.titles.factoryBeanClassName")}:
                                     </div>
                                     <div className={styles.BeanTreeValue}>{beanSource.factoryBeanName}</div>
                                 </div>
