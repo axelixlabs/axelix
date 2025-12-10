@@ -64,12 +64,13 @@ export const BeanSource = ({ bean }: IProps) => {
                                     <div className={styles.BeanTreeValue}>{beanSource.methodName}</div>
                                 </div>
                             ),
+                            selectable: false,
                             key: beanSource.methodName!,
                         },
                         {
                             title: (
                                 <div
-                                    className={`${styles.BeanTreeItem} ${styles.BeanTreeItemHover}`}
+                                    className={`${styles.ClickableBeanTreeItem}`}
                                     onClick={() =>
                                         scrollToAccordionById(
                                             beanSource.enclosingClassFullName!,
@@ -98,21 +99,14 @@ export const BeanSource = ({ bean }: IProps) => {
                     children: [
                         {
                             title: (
-                                <div
-                                    className={`${styles.BeanTreeItem} ${styles.BeanTreeItemHover}`}
-                                    onClick={() =>
-                                        scrollToAccordionById(
-                                            beanSource.factoryBeanName!,
-                                            ESearchSubject.BEAN_NAME_OR_ALIAS,
-                                        )
-                                    }
-                                >
+                                <div className={styles.BeanTreeItem}>
                                     <div className={styles.BeanTreeLabel}>
-                                        {t("Beans.beanSource.titles.factoryBeanName")}:
+                                        {t("Beans.beanSource.titles.factoryBeanClassName")}:
                                     </div>
                                     <div className={styles.BeanTreeValue}>{beanSource.factoryBeanName}</div>
                                 </div>
                             ),
+                            selectable: false,
                             key: beanSource.factoryBeanName!,
                         },
                     ],

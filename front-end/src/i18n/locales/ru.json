@@ -119,7 +119,7 @@
                 "main": "Происхождение",
                 "beanMethod": "Bean метод",
                 "enclosingClass": "Декларирущий класс",
-                "factoryBeanName": "Имя FactoryBean бина"
+                "factoryBeanClassName" : "Factory Bean"
             },
             "COMPONENT_ANNOTATION": "@Component или аналоги",
             "SYNTHETIC_BEAN": "Синтетический bean",
