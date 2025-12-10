@@ -67,7 +67,13 @@
     },
     "Header": {
         "dashboard": "Dashboard",
-        "wallboard": "Wallboard"
+        "wallboard": "Wallboard",
+        "Help": {
+            "title": "Help",
+            "documentation": "Documentation",
+            "about": "About",
+            "feedback": "Provide Feedback"
+        }
     },
     "Sider": {
         "insights": "Insights",

@@ -1,0 +1,26 @@
+.HelpLabelWrapper {
+    margin-left: 20px;
+}
+
+.HelpLabelWrapper:hover {
+    color: var(--axile-primary-green);
+}
+
+.CommonIcon {
+    font-size: 18px !important;
+}
+
+.ArrowIcon {
+    transform: rotate(180deg);
+    transition: transform 0.5s;
+}
+
+.HelpLabelWrapper:hover .ArrowIcon {
+    transform: rotate(0);
+}
+
+.HelpLabel {
+    display: flex;
+    align-items: flex-end;
+    column-gap: 4px;
+}
