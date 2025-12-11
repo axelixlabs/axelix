@@ -4,21 +4,6 @@
   gap: 20px;
 }
 
-.DependencyWrapper {
-  display: flex;
-  align-items: center;
-  column-gap: 8px;
-}
-
-.Dependency {
-  min-width: 0;
-}
-
-.Dependency:hover {
-  cursor: pointer;
-  color: var(--axile-primary-green);
-}
-
 .Divider {
   margin-block: 5px;
 }

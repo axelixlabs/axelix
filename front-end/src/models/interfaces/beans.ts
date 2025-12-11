@@ -25,7 +25,7 @@ export interface IBeansResponseBody {
     beans: IBean[];
 }
 
-interface IDependency {
+export interface IDependency {
     /**
      * The name of the dependent bean
      */

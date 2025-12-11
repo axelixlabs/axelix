@@ -1,0 +1,25 @@
+.AccordionBodyChunkTitle {
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.AccordionBodyChunkList:not(:last-child) {
+    border-bottom: 1px solid var(--axile-medium-grey);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+}
+
+.DependencyWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.Dependency {
+    min-width: 0;
+}
+
+.Dependency:hover {
+    cursor: pointer;
+    color: var(--axile-primary-green);
+}
