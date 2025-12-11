@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./scheduledTasks";
-export * from "./siderMenu";
-export * from "./dashboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./beans";
+import { EHealthStatusesColors } from "models";
+
+export const HEALTH_STATUSES_COLORS: Record<EHealthStatusesColors, string> = {
+    [EHealthStatusesColors.UP]: "#00ab55",
+    [EHealthStatusesColors.DOWN]: "#ff000a",
+    [EHealthStatusesColors.UNKNOWN]: "#838383",
+};

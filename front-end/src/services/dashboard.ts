@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./scheduledTasks";
-export * from "./siderMenu";
-export * from "./dashboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./beans";
+import apiFetch from "api/apiFetch";
+
+export const getDashboardData = () => {
+    return apiFetch.get("dashboard");
+};
