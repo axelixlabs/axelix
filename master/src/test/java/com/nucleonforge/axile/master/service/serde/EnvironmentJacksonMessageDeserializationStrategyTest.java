@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 28.08.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 class EnvironmentJacksonMessageDeserializationStrategyTest {
 
@@ -50,10 +51,12 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
           "propertySources": [
             {
               "sourceName": "servletContextInitParams",
+              "sourceDescription": "Contains the initialization parameters of the 'ServletContext', defined in 'web.xml' or set via 'ServletContext.setInitParameter()', and has higher priority than properties in 'jndiProperties' and 'StandardEnvironment'",
               "properties": []
             },
             {
               "sourceName": "systemProperties",
+              "sourceDescription": "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'",
               "properties": [
                 {
                   "propertyName": "java.specification.version",
@@ -73,6 +76,7 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
             },
             {
               "sourceName": "systemEnvironment",
+              "sourceDescription": "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application.*'",
               "properties": [
                 {
                   "propertyName": "JAVA_HOME",
@@ -96,6 +100,7 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
             },
             {
               "sourceName": "Config resource classpath:actuate/env/",
+              "sourceDescription": "Contains properties from the 'application.*' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources.",
               "properties": [
                 {
                   "propertyName": "com.example.cache.max-size",
@@ -123,12 +128,18 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                 .findFirst()
                 .orElseThrow();
         assertThat(servletParams.properties()).isEmpty();
+        assertThat(servletParams.sourceDescription())
+                .isEqualTo(
+                        "Contains the initialization parameters of the 'ServletContext', defined in 'web.xml' or set via 'ServletContext.setInitParameter()', and has higher priority than properties in 'jndiProperties' and 'StandardEnvironment'");
 
         PropertySource systemProps = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemProperties"))
                 .findFirst()
                 .orElseThrow();
         assertThat(systemProps.properties()).hasSize(2);
+        assertThat(systemProps.sourceDescription())
+                .isEqualTo(
+                        "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'");
 
         Property javaSpecVersion = systemProps.properties().stream()
                 .filter(pv -> pv.propertyName().equals("java.specification.version"))
@@ -157,6 +168,9 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                 .findFirst()
                 .orElseThrow();
         assertThat(systemEnv.properties()).hasSize(2);
+        assertThat(systemEnv.sourceDescription())
+                .isEqualTo(
+                        "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application.*'");
 
         Property javaHome = systemEnv.properties().stream()
                 .filter(pv -> pv.propertyName().equals("JAVA_HOME"))
@@ -185,6 +199,9 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                 .findFirst()
                 .orElseThrow();
         assertThat(configProps.properties()).hasSize(1);
+        assertThat(configProps.sourceDescription())
+                .isEqualTo(
+                        "Contains properties from the 'application.*' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources.");
 
         Property cacheMaxSize = configProps.properties().stream()
                 .filter(pv -> pv.propertyName().equals("com.example.cache.max-size"))

@@ -32,6 +32,7 @@ import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
  * @see EnvironmentFeed
  * @since 27.08.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public record EnvironmentFeedResponse(
         List<String> activeProfiles, List<String> defaultProfiles, List<PropertySourceShortProfile> propertySources) {
@@ -39,10 +40,12 @@ public record EnvironmentFeedResponse(
     /**
      * Short profile of a given property source.
      *
-     * @param name       the sourceName of the property source
-     * @param properties the list of property entries
+     * @param name         the sourceName of the property source
+     * @param description  the custom description of this property source, if any.
+     * @param properties   the list of property entries
      */
-    public record PropertySourceShortProfile(String name, List<PropertyEntry> properties) {}
+    public record PropertySourceShortProfile(
+            String name, @Nullable String description, List<PropertyEntry> properties) {}
 
     /**
      * Represents a property value returned by the custom Axile environment endpoint.
@@ -67,8 +70,8 @@ public record EnvironmentFeedResponse(
             @JsonInclude(JsonInclude.Include.NON_NULL) @Nullable Deprecation deprecation) {}
 
     /**
-     * @param reason the reason why the given property is deprecated.
-     * @param replacement the name of the property that potentially aims to replace the given deprecated property.
+     * @param reason       the reason why the given property is deprecated.
+     * @param replacement  the name of the property that potentially aims to replace the given deprecated property.
      */
     public record Deprecation(@Nullable String reason, @Nullable String replacement) {}
 }

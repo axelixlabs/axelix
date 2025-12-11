@@ -17,7 +17,6 @@ package com.nucleonforge.axile.common.api.env;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
@@ -28,40 +27,60 @@ import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
  *
  * @see ActuatorEndpoint
  * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/env.html">Env Endpoint</a>
+ *
+ * @param activeProfiles   the list of currently active Spring profiles.
+ * @param defaultProfiles  the list of default Spring profiles.
+ * @param propertySources  the list of property sources with their short profiles.
+ *
  * @since 26.08.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public record EnvironmentFeed(
-        List<String> activeProfiles, List<String> defaultProfiles, List<PropertySource> propertySources) {
+        @JsonProperty("activeProfiles") List<String> activeProfiles,
+        @JsonProperty("defaultProfiles") List<String> defaultProfiles,
+        @JsonProperty("propertySources") List<PropertySource> propertySources) {
 
-    @JsonCreator
-    public EnvironmentFeed(
-            @JsonProperty("activeProfiles") List<String> activeProfiles,
-            @JsonProperty("defaultProfiles") List<String> defaultProfiles,
-            @JsonProperty("propertySources") List<PropertySource> propertySources) {
-        this.activeProfiles = activeProfiles;
-        this.defaultProfiles = defaultProfiles;
-        this.propertySources = propertySources;
-    }
+    /**
+     * DTO that encapsulates the property source of the given artifact.
+     *
+     * @param sourceName         the sourceName of the property source.
+     * @param sourceDescription  the custom description of this property source, if any.
+     * @param properties         the list of property entries.
+     */
+    public record PropertySource(
+            @JsonProperty("sourceName") String sourceName,
+            @JsonProperty("sourceDescription") @Nullable String sourceDescription,
+            @JsonProperty("properties") List<Property> properties) {}
 
-    public record PropertySource(String sourceName, List<Property> properties) {
-
-        @JsonCreator
-        public PropertySource(
-                @JsonProperty("sourceName") String sourceName, @JsonProperty("properties") List<Property> properties) {
-            this.sourceName = sourceName;
-            this.properties = properties;
-        }
-    }
-
+    /**
+     * DTO representing a property value returned by the custom Axile environment endpoint.
+     *
+     * @param propertyName         the property name.
+     * @param value                the string representation of the property's value.
+     * @param isPrimary            whether this property value is primary (i.e. this value takes precedence over the other values
+     *                             from other property sources).
+     * @param configPropsBeanName  the propertyName of the configProps (if any) bean onto which this property maps,
+     *                             {@code null} otherwise.
+     * @param description          the description from spring-configuration-metadata.json
+     * @param deprecation          deprecation related information. If {@code null}, the
+     *                             property is not considered deprecated. If not {@code null},
+     *                             then the property is considered deprecated.
+     */
     public record Property(
-            String propertyName,
-            @Nullable String value,
-            boolean isPrimary,
-            @Nullable String configPropsBeanName,
-            @Nullable String description,
-            @Nullable Deprecation deprecation) {}
+            @JsonProperty("propertyName") String propertyName,
+            @JsonProperty("value") @Nullable String value,
+            @JsonProperty("isPrimary") boolean isPrimary,
+            @JsonProperty("configPropsBeanName") @Nullable String configPropsBeanName,
+            @JsonProperty("description") @Nullable String description,
+            @JsonProperty("deprecation") @Nullable Deprecation deprecation) {}
 
+    /**
+     * DTO that encapsulates the deprecation property of the given artifact.
+     *
+     * @param reason        the reason why the given property is deprecated.
+     * @param replacement   the name of the property that potentially aims to replace the given deprecated property.
+     */
     public record Deprecation(
             @JsonProperty("reason") @Nullable String reason,
             @JsonProperty("replacement") @Nullable String replacement) {}

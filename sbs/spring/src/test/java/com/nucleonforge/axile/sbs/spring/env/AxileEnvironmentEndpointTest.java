@@ -35,6 +35,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -51,6 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 21.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -197,6 +199,28 @@ class AxileEnvironmentEndpointTest {
                 Arguments.of("axile.prop.test.http-client.requests[1].methods[0].type"),
                 Arguments.of("axile.prop.test.http-client.requests[1].methods[0].retries[0].count"),
                 Arguments.of("axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("propertySourceDescription")
+    void shouldReturnDescriptionKnownPropertySource(String sourceName, String sourceDescription) {
+        ResponseEntity<EnvironmentFeed> response =
+                restTemplate.getForEntity("/actuator/axile-env", EnvironmentFeed.class);
+
+        assertThat(response.getBody().propertySources())
+                .filteredOn(e -> e.sourceName().equals(sourceName))
+                .first()
+                .satisfies(e -> e.sourceDescription().equals(sourceDescription));
+    }
+
+    private static Stream<Arguments> propertySourceDescription() {
+        return Stream.of(
+                Arguments.of(
+                        StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME,
+                        "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'"),
+                Arguments.of(
+                        "server.ports",
+                        "Contains the 'server.port' property from 'application.*', which defines the web server port (8080 by default)."));
     }
 
     @ConfigurationProperties(prefix = "axile.prop.test")
