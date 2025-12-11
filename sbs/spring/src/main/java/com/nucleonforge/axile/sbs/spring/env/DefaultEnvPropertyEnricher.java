@@ -42,6 +42,7 @@ import com.nucleonforge.axile.sbs.spring.configprops.ConfigurationPropertiesCach
  *
  * @since 21.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
@@ -124,7 +125,10 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                 })
                 .toList();
 
-        return new PropertySource(source.getName(), enrichedProperties);
+        return new PropertySource(
+                source.getName(),
+                PropertySourceDescription.getDescriptionBySourceName(source.getName()),
+                enrichedProperties);
     }
 
     @Nullable

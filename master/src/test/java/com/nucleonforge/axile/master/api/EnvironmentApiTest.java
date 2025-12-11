@@ -54,6 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 28.08.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class EnvironmentApiTest {
@@ -67,6 +68,7 @@ class EnvironmentApiTest {
           "propertySources": [
             {
               "name": "systemProperties",
+              "description": "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'",
               "properties": [
                 {
                   "name": "java.specification.version",
@@ -86,6 +88,7 @@ class EnvironmentApiTest {
             },
             {
               "name": "systemEnvironment",
+              "description": "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application.*'",
               "properties": [
                 {
                   "name": "JAVA_HOME",
@@ -109,6 +112,7 @@ class EnvironmentApiTest {
             },
             {
               "name": "Config resource classpath:actuate/env/",
+              "description": "Contains properties from the 'application.*' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources.",
               "properties": [
                 {
                   "name": "com.example.cache.max-size",
@@ -179,6 +183,7 @@ class EnvironmentApiTest {
           "propertySources": [
             {
               "sourceName": "systemProperties",
+              "sourceDescription": "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'",
               "properties": [
                 {
                   "propertyName": "java.specification.version",
@@ -198,6 +203,7 @@ class EnvironmentApiTest {
             },
             {
               "sourceName": "systemEnvironment",
+              "sourceDescription": "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application.*'",
               "properties": [
                 {
                   "propertyName": "JAVA_HOME",
@@ -221,6 +227,7 @@ class EnvironmentApiTest {
             },
             {
               "sourceName": "Config resource classpath:actuate/env/",
+              "sourceDescription": "Contains properties from the 'application.*' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources.",
               "properties": [
                 {
                   "propertyName": "com.example.cache.max-size",

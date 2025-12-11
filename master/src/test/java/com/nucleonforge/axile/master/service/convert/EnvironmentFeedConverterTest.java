@@ -34,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 28.08.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 class EnvironmentFeedConverterTest {
 
@@ -58,6 +59,9 @@ class EnvironmentFeedConverterTest {
 
         PropertySourceShortProfile propertySource1 =
                 getPropertySourceProfileByName(environmentFeedResponse, "systemProperties");
+        assertThat(propertySource1.description())
+                .isEqualTo(
+                        "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'");
         assertThat(propertySource1.properties()).hasSize(1).anySatisfy(kv -> {
             assertThat(kv.name()).isEqualTo("java.vm.vendor");
             assertThat(kv.value()).isEqualTo("Amazon.com Inc.");
@@ -69,6 +73,9 @@ class EnvironmentFeedConverterTest {
 
         PropertySourceShortProfile propertySource2 =
                 getPropertySourceProfileByName(environmentFeedResponse, "systemEnvironment");
+        assertThat(propertySource2.description())
+                .isEqualTo(
+                        "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application.*'");
         assertThat(propertySource2.properties()).hasSize(1).anySatisfy(kv -> {
             assertThat(kv.name()).isEqualTo("JAVA_HOME");
             assertThat(kv.value()).isEqualTo(".jdks\\corretto-17.0.16");
@@ -80,6 +87,9 @@ class EnvironmentFeedConverterTest {
 
         PropertySourceShortProfile propertySource3 = getPropertySourceProfileByName(
                 environmentFeedResponse, "Config resource class path resource [application.yaml]");
+        assertThat(propertySource3.description())
+                .isEqualTo(
+                        "Contains properties from the 'application.*' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources.");
         assertThat(propertySource3.properties())
                 .hasSize(2)
                 .anySatisfy(kv -> {
@@ -103,6 +113,9 @@ class EnvironmentFeedConverterTest {
 
         PropertySourceShortProfile propertySource4 =
                 getPropertySourceProfileByName(environmentFeedResponse, "springCloudClientHostInfo");
+        assertThat(propertySource4.description())
+                .isEqualTo(
+                        "Contains information about the client host for discovering and identifying instances in the cluster");
         assertThat(propertySource4.properties())
                 .hasSize(2)
                 .anySatisfy(kv -> {
@@ -153,7 +166,10 @@ class EnvironmentFeedConverterTest {
                 "org.springframework.boot.test.property.SystemProperties",
                 null,
                 null));
-        PropertySource propertySource1 = new PropertySource("systemProperties", properties1);
+        String systemPropertiesDescription =
+                "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'";
+        PropertySource propertySource1 =
+                new PropertySource("systemProperties", systemPropertiesDescription, properties1);
 
         List<Property> properties2 = new ArrayList<>();
         properties2.add(new Property(
@@ -163,7 +179,10 @@ class EnvironmentFeedConverterTest {
                 "org.springframework.boot.test.property.SystemEnvironment",
                 null,
                 null));
-        PropertySource propertySource2 = new PropertySource("systemEnvironment", properties2);
+        String systemEnvironmentDescription =
+                "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application.*'";
+        PropertySource propertySource2 =
+                new PropertySource("systemEnvironment", systemEnvironmentDescription, properties2);
 
         List<Property> properties3 = new ArrayList<>();
         properties3.add(
@@ -176,8 +195,12 @@ class EnvironmentFeedConverterTest {
                 null,
                 "DDL mode. This is actually a shortcut for the \"hibernate.hbm2ddl.auto\" property.",
                 null));
-        PropertySource propertySource3 =
-                new PropertySource("Config resource class path resource [application.yaml]", properties3);
+        String applicationPropertiesDescription =
+                "Contains properties from the 'application.*' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources.";
+        PropertySource propertySource3 = new PropertySource(
+                "Config resource class path resource [application.yaml]",
+                applicationPropertiesDescription,
+                properties3);
 
         List<Property> properties4 = new ArrayList<>();
         properties4.add(new Property(
@@ -188,9 +211,12 @@ class EnvironmentFeedConverterTest {
                 null,
                 null));
 
+        String springCloudSourceDescription =
+                "Contains information about the client host for discovering and identifying instances in the cluster";
         properties4.add(new Property(
                 "logging.path", "pattern", false, null, "Location of the log file. For instance, `/var/log`.", null));
-        PropertySource propertySource4 = new PropertySource("springCloudClientHostInfo", properties4);
+        PropertySource propertySource4 =
+                new PropertySource("springCloudClientHostInfo", springCloudSourceDescription, properties4);
 
         return new ArrayList<>(List.of(propertySource1, propertySource2, propertySource3, propertySource4));
     }

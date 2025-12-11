@@ -35,6 +35,7 @@ import com.nucleonforge.axile.master.service.convert.response.Converter;
  *
  * @since 27.08.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Service
 public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, EnvironmentFeedResponse> {
@@ -47,7 +48,8 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
 
         for (PropertySource propertySource : source.propertySources()) {
             List<PropertyEntry> properties = convertPropertyEntries(propertySource);
-            propertySources.add(new PropertySourceShortProfile(propertySource.sourceName(), properties));
+            propertySources.add(new PropertySourceShortProfile(
+                    propertySource.sourceName(), propertySource.sourceDescription(), properties));
         }
 
         return new EnvironmentFeedResponse(activeProfiles, defaultProfiles, propertySources);
