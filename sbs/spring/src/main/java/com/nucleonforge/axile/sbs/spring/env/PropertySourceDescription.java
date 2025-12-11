@@ -34,6 +34,7 @@ import com.nucleonforge.axile.sbs.spring.properties.AxilePropertySource;
  * @author Sergey Cherkasov
  */
 public enum PropertySourceDescription {
+
     // AxilePropertySource
     AXILE_PROPERTY_SOURCE_NAME(
             AxilePropertySource.AXILE_PROPERTY_SOURCE_NAME,
@@ -120,7 +121,7 @@ public enum PropertySourceDescription {
         return description;
     }
 
-    public static Optional<PropertySourceDescription> findBySourceName(String sourceName) {
+    private static Optional<PropertySourceDescription> findBySourceName(String sourceName) {
         return Arrays.stream(values())
                 .filter(desc -> desc.sourceName.equals(sourceName) || sourceName.startsWith(desc.sourceName))
                 .findFirst();
