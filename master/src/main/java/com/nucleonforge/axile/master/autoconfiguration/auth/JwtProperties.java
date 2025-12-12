@@ -19,7 +19,14 @@ import java.time.Duration;
 
 import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
 
-@SuppressWarnings("NullAway")
+/**
+ * JWT configuration properties.
+ *
+ * @since 11.12.2025
+ * @author Mikhail Polivakha
+ * @author Nikita Kirillov
+ */
+@SuppressWarnings("NullAway.Init")
 public class JwtProperties {
 
     private JwtAlgorithm algorithm;
