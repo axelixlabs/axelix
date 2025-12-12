@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { EHealthStatusesColors, IDistribution, IHealthStatus } from "models";
+import type { EInstanceStatus, IDistribution, IHealthStatus } from "models";
 import { HEALTH_STATUSES_COLORS } from "utils";
 
 export const prepareHealthStatusesChartData = (statuses: IHealthStatus["statuses"]) => {
-    const statusesEntries = Object.entries(statuses) as [EHealthStatusesColors, number][];
+    const statusesEntries = Object.entries(statuses) as [EInstanceStatus, number][];
 
     return statusesEntries.map(([name, value]) => ({
         name: name,

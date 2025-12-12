@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { EInstanceStatus } from "../enums/globals.ts";
+
 export interface IInstanceCard {
     instanceId: string;
     springBootVersion: string;
     javaVersion: string;
-    status: string;
+    status: EInstanceStatus;
     name: string;
     serviceVersion: string;
     commitShaShort: string;
