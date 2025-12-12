@@ -1,0 +1,31 @@
+.HeaderWrapper{
+    margin-bottom: 20px;
+}
+
+.Version{
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--axile-bold-grey);
+}
+
+.ParagraphGutter{
+    margin-bottom: 12px;
+}
+
+.ParagraphGutter:last-child {
+    margin-bottom: 20px;
+}
+
+.ParagraphGutter>a{
+    color: #1677ff;
+    transition: color 0.3s;
+}
+
+.ParagraphGutter>a:hover {
+    color: #69b1ff
+}
+
+.ActionsWrapper {
+    display: flex;
+    column-gap: 12px;
+}
