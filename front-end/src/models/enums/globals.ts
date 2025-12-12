@@ -13,11 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./scheduledTasks";
-export * from "./siderMenu";
-export * from "./dashboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./beans";
+
+/**
+ * Possible statuses of the instances
+ */
+export enum EInstanceStatus {
+    /**
+     * Instance is UP and running
+     */
+    UP = "UP",
+
+    /**
+     * Instance is not healthy
+     */
+    DOWN = "DOWN",
+
+    /**
+     * We're not sure about the instance's status
+     */
+    UNKNOWN = "UNKNOWN",
+}

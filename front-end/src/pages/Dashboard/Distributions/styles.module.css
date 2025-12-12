@@ -1,0 +1,30 @@
+.MainWrapper {
+    margin-bottom: 40px;
+}
+
+.Title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.ChartsWrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    justify-content: center;
+    gap: 8px;
+}
+
+.SingleChartWrapper {
+    display: grid;
+    place-items: center;
+    padding: 8px;
+    border: 1px solid var(--axile-medium-grey);
+    border-radius: var(--axile-border-radius-large);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
+}
+
+.CardTitle {
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 600;
+}

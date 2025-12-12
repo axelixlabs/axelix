@@ -1,0 +1,37 @@
+.MainWrapper {
+    background-color: #ffffff;
+    border: 1px solid var(--axile-light-grey);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
+    border-radius: var(--axile-border-radius-large);
+    padding: 16px;
+    width: 100%;
+    align-self: flex-start;
+}
+
+.Title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.CardsWrapper {
+    display: flex;
+    gap: 20px;
+}
+
+.CardWrapper {
+    border-radius: var(--axile-border-radius-large);
+    padding: 30px 8px;
+    border: 1px solid var(--axile-light-grey);
+    flex-basis: 33%;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
+}
+
+.CardTitle {
+    font-weight: 600;
+    margin-bottom: 40px;
+}
+
+.CardValue {
+    word-break: break-all;
+}

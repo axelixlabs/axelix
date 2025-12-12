@@ -160,5 +160,12 @@
         "tags": "Tags",
         "selectValue": "Select value",
         "selectPrevFirst": "Select previous value"
+    },
+    "Dashboard": {
+        "distributions": "System's Map",
+        "healthStatus": "Health Status",
+        "totalCount": "Total Count",
+        "statistics": "Statistics",
+        "totalServicesCount": "Total count of services"
     }
 }

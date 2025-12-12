@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./scheduledTasks";
-export * from "./siderMenu";
-export * from "./dashboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./beans";
+import { EInstanceStatus } from "models";
+
+export const HEALTH_STATUSES_COLORS: Record<EInstanceStatus, string> = {
+    [EInstanceStatus.UP]: "#00ab55",
+    [EInstanceStatus.DOWN]: "#ff000a",
+    [EInstanceStatus.UNKNOWN]: "#838383",
+};

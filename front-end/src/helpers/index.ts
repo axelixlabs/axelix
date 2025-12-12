@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 export * from "./scheduledTasks";
-export * from "./conditions.ts";
 export * from "./configProps";
 export * from "./environment";
-export * from "./details.ts";
-export * from "./globals.ts";
-export * from "./metrics.ts";
+export * from "./conditions";
 export * from "./wallboard";
+export * from "./dashboard";
+export * from "./metrics";
+export * from "./globals";
+export * from "./details";
 export * from "./loggers";
 export * from "./caches";
 export * from "./beans";
