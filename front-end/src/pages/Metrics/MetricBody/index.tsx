@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 import { Select } from "antd";
+import type { DefaultOptionType } from "antd/es/select";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { EmptyHandler, Loader } from "components";
-import { buildSelectedTagParams, extractUniqueMetricValuesPerKey, fetchData } from "helpers";
-import { type IMetric, type ISingleMetricResponseBody, type IValidTagCombination, StatefulRequest } from "models";
+import { EmptyHandler, InfoTooltip, Loader } from "components";
+import { buildSelectedTagParams, fetchData, getMetricTagValuesWithStatus } from "helpers";
+import {
+    type IMetric,
+    type ISingleMetricResponseBody,
+    type ITagValueOptionValues,
+    type IValidTagCombination,
+    StatefulRequest,
+} from "models";
 import { getSingleMetricData } from "services";
 
 import MetricChart from "../MetricChart";
@@ -65,7 +72,7 @@ export const MetricBody = ({ metric }: IProps) => {
     const singleMetricFeedMeasurements = singleMetricFeed.measurements;
     const validTagCombinations: IValidTagCombination[] = singleMetricFeed.validTagCombinations;
 
-    const valuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
+    const tagValuesWithStatus = getMetricTagValuesWithStatus(validTagCombinations, selectedTags);
 
     const handleSelectChange = (tagName: string, selectedValue?: string) => {
         setSelectedTags((prev) => {
@@ -79,6 +86,20 @@ export const MetricBody = ({ metric }: IProps) => {
 
             return updatedTags;
         });
+    };
+
+    const createMetricTagSelectOptions = (values: ITagValueOptionValues[]): DefaultOptionType[] => {
+        return values.map(({ value, disabled }) => ({
+            label: disabled ? (
+                <InfoTooltip text={t("Metrics.disabledTag")}>
+                    <div>{value}</div>
+                </InfoTooltip>
+            ) : (
+                value
+            ),
+            value: value,
+            disabled: disabled,
+        }));
     };
 
     return (
@@ -98,18 +119,21 @@ export const MetricBody = ({ metric }: IProps) => {
                     <>
                         <div>{t("Metrics.tags")}:</div>
                         <div className={styles.TagsWrapper}>
-                            {valuesPerKey.map((options) => (
-                                <Fragment key={options.tag}>
-                                    <div>{options.tag}:</div>
+                            {tagValuesWithStatus.map(({ tag, values }) => (
+                                <Fragment key={tag}>
+                                    <div>{tag}:</div>
                                     <Select
-                                        value={selectedTags[options.tag] || undefined}
-                                        onChange={(it) => handleSelectChange(options.tag, it)}
+                                        value={selectedTags[tag] || undefined}
+                                        onChange={(it) => handleSelectChange(tag, it)}
                                         placeholder={t("Metrics.selectValue")}
-                                        options={options.values.map((it) => ({
-                                            value: it,
-                                        }))}
+                                        options={createMetricTagSelectOptions(values)}
                                         allowClear
                                         className={styles.TagSelect}
+                                        classNames={{
+                                            popup: {
+                                                root: styles.SelectPopupRoot,
+                                            },
+                                        }}
                                     />
                                 </Fragment>
                             ))}

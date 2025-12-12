@@ -18,6 +18,7 @@ export { LanguageSwitcher } from "./LanguageSwitcher";
 export { TooltipWithCopy } from "./TooltipWithCopy";
 export { LinearProgress } from "./LinearProgress";
 export { EmptyHandler } from "./EmptyHandler";
+export { InfoTooltip } from "./InfoTooltip";
 export { PageSearch } from "./PageSearch";
 export { AboutModal } from "./AboutModal";
 export { Accordion } from "./Accordion";

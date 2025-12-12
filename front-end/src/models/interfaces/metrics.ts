@@ -102,6 +102,18 @@ export interface IGetSingleMetricRequestData {
     tags: string[];
 }
 
+export interface ITagValueOptionValues {
+    /**
+     * Option value
+     */
+    value: string;
+
+    /**
+     * Whether the option is disabled
+     */
+    disabled: boolean;
+}
+
 export interface ITagValueOption {
     /**
      * The name of the tag
@@ -111,5 +123,5 @@ export interface ITagValueOption {
     /**
      * Possible values for the tag with the given name
      */
-    values: string[];
+    values: ITagValueOptionValues[];
 }

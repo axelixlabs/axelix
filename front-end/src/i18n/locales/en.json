@@ -159,7 +159,8 @@
         "baseUnit": "Base unit",
         "tags": "Tags",
         "selectValue": "Select value",
-        "selectPrevFirst": "Select previous value"
+        "selectPrevFirst": "Select previous value",
+        "disabledTag": "Not available with current selections."
     },
     "Dashboard": {
         "distributions": "System's Map",

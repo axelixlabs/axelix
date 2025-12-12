@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { IMetricsGroup, ITagValueOption, IValidTagCombination } from "models";
+import type { IMetricsGroup, ITagValueOption, ITagValueOptionValues, IValidTagCombination } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
@@ -91,51 +91,70 @@ export const findMetricsCount = (metricsGroups: IMetricsGroup[]): number => {
     return metricsGroups.reduce((count, group) => count + group.metrics.length, 0);
 };
 
-/**
- * Returns possible tag values options. Contains possible values for all the tags.
- *
- * If the given tag already has a selected value, then the array of possible values for the given tag
- * will contain the only value - the selected value.
- *
- * This would make it impossible to distinguish two cases:
- * - The selected that already has a selected value
- * - Tag that possibly can have only a single value (considering the values fo other tags of course)
- *
- * But we do not need to distinguish these two cases.
- *
- * @param validTagCombinations valid tag combinations.
- * @param selectedTags tags that are currently selected.
- */
-export const extractUniqueMetricValuesPerKey = (
+export const getMetricTagValuesWithStatus = (
     validTagCombinations: IValidTagCombination[],
     selectedTags: IValidTagCombination,
 ): ITagValueOption[] => {
-    const selected = Object.entries(selectedTags);
+    const selectedEntries = Object.entries(selectedTags);
 
-    const tagsPossibleValues = new Map<string, string[]>();
+    const tagsPossibleValues = new Map<string, ITagValueOptionValues[]>();
 
-    validTagCombinations
-        .filter((combination) => {
-            return selected.every(([key, value]) => combination[key] === value);
-        })
-        .forEach((combination) => {
-            Object.entries(combination).forEach(([tag, val]) => {
-                const values = tagsPossibleValues.get(tag) ?? [];
-                if (!values.includes(val)) {
-                    values.push(val);
-                }
-                tagsPossibleValues.set(tag, values);
-            });
+    validTagCombinations.forEach((combination) => {
+        Object.entries(combination).forEach(([tagKey, tagValue]) => {
+            const options = tagsPossibleValues.get(tagKey) ?? [];
+
+            if (!options.some(({ value }) => value === tagValue)) {
+                options.push({
+                    value: tagValue,
+                    disabled: false,
+                });
+            }
+
+            tagsPossibleValues.set(tagKey, options);
         });
+    });
+
+    tagsPossibleValues.forEach((optionsForTag, tagKey) => {
+        optionsForTag.forEach((option) => {
+            const otherSelected = selectedEntries.filter(([key]) => key !== tagKey);
+
+            const isEnabled = validTagCombinations.some((combination) => {
+                if (combination[tagKey] !== option.value) {
+                    return false;
+                }
+
+                return otherSelected.every(
+                    ([selectedKey, selectedValue]) => combination[selectedKey] === selectedValue,
+                );
+            });
+
+            option.disabled = !isEnabled;
+        });
+    });
 
     return [...tagsPossibleValues.entries()].map(([tagName, tagValues]) => {
+        const sortedTagValues = [...tagValues].sort((currentOption, nextOption) => {
+            if (currentOption.disabled === nextOption.disabled) {
+                return 0;
+            }
+
+            return currentOption.disabled ? 1 : -1;
+        });
+
         return {
             tag: tagName,
-            values: tagValues,
+            values: sortedTagValues,
         };
     });
 };
 
 export const buildSelectedTagParams = (selectedTags: Record<string, string>): string[] => {
     return Object.entries(selectedTags).map(([key, value]) => `${key}:${value}`);
+};
+
+export const createMetricTagSelectOptions = (values: ITagValueOptionValues[]) => {
+    return values.map(({ value, disabled }) => ({
+        value: value,
+        disabled: disabled,
+    }));
 };

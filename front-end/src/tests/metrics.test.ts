@@ -15,7 +15,7 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { extractUniqueMetricValuesPerKey, reduceDisplayedNumber } from "helpers";
+import { getMetricTagValuesWithStatus, reduceDisplayedNumber } from "helpers";
 import type { IValidTagCombination } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
@@ -64,90 +64,126 @@ describe("Check reduceDisplayedNumber function", () => {
     });
 });
 
-const validTagCombinations: IValidTagCombination[] = [
-    {
-        a: "1",
-        b: "1",
-        c: "3",
-    },
-    {
-        a: "1",
-        b: "1",
-        c: "4",
-    },
-    {
-        a: "1",
-        b: "2",
-        c: "2",
-    },
-    {
-        a: "1",
-        b: "2",
-        c: "3",
-    },
-    {
-        a: "2",
-        b: "2",
-        c: "2",
-    },
-];
+describe("Check getMetricTagValuesWithStatus function", () => {
+    it("Returns empty array when there are no valid combinations", () => {
+        const validTagCombinations: IValidTagCombination[] = [];
+        const selectedTags: Record<string, string> = {};
 
-describe("Check extractUniqueMetricValuesPerKey function", () => {
-    it("Returns all unique values for each key when no selected keys are provided", () => {
-        const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, {});
+        const result = getMetricTagValuesWithStatus(validTagCombinations, selectedTags);
+        expect(result).toEqual([]);
+    });
 
-        expect(uniqueMetricValuesPerKey).toEqual([
+    it("No tags selected", () => {
+        const validTagCombinations: IValidTagCombination[] = [
             {
-                tag: "a",
-                values: ["1", "2"],
+                testKey1: "111",
+                testKey2: "222",
             },
             {
-                tag: "b",
-                values: ["1", "2"],
+                testKey1: "Test2",
+                testKey2: "222",
             },
             {
-                tag: "c",
-                values: ["3", "4", "2"],
+                testKey1: "111",
+                testKey2: "333",
+            },
+        ];
+        const selectedTags: Record<string, string> = {};
+
+        const result = getMetricTagValuesWithStatus(validTagCombinations, selectedTags);
+
+        expect(result).toEqual([
+            {
+                tag: "testKey1",
+                values: [
+                    {
+                        value: "111",
+                        disabled: false,
+                    },
+                    {
+                        value: "Test2",
+                        disabled: false,
+                    },
+                ],
+            },
+            {
+                tag: "testKey2",
+                values: [
+                    {
+                        value: "222",
+                        disabled: false,
+                    },
+                    {
+                        value: "333",
+                        disabled: false,
+                    },
+                ],
             },
         ]);
     });
 
-    it("Filters combinations by single selected tag", () => {
-        const selectedTags = { a: "1" };
-        const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
+    it("Some values enabled and some disabled when partial match exists", () => {
+        const validTagCombinations: IValidTagCombination[] = [
+            {
+                TestKey1: "111",
+                TestKey2: "111",
+                TestKey3: "333",
+            },
+            {
+                TestKey1: "111",
+                TestKey2: "222",
+                TestKey3: "222",
+            },
+            {
+                TestKey1: "222",
+                TestKey2: "222",
+                TestKey3: "222",
+            },
+        ];
 
-        expect(uniqueMetricValuesPerKey).toEqual([
-            {
-                tag: "a",
-                values: ["1"],
-            },
-            {
-                tag: "b",
-                values: ["1", "2"],
-            },
-            {
-                tag: "c",
-                values: ["3", "4", "2"],
-            },
-        ]);
-    });
+        const selectedTags = { TestKey2: "222" };
 
-    it("Filters by multiple selected tags", () => {
-        const selectedTags = { a: "1", b: "2" };
-        const uniqueMetricValuesPerKey = extractUniqueMetricValuesPerKey(validTagCombinations, selectedTags);
+        const result = getMetricTagValuesWithStatus(validTagCombinations, selectedTags);
 
-        expect(uniqueMetricValuesPerKey).toEqual([
+        expect(result).toEqual([
             {
-                tag: "a",
-                values: ["1"],
+                tag: "TestKey1",
+                values: [
+                    {
+                        value: "111",
+                        disabled: false,
+                    },
+                    {
+                        value: "222",
+                        disabled: false,
+                    },
+                ],
             },
             {
-                tag: "b",
-                values: ["2"],
+                tag: "TestKey2",
+                values: [
+                    {
+                        value: "111",
+                        disabled: false,
+                    },
+                    {
+                        value: "222",
+                        disabled: false,
+                    },
+                ],
             },
             {
-                tag: "c",
-                values: ["2", "3"],
+                tag: "TestKey3",
+                values: [
+                    {
+                        value: "222",
+                        disabled: false,
+                    },
+                    {
+                        value: "333",
+                        disabled: true,
+                    },
+                ],
             },
         ]);
     });

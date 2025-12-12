@@ -159,7 +159,8 @@
         "baseUnit": "Базовая единица",
         "tags": "Теги",
         "selectValue": "Выберите значение",
-        "selectPrevFirst": "Выбрать предыдущее значение"
+        "selectPrevFirst": "Выбрать предыдущее значение",
+        "disabledTag": "Недоступно с текущими выбранными опциями."
     },
     "Dashboard": {
         "distributions": "Карта Системы",
