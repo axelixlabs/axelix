@@ -32,7 +32,7 @@ export * from "./types/conditions";
 export * from "./types/antd";
 
 export * from "./enums/conditions";
-export * from "./enums/dashboard";
+export * from "./enums/globals.ts";
 export * from "./enums/details";
 export * from "./enums/loggers";
 export * from "./enums/beans";

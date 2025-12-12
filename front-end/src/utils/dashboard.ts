@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { EHealthStatusesColors } from "models";
+import { EInstanceStatus } from "models";
 
-export const HEALTH_STATUSES_COLORS: Record<EHealthStatusesColors, string> = {
-    [EHealthStatusesColors.UP]: "#00ab55",
-    [EHealthStatusesColors.DOWN]: "#ff000a",
-    [EHealthStatusesColors.UNKNOWN]: "#838383",
+export const HEALTH_STATUSES_COLORS: Record<EInstanceStatus, string> = {
+    [EInstanceStatus.UP]: "#00ab55",
+    [EInstanceStatus.DOWN]: "#ff000a",
+    [EInstanceStatus.UNKNOWN]: "#838383",
 };

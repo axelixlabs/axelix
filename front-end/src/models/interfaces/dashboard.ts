@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { EHealthStatusesColors } from "models";
+import type { EInstanceStatus } from "models";
 
 export interface IDistribution {
     /**
@@ -22,7 +22,9 @@ export interface IDistribution {
     softwareComponentName: string;
 
     /**
-     * Key–value map of versions
+     * Key–value map of versions.
+     *
+     * Key - the version, value - the amount of software components of that version deployed.
      */
     versions: Record<string, number>;
 }
@@ -31,7 +33,7 @@ export interface IHealthStatus {
     /**
      * Key–value map of statuses
      */
-    statuses: Record<EHealthStatusesColors, number>;
+    statuses: Record<EInstanceStatus, number>;
 }
 
 export interface IDashboardResponseBody {

@@ -13,8 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export enum EHealthStatusesColors {
+
+/**
+ * Possible statuses of the instances
+ */
+export enum EInstanceStatus {
+    /**
+     * Instance is UP and running
+     */
     UP = "UP",
+
+    /**
+     * Instance is not healthy
+     */
     DOWN = "DOWN",
+
+    /**
+     * We're not sure about the instance's status
+     */
     UNKNOWN = "UNKNOWN",
 }
