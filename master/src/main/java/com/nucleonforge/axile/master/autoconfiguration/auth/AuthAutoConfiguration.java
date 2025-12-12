@@ -21,17 +21,20 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 
+import com.nucleonforge.axile.master.service.auth.CookieService;
+import com.nucleonforge.axile.master.service.auth.DefaultCookieService;
 import com.nucleonforge.axile.master.service.auth.jwt.DefaultJwtEncoderService;
 import com.nucleonforge.axile.master.service.auth.jwt.JwtEncoderService;
 import com.nucleonforge.axile.master.service.auth.provider.StaticAdminUserProvider;
 
 /**
- * Autoconfiguration for security.
+ * Autoconfiguration for auth.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @AutoConfiguration
-public class SecurityAutoConfiguration {
+public class AuthAutoConfiguration {
 
     /**
      * Autoconfiguration for the JWT-related part.
@@ -49,6 +52,29 @@ public class SecurityAutoConfiguration {
         JwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
             return new DefaultJwtEncoderService(
                     jwtProperties.getAlgorithm(), jwtProperties.getSigningKey(), jwtProperties.getLifespan());
+        }
+    }
+
+    /**
+     * Autoconfiguration for cookie.
+     */
+    @AutoConfiguration(after = JwtAutoConfiguration.class)
+    @ConditionalOnProperty(
+            prefix = "axile.master.auth",
+            name = "cookie.enabled",
+            havingValue = "true",
+            matchIfMissing = true)
+    public static class CookieAutoConfiguration {
+
+        @Bean
+        @ConfigurationProperties(prefix = "axile.master.auth.cookie")
+        public CookieProperties cookieProperties() {
+            return new CookieProperties();
+        }
+
+        @Bean
+        public CookieService cookieService(CookieProperties cookieProperties, JwtProperties jwtProperties) {
+            return new DefaultCookieService(cookieProperties, jwtProperties);
         }
     }
 
