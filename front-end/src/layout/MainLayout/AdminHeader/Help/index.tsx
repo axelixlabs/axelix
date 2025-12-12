@@ -17,12 +17,17 @@ import { BookOutlined, CommentOutlined } from "@ant-design/icons";
 
 import { Dropdown, type MenuProps } from "antd";
 import AboutIcon from "assets/icons/info-black.svg";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+
+import { AboutModal } from "components";
 
 import styles from "./styles.module.css";
 
 export const Help = () => {
     const { t } = useTranslation();
+
+    const [open, setOpen] = useState<boolean>(false);
 
     const items: MenuProps["items"] = [
         {
@@ -38,7 +43,7 @@ export const Help = () => {
             icon: <BookOutlined className={styles.CommonIcon} />,
             label: (
                 <a target="_blank" rel="noopener noreferrer" href="#">
-                    {t("Header.Help.documentation")}
+                    {t("documentation")}
                 </a>
             ),
         },
@@ -46,11 +51,7 @@ export const Help = () => {
             key: "3",
             // TODO: Replace this via svgr in future and delete the info-black.svg icon
             icon: <img src={AboutIcon} alt="About icon" />,
-            label: (
-                <a target="_blank" rel="noopener noreferrer" href="#">
-                    {t("Header.Help.about")}
-                </a>
-            ),
+            label: <a onClick={() => setOpen(true)}>{t("Header.Help.about")}</a>,
         },
         {
             key: "4",
@@ -64,29 +65,32 @@ export const Help = () => {
     ];
 
     return (
-        <Dropdown menu={{ items }}>
-            <a onClick={(e) => e.preventDefault()} className={styles.HelpLabelWrapper}>
-                <div className={styles.HelpLabel}>
-                    {t("Header.Help.title")}
+        <>
+            <Dropdown menu={{ items }}>
+                <a onClick={(e) => e.preventDefault()} className={styles.HelpLabelWrapper}>
+                    <div className={styles.HelpLabel}>
+                        {t("Header.Help.title")}
 
-                    {/* TODO: Replace this in future via svgr */}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className={styles.ArrowIcon}
-                    >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                </div>
-            </a>
-        </Dropdown>
+                        {/* TODO: Replace this in future via svgr */}
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            strokeWidth="2"
+                            stroke="currentColor"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className={styles.ArrowIcon}
+                        >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </div>
+                </a>
+            </Dropdown>
+            <AboutModal open={open} setOpen={setOpen} />
+        </>
     );
 };
