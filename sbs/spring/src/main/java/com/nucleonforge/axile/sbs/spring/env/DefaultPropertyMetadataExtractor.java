@@ -128,7 +128,10 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
             return;
         }
 
-        metadataMap.put(normalizedName, buildPropertyMetadata(propertyNode));
+        PropertyMetadata propertyMetadata = buildPropertyMetadata(propertyNode);
+        if (propertyMetadata != null) {
+            metadataMap.put(normalizedName, propertyMetadata);
+        }
     }
 
     public @Nullable PropertyMetadata buildPropertyMetadata(JsonNode propertyNode) {
