@@ -160,5 +160,12 @@
         "tags": "Теги",
         "selectValue": "Выберите значение",
         "selectPrevFirst": "Выбрать предыдущее значение"
+    },
+    "Dashboard": {
+        "distributions": "Карта Системы",
+        "healthStatus": "Состояние системы",
+        "totalCount": "Общее кол-во",
+        "statistics": "Статистика",
+        "totalServicesCount": "Общее количество сервисов"
     }
 }

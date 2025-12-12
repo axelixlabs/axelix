@@ -24,6 +24,7 @@ const Environment = Loadable(lazy(() => import("pages/Environment")));
 const ConfigProps = Loadable(lazy(() => import("pages/ConfigProps")));
 const Conditions = Loadable(lazy(() => import("pages/Conditions")));
 const Wallboard = Loadable(lazy(() => import("pages/Wallboard")));
+const Dashboard = Loadable(lazy(() => import("pages/Dashboard")));
 const Loggers = Loadable(lazy(() => import("pages/Loggers")));
 const Details = Loadable(lazy(() => import("pages/Details")));
 const Metrics = Loadable(lazy(() => import("pages/Metrics")));
@@ -36,6 +37,7 @@ export const MainRoutes = () => {
             <Route path="/" element={<MainLayout hideSider />}>
                 <Route index element={<Navigate to="/wallboard" replace />} />
                 <Route path="/wallboard" element={<Wallboard />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="*" element={<Navigate to="/wallboard" replace />} />
             </Route>
 
