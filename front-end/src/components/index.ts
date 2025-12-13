@@ -19,6 +19,7 @@ export { TooltipWithCopy } from "./TooltipWithCopy";
 export { LinearProgress } from "./LinearProgress";
 export { EmptyHandler } from "./EmptyHandler";
 export { PageSearch } from "./PageSearch";
+export { AboutModal } from "./AboutModal";
 export { Accordion } from "./Accordion";
 export { default } from "./Loadable";
 export { Loader } from "./Loader";

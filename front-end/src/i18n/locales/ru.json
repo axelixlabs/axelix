@@ -9,10 +9,11 @@
     "status": "Статус",
     "on": "ВКЛ",
     "off": "ВЫКЛ",
+    "documentation": "Документация",
     "Details": {
         "downloadState": "Выгрузить состояние",
         "exportConfigurationOptions": "Список компонентов состояния для экспорта",
-        "exportConfigurationLoading" : "Выгружаем состояние... Терпение...",
+        "exportConfigurationLoading": "Выгружаем состояние... Терпение...",
         "Components": {
             "HEAP_DUMP": "Дамп Кучи",
             "THREAD_DUMP": "Дамп Потоков",
@@ -70,7 +71,6 @@
         "wallboard": "Панель",
         "Help": {
             "title": "Помощь",
-            "documentation": "Документация",
             "about": "О программе",
             "feedback": "Оставить отзыв"
         }
@@ -120,19 +120,19 @@
         "cglibProxy": "CGLIB",
         "jdkProxy": "JDK Динамический Прокси",
         "noProxy": "Не проксирован",
-        "beanSource" : {
-            "titles" : {
+        "beanSource": {
+            "titles": {
                 "main": "Происхождение",
                 "beanMethod": "Bean метод",
                 "enclosingClass": "Декларирущий класс",
-                "factoryBeanClassName" : "Factory Bean"
+                "factoryBeanClassName": "Factory Bean"
             },
             "COMPONENT_ANNOTATION": "@Component или аналоги",
             "SYNTHETIC_BEAN": "Синтетический bean",
             "UNKNOWN": "Незивестно",
             "FACTORY_BEAN": "Создан другим FactoryBean-ом",
             "BEAN_METHOD": "@Bean метод",
-            "CONFIG_PROPS_BEAN" : "@ConfigurationProperties bean"
+            "CONFIG_PROPS_BEAN": "@ConfigurationProperties bean"
         }
     },
     "ScheduledTasks": {
@@ -167,5 +167,15 @@
         "totalCount": "Общее кол-во",
         "statistics": "Статистика",
         "totalServicesCount": "Общее количество сервисов"
+    },
+    "About": {
+        "title": "Про Axelix",
+        "version": "Версия",
+        "intro": "<0>Axelix</0> — интерфейс пользователя для развёртываний Java/Kotlin, работающих на Spring Boot.",
+        "licensing": "Ядро продукта <0>Axelix</0> лежит в открытом досутпе и доступно в рамках Open Source лицензии <1>Apache License 2.0</1>. Исходный код ядра Axelix доступен на <2>GitHub</2>.",
+        "contact": "Если у вас есть вопросы, пожалуйста, обратитесь к <0>Документации</0>, задайте вопрос на Stack Overflow или свяжитесь с авторами: <1>questions@nucleon-forge.com</1>.",
+        "bug": "Если вы нашли ошибку, хотите предложить функцию или отправить pull request, пожалуйста, используйте issue-трекер на GitHub. Мы будем рады рассмотреть ваш вклад.",
+        "githubSource": "Исходный код на GitHub",
+        "blog": "Блог"
     }
 }

@@ -9,6 +9,7 @@
     "status": "Status",
     "on": "ON",
     "off": "OFF",
+    "documentation": "Documentation",
     "Details": {
         "downloadState": "Download state",
         "exportConfigurationOptions": "List of state export components",
@@ -70,7 +71,6 @@
         "wallboard": "Wallboard",
         "Help": {
             "title": "Help",
-            "documentation": "Documentation",
             "about": "About",
             "feedback": "Provide Feedback"
         }
@@ -120,19 +120,19 @@
         "cglibProxy": "CGLIB",
         "jdkProxy": "JDK Dynamic Proxy",
         "noProxy": "No Proxying",
-        "beanSource" : {
-            "titles" : {
-                "main" : "Origin",
-                "beanMethod" : "Bean method",
-                "enclosingClass" : "Declaring class",
-                "factoryBeanClassName" : "Factory Bean"
+        "beanSource": {
+            "titles": {
+                "main": "Origin",
+                "beanMethod": "Bean method",
+                "enclosingClass": "Declaring class",
+                "factoryBeanClassName": "Factory Bean"
             },
-            "COMPONENT_ANNOTATION" : "@Component or variants",
-            "SYNTHETIC_BEAN" : "Synthetic bean",
-            "UNKNOWN" : "Unknown",
-            "FACTORY_BEAN" : "Produced by the FactoryBean",
-            "BEAN_METHOD" : "@Bean method",
-            "CONFIG_PROPS_BEAN" : "@ConfigurationProperties bean"
+            "COMPONENT_ANNOTATION": "@Component or variants",
+            "SYNTHETIC_BEAN": "Synthetic bean",
+            "UNKNOWN": "Unknown",
+            "FACTORY_BEAN": "Produced by the FactoryBean",
+            "BEAN_METHOD": "@Bean method",
+            "CONFIG_PROPS_BEAN": "@ConfigurationProperties bean"
         }
     },
     "ScheduledTasks": {
@@ -167,5 +167,15 @@
         "totalCount": "Total Count",
         "statistics": "Statistics",
         "totalServicesCount": "Total count of services"
+    },
+    "About": {
+        "title": "About Axelix",
+        "version": "Version",
+        "intro": "<0>Axelix</0> is the UI for Java/Kotlin deployments that run on Spring Boot.",
+        "licensing": "The core of the <0>Axelix</0> product is Open Source and is available under <1>Apache License 2.0</1>. The source code of the Axelix core is available over on <2>GitHub</2>.",
+        "contact": "In case of any questions please consult the <0>Reference Guide</0>, ask on Stack Overflow or reach out the support: <1>questions@nucleon-forge.com</1>.",
+        "bug": "If you found a bug, want to propose a feature or submit a pull request, please, use the GitHub issue tracker. We're really glad to review your experience.",
+        "githubSource": "GitHub Source",
+        "blog": "Blog"
     }
 }
