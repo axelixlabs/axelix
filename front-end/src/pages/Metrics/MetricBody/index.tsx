@@ -24,7 +24,7 @@ import { buildSelectedTagParams, fetchData, getMetricTagValuesWithStatus } from 
 import {
     type IMetric,
     type ISingleMetricResponseBody,
-    type ITagValueOptionValues,
+    type ITagValueOptionValue,
     type IValidTagCombination,
     StatefulRequest,
 } from "models";
@@ -88,9 +88,9 @@ export const MetricBody = ({ metric }: IProps) => {
         });
     };
 
-    const createMetricTagSelectOptions = (values: ITagValueOptionValues[]): DefaultOptionType[] => {
-        return values.map(({ value, disabled }) => ({
-            label: disabled ? (
+    const createMetricTagSelectOptions = (values: ITagValueOptionValue[]): DefaultOptionType[] => {
+        return values.map(({ value, invalid }) => ({
+            label: invalid ? (
                 <InfoTooltip text={t("Metrics.disabledTag")}>
                     <div>{value}</div>
                 </InfoTooltip>
@@ -98,7 +98,7 @@ export const MetricBody = ({ metric }: IProps) => {
                 value
             ),
             value: value,
-            disabled: disabled,
+            disabled: invalid,
         }));
     };
 
