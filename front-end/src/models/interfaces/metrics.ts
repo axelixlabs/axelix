@@ -102,6 +102,22 @@ export interface IGetSingleMetricRequestData {
     tags: string[];
 }
 
+/**
+ * Represents the possible value of the given metric along with the
+ * validity flag.
+ */
+export interface ITagValueOptionValue {
+    /**
+     * Option value
+     */
+    value: string;
+
+    /**
+     * Whether this tag value is valid, considering other values of other tags.
+     */
+    invalid: boolean;
+}
+
 export interface ITagValueOption {
     /**
      * The name of the tag
@@ -111,5 +127,5 @@ export interface ITagValueOption {
     /**
      * Possible values for the tag with the given name
      */
-    values: string[];
+    values: ITagValueOptionValue[];
 }

@@ -156,10 +156,10 @@
     },
     "Metrics": {
         "value": "Value",
-        "baseUnit": "Base unit",
+        "baseUnit": "Base Unit",
         "tags": "Tags",
         "selectValue": "Select value",
-        "selectPrevFirst": "Select previous value"
+        "disabledTag": "This tag value is not valid, considering the values selected for other tags"
     },
     "Dashboard": {
         "distributions": "System's Map",

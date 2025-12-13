@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { IMetricsGroup, ITagValueOption, IValidTagCombination } from "models";
+import type { IMetricsGroup, ITagValueOption, ITagValueOptionValue, IValidTagCombination } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
@@ -91,51 +91,89 @@ export const findMetricsCount = (metricsGroups: IMetricsGroup[]): number => {
     return metricsGroups.reduce((count, group) => count + group.metrics.length, 0);
 };
 
-/**
- * Returns possible tag values options. Contains possible values for all the tags.
- *
- * If the given tag already has a selected value, then the array of possible values for the given tag
- * will contain the only value - the selected value.
- *
- * This would make it impossible to distinguish two cases:
- * - The selected that already has a selected value
- * - Tag that possibly can have only a single value (considering the values fo other tags of course)
- *
- * But we do not need to distinguish these two cases.
- *
- * @param validTagCombinations valid tag combinations.
- * @param selectedTags tags that are currently selected.
- */
-export const extractUniqueMetricValuesPerKey = (
+const isValueMissed = (options: ITagValueOptionValue[], tagValue: string): boolean => {
+    return !options.some(({ value }) => value === tagValue);
+};
+
+const createTagPossibleValues = (validTagCombinations: IValidTagCombination[]) => {
+    const tagsPossibleValues = new Map<string, ITagValueOptionValue[]>();
+
+    validTagCombinations.forEach((combination) => {
+        Object.entries(combination).forEach(([tagKey, tagValue]) => {
+            const options = tagsPossibleValues.get(tagKey) ?? [];
+
+            if (isValueMissed(options, tagValue)) {
+                options.push({
+                    value: tagValue,
+                    invalid: false,
+                });
+            }
+
+            tagsPossibleValues.set(tagKey, options);
+        });
+    });
+
+    return tagsPossibleValues;
+};
+
+const filterOtherSelected = (selectedEntries: [string, string][], tagKey: string): [string, string][] => {
+    return selectedEntries.filter(([key]) => key !== tagKey);
+};
+
+const isValueValid = (
+    validTagCombinations: IValidTagCombination[],
+    tagKey: string,
+    option: ITagValueOptionValue,
+    otherSelected: [string, string][],
+): boolean => {
+    return validTagCombinations.some((combination) => {
+        if (combination[tagKey] !== option.value) {
+            return false;
+        }
+
+        return otherSelected.every(([key, value]) => combination[key] === value);
+    });
+};
+
+export const getMetricTagValuesWithStatus = (
     validTagCombinations: IValidTagCombination[],
     selectedTags: IValidTagCombination,
 ): ITagValueOption[] => {
-    const selected = Object.entries(selectedTags);
+    const selectedEntries = Object.entries(selectedTags);
 
-    const tagsPossibleValues = new Map<string, string[]>();
+    const tagsPossibleValues = createTagPossibleValues(validTagCombinations);
 
-    validTagCombinations
-        .filter((combination) => {
-            return selected.every(([key, value]) => combination[key] === value);
-        })
-        .forEach((combination) => {
-            Object.entries(combination).forEach(([tag, val]) => {
-                const values = tagsPossibleValues.get(tag) ?? [];
-                if (!values.includes(val)) {
-                    values.push(val);
-                }
-                tagsPossibleValues.set(tag, values);
-            });
+    tagsPossibleValues.forEach((values, tag) => {
+        values.forEach((value) => {
+            const otherSelected = filterOtherSelected(selectedEntries, tag);
+
+            value.invalid = !isValueValid(validTagCombinations, tag, value, otherSelected);
         });
+    });
 
     return [...tagsPossibleValues.entries()].map(([tagName, tagValues]) => {
+        const sortedTagValues = [...tagValues].sort((currentOption, nextOption) => {
+            if (currentOption.invalid === nextOption.invalid) {
+                return 0;
+            }
+
+            return currentOption.invalid ? 1 : -1;
+        });
+
         return {
             tag: tagName,
-            values: tagValues,
+            values: sortedTagValues,
         };
     });
 };
 
 export const buildSelectedTagParams = (selectedTags: Record<string, string>): string[] => {
     return Object.entries(selectedTags).map(([key, value]) => `${key}:${value}`);
+};
+
+export const createMetricTagSelectOptions = (values: ITagValueOptionValue[]) => {
+    return values.map(({ value, invalid }) => ({
+        value: value,
+        disabled: invalid,
+    }));
 };

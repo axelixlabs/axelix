@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Tooltip } from "antd";
-
+import { InfoTooltip } from "components";
 import type { IMetric } from "models";
 
 import styles from "./styles.module.css";
-
-import InfoIcon from "assets/icons/info.svg";
-import QuestionIcon from "assets/icons/question.svg";
 
 interface IProps {
     /**
@@ -34,23 +30,7 @@ export const MetricHeader = ({ metric }: IProps) => {
         <div className={styles.MainWrapper}>
             <div>{metric.metricName}</div>
 
-            {/* TODO: Maybe we would want to extract that into a separate component in the future? */}
-            {metric.description && (
-                <Tooltip
-                    title={
-                        <div className={styles.TooltipContentWrapper}>
-                            <div>
-                                <img src={InfoIcon} alt="Info icon" className={styles.InfoIcon} />
-                            </div>
-                            <div>{metric.description}</div>
-                        </div>
-                    }
-                    placement="right"
-                    color="#2196F3"
-                >
-                    <img src={QuestionIcon} alt="Question icon" />
-                </Tooltip>
-            )}
+            {metric.description && <InfoTooltip text={metric.description} />}
         </div>
     );
 };
