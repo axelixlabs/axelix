@@ -90,12 +90,20 @@ export default [
             ],
             "header/header": ["error", "../LICENSE_HEADER"],
             complexity: ["error", 10],
+            "max-nested-callbacks": ["error", 2],
+            "max-depth": ["error", 2],
         },
     },
     {
         files: ["eslint.config.js"],
         rules: {
             complexity: ["off"],
+        },
+    },
+    {
+        files: ["cypress/**"],
+        rules: {
+            "max-nested-callbacks": ["off"],
         },
     },
     {

@@ -35,6 +35,18 @@ interface IProps {
     loading: boolean;
 }
 
+function scrollToConfigPropsBean(hash: string) {
+    const element = document.querySelector(hash);
+    if (element) {
+        element.scrollIntoView();
+
+        const header = element.querySelector(`.${accordionStyles.HeaderWrapper}`);
+        if (header) {
+            header.classList.add(styles.Highlight);
+        }
+    }
+}
+
 export const ConfigPropsTables = ({ effectiveConfigProps, loading }: IProps) => {
     const { hash } = useLocation();
 
@@ -46,15 +58,7 @@ export const ConfigPropsTables = ({ effectiveConfigProps, loading }: IProps) => 
     //  to re-navigate to the requested 'hash', and therefore we have to do it manually here.
     useEffect(() => {
         if (!loading && hash) {
-            const element = document.querySelector(hash);
-            if (element) {
-                element.scrollIntoView();
-
-                const header = element.querySelector(`.${accordionStyles.HeaderWrapper}`);
-                if (header) {
-                    header.classList.add(styles.Highlight);
-                }
-            }
+            scrollToConfigPropsBean(hash);
         }
     }, [loading, hash]);
 
