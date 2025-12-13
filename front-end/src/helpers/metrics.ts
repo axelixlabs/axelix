@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { IMetricsGroup, ITagValueOption, ITagValueOptionValues, IValidTagCombination } from "models";
+import type { IMetricsGroup, ITagValueOption, ITagValueOptionValue, IValidTagCombination } from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
@@ -91,12 +91,12 @@ export const findMetricsCount = (metricsGroups: IMetricsGroup[]): number => {
     return metricsGroups.reduce((count, group) => count + group.metrics.length, 0);
 };
 
-const isValueMissed = (options: ITagValueOptionValues[], tagValue: string): boolean => {
+const isValueMissed = (options: ITagValueOptionValue[], tagValue: string): boolean => {
     return !options.some(({ value }) => value === tagValue);
 };
 
 const createTagPossibleValues = (validTagCombinations: IValidTagCombination[]) => {
-    const tagsPossibleValues = new Map<string, ITagValueOptionValues[]>();
+    const tagsPossibleValues = new Map<string, ITagValueOptionValue[]>();
 
     validTagCombinations.forEach((combination) => {
         Object.entries(combination).forEach(([tagKey, tagValue]) => {
@@ -105,7 +105,7 @@ const createTagPossibleValues = (validTagCombinations: IValidTagCombination[]) =
             if (isValueMissed(options, tagValue)) {
                 options.push({
                     value: tagValue,
-                    disabled: false,
+                    invalid: false,
                 });
             }
 
@@ -120,10 +120,10 @@ const filterOtherSelected = (selectedEntries: [string, string][], tagKey: string
     return selectedEntries.filter(([key]) => key !== tagKey);
 };
 
-const checkIsEnabled = (
+const isValueValid = (
     validTagCombinations: IValidTagCombination[],
     tagKey: string,
-    option: ITagValueOptionValues,
+    option: ITagValueOptionValue,
     otherSelected: [string, string][],
 ): boolean => {
     return validTagCombinations.some((combination) => {
@@ -131,7 +131,7 @@ const checkIsEnabled = (
             return false;
         }
 
-        return otherSelected.every(([selectedKey, selectedValue]) => combination[selectedKey] === selectedValue);
+        return otherSelected.every(([key, value]) => combination[key] === value);
     });
 };
 
@@ -143,23 +143,21 @@ export const getMetricTagValuesWithStatus = (
 
     const tagsPossibleValues = createTagPossibleValues(validTagCombinations);
 
-    tagsPossibleValues.forEach((optionsForTag, tagKey) => {
-        optionsForTag.forEach((option) => {
-            const otherSelected = filterOtherSelected(selectedEntries, tagKey);
+    tagsPossibleValues.forEach((values, tag) => {
+        values.forEach((value) => {
+            const otherSelected = filterOtherSelected(selectedEntries, tag);
 
-            const isEnabled = checkIsEnabled(validTagCombinations, tagKey, option, otherSelected);
-
-            option.disabled = !isEnabled;
+            value.invalid = !isValueValid(validTagCombinations, tag, value, otherSelected);
         });
     });
 
     return [...tagsPossibleValues.entries()].map(([tagName, tagValues]) => {
         const sortedTagValues = [...tagValues].sort((currentOption, nextOption) => {
-            if (currentOption.disabled === nextOption.disabled) {
+            if (currentOption.invalid === nextOption.invalid) {
                 return 0;
             }
 
-            return currentOption.disabled ? 1 : -1;
+            return currentOption.invalid ? 1 : -1;
         });
 
         return {
@@ -173,9 +171,9 @@ export const buildSelectedTagParams = (selectedTags: Record<string, string>): st
     return Object.entries(selectedTags).map(([key, value]) => `${key}:${value}`);
 };
 
-export const createMetricTagSelectOptions = (values: ITagValueOptionValues[]) => {
-    return values.map(({ value, disabled }) => ({
+export const createMetricTagSelectOptions = (values: ITagValueOptionValue[]) => {
+    return values.map(({ value, invalid }) => ({
         value: value,
-        disabled: disabled,
+        disabled: invalid,
     }));
 };
