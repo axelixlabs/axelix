@@ -17,6 +17,20 @@ import { ESearchSubject } from "models";
 
 import styles from "../components/Accordion/styles.module.css";
 
+function openAndScrollToAccordion(element: HTMLElement) {
+    const accordion = element.closest<HTMLElement>(`.${styles.MainWrapper}`) ?? element;
+    const isOpen = accordion.classList.contains(styles.Open);
+
+    const accordionHeader = accordion.querySelector<HTMLElement>(`.${styles.HeaderWrapper}`);
+    if (accordionHeader && !isOpen) {
+        accordionHeader.click();
+    }
+
+    element.scrollIntoView();
+
+    return;
+}
+
 export function scrollToAccordionById(query: string, searchSubject: ESearchSubject): void {
     if (!query) {
         return;
@@ -36,17 +50,7 @@ export function scrollToAccordionById(query: string, searchSubject: ESearchSubje
                 (beanName === query || beanAliases.some((alias) => alias === query)));
 
         if (isMatchingBean) {
-            const accordion = element.closest<HTMLElement>(`.${styles.MainWrapper}`) ?? element;
-            const isOpen = accordion.classList.contains(styles.Open);
-
-            const accordionHeader = accordion.querySelector<HTMLElement>(`.${styles.HeaderWrapper}`);
-            if (accordionHeader && !isOpen) {
-                accordionHeader.click();
-            }
-
-            element.scrollIntoView();
-
-            return;
+            openAndScrollToAccordion(element);
         }
     }
 }

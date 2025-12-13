@@ -71,7 +71,6 @@ export default [
             // TODO: Remove this rule later on, once the error handling logic is resolved
             "@typescript-eslint/no-explicit-any": ["off"],
             "prettier/prettier": "error",
-
             "@typescript-eslint/naming-convention": [
                 "error",
                 {
@@ -90,6 +89,13 @@ export default [
                 },
             ],
             "header/header": ["error", "../LICENSE_HEADER"],
+            complexity: ["error", 10],
+        },
+    },
+    {
+        files: ["eslint.config.js"],
+        rules: {
+            complexity: ["off"],
         },
     },
     {
