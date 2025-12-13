@@ -37,6 +37,11 @@ export function AboutModal({ open, setOpen }: IProps) {
     const { t } = useTranslation();
 
     const version = import.meta.env.VITE_APP_VERSION;
+    const sourceCodeLink = import.meta.env.VITE_APP_SOURCE_CODE_LINK;
+    const licenseLink = import.meta.env.VITE_APP_LICENSE_LINK;
+    const referenceGuideLink = import.meta.env.VITE_APP_REFERENCE_GUIDE_LINK;
+    const blogLink = import.meta.env.VITE_APP_BLOG_LINK;
+    const corporateSupportEmail = import.meta.env.VITE_CORPORATE_SUPPORT_EMAIL;
 
     const onClose = (): void => {
         setOpen(false);
@@ -62,36 +67,28 @@ export function AboutModal({ open, setOpen }: IProps) {
 
             <div>
                 <p className={styles.ParagraphGutter}>
-                    <Trans i18nKey={t("About.intro")} components={[<b key="0" />]} />
+                    <Trans t={t} i18nKey={"About.intro"} components={[<b key="0" />]} />
                 </p>
 
                 <p className={styles.ParagraphGutter}>
                     <Trans
-                        i18nKey={t("About.core")}
+                        t={t}
+                        i18nKey={"About.licensing"}
                         components={[
                             <b key="0" />,
-                            <a
-                                key="1"
-                                href="https://www.apache.org/licenses/LICENSE-2.0"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            />,
-                            <a
-                                key="2"
-                                href="https://github.com/Nucleon-Forge/axile"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            />,
+                            <a key="1" href={licenseLink} target="_blank" rel="noopener noreferrer" />,
+                            <a key="2" href={sourceCodeLink} target="_blank" rel="noopener noreferrer" />,
                         ]}
                     />
                 </p>
 
                 <p className={styles.ParagraphGutter}>
                     <Trans
-                        i18nKey={t("About.contact")}
+                        t={t}
+                        i18nKey={"About.contact"}
                         components={[
-                            <a key="0" href="http://example.com" target="_blank" rel="noopener noreferrer" />,
-                            <a key="1" href="mailto:questions@nucleon-forge.com" />,
+                            <a key="0" href={referenceGuideLink} target="_blank" rel="noopener noreferrer" />,
+                            <a key="1" href={corporateSupportEmail} />,
                         ]}
                     />
                 </p>
@@ -104,24 +101,18 @@ export function AboutModal({ open, setOpen }: IProps) {
                     size="small"
                     shape="round"
                     icon={<GithubOutlined />}
-                    href="https://github.com/Nucleon-Forge/axile"
+                    href={sourceCodeLink}
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    {t("About.githubSource")}
+                    {"About.githubSource"}
                 </Button>
 
-                <Button size="small" shape="round" icon={<ReadOutlined />} href="http://example.com" target="_blank">
+                <Button size="small" shape="round" icon={<ReadOutlined />} href={referenceGuideLink} target="_blank">
                     {t("documentation")}
                 </Button>
 
-                <Button
-                    icon={<FileTextOutlined />}
-                    size="small"
-                    shape="round"
-                    href="http://example.com"
-                    target="_blank"
-                >
+                <Button icon={<FileTextOutlined />} size="small" shape="round" href={blogLink} target="_blank">
                     {t("About.blog")}
                 </Button>
             </div>

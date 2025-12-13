@@ -1,14 +1,14 @@
-.HeaderWrapper{
+.HeaderWrapper {
     margin-bottom: 20px;
 }
 
-.Version{
+.Version {
     margin-top: 8px;
     font-size: 13px;
     color: var(--axile-bold-grey);
 }
 
-.ParagraphGutter{
+.ParagraphGutter {
     margin-bottom: 12px;
 }
 
@@ -16,12 +16,12 @@
     margin-bottom: 20px;
 }
 
-.ParagraphGutter>a{
+.ParagraphGutter > a {
     color: #1677ff;
     transition: color 0.3s;
 }
 
-.ParagraphGutter>a:hover {
+.ParagraphGutter > a:hover {
     color: #69b1ff
 }
 

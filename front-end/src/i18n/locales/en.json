@@ -172,7 +172,7 @@
         "title": "About Axelix",
         "version": "Version",
         "intro": "<0>Axelix</0> is the UI for Java/Kotlin deployments that run on Spring Boot.",
-        "core": "The core of the <0>Axelix</0> product is Open Source and is available under <1>Apache License 2.0</1>. The source code of the Axelix core is available over on <2>GitHub</2>.",
+        "licensing": "The core of the <0>Axelix</0> product is Open Source and is available under <1>Apache License 2.0</1>. The source code of the Axelix core is available over on <2>GitHub</2>.",
         "contact": "In case of any questions please consult the <0>Reference Guide</0>, ask on Stack Overflow or reach out the support: <1>questions@nucleon-forge.com</1>.",
         "bug": "If you found a bug, want to propose a feature or submit a pull request, please, use the GitHub issue tracker. We're really glad to review your experience.",
         "githubSource": "GitHub Source",
