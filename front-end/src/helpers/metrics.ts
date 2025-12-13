@@ -91,19 +91,18 @@ export const findMetricsCount = (metricsGroups: IMetricsGroup[]): number => {
     return metricsGroups.reduce((count, group) => count + group.metrics.length, 0);
 };
 
-export const getMetricTagValuesWithStatus = (
-    validTagCombinations: IValidTagCombination[],
-    selectedTags: IValidTagCombination,
-): ITagValueOption[] => {
-    const selectedEntries = Object.entries(selectedTags);
+const isValueMissed = (options: ITagValueOptionValues[], tagValue: string): boolean => {
+    return !options.some(({ value }) => value === tagValue);
+};
 
+const createTagPossibleValues = (validTagCombinations: IValidTagCombination[]) => {
     const tagsPossibleValues = new Map<string, ITagValueOptionValues[]>();
 
     validTagCombinations.forEach((combination) => {
         Object.entries(combination).forEach(([tagKey, tagValue]) => {
             const options = tagsPossibleValues.get(tagKey) ?? [];
 
-            if (!options.some(({ value }) => value === tagValue)) {
+            if (isValueMissed(options, tagValue)) {
                 options.push({
                     value: tagValue,
                     disabled: false,
@@ -114,19 +113,41 @@ export const getMetricTagValuesWithStatus = (
         });
     });
 
+    return tagsPossibleValues;
+};
+
+const filterOtherSelected = (selectedEntries: [string, string][], tagKey: string): [string, string][] => {
+    return selectedEntries.filter(([key]) => key !== tagKey);
+};
+
+const checkIsEnabled = (
+    validTagCombinations: IValidTagCombination[],
+    tagKey: string,
+    option: ITagValueOptionValues,
+    otherSelected: [string, string][],
+): boolean => {
+    return validTagCombinations.some((combination) => {
+        if (combination[tagKey] !== option.value) {
+            return false;
+        }
+
+        return otherSelected.every(([selectedKey, selectedValue]) => combination[selectedKey] === selectedValue);
+    });
+};
+
+export const getMetricTagValuesWithStatus = (
+    validTagCombinations: IValidTagCombination[],
+    selectedTags: IValidTagCombination,
+): ITagValueOption[] => {
+    const selectedEntries = Object.entries(selectedTags);
+
+    const tagsPossibleValues = createTagPossibleValues(validTagCombinations);
+
     tagsPossibleValues.forEach((optionsForTag, tagKey) => {
         optionsForTag.forEach((option) => {
-            const otherSelected = selectedEntries.filter(([key]) => key !== tagKey);
+            const otherSelected = filterOtherSelected(selectedEntries, tagKey);
 
-            const isEnabled = validTagCombinations.some((combination) => {
-                if (combination[tagKey] !== option.value) {
-                    return false;
-                }
-
-                return otherSelected.every(
-                    ([selectedKey, selectedValue]) => combination[selectedKey] === selectedValue,
-                );
-            });
+            const isEnabled = checkIsEnabled(validTagCombinations, tagKey, option, otherSelected);
 
             option.disabled = !isEnabled;
         });
