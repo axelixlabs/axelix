@@ -40,8 +40,7 @@ public class DefaultCookieService implements CookieService {
                 .secure(cookieProperties.isSecure())
                 .path("/")
                 .maxAge(jwtProperties.getLifespan())
-                .sameSite(cookieProperties.getSameSite())
-                .domain(cookieProperties.getDomain());
+                .sameSite("Strict");
 
         return builder.build();
     }

@@ -18,7 +18,6 @@ package com.nucleonforge.axile.master.api;
 import jakarta.servlet.http.HttpServletRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -74,7 +73,7 @@ public class UserApi {
                         responseCode = "200",
                         headers = {
                             @Header(
-                                    name = "Authorization",
+                                    name = "Set-Cookie",
                                     required = true,
                                     description = "The JWT token that should be subsequently used for auth purposes")
                         }),
@@ -97,7 +96,6 @@ public class UserApi {
                                         mediaType = "application/json",
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
-    @Parameter(name = "loginRequest", description = "Request for login", required = true)
     @PostMapping(path = ApiPaths.UsersApi.LOGIN)
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         String token = userLoginService.login(loginRequest.username(), loginRequest.password());

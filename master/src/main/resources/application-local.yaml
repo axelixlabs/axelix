@@ -21,11 +21,4 @@ axile:
           username: admin
       cookie:
         name: auth-token
-        same-site: Strict
         secure: false
-    cors:
-      allow-credentials: true
-      allowed-headers: Content-Type,Authorization
-      allowed-methods: *
-      allowed-origins: localhost
-      max-age: 3600

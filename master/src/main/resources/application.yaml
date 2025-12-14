@@ -37,12 +37,4 @@ axile:
       type: static-admin
       cookie:
         name: auth_token
-        same-site: Strict
         secure: false
-    cors:
-      allow-credentials: true
-      allowed-headers: Content-Type,Authorization
-      allowed-methods: '*'
-      allowed-origins: http://158.160.200.59
-      max-age: 3600
-

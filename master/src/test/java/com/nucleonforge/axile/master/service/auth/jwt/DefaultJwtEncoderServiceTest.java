@@ -41,7 +41,7 @@ import com.nucleonforge.axile.common.auth.core.DefaultUser;
 import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
-import com.nucleonforge.axile.master.autoconfiguration.auth.AuthAutoConfiguration;
+import com.nucleonforge.axile.master.autoconfiguration.auth.SecurityAutoConfiguration;
 import com.nucleonforge.axile.master.exception.auth.JwtTokenGenerationException;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -56,7 +56,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 22.07.2025
  */
 @EnableConfigurationProperties
-@SpringBootTest(classes = AuthAutoConfiguration.JwtAutoConfiguration.class)
+@SpringBootTest(classes = SecurityAutoConfiguration.JwtAutoConfiguration.class)
 class DefaultJwtEncoderServiceTest {
 
     @Autowired

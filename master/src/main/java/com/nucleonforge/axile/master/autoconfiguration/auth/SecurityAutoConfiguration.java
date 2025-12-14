@@ -28,13 +28,13 @@ import com.nucleonforge.axile.master.service.auth.jwt.JwtEncoderService;
 import com.nucleonforge.axile.master.service.auth.provider.StaticAdminUserProvider;
 
 /**
- * Autoconfiguration for auth.
+ * Autoconfiguration for security.
  *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
  */
 @AutoConfiguration
-public class AuthAutoConfiguration {
+public class SecurityAutoConfiguration {
 
     /**
      * Autoconfiguration for the JWT-related part.

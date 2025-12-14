@@ -58,8 +58,6 @@ class DefaultCookieServiceTest {
             assertThat(c.isHttpOnly()).isTrue();
             assertThat(c.getPath()).isEqualTo("/");
             assertThat(c.isSecure()).isEqualTo(cookieProperties.isSecure());
-            assertThat(c.getSameSite()).isEqualTo(cookieProperties.getSameSite());
-            assertThat(c.getDomain()).isEqualTo(cookieProperties.getDomain());
             assertThat(c.getMaxAge()).isEqualTo(jwtProperties.getLifespan());
         });
     }

@@ -15,8 +15,6 @@
  */
 package com.nucleonforge.axile.master.autoconfiguration.auth;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * Cookie configuration properties.
  *
@@ -26,17 +24,6 @@ import org.jspecify.annotations.Nullable;
 public class CookieProperties {
 
     private String name = "auth_token";
-
-    /**
-     * SameSite attribute for cookies.
-     */
-    private String sameSite = "Strict";
-
-    /**
-     * Domain attribute for cookies.
-     */
-    @Nullable
-    private String domain;
 
     /**
      * Secure attribute for cookies.
@@ -50,23 +37,6 @@ public class CookieProperties {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getSameSite() {
-        return sameSite;
-    }
-
-    public void setSameSite(String sameSite) {
-        this.sameSite = sameSite;
-    }
-
-    @Nullable
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
     }
 
     public boolean isSecure() {

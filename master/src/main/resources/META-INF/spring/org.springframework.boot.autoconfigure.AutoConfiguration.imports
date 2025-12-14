@@ -1,3 +1,2 @@
 com.nucleonforge.axile.master.autoconfiguration.discovery.DiscoveryAutoConfiguration
-com.nucleonforge.axile.master.autoconfiguration.auth.AuthAutoConfiguration
-com.nucleonforge.axile.master.autoconfiguration.security.SecurityAutoConfiguration
+com.nucleonforge.axile.master.autoconfiguration.auth.SecurityAutoConfiguration
