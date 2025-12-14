@@ -18,7 +18,6 @@ package com.nucleonforge.axile.master.api;
 import jakarta.servlet.http.HttpServletRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,24 +36,27 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.request.LoginRequest;
 import com.nucleonforge.axile.master.api.response.UserProfileResponse;
+import com.nucleonforge.axile.master.service.auth.CookieService;
 import com.nucleonforge.axile.master.service.auth.UserLoginService;
 
 /**
  * The API for working with users.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
-@Tag(
-        name = "API for working with Users",
-        description = "The beans endpoint provides information about the application’s beans.")
+@Tag(name = "API for working with Users", description = "The endpoints for user login and authentication")
 @RestController
 @RequestMapping(path = ApiPaths.UsersApi.MAIN)
 public class UserApi {
 
     private final UserLoginService userLoginService;
 
-    public UserApi(UserLoginService userLoginService) {
+    private final CookieService cookieService;
+
+    public UserApi(UserLoginService userLoginService, CookieService cookieService) {
         this.userLoginService = userLoginService;
+        this.cookieService = cookieService;
     }
 
     /**
@@ -70,7 +73,7 @@ public class UserApi {
                         responseCode = "200",
                         headers = {
                             @Header(
-                                    name = "Authorization",
+                                    name = "Set-Cookie",
                                     required = true,
                                     description = "The JWT token that should be subsequently used for auth purposes")
                         }),
@@ -93,13 +96,14 @@ public class UserApi {
                                         mediaType = "application/json",
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
-    @Parameter(name = "loginRequest", description = "Request for login", required = true)
     @PostMapping(path = ApiPaths.UsersApi.LOGIN)
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         String token = userLoginService.login(loginRequest.username(), loginRequest.password());
 
+        ResponseCookie cookie = cookieService.buildAuthCookie(token);
+
         return ResponseEntity.status(HttpStatus.OK)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
     }
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.master.auth.spi.provider;
+package com.nucleonforge.axile.master.service.auth.provider;
 
 import java.util.Set;
 
@@ -36,8 +36,6 @@ import com.nucleonforge.axile.common.auth.core.Role;
 import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.master.exception.auth.UserNotFoundException;
 import com.nucleonforge.axile.master.service.auth.jwt.JdbcAuthConfig;
-import com.nucleonforge.axile.master.service.auth.provider.JdbcUserProvider;
-import com.nucleonforge.axile.master.service.auth.provider.UserProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

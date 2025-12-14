@@ -35,3 +35,6 @@ axile:
           password: admin
           username: admin
       type: static-admin
+      cookie:
+        name: auth_token
+        secure: false
