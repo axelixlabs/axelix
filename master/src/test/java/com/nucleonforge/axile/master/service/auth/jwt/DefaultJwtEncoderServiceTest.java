@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.master.auth.spi.jwt;
+package com.nucleonforge.axile.master.service.auth.jwt;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -43,8 +43,6 @@ import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
 import com.nucleonforge.axile.master.autoconfiguration.auth.SecurityAutoConfiguration;
 import com.nucleonforge.axile.master.exception.auth.JwtTokenGenerationException;
-import com.nucleonforge.axile.master.service.auth.jwt.DefaultJwtEncoderService;
-import com.nucleonforge.axile.master.service.auth.jwt.JwtEncoderService;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
