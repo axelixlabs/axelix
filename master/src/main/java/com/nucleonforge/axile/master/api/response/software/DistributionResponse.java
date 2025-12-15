@@ -40,11 +40,6 @@ public class DistributionResponse {
         this.softwareComponentName = name;
     }
 
-    public DistributionResponse(String softwareComponentName, Map<String, Long> versions) {
-        this.softwareComponentName = softwareComponentName;
-        this.versions = versions;
-    }
-
     /**
      * Increase the versions counter for the given {@link #softwareComponentName}.
      */

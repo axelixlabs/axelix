@@ -40,9 +40,9 @@ import com.nucleonforge.axile.master.api.LoggersApi;
 import com.nucleonforge.axile.master.api.request.LogLevelChangeRequest;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axile.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -95,7 +95,7 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
         String groupName = "test";
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
 
-        registry.register(createInstanceWithUrl(
+        registry.register(TestObjectFactory.createInstance(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
         // when.

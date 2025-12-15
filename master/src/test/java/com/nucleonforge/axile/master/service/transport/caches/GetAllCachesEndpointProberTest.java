@@ -39,7 +39,7 @@ import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -126,7 +126,7 @@ public class GetAllCachesEndpointProberTest {
 
     @Test
     void shouldReturnServiceCaches() {
-        registry.register(createInstanceWithUrl(
+        registry.register(createInstance(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
         // when.

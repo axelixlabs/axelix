@@ -41,7 +41,7 @@ import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -90,7 +90,7 @@ public class ClearCacheByNameEndpointProberTest {
             }
         });
 
-        registry.register(createInstanceWithUrl(
+        registry.register(createInstance(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
     }
 

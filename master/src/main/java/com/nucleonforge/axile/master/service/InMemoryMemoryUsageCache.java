@@ -58,4 +58,9 @@ public class InMemoryMemoryUsageCache implements MemoryUsageCache {
                 .average()
                 .orElse(-1d);
     }
+
+    @Override
+    public double getTotalRss() {
+        return cache.values().stream().reduce(0d, Double::sum);
+    }
 }

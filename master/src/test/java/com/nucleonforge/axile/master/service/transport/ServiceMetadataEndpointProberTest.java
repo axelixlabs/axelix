@@ -44,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  *
  * @since 19.09.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
 class ServiceMetadataEndpointProberTest {
@@ -75,8 +76,13 @@ class ServiceMetadataEndpointProberTest {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
-              "javaVersion" : "17.0.14u",
-              "springBootVersion" : "3.5.0",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.0",
+                "java" : "17.0.14u",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
               "healthStatus" : "UP"
             }
             """;
@@ -107,8 +113,8 @@ class ServiceMetadataEndpointProberTest {
         assertThat(metadata.version()).isEqualTo("1.0.0-SNAPSHOT");
         assertThat(metadata.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
         assertThat(metadata.commitShortSha()).isEqualTo("a8b0929");
-        assertThat(metadata.javaVersion()).isEqualTo("17.0.14u");
-        assertThat(metadata.springBootVersion()).isEqualTo("3.5.0");
+        assertThat(metadata.versions().java()).isEqualTo("17.0.14u");
+        assertThat(metadata.versions().springBoot()).isEqualTo("3.5.0");
         assertThat(metadata.healthStatus()).isEqualTo(ServiceMetadata.HealthStatus.UP);
     }
 

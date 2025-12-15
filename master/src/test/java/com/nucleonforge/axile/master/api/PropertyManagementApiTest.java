@@ -45,10 +45,10 @@ import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axile.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrlAndStatus;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -104,7 +104,7 @@ class PropertyManagementApiTest {
     void shouldReturnOkOnPropertyUpdate() {
         PropertyUpdatedRequest request = new PropertyUpdatedRequest("property.enabled", "false");
 
-        registry.register(createInstanceWithUrlAndStatus(
+        registry.register(TestObjectFactory.createInstance(
                 activeInstanceId,
                 mockWebServer.url(activeInstanceId + "/actuator").toString(),
                 Instance.InstanceStatus.UP));

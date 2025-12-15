@@ -45,9 +45,9 @@ import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.service.export.HeapDumpAnonymizer;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axile.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -124,7 +124,8 @@ class HeapDumpApiTest {
 
     @Test
     void shouldReturnHeapDumpAsAttachment() {
-        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.register(
+                TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         ResponseEntity<byte[]> response =
                 restTemplate.getForEntity("/api/axile/heapdump/{instanceId}", byte[].class, activeInstanceId);

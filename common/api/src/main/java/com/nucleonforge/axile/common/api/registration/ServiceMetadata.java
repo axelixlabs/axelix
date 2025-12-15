@@ -16,6 +16,7 @@
 package com.nucleonforge.axile.common.api.registration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents the metadata of a service instance as exposed by the Axile SBS actuator endpoint.
@@ -30,14 +31,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @param commitShortSha the short commit hash (i.e. 'a622a54' or smth like that). Assuming it
  *                to never be {@code null}.
  *
- * @param javaVersion the version of java platform that service is currently running on. Because the
- *                    assumption is that we're going to manage java/kotlin services, the java platform
- *                    is always going to be there. Therefore, it is never {@code null}.
- *
- * @param springBootVersion the version of Spring Boot that service is currently running on. Because the
- *                    assumption is that we're managing the Spring Boot projects (at least as of now), the
- *                    Spring Boot version is also neven {@code null}.
- *
  * @param healthStatus the health status of the given instance that is reported by started infrastructure.
  *                    Never {@code null}.
  *
@@ -51,8 +44,8 @@ public record ServiceMetadata(
         @JsonProperty("version") String version,
         @JsonProperty("serviceVersion") String serviceVersion,
         @JsonProperty("commitShortSha") String commitShortSha,
-        @JsonProperty("javaVersion") String javaVersion,
-        @JsonProperty("springBootVersion") String springBootVersion,
+        @JsonProperty("jdkVendor") String jdkVendor,
+        @JsonProperty("versions") SoftwareVersions versions,
         @JsonProperty("healthStatus") HealthStatus healthStatus) {
 
     /**
@@ -65,4 +58,26 @@ public record ServiceMetadata(
         DOWN,
         UNKNOWN
     }
+
+    /**
+     * @param java            the version of java platform that service is currently running on. Because the
+     *                        assumption is that we're going to manage java/kotlin services, the java platform
+     *                        is always going to be there. Therefore, it is never {@code null}.
+     *
+     * @param springBoot      the version of Spring Boot that service is currently running on. Because the
+     *                        assumption is that we're managing the Spring Boot projects (at least as of now), the
+     *                        Spring Boot version is also never {@code null}.
+     *
+     * @param springFramework the version of Spring Framework that service is currently running on. Because the
+     *                        assumption is that we're managing the Spring Boot projects (at least as of now), the
+     *                        Spring Framework version is also never {@code null}.
+     *
+     * @param kotlin          the version of Kotlin that service is currently using. Might be {@code null} in case
+     *                        the service is not using kotlin.
+     */
+    public record SoftwareVersions(
+            @JsonProperty("java") String java,
+            @JsonProperty("springBoot") String springBoot,
+            @JsonProperty("springFramework") String springFramework,
+            @JsonProperty("kotlin") @Nullable String kotlin) {}
 }

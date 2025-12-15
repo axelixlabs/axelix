@@ -42,10 +42,10 @@ import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
+import com.nucleonforge.axile.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -109,7 +109,7 @@ class ProfileManagementEndpointProberTest {
 
     @Test
     void shouldReturnProfileMutationResult() throws JsonProcessingException {
-        registry.register(createInstanceWithUrl(
+        registry.register(TestObjectFactory.createInstance(
                 activeInstanceId,
                 mockWebServer.url(activeInstanceId + "/actuator").toString()));
 

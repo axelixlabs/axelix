@@ -110,14 +110,19 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         // language=json
         String response =
                 """
-        {
-          "version": "1.0.0-SNAPSHOT",
-          "serviceVersion": "1.0.0",
-          "commitShortSha": "a8b0929",
-          "javaVersion": "17.0.0",
-          "springBootVersion": "3.0.0",
-          "healthStatus": "UP"
-        }
+            {
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP"
+            }
         """;
 
         mockWebServer.enqueue(
@@ -167,11 +172,16 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 """
             {
               "version": "1.0.0-SNAPSHOT",
-              "serviceVersion": "1.0.0",
-              "commitShortSha": "a8b0929",
-              "javaVersion": "17.0.0",
-              "springBootVersion": "3.0.0",
-              "healthStatus": "UP"
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP"
             }
             """;
 
@@ -180,11 +190,16 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 """
             {
               "version": "1.0.0-SNAPSHOT",
-              "serviceVersion": "1.0.0",
-              "commitShortSha": "910230",
-              "javaVersion": "17.0.0",
-              "springBootVersion": "3.4.1",
-              "healthStatus": "DOWN"
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "910230",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.2",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "DOWN"
             }
             """;
 
@@ -213,7 +228,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             assertThat(instance.id().instanceId()).isEqualTo(instanceId);
             assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.DOWN);
             assertThat(instance.commitShaShort()).isEqualTo("910230");
-            assertThat(instance.springBootVersion()).isEqualTo("3.4.1");
+            assertThat(instance.springBootVersion()).isEqualTo("3.5.2");
         });
     }
 
@@ -227,11 +242,16 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 """
             {
               "version": "1.0.0-SNAPSHOT",
-              "serviceVersion": "3.5.0-SNAPSHOT",
-              "commitShortSha": "a8b0929",
-              "javaVersion": "17.0.14u",
-              "springBootVersion": "3.5.0",
-              "healthStatus": "UP"
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "910230",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.2",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "DOWN"
             }
             """;
 

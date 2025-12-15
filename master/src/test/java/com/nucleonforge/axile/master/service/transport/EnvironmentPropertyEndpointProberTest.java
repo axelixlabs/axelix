@@ -40,7 +40,7 @@ import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -129,7 +129,7 @@ class EnvironmentPropertyEndpointProberTest {
     void shouldReturnEnvironmentProperty() {
         String propertyName = "java.vendor";
 
-        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.register(createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         HttpPayload payload = new DefaultHttpPayload(Map.of("property.name", propertyName));
 

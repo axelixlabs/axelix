@@ -57,6 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link KubernetesInstanceDiscoverer}.
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  * @since 21.09.2025
  */
 @ExtendWith(SpringExtension.class)
@@ -121,8 +122,13 @@ class KubernetesInstanceDiscovererTest {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
-              "javaVersion" : "17.0.14u",
-              "springBootVersion" : "3.5.0",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
               "healthStatus" : "UP"
             }
             """;
@@ -160,8 +166,10 @@ class KubernetesInstanceDiscovererTest {
         assertThat(instance).satisfies(it -> {
             assertThat(it.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
             assertThat(it.commitShaShort()).isEqualTo("a8b0929");
-            assertThat(it.javaVersion()).isEqualTo("17.0.14u");
+            assertThat(it.javaVersion()).isEqualTo("25");
             assertThat(it.springBootVersion()).isEqualTo("3.5.0");
+            assertThat(it.springFrameworkVersion()).isEqualTo("6.1.2");
+            assertThat(it.kotlinVersion()).isNull();
             assertThat(it.status()).isEqualTo(Instance.InstanceStatus.UP);
             assertThat(it.actuatorUrl())
                     .isEqualTo(mockWebServer.url("/actuator").toString());
@@ -181,10 +189,15 @@ class KubernetesInstanceDiscovererTest {
                 """
             {
               "version": "2.0.0-BAD-VERSION",
-              "serviceVersion" : "3.3.1-SNAPSHOT",
-              "commitShortSha" : "k29dql2",
-              "javaVersion" : "21.0.2",
-              "springBootVersion" : "3.1.3",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
               "healthStatus" : "UP"
             }
             """;
@@ -193,11 +206,16 @@ class KubernetesInstanceDiscovererTest {
                 """
             {
               "version": "1.0.0-SNAPSHOT",
-              "serviceVersion" : "1.2.0",
-              "commitShortSha" : "ei2o11a",
-              "javaVersion" : "19.0.1",
-              "springBootVersion" : "3.0.7",
-              "healthStatus" : "DOWN"
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP"
             }
             """;
 
@@ -288,11 +306,16 @@ class KubernetesInstanceDiscovererTest {
                 """
             {
               "version": "1.0.0-SNAPSHOT",
-              "serviceVersion" : "1.2.0",
-              "commitShortSha" : "ei2o11a",
-              "javaVersion" : "19.0.1",
-              "springBootVersion" : "3.0.7",
-              "healthStatus" : "DOWN"
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP"
             }
         """;
 
@@ -359,11 +382,16 @@ class KubernetesInstanceDiscovererTest {
                 """
             {
               "version": "1.0.0-SNAPSHOT",
-              "serviceVersion" : "1.2.0",
-              "commitShortSha" : "ei2o11a",
-              "javaVersion" : "19.0.1",
-              "springBootVersion" : "3.0.7",
-              "healthStatus" : "DOWN"
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "a8b0929",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "UP"
             }
         """;
 

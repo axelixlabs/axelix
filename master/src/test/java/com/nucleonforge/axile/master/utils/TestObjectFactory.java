@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.instancio.Instancio;
 import org.instancio.Select;
+import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axile.common.domain.BuildInfo;
 import com.nucleonforge.axile.common.domain.ClassPath;
@@ -33,6 +34,7 @@ import com.nucleonforge.axile.master.model.instance.InstanceId;
  *
  * @since 29.08.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public final class TestObjectFactory {
 
@@ -43,25 +45,49 @@ public final class TestObjectFactory {
     private TestObjectFactory() {}
 
     public static Instance createInstance(String id) {
-        return createInstanceWithUrl(id, DEFAULT_URL);
+        return createInstance(id, DEFAULT_URL);
     }
 
-    // TODO:
-    public static Instance createInstanceWithUrl(String id, String url) {
-        return createInstanceWithUrlAndStatus(id, url, DEFAULT_STATUS);
+    public static Instance createInstance(String id, String url) {
+        return createInstance(id, url, DEFAULT_STATUS);
     }
 
-    public static Instance createInstanceWithStatus(String id, Instance.InstanceStatus status) {
-        return createInstanceWithUrlAndStatus(id, DEFAULT_URL, status);
+    public static Instance createInstance(String id, Instance.InstanceStatus status) {
+        return createInstance(id, DEFAULT_URL, status);
     }
 
-    public static Instance createInstanceWithUrlAndStatus(String id, String url, Instance.InstanceStatus status) {
+    public static Instance createInstance(
+            String id,
+            String java,
+            String springBoot,
+            String springFramework,
+            String jdkVendor,
+            @Nullable String kotlin) {
+        return createInstance(id, DEFAULT_URL, DEFAULT_STATUS, java, springBoot, springFramework, jdkVendor, kotlin);
+    }
+
+    public static Instance createInstance(String id, String url, Instance.InstanceStatus status) {
+        return createInstance(id, url, status, "25", "3.5.2", "6.0.2", "BellSoft", null);
+    }
+
+    public static Instance createInstance(
+            String id,
+            String url,
+            Instance.InstanceStatus status,
+            String java,
+            String springBoot,
+            String springFramework,
+            String jdkVendor,
+            @Nullable String kotlin) {
         return new Instance(
                 InstanceId.of(id),
                 "test-object-factory-instance",
                 "1.2.3-classifer-test",
-                "17.0.14",
-                "3.5.0",
+                java,
+                springBoot,
+                springFramework,
+                kotlin,
+                jdkVendor,
                 "df027cf",
                 Instant.now(),
                 status,

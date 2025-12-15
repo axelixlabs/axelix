@@ -32,4 +32,17 @@ public interface LibraryDiscoverer {
      * @return the library version, or {@link Optional#empty()} if none were detected
      */
     Optional<String> getLibraryVersion(String artifactId, String groupId);
+
+    /**
+     * Detect library version.
+     *
+     * @param artifactId the artifact id of the dependency
+     * @param groupId the groupId of the dependency
+     * @return the library version, or {@link Optional#empty()} if none were detected
+     */
+    default String getRequiredLibraryVersion(String artifactId, String groupId) {
+        return getLibraryVersion(artifactId, groupId)
+                .orElseThrow(() ->
+                        new IllegalStateException("Expected %s:%s to be available in the classpath, but there was no"));
+    }
 }

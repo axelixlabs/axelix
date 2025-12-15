@@ -42,7 +42,7 @@ import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -131,7 +131,7 @@ public class DetailsEndpointProberTest {
     @Test
     void shouldReturnAxileDetailsResponse() {
         // when.
-        registry.register(createInstanceWithUrl(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.register(createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
         AxileDetails axileDetails =
                 detailsEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
