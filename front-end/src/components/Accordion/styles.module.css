@@ -2,14 +2,18 @@
   border-bottom: 1px solid var(--axile-medium-grey);
 }
 
-.Open>.ContentWrapper {
+.ContentWrapper {
+  display: none;
+}
+
+.Open > .ContentWrapper {
   display: block;
   animation: slidein 0.4s;
   animation-fill-mode: forwards;
   height: 0%;
 }
 
-.MainWrapper.Open>.HeaderWrapper>.Icon {
+.MainWrapper.Open > .HeaderWrapper > .Icon {
   transform: rotate(180deg);
   transition: transform 0.3s;
 }
@@ -30,10 +34,6 @@
   min-width: 0;
 }
 
-.ContentWrapper {
-  display: none;
-}
-
 .Content {
   padding: 16px;
 }
@@ -42,6 +42,7 @@
   from {
     opacity: 0.3;
   }
+
   to {
     opacity: 1;
   }

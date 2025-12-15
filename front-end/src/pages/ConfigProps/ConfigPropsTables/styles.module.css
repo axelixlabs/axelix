@@ -8,10 +8,10 @@
 }
 
 .Highlight {
-    animation: highlightFade 4s;
+    animation: highlight-fade 4s;
 }
 
-@keyframes highlightFade {
+@keyframes highlight-fade {
     0% {
         background-color: var(--axile-primary-green);
     }

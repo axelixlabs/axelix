@@ -8,17 +8,17 @@
 .MetricDataWrapper {
     display: grid;
     grid-template-columns: max-content 1fr;
-    gap: 20px
+    gap: 20px;
 }
 
-.TagsWrapper{
+.TagsWrapper {
     display: grid;
     grid-template-columns: max-content 1fr;
     align-items: center;
     gap: 8px;
 }
 
-.TagSelect{
+.TagSelect {
     width: 200px;
 }
 

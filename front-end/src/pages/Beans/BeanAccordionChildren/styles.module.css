@@ -32,14 +32,14 @@
   display: none;
 }
 
-.Flag:global(.ant-checkbox-wrapper:hover .ant-checkbox-inner),
-.Flag :global(.ant-checkbox-inner) {
-  border-color: var(--axile-medium-grey) !important;
-}
-
 .Flag:global(.ant-checkbox-wrapper),
 .Flag:global(.ant-checkbox-wrapper *) {
   cursor: default !important;
+}
+
+.Flag:global(.ant-checkbox-wrapper:hover .ant-checkbox-inner),
+.Flag :global(.ant-checkbox-inner) {
+  border-color: var(--axile-medium-grey) !important;
 }
 
 .Flag:global(.ant-checkbox-wrapper:hover .ant-checkbox-checked .ant-checkbox-inner),

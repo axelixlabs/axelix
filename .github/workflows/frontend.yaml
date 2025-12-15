@@ -40,8 +40,11 @@ jobs:
 
       - name: Lint application
         run: npm run lint
-  test: 
-    needs: lint
+
+      - name: CSS lint application
+        run: npm run lint-css
+  test:
+    needs: css-lint
     runs-on: ubuntu-latest
     defaults:
       run:

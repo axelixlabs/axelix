@@ -1,7 +1,5 @@
-@import url(./antdCustomizedTable.css);
-
 @font-face {
-    font-family: "Golos";
+    font-family: Golos;
     src: url("fonts/Variable_Golos_Text.woff2") format("woff2");
     font-weight: 100 900;
     font-style: normal;
@@ -19,7 +17,7 @@
     --axile-primary-light-red: #ff000a1a;
     --axile-border-radius-large: 8px;
     --axile-border-radius-small: 4px;
-    --axile-scroll-margin-top: 150px
+    --axile-scroll-margin-top: 150px;
 }
 
 *,
@@ -36,7 +34,7 @@ html {
 
 body {
     font-family:
-        "Golos",
+        Golos,
         Helvetica,
         Arial,
         sans-serif,

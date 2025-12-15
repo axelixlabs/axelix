@@ -23,8 +23,8 @@
     cursor: pointer;
     user-select: none;
     border: 1px solid var(--axile-medium-grey);
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #fff;
+    color: #000;
     transition: all 0.3s;
 }
 
@@ -36,7 +36,7 @@
 .RadioButton.Selected:active {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
-    color: #ffffff;
+    color: #fff;
 }
 
 .RadioButton.Selected:active {
@@ -52,7 +52,7 @@
 .RadioButton:active:not(.Selected) {
     background-color: var(--color-primary-active);
     border-color: var(--color-primary-active);
-    color: #ffffff;
+    color: #fff;
 }
 
 .TargetIcon {

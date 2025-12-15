@@ -3,17 +3,13 @@
     flex-direction: column;
     justify-content: space-between;
     border-radius: var(--axile-border-radius-large);
-    box-shadow: 4px 4px 10px 0px #00000040;
+    box-shadow: 4px 4px 10px 0 #00000040;
 
 }
 
 .Card:hover {
     cursor: pointer;
     color: inherit;
-}
-
-.Card:hover>.CardHeader {
-    color: var(--axile-primary-green);
 }
 
 .CardHeader {
@@ -26,6 +22,10 @@
     border-radius: var(--axile-border-radius-large);
     word-break: break-all;
     transition: color 0.3s ease;
+}
+
+.Card:hover > .CardHeader {
+    color: var(--axile-primary-green);
 }
 
 .CardUP {
