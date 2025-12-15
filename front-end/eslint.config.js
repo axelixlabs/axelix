@@ -92,6 +92,11 @@ export default [
             complexity: ["error", 10],
             "max-nested-callbacks": ["error", 2],
             "max-depth": ["error", 2],
+            "react/no-danger": "error",
+            "react/jsx-no-target-blank": "error",
+            "react/no-unknown-property": "error",
+            "react/jsx-curly-newline": ["error", "consistent"],
+            "react/no-unstable-nested-components": "error",
         },
     },
     {
