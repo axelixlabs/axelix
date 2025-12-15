@@ -15,11 +15,10 @@
  */
 import { configureStore } from "@reduxjs/toolkit";
 
-import { LoginSlice, UpdatePropertySlice } from "./slices";
+import { UpdatePropertySlice } from "./slices";
 
 export const store = configureStore({
     reducer: {
-        login: LoginSlice.reducer,
         updateProperty: UpdatePropertySlice.reducer,
     },
 });

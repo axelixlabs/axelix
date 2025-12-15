@@ -15,15 +15,13 @@
  */
 import { BrowserRouter } from "react-router-dom";
 
-import { useAppSelector } from "hooks";
+import { IS_AUTH } from "utils";
 
 import { AuthRoutes } from "./AuthRoutes";
 import { MainRoutes } from "./MainRoutes";
 
 export const AppRoutes = () => {
-    const token = useAppSelector((state) => {
-        return state.login.accessToken;
-    });
+    const isAuth = localStorage.getItem(IS_AUTH);
 
-    return <BrowserRouter>{!token ? <AuthRoutes /> : <MainRoutes />}</BrowserRouter>;
+    return <BrowserRouter>{isAuth ? <MainRoutes /> : <AuthRoutes />}</BrowserRouter>;
 };
