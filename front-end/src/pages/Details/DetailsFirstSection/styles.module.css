@@ -33,7 +33,7 @@
     border: none;
     border-bottom: 1px solid #0505050f;
     border-radius: 0;
-    background-color: #ffffff;
+    background-color: #fff;
 }
 
 .Collapse :global(.ant-collapse-header):hover {
@@ -57,11 +57,11 @@
     padding-inline: 28px 16px;
 }
 
-.LoaderWrapper{
+.LoaderWrapper {
     margin-block: 40px;
 }
 
-@media all and (max-width: 1220px) {
+@media all and (width <= 1220px) {
     .MainTitle {
         text-align: left;
         transform: translateX(0);

@@ -4,19 +4,19 @@
     gap: 15px;
 }
 
-@media all and (max-width: 1490px) {
+@media all and (width <= 1490px) {
     .CardsResponsiveWrapper {
         grid-template-columns: repeat(5, minmax(220px, 1fr));
     }
 }
 
-@media all and (max-width: 1270px) {
+@media all and (width <= 1270px) {
     .CardsResponsiveWrapper {
         grid-template-columns: repeat(4, minmax(220px, 1fr));
     }
 }
 
-@media all and (max-width: 1030px) {
+@media all and (width <= 1030px) {
     .CardsResponsiveWrapper {
         grid-template-columns: repeat(3, minmax(220px, 1fr));
     }

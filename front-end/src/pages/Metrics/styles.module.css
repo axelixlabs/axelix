@@ -1,8 +1,8 @@
-.HeaderStyles{
+.HeaderStyles {
     background-color: var(--axile-primary-light-green);
-    padding: 16px
+    padding: 16px;
 }
 
-.AccordionsWrapper{
+.AccordionsWrapper {
     margin-bottom: 40px;
 }
