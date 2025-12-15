@@ -98,11 +98,11 @@ describe("Check getMetricTagValuesWithStatus function", () => {
                 values: [
                     {
                         value: "111",
-                        disabled: false,
+                        invalid: false,
                     },
                     {
                         value: "Test2",
-                        disabled: false,
+                        invalid: false,
                     },
                 ],
             },
@@ -111,11 +111,11 @@ describe("Check getMetricTagValuesWithStatus function", () => {
                 values: [
                     {
                         value: "222",
-                        disabled: false,
+                        invalid: false,
                     },
                     {
                         value: "333",
-                        disabled: false,
+                        invalid: false,
                     },
                 ],
             },
@@ -151,11 +151,11 @@ describe("Check getMetricTagValuesWithStatus function", () => {
                 values: [
                     {
                         value: "111",
-                        disabled: false,
+                        invalid: false,
                     },
                     {
                         value: "222",
-                        disabled: false,
+                        invalid: false,
                     },
                 ],
             },
@@ -164,11 +164,11 @@ describe("Check getMetricTagValuesWithStatus function", () => {
                 values: [
                     {
                         value: "111",
-                        disabled: false,
+                        invalid: false,
                     },
                     {
                         value: "222",
-                        disabled: false,
+                        invalid: false,
                     },
                 ],
             },
@@ -177,11 +177,11 @@ describe("Check getMetricTagValuesWithStatus function", () => {
                 values: [
                     {
                         value: "222",
-                        disabled: false,
+                        invalid: false,
                     },
                     {
                         value: "333",
-                        disabled: true,
+                        invalid: true,
                     },
                 ],
             },
