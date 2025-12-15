@@ -40,8 +40,13 @@ import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 /**
  * The {@link Converter} from {@link AxileDetails} to {@link AxileDetailsResponse}.
  *
- * @author Nikita Kirilov, Sergey Cherkasov
+ * @author Nikita Kirilov
+ * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
+// TODO: Some of the information that we request from axelix-details endpoint is actually
+//  available in the Instance itself. But it is also present in the axelix-details endpoint response.
+//  What should we do about it?
 @Service
 public class AxileDetailsConverter implements Converter<DetailsConversionRequest, AxileDetailsResponse> {
 
@@ -56,7 +61,9 @@ public class AxileDetailsConverter implements Converter<DetailsConversionRequest
         AxileDetails source = request.axileDetails();
         InstanceId instanceId = request.instanceId();
 
-        String serviceName = getServiceName(instanceId);
+        Instance instance = instanceRegistry.get(instanceId).orElseThrow(InstanceNotFoundException::new);
+
+        String serviceName = instance.name();
         GitProfile gitProfile = gitDetailsConverter(source.git());
         RuntimeProfile runtimeProfile = runtimeDetailsConverter(source.runtime());
         SpringProfile springProfile = springDetailsConverter(source.spring());
@@ -65,16 +72,6 @@ public class AxileDetailsConverter implements Converter<DetailsConversionRequest
 
         return new AxileDetailsResponse(
                 serviceName, gitProfile, runtimeProfile, springProfile, buildProfile, osProfile);
-    }
-
-    private String getServiceName(InstanceId instanceId) {
-        Instance instance = instanceRegistry.get(instanceId).orElse(null);
-
-        if (instance == null) {
-            throw new InstanceNotFoundException();
-        }
-
-        return instance.name();
     }
 
     private GitProfile gitDetailsConverter(GitDetails gitDetails) {

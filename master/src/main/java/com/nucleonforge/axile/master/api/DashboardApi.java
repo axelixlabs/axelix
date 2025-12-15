@@ -15,9 +15,6 @@
  */
 package com.nucleonforge.axile.master.api;
 
-import java.util.List;
-import java.util.Map;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axile.master.api.error.SimpleApiError;
 import com.nucleonforge.axile.master.api.response.DashboardResponse;
-import com.nucleonforge.axile.master.api.response.software.DistributionResponse;
+import com.nucleonforge.axile.master.service.DashboardService;
 
 /**
  * API for rendering the dashboard.
@@ -41,6 +38,12 @@ import com.nucleonforge.axile.master.api.response.software.DistributionResponse;
 @RestController
 @RequestMapping(path = ApiPaths.DashboardApi.MAIN)
 public class DashboardApi {
+
+    private final DashboardService dashboardService;
+
+    public DashboardApi(DashboardService dashboardService) {
+        this.dashboardService = dashboardService;
+    }
 
     @Operation(
             summary = "Retrieve information about the entire ecosystem to render the dashboard",
@@ -69,20 +72,6 @@ public class DashboardApi {
             })
     @GetMapping
     public DashboardResponse getDashboard() {
-        return new DashboardResponse(
-                List.of(
-                        new DistributionResponse("Java", Map.of("17", 35L, "21", 151L, "25", 14L)),
-                        new DistributionResponse("Kotlin", Map.of("1.8", 2L, "2.0", 7L, "2.2", 1L)),
-                        new DistributionResponse("JdkVendor", Map.of("Azul", 35L, "Liberica", 165L)),
-                        new DistributionResponse("SpringBoot", Map.of("3.2", 35L, "3.3", 12L, "3.4", 4L, "4.0", 76L)),
-                        new DistributionResponse(
-                                "SpringFramework", Map.of("6.1", 21L, "6.2", 19L, "6.3", 7L, "7.0", 2L))),
-                new DashboardResponse.HealthStatus(Map.of(
-                        DashboardResponse.Status.DOWN, 2,
-                        DashboardResponse.Status.UP, 18,
-                        DashboardResponse.Status.UNKNOWN, 1)),
-                new DashboardResponse.MemoryUsageMap(
-                        new DashboardResponse.MemoryUsage("MB", 477.2),
-                        new DashboardResponse.MemoryUsage("MB", 1231322.1)));
+        return dashboardService.getDashboardInfo();
     }
 }

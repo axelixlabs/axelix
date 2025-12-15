@@ -72,9 +72,9 @@ class DefaultServiceMetadataAssemblerTest {
         // then.
         assertThat(serviceMetadata.commitShortSha()).isEqualTo("a8b0929");
         assertThat(serviceMetadata.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
-        assertThat(serviceMetadata.javaVersion()).isEqualTo(System.getProperty("java.version"));
+        assertThat(serviceMetadata.versions().java()).isEqualTo(System.getProperty("java.version"));
         assertThat(serviceMetadata.version()).isEqualTo("1.0.0-SNAPSHOT");
-        assertThat(serviceMetadata.springBootVersion()).isEqualTo("3.5.0");
+        assertThat(serviceMetadata.versions().springBoot()).isEqualTo("3.5.0");
         assertThat(serviceMetadata.healthStatus()).isEqualTo(ServiceMetadata.HealthStatus.UP);
     }
 }

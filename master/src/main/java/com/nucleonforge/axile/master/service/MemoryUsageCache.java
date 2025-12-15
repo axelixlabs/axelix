@@ -52,4 +52,10 @@ public interface MemoryUsageCache {
      *         or -1 if this {@link MemoryUsageCache} does not have any RSS usages recorded yet.
      */
     double getAverageRss();
+
+    /**
+     * @return get estimate of total rss usage by all instances or -1 if this
+     *         {@link MemoryUsageCache} does not have any RSS usages recorded yet.
+     */
+    double getTotalRss();
 }

@@ -65,10 +65,14 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 "1.0.0-SNAPSHOT",
                 shortBuildInfo.map(ShortBuildInfo::serviceVersion).orElse(""),
                 gitCommitInfo.map(GitInfo::commitShaShort).orElse(""),
-                System.getProperty("java.version"),
-                libraryDiscoverer
-                        .getLibraryVersion("spring-boot", "org.springframework.boot")
-                        .orElse(""),
+                System.getProperty("java.vendor"),
+                new ServiceMetadata.SoftwareVersions(
+                        System.getProperty("java.version"),
+                        libraryDiscoverer.getRequiredLibraryVersion("spring-boot", "org.springframework.boot"),
+                        libraryDiscoverer.getRequiredLibraryVersion("spring-core", "org.springframework"),
+                        libraryDiscoverer
+                                .getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin")
+                                .orElse(null)),
                 getCurrentHealth());
     }
 

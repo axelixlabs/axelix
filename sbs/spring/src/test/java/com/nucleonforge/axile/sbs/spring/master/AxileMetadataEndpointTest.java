@@ -33,6 +33,11 @@ import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Integration tests for {@link AxileMetadataEndpoint}.
+ *
+ * @author Mikhail Polivakha
+ */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({
     AxileMetadataEndpoint.class,
@@ -70,7 +75,7 @@ class AxileMetadataEndpointTest {
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
         JsonAssertions.assertThatJson(result.getBody())
                 // we do not want to know exactly the java version on which the test is going to run
-                .whenIgnoringPaths("javaVersion")
+                .whenIgnoringPaths("jdkVendor", "versions")
                 .isEqualTo(
                         // language=json
                         """
@@ -78,8 +83,13 @@ class AxileMetadataEndpointTest {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
-              "javaVersion" : "17.0.15",
-              "springBootVersion" : "3.5.0",
+              "jdkVendor" : "BellSoft",
+              "versions" : {
+                "springBoot" : "3.5.0",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
               "healthStatus" : "UP"
             }
             """);

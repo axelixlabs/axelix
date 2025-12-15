@@ -46,10 +46,10 @@ import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axile.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrlAndStatus;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -125,7 +125,7 @@ class ProfileManagementApiTest {
         List<String> profiles = List.of("postgres");
         ProfileUpdatedRequest request = new ProfileUpdatedRequest(profiles);
 
-        registry.register(createInstanceWithUrlAndStatus(
+        registry.register(TestObjectFactory.createInstance(
                 activeInstanceId,
                 mockWebServer.url(activeInstanceId + "/actuator").toString(),
                 Instance.InstanceStatus.UP));

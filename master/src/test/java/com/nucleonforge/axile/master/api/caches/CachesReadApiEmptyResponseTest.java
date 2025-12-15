@@ -39,7 +39,7 @@ import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -110,7 +110,7 @@ public class CachesReadApiEmptyResponseTest {
             }
             """;
 
-        registry.register(createInstanceWithUrl(
+        registry.register(createInstance(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
         // when

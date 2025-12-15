@@ -23,7 +23,7 @@ import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.Instance;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithStatus;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -40,7 +40,7 @@ public class InstanceStatusModifierTest {
     @Test
     void shouldInstanceModifyStatus() {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstanceWithStatus(instanceId, Instance.InstanceStatus.UP));
+        registry.register(createInstance(instanceId, Instance.InstanceStatus.UP));
 
         // when.
         modifyStatus.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);

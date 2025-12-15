@@ -43,7 +43,7 @@ import com.nucleonforge.axile.master.service.transport.scheduled.EnableSingleSch
 import com.nucleonforge.axile.master.service.transport.scheduled.GetAllScheduledTasksEndpointProber;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
-import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstanceWithUrl;
+import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -185,7 +185,7 @@ public class ScheduledTasksEndpointProberTest {
                 }
             }
         });
-        registry.register(createInstanceWithUrl(
+        registry.register(createInstance(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
     }
 
