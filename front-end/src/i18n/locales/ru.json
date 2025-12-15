@@ -138,7 +138,7 @@
     "ScheduledTasks": {
         "runnable": "Метод",
         "expression": "Cron выражение",
-        "initialDelay": "Начальная <br /> задержка (мс)",
+        "initialDelay": "Начальная задержка (мс)",
         "interval": "Интервал (мс)",
         "cron": "Cron",
         "fixedDelay": "Fixed delay",
