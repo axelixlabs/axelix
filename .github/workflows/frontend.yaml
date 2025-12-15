@@ -40,21 +40,9 @@ jobs:
 
       - name: Lint application
         run: npm run lint
-  css-lint:
-    needs: lint
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: front-end
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: CSS lint application
-        run: npm run lint:css
+        run: npm run lint-css
   test:
     needs: css-lint
     runs-on: ubuntu-latest
