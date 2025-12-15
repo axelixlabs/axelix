@@ -5,3 +5,7 @@
 .Status {
     text-align: center;
 }
+
+.InitialDelayRowChunk {
+    word-break: normal;
+}
