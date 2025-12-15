@@ -1,0 +1,24 @@
+{
+    "extends": "stylelint-config-standard",
+    "plugins": ["@stylistic/stylelint-plugin"],
+    "rules": {
+        "@stylistic/block-opening-brace-space-before": "always",
+        "@stylistic/selector-combinator-space-before": "always",
+        "@stylistic/selector-combinator-space-after": "always",
+        "@stylistic/declaration-block-trailing-semicolon": "always",
+        "selector-class-pattern": [
+            "^([A-Z][a-zA-Z0-9]+|ant(-[a-z0-9]+)*)$",
+            {
+                "message": "Class names must be PascalCase, unless they are AntD classes (.ant-...)"
+            }
+        ],
+        "selector-pseudo-class-no-unknown": [
+            true,
+            {
+                "ignorePseudoClasses": [
+                    "global"
+                ]
+            }
+        ]
+    }
+}

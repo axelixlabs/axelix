@@ -1,12 +1,11 @@
 .MainWrapper {
     width: min(420px, 100%);
     border-radius: var(--axile-border-radius-large);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
     padding: 16px;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
+    box-shadow: 0 6px 18px rgb(15 23 42 / 20%);
 }
 
-.Title{
+.Title {
     margin-bottom: 20px;
     text-align: center;
 }

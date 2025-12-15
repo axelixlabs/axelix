@@ -8,6 +8,8 @@
         "build": "tsc -b && vite build --mode cloud",
         "lint": "eslint .",
         "lint-fix": "eslint . --fix",
+        "lint:css": "stylelint \"src/**/*.css\"",
+        "lint:css:fix": "stylelint \"src/**/*.css\" --fix",
         "test": "vitest",
         "preview": "vite preview",
         "cy:open": "cypress open"
@@ -28,6 +30,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.37.0",
+        "@stylistic/stylelint-plugin": "^4.0.0",
         "@trivago/prettier-plugin-sort-imports": "^5.2.2",
         "@types/node": "^24.1.0",
         "@types/react": "^19.1.13",
@@ -47,6 +50,8 @@
         "jsonc-eslint-parser": "^2.4.1",
         "prettier": "^3.6.2",
         "rollup-plugin-visualizer": "^6.0.4",
+        "stylelint": "^16.26.1",
+        "stylelint-config-standard": "^39.0.1",
         "typescript": "~5.8.3",
         "typescript-eslint": "^8.46.1",
         "vite": "^7.0.6",

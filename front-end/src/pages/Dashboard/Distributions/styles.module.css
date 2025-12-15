@@ -20,7 +20,7 @@
     padding: 8px;
     border: 1px solid var(--axile-medium-grey);
     border-radius: var(--axile-border-radius-large);
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
+    box-shadow: 0 6px 18px rgb(15 23 42 / 20%);
 }
 
 .CardTitle {
