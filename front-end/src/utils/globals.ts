@@ -14,3 +14,4 @@
  * limitations under the License.
  */
 export const UNKNOWN_ERROR = "UNKNOWN_ERROR";
+export const IS_AUTH = "isAuth";

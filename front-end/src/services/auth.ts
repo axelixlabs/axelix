@@ -19,3 +19,7 @@ import type { ILoginSubmitRequestData } from "models";
 export const login = (data: ILoginSubmitRequestData) => {
     return apiFetch.post("users/login", data);
 };
+
+export const logout = () => {
+    return apiFetch.post("users/logout");
+};
