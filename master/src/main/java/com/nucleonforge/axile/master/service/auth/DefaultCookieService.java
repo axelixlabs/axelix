@@ -22,6 +22,9 @@ import com.nucleonforge.axile.master.autoconfiguration.auth.JwtProperties;
 
 /**
  * Default implementation of {@link CookieService}.
+ *
+ * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public class DefaultCookieService implements CookieService {
 
@@ -34,14 +37,26 @@ public class DefaultCookieService implements CookieService {
         this.jwtProperties = jwtProperties;
     }
 
+    @Override
     public ResponseCookie buildAuthCookie(String token) {
-        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(cookieProperties.getName(), token)
+        return buildCookie(token, jwtProperties.getLifespan().toSeconds());
+    }
+
+    @Override
+    public ResponseCookie buildExpiredAuthCookie(String token) {
+        return buildCookie(token, 0L);
+    }
+
+    /**
+     * zero in {@code cookieLifetimeInSeconds} means cookie will expire immediately.
+     */
+    private ResponseCookie buildCookie(String token, long cookieLifetimeInSeconds) {
+        return ResponseCookie.from(cookieProperties.getName(), token)
                 .httpOnly(true)
                 .secure(cookieProperties.isSecure())
                 .path("/")
-                .maxAge(jwtProperties.getLifespan())
-                .sameSite("Strict");
-
-        return builder.build();
+                .maxAge(cookieLifetimeInSeconds)
+                .sameSite("Strict")
+                .build();
     }
 }

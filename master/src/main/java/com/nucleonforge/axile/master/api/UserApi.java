@@ -28,6 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -101,6 +102,48 @@ public class UserApi {
         String token = userLoginService.login(loginRequest.username(), loginRequest.password());
 
         ResponseCookie cookie = cookieService.buildAuthCookie(token);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
+    // TODO: Cover this API with tests.
+    /**
+     * Logout current user.
+     *
+     * @param authToken the auth token. Expected to be sent in the {@link HttpHeaders#COOKIE Cookie Header}.
+     * @return the HTTP Response with expired aut token cookie.
+     */
+    @Operation(
+            summary = "Log-out current user",
+            responses = {
+                @ApiResponse(
+                        description = "OK",
+                        responseCode = "200",
+                        headers = {@Header(name = "Set-Cookie", required = true, description = "The expired cookie")}),
+                @ApiResponse(
+                        description = "Bad Request",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(description = "Unauthorized", responseCode = "401"),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
+            })
+    @PostMapping(path = ApiPaths.UsersApi.LOGOUT)
+    // TODO:
+    //  That is wrong. The name of the cookie must be configurable as it currently is in the
+    //  CookieProperties configuration properties class.
+    public ResponseEntity<?> login(@CookieValue(name = "auth_token") String authToken) {
+        ResponseCookie cookie = cookieService.buildExpiredAuthCookie(authToken);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())

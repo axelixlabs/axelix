@@ -22,6 +22,7 @@ import org.springframework.http.ResponseCookie;
  *
  * @since 12.12.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public interface CookieService {
 
@@ -32,4 +33,12 @@ public interface CookieService {
      * @return configured ResponseCookie instance ready to be set in HTTP response
      */
     ResponseCookie buildAuthCookie(String token);
+
+    /**
+     * Builds an authentication HTTP cookie with the provided JWT token.
+     *
+     * @param token JWT token to be stored in the cookie
+     * @return configured ResponseCookie instance ready to be set in HTTP response
+     */
+    ResponseCookie buildExpiredAuthCookie(String token);
 }

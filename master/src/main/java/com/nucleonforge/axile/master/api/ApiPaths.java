@@ -31,6 +31,8 @@ public final class ApiPaths {
         public static final String MAIN = "/users";
 
         public static final String LOGIN = "/login";
+
+        public static final String LOGOUT = "/logout";
     }
 
     public static final class InstancesApi {
