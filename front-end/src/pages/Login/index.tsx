@@ -14,30 +14,41 @@
  * limitations under the License.
  */
 import { Button, Form, Input } from "antd";
+import type { AxiosError } from "axios";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useAppDispatch, useAppSelector } from "hooks";
-import type { ILoginSubmitRequestData } from "models";
-import { loginThunk } from "store/thunks";
+import { extractErrorCode } from "helpers";
+import { type IErrorResponse, type ILoginSubmitRequestData, StatelessRequest } from "models";
+import { login } from "services";
+import { IS_AUTH } from "utils";
 
 import styles from "./styles.module.css";
 
 export const Login = () => {
     const { t } = useTranslation();
-    const dispatch = useAppDispatch();
-
-    const loading = useAppSelector((store) => store.login.loading);
-    const error = useAppSelector((store) => store.login.error);
+    const [loginData, setLoginData] = useState(StatelessRequest.inactive());
 
     const onFinish = (values: ILoginSubmitRequestData): void => {
         const { username, password } = values;
 
-        const loginData = {
+        const loginResponseBody = {
             username,
             password,
         };
 
-        dispatch(loginThunk(loginData));
+        setLoginData(StatelessRequest.loading());
+
+        login(loginResponseBody)
+            .then(() => {
+                setLoginData(StatelessRequest.success());
+                localStorage.setItem(IS_AUTH, "true");
+                window.location.href = "/";
+            })
+            // TODO: We need to decide whether we need the code below, since our errors are already being handled through Axios interceptors, and basically the code below isn’t used at all.
+            .catch((error: AxiosError<IErrorResponse>) => {
+                setLoginData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
+            });
     };
 
     return (
@@ -62,10 +73,9 @@ export const Login = () => {
                 >
                     <Input.Password className={styles.LoginInput} />
                 </Form.Item>
-                <Button type="primary" htmlType="submit" loading={loading} className={styles.SubmitButton}>
+                <Button type="primary" htmlType="submit" loading={loginData.loading} className={styles.SubmitButton}>
                     {t("Authentication.loginButtonText")}
                 </Button>
-                <p className={styles.Error}>{error}</p>
             </Form>
         </div>
     );

@@ -1,0 +1,5 @@
+.Avatar {
+    margin-inline: 20px;
+    background-color: var(--axile-primary-green);
+    cursor: pointer;
+}

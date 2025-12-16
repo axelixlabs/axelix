@@ -17,6 +17,7 @@ import axios, { AxiosError } from "axios";
 
 import { extractErrorCode, showErrorNotification } from "helpers";
 import type { IErrorResponse } from "models";
+import { IS_AUTH } from "utils";
 
 const apiFetch = axios.create({
     baseURL: `${import.meta.env.VITE_APP_API_URL}/api/axile`,
@@ -24,16 +25,6 @@ const apiFetch = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
-});
-
-apiFetch.interceptors.request.use(async (config) => {
-    const token = localStorage.getItem("accessToken");
-
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
 });
 
 apiFetch.interceptors.response.use(
@@ -45,7 +36,7 @@ apiFetch.interceptors.response.use(
         showErrorNotification(errorCode);
 
         if (error.response?.status === 401) {
-            localStorage.removeItem("accessToken");
+            localStorage.removeItem(IS_AUTH);
             window.location.href = "/login";
         }
 
