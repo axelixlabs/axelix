@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ICommonSliceState } from "./globals";
-
 export interface ILoginSubmitRequestData {
     /**
      * The username of the user.
@@ -26,9 +24,4 @@ export interface ILoginSubmitRequestData {
      * Used to authenticate the user during the login process.
      */
     password: string;
-}
-
-export interface ILoginSliceState extends ICommonSliceState {
-    /** Access token if login succeeded, null otherwise */
-    accessToken: string | null;
 }

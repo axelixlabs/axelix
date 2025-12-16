@@ -13,39 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { UserOutlined } from "@ant-design/icons";
-
-import { Avatar, Dropdown, type MenuProps } from "antd";
-import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import { LanguageSwitcher } from "components";
-import { useAppDispatch } from "hooks";
-import { logout } from "store/slices";
 
 import { Help } from "./Help";
 import { NavigationBar } from "./NavigationBar";
+import { ProfileMenu } from "./ProfileMenu";
 import styles from "./styles.module.css";
 
 import LogoIcon from "assets/icons/logo.png";
 
 export const AdminHeader = () => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-
-    const logoutClickHandler = () => {
-        localStorage.removeItem("accessToken");
-        dispatch(logout());
-        window.location.href = "/login";
-    };
-
-    const items: MenuProps["items"] = [
-        {
-            key: "logout",
-            label: <div onClick={logoutClickHandler}>{t("Authentication.logout")}</div>,
-        },
-    ];
 
     return (
         <div className={styles.Header}>
@@ -53,9 +33,7 @@ export const AdminHeader = () => {
             <div className={styles.LinksAndAvatarWrapper}>
                 <NavigationBar />
                 <Help />
-                <Dropdown menu={{ items }}>
-                    <Avatar size={32} icon={<UserOutlined />} className={styles.Avatar} />
-                </Dropdown>
+                <ProfileMenu />
                 <LanguageSwitcher />
             </div>
         </div>
