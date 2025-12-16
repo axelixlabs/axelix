@@ -70,7 +70,7 @@ public class AxileCachesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
+    public CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {
         return new CacheManagerBeanPostProcessor();
     }
 }

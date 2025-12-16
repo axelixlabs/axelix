@@ -55,15 +55,19 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
     private final PropertyMetadataExtractor metadataExtractor;
 
+    private final ValueInjectionTrackerBeanPostProcessor injectionTracker;
+
     public DefaultEnvPropertyEnricher(
             Environment environment,
             PropertyNameNormalizer propertyNameNormalizer,
             ObjectProvider<ConfigurationPropertiesCache> cache,
-            PropertyMetadataExtractor metadataExtractor) {
+            PropertyMetadataExtractor metadataExtractor,
+            ValueInjectionTrackerBeanPostProcessor injectionTracker) {
         this.configurationPropertiesCache = cache.getIfAvailable();
         this.propertyNameNormalizer = propertyNameNormalizer;
         this.environment = environment;
         this.metadataExtractor = metadataExtractor;
+        this.injectionTracker = injectionTracker;
     }
 
     @Override
@@ -113,6 +117,9 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
                     PropertyMetadata metadata = metadataExtractor.getMetadata(normalizedName);
 
+                    List<EnvironmentFeed.InjectionPoint> injectionPoints =
+                            injectionTracker.getInjectionPointsForProperty(normalizedName);
+
                     return new Property(
                             propertyName,
                             stringValue,
@@ -121,7 +128,8 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                             Optional.ofNullable(metadata)
                                     .map(PropertyMetadata::description)
                                     .orElse(null),
-                            buildFromMetadata(metadata));
+                            buildFromMetadata(metadata),
+                            injectionPoints);
                 })
                 .toList();
 
