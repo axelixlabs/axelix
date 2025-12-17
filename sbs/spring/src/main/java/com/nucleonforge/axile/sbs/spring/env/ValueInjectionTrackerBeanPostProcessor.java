@@ -15,7 +15,6 @@
  */
 package com.nucleonforge.axile.sbs.spring.env;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
@@ -32,6 +31,8 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.annotation.MergedAnnotation;
+import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.util.ReflectionUtils;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionPoint;
@@ -48,12 +49,24 @@ import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionType;
  *
  * @since 12.12.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor {
 
     private final Map<String, List<InjectionPoint>> propertyToInjectionPoints = new ConcurrentHashMap<>();
     private final PropertyNameNormalizer propertyNameNormalizer;
+
+    // Looks up for the pattern @Value("${my.property:123}"), works also if the default value is absent.
     private static final Pattern PROPERTY_PATTERN = Pattern.compile("\\$\\{(.+?)(?::(.+?))?}");
+
+    // Looks up for the pattern ".getProperty()", such as "#{environment.getProperty('server.port')}"
+    // Note that as of now we're not checking that the actual receiver is instanceof Spring's Environment
+    private static final Pattern ENVIRONMENT_GET_PROPERTY_CALLS_PATTERN =
+            Pattern.compile("getProperty\\s*\\(\\s*['\"]([^'\"]+)['\"]");
+
+    // Looks up for the pattern that uses property source name indexed usage, such as
+    // "#{systemProperties['server.port']}"
+    private final Pattern SYSTEM_PROPERTIES_ACCESS_PATTERN = Pattern.compile("\\[\\s*['\"]([^'\"]+)['\"]\\s*]");
 
     public ValueInjectionTrackerBeanPostProcessor(PropertyNameNormalizer propertyNameNormalizer) {
         this.propertyNameNormalizer = propertyNameNormalizer;
@@ -71,6 +84,7 @@ public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor
     }
 
     private void analyzeBean(Object bean, String beanName) {
+        // At this point it is safe to just call getClass() since bean is not proxied yet
         Class<?> beanClass = bean.getClass();
 
         analyzeFields(beanClass, beanName);
@@ -121,19 +135,10 @@ public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor
 
     @Nullable
     private Value findValueAnnotation(AnnotatedElement element) {
-        Value directAnnotation = element.getAnnotation(Value.class);
-        if (directAnnotation != null) {
-            return directAnnotation;
-        }
-
-        for (Annotation annotation : element.getAnnotations()) {
-            Value metaAnnotation = annotation.annotationType().getAnnotation(Value.class);
-            if (metaAnnotation != null) {
-                return metaAnnotation;
-            }
-        }
-
-        return null;
+        return MergedAnnotations.from(element)
+                .get(Value.class)
+                .synthesize(MergedAnnotation::isPresent)
+                .orElse(null);
     }
 
     private void processValueAnnotation(
@@ -172,16 +177,12 @@ public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor
     }
 
     private void extractPropertyNamesFromSpEL(String expression, List<String> propertyNames) {
-        // "#{environment.getProperty('server.port')}"
-        Pattern spelPropertyPattern = Pattern.compile("getProperty\\s*\\(\\s*['\"]([^'\"]+)['\"]");
-        Matcher matcher = spelPropertyPattern.matcher(expression);
+        Matcher matcher = ENVIRONMENT_GET_PROPERTY_CALLS_PATTERN.matcher(expression);
         while (matcher.find()) {
             propertyNames.add(matcher.group(1));
         }
 
-        // "#{systemProperties['server.port']}"
-        Pattern spelBracketPattern = Pattern.compile("\\[\\s*['\"]([^'\"]+)['\"]\\s*]");
-        matcher = spelBracketPattern.matcher(expression);
+        matcher = SYSTEM_PROPERTIES_ACCESS_PATTERN.matcher(expression);
         while (matcher.find()) {
             propertyNames.add(matcher.group(1));
         }
