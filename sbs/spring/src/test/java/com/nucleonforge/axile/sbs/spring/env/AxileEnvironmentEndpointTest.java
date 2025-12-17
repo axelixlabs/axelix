@@ -160,9 +160,19 @@ class AxileEnvironmentEndpointTest {
                             .containsKey("isPrimary")
                             .containsKey("value")
                             .containsKey("configPropsBeanName")
-                            .containsKey("description");
+                            .containsKey("description")
+                            .containsKey("injectionPoints");
 
                     assertThatJson(property).node("isPrimary").isBoolean();
+
+                    assertThatJson(property)
+                            .inPath("injectionPoints[*]")
+                            .isArray()
+                            .allSatisfy(injectionPoint -> {
+                                assertThatJson(injectionPoint)
+                                        .isObject()
+                                        .containsKeys("beanName", "injectionType", "targetName", "propertyExpression");
+                            });
                 }));
     }
 

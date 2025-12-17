@@ -74,11 +74,13 @@ class ValueInjectionTrackerBeanPostProcessorTest {
     @Autowired
     private ValueInjectionTrackerBeanPostProcessor tracker;
 
+    private final PropertyNameNormalizer normalizer = new DefaultPropertyNameNormalizer();
+
     @Test
     void testValueInjectionOnField() {
         String propertyServerPort = "test.server.port";
 
-        List<InjectionPoint> points = tracker.getInjectionPointsForProperty(propertyServerPort);
+        List<InjectionPoint> points = tracker.getInjectionPointsForProperty(normalizer.normalize(propertyServerPort));
 
         assertThat(points).hasSize(1).first().satisfies(point -> {
             assertThat(point.beanName())
@@ -90,7 +92,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
 
         String propertyTimeout = "test.app.timeout";
 
-        points = tracker.getInjectionPointsForProperty(propertyTimeout);
+        points = tracker.getInjectionPointsForProperty(normalizer.normalize(propertyTimeout));
         InjectionPoint injectionPoint = points.stream()
                 .filter(point -> point.injectionType().equals(InjectionType.FIELD)
                         && point.targetName().equals("timeout"))
@@ -106,7 +108,8 @@ class ValueInjectionTrackerBeanPostProcessorTest {
     void testConstructorParameterInjections() {
         String propertyApplicationName = "test.spring.application.name";
 
-        List<InjectionPoint> appNamePoints = tracker.getInjectionPointsForProperty(propertyApplicationName);
+        List<InjectionPoint> appNamePoints =
+                tracker.getInjectionPointsForProperty(normalizer.normalize(propertyApplicationName));
         assertThat(appNamePoints).hasSize(1).first().satisfies(point -> {
             assertThat(point.beanName())
                     .isEqualTo("valueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations");
@@ -115,7 +118,8 @@ class ValueInjectionTrackerBeanPostProcessorTest {
             assertThat(point.propertyExpression()).isEqualTo("${" + propertyApplicationName + ":TestApp}");
         });
 
-        List<InjectionPoint> timeoutPoints = tracker.getInjectionPointsForProperty("test.app.timeout");
+        List<InjectionPoint> timeoutPoints =
+                tracker.getInjectionPointsForProperty(normalizer.normalize("test.app.timeout"));
         assertThat(timeoutPoints)
                 .filteredOn(point -> point.injectionType() == InjectionType.CONSTRUCTOR_PARAMETER
                         && point.targetName().equals("connectionTimeout"))
@@ -132,7 +136,8 @@ class ValueInjectionTrackerBeanPostProcessorTest {
     void testMethodParameterInjections() {
         String propertyProfile = "test.spring.profiles.active";
 
-        List<InjectionPoint> profilePoints = tracker.getInjectionPointsForProperty(propertyProfile);
+        List<InjectionPoint> profilePoints =
+                tracker.getInjectionPointsForProperty(normalizer.normalize(propertyProfile));
         assertThat(profilePoints).hasSize(1).first().satisfies(point -> {
             assertThat(point.beanName())
                     .isEqualTo("valueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations");
@@ -143,7 +148,8 @@ class ValueInjectionTrackerBeanPostProcessorTest {
 
         String propertyTimeout = "test.app.timeout";
 
-        List<InjectionPoint> timeoutPoints = tracker.getInjectionPointsForProperty(propertyTimeout);
+        List<InjectionPoint> timeoutPoints =
+                tracker.getInjectionPointsForProperty(normalizer.normalize(propertyTimeout));
         assertThat(timeoutPoints)
                 .filteredOn(point -> point.injectionType() == InjectionType.METHOD_PARAMETER
                         && point.targetName().contains("setMaxTimeout"))
@@ -160,7 +166,8 @@ class ValueInjectionTrackerBeanPostProcessorTest {
     void testMethodInjections() {
         String propertyMethodTimeout = "test.method.timeout";
 
-        List<InjectionPoint> timeoutPoints = tracker.getInjectionPointsForProperty(propertyMethodTimeout);
+        List<InjectionPoint> timeoutPoints =
+                tracker.getInjectionPointsForProperty(normalizer.normalize(propertyMethodTimeout));
         assertThat(timeoutPoints)
                 .filteredOn(point -> point.injectionType() == InjectionType.METHOD
                         && point.targetName().contains("calculateRandomTimeout"))
@@ -174,7 +181,8 @@ class ValueInjectionTrackerBeanPostProcessorTest {
 
         String propertyAppTimeout = "test.app.timeout";
 
-        List<InjectionPoint> customTimeoutPoints = tracker.getInjectionPointsForProperty(propertyAppTimeout);
+        List<InjectionPoint> customTimeoutPoints =
+                tracker.getInjectionPointsForProperty(normalizer.normalize(propertyAppTimeout));
         assertThat(customTimeoutPoints)
                 .filteredOn(point -> point.injectionType() == InjectionType.METHOD
                         && point.targetName().contains("getDefaultTimeout"))
@@ -191,7 +199,8 @@ class ValueInjectionTrackerBeanPostProcessorTest {
     void testInnerClassInjections() {
         String propertyInnerTimeout = "test.inner.timeout";
 
-        List<InjectionPoint> innerTimeoutPoints = tracker.getInjectionPointsForProperty(propertyInnerTimeout);
+        List<InjectionPoint> innerTimeoutPoints =
+                tracker.getInjectionPointsForProperty(normalizer.normalize(propertyInnerTimeout));
         assertThat(innerTimeoutPoints)
                 .filteredOn(point -> point.injectionType() == InjectionType.FIELD)
                 .isNotEmpty();
@@ -199,14 +208,15 @@ class ValueInjectionTrackerBeanPostProcessorTest {
         String propertyInnerConstructorTimeout = "test.inner.constructor.timeout";
 
         List<InjectionPoint> innerConstructorPoints =
-                tracker.getInjectionPointsForProperty(propertyInnerConstructorTimeout);
+                tracker.getInjectionPointsForProperty(normalizer.normalize(propertyInnerConstructorTimeout));
         assertThat(innerConstructorPoints)
                 .filteredOn(point -> point.injectionType() == InjectionType.CONSTRUCTOR_PARAMETER)
                 .isNotEmpty();
 
         String propertyAppTimeout = "test.app.timeout";
 
-        List<InjectionPoint> timeoutPoints = tracker.getInjectionPointsForProperty(propertyAppTimeout);
+        List<InjectionPoint> timeoutPoints =
+                tracker.getInjectionPointsForProperty(normalizer.normalize(propertyAppTimeout));
         assertThat(timeoutPoints)
                 .filteredOn(point -> point.injectionType() == InjectionType.FIELD
                         && point.beanName().contains("InnerTimeoutBean")
@@ -223,7 +233,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
 
     @Test
     void testEnvironmentGetPropertySpEL() {
-        List<InjectionPoint> points = tracker.getInjectionPointsForProperty("server.port");
+        List<InjectionPoint> points = tracker.getInjectionPointsForProperty(normalizer.normalize("server.port"));
 
         assertThat(points)
                 .filteredOn(p -> p.targetName().equals("envPort"))
@@ -237,7 +247,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
 
     @Test
     void testSystemPropertiesSpEL() {
-        List<InjectionPoint> points = tracker.getInjectionPointsForProperty("user.home");
+        List<InjectionPoint> points = tracker.getInjectionPointsForProperty(normalizer.normalize("user.home"));
 
         assertThat(points)
                 .filteredOn(p -> p.targetName().equals("systemHome"))
@@ -251,7 +261,7 @@ class ValueInjectionTrackerBeanPostProcessorTest {
 
     @Test
     void testMethodSpEL() {
-        List<InjectionPoint> points = tracker.getInjectionPointsForProperty("app.timeout");
+        List<InjectionPoint> points = tracker.getInjectionPointsForProperty(normalizer.normalize("app.timeout"));
 
         assertThat(points)
                 .filteredOn(p -> p.targetName().contains("getTimeout"))
@@ -292,16 +302,9 @@ class ValueInjectionTrackerBeanPostProcessorTest {
         @TimeoutValue
         private Integer timeout;
 
-        private final String appName;
-
-        private final Integer connectionTimeout;
-
         public TestBeanWithCustomAnnotations(
                 @Value("${test.spring.application.name:TestApp}") String appName,
-                @TimeoutValue Integer connectionTimeout) {
-            this.appName = appName;
-            this.connectionTimeout = connectionTimeout;
-        }
+                @TimeoutValue String connectionTimeout) {}
 
         private String profile;
         private Integer maxTimeout;

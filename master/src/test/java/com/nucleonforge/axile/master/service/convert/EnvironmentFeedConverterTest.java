@@ -18,10 +18,12 @@ package com.nucleonforge.axile.master.service.convert;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionPoint;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionType;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse.PropertySourceShortProfile;
@@ -36,7 +38,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@Disabled
 class EnvironmentFeedConverterTest {
 
     private final EnvironmentFeedConverter subject = new EnvironmentFeedConverter();
@@ -70,6 +71,32 @@ class EnvironmentFeedConverterTest {
             assertThat(kv.configPropsBeanName()).isEqualTo("org.springframework.boot.test.property.SystemProperties");
             assertThat(kv.description()).isNull();
             assertThat(kv.deprecation()).isNull();
+            assertThat(kv.injectionPoints()).isNotNull().hasSize(2);
+
+            List<EnvironmentFeedResponse.InjectionPoint> injectionPoints = kv.injectionPoints();
+            assertThat(injectionPoints.get(0))
+                    .extracting(
+                            EnvironmentFeedResponse.InjectionPoint::beanName,
+                            EnvironmentFeedResponse.InjectionPoint::injectionType,
+                            EnvironmentFeedResponse.InjectionPoint::targetName,
+                            EnvironmentFeedResponse.InjectionPoint::propertyExpression)
+                    .containsExactly(
+                            "systemPropertiesBean",
+                            EnvironmentFeedResponse.InjectionType.FIELD,
+                            "vendorField",
+                            "${java.vm.vendor}");
+
+            assertThat(injectionPoints.get(1))
+                    .extracting(
+                            EnvironmentFeedResponse.InjectionPoint::beanName,
+                            EnvironmentFeedResponse.InjectionPoint::injectionType,
+                            EnvironmentFeedResponse.InjectionPoint::targetName,
+                            EnvironmentFeedResponse.InjectionPoint::propertyExpression)
+                    .containsExactly(
+                            "appConfig",
+                            EnvironmentFeedResponse.InjectionType.CONSTRUCTOR_PARAMETER,
+                            "vendorParam",
+                            "#{systemProperties['java.vm.vendor']}");
         });
 
         PropertySourceShortProfile propertySource2 =
@@ -84,6 +111,7 @@ class EnvironmentFeedConverterTest {
             assertThat(kv.configPropsBeanName()).isEqualTo("org.springframework.boot.test.property.SystemEnvironment");
             assertThat(kv.description()).isNull();
             assertThat(kv.deprecation()).isNull();
+            assertThat(kv.injectionPoints()).isNull();
         });
 
         PropertySourceShortProfile propertySource3 = getPropertySourceProfileByName(
@@ -100,6 +128,7 @@ class EnvironmentFeedConverterTest {
                     assertThat(kv.configPropsBeanName()).isNull();
                     assertThat(kv.description()).isNull();
                     assertThat(kv.deprecation()).isNull();
+                    assertThat(kv.injectionPoints()).isNull();
                 })
                 .anySatisfy(kv -> {
                     assertThat(kv.name()).isEqualTo("spring.jpa.hibernate.ddl-auto");
@@ -110,6 +139,7 @@ class EnvironmentFeedConverterTest {
                             .isEqualTo(
                                     "DDL mode. This is actually a shortcut for the \"hibernate.hbm2ddl.auto\" property.");
                     assertThat(kv.deprecation()).isNull();
+                    assertThat(kv.injectionPoints()).isNull();
                 });
 
         PropertySourceShortProfile propertySource4 =
@@ -128,6 +158,7 @@ class EnvironmentFeedConverterTest {
                                     "org.springframework.cloud.spring.cloud.client.hostname.SpringCloudClientHostInfo");
                     assertThat(kv.description()).isNull();
                     assertThat(kv.deprecation()).isNull();
+                    assertThat(kv.injectionPoints()).isNull();
                 })
                 .anySatisfy(kv -> {
                     assertThat(kv.name()).isEqualTo("logging.path");
@@ -136,6 +167,7 @@ class EnvironmentFeedConverterTest {
                     assertThat(kv.configPropsBeanName()).isNull();
                     assertThat(kv.description()).isEqualTo("Location of the log file. For instance, `/var/log`.");
                     assertThat(kv.deprecation()).isNull();
+                    assertThat(kv.injectionPoints()).isNull();
                 });
     }
 
@@ -159,14 +191,23 @@ class EnvironmentFeedConverterTest {
     }
 
     private static List<PropertySource> getPropertySources() {
-        /* List<Property> properties1 = new ArrayList<>();
+        List<InjectionPoint> injectionPoints = List.of(
+                new InjectionPoint("systemPropertiesBean", InjectionType.FIELD, "vendorField", "${java.vm.vendor}"),
+                new InjectionPoint(
+                        "appConfig",
+                        InjectionType.CONSTRUCTOR_PARAMETER,
+                        "vendorParam",
+                        "#{systemProperties['java.vm.vendor']}"));
+
+        List<Property> properties1 = new ArrayList<>();
         properties1.add(new Property(
                 "java.vm.vendor",
                 "Amazon.com Inc.",
                 true,
                 "org.springframework.boot.test.property.SystemProperties",
                 null,
-                null));
+                null,
+                injectionPoints));
         String systemPropertiesDescription =
                 "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'";
         PropertySource propertySource1 =
@@ -179,6 +220,7 @@ class EnvironmentFeedConverterTest {
                 true,
                 "org.springframework.boot.test.property.SystemEnvironment",
                 null,
+                null,
                 null));
         String systemEnvironmentDescription =
                 "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application.*'";
@@ -186,8 +228,8 @@ class EnvironmentFeedConverterTest {
                 new PropertySource("systemEnvironment", systemEnvironmentDescription, properties2);
 
         List<Property> properties3 = new ArrayList<>();
-        properties3.add(
-                new Property("spring.datasource.driver-class-sourceName", "org.h2.Driver", false, null, null, null));
+        properties3.add(new Property(
+                "spring.datasource.driver-class-sourceName", "org.h2.Driver", false, null, null, null, null));
 
         properties3.add(new Property(
                 "spring.jpa.hibernate.ddl-auto",
@@ -195,6 +237,7 @@ class EnvironmentFeedConverterTest {
                 false,
                 null,
                 "DDL mode. This is actually a shortcut for the \"hibernate.hbm2ddl.auto\" property.",
+                null,
                 null));
         String applicationPropertiesDescription =
                 "Contains properties from the 'application.*' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources.";
@@ -210,16 +253,22 @@ class EnvironmentFeedConverterTest {
                 false,
                 "org.springframework.cloud.spring.cloud.client.hostname.SpringCloudClientHostInfo",
                 null,
+                null,
                 null));
 
         String springCloudSourceDescription =
                 "Contains information about the client host for discovering and identifying instances in the cluster";
         properties4.add(new Property(
-                "logging.path", "pattern", false, null, "Location of the log file. For instance, `/var/log`.", null));
+                "logging.path",
+                "pattern",
+                false,
+                null,
+                "Location of the log file. For instance, `/var/log`.",
+                null,
+                null));
         PropertySource propertySource4 =
                 new PropertySource("springCloudClientHostInfo", springCloudSourceDescription, properties4);
 
-        return new ArrayList<>(List.of(propertySource1, propertySource2, propertySource3, propertySource4));*/
-        return new ArrayList<>();
+        return new ArrayList<>(List.of(propertySource1, propertySource2, propertySource3, propertySource4));
     }
 }

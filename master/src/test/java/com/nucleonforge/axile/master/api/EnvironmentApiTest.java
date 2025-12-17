@@ -82,7 +82,15 @@ class EnvironmentApiTest {
                   "value": "BellSoft",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null
+                  "description": null,
+                  "injectionPoints": [
+                    {
+                      "beanName": "systemPropertiesBean",
+                      "injectionType": "FIELD",
+                      "targetName": "vendorField",
+                      "propertyExpression": "${java.vm.vendor}"
+                    }
+                  ]
                 }
               ]
             },
@@ -190,14 +198,23 @@ class EnvironmentApiTest {
                   "value": "17",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null
+                  "description": null,
+                  "injectionPoints": null
                 },
                 {
                   "propertyName": "java.vm.vendor",
                   "value": "BellSoft",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null
+                  "description": null,
+                  "injectionPoints": [
+                    {
+                      "beanName": "systemPropertiesBean",
+                      "injectionType": "FIELD",
+                      "targetName": "vendorField",
+                      "propertyExpression": "${java.vm.vendor}"
+                    }
+                  ]
                 }
               ]
             },
@@ -210,7 +227,8 @@ class EnvironmentApiTest {
                   "value": "Java_Liberica_jdk/17.0.16-12/x64",
                   "isPrimary": true,
                   "configPropsBeanName": null,
-                  "description": "System Environment Property \\"JAVA_HOME\\""
+                  "description": "System Environment Property \\"JAVA_HOME\\"",
+                  "injectionPoints": null
                 },
                 {
                   "propertyName": "logging.path",
@@ -221,7 +239,8 @@ class EnvironmentApiTest {
                   "deprecation": {
                       "reason": null,
                       "replacement": "logging.file.path"
-                  }
+                  },
+                  "injectionPoints": null
                 }
               ]
             },

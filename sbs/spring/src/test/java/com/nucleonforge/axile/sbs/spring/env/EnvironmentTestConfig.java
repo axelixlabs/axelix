@@ -60,7 +60,7 @@ public class EnvironmentTestConfig {
     }
 
     @Bean
-    public static ValueInjectionTrackerBeanPostProcessor trackingAutowiredAnnotationBeanPostProcessor(
+    public ValueInjectionTrackerBeanPostProcessor trackingAutowiredAnnotationBeanPostProcessor(
             PropertyNameNormalizer propertyNameNormalizer) {
         return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
     }
