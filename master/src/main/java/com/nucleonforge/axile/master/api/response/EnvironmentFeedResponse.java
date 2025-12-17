@@ -18,6 +18,7 @@ package com.nucleonforge.axile.master.api.response;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
@@ -67,11 +68,36 @@ public record EnvironmentFeedResponse(
             boolean isPrimary,
             @Nullable String configPropsBeanName,
             @Nullable String description,
-            @JsonInclude(JsonInclude.Include.NON_NULL) @Nullable Deprecation deprecation) {}
+            @JsonInclude(JsonInclude.Include.NON_NULL) @Nullable Deprecation deprecation,
+            @JsonInclude(JsonInclude.Include.NON_NULL) @Nullable List<InjectionPoint> injectionPoints) {}
 
     /**
      * @param reason       the reason why the given property is deprecated.
      * @param replacement  the name of the property that potentially aims to replace the given deprecated property.
      */
     public record Deprecation(@Nullable String reason, @Nullable String replacement) {}
+
+    /**
+     * InjectionPoint represents a point in the code where a property is injected.
+     *
+     * @param beanName           the name of the Spring bean where injection occurs.
+     * @param injectionType      the type of injection {@link InjectionType}.
+     * @param targetName         the target name (field name, method name, or parameter name).
+     * @param propertyExpression the property expression used (e.g., "${some.property:default}").
+     */
+    public record InjectionPoint(
+            @JsonProperty("beanName") String beanName,
+            @JsonProperty("injectionType") InjectionType injectionType,
+            @JsonProperty("targetName") String targetName,
+            @JsonProperty("propertyExpression") String propertyExpression) {}
+
+    /**
+     * Enumerates the types of injection points where @Value annotations can be applied.
+     */
+    public enum InjectionType {
+        FIELD,
+        METHOD,
+        CONSTRUCTOR_PARAMETER,
+        METHOD_PARAMETER
+    }
 }

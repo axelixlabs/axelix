@@ -30,6 +30,7 @@ import com.nucleonforge.axile.sbs.spring.configprops.DefaultConfigurationPropert
  * Environment test configuration.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @TestConfiguration
 public class EnvironmentTestConfig {
@@ -59,12 +60,23 @@ public class EnvironmentTestConfig {
     }
 
     @Bean
+    public ValueInjectionTrackerBeanPostProcessor trackingAutowiredAnnotationBeanPostProcessor(
+            PropertyNameNormalizer propertyNameNormalizer) {
+        return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
+    }
+
+    @Bean
     public EnvPropertyEnricher envPropertyEnricher(
             Environment environment,
             DefaultPropertyNameNormalizer propertyNameNormalizer,
             ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache,
-            PropertyMetadataExtractor propertyMetadataExtractor) {
+            PropertyMetadataExtractor propertyMetadataExtractor,
+            ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor) {
         return new DefaultEnvPropertyEnricher(
-                environment, propertyNameNormalizer, configurationPropertiesCache, propertyMetadataExtractor);
+                environment,
+                propertyNameNormalizer,
+                configurationPropertiesCache,
+                propertyMetadataExtractor,
+                valueInjectionTrackerBeanPostProcessor);
     }
 }

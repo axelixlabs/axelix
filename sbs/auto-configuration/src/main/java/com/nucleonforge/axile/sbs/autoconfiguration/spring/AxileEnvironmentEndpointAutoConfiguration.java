@@ -33,6 +33,7 @@ import com.nucleonforge.axile.sbs.spring.env.DefaultPropertyNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.env.EnvPropertyEnricher;
 import com.nucleonforge.axile.sbs.spring.env.PropertyMetadataExtractor;
 import com.nucleonforge.axile.sbs.spring.env.PropertyNameNormalizer;
+import com.nucleonforge.axile.sbs.spring.env.ValueInjectionTrackerBeanPostProcessor;
 
 /**
  * Auto-configuration for the {@link AxileEnvironmentEndpoint}.
@@ -67,8 +68,10 @@ public class AxileEnvironmentEndpointAutoConfiguration {
             Environment environment,
             PropertyNameNormalizer propertyNameNormalizer,
             ObjectProvider<ConfigurationPropertiesCache> cache,
-            PropertyMetadataExtractor propertyMetadataExtractor) {
-        return new DefaultEnvPropertyEnricher(environment, propertyNameNormalizer, cache, propertyMetadataExtractor);
+            PropertyMetadataExtractor propertyMetadataExtractor,
+            ValueInjectionTrackerBeanPostProcessor injectionTracker) {
+        return new DefaultEnvPropertyEnricher(
+                environment, propertyNameNormalizer, cache, propertyMetadataExtractor, injectionTracker);
     }
 
     @Bean
@@ -76,5 +79,12 @@ public class AxileEnvironmentEndpointAutoConfiguration {
     public AxileEnvironmentEndpoint axileEnvironmentEndpoint(
             EnvironmentEndpoint environmentEndpoint, EnvPropertyEnricher envPropertyEnricher) {
         return new AxileEnvironmentEndpoint(environmentEndpoint, envPropertyEnricher);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ValueInjectionTrackerBeanPostProcessor trackingAutowiredAnnotationBeanPostProcessor(
+            PropertyNameNormalizer propertyNameNormalizer) {
+        return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
     }
 }

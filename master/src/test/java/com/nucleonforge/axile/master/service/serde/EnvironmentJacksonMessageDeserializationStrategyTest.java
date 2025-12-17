@@ -16,11 +16,14 @@
 package com.nucleonforge.axile.master.service.serde;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionPoint;
+import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionType;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 
@@ -63,14 +66,29 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                   "value": "17",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null
+                  "description": null,
+                  "injectionPoints": null
                 },
                 {
                   "propertyName": "java.vm.vendor",
                   "value": "BellSoft",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null
+                  "description": null,
+                  "injectionPoints": [
+                    {
+                     "beanName": "systemPropertiesBean",
+                      "injectionType": "FIELD",
+                      "targetName": "vendorField",
+                      "propertyExpression": "${java.vm.vendor}"
+                    },
+                    {
+                      "beanName": "appConfig",
+                      "injectionType": "CONSTRUCTOR_PARAMETER",
+                      "targetName": "vendorParam",
+                      "propertyExpression": "#{systemProperties['java.vm.vendor']}"
+                    }
+                  ]
                 }
               ]
             },
@@ -151,6 +169,7 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                 .isEqualTo("org.springframework.boot.test.property.SystemProperties");
         assertThat(javaSpecVersion.description()).isNull();
         assertThat(javaSpecVersion.deprecation()).isNull();
+        assertThat(javaSpecVersion.injectionPoints()).isNull();
 
         Property javaVmVendor = systemProps.properties().stream()
                 .filter(pv -> pv.propertyName().equals("java.vm.vendor"))
@@ -162,6 +181,28 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
                 .isEqualTo("org.springframework.boot.test.property.SystemProperties");
         assertThat(javaVmVendor.description()).isNull();
         assertThat(javaVmVendor.deprecation()).isNull();
+        assertThat(javaVmVendor.injectionPoints()).isNotNull().hasSize(2);
+
+        List<InjectionPoint> injectionPoints = javaVmVendor.injectionPoints();
+        assertThat(injectionPoints.get(0))
+                .extracting(
+                        InjectionPoint::beanName,
+                        InjectionPoint::injectionType,
+                        InjectionPoint::targetName,
+                        InjectionPoint::propertyExpression)
+                .containsExactly("systemPropertiesBean", InjectionType.FIELD, "vendorField", "${java.vm.vendor}");
+
+        assertThat(injectionPoints.get(1))
+                .extracting(
+                        InjectionPoint::beanName,
+                        InjectionPoint::injectionType,
+                        InjectionPoint::targetName,
+                        InjectionPoint::propertyExpression)
+                .containsExactly(
+                        "appConfig",
+                        InjectionType.CONSTRUCTOR_PARAMETER,
+                        "vendorParam",
+                        "#{systemProperties['java.vm.vendor']}");
 
         PropertySource systemEnv = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("systemEnvironment"))
@@ -181,6 +222,7 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
         assertThat(javaHome.configPropsBeanName()).isNull();
         assertThat(javaHome.description()).isEqualTo("System Environment Property \"JAVA_HOME\"");
         assertThat(javaHome.deprecation()).isNull();
+        assertThat(javaHome.injectionPoints()).isNull();
 
         Property loggingPath = systemEnv.properties().stream()
                 .filter(pv -> pv.propertyName().equals("logging.path"))
@@ -193,6 +235,7 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
         assertThat(loggingPath.deprecation()).isNotNull();
         assertThat(loggingPath.deprecation().reason()).isNull();
         assertThat(loggingPath.deprecation().replacement()).isEqualTo("logging.file.path");
+        assertThat(loggingPath.injectionPoints()).isNull();
 
         PropertySource configProps = environmentFeed.propertySources().stream()
                 .filter(ps -> ps.sourceName().equals("Config resource classpath:actuate/env/"))
@@ -212,5 +255,6 @@ class EnvironmentJacksonMessageDeserializationStrategyTest {
         assertThat(cacheMaxSize.configPropsBeanName()).isNull();
         assertThat(cacheMaxSize.description()).isNull();
         assertThat(cacheMaxSize.deprecation()).isNull();
+        assertThat(cacheMaxSize.injectionPoints()).isNull();
     }
 }

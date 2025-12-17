@@ -73,7 +73,8 @@ public record EnvironmentFeed(
             @JsonProperty("isPrimary") boolean isPrimary,
             @JsonProperty("configPropsBeanName") @Nullable String configPropsBeanName,
             @JsonProperty("description") @Nullable String description,
-            @JsonProperty("deprecation") @Nullable Deprecation deprecation) {}
+            @JsonProperty("deprecation") @Nullable Deprecation deprecation,
+            @JsonProperty("injectionPoints") @Nullable List<InjectionPoint> injectionPoints) {}
 
     /**
      * DTO that encapsulates the deprecation property of the given artifact.
@@ -84,4 +85,28 @@ public record EnvironmentFeed(
     public record Deprecation(
             @JsonProperty("reason") @Nullable String reason,
             @JsonProperty("replacement") @Nullable String replacement) {}
+
+    /**
+     * InjectionPoint represents a point in the code where a property is injected.
+     *
+     * @param beanName           the name of the Spring bean where injection occurs.
+     * @param injectionType      the type of injection {@link InjectionType}.
+     * @param targetName         the target name (field name, method name, or parameter name).
+     * @param propertyExpression the property expression used (e.g., "${some.property:default}").
+     */
+    public record InjectionPoint(
+            @JsonProperty("beanName") String beanName,
+            @JsonProperty("injectionType") InjectionType injectionType,
+            @JsonProperty("targetName") String targetName,
+            @JsonProperty("propertyExpression") String propertyExpression) {}
+
+    /**
+     * Enumerates the types of injection points where @Value annotations can be applied.
+     */
+    public enum InjectionType {
+        FIELD,
+        METHOD,
+        CONSTRUCTOR_PARAMETER,
+        METHOD_PARAMETER
+    }
 }

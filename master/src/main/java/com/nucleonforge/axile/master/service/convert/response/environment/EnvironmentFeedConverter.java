@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
 import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse;
+import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse.InjectionPoint;
+import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse.InjectionType;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse.PropertyEntry;
 import com.nucleonforge.axile.master.api.response.EnvironmentFeedResponse.PropertySourceShortProfile;
 import com.nucleonforge.axile.master.service.convert.response.Converter;
@@ -66,7 +68,8 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
                         property.isPrimary(),
                         property.configPropsBeanName(),
                         property.description(),
-                        mapDeprecation(property.deprecation())));
+                        mapDeprecation(property.deprecation()),
+                        mapInjectionPoints(property.injectionPoints())));
             }
         }
 
@@ -80,5 +83,23 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
         }
 
         return new EnvironmentFeedResponse.Deprecation(deprecation.reason(), deprecation.replacement());
+    }
+
+    private @Nullable List<EnvironmentFeedResponse.InjectionPoint> mapInjectionPoints(
+            @Nullable List<EnvironmentFeed.InjectionPoint> injectionPoints) {
+        if (injectionPoints == null || injectionPoints.isEmpty()) {
+            return null;
+        }
+
+        List<EnvironmentFeedResponse.InjectionPoint> result = new ArrayList<>();
+        for (EnvironmentFeed.InjectionPoint ip : injectionPoints) {
+            result.add(new InjectionPoint(
+                    ip.beanName(), mapInjectionType(ip.injectionType()), ip.targetName(), ip.propertyExpression()));
+        }
+        return result;
+    }
+
+    private InjectionType mapInjectionType(EnvironmentFeed.InjectionType injectionType) {
+        return InjectionType.valueOf(injectionType.name());
     }
 }
