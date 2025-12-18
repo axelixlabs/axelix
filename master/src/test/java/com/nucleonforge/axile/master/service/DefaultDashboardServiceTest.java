@@ -41,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Unit tests for {@link DefaultDashboardService}.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 class DefaultDashboardServiceTest {
 

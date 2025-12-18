@@ -46,6 +46,7 @@ import static com.nucleonforge.axile.master.service.versions.VersionTrimmer.getM
  * Default implementation of {@link DashboardService}.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @Service
 public class DefaultDashboardService implements DashboardService {
