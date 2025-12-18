@@ -27,7 +27,6 @@ import com.nucleonforge.axile.common.api.transform.units.BytesMemoryBaseUnit;
 import com.nucleonforge.axile.common.api.transform.units.GigabytesMemoryBaseUnit;
 import com.nucleonforge.axile.common.api.transform.units.KilobytesMemoryBaseUnit;
 import com.nucleonforge.axile.common.api.transform.units.MegabytesMemoryBaseUnit;
-import com.nucleonforge.axile.common.api.transform.units.TerabyteMemoryBaseUnit;
 
 /**
  * Parser that is capable to parse the given source string into the {@link BaseUnit}.
@@ -40,8 +39,7 @@ public class BaseUnitParser {
             BytesMemoryBaseUnit.INSTANCE,
             KilobytesMemoryBaseUnit.INSTANCE,
             MegabytesMemoryBaseUnit.INSTANCE,
-            GigabytesMemoryBaseUnit.INSTANCE,
-            TerabyteMemoryBaseUnit.INSTANCE);
+            GigabytesMemoryBaseUnit.INSTANCE);
 
     /**
      * Cache that holds computed {@link BaseUnit} for the given source string.

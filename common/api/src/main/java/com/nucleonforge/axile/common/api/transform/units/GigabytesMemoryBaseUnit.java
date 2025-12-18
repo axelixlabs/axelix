@@ -17,6 +17,8 @@ package com.nucleonforge.axile.common.api.transform.units;
 
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Gigabytes {@link MemoryBaseUnit}.
  *
@@ -32,7 +34,8 @@ public class GigabytesMemoryBaseUnit extends MemoryBaseUnit {
     }
 
     @Override
+    @Nullable
     public MemoryBaseUnit next() {
-        return TerabyteMemoryBaseUnit.INSTANCE;
+        return null;
     }
 }

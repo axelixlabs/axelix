@@ -29,7 +29,6 @@ import com.nucleonforge.axile.common.api.transform.units.BytesMemoryBaseUnit;
 import com.nucleonforge.axile.common.api.transform.units.GigabytesMemoryBaseUnit;
 import com.nucleonforge.axile.common.api.transform.units.KilobytesMemoryBaseUnit;
 import com.nucleonforge.axile.common.api.transform.units.MegabytesMemoryBaseUnit;
-import com.nucleonforge.axile.common.api.transform.units.TerabyteMemoryBaseUnit;
 
 import static org.junit.jupiter.params.provider.Arguments.of;
 
@@ -59,7 +58,6 @@ class BaseUnitParserTest {
                 of("kilobytes", Optional.of(KilobytesMemoryBaseUnit.INSTANCE)),
                 of("megabytes", Optional.of(MegabytesMemoryBaseUnit.INSTANCE)),
                 of("gigabytes", Optional.of(GigabytesMemoryBaseUnit.INSTANCE)),
-                of("terabytes", Optional.of(TerabyteMemoryBaseUnit.INSTANCE)),
                 of("classes", Optional.empty()));
     }
 }
