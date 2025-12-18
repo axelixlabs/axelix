@@ -17,10 +17,18 @@ package com.nucleonforge.axile.master.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axile.common.api.transform.BaseUnitParser;
+import com.nucleonforge.axile.common.api.transform.BaseUnitValueTransformer;
+import com.nucleonforge.axile.common.api.transform.TransformedMetricValue;
+import com.nucleonforge.axile.common.api.transform.units.BaseUnit;
 import com.nucleonforge.axile.master.api.response.DashboardResponse;
 import com.nucleonforge.axile.master.api.response.software.DistributionResponse;
 import com.nucleonforge.axile.master.api.response.software.SoftwareDistributions;
@@ -31,6 +39,8 @@ import static com.nucleonforge.axile.master.api.response.DashboardResponse.Healt
 import static com.nucleonforge.axile.master.api.response.DashboardResponse.MemoryUsage;
 import static com.nucleonforge.axile.master.api.response.DashboardResponse.MemoryUsageMap;
 import static com.nucleonforge.axile.master.api.response.DashboardResponse.Status;
+import static com.nucleonforge.axile.master.service.versions.VersionTrimmer.getMajorMinorVersion;
+import static com.nucleonforge.axile.master.service.versions.VersionTrimmer.getMajorVersion;
 
 /**
  * Default implementation of {@link DashboardService}.
@@ -42,10 +52,20 @@ public class DefaultDashboardService implements DashboardService {
 
     private final InstanceRegistry instanceRegistry;
     private final MemoryUsageCache memoryUsageCache;
+    private final BaseUnitParser baseUnitParser;
+    private final Map<BaseUnit, BaseUnitValueTransformer> baseUnitValueTransformers;
 
-    public DefaultDashboardService(InstanceRegistry instanceRegistry, MemoryUsageCache memoryUsageCache) {
+    public DefaultDashboardService(
+            InstanceRegistry instanceRegistry,
+            MemoryUsageCache memoryUsageCache,
+            BaseUnitParser baseUnitParser,
+            Set<BaseUnitValueTransformer> baseUnitValueTransformers) {
         this.instanceRegistry = instanceRegistry;
         this.memoryUsageCache = memoryUsageCache;
+        this.baseUnitParser = baseUnitParser;
+
+        this.baseUnitValueTransformers = baseUnitValueTransformers.stream()
+                .collect(Collectors.toMap(BaseUnitValueTransformer::supports, Function.identity()));
     }
 
     @Override
@@ -65,22 +85,13 @@ public class DefaultDashboardService implements DashboardService {
                 case UNKNOWN -> statuesMap.compute(Status.UNKNOWN, counterIncrementFunction());
             }
 
-            // TODO:
-            //  now, here, we're having versions like:
-            //  - java = 17.0.19u
-            //  - spring-boot = 3.5.2
-            //  - spring-framework = 6.0.2 etc.
-            //  that is not really a great idea since we probably would have
-            //  quite a lot of different Patch versions of spring boot/spring-framework for sure
-            //  I guess we need to introduce the abstraction of Version to be able to show only
-            //  major/minor versions pair, or even just major.
-            java.addVersion(instance.javaVersion());
-            springBoot.addVersion(instance.springBootVersion());
-            springFramework.addVersion(instance.springFrameworkVersion());
+            java.addVersion(getMajorVersion(instance.javaVersion()));
+            springBoot.addVersion(getMajorMinorVersion(instance.springBootVersion()));
+            springFramework.addVersion(getMajorMinorVersion(instance.springFrameworkVersion()));
             jdkVendor.addVersion(instance.jdkVendor());
 
             if (instance.kotlinVersion() != null) {
-                kotlin.addVersion(instance.kotlinVersion());
+                kotlin.addVersion(getMajorMinorVersion(instance.kotlinVersion()));
             }
         }
 
@@ -91,12 +102,24 @@ public class DefaultDashboardService implements DashboardService {
     }
 
     private MemoryUsageMap buildMemoryUsageMap() {
-        // TODO:
-        //  We need to apply MemoryBaseUnit conversions as it is done in the
-        //  metrics endpoint, see AbstractMemoryBaseUnitValueTransformer
-        return new MemoryUsageMap(
-                new MemoryUsage("bytes", memoryUsageCache.getAverageRss()),
-                new MemoryUsage("bytes", memoryUsageCache.getTotalRss()));
+
+        BaseUnitValueTransformer baseUnitValueTransformer = baseUnitParser
+                .parse("bytes")
+                .map(baseUnitValueTransformers::get)
+                .orElse(null);
+
+        double averageRss = memoryUsageCache.getAverageRss();
+        double totalRss = memoryUsageCache.getTotalRss();
+
+        if (baseUnitValueTransformer != null) {
+            TransformedMetricValue transformedAverageRss = baseUnitValueTransformer.transform(averageRss);
+            TransformedMetricValue transformedTotalRss = baseUnitValueTransformer.transform(totalRss);
+            return new MemoryUsageMap(
+                    new MemoryUsage(transformedAverageRss.baseUnit().getDisplayName(), transformedAverageRss.value()),
+                    new MemoryUsage(transformedTotalRss.baseUnit().getDisplayName(), transformedTotalRss.value()));
+        }
+
+        return new MemoryUsageMap(new MemoryUsage("bytes", averageRss), new MemoryUsage("bytes", totalRss));
     }
 
     private static BiFunction<Status, Integer, Integer> counterIncrementFunction() {

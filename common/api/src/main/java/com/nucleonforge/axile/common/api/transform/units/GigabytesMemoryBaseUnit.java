@@ -13,14 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform;
+package com.nucleonforge.axile.common.api.transform.units;
 
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.BaseUnit;
+import java.util.Set;
 
 /**
- * Transformed base unit.
+ * Gigabytes {@link MemoryBaseUnit}.
  *
- * @param baseUnit the base unit of value
- * @param value the value
+ * @since 18.12.2025
+ * @author Nikita Kirillov
  */
-public record TransformedMetricValue(BaseUnit baseUnit, double value) {}
+public class GigabytesMemoryBaseUnit extends MemoryBaseUnit {
+
+    public static final GigabytesMemoryBaseUnit INSTANCE = new GigabytesMemoryBaseUnit(Set.of("gigabytes"), "GB");
+
+    public GigabytesMemoryBaseUnit(Set<String> aliases, String displayName) {
+        super(aliases, displayName);
+    }
+
+    @Override
+    public MemoryBaseUnit next() {
+        return TerabyteMemoryBaseUnit.INSTANCE;
+    }
+}

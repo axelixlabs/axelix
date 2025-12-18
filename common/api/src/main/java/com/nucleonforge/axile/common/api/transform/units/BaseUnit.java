@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform.units;
+package com.nucleonforge.axile.common.api.transform.units;
 
 import java.util.Set;
 
+import com.nucleonforge.axile.common.api.transform.BaseUnitValueTransformer;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.BaseUnitValueTransformer;
 
 /**
  * The base unit that is reported by {@link ActuatorEndpoints#SINGLE_METRIC} which we
