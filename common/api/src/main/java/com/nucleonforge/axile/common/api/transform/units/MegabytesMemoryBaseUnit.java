@@ -13,14 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform;
+package com.nucleonforge.axile.common.api.transform.units;
 
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.BaseUnit;
+import java.util.Set;
 
 /**
- * Transformed base unit.
+ * Megabytes {@link MemoryBaseUnit}.
  *
- * @param baseUnit the base unit of value
- * @param value the value
+ * @author Mikhail Polivakha
  */
-public record TransformedMetricValue(BaseUnit baseUnit, double value) {}
+public class MegabytesMemoryBaseUnit extends MemoryBaseUnit {
+
+    public static final MegabytesMemoryBaseUnit INSTANCE = new MegabytesMemoryBaseUnit(Set.of("megabytes"), "MB");
+
+    public MegabytesMemoryBaseUnit(Set<String> aliases, String displayName) {
+        super(aliases, displayName);
+    }
+
+    @Override
+    public MemoryBaseUnit next() {
+        return GigabytesMemoryBaseUnit.INSTANCE;
+    }
+}

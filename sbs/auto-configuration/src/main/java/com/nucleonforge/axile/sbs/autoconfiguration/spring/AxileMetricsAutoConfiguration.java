@@ -26,13 +26,13 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
+import com.nucleonforge.axile.common.api.transform.BaseUnitParser;
+import com.nucleonforge.axile.common.api.transform.BaseUnitValueTransformer;
+import com.nucleonforge.axile.common.api.transform.BytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axile.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
 import com.nucleonforge.axile.sbs.spring.metrics.AxileMetricsEndpoint;
 import com.nucleonforge.axile.sbs.spring.metrics.DefaultServiceMetricsGroupsAssembler;
 import com.nucleonforge.axile.sbs.spring.metrics.ServiceMetricsGroupsAssembler;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.BaseUnitParser;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.BaseUnitValueTransformer;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.BytesMemoryBaseUnitValueTransformer;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.KilobytesMemoryBaseUnitValueTransformer;
 
 /**
  * Auto-configuration for the {@link AxileMetricsEndpoint}.

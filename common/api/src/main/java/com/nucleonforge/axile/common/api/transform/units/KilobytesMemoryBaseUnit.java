@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform;
+package com.nucleonforge.axile.common.api.transform.units;
 
-import org.jspecify.annotations.NonNull;
-
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.KiloBytesMemoryBaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.MemoryBaseUnit;
+import java.util.Set;
 
 /**
- * {@link AbstractMemoryBaseUnitValueTransformer} for {@link KiloBytesMemoryBaseUnit}.
+ * Kilobytes {@link MemoryBaseUnit}.
  *
  * @author Mikhail Polivakha
  */
-public class KilobytesMemoryBaseUnitValueTransformer extends AbstractMemoryBaseUnitValueTransformer {
+public class KilobytesMemoryBaseUnit extends MemoryBaseUnit {
 
-    @NonNull
+    public static final KilobytesMemoryBaseUnit INSTANCE = new KilobytesMemoryBaseUnit(Set.of("kilobytes"), "KB");
+
+    public KilobytesMemoryBaseUnit(Set<String> aliases, String displayName) {
+        super(aliases, displayName);
+    }
+
     @Override
-    public MemoryBaseUnit supports() {
-        return KiloBytesMemoryBaseUnit.INSTANCE;
+    public MemoryBaseUnit next() {
+        return MegabytesMemoryBaseUnit.INSTANCE;
     }
 }

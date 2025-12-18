@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform.units;
+package com.nucleonforge.axile.common.api.transform;
 
-import java.util.Set;
+import com.nucleonforge.axile.common.api.transform.units.BaseUnit;
 
 /**
- * Bytes {@link MemoryBaseUnit}.
+ * Transformed base unit.
  *
- * @author Mikhail Polivakha
+ * @param baseUnit the base unit of value
+ * @param value the value
  */
-public class BytesMemoryBaseUnit extends MemoryBaseUnit {
-
-    public static final BytesMemoryBaseUnit INSTANCE = new BytesMemoryBaseUnit(Set.of("bytes"), "bytes");
-
-    public BytesMemoryBaseUnit(Set<String> aliases, String displayName) {
-        super(aliases, displayName);
-    }
-
-    @Override
-    public MemoryBaseUnit next() {
-        return KiloBytesMemoryBaseUnit.INSTANCE;
-    }
-}
+public record TransformedMetricValue(BaseUnit baseUnit, double value) {}

@@ -13,28 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform.units;
+package com.nucleonforge.axile.common.api.transform.units;
 
 import java.util.Set;
 
-import org.jspecify.annotations.Nullable;
-
 /**
- * Megabytes {@link MemoryBaseUnit}.
+ * Abstract {@link BaseUnit}.
  *
  * @author Mikhail Polivakha
  */
-public class MegabytesMemoryBaseUnit extends MemoryBaseUnit {
+public abstract class AbstractBaseUnit implements BaseUnit {
 
-    public static final MegabytesMemoryBaseUnit INSTANCE = new MegabytesMemoryBaseUnit(Set.of("megabytes"), "MB");
+    /**
+     * An array of aliases for the given base unit.
+     * All members expected to be in lower case.
+     */
+    private final Set<String> aliases;
 
-    public MegabytesMemoryBaseUnit(Set<String> aliases, String displayName) {
-        super(aliases, displayName);
+    private final String displayName;
+
+    public AbstractBaseUnit(Set<String> aliases, String displayName) {
+        this.aliases = aliases;
+        this.displayName = displayName;
     }
 
-    @Nullable
     @Override
-    public MemoryBaseUnit next() {
-        return null;
+    public Set<String> getAliases() {
+        return aliases;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
     }
 }

@@ -13,37 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform.units;
+package com.nucleonforge.axile.common.api.transform;
 
-import java.util.Set;
+import org.jspecify.annotations.NonNull;
+
+import com.nucleonforge.axile.common.api.transform.units.KilobytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.MemoryBaseUnit;
 
 /**
- * Abstract {@link BaseUnit}.
+ * {@link AbstractMemoryBaseUnitValueTransformer} for {@link KilobytesMemoryBaseUnit}.
  *
  * @author Mikhail Polivakha
  */
-public abstract class AbstractBaseUnit implements BaseUnit {
+public class KilobytesMemoryBaseUnitValueTransformer extends AbstractMemoryBaseUnitValueTransformer {
 
-    /**
-     * An array of aliases for the given base unit.
-     * All members expected to be in lower case.
-     */
-    private final Set<String> aliases;
-
-    private final String displayName;
-
-    public AbstractBaseUnit(Set<String> aliases, String displayName) {
-        this.aliases = aliases;
-        this.displayName = displayName;
-    }
-
+    @NonNull
     @Override
-    public Set<String> getAliases() {
-        return aliases;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return displayName;
+    public MemoryBaseUnit supports() {
+        return KilobytesMemoryBaseUnit.INSTANCE;
     }
 }

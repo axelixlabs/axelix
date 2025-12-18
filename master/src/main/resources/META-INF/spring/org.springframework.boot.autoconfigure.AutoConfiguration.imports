@@ -1,2 +1,3 @@
 com.nucleonforge.axile.master.autoconfiguration.discovery.DiscoveryAutoConfiguration
 com.nucleonforge.axile.master.autoconfiguration.auth.SecurityAutoConfiguration
+com.nucleonforge.axile.master.autoconfiguration.memory.MemoryTransformerAutoConfiguration
