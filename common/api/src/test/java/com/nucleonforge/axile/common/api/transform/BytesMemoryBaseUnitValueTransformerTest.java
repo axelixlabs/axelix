@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform;
+package com.nucleonforge.axile.common.api.transform;
 
 import java.util.stream.Stream;
 
@@ -24,10 +24,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.BaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.BytesMemoryBaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.KiloBytesMemoryBaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.MegabytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.BaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.BytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.KilobytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.MegabytesMemoryBaseUnit;
 
 import static org.junit.jupiter.params.provider.Arguments.of;
 
@@ -57,8 +57,8 @@ class BytesMemoryBaseUnitValueTransformerTest {
     static Stream<Arguments> arguments() {
         return Stream.of(
                 of(121, BytesMemoryBaseUnit.INSTANCE, 121),
-                of(1044, KiloBytesMemoryBaseUnit.INSTANCE, (double) 1044 / 1024),
-                of(12024, KiloBytesMemoryBaseUnit.INSTANCE, (double) 12024 / 1024),
+                of(1044, KilobytesMemoryBaseUnit.INSTANCE, (double) 1044 / 1024),
+                of(12024, KilobytesMemoryBaseUnit.INSTANCE, (double) 12024 / 1024),
                 of(1024 * 1024 * 6 * 1.2, MegabytesMemoryBaseUnit.INSTANCE, (double) 6 * 1.2));
     }
 }

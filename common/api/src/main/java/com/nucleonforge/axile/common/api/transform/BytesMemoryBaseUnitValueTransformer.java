@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform;
+package com.nucleonforge.axile.common.api.transform;
 
 import org.jspecify.annotations.NonNull;
 
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.BytesMemoryBaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.MemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.BytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.MemoryBaseUnit;
 
 /**
  * {@link AbstractMemoryBaseUnitValueTransformer} for {@link BytesMemoryBaseUnit}.

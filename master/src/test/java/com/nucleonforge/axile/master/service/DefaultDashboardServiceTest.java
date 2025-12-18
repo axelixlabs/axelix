@@ -16,12 +16,17 @@
 package com.nucleonforge.axile.master.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.assertj.core.data.Percentage;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axile.common.api.transform.BaseUnitParser;
+import com.nucleonforge.axile.common.api.transform.BaseUnitValueTransformer;
+import com.nucleonforge.axile.common.api.transform.BytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axile.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
 import com.nucleonforge.axile.master.api.response.DashboardResponse;
 import com.nucleonforge.axile.master.api.response.software.DistributionResponse;
 import com.nucleonforge.axile.master.api.response.software.SoftwareDistributions;
@@ -45,13 +50,17 @@ class DefaultDashboardServiceTest {
     void setUp() {
         InstanceRegistry instanceRegistry = createInMemoryInstanceRegistry();
         MemoryUsageCache memoryUsageCache = createInMemoryUsageCache();
-        subject = new DefaultDashboardService(instanceRegistry, memoryUsageCache);
+        BaseUnitParser baseUnitParser = new BaseUnitParser();
+        Set<BaseUnitValueTransformer> transformerSet =
+                Set.of(new BytesMemoryBaseUnitValueTransformer(), new KilobytesMemoryBaseUnitValueTransformer());
+
+        subject = new DefaultDashboardService(instanceRegistry, memoryUsageCache, baseUnitParser, transformerSet);
     }
 
     private static @NotNull InMemoryInstanceRegistry createInMemoryInstanceRegistry() {
         var registry = new InMemoryInstanceRegistry();
-        registry.register(createInstance("123", "21", "3.5.2", "6.1.1", "BellSoft", "2.0.2"));
-        registry.register(createInstance("456", "25", "3.4.1", "6.2.0", "BellSoft", null));
+        registry.register(createInstance("123", "21.0.0", "3.5.2", "6.1.1", "BellSoft", "2.0.2"));
+        registry.register(createInstance("456", "25.0.1", "3.4.1", "6.2.0", "BellSoft", null));
         registry.register(createInstance("789", "21", "4.0.0", "7.0.1", "Oracle", null));
 
         return registry;
@@ -60,7 +69,7 @@ class DefaultDashboardServiceTest {
     private static InMemoryMemoryUsageCache createInMemoryUsageCache() {
         var cache = new InMemoryMemoryUsageCache();
         cache.putRss(InstanceId.of("123"), 300d);
-        cache.putRss(InstanceId.of("456"), 250d);
+        cache.putRss(InstanceId.of("456"), 550d);
         cache.putRss(InstanceId.of("789"), 410d);
 
         return cache;
@@ -80,8 +89,11 @@ class DefaultDashboardServiceTest {
 
         var memoryUsageMap = dashboardInfo.memoryUsage();
         assertThat(memoryUsageMap.averageRss().value())
-                .isCloseTo((300d + 250d + 410d) / 3, Percentage.withPercentage(0.5));
-        assertThat(memoryUsageMap.totalRss().value()).isCloseTo(300d + 250d + 410d, Percentage.withPercentage(0.5));
+                .isCloseTo((300d + 550d + 410d) / 3, Percentage.withPercentage(0.5));
+        assertThat(memoryUsageMap.averageRss().unit()).isEqualTo("bytes");
+        assertThat(memoryUsageMap.totalRss().value())
+                .isCloseTo((300d + 550d + 410d) / 1024, Percentage.withPercentage(0.5));
+        assertThat(memoryUsageMap.totalRss().unit()).isEqualTo("KB");
 
         var distributions = dashboardInfo.distributions();
 
@@ -90,6 +102,18 @@ class DefaultDashboardServiceTest {
         assertThat(java.getVersions()).extractingByKey("21").isEqualTo(2L);
         assertThat(java.getVersions()).extractingByKey("25").isEqualTo(1L);
 
+        DistributionResponse springBoot = findDistribution(distributions, SoftwareDistributions.SPRING_BOOT);
+        assertThat(springBoot.getVersions()).hasSize(3);
+        assertThat(springBoot.getVersions()).extractingByKey("3.4").isEqualTo(1L);
+        assertThat(springBoot.getVersions()).extractingByKey("3.5").isEqualTo(1L);
+        assertThat(springBoot.getVersions()).extractingByKey("4.0").isEqualTo(1L);
+
+        DistributionResponse springFramework = findDistribution(distributions, SoftwareDistributions.SPRING_FRAMEWORK);
+        assertThat(springFramework.getVersions()).hasSize(3);
+        assertThat(springFramework.getVersions()).extractingByKey("6.1").isEqualTo(1L);
+        assertThat(springFramework.getVersions()).extractingByKey("6.2").isEqualTo(1L);
+        assertThat(springFramework.getVersions()).extractingByKey("7.0").isEqualTo(1L);
+
         DistributionResponse jdkVendor = findDistribution(distributions, SoftwareDistributions.JDK_VENDOR);
         assertThat(jdkVendor.getVersions()).hasSize(2);
         assertThat(jdkVendor.getVersions()).extractingByKey("BellSoft").isEqualTo(2L);
@@ -97,7 +121,7 @@ class DefaultDashboardServiceTest {
 
         DistributionResponse kotlin = findDistribution(distributions, SoftwareDistributions.KOTLIN);
         assertThat(kotlin.getVersions()).hasSize(1);
-        assertThat(kotlin.getVersions()).extractingByKey("2.0.2").isEqualTo(1L);
+        assertThat(kotlin.getVersions()).extractingByKey("2.0").isEqualTo(1L);
     }
 
     private DistributionResponse findDistribution(List<DistributionResponse> distributions, String name) {

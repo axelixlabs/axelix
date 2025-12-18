@@ -40,10 +40,10 @@ import org.springframework.http.ResponseEntity;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.BaseUnitParser;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.BytesMemoryBaseUnitValueTransformer;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.KilobytesMemoryBaseUnitValueTransformer;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.MegabytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.BaseUnitParser;
+import com.nucleonforge.axile.common.api.transform.BytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axile.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axile.common.api.transform.units.MegabytesMemoryBaseUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

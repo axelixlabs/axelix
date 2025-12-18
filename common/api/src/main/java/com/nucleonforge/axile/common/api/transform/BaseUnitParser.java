@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform;
+package com.nucleonforge.axile.common.api.transform;
 
 import java.util.Optional;
 import java.util.Set;
@@ -22,10 +22,12 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.jspecify.annotations.Nullable;
 
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.BaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.BytesMemoryBaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.KiloBytesMemoryBaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.MegabytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.BaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.BytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.GigabytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.KilobytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.MegabytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.TerabyteMemoryBaseUnit;
 
 /**
  * Parser that is capable to parse the given source string into the {@link BaseUnit}.
@@ -34,8 +36,12 @@ import com.nucleonforge.axile.sbs.spring.metrics.transform.units.MegabytesMemory
  */
 public class BaseUnitParser {
 
-    private static final Set<BaseUnit> UNITS =
-            Set.of(BytesMemoryBaseUnit.INSTANCE, KiloBytesMemoryBaseUnit.INSTANCE, MegabytesMemoryBaseUnit.INSTANCE);
+    private static final Set<BaseUnit> UNITS = Set.of(
+            BytesMemoryBaseUnit.INSTANCE,
+            KilobytesMemoryBaseUnit.INSTANCE,
+            MegabytesMemoryBaseUnit.INSTANCE,
+            GigabytesMemoryBaseUnit.INSTANCE,
+            TerabyteMemoryBaseUnit.INSTANCE);
 
     /**
      * Cache that holds computed {@link BaseUnit} for the given source string.

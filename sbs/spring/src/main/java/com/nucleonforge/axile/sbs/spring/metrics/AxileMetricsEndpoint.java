@@ -38,9 +38,9 @@ import org.springframework.lang.Nullable;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 import com.nucleonforge.axile.common.api.metrics.MetricProfile.Measurement;
 import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.BaseUnitParser;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.BaseUnitValueTransformer;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.BaseUnit;
+import com.nucleonforge.axile.common.api.transform.BaseUnitParser;
+import com.nucleonforge.axile.common.api.transform.BaseUnitValueTransformer;
+import com.nucleonforge.axile.common.api.transform.units.BaseUnit;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.
