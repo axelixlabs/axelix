@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform;
+package com.nucleonforge.axile.common.api.transform;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -24,10 +24,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.BaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.BytesMemoryBaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.KiloBytesMemoryBaseUnit;
-import com.nucleonforge.axile.sbs.spring.metrics.transform.units.MegabytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.BaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.BytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.GigabytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.KilobytesMemoryBaseUnit;
+import com.nucleonforge.axile.common.api.transform.units.MegabytesMemoryBaseUnit;
 
 import static org.junit.jupiter.params.provider.Arguments.of;
 
@@ -54,8 +55,9 @@ class BaseUnitParserTest {
     static Stream<Arguments> arguments() {
         return Stream.of(
                 of("bytes", Optional.of(BytesMemoryBaseUnit.INSTANCE)),
-                of("kilobytes", Optional.of(KiloBytesMemoryBaseUnit.INSTANCE)),
+                of("kilobytes", Optional.of(KilobytesMemoryBaseUnit.INSTANCE)),
                 of("megabytes", Optional.of(MegabytesMemoryBaseUnit.INSTANCE)),
+                of("gigabytes", Optional.of(GigabytesMemoryBaseUnit.INSTANCE)),
                 of("classes", Optional.empty()));
     }
 }

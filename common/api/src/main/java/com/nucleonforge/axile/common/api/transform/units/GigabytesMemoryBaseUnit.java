@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.sbs.spring.metrics.transform.units;
+package com.nucleonforge.axile.common.api.transform.units;
 
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 /**
- * Kilobytes {@link MemoryBaseUnit}.
+ * Gigabytes {@link MemoryBaseUnit}.
  *
- * @author Mikhail Polivakha
+ * @since 18.12.2025
+ * @author Nikita Kirillov
  */
-public class KiloBytesMemoryBaseUnit extends MemoryBaseUnit {
+public class GigabytesMemoryBaseUnit extends MemoryBaseUnit {
 
-    public static final KiloBytesMemoryBaseUnit INSTANCE = new KiloBytesMemoryBaseUnit(Set.of("kilobytes"), "KB");
+    public static final GigabytesMemoryBaseUnit INSTANCE = new GigabytesMemoryBaseUnit(Set.of("gigabytes"), "GB");
 
-    public KiloBytesMemoryBaseUnit(Set<String> aliases, String displayName) {
+    public GigabytesMemoryBaseUnit(Set<String> aliases, String displayName) {
         super(aliases, displayName);
     }
 
     @Override
+    @Nullable
     public MemoryBaseUnit next() {
-        return MegabytesMemoryBaseUnit.INSTANCE;
+        return null;
     }
 }
