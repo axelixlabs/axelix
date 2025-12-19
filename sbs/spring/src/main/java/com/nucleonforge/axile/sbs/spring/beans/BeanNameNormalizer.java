@@ -15,23 +15,26 @@
  */
 package com.nucleonforge.axile.sbs.spring.beans;
 
-import java.util.List;
-
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.common.api.BeansFeed.ProxyType;
-
 /**
- * Additional bean metadata.
+ * Interface capable to "normalize" the bean name. The normalization is the process that
+ * converts a property from its specific form like {@code WebMvcAutoConfiguration$EnableWebMvcConfiguration}
+ * to some canonical view.
  *
- * @author Mikhail Polivakha
- * @author Sergey  Cherkasov
+ * @author Sergey Cherkasov
  */
-public record BeanMetaInfo(
-        @Nullable String autoConfigurationRef,
-        ProxyType proxyType,
-        boolean isLazyInit,
-        boolean isPrimary,
-        List<String> qualifiers,
-        BeansFeed.BeanSource beanSource) {}
+public interface BeanNameNormalizer {
+
+    default @Nullable String normalize(@Nullable String beanName) {
+        return beanName != null ? normalizeInternal(beanName) : null;
+    }
+
+    /**
+     * @param beanName inbound bean name, to be normalized
+     * @return normalized bean name
+     */
+    @NonNull
+    String normalizeInternal(@NonNull String beanName);
+}

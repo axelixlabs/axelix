@@ -32,9 +32,11 @@ import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 /**
  * The response to beans actuator endpoint.
  *
- * @author Mikhail Polivakha
- * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/beans.html">Beans Endpoint</a>
  * @see ActuatorEndpoint
+ * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/beans.html">Beans Endpoint</a>
+ *
+ * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public record BeansFeed(Map<String, Context> contexts) {
 
@@ -57,6 +59,7 @@ public record BeansFeed(Map<String, Context> contexts) {
             @JsonProperty("type") String type,
             @JsonProperty("proxyType") ProxyType proxyType,
             @JsonProperty("aliases") Set<String> aliases,
+            @JsonProperty("autoConfigurationRef") @Nullable String autoConfigurationRef,
             @JsonProperty("dependencies") Set<BeanDependency> dependencies,
             @JsonProperty("isLazyInit") boolean isLazyInit,
             @JsonProperty("isPrimary") boolean isPrimary,

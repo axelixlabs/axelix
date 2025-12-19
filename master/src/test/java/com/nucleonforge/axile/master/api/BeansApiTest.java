@@ -52,6 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 28.08.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BeansApiTest {
@@ -66,6 +67,7 @@ class BeansApiTest {
               "scope": "singleton",
               "className": "JmxEndpointProperties",
               "aliases": [],
+              "autoConfigurationRef" : null,
               "proxyType" : "CGLIB",
               "dependencies": [],
               "isPrimary": false,
@@ -81,6 +83,7 @@ class BeansApiTest {
               "scope": "prototype",
               "className": "Jackson2ObjectMapperBuilder",
               "aliases": [],
+              "autoConfigurationRef" :"HibernateJpaConfiguration#entityManagerFactoryBuilder",
               "proxyType" : "JDK_PROXY",
               "dependencies": [
                 {
@@ -109,6 +112,7 @@ class BeansApiTest {
               "className": "TestSessionBean",
               "proxyType" : "NO_PROXYING",
               "aliases": ["sessionBeanForProberTest"],
+              "autoConfigurationRef" : null,
               "dependencies": [],
               "isPrimary": false,
               "isLazyInit": false,
@@ -124,6 +128,7 @@ class BeansApiTest {
               "scope": "singleton",
               "className": "SomeClass",
               "aliases": [],
+              "autoConfigurationRef" : null,
               "proxyType" : "NO_PROXYING",
               "dependencies": [],
               "isPrimary": false,
@@ -174,6 +179,7 @@ class BeansApiTest {
                   "type": "JmxEndpointProperties",
                   "proxyType" : "CGLIB",
                   "aliases": [],
+                  "autoConfigurationRef" : null,
                   "dependencies": [],
                   "isLazyInit": false,
                   "isPrimary": false,
@@ -188,6 +194,7 @@ class BeansApiTest {
                   "type": "Jackson2ObjectMapperBuilder",
                   "proxyType" : "JDK_PROXY",
                   "aliases": [],
+                  "autoConfigurationRef" : "HibernateJpaConfiguration#entityManagerFactoryBuilder",
                   "dependencies": [
                     {
                       "name": "some.prefix-JacksonObjectMapperBuilderConfiguration",
@@ -214,6 +221,7 @@ class BeansApiTest {
                   "type": "TestSessionBean",
                   "proxyType" : "NO_PROXYING",
                   "aliases": ["sessionBeanForProberTest"],
+                  "autoConfigurationRef" : null,
                   "dependencies": [],
                   "isLazyInit": false,
                   "isPrimary": false,
@@ -229,6 +237,7 @@ class BeansApiTest {
                   "type": "SomeClass",
                   "proxyType" : "NO_PROXYING",
                   "aliases": [],
+                  "autoConfigurationRef" : null,
                   "dependencies": [],
                   "isPrimary": false,
                   "isLazyInit": false,

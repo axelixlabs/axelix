@@ -15,23 +15,18 @@
  */
 package com.nucleonforge.axile.sbs.spring.beans;
 
-import java.util.List;
-
-import org.jspecify.annotations.Nullable;
-
-import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.common.api.BeansFeed.ProxyType;
+import org.jspecify.annotations.NonNull;
 
 /**
- * Additional bean metadata.
+ * Default implementation {@link BeanNameNormalizer}.
  *
- * @author Mikhail Polivakha
- * @author Sergey  Cherkasov
+ * @author Sergey Cherkasov
  */
-public record BeanMetaInfo(
-        @Nullable String autoConfigurationRef,
-        ProxyType proxyType,
-        boolean isLazyInit,
-        boolean isPrimary,
-        List<String> qualifiers,
-        BeansFeed.BeanSource beanSource) {}
+public class DefaultBeanNameNormalizer implements BeanNameNormalizer {
+
+    public @NonNull String normalizeInternal(@NonNull String beanName) {
+        return beanName.substring(beanName.lastIndexOf(".") + 1)
+                .replace('$', '.'); // WebMvcAutoConfiguration$EnableWebMvcConfiguration ->
+        // WebMvcAutoConfiguration.EnableWebMvcConfiguration
+    }
+}

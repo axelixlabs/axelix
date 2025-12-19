@@ -17,6 +17,10 @@ package com.nucleonforge.axile.sbs.spring.beans;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
@@ -27,6 +31,7 @@ import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
 import org.springframework.core.type.StandardMethodMetadata;
@@ -39,6 +44,7 @@ import com.nucleonforge.axile.common.api.BeansFeed;
  * Default implementation of {@link BeanMetaInfoExtractor}.
  *
  * @author Nikita Kirillov
+ * @author Sergey  Cherkasov
  * @since 04.07.2025
  */
 @NullMarked
@@ -46,18 +52,27 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
 
     private final DefaultQualifiersRegistry qualifiersRegistry;
     private final ConfigurableListableBeanFactory beanFactory;
+    private final ConditionsReportEndpoint delegateConditions;
+    private final BeanNameNormalizer beanNameNormalizer;
 
-    public DefaultBeanMetaInfoExtractor(ConfigurableListableBeanFactory configurableBeanFactory) {
+    public DefaultBeanMetaInfoExtractor(
+            ConfigurableListableBeanFactory configurableBeanFactory,
+            ConditionsReportEndpoint delegateConditions,
+            BeanNameNormalizer beanNameNormalizer) {
         this.beanFactory = configurableBeanFactory;
         this.qualifiersRegistry = DefaultQualifiersRegistry.INSTANCE;
+        this.delegateConditions = delegateConditions;
+        this.beanNameNormalizer = beanNameNormalizer;
     }
 
     @Override
     public BeanMetaInfo extract(String beanName, ConfigurableListableBeanFactory beanFactory) {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
         Object bean = beanFactory.getBean(beanName);
+        Map<String, List<String>> positiveConditionsMapping = conditionsMappingMap();
 
         return new BeanMetaInfo(
+                getConditionRef(positiveConditionsMapping, beanDefinition, beanName),
                 analyzeProxyType(bean.getClass()),
                 beanDefinition.isLazyInit(),
                 beanDefinition.isPrimary(),
@@ -157,5 +172,59 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    private Map<String, List<String>> conditionsMappingMap() {
+        Map<String, List<String>> map = new HashMap<>();
+
+        delegateConditions.conditions().getContexts().values().forEach(context -> {
+            if (context.getPositiveMatches() != null) {
+                for (var entry : context.getPositiveMatches().entrySet()) {
+                    unwrapConditionBeanName(entry.getKey(), map);
+                }
+            }
+        });
+
+        return map;
+    }
+
+    private static void unwrapConditionBeanName(String target, Map<String, List<String>> map) {
+        if (target.contains("#")) {
+            String[] pair = target.split("#", 2);
+            map.computeIfAbsent(pair[0], k -> new ArrayList<>()).add(pair[1]);
+        } else {
+            map.computeIfAbsent(target, k -> new ArrayList<>()).add(null);
+        }
+    }
+
+    @Nullable
+    private String getConditionRef(
+            Map<String, List<String>> positiveConditionsMapping, BeanDefinition beanDefinition, String beanName) {
+        if (beanDefinition.getFactoryMethodName() != null) {
+            Class<?> enclosingClass = extractEnclosingClass(beanDefinition, beanName);
+
+            String enclosingClassName = Optional.ofNullable(enclosingClass)
+                    .map(ClassUtils::getUserClass)
+                    .map(Class::getName)
+                    .orElse(null);
+
+            return buildConditionRef(
+                    positiveConditionsMapping,
+                    beanNameNormalizer.normalize(enclosingClassName),
+                    beanDefinition.getFactoryMethodName());
+        }
+
+        String normalizedBeanName = beanNameNormalizer.normalize(beanName);
+
+        return positiveConditionsMapping.containsKey(normalizedBeanName) ? normalizedBeanName : null;
+    }
+
+    @Nullable
+    private String buildConditionRef(
+            Map<String, List<String>> positiveConditionsMapping, @Nullable String beanName, String methodName) {
+        return Optional.ofNullable(beanName)
+                .flatMap(name -> Optional.ofNullable(positiveConditionsMapping.get(name))
+                        .map(methods -> methods.contains(methodName) ? name + "#" + methodName : name))
+                .orElse(null);
     }
 }

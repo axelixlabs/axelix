@@ -39,11 +39,13 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -87,6 +89,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest(classes = DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.class)
+@Import(ConditionsReportEndpoint.class)
 class DefaultBeanMetaInfoExtractorTest {
 
     @Autowired
@@ -378,8 +381,16 @@ class DefaultBeanMetaInfoExtractorTest {
         }
 
         @Bean
-        public DefaultBeanMetaInfoExtractor beanAnalyzer(ConfigurableListableBeanFactory beanFactory) {
-            return new DefaultBeanMetaInfoExtractor(beanFactory);
+        public BeanNameNormalizer beanNameNormalizer() {
+            return new DefaultBeanNameNormalizer();
+        }
+
+        @Bean
+        public DefaultBeanMetaInfoExtractor beanAnalyzer(
+                ConfigurableListableBeanFactory beanFactory,
+                ConditionsReportEndpoint delegateConditions,
+                BeanNameNormalizer beanNameNormalizer) {
+            return new DefaultBeanMetaInfoExtractor(beanFactory, delegateConditions, beanNameNormalizer);
         }
 
         @Entity
