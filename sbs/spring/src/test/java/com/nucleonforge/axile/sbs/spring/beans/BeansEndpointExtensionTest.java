@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -44,7 +45,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
 @SpringBootTest(
         classes = BeansEndpointExtensionTest.CurrentConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({BeansEndpoint.class, BeansEndpointExtension.class})
+@Import({BeansEndpoint.class, BeansEndpointExtension.class, ConditionsReportEndpoint.class})
 class BeansEndpointExtensionTest {
 
     @Autowired
@@ -57,9 +58,18 @@ class BeansEndpointExtensionTest {
         static final String BEAN_META_INFO_EXTRACTOR = "beanMetaInfoExtractor";
         static final String CUSTOM_SUPPLIER = "customSupplier";
 
+        @Bean
+        public BeanNameNormalizer beanNameNormalizer() {
+            return new DefaultBeanNameNormalizer();
+        }
+
         @Bean(BEAN_META_INFO_EXTRACTOR)
-        BeanMetaInfoExtractor beanMetaInfoExtractor(ConfigurableListableBeanFactory configurableListableBeanFactory) {
-            return new DefaultBeanMetaInfoExtractor(configurableListableBeanFactory);
+        BeanMetaInfoExtractor beanMetaInfoExtractor(
+                ConfigurableListableBeanFactory configurableListableBeanFactory,
+                ConditionsReportEndpoint delegateConditions,
+                BeanNameNormalizer beanNameNormalizer) {
+            return new DefaultBeanMetaInfoExtractor(
+                    configurableListableBeanFactory, delegateConditions, beanNameNormalizer);
         }
 
         @Bean(QUALIFIERS_PERSISTENCE_POST_PROCESSOR)

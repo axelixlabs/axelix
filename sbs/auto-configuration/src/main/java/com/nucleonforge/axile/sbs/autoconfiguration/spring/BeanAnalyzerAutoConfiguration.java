@@ -17,6 +17,7 @@ package com.nucleonforge.axile.sbs.autoconfiguration.spring;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.actuate.autoconfigure.beans.BeansEndpointAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -25,8 +26,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axile.sbs.spring.beans.BeanMetaInfoExtractor;
+import com.nucleonforge.axile.sbs.spring.beans.BeanNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.beans.BeansEndpointExtension;
 import com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractor;
+import com.nucleonforge.axile.sbs.spring.beans.DefaultBeanNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.beans.QualifiersPersistencePostProcessor;
 
 /**
@@ -34,6 +37,7 @@ import com.nucleonforge.axile.sbs.spring.beans.QualifiersPersistencePostProcesso
  *
  * @since 07.07.2025
  * @author Nikita Kirillov
+ * @author Sergey  Cherkasov
  */
 @AutoConfiguration(after = BeansEndpointAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = BeansEndpoint.class)
@@ -41,8 +45,17 @@ public class BeanAnalyzerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public BeanMetaInfoExtractor defaultBeanMetaInfoExtractor(ConfigurableListableBeanFactory beanFactory) {
-        return new DefaultBeanMetaInfoExtractor(beanFactory);
+    public BeanNameNormalizer beanNameNormalizer() {
+        return new DefaultBeanNameNormalizer();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public BeanMetaInfoExtractor defaultBeanMetaInfoExtractor(
+            ConfigurableListableBeanFactory beanFactory,
+            ConditionsReportEndpoint delegateConditions,
+            BeanNameNormalizer beanNameNormalizer) {
+        return new DefaultBeanMetaInfoExtractor(beanFactory, delegateConditions, beanNameNormalizer);
     }
 
     @Bean

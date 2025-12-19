@@ -39,6 +39,7 @@ import com.nucleonforge.axile.master.api.response.BeansFeedResponse;
  * The {@link Converter} from {@link BeansFeed} to {@link BeansFeedResponse}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @Service
 public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedResponse> {
@@ -60,6 +61,7 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
                             bean.type(),
                             ProxyType.valueOf(bean.proxyType().name()),
                             bean.aliases(),
+                            bean.autoConfigurationRef(),
                             convertDependencies(bean.dependencies()),
                             bean.isPrimary(),
                             bean.isLazyInit(),

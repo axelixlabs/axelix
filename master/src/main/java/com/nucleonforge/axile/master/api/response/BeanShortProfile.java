@@ -32,18 +32,22 @@ import org.springframework.stereotype.Component;
 /**
  * Short profile of a given bean.
  *
- * @param beanName     The name of the bean.
- * @param scope        The scope of the bean.
- * @param className    The fully qualified class name of the bean.
- * @param aliases      The aliases of the given bean.
- * @param dependencies The list of dependencies of this bean (i.e. other beans that this bean depends on).
- * @param isLazyInit   Whether the bean is lazily instantiated or eagerly.
- * @param isPrimary    Whether the bean is marked with {@link BeanDefinition#isPrimary() primary marker}.
- * @param isConfigPropsBean Whether the bean is a configuration properties bean {@link ConfigurationProperties}.
- * @param qualifiers   The list of {@link AutowireCandidateQualifier qualifiers} that are assigned to this bean.
- * @param beanSource   The source information describing how this bean was created and its origin type.
+ * @param beanName              The name of the bean.
+ * @param scope                 The scope of the bean.
+ * @param className             The fully qualified class name of the bean.
+ * @param aliases               The aliases of the given bean.
+ * @param autoConfigurationRef  The reference to an @AutoConfiguration class if it is annotated with conditions
+ *                              {@code className}, or, if it contains a method annotated with conditions,
+ *                              a reference to the class with the method specified {@code className#methodName}.
+ * @param dependencies          The list of dependencies of this bean (i.e. other beans that this bean depends on).
+ * @param isLazyInit            Whether the bean is lazily instantiated or eagerly.
+ * @param isPrimary             Whether the bean is marked with {@link BeanDefinition#isPrimary() primary marker}.
+ * @param isConfigPropsBean     Whether the bean is a configuration properties bean {@link ConfigurationProperties}.
+ * @param qualifiers            The list of {@link AutowireCandidateQualifier qualifiers} that are assigned to this bean.
+ * @param beanSource            The source information describing how this bean was created and its origin type.
  *
  * @author Mikhail Polivakha
+ * @author Sergey  Cherkasov
  */
 public record BeanShortProfile(
         String beanName,
@@ -51,6 +55,7 @@ public record BeanShortProfile(
         String className,
         ProxyType proxyType,
         Set<String> aliases,
+        @Nullable String autoConfigurationRef,
         Set<BeanDependencyProfile> dependencies,
         boolean isPrimary,
         boolean isLazyInit,

@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Unit tests for {@link BeansFeedConverter}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 class BeansFeedConverterTest {
 
@@ -53,6 +54,7 @@ class BeansFeedConverterTest {
             BeanShortProfile bean1 = getBeanByName(beansFeedResponse, "bean1");
             assertThat(bean1).extracting(BeanShortProfile::beanName).isEqualTo("bean1");
             assertThat(bean1).extracting(BeanShortProfile::className).isEqualTo("java.lang.String");
+            assertThat(bean1).extracting(BeanShortProfile::autoConfigurationRef).isNull();
             assertThat(bean1).extracting(BeanShortProfile::scope).isEqualTo("singleton");
             assertThat(bean1).extracting(BeanShortProfile::isPrimary).isEqualTo(false);
             assertThat(bean1).extracting(BeanShortProfile::isLazyInit).isEqualTo(false);
@@ -74,6 +76,7 @@ class BeansFeedConverterTest {
             assertThat(bean2).extracting(BeanShortProfile::beanName).isEqualTo("bean2");
             assertThat(bean2).extracting(BeanShortProfile::className).isEqualTo("java.lang.Integer");
             assertThat(bean2).extracting(BeanShortProfile::scope).isEqualTo("session");
+            assertThat(bean2).extracting(BeanShortProfile::autoConfigurationRef).isEqualTo("bean2");
             assertThat(bean2).extracting(BeanShortProfile::isPrimary).isEqualTo(true);
             assertThat(bean2).extracting(BeanShortProfile::isLazyInit).isEqualTo(false);
             assertThat(bean2).extracting(BeanShortProfile::isConfigPropsBean).isEqualTo(false);
@@ -101,6 +104,9 @@ class BeansFeedConverterTest {
             BeanShortProfile bean3 = getBeanByName(beansFeedResponse, "bean3");
             assertThat(bean3).extracting(BeanShortProfile::beanName).isEqualTo("bean3");
             assertThat(bean3).extracting(BeanShortProfile::className).isEqualTo("java.util.Date");
+            assertThat(bean3)
+                    .extracting(BeanShortProfile::autoConfigurationRef)
+                    .isEqualTo("enclosingClass#factoryMethod");
             assertThat(bean3).extracting(BeanShortProfile::scope).isEqualTo("prototype");
             assertThat(bean3)
                     .extracting(BeanShortProfile::aliases, InstanceOfAssertFactories.COLLECTION)
@@ -154,6 +160,7 @@ class BeansFeedConverterTest {
                         "java.lang.String",
                         BeansFeed.ProxyType.CGLIB,
                         Set.of(),
+                        null,
                         Set.of(),
                         false,
                         false,
@@ -168,6 +175,7 @@ class BeansFeedConverterTest {
                         "java.lang.Integer",
                         BeansFeed.ProxyType.JDK_PROXY,
                         Set.of(),
+                        "bean2",
                         Set.of(new BeanDependency(
                                 "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties", true)),
                         false,
@@ -183,6 +191,7 @@ class BeansFeedConverterTest {
                         "java.util.Date",
                         BeansFeed.ProxyType.NO_PROXYING,
                         Set.of("abc", "bcd"),
+                        "enclosingClass#factoryMethod",
                         Set.of(
                                 new BeanDependency(
                                         "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
