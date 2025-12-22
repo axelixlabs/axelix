@@ -32,8 +32,9 @@ import org.jspecify.annotations.Nullable;
 public record PropertyMetadata(@Nullable String description, @Nullable Deprecation deprecation) {
 
     /**
-     * @param reason the reason why the given property is deprecated.
-     * @param replacement the name of the property that potentially aims to replace the given deprecated property.
+     * Deprecation metadata for a property.
+     *
+     * @param message explaining why the property is deprecated and, optionally, what should be used instead.
      */
-    public record Deprecation(@Nullable String reason, @Nullable String replacement) {}
+    public record Deprecation(String message) {}
 }

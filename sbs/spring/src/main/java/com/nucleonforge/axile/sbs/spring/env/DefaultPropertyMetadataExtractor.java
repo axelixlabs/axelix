@@ -54,6 +54,11 @@ import com.nucleonforge.axile.sbs.spring.env.PropertyMetadata.Deprecation;
  */
 public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtractor {
 
+    private static final String DEFAULT_DEPRECATION_MESSAGE =
+            "Property marked as deprecated by spring-boot configuration processor";
+
+    private static final String DEPRECATION_PREFIX = "Deprecated in favor of";
+
     private static final Logger log = LoggerFactory.getLogger(DefaultPropertyMetadataExtractor.class);
 
     private final ConfigurableEnvironment configurableEnvironment;
@@ -134,7 +139,8 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
         }
     }
 
-    public @Nullable PropertyMetadata buildPropertyMetadata(JsonNode propertyNode) {
+    @Nullable
+    public PropertyMetadata buildPropertyMetadata(JsonNode propertyNode) {
         boolean deprecated = false;
         String reason = null;
         String replacement = null;
@@ -154,11 +160,37 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
             }
         }
 
-        if (deprecated || StringUtils.hasText(description)) {
-            return new PropertyMetadata(description, deprecated ? new Deprecation(reason, replacement) : null);
-        } else {
+        if (!deprecated && !StringUtils.hasText(description)) {
             return null;
         }
+
+        if (deprecated) {
+            String message = buildDeprecationMessage(reason, replacement);
+            return new PropertyMetadata(description, new Deprecation(message));
+        }
+
+        return new PropertyMetadata(description, null);
+    }
+
+    // NullAway cannot infer that StringUtils.hasText(reason) guarantees a non-null value here.
+    @SuppressWarnings("NullAway")
+    private String buildDeprecationMessage(@Nullable String reason, @Nullable String replacement) {
+        boolean hasReason = StringUtils.hasText(reason);
+        boolean hasReplacement = StringUtils.hasText(replacement);
+
+        if (hasReason && hasReplacement) {
+            return "%s %s %s property.".formatted(reason, DEPRECATION_PREFIX, replacement);
+        }
+
+        if (hasReason) {
+            return reason;
+        }
+
+        if (hasReplacement) {
+            return "%s %s property.".formatted(DEPRECATION_PREFIX, replacement);
+        }
+
+        return DEFAULT_DEPRECATION_MESSAGE;
     }
 
     @Nullable

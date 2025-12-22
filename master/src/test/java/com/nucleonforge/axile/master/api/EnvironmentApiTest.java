@@ -112,8 +112,7 @@ class EnvironmentApiTest {
                   "configPropsBeanName": null,
                   "description": "Location of the log file. For instance, `/var/log`.",
                   "deprecation": {
-                      "reason": null,
-                      "replacement": "logging.file.path"
+                      "message": "Deprecated in favor of logging.file.path property."
                   }
                 }
               ]
@@ -237,8 +236,7 @@ class EnvironmentApiTest {
                   "configPropsBeanName": null,
                   "description": "Location of the log file. For instance, `/var/log`.",
                   "deprecation": {
-                      "reason": null,
-                      "replacement": "logging.file.path"
+                      "message": "Deprecated in favor of logging.file.path property."
                   },
                   "injectionPoints": null
                 }
