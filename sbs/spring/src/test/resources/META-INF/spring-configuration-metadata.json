@@ -4,8 +4,28 @@
       "name": "prop.test.server.port",
       "description": "Server HTTP port.",
       "deprecation": {
-        "reason": "Just because",
+        "reason": "Just because.",
         "replacement": "new.prop.test.server.port"
+      }
+    },
+    {
+      "name": "prop.test.server.port",
+      "description": "Server HTTP port.",
+      "deprecation": {
+        "reason": "Just because.",
+        "replacement": "new.prop.test.server.port"
+      }
+    },
+    {
+      "name": "custom.test.without.reason.property",
+      "deprecation": {
+        "replacement": "new.custom.test.without.reason.property"
+      }
+    },
+    {
+      "name": "custom.test.without.replacement.property",
+      "deprecation": {
+        "reason": "Marked for deletion."
       }
     },
     {

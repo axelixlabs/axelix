@@ -82,7 +82,7 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
             return null;
         }
 
-        return new EnvironmentFeedResponse.Deprecation(deprecation.reason(), deprecation.replacement());
+        return new EnvironmentFeedResponse.Deprecation(deprecation.message());
     }
 
     private @Nullable List<EnvironmentFeedResponse.InjectionPoint> mapInjectionPoints(

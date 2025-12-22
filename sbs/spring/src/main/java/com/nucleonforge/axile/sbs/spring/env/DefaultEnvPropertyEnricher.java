@@ -146,9 +146,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
             return null;
         }
 
-        return new Deprecation(
-                propertyMetadata.deprecation().reason(),
-                propertyMetadata.deprecation().replacement());
+        return new Deprecation(propertyMetadata.deprecation().message());
     }
 
     private Map<String, String> buildConfigPropsMappingMap() {

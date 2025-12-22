@@ -79,12 +79,9 @@ public record EnvironmentFeed(
     /**
      * DTO that encapsulates the deprecation property of the given artifact.
      *
-     * @param reason        the reason why the given property is deprecated.
-     * @param replacement   the name of the property that potentially aims to replace the given deprecated property.
+     * @param message explaining why the property is deprecated and, optionally, what should be used instead.
      */
-    public record Deprecation(
-            @JsonProperty("reason") @Nullable String reason,
-            @JsonProperty("replacement") @Nullable String replacement) {}
+    public record Deprecation(@JsonProperty("message") String message) {}
 
     /**
      * InjectionPoint represents a point in the code where a property is injected.
