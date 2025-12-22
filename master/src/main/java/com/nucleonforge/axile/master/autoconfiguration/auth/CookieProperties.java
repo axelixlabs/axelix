@@ -21,9 +21,13 @@ package com.nucleonforge.axile.master.autoconfiguration.auth;
  * @since 11.12.2025
  * @author Nikita Kirillov
  */
+@SuppressWarnings("NullAway.Init")
 public class CookieProperties {
 
-    private String name = "auth_token";
+    /**
+     * Name of cookie.
+     */
+    private String name;
 
     /**
      * Secure attribute for cookies.

@@ -26,3 +26,6 @@ axile:
         credentials:
           password: admin
           username: admin
+      cookie:
+        name: auth_token
+        secure: false
