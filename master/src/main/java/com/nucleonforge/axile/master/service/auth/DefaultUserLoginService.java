@@ -19,7 +19,7 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axile.common.auth.core.User;
+import com.nucleonforge.axile.common.auth.rbac.core.User;
 import com.nucleonforge.axile.master.exception.auth.AuthenticationException;
 import com.nucleonforge.axile.master.exception.auth.InvalidCredentialsException;
 import com.nucleonforge.axile.master.service.auth.jwt.JwtEncoderService;

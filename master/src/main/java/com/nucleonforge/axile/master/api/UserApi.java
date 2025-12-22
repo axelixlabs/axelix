@@ -108,7 +108,6 @@ public class UserApi {
                 .build();
     }
 
-    // TODO: Cover this API with tests.
     /**
      * Logout current user.
      *
@@ -139,10 +138,7 @@ public class UserApi {
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
     @PostMapping(path = ApiPaths.UsersApi.LOGOUT)
-    // TODO:
-    //  That is wrong. The name of the cookie must be configurable as it currently is in the
-    //  CookieProperties configuration properties class.
-    public ResponseEntity<?> login(@CookieValue(name = "auth_token") String authToken) {
+    public ResponseEntity<?> logout(@CookieValue(name = "${axile.master.auth.cookie.name}") String authToken) {
         ResponseCookie cookie = cookieService.buildExpiredAuthCookie(authToken);
 
         return ResponseEntity.status(HttpStatus.OK)
