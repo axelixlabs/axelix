@@ -39,32 +39,32 @@ interface IStackFrame {
     lineNumber: number;
 
     /**
-     *  Name of the method
+     * Name of the method that is currently executed
      */
     methodName: string;
 
     /**
-     *  True if this is a native method
+     * True if this is a native method
      */
     nativeMethod: boolean;
 
     /**
-     *  Module name (if module system is used)
+     * The name of the java module where current class resides (if module system is used)
      */
     moduleName?: string;
 
     /**
-     *  Module version
+     * Module version
      */
     moduleVersion?: string;
 
     /**
-     *  Class loader name
+     * Class loader name
      */
     classLoaderName?: string;
 
     /**
-     *  Source file name
+     * Source file name
      */
     fileName?: string;
 }
@@ -91,7 +91,7 @@ export interface IThread {
     threadId: number;
 
     /**
-     * Time (ms) the thread was blocked
+     * The total time (in ms) the thread spent being blocked
      */
     blockedTime: number;
 
@@ -101,7 +101,7 @@ export interface IThread {
     blockedCount: number;
 
     /**
-     * Time (ms) the thread was waiting
+     * The total time (in ms) the thread spent in WAITING/TIMED_WAITING state
      */
     waitedTime: number;
 

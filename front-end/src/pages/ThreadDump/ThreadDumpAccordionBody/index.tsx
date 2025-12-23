@@ -19,6 +19,7 @@ import type { IThread } from "models";
 
 import { ThreadDumpLockInfo } from "../ThreadDumpLockInfo";
 import { ThreadDumpRow } from "../ThreadDumpRow";
+import ThreadDumpTrackableValue from "../ThreadDumpRow/ThreadDumpRowTooltipValue";
 import { ThreadDumpStackTrace } from "../ThreadDumpStackTrace";
 
 import styles from "./styles.module.css";
@@ -27,29 +28,50 @@ interface IProps {
     /**
      *  An object representing the thread dump.
      */
-    threadDump: IThread;
+    thread: IThread;
 }
 
-export const ThreadDumpAccordionBody = ({ threadDump }: IProps) => {
+export const ThreadDumpAccordionBody = ({ thread }: IProps) => {
     const { t } = useTranslation();
 
     return (
         <>
             <div className={styles.AccordionBody}>
-                <ThreadDumpRow title={t("ThreadDump.id")} value={threadDump.threadId} />
-                <ThreadDumpRow title={t("ThreadDump.name")} value={threadDump.threadName} />
-                <ThreadDumpRow title={t("ThreadDump.state")} value={threadDump.threadState} />
-                <ThreadDumpRow title={t("ThreadDump.priority")} value={threadDump.priority} />
-                <ThreadDumpRow title={t("ThreadDump.blockedCount")} value={threadDump.blockedCount} />
-                <ThreadDumpRow title={t("ThreadDump.blockedTime")} value={threadDump.blockedTime} />
-                <ThreadDumpRow title={t("ThreadDump.waitedCount")} value={threadDump.waitedCount} />
-                <ThreadDumpRow title={t("ThreadDump.daemon")} value={String(threadDump.daemon)} />
+                <ThreadDumpRow title={t("ThreadDump.id")} value={thread.threadId} />
+                <ThreadDumpRow title={t("ThreadDump.name")} value={thread.threadName} />
+                <ThreadDumpRow title={t("ThreadDump.state")} value={thread.threadState} />
+                <ThreadDumpRow title={t("ThreadDump.priority")} value={thread.priority} />
+                <ThreadDumpRow title={t("ThreadDump.blockedCount")} value={thread.blockedCount} />
                 <ThreadDumpRow
-                    title={t("ThreadDump.lockInfo")}
-                    value={<ThreadDumpLockInfo threadDump={threadDump} />}
+                    title={t("ThreadDump.blockedTime")}
+                    value={
+                        <ThreadDumpTrackableValue
+                            value={thread.blockedTime}
+                            parameterName={"blockedTime"}
+                        ></ThreadDumpTrackableValue>
+                    }
                 />
+                <ThreadDumpRow title={t("ThreadDump.waitedCount")} value={thread.waitedCount} />
+                <ThreadDumpRow
+                    title={t("ThreadDump.waitedTime")}
+                    value={
+                        <ThreadDumpTrackableValue
+                            value={thread.waitedTime}
+                            parameterName={"waitedTime"}
+                        ></ThreadDumpTrackableValue>
+                    }
+                />
+
+                <ThreadDumpRow title={t("ThreadDump.daemon")} value={String(thread.daemon)} />
+                {thread.lockInfo && (
+                    <ThreadDumpRow
+                        title={t("ThreadDump.lockInfo")}
+                        value={<ThreadDumpLockInfo threadDump={thread} />}
+                    />
+                )}
+                {/* TODO: Add thread lock owner tree similar to lockInfo above*/}
             </div>
-            <ThreadDumpStackTrace threadDump={threadDump} />
+            <ThreadDumpStackTrace threadDump={thread} />
         </>
     );
 };

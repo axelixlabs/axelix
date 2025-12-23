@@ -180,21 +180,23 @@
         "blog": "Блог"
     },
     "ThreadDump": {
-        "title": "Дамп потоков",
-        "id": "id потока",
+        "title": "Дамп Потоков",
+        "id": "Id потока",
         "name": "Имя потока",
         "state": "Состояние потока",
-        "blockedCount": "Количество блокировок",
-        "blockedTime": "Время блокировки",
-        "waitedCount": "Количество ожиданий",
-        "lockName": "Имя блокировки",
-        "lockOwnerId": "id владельца блокировки",
+        "blockedCount": "Счётчик блокировок",
+        "blockedTime": "Общее время блокировки",
+        "waitedCount": "Счётчик ожиданий",
+        "waitedTime": "Общее время ожидания",
+        "lockOwnerId": "Id владельца блокировки",
         "lockOwnerName": "Имя владельца блокировки",
-        "className": "Имя класса",
-        "identityHashCode": "Хеш-код идентичности",
+        "className": "Класса",
+        "identityHashCode": "Хеш-код объекта блокировки",
         "priority": "Приоритет",
         "daemon": "Демон",
-        "lockInfo": "Информация о блокировке",
-        "stacktrace": "Стек вызовов"
+        "lockInfo": "Заблокирован на",
+        "lock": "Блокировка",
+        "stacktrace": "Стек вызовов",
+        "notAvailable" : "Не Доступно"
     }
 }

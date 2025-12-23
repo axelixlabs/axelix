@@ -24,10 +24,10 @@ export const ThreadDumpTimeLine = () => {
     const [timeSlots, setTimeSlots] = useState<Date[]>([]);
 
     useEffect(() => {
-        generateTimeSlots(setTimeSlots);
+        setTimeSlots(generateTimeSlots());
 
         const intervalId = setInterval(() => {
-            generateTimeSlots(setTimeSlots);
+            setTimeSlots(generateTimeSlots());
         }, TEN_MINUTES_MILLISECDONDS);
 
         return () => clearInterval(intervalId);

@@ -32,30 +32,6 @@ export const ThreadDumpLockInfo = ({ threadDump }: IProps) => {
 
     const children: TreeDataNode[] = [];
 
-    if (threadDump.lockName) {
-        children.push({
-            title: (
-                <div className={styles.ContentWrapper}>
-                    <div className={styles.ContentLabel}>{t("ThreadDump.lockName")}:</div>
-                    <div>{threadDump.lockName}</div>
-                </div>
-            ),
-            key: `${threadDump.threadId}-lockName`,
-        });
-    }
-
-    if (threadDump.lockOwnerName) {
-        children.push({
-            title: (
-                <div className={styles.ContentWrapper}>
-                    <div className={styles.ContentLabel}>{t("ThreadDump.lockOwnerName")}:</div>
-                    <div>{threadDump.lockOwnerName}</div>
-                </div>
-            ),
-            key: `${threadDump.threadId}-lockOwnerName`,
-        });
-    }
-
     if (threadDump.lockInfo) {
         children.push({
             title: (
@@ -84,8 +60,7 @@ export const ThreadDumpLockInfo = ({ threadDump }: IProps) => {
         {
             title: (
                 <div className={styles.ContentWrapper}>
-                    <div className={styles.ContentLabel}>{t("ThreadDump.lockOwnerId")}:</div>
-                    <div>{threadDump.lockOwnerId}</div>
+                    <div className={styles.ContentLabel}>{t("ThreadDump.lock")}:</div>
                 </div>
             ),
             key: `${threadDump.threadId}-root`,
@@ -97,8 +72,7 @@ export const ThreadDumpLockInfo = ({ threadDump }: IProps) => {
         <Tree expandAction="click" showLine treeData={treeData} className={styles.Tree} />
     ) : (
         <div className={styles.ContentWrapper}>
-            <div className={styles.ContentLabel}>{t("ThreadDump.lockOwnerId")}:</div>
-            <div>{threadDump.lockOwnerId}</div>
+            <div className={styles.ContentLabel}>{t("ThreadDump.lock")}:</div>
         </div>
     );
 };

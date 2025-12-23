@@ -1,0 +1,5 @@
+.ValueWrapper {
+    display: flex;
+    gap: 8px;
+    vertical-align: center;
+}
