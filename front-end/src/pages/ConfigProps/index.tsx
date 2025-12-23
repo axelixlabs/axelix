@@ -26,7 +26,7 @@ import { getConfigPropsData } from "services";
 
 import { ConfigPropsTables } from "./ConfigPropsTables";
 
-export const ConfigProps = () => {
+const ConfigProps = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 

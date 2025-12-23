@@ -35,7 +35,7 @@ import { NegativeConditions } from "./NegativeConditions";
 import { PositiveConditions } from "./PositiveConditions";
 import styles from "./styles.module.css";
 
-export const Conditions = () => {
+const Conditions = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 

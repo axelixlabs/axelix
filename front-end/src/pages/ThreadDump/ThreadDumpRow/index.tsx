@@ -13,17 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./scheduledTasks";
-export * from "./environment";
-export * from "./configProps";
-export * from "./threadDump";
-export * from "./conditions";
-export * from "./wallboard";
-export * from "./dashboard";
-export * from "./loggers";
-export * from "./globals";
-export * from "./details";
-export * from "./metrics";
-export * from "./caches";
-export * from "./beans";
-export * from "./auth";
+import type { ReactNode } from "react";
+
+import styles from "./styles.module.css";
+
+interface IProps {
+    /**
+     * The title of the row.
+     */
+    title: string;
+
+    /**
+     * The content or value.
+     * Can be any valid React node.
+     */
+    value: ReactNode;
+}
+
+export const ThreadDumpRow = ({ title, value }: IProps) => {
+    return (
+        <>
+            <div className={styles.AccordionBodyChunkTitle}>{title}:</div>
+            <div>{value}</div>
+        </>
+    );
+};

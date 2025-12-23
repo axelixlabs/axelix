@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./scheduledTasks";
-export * from "./environment";
-export * from "./configProps";
-export * from "./threadDump";
-export * from "./conditions";
-export * from "./wallboard";
-export * from "./dashboard";
-export * from "./loggers";
-export * from "./globals";
-export * from "./details";
-export * from "./metrics";
-export * from "./caches";
-export * from "./beans";
-export * from "./auth";
+export enum EThreadState {
+    NEW = "NEW",
+    RUNNABLE = "RUNNABLE",
+    BLOCKED = "BLOCKED",
+    WAITING = "WAITING",
+    TIMED_WAITING = "TIMED_WAITING",
+    TERMINATED = "TERMINATED",
+}
+
+export enum EThreadDumpStateColors {
+    BLUE = "Blue",
+    GREEN = "Green",
+    ORANGE = "Orange",
+    RED = "Red",
+    YELLOW = "Yellow",
+    WHITE = "White",
+    GREY = "GREY",
+}

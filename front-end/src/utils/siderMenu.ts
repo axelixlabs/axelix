@@ -34,6 +34,7 @@ export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
         },
         { key: `/instance/${instanceId}/loggers`, label: t("Sider.loggers") },
         { key: `/instance/${instanceId}/jvm`, label: "JVM" },
+        { key: `/instance/${instanceId}/thread-dump`, label: t("Sider.threadDump") },
         { key: `/instance/${instanceId}/mappings`, label: t("Sider.mappings") },
         { key: `/instance/${instanceId}/caches`, label: t("Sider.caches") },
     ];

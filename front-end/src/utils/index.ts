@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 export * from "./scheduledTasks";
+export * from "./threadDump";
 export * from "./siderMenu";
 export * from "./dashboard";
 export * from "./loggers";
