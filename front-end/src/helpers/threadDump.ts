@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Dispatch, SetStateAction } from "react";
-
 import { EThreadDumpStateColors, EThreadState, type IThread } from "models";
 import { FIFTEEN_SECONDS, TEN_MINUTES_MILLISECDONDS } from "utils";
 
@@ -47,7 +45,7 @@ export const threadStateColor = (singleHistory: IThread) => {
     }
 };
 
-export const generateTimeSlots = (setter: Dispatch<SetStateAction<Date[]>>): void => {
+export const generateTimeSlots = () => {
     const now = new Date();
 
     // 15 seconds interval between time slots
@@ -65,5 +63,5 @@ export const generateTimeSlots = (setter: Dispatch<SetStateAction<Date[]>>): voi
         currentTime = new Date(currentTime.getTime() + stepMilliseconds);
     }
 
-    setter(slots);
+    return slots;
 };

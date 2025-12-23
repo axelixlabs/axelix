@@ -61,7 +61,7 @@ const ThreadDump = () => {
     return (
         <>
             <div className={styles.TitleAndTimelineWrapper}>
-                <div className={`MediumTitle ${styles.MainTitle}`}>{t("ThreadDump.title")}</div>
+                <div className={`TextMedium ${styles.MainTitle}`}>{t("ThreadDump.title")}</div>
                 <ThreadDumpTimeLine />
             </div>
 
@@ -72,7 +72,7 @@ const ThreadDump = () => {
                         key={threadDump.threadId}
                         hideArrowIcon
                     >
-                        <ThreadDumpAccordionBody threadDump={threadDump} />
+                        <ThreadDumpAccordionBody thread={threadDump} />
                     </Accordion>
                 ))}
             </div>

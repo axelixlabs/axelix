@@ -187,14 +187,17 @@
         "blockedCount": "Blocked count",
         "blockedTime": "Blocked time",
         "waitedCount": "Waited count",
+        "waitedTime": "Waited time",
         "lockName": "Lock name",
         "lockOwnerId": "Lock owner id",
         "lockOwnerName": "Lock owner name",
-        "className": "Classname",
+        "className": "Class",
         "identityHashCode": "Identity hash code",
         "priority": "Priority",
         "daemon": "Daemon",
-        "lockInfo": "Lock info",
-        "stacktrace": "Stacktrace"
+        "lockInfo": "Locked by",
+        "lock": "Lock",
+        "stacktrace": "Stacktrace",
+        "notAvailable" : "Not Available"
     }
 }
