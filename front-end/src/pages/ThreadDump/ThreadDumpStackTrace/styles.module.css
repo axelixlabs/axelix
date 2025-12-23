@@ -3,14 +3,14 @@
     color: var(--axile-bold-grey);
 }
 
-.lll {
+.TraceLine {
     display: flex;
     align-items: center;
     column-gap: 8px;
     margin-top: 8px;
 }
 
-.NativeTag{
+.NativeTag {
     border: 1px solid var(--axile-primary-green);
     background-color: var(--axile-primary-light-green);
     color: var(--axile-primary-green);

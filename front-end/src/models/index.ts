@@ -35,5 +35,6 @@ export * from "./types/antd";
 export * from "./enums/conditions";
 export * from "./enums/threadDump";
 export * from "./enums/details";
+export * from "./enums/globals";
 export * from "./enums/loggers";
 export * from "./enums/beans";
