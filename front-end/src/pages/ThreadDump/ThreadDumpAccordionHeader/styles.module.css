@@ -10,10 +10,11 @@
     place-items: center;
     height: 30px;
     width: 30px;
-    color: #ffffff;
+    color: #fff;
     border-radius: var(--axile-border-radius-large);
 }
 
+/* stylelint-disable */
 .NEW {
     background-color: #838383;
 }
@@ -37,3 +38,4 @@
 .TERMINATED {
     background-color: #1890ff;
 }
+/* stylelint-enable */
