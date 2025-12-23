@@ -1,0 +1,19 @@
+.AccordionBody {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 20px;
+}
+
+.Value {
+  word-break: break-all;
+}
+
+.LinkIcon {
+  margin-left: 8px;
+}
+
+.InjectionPointWrapper:not(:last-child) {
+  border-bottom: 1px solid var(--axile-medium-grey);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+}

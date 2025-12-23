@@ -16,9 +16,7 @@
 import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 
 import { Button, Input, Tooltip } from "antd";
-import { CrownIcon } from "components/CrownIcon";
-import { InfoIcon } from "components/InfoIcon";
-import { useState } from "react";
+import { type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
@@ -27,6 +25,8 @@ import type { IEnvProperties } from "models";
 import { updatePropertyThunk } from "store/thunks";
 
 import styles from "./styles.module.css";
+
+import CrownIcon from "assets/icons/crown.svg";
 
 interface IProps {
     /**
@@ -38,7 +38,7 @@ interface IProps {
 // TODO: ESLint is complaining about the complexity of this component. In the future, when we start using separate components on this page, we will address this.
 // eslint-disable-next-line
 export const EnvironmentPropertyValue = ({ property }: IProps) => {
-    const { name, value, isPrimary, description, deprecation } = property;
+    const { name, value, isPrimary } = property;
 
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
@@ -47,7 +47,8 @@ export const EnvironmentPropertyValue = ({ property }: IProps) => {
     const [editProperty, setEditProperty] = useState<boolean>(false);
     const [newPropertyValue, setNewPropertyValue] = useState<string>(value);
 
-    const updatePropertyClickHandler = (): void => {
+    const updatePropertyClickHandler = (e: MouseEvent<HTMLButtonElement>): void => {
+        e.stopPropagation();
         dispatch(
             updatePropertyThunk({
                 instanceId: instanceId!,
@@ -63,7 +64,7 @@ export const EnvironmentPropertyValue = ({ property }: IProps) => {
             {editProperty ? (
                 <div className={styles.EditPropertyWrapper}>
                     <Input
-                        value={newPropertyValue}
+                        value={newPropertyValue || "null"}
                         onChange={(e) => setNewPropertyValue(e.target.value)}
                         className={styles.EditPropertyField}
                     />
@@ -71,7 +72,8 @@ export const EnvironmentPropertyValue = ({ property }: IProps) => {
                     <Button
                         icon={<CloseOutlined />}
                         type="primary"
-                        onClick={() => {
+                        onClick={(e) => {
+                            e.stopPropagation();
                             setEditProperty(false);
                             setNewPropertyValue(value);
                         }}
@@ -87,51 +89,21 @@ export const EnvironmentPropertyValue = ({ property }: IProps) => {
                 </div>
             ) : (
                 <div className={styles.PropertyValueWrapper}>
-                    {value ?? "null"}
+                    {value || "null"}
                     <Button
                         icon={<EditOutlined />}
                         type="primary"
-                        onClick={() => setEditProperty(true)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setEditProperty(true);
+                        }}
                         className={styles.EditButton}
                     />
-
-                    <Tooltip
-                        title={
-                            <>
-                                {t("Environments.primaryProperty")}
-                                {deprecation && (
-                                    <div className={styles.Deprecation}>
-                                        {deprecation?.reason && (
-                                            <>
-                                                <div>{t("Environments.reason")}:</div>
-                                                <div className={styles.DeprecationValues}>{deprecation.reason}</div>
-                                            </>
-                                        )}
-
-                                        {deprecation?.replacement && (
-                                            <>
-                                                <div>{t("Environments.replacement")}:</div>
-                                                <div className={styles.DeprecationValues}>
-                                                    {deprecation.replacement}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                )}
-                            </>
-                        }
-                    >
-                        <span className={!isPrimary ? styles.IconPlaceholder : ""}>
-                            <CrownIcon color={deprecation ? "#ff000a" : undefined} />
-                        </span>
-                    </Tooltip>
-                    <Tooltip title={description}>
-                        <span className={!description ? styles.IconPlaceholder : ""}>
-                            <InfoIcon color="#2196F3" />
-                        </span>
-                    </Tooltip>
                 </div>
             )}
+            <Tooltip title={t("Environments.primaryProperty")}>
+                <img src={CrownIcon} alt="Crown icon" className={!isPrimary ? styles.IconPlaceholder : ""} />
+            </Tooltip>
         </div>
     );
 };

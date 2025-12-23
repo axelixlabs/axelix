@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AutoComplete, type AutoCompleteProps, Input } from "antd";
+import { AutoComplete, type AutoCompleteProps, Input, Space } from "antd";
 import { type Dispatch, type SetStateAction, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -56,23 +56,26 @@ export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, removeB
 
     if (autocompleteOptions) {
         return (
-            <AutoComplete
-                options={autocompleteOptions}
-                onChange={(value) => scheduleSetSearch(value)}
-                onSelect={(value) => setSearch(value)}
-                className={`${styles.Search} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}
+            <Space.Compact
+                className={`${styles.SearchWrapper} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}
             >
-                <Input placeholder={t("search")} addonAfter={addonAfter} />
-            </AutoComplete>
+                <AutoComplete
+                    options={autocompleteOptions}
+                    onChange={(value) => scheduleSetSearch(value)}
+                    onSelect={(value) => setSearch(value)}
+                    className={`${styles.Search}`}
+                >
+                    <Input placeholder={t("search")} />
+                </AutoComplete>
+                {addonAfter && <Space.Addon className={styles.AddonAfter}>{addonAfter}</Space.Addon>}
+            </Space.Compact>
         );
     }
 
     return (
-        <Input
-            placeholder={t("search")}
-            addonAfter={addonAfter}
-            onChange={(e) => scheduleSetSearch(e.target.value)}
-            className={`${styles.Search} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}
-        />
+        <Space.Compact className={`${styles.SearchWrapper} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}>
+            <Input placeholder={t("search")} onChange={(e) => scheduleSetSearch(e.target.value)} />
+            {addonAfter && <Space.Addon className={styles.AddonAfter}>{addonAfter}</Space.Addon>}
+        </Space.Compact>
     );
 };

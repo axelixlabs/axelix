@@ -1,5 +1,9 @@
-.MainWrapper {
-    padding-right: 20px;
+.MainWrapper{
+    display: flex;
+    justify-content: flex-end;
+    column-gap: 20px;
+    padding-right: 40px;
+    width: 100%;
 }
 
 .PropertyValueWrapper {
@@ -9,24 +13,13 @@
     column-gap: 20px;
 }
 
-.Deprecation {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-.DeprecationValues {
-    word-break: break-all;
-}
-
 .IconPlaceholder {
     visibility: hidden;
     pointer-events: none;
 }
 
 .EditPropertyField {
-    max-width: 400px;
+    width: min(300px, 100%);
 }
 
 .EditButton,
@@ -38,5 +31,6 @@
 .EditPropertyWrapper {
     display: flex;
     justify-content: flex-end;
+    width: 100%;
     column-gap: 8px;
 }

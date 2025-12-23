@@ -59,8 +59,10 @@
     "Environments": {
         "activeProfiles": "Профили",
         "primaryProperty": "Основной экземпляр",
-        "reason": "Причина",
-        "replacement": "Замена"
+        "deprecated": "Устаревшее",
+        "description": "Описание",
+        "configProps": "Параметры конфигурации",
+        "injectedIn": "Внедряется в"
     },
     "Loggers": {
         "loggers": "Логгеры",

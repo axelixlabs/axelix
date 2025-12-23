@@ -16,13 +16,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Accordion, EmptyHandler, Loader, PageSearch } from "components";
+import { EmptyHandler, HashNavigableHOC, Loader, PageSearch } from "components";
 import { fetchData, filterBeans } from "helpers";
 import { type IBeansResponseBody, StatefulRequest } from "models";
 import { getBeansData } from "services";
 
-import { BeanAccordionChildren } from "./BeanAccordionChildren";
-import { BeanAccordionLabels } from "./BeanAccordionLabels";
+import { BeansAccordionsList } from "./BeansAccordionsList";
 
 const Beans = () => {
     const { instanceId } = useParams();
@@ -51,13 +50,9 @@ const Beans = () => {
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
 
             <EmptyHandler isEmpty={!effectiveBeans.length}>
-                <div className="AccordionsWrapper">
-                    {effectiveBeans.map((bean) => (
-                        <Accordion header={<BeanAccordionLabels bean={bean} />} key={bean.beanName}>
-                            <BeanAccordionChildren bean={bean} />
-                        </Accordion>
-                    ))}
-                </div>
+                <HashNavigableHOC>
+                    <BeansAccordionsList effectiveBeans={effectiveBeans} />
+                </HashNavigableHOC>
             </EmptyHandler>
         </>
     );

@@ -13,25 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InfoTooltip } from "components";
-
-import type { IMetric } from "models";
-
-import styles from "./styles.module.css";
-
-interface IProps {
-    /**
-     * Single metric
-     */
-    metric: IMetric;
+export enum EEnvironmentsInjectionType {
+    FIELD = "FIELD",
+    METHOD = "METHOD",
+    CONSTRUCTOR_PARAMETER = "CONSTRUCTOR_PARAMETER",
+    METHOD_PARAMETER = "METHOD_PARAMETER",
 }
-
-export const MetricHeader = ({ metric }: IProps) => {
-    return (
-        <div className={styles.MainWrapper}>
-            <div>{metric.metricName}</div>
-
-            {metric.description && <InfoTooltip text={metric.description} />}
-        </div>
-    );
-};

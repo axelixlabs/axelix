@@ -15,7 +15,7 @@
  */
 import type { JSX } from "react";
 
-import type { EExportableComponent } from "../enums/details.ts";
+import type { EExportableComponent } from "../enums/details";
 
 export interface IDetailsGit {
     commitShaShort: string;
