@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { InfoTooltip } from "components";
-
 import type { IMetric } from "models";
 
 import styles from "./styles.module.css";

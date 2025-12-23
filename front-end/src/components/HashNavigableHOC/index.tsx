@@ -29,17 +29,23 @@ export const HashNavigableHOC = ({ children }: PropsWithChildren) => {
     //  is just not yet loaded from the backend. Once the data is loaded, the browser will not re-attempt
     //  to re-navigate to the requested 'hash', and therefore we have to do it manually here.
     useEffect(() => {
-        if (hash) {
-            const element = document.querySelector(hash);
-            if (element) {
-                element.scrollIntoView();
-
-                const header = element.querySelector(`.${accordionStyles.HeaderWrapper}`);
-                if (header) {
-                    header.classList.add(styles.Highlight);
-                }
-            }
+        if (!hash) {
+            return;
         }
+
+        const element = document.querySelector(hash);
+        if (!element) {
+            return;
+        }
+
+        element.scrollIntoView();
+
+        const header = element.querySelector(`.${accordionStyles.HeaderWrapper}`);
+        if (!header) {
+            return;
+        }
+
+        header.classList.add(styles.Highlight);
     }, [hash]);
 
     return <>{children}</>;
