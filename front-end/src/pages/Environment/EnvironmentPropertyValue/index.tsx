@@ -35,8 +35,6 @@ interface IProps {
     property: IEnvProperties;
 }
 
-// TODO: ESLint is complaining about the complexity of this component. In the future, when we start using separate components on this page, we will address this.
-// eslint-disable-next-line
 export const EnvironmentPropertyValue = ({ property }: IProps) => {
     const { name, value, isPrimary } = property;
 
