@@ -15,11 +15,11 @@
  */
 import { Tooltip } from "antd";
 import type { TooltipPlacement } from "antd/es/tooltip";
+import InfoIcon from "assets/icons/info.svg?react";
 import type { PropsWithChildren } from "react";
 
 import styles from "./styles.module.css";
 
-import InfoIcon from "assets/icons/info.svg";
 import QuestionIcon from "assets/icons/question.svg";
 
 interface IProps {
@@ -40,7 +40,7 @@ export const InfoTooltip = ({ children, text, placement = "right" }: PropsWithCh
             title={
                 <div className={styles.TooltipContentWrapper}>
                     <div>
-                        <img src={InfoIcon} alt="Info icon" className={styles.InfoIcon} />
+                        <InfoIcon color="#fff" className={styles.InfoIcon} />
                     </div>
                     {text}
                 </div>

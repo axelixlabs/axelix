@@ -1,9 +1,10 @@
 .MainWrapper {
+    width: 100%;
     padding-right: 100px;
 }
 
 .EditPropertyField {
-    max-width: 400px;
+    width: min(300px, 100%);
 }
 
 .EditButton,

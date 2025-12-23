@@ -22,10 +22,12 @@ describe("Filter propertySources", () => {
     const propertySources: IEnvironmentPropertySource[] = [
         {
             name: "server.ports",
+            description: null,
             properties: [],
         },
         {
             name: "AXILE_PROPERTY_SOURCE_NAME",
+            description: null,
             properties: [
                 {
                     name: "java.specification.version",

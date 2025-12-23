@@ -59,8 +59,10 @@
     "Environments": {
         "activeProfiles": "Profiles",
         "primaryProperty": "Primary property",
-        "reason": "Reason",
-        "replacement": "Replacement"
+        "deprecated": "Deprecated",
+        "description": "Description",
+        "configProps": "Configuration Properties",
+        "injectedIn": "Injected in"
     },
     "Loggers": {
         "loggers": "Loggers",

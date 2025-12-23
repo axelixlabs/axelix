@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { IEnvironmentPropertySource } from "models";
+import type { IEnvProperties, IEnvironmentPropertySource, IInjectionPoint } from "models";
 
 import { canonicalize } from "./globals";
 
@@ -24,7 +24,7 @@ export const filterPropertySources = (
     const formattedSearch = canonicalize(search);
 
     return propertySources.reduce<IEnvironmentPropertySource[]>((result, propertySource) => {
-        const { name, properties } = propertySource;
+        const { name, description, properties } = propertySource;
 
         const isNameMatch = name.includes(search.trim());
 
@@ -40,10 +40,40 @@ export const filterPropertySources = (
         if (filteredProperties.length) {
             result.push({
                 name: name,
+                description: description,
                 properties: filteredProperties,
             });
         }
 
         return result;
     }, []);
+};
+
+export const isDropdownNeededProperty = (property: IEnvProperties): boolean => {
+    const { configPropsBeanName, deprecation, description, injectionPoints } = property;
+
+    return !!(deprecation || description || injectionPoints || configPropsBeanName);
+};
+
+export const sortEnvironmentsProperties = (properties: IEnvProperties[]): IEnvProperties[] => {
+    return properties.toSorted((firstProperty, secondProperty) => {
+        const firstPropertySpecial = isDropdownNeededProperty(firstProperty) ? 1 : 0;
+        const secondPropertySpecial = isDropdownNeededProperty(secondProperty) ? 1 : 0;
+        return secondPropertySpecial - firstPropertySpecial;
+    });
+};
+
+/**
+ * Applies deduplication in case the property name is present in multiple property sources with the same name
+ */
+export const buildAutoCompleteOptions = (propertySources: IEnvironmentPropertySource[]) => {
+    return [...new Set(propertySources.flatMap(({ properties }) => properties).map((p) => p.name))].map((value) => {
+        return {
+            value: value,
+        };
+    });
+};
+
+export const uniqueInjectionPointsBeanNames = (injectionPoints: IInjectionPoint[]): string[] => {
+    return injectionPoints ? [...new Set(injectionPoints.map(({ beanName }) => beanName))] : [];
 };

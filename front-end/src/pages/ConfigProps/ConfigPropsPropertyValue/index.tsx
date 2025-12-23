@@ -58,7 +58,7 @@ export const ConfigPropsPropertyValue = ({ propertyName, propertyValue }: IProps
             {editProperty ? (
                 <div className={styles.EditPropertyWrapper}>
                     <Input
-                        value={newPropertyValue}
+                        value={newPropertyValue || "null"}
                         onChange={(e) => setNewPropertyValue(e.target.value)}
                         className={styles.EditPropertyField}
                     />
@@ -82,7 +82,7 @@ export const ConfigPropsPropertyValue = ({ propertyName, propertyValue }: IProps
                 </div>
             ) : (
                 <div className={styles.PropertyValueWrapper}>
-                    {propertyValue ?? "null"}
+                    {propertyValue || "null"}
                     <Button
                         icon={<EditOutlined />}
                         type="primary"

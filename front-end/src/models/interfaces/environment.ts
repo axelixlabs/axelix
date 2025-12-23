@@ -13,15 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { EEnvironmentsInjectionType } from "models/enums/environments";
+
 interface IDeprecation {
     /**
-     * Тhe reason for deprecation
+     * The message for deprecation
      */
-    reason: string | null;
+    message: string;
+}
+
+export interface IInjectionPoint {
     /**
-     * Deprecated property replacement
+     * The bean name of injection point
      */
-    replacement: string | null;
+    beanName: string;
+
+    /**
+     * Type of injected bean
+     */
+    injectionType: EEnvironmentsInjectionType;
+
+    /**
+     * The name of the target subject
+     */
+    targetName: string;
+
+    /**
+     * The expression of the property
+     */
+    propertyExpression: string;
 }
 
 export interface IEnvProperties {
@@ -29,26 +49,36 @@ export interface IEnvProperties {
      * The property name
      */
     name: string;
+
     /**
      * The property value
      */
     value: string;
+
     /**
      * True if propertyValue is primary, false otherwise
      */
     isPrimary: boolean;
+
     /**
      * Flag that designates that the bean is the config props bean.
      */
     configPropsBeanName: string | null;
+
     /**
      * The property description
      */
     description: string | null;
+
     /**
      * If true, the property is deprecated
      */
     deprecation?: IDeprecation;
+
+    /**
+     * The injection points list
+     */
+    injectionPoints?: IInjectionPoint[];
 }
 
 export interface IEnvironmentPropertySource {
@@ -56,6 +86,12 @@ export interface IEnvironmentPropertySource {
      * Environment property source name
      */
     name: string;
+
+    /**
+     * The description of property source
+     */
+    description: string | null;
+
     /**
      * Environment properties list
      */
@@ -72,6 +108,7 @@ export interface IEnvironmentResponseBody {
      * Environment default profiles list
      */
     defaultProfiles: string[];
+
     /**
      * Environment property sources list
      */

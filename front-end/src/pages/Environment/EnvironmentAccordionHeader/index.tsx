@@ -13,25 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { InfoTooltip } from "components";
+import { Copy } from "components";
+import type { IEnvProperties } from "models";
 
-import type { IMetric } from "models";
+import { EnvironmentPropertyValue } from "../EnvironmentPropertyValue";
 
 import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * Single metric
+     * Single property
      */
-    metric: IMetric;
+    property: IEnvProperties;
 }
 
-export const MetricHeader = ({ metric }: IProps) => {
-    return (
-        <div className={styles.MainWrapper}>
-            <div>{metric.metricName}</div>
+export const EnvironmentAccordionHeader = ({ property }: IProps) => {
+    const { name } = property;
 
-            {metric.description && <InfoTooltip text={metric.description} />}
+    return (
+        <div key={name} className={styles.MainWrapper}>
+            <div className={styles.KeyChunk}>
+                {name} <Copy text={name} />
+            </div>
+            <div className={styles.ValueChunk}>
+                <EnvironmentPropertyValue property={property} />
+            </div>
         </div>
     );
 };
