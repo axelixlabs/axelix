@@ -27,7 +27,7 @@ import { getEnvironmentData } from "services";
 import { EnvironmentProfiles } from "./EnvironmentProfiles";
 import { EnvironmentTables } from "./EnvironmentTables";
 
-export const Environment = () => {
+const Environment = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 

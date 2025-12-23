@@ -1,0 +1,12 @@
+.Tree {
+    margin-left: -5px;
+}
+
+.ContentWrapper {
+    display: flex;
+    column-gap: 8px;
+}
+
+.ContentLabel {
+    flex-shrink: 0;
+}

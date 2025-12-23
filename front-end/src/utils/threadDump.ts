@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./scheduledTasks";
-export * from "./environment";
-export * from "./configProps";
-export * from "./threadDump";
-export * from "./conditions";
-export * from "./wallboard";
-export * from "./dashboard";
-export * from "./loggers";
-export * from "./globals";
-export * from "./details";
-export * from "./metrics";
-export * from "./caches";
-export * from "./beans";
-export * from "./auth";
+import { EThreadState } from "models";
+
+export const threadDumpStateLetters: Record<EThreadState, string> = {
+    [EThreadState.NEW]: "N",
+    [EThreadState.RUNNABLE]: "R",
+    [EThreadState.BLOCKED]: "B",
+    [EThreadState.WAITING]: "W",
+    [EThreadState.TIMED_WAITING]: "T",
+    [EThreadState.TERMINATED]: "F",
+};
+
+export const TEN_MINUTES_MILLISECDONDS = 10 * 60 * 1000;
+export const FIFTEEN_SECONDS = 15 * 1000;

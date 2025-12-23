@@ -19,6 +19,7 @@ export * from "./interfaces/configProps";
 export * from "./interfaces/conditions";
 export * from "./interfaces/wallboard";
 export * from "./interfaces/dashboard";
+export * from "./interfaces/threadDump";
 export * from "./interfaces/metrics";
 export * from "./interfaces/details";
 export * from "./interfaces/globals";
@@ -32,7 +33,8 @@ export * from "./types/conditions";
 export * from "./types/antd";
 
 export * from "./enums/conditions";
-export * from "./enums/globals.ts";
+export * from "./enums/threadDump";
 export * from "./enums/details";
+export * from "./enums/globals";
 export * from "./enums/loggers";
 export * from "./enums/beans";

@@ -1,0 +1,18 @@
+.TitleAndTimelineWrapper {
+    height: 58px;
+    position: sticky;
+    top: var(--axile-header-height);
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+    margin-bottom: 30px;
+    z-index: 9;
+}
+
+.MainTitle {
+    flex-shrink: 0;
+
+    /* This size is measured from the start of the accordion to the end of the thread name */
+    width: 488px;
+}

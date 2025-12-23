@@ -7,6 +7,7 @@
     top: var(--axile-header-height);
     height: 100vh;
     background-color: #fff;
+    z-index: 10;
 }
 
 .Content {
@@ -22,4 +23,13 @@
 .ContentLayout {
     margin-top: var(--axile-header-height);
     padding: 24px;
+}
+
+.ThreadDumpContentLayout {
+    min-width: max-content;
+}
+
+.ThreadDumpContent {
+    width: max-content;
+    min-width: 100vw;
 }

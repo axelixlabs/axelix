@@ -85,7 +85,8 @@
         "conditions": "Conditions",
         "loggers": "Loggers",
         "mappings": "Mappings",
-        "caches": "Caches"
+        "caches": "Caches",
+        "threadDump": "Thread Dump"
     },
     "Caches": {
         "clearAll": "Clear All Caches",
@@ -177,5 +178,23 @@
         "bug": "If you found a bug, want to propose a feature or submit a pull request, please, use the GitHub issue tracker. We're really glad to review your experience.",
         "githubSource": "GitHub Source",
         "blog": "Blog"
+    },
+    "ThreadDump": {
+        "title": "Thread Dump",
+        "id": "Thread id",
+        "name": "Thread name",
+        "state": "Thread state",
+        "blockedCount": "Blocked count",
+        "blockedTime": "Blocked time",
+        "waitedCount": "Waited count",
+        "lockName": "Lock name",
+        "lockOwnerId": "Lock owner id",
+        "lockOwnerName": "Lock owner name",
+        "className": "Classname",
+        "identityHashCode": "Identity hash code",
+        "priority": "Priority",
+        "daemon": "Daemon",
+        "lockInfo": "Lock info",
+        "stacktrace": "Stacktrace"
     }
 }

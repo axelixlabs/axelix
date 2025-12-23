@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { ConfigProps } from "./ConfigProps";
-export { Environment } from "./Environment";
-export { Wallboard } from "./Wallboard";
-export { Loggers } from "./Loggers";
-export { Login } from "./Login";
-export { Beans } from "./Beans";
+import apiFetch from "api/apiFetch";
+
+export const getThreadDumpData = (instanceId: string) => {
+    return apiFetch.get(`/thread-dump/${instanceId}`);
+};

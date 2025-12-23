@@ -1,0 +1,41 @@
+.MainWrapper {
+    display: flex;
+    border-radius: var(--axile-border-radius-small);
+    overflow: hidden;
+
+    /* Our timeline grows by 5px for each thread. Since our monitoring lasts 10 minutes, that’s 10 * 60 * 5 = 3000 */
+    width: 3000px;
+}
+
+.SingleHistoryChunk {
+    width: 5px;
+    height: 30px;
+}
+
+.Grey {
+    background-color: #838383;
+}
+
+.White {
+    background-color: #fff;
+}
+
+.Yellow {
+    background-color: #fadb14;
+}
+
+.Red {
+    background-color: #ff4d4f;
+}
+
+.Orange {
+    background-color: #faad14;
+}
+
+.Green {
+    background-color: #52c41a;
+}
+
+.Blue {
+    background-color: #1890ff;
+}

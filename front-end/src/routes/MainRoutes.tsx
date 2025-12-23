@@ -23,6 +23,7 @@ const ScheduledTasks = Loadable(lazy(() => import("pages/ScheduledTasks")));
 const Environment = Loadable(lazy(() => import("pages/Environment")));
 const ConfigProps = Loadable(lazy(() => import("pages/ConfigProps")));
 const Conditions = Loadable(lazy(() => import("pages/Conditions")));
+const ThreadDump = Loadable(lazy(() => import("pages/ThreadDump")));
 const Wallboard = Loadable(lazy(() => import("pages/Wallboard")));
 const Dashboard = Loadable(lazy(() => import("pages/Dashboard")));
 const Loggers = Loadable(lazy(() => import("pages/Loggers")));
@@ -51,6 +52,7 @@ export const MainRoutes = () => {
                 <Route path="/instance/:instanceId/caches" element={<Caches />} />
                 <Route path="/instance/:instanceId/scheduled-tasks" element={<ScheduledTasks />} />
                 <Route path="/instance/:instanceId/conditions" element={<Conditions />} />
+                <Route path="/instance/:instanceId/thread-dump" element={<ThreadDump />} />
             </Route>
         </Routes>
     );
