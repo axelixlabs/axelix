@@ -142,8 +142,7 @@ class EnvironmentEndpointProberTest {
                   "configPropsBeanName": null,
                   "description": "Location of the log file. For instance, `/var/log`.",
                   "deprecation": {
-                    "reason": null,
-                    "replacement": "logging.file.path"
+                    "message": "Deprecated in favor of logging.file.path property."
                   }
                 }
               ]
@@ -274,8 +273,7 @@ class EnvironmentEndpointProberTest {
         assertThat(loggingPath.configPropsBeanName()).isNull();
         assertThat(loggingPath.description()).isEqualTo("Location of the log file. For instance, `/var/log`.");
         assertThat(loggingPath.deprecation()).isNotNull();
-        assertThat(loggingPath.deprecation().reason()).isNull();
-        assertThat(loggingPath.deprecation().replacement()).isEqualTo("logging.file.path");
+        assertThat(loggingPath.deprecation().message()).isEqualTo("Deprecated in favor of logging.file.path property.");
         assertThat(loggingPath.injectionPoints()).isNull();
 
         PropertySource configResource = feed.propertySources().stream()

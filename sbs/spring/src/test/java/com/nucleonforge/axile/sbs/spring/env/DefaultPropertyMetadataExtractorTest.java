@@ -38,7 +38,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         properties = {
             "prop.test.server.port=test",
             "prop.test.logging.level.root=test",
-            "additional.custom.property=test"
+            "custom.test.without.reason.property=test",
+            "custom.test.without.replacement.property=test"
         })
 @SpringBootTest
 @Import(DefaultPropertyMetadataExtractorTest.DefaultPropertyMetadataExtractorTestConfiguration.class)
@@ -61,13 +62,41 @@ class DefaultPropertyMetadataExtractorTest {
         assertThat(serverPortMetadata).isNotNull();
         assertThat(serverPortMetadata.description()).isEqualTo("Server HTTP port.");
         assertThat(serverPortMetadata.deprecation()).isNotNull();
-        assertThat(serverPortMetadata.deprecation().reason()).isEqualTo("Just because");
-        assertThat(serverPortMetadata.deprecation().replacement()).isEqualTo("new.prop.test.server.port");
+        assertThat(serverPortMetadata.deprecation().message())
+                .isEqualTo("Just because. Deprecated in favor of new.prop.test.server.port property.");
+    }
 
+    @Test
+    void shouldExtractPropertyMetadataWithoutReason() {
+        PropertyMetadata metadataWithoutReason =
+                extractor.getMetadata(normalizer.normalize("custom.test.without.replacement.property"));
+        assertThat(metadataWithoutReason).isNotNull();
+        assertThat(metadataWithoutReason.description()).isNull();
+        assertThat(metadataWithoutReason.deprecation()).isNotNull();
+        assertThat(metadataWithoutReason.deprecation().message()).isEqualTo("Marked for deletion.");
+    }
+
+    @Test
+    void shouldExtractPropertyMetadataWithoutReplacement() {
+        PropertyMetadata metadataWithoutReplacament =
+                extractor.getMetadata(normalizer.normalize("custom.test.without.reason.property"));
+        assertThat(metadataWithoutReplacament).isNotNull();
+        assertThat(metadataWithoutReplacament.description()).isNull();
+        assertThat(metadataWithoutReplacament.deprecation()).isNotNull();
+        assertThat(metadataWithoutReplacament.deprecation().message())
+                .isEqualTo("Deprecated in favor of new.custom.test.without.reason.property property.");
+    }
+
+    @Test
+    void shouldExtractPropertyMetadataWithoutDeprecated() {
         PropertyMetadata loggingMetadata = extractor.getMetadata(normalizer.normalize("prop.test.logging.level.root"));
         assertThat(loggingMetadata).isNotNull();
         assertThat(loggingMetadata.description()).isEqualTo("Logging level for root logger.");
+        assertThat(loggingMetadata.deprecation()).isNull();
+    }
 
+    @Test
+    void shouldNotExtractPropertyMetadataWithoutDeprecated() {
         PropertyMetadata nonExistentMetadata = extractor.getMetadata("non.existent.property");
         assertThat(nonExistentMetadata).isNull();
     }
