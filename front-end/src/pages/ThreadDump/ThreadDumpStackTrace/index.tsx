@@ -39,13 +39,13 @@ export const ThreadDumpStackTrace = ({ threadDump }: IProps) => {
         <div>
             <div className={styles.Title}>{t("ThreadDump.stacktrace")}</div>
             <div>
-                {stackTrace.map((trace) => {
+                {stackTrace.map((trace, index) => {
                     const { moduleName, className, methodName, fileName, lineNumber } = trace;
 
                     const traceLine = `${moduleName ?? "unknown module"}:${className}.${methodName}(${fileName}: ${lineNumber})`;
 
                     return (
-                        <div key={traceLine} className={styles.TraceLine}>
+                        <div key={`${traceLine}${index}`} className={styles.TraceLine}>
                             <p>{traceLine}</p>
                             {trace.nativeMethod && <Tag className={styles.NativeTag}>NATIVE</Tag>}
                         </div>
