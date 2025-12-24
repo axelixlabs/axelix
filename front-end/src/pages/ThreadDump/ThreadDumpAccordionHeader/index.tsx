@@ -15,6 +15,7 @@
  */
 import { useEffect, useState } from "react";
 
+import { getThreadStateColor } from "helpers";
 import type { IThread } from "models";
 import { TEN_MINUTES_MILLISECDONDS, threadDumpStateLetters } from "utils";
 
@@ -46,8 +47,12 @@ export const ThreadDumpAccordionHeader = ({ threadDump }: IProps) => {
 
     return (
         <div className={styles.MainWrapper}>
-            {/* TODO: Add tooltip in future */}
-            <div className={`${styles.ThreadNameAvatar} ${styles[threadDump.threadState]}`}>
+            <div
+                className={styles.ThreadNameAvatar}
+                style={{
+                    backgroundColor: getThreadStateColor(threadDump),
+                }}
+            >
                 {threadDumpStateLetters[threadDump.threadState]}
             </div>
             <div>{threadDump.threadName}</div>

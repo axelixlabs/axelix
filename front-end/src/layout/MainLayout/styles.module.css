@@ -25,11 +25,13 @@
     padding: 24px;
 }
 
-.ThreadDumpContentLayout {
+/* Targets the thread-dump page */
+.ContentLayout:has([data-thread-layout]) {
     min-width: max-content;
 }
 
-.ThreadDumpContent {
+/* Targets the thread-dump page */
+.Content:has([data-thread-layout]) {
     width: max-content;
     min-width: 100vw;
 }

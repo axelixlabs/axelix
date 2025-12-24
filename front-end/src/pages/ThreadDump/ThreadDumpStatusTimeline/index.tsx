@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { threadStateColor } from "helpers";
-import { EThreadDumpStateColors, type IThread } from "models";
+import { getThreadStateColor } from "helpers";
+import { type IThread } from "models";
 
 import styles from "./styles.module.css";
 
@@ -28,9 +28,12 @@ interface IProps {
 export const ThreadDumpTimeline = ({ history }: IProps) => {
     return (
         <div className={styles.MainWrapper}>
-            {history.map((singleHistory, index) => (
+            {history.map((thread, index) => (
                 <div
-                    className={`${styles.SingleHistoryChunk} ${styles[threadStateColor(singleHistory) as EThreadDumpStateColors]}`}
+                    className={styles.SingleHistoryChunk}
+                    style={{
+                        backgroundColor: getThreadStateColor(thread),
+                    }}
                     key={index}
                 />
             ))}

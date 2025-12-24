@@ -13,29 +13,3 @@
     color: #fff;
     border-radius: var(--axile-border-radius-large);
 }
-
-/* stylelint-disable */
-.NEW {
-    background-color: #838383;
-}
-
-.RUNNABLE {
-    background-color: #52c41a;
-}
-
-.BLOCKED {
-    background-color: #ff4d4f;
-}
-
-.WAITING {
-    background-color: #faad14;
-}
-
-.TIMED_WAITING {
-    background-color: #13c2c2;
-}
-
-.TERMINATED {
-    background-color: #1890ff;
-}
-/* stylelint-enable */
