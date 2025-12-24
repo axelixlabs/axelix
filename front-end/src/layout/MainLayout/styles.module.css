@@ -25,11 +25,11 @@
     padding: 24px;
 }
 
-.ThreadDumpContentLayout {
+.ContentLayout:has([data-thread-layout]) {
     min-width: max-content;
 }
 
-.ThreadDumpContent {
+.Content:has([data-thread-layout]) {
     width: max-content;
     min-width: 100vw;
 }

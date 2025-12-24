@@ -60,7 +60,7 @@ const ThreadDump = () => {
 
     return (
         <>
-            <div className={styles.TitleAndTimelineWrapper}>
+            <div data-thread-layout className={styles.TitleAndTimelineWrapper}>
                 <div className={`TextMedium ${styles.MainTitle}`}>{t("ThreadDump.title")}</div>
                 <ThreadDumpTimeLine />
             </div>
