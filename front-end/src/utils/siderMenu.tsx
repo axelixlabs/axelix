@@ -25,6 +25,7 @@ import LoggersIcon from "assets/icons/loggers.svg?react";
 import MappingsIcon from "assets/icons/mappings.svg?react";
 import MetricsIcon from "assets/icons/metrics.svg?react";
 import ScheduledTasksIcon from "assets/icons/scheduledTasks.svg?react";
+import ThreadDumpIcon from "assets/icons/threadDump.svg?react";
 import type { TFunction } from "i18next";
 
 import type { MenuItem } from "models";
@@ -59,6 +60,7 @@ export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
         },
         { key: `/instance/${instanceId}/loggers`, icon: <LoggersIcon />, label: t("Sider.loggers") },
         { key: `/instance/${instanceId}/jvm`, icon: <JvmIcon />, label: "JVM" },
+        { key: `/instance/${instanceId}/thread-dump`, icon: <ThreadDumpIcon />, label: t("Sider.threadDump") },
         { key: `/instance/${instanceId}/mappings`, icon: <MappingsIcon />, label: t("Sider.mappings") },
         { key: `/instance/${instanceId}/caches`, icon: <CachesIcon />, label: t("Sider.caches") },
     ];
