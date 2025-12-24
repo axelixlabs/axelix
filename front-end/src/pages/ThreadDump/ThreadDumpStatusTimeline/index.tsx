@@ -28,11 +28,11 @@ interface IProps {
 export const ThreadDumpTimeline = ({ history }: IProps) => {
     return (
         <div className={styles.MainWrapper}>
-            {history.map((singleHistory, index) => (
+            {history.map((thread, index) => (
                 <div
                     className={styles.SingleHistoryChunk}
                     style={{
-                        backgroundColor: getThreadStateColor(singleHistory),
+                        backgroundColor: getThreadStateColor(thread),
                     }}
                     key={index}
                 />
