@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Tooltip } from "antd";
+import type { TooltipPlacement } from "antd/es/tooltip";
 import type { PropsWithChildren } from "react";
 
 import styles from "./styles.module.css";
@@ -26,9 +27,14 @@ interface IProps {
      * Info tooltip text
      */
     text: string;
+
+    /**
+     * Tooltip position relative to the target.
+     */
+    placement?: TooltipPlacement;
 }
 
-export const InfoTooltip = ({ children, text }: PropsWithChildren<IProps>) => {
+export const InfoTooltip = ({ children, text, placement = "right" }: PropsWithChildren<IProps>) => {
     return (
         <Tooltip
             title={
@@ -39,7 +45,7 @@ export const InfoTooltip = ({ children, text }: PropsWithChildren<IProps>) => {
                     {text}
                 </div>
             }
-            placement="right"
+            placement={placement}
             color="#2196F3"
         >
             {children || <img src={QuestionIcon} alt="Question icon" />}

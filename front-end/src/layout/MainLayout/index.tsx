@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Layout } from "antd";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { AdminHeader } from "./AdminHeader";
 import { SiderMenu } from "./SiderMenu";
@@ -30,10 +30,6 @@ interface IProps {
 }
 
 export const MainLayout = ({ hideSider }: IProps) => {
-    const location = useLocation();
-
-    const isThreadDumpPage = location.pathname.endsWith("/thread-dump");
-
     return (
         <Layout className={styles.MainWrapper}>
             <AdminHeader />
@@ -45,10 +41,8 @@ export const MainLayout = ({ hideSider }: IProps) => {
                     </Sider>
                 )}
 
-                <Layout className={`${styles.ContentLayout} ${isThreadDumpPage ? styles.ThreadDumpContentLayout : ""}`}>
-                    <Content
-                        className={`${styles.Content} ${isThreadDumpPage ? styles.ThreadDumpContent : ""} ${!hideSider ? styles.WithSider : ""}`}
-                    >
+                <Layout className={styles.ContentLayout}>
+                    <Content className={`${styles.Content} ${!hideSider ? styles.WithSider : ""}`}>
                         <Outlet />
                     </Content>
                 </Layout>

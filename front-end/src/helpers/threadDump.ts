@@ -16,31 +16,30 @@
 import { EThreadDumpStateColors, EThreadState, type IThread } from "models";
 import { FIFTEEN_SECONDS, TEN_MINUTES_MILLISECDONDS } from "utils";
 
-export const threadStateColor = (singleHistory: IThread) => {
-    if (singleHistory.threadState === EThreadState.RUNNABLE) {
-        return singleHistory.inNative ? EThreadDumpStateColors.BLUE : EThreadDumpStateColors.GREEN;
+export const getThreadStateColor = (threadDump: IThread) => {
+    const { threadState, inNative, suspended } = threadDump;
+
+    if (threadState === EThreadState.RUNNABLE) {
+        return inNative ? EThreadDumpStateColors.BLUE : EThreadDumpStateColors.GREEN;
     }
 
-    if (
-        (singleHistory.threadState === EThreadState.WAITING && !singleHistory.suspended) ||
-        singleHistory.threadState === EThreadState.TIMED_WAITING
-    ) {
+    if ((threadState === EThreadState.WAITING && !suspended) || threadState === EThreadState.TIMED_WAITING) {
         return EThreadDumpStateColors.ORANGE;
     }
 
-    if (singleHistory.threadState === EThreadState.WAITING) {
+    if (threadState === EThreadState.WAITING) {
         return EThreadDumpStateColors.YELLOW;
     }
 
-    if (singleHistory.threadState === EThreadState.BLOCKED) {
+    if (threadState === EThreadState.BLOCKED) {
         return EThreadDumpStateColors.RED;
     }
 
-    if (singleHistory.threadState === EThreadState.NEW) {
+    if (threadState === EThreadState.NEW) {
         return EThreadDumpStateColors.WHITE;
     }
 
-    if (singleHistory.threadState === EThreadState.TERMINATED) {
+    if (threadState === EThreadState.TERMINATED) {
         return EThreadDumpStateColors.GREY;
     }
 };

@@ -23,11 +23,11 @@ export enum EThreadState {
 }
 
 export enum EThreadDumpStateColors {
-    BLUE = "Blue",
-    GREEN = "Green",
-    ORANGE = "Orange",
-    RED = "Red",
-    YELLOW = "Yellow",
-    WHITE = "White",
-    GREY = "GREY",
+    BLUE = "#1890ff",
+    GREEN = "#52c41a",
+    ORANGE = "#faad14",
+    RED = "#ff4d4f",
+    YELLOW = "#fadb14",
+    WHITE = "#fff",
+    GREY = "#838383",
 }
