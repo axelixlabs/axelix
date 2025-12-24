@@ -18,6 +18,7 @@ import react from "@vitejs/plugin-react";
 import * as path from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
+import svgr from "vite-plugin-svgr";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -27,6 +28,7 @@ export default defineConfig({
                 plugins: ["babel-plugin-react-compiler"],
             },
         }),
+        svgr(),
     ],
     server: {
         port: 3000,
