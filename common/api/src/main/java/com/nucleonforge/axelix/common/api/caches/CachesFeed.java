@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 
@@ -48,12 +49,18 @@ public record CachesFeed(@JsonProperty("cacheManagers") List<CacheManagers> cach
     /**
      * DTO that encapsulates the full cache name.
      *
-     * @param name    The cache name.
-     * @param target  The fully qualified name of the native cache.
-     * @param enabled Whether the cache is enabled ({@code true}) or disabled ({@code false}).
+     * @param name                  The cache name.
+     * @param target                The fully qualified name of the native cache.
+     * @param hitsCount             The number of cache hits.
+     * @param missesCount           The number of cache misses.
+     * @param estimatedEntrySize    The estimated number of entries in the cache, or {@code null} if unknown.
+     * @param enabled               Whether the cache is enabled ({@code true}) or disabled ({@code false}).
      */
     public record Caches(
             @JsonProperty("name") String name,
             @JsonProperty("target") String target,
+            @JsonProperty("hitsCount") long hitsCount,
+            @JsonProperty("missesCount") long missesCount,
+            @JsonProperty("estimatedEntrySize") @Nullable Object estimatedEntrySize,
             @JsonProperty("enabled") boolean enabled) {}
 }

@@ -15,6 +15,8 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-starter-web")
     compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
     compileOnly("org.springframework.kafka:spring-kafka")
+    compileOnly("com.github.ben-manes.caffeine:caffeine")
+
 
     // Test
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -26,6 +28,7 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka")
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("com.h2database:h2")
+    testImplementation("com.github.ben-manes.caffeine:caffeine")
 }
 
 tasks.withType<JavaCompile> {

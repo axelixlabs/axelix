@@ -32,8 +32,9 @@ import org.springframework.cache.CacheManager;
  * @since 24.11.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public final class EnhancedCacheManager implements CacheManager {
+public class EnhancedCacheManager implements CacheManager {
 
     private final CacheManager delegate;
     private final Map<String, EnhancedCache> caches = new ConcurrentHashMap<>();
@@ -126,5 +127,20 @@ public final class EnhancedCacheManager implements CacheManager {
         }
 
         return false;
+    }
+
+    public long getHitsCount(String cacheName) {
+        EnhancedCache cache = caches.get(cacheName);
+        return cache != null ? cache.getHitsCount() : 0;
+    }
+
+    public long getMissesCount(String cacheName) {
+        EnhancedCache cache = caches.get(cacheName);
+        return cache != null ? cache.getMissesCount() : 0;
+    }
+
+    public @Nullable Object getNativeCache(String cacheName) {
+        EnhancedCache enhanced = caches.get(cacheName);
+        return enhanced != null ? enhanced.getNativeCache() : null;
     }
 }
