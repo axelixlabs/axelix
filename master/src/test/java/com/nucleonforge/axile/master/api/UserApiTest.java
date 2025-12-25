@@ -101,7 +101,8 @@ class UserApiTest {
 
     @Test
     void logout_shouldClearCookie() {
-        String token = "token";
+        String token =
+                "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0VXNlciIsImlhdCI6MTc1NDQ4Njc1NywiZXhwIjoyODY0NTE2NzU3fQ.57kPI4R7m8gxoF3Xcb6ifyGJS7GVOn-rQdTyNhMA4Z0";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -129,6 +130,6 @@ class UserApiTest {
         ResponseEntity<String> logoutResponse =
                 restTemplate.exchange("/api/axile/users/logout", HttpMethod.POST, logoutEntity, String.class);
 
-        assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 }

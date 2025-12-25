@@ -4,6 +4,8 @@ spring:
   mvc:
     servlet:
       path: /api/${spring.application.name}
+  config:
+    import: "classpath:tokens.yml"
 
 axile:
   config:
@@ -29,3 +31,8 @@ axile:
       cookie:
         name: auth_token
         secure: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

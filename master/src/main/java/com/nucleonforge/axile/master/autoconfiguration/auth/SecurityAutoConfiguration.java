@@ -22,20 +22,13 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 
-import com.nucleonforge.axile.common.auth.basic.jwt.service.BasicJwtDecoderService;
-import com.nucleonforge.axile.common.auth.basic.jwt.service.DefaultBasicJwtDecoderService;
-import com.nucleonforge.axile.common.auth.rbac.filter.AuthorityResolver;
-import com.nucleonforge.axile.common.auth.rbac.filter.DefaultAuthorityResolver;
-import com.nucleonforge.axile.common.auth.rbac.filter.RbacJwtAuthorizationFilter;
-import com.nucleonforge.axile.common.auth.rbac.jwt.service.DefaultRbacJwtDecoderService;
-import com.nucleonforge.axile.common.auth.rbac.jwt.service.RbacJwtDecoderService;
-import com.nucleonforge.axile.common.auth.rbac.spi.Authorizer;
-import com.nucleonforge.axile.common.auth.rbac.spi.DefaultAuthorizer;
+import com.nucleonforge.axile.common.auth.spi.jwt.service.DefaultJwtDecoderService;
+import com.nucleonforge.axile.common.auth.spi.jwt.service.JwtDecoderService;
+import com.nucleonforge.axile.master.service.auth.CookieBasedJwtAuthorizationFilter;
 import com.nucleonforge.axile.master.service.auth.CookieService;
 import com.nucleonforge.axile.master.service.auth.DefaultCookieService;
-import com.nucleonforge.axile.master.service.auth.jwt.BasicJwtEncoderService;
+import com.nucleonforge.axile.master.service.auth.jwt.DefaultJwtEncoderService;
 import com.nucleonforge.axile.master.service.auth.jwt.JwtEncoderService;
-import com.nucleonforge.axile.master.service.auth.jwt.RbacJwtEncoderService;
 import com.nucleonforge.axile.master.service.auth.provider.StaticAdminUserProvider;
 
 /**
@@ -48,96 +41,42 @@ import com.nucleonforge.axile.master.service.auth.provider.StaticAdminUserProvid
 public class SecurityAutoConfiguration {
 
     /**
-     * Autoconfiguration for {@link JwtProperties}
+     * Autoconfiguration for the JWT-related part.
      */
     @AutoConfiguration
-    public static class JwtPropertiesAutoConfiguration {
+    @ConditionalOnProperty(name = "axile.master.auth.type", havingValue = "static-admin")
+    public static class JwtAutoConfiguration {
 
         @Bean
         @ConfigurationProperties(prefix = "axile.master.auth.jwt")
         public JwtProperties jwtProperties() {
             return new JwtProperties();
         }
-    }
-
-    /**
-     * Autoconfiguration for the JWT-related part, for static-admin security option.
-     */
-    @AutoConfiguration(after = JwtPropertiesAutoConfiguration.class)
-    @ConditionalOnProperty(name = "axile.master.auth.type", havingValue = "static-admin")
-    public static class BasicJwtAutoConfiguration {
 
         @Bean
         public JwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
-            return new BasicJwtEncoderService(
+            return new DefaultJwtEncoderService(
                     jwtProperties.getAlgorithm(), jwtProperties.getSigningKey(), jwtProperties.getLifespan());
         }
 
         @Bean
-        public BasicJwtDecoderService basicJwtDecoderService(JwtProperties jwtProperties) {
-            return new DefaultBasicJwtDecoderService(jwtProperties.getAlgorithm(), jwtProperties.getSigningKey());
+        public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties) {
+            return new DefaultJwtDecoderService(jwtProperties.getAlgorithm(), jwtProperties.getSigningKey());
         }
 
-        /*@Bean
-        public BasicJwtAuthorizationFilter basicJwtAuthorizationFilter(
-                BasicJwtDecoderService basicAuthJwtDecoderService) {
-            return new BasicJwtAuthorizationFilter(basicAuthJwtDecoderService);
+        @Bean
+        public CookieBasedJwtAuthorizationFilter cookieBasedJwtAuthorizationFilter(
+                JwtDecoderService jwtDecoderService) {
+            return new CookieBasedJwtAuthorizationFilter(jwtDecoderService);
         }
 
         // TODO: rework this filter's path
         @Bean
-        public FilterRegistrationBean<RbacJwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-                RbacJwtAuthorizationFilter filter) {
-            FilterRegistrationBean<RbacJwtAuthorizationFilter> registration = new FilterRegistrationBean<>();
+        public FilterRegistrationBean<CookieBasedJwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
+                CookieBasedJwtAuthorizationFilter filter) {
+            FilterRegistrationBean<CookieBasedJwtAuthorizationFilter> registration = new FilterRegistrationBean<>();
             registration.setFilter(filter);
-            registration.setName("jwtAuthorizationFilter");
-            registration.addUrlPatterns("/actuator/*");
-            return registration;
-        }*/
-    }
-
-    /**
-     * Autoconfiguration for the JWT-related part, for RBAC security option.
-     */
-    @AutoConfiguration(after = JwtPropertiesAutoConfiguration.class)
-    @ConditionalOnProperty(name = "axile.master.auth.type", havingValue = "rbac")
-    public static class RbacJwtAutoConfiguration {
-
-        @Bean
-        public Authorizer authorizer() {
-            return new DefaultAuthorizer();
-        }
-
-        @Bean
-        public AuthorityResolver authorityResolver() {
-            return new DefaultAuthorityResolver();
-        }
-
-        @Bean
-        public JwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
-            return new RbacJwtEncoderService(
-                    jwtProperties.getAlgorithm(), jwtProperties.getSigningKey(), jwtProperties.getLifespan());
-        }
-
-        @Bean
-        public RbacJwtDecoderService rbacJwtDecoderService(JwtProperties jwtProperties) {
-            return new DefaultRbacJwtDecoderService(jwtProperties.getAlgorithm(), jwtProperties.getSigningKey());
-        }
-
-        @Bean
-        public RbacJwtAuthorizationFilter rbacJwtAuthorizationFilter(
-                RbacJwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
-            return new RbacJwtAuthorizationFilter(jwtDecoderService, authorityResolver, authorizer);
-        }
-
-        // TODO: rework this filter's path in the future
-        @Bean
-        public FilterRegistrationBean<RbacJwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-                RbacJwtAuthorizationFilter filter) {
-            FilterRegistrationBean<RbacJwtAuthorizationFilter> registration = new FilterRegistrationBean<>();
-            registration.setFilter(filter);
-            registration.setName("jwtAuthorizationFilter");
-            registration.addUrlPatterns("/actuator/*");
+            registration.addUrlPatterns("/*");
             return registration;
         }
     }
@@ -145,7 +84,7 @@ public class SecurityAutoConfiguration {
     /**
      * Autoconfiguration for cookie.
      */
-    @AutoConfiguration(after = JwtPropertiesAutoConfiguration.class)
+    @AutoConfiguration(after = JwtAutoConfiguration.class)
     @ConditionalOnProperty(name = "axile.master.auth.cookie.enabled", havingValue = "true", matchIfMissing = true)
     public static class CookieAutoConfiguration {
 

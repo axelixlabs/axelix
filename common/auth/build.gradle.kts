@@ -7,7 +7,6 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-starter-web")
 
     // Test
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
-    testImplementation("org.springframework.boot:spring-boot-starter-actuator")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

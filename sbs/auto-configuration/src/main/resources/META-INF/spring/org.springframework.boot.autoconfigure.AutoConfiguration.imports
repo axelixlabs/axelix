@@ -15,5 +15,4 @@ com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileEnvironmentEndpointAuto
 com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileDetailsEndpointAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileConfigurationsPropertiesEndpointAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileMetricsAutoConfiguration
-com.nucleonforge.axile.sbs.autoconfiguration.auth.RbacAuthJwtAuthAutoConfiguration
-com.nucleonforge.axile.sbs.autoconfiguration.auth.BasicAuthJwtAutoConfiguration
+com.nucleonforge.axile.sbs.autoconfiguration.auth.JwtAuthAutoConfiguration

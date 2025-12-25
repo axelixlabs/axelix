@@ -28,18 +28,19 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nucleonforge.axile.common.auth.rbac.core.Authority;
-import com.nucleonforge.axile.common.auth.rbac.core.DefaultAuthority;
-import com.nucleonforge.axile.common.auth.rbac.core.DefaultRole;
-import com.nucleonforge.axile.common.auth.rbac.core.DefaultUser;
-import com.nucleonforge.axile.common.auth.rbac.core.Role;
-import com.nucleonforge.axile.common.auth.rbac.core.User;
+import com.nucleonforge.axile.common.auth.core.Authority;
+import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
+import com.nucleonforge.axile.common.auth.core.DefaultRole;
+import com.nucleonforge.axile.common.auth.core.DefaultUser;
+import com.nucleonforge.axile.common.auth.core.Role;
+import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.master.exception.auth.UserNotFoundException;
 
 /**
  * {@link UserProvider} that is capable to load user from RDBMS database.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  * @since 16.07.25
  */
 public class JdbcUserProvider implements UserProvider {

@@ -31,9 +31,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.test.context.jdbc.Sql;
 
-import com.nucleonforge.axile.common.auth.rbac.core.DefaultAuthority;
-import com.nucleonforge.axile.common.auth.rbac.core.Role;
-import com.nucleonforge.axile.common.auth.rbac.core.User;
+import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
+import com.nucleonforge.axile.common.auth.core.Role;
+import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.master.exception.auth.UserNotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;

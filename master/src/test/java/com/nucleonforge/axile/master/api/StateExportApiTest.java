@@ -46,8 +46,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
+import com.nucleonforge.axile.master.service.auth.CookieService;
+import com.nucleonforge.axile.master.service.auth.UserLoginService;
 import com.nucleonforge.axile.master.service.export.HeapDumpAnonymizer;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.utils.TestObjectFactory;
@@ -65,7 +68,17 @@ import static org.mockito.Mockito.when;
  * @author Nikita Kirillov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = "axile.master.auth.type=none")
 class StateExportApiTest {
+
+    @MockBean
+    private UserApi userApi;
+
+    @MockBean
+    private UserLoginService userLoginService;
+
+    @MockBean
+    private CookieService cookieService;
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 

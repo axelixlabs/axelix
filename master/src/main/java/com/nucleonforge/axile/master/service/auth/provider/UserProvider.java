@@ -15,7 +15,7 @@
  */
 package com.nucleonforge.axile.master.service.auth.provider;
 
-import com.nucleonforge.axile.common.auth.rbac.core.User;
+import com.nucleonforge.axile.common.auth.core.User;
 import com.nucleonforge.axile.master.exception.auth.UserNotFoundException;
 
 /**
@@ -23,6 +23,7 @@ import com.nucleonforge.axile.master.exception.auth.UserNotFoundException;
  *
  * @since 16.07.25
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 public interface UserProvider {
 

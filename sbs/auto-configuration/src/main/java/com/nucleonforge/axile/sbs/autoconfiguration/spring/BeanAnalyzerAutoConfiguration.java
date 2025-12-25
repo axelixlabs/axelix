@@ -41,7 +41,7 @@ public class BeanAnalyzerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public BeanMetaInfoExtractor defaultBeanMetaInfoExtractor(ConfigurableListableBeanFactory beanFactory) {
+    public BeanMetaInfoExtractor beanMetaInfoExtractor(ConfigurableListableBeanFactory beanFactory) {
         return new DefaultBeanMetaInfoExtractor(beanFactory);
     }
 

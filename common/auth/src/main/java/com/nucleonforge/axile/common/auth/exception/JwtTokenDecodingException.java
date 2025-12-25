@@ -15,12 +15,12 @@
  */
 package com.nucleonforge.axile.common.auth.exception;
 
-import com.nucleonforge.axile.common.auth.basic.jwt.service.BasicJwtDecoderService;
+import com.nucleonforge.axile.common.auth.spi.jwt.service.JwtDecoderService;
 
 /**
  * Thrown when decoding or parsing a JWT token fails.
  *
- * @see BasicJwtDecoderService
+ * @see JwtDecoderService
  * @since 23.07.2025
  * @author Nikita Kirillov
  */
