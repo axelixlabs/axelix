@@ -34,17 +34,28 @@ import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
  *
  * @since 24.06.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @RestControllerEndpoint(id = "axelix-caches")
-public class AxilixCachesEndpoint {
+public class AxelixCachesEndpoint {
+
+    private final EnhancedCacheManager enhancedCacheManager;
+
+    private final CacheSizeProvider cacheSizeProvider;
 
     private final CacheDispatcher dispatcher;
 
     private final CachesEndpoint delegate;
 
-    public AxilixCachesEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
+    public AxelixCachesEndpoint(
+            CacheDispatcher dispatcher,
+            CachesEndpoint delegate,
+            EnhancedCacheManager enhancedCacheManager,
+            CacheSizeProvider cacheSizeProvider) {
         this.dispatcher = dispatcher;
         this.delegate = delegate;
+        this.enhancedCacheManager = enhancedCacheManager;
+        this.cacheSizeProvider = cacheSizeProvider;
     }
 
     @GetMapping
@@ -58,8 +69,15 @@ public class AxilixCachesEndpoint {
 
             cacheManagerDescriptor.getCaches().forEach((cacheName, cacheDescriptor) -> {
                 boolean isEnabled = dispatcher.isCacheEnabled(managerName, cacheName);
+                enhancedCacheManager.getCache(cacheName);
 
-                Caches extendedCache = new Caches(cacheName, cacheDescriptor.getTarget(), isEnabled);
+                Caches extendedCache = new Caches(
+                        cacheName,
+                        cacheDescriptor.getTarget(),
+                        enhancedCacheManager.getHitsCount(cacheName),
+                        enhancedCacheManager.getMissesCount(cacheName),
+                        cacheSizeProvider.getEstimatedCacheSize(enhancedCacheManager.getNativeCache(cacheName)),
+                        isEnabled);
                 extendedCaches.add(extendedCache);
             });
 

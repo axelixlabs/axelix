@@ -21,6 +21,7 @@ import org.springframework.cache.Cache;
  * The enhanced variation of {@link Cache} to handle specific operations.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public interface EnhancedCache extends Cache {
 
@@ -49,4 +50,14 @@ public interface EnhancedCache extends Cache {
      * @return {@code true} if this cache is enabled, {@code false} otherwise.
      */
     boolean isEnabled();
+
+    /**
+     * @return the number of cache hits.
+     */
+    long getHitsCount();
+
+    /**
+     * @return the number of cache misses.
+     */
+    long getMissesCount();
 }

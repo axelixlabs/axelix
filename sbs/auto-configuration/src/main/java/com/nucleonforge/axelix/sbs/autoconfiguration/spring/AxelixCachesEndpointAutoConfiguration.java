@@ -17,6 +17,9 @@ package com.nucleonforge.axelix.sbs.autoconfiguration.spring;
 
 import java.util.Map;
 
+import com.nucleonforge.axelix.sbs.spring.cache.CacheSizeProvider;
+import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheSizeProvider;
+import com.nucleonforge.axelix.sbs.spring.cache.EnhancedCacheManager;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.cache.CachesEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -58,14 +61,24 @@ public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public CacheSizeProvider cacheSizeProvider() {
+        return new DefaultCacheSizeProvider();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public CacheDispatcher cacheDispatcher(Map<String, CacheManager> managerMap) {
         return new DefaultCacheDispatcher(managerMap);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public AxilixCachesEndpoint cacheDispatcherEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
-        return new AxilixCachesEndpoint(dispatcher, delegate);
+    public AxelixCachesEndpoint cacheDispatcherEndpoint(
+            CacheDispatcher dispatcher,
+            CachesEndpoint delegate,
+            EnhancedCacheManager enhancedCacheManager,
+            CacheSizeProvider cacheSizeProvider) {
+        return new AxelixCachesEndpoint(dispatcher, delegate, enhancedCacheManager, cacheSizeProvider);
     }
 
     @Bean
