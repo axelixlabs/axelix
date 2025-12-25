@@ -32,6 +32,7 @@ export * from "./types/scheduledTasks";
 export * from "./types/conditions";
 export * from "./types/antd";
 
+export * from "./enums/environments";
 export * from "./enums/conditions";
 export * from "./enums/threadDump";
 export * from "./enums/details";

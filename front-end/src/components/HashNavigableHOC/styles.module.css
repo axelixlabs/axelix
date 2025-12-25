@@ -1,0 +1,13 @@
+.Highlight {
+    animation: highlight-fade 4s;
+}
+
+@keyframes highlight-fade {
+    0% {
+        background-color: var(--axile-primary-green);
+    }
+
+    100% {
+        background-color: var(--axile-primary-light-green);
+    }
+}

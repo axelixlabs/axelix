@@ -16,7 +16,7 @@
 import { useState } from "react";
 
 import { EmptyHandler, PageSearch } from "components";
-import { filterPropertySources, getPropertiesCount } from "helpers";
+import { buildAutoCompleteOptions, filterPropertySources, getPropertiesCount } from "helpers";
 import type { IEnvironmentPropertySource } from "models";
 
 import { EnvironmentModifiableTable } from "../EnvironmentModifiableTable";
@@ -26,17 +26,6 @@ interface IProps {
      * The list of property sources to render
      */
     propertySources: IEnvironmentPropertySource[];
-}
-
-/**
- * Applies deduplication in case the property name is present in multiple property sources with the same name
- */
-function buildAutoCompleteOptions(propertySources: IEnvironmentPropertySource[]) {
-    return [...new Set(propertySources.flatMap(({ properties }) => properties).map((p) => p.name))].map((value) => {
-        return {
-            value: value,
-        };
-    });
 }
 
 export const EnvironmentTables = ({ propertySources }: IProps) => {
@@ -56,18 +45,8 @@ export const EnvironmentTables = ({ propertySources }: IProps) => {
 
             <EmptyHandler isEmpty={effectivePropertySources.length === 0}>
                 <>
-                    {effectivePropertySources.map(({ name, properties }) => (
-                        <EnvironmentModifiableTable
-                            headerName={name}
-                            properties={properties.map((property) => ({
-                                key: property.name,
-                                displayKey: property.name,
-                                displayValue: property.value,
-                                isPrimary: property.isPrimary,
-                                configPropsBeanName: property.configPropsBeanName,
-                            }))}
-                            key={name}
-                        />
+                    {effectivePropertySources.map((propertySource) => (
+                        <EnvironmentModifiableTable propertySource={propertySource} key={propertySource.name} />
                     ))}
                 </>
             </EmptyHandler>

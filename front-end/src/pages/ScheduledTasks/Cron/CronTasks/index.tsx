@@ -37,7 +37,7 @@ export const CronTasks = ({ cronTasks }: IProps) => {
             <div className={styles.SectionWrapper}>
                 <div className={`TextMedium ${styles.TaskType}`}>{t("ScheduledTasks.cron")}</div>
 
-                <div className="CustomizedAntdTable">
+                <div className="CustomizedTable">
                     <CronTableHeader />
                     <EmptyHandler isEmpty={cronTasks.length === 0}>
                         {cronTasks.map((task: ICron, index: number) => (

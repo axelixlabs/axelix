@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export { LanguageSwitcher } from "./LanguageSwitcher";
-export { HashNavigable } from "./HashNavigableHOC";
-export { TooltipWithCopy } from "./TooltipWithCopy";
-export { LinearProgress } from "./LinearProgress";
-export { EmptyHandler } from "./EmptyHandler";
-export { InfoTooltip } from "./InfoTooltip";
-export { PageSearch } from "./PageSearch";
-export { AboutModal } from "./AboutModal";
-export { Accordion } from "./Accordion";
-export { default } from "./Loadable";
-export { Loader } from "./Loader";
-export { Copy } from "./Copy";
+
+/**
+ * Injection type of the given property, that is to say - information on
+ * how exactly this property is injected into the given bean.
+ */
+export enum EPropertyInjectionType {
+    FIELD = "FIELD",
+    METHOD = "METHOD",
+    CONSTRUCTOR_PARAMETER = "CONSTRUCTOR_PARAMETER",
+    METHOD_PARAMETER = "METHOD_PARAMETER",
+}

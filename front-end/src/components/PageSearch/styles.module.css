@@ -1,8 +1,16 @@
-.Search {
+.SearchWrapper {
     width: min(400px, 100%);
     margin-bottom: 30px;
 }
 
+.Search {
+    flex: 1;
+}
+
 .RemovedBottomGutter {
     margin-bottom: 0;
+}
+
+.AddonAfter {
+    flex-shrink: 0;
 }

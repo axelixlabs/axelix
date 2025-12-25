@@ -13,25 +13,74 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ITableRow } from "./globals";
+import type { EPropertyInjectionType } from "models/enums/environments";
 
-interface IProperties {
+interface IDeprecation {
+    /**
+     * The message for deprecation
+     */
+    message: string;
+}
+
+export interface IInjectionPoint {
+    /**
+     * The bean name of injection point
+     */
+    beanName: string;
+
+    /**
+     * The type of the injection point.
+     */
+    injectionType: EPropertyInjectionType;
+
+    /**
+     * The name of the "target". Can be the name of the method in
+     * case of method injection, the name of the field in case of
+     * a field injection, or a parameter name/number.
+     */
+    targetName: string;
+
+    /**
+     * The expression of the property
+     */
+    propertyExpression: string;
+}
+
+export interface IEnvProperty {
     /**
      * The property name
      */
     name: string;
+
     /**
      * The property value
      */
     value: string;
+
     /**
      * True if propertyValue is primary, false otherwise
      */
     isPrimary: boolean;
+
     /**
-     * flag that designates that the bean is the config props bean.
+     * Flag that designates that the bean is the config props bean.
      */
     configPropsBeanName: string | null;
+
+    /**
+     * The property description
+     */
+    description: string | null;
+
+    /**
+     * If this property exists, then the underlying spring environment's property is deprecated
+     */
+    deprecation?: IDeprecation;
+
+    /**
+     * The injection points list
+     */
+    injectionPoints?: IInjectionPoint[];
 }
 
 export interface IEnvironmentPropertySource {
@@ -39,10 +88,16 @@ export interface IEnvironmentPropertySource {
      * Environment property source name
      */
     name: string;
+
+    /**
+     * The description of property source
+     */
+    description: string | null;
+
     /**
      * Environment properties list
      */
-    properties: IProperties[];
+    properties: IEnvProperty[];
 }
 
 export interface IEnvironmentResponseBody {
@@ -55,20 +110,9 @@ export interface IEnvironmentResponseBody {
      * Environment default profiles list
      */
     defaultProfiles: string[];
+
     /**
      * Environment property sources list
      */
     propertySources: IEnvironmentPropertySource[];
-}
-
-export interface IEnvironmentTableRow extends ITableRow {
-    /**
-     * True if propertyValue is primary, false otherwise
-     */
-    isPrimary: boolean;
-
-    /**
-     * flag that designates that the bean is the config props bean.
-     */
-    configPropsBeanName: string | null;
 }
