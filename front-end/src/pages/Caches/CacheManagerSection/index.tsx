@@ -33,7 +33,7 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
 
     return (
         <div className={styles.CacheManagerWrapper}>
-            <div className="CustomizedAntdTable">
+            <div className="CustomizedTable">
                 <div className={`TableHeader ${styles.CacheManagerHeader}`}>
                     <div className={`RowChunk ${styles.CacheManagerName}`}>
                         {t("Caches.name")}: {cacheManager.name}

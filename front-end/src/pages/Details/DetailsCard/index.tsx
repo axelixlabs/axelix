@@ -42,7 +42,7 @@ export const DetailsCard = ({ icon, i18nPropertiesPrefix, title, records }: IPro
     const { t } = useTranslation();
 
     return (
-        <div className={`CustomizedAntdTable ${styles.Card}`}>
+        <div className={`CustomizedTable ${styles.Card}`}>
             <div className="TableHeader">
                 <div className={`RowChunk ${styles.TableHeaderRowChunk}`}>
                     {icon && <img src={icon} alt={`${title} icon`} className={styles.CardIcon} />}

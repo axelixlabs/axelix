@@ -1,0 +1,17 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    align-items: center;
+}
+
+.KeyChunk {
+    word-break: break-all;
+    padding-right: 16px;
+}
+
+.ValueChunk {
+    display: flex;
+    justify-content: flex-end;
+    word-break: break-all;
+    padding-left: 16px;
+}

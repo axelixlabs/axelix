@@ -13,63 +13,71 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Link, useParams } from "react-router-dom";
+import { Tooltip } from "antd";
+import InfoIcon from "assets/icons/info.svg?react";
 
-import { Accordion, Copy, EmptyHandler, TablePropertyValue } from "components";
-import { normalizeHtmlElementId } from "helpers";
-import type { IEnvironmentTableRow } from "models";
+import { Accordion, Copy, EmptyHandler } from "components";
+import { splitProperties } from "helpers";
+import type { IEnvironmentPropertySource } from "models";
+
+import { EnvironmentAccordionBody } from "../EnvironmentAccordionBody";
+import { EnvironmentAccordionHeader } from "../EnvironmentAccordionHeader";
+import { EnvironmentPropertyValue } from "../EnvironmentPropertyValue";
 
 import styles from "./styles.module.css";
 
-import LinkIcon from "assets/icons/link.svg";
-
 interface IProps {
     /**
-     * Table header name
+     * The property source data
      */
-    headerName: string;
-
-    /**
-     * Table rows data
-     */
-    properties: IEnvironmentTableRow[];
+    propertySource: IEnvironmentPropertySource;
 }
 
-export const EnvironmentModifiableTable = ({ headerName, properties }: IProps) => {
-    const { instanceId } = useParams();
+export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
+    const { name, properties, description } = propertySource;
+    const [withDropDown, withoutDropDown] = splitProperties(properties);
 
     return (
         <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
             <Accordion
-                header={<div className={styles.AccordionHeader}>{headerName}</div>}
-                headerStyles={styles.HeaderStyles}
-                contentStyles={styles.ContentStyles}
+                header={
+                    <div className={styles.AccordionHeader}>
+                        {name}
+                        {description && (
+                            <Tooltip title={description}>
+                                <InfoIcon color="#2196F3" />
+                            </Tooltip>
+                        )}
+                    </div>
+                }
+                headerStyles={styles.MainAccordionHeaderStyles}
                 accordionExpanded
             >
-                <EmptyHandler isEmpty={!properties.length}>
-                    {properties.map(({ key, displayKey, displayValue, isPrimary, configPropsBeanName }) => (
-                        <div key={key} className="TableRow">
-                            <div className={`RowChunk ${styles.KeyChunk}`}>
-                                {displayKey} <Copy text={displayKey} />
-                                {configPropsBeanName && (
-                                    <Link
-                                        to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <img src={LinkIcon} alt="Link icon" />
-                                    </Link>
-                                )}
-                            </div>
-                            <div className={`RowChunk ${styles.ValueChunk}`}>
-                                <TablePropertyValue
-                                    propertyName={key}
-                                    propertyValue={displayValue}
-                                    isPrimary={isPrimary}
-                                />
-                            </div>
-                        </div>
-                    ))}
-                </EmptyHandler>
+                <div className="AccordionsWrapper">
+                    <EmptyHandler isEmpty={!properties.length}>
+                        {[
+                            ...withDropDown.map((property) => (
+                                <Accordion
+                                    header={<EnvironmentAccordionHeader property={property} />}
+                                    headerStyles={property.deprecation ? styles.DeprecatedPropertyAccordionsHeader : ""}
+                                    key={property.name}
+                                >
+                                    <EnvironmentAccordionBody property={property} />
+                                </Accordion>
+                            )),
+                            ...withoutDropDown.map((property) => (
+                                <div className={styles.CommonPropertyWrapper} key={property.name}>
+                                    <div className={styles.KeyChunk}>
+                                        {property.name} <Copy text={property.name} />
+                                    </div>
+                                    <div className={styles.ValueChunk}>
+                                        <EnvironmentPropertyValue property={property} />
+                                    </div>
+                                </div>
+                            )),
+                        ]}
+                    </EmptyHandler>
+                </div>
             </Accordion>
         </div>
     );

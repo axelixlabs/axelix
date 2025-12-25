@@ -1,5 +1,5 @@
 /* TODO: this css class CustomizedAntdTable is used also for scheduled tasks, and I do not think it is correct */
-.CustomizedAntdTable {
+.CustomizedTable {
     width: 100%;
     border: 1px solid #f0f0f0;
     border-radius: var(--axile-border-radius-large);
@@ -8,7 +8,7 @@
     margin-bottom: 40px;
 }
 
-.CustomizedAntdTable:last-child {
+.CustomizedTable:last-child {
     margin-bottom: 0;
 }
 
@@ -45,10 +45,10 @@
     display: flex;
     align-items: center;
     padding: 16px;
-    border-right: 1px solid #f0f0f0;
     word-break: break-all;
+    border-left: none;
 }
 
 .RowChunk:last-child {
-    border-right: none;
+    border-left: 1px solid #f0f0f0;
 }

@@ -57,7 +57,12 @@
         }
     },
     "Environments": {
-        "activeProfiles": "Профили"
+        "activeProfiles": "Профили",
+        "primaryProperty": "Актуальное значение",
+        "deprecated": "Устаревшее",
+        "description": "Описание",
+        "configProps": "Configuration Properties",
+        "injectedIn": "Инжектируется в"
     },
     "Loggers": {
         "loggers": "Логгеры",

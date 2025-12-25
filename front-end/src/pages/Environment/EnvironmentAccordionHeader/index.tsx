@@ -13,34 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Tooltip } from "antd";
+import { Copy } from "components";
+import type { IEnvProperty } from "models";
 
-import { Copy } from "../Copy";
+import { EnvironmentPropertyValue } from "../EnvironmentPropertyValue";
 
 import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * Tooltip text
+     * Single property
      */
-    text: string;
-    /**
-     * Different onclick handlers on tooltip text
-     */
-    onClick?: () => void;
+    property: IEnvProperty;
 }
 
-export const TooltipWithCopy = ({ text, onClick }: IProps) => {
+export const EnvironmentAccordionHeader = ({ property }: IProps) => {
+    const { name } = property;
+
     return (
-        <>
-            <Tooltip title={text}>
-                <div className={styles.TextWrapper}>
-                    <div className={styles.Text} onClick={onClick}>
-                        {text}
-                    </div>
-                    <Copy text={text} />
-                </div>
-            </Tooltip>
-        </>
+        <div key={name} className={styles.MainWrapper}>
+            <div className={styles.KeyChunk}>
+                {name} <Copy text={name} />
+            </div>
+            <div className={styles.ValueChunk}>
+                <EnvironmentPropertyValue property={property} />
+            </div>
+        </div>
     );
 };

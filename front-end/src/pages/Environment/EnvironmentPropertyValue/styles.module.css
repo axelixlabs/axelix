@@ -1,0 +1,35 @@
+.MainWrapper {
+    display: flex;
+    justify-content: flex-end;
+    column-gap: 20px;
+    width: 100%;
+}
+
+.PropertyValueWrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    column-gap: 20px;
+}
+
+.IconPlaceholder {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.EditPropertyField {
+    width: min(300px, 100%);
+}
+
+.EditButton,
+.CloseButton,
+.UpdateButton {
+    flex-shrink: 0;
+}
+
+.EditPropertyWrapper {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    column-gap: 8px;
+}
