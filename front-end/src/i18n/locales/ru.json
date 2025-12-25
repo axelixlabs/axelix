@@ -58,11 +58,11 @@
     },
     "Environments": {
         "activeProfiles": "Профили",
-        "primaryProperty": "Основной экземпляр",
+        "primaryProperty": "Актуальное значение",
         "deprecated": "Устаревшее",
         "description": "Описание",
-        "configProps": "Параметры конфигурации",
-        "injectedIn": "Внедряется в"
+        "configProps": "Configuration Properties",
+        "injectedIn": "Инжектируется в"
     },
     "Loggers": {
         "loggers": "Логгеры",

@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { EmptyHandler, HashNavigableHOC, Loader, PageSearch } from "components";
+import { EmptyHandler, HashNavigable, Loader, PageSearch } from "components";
 import { fetchData, filterConfigPropsBeans, getPropertiesCount } from "helpers";
 import { useAppSelector } from "hooks";
 import { type IConfigPropsBean, type IConfigPropsResponseBody, StatefulRequest } from "models";
@@ -69,9 +69,9 @@ const ConfigProps = () => {
     return (
         <>
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
-            <HashNavigableHOC>
+            <HashNavigable>
                 <ConfigPropsTables effectiveConfigProps={effectiveConfigProps} />
-            </HashNavigableHOC>
+            </HashNavigable>
         </>
     );
 };

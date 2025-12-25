@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
 import { normalizeHtmlElementId, uniqueInjectionPointsBeanNames } from "helpers";
-import type { IEnvProperties } from "models";
+import type { IEnvProperty } from "models";
 
 import styles from "./styles.module.css";
 
@@ -27,7 +27,7 @@ interface IProps {
     /**
      * Single property
      */
-    property: IEnvProperties;
+    property: IEnvProperty;
 }
 
 export const EnvironmentAccordionBody = ({ property }: IProps) => {

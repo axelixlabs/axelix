@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { EEnvironmentsInjectionType } from "models/enums/environments";
+import type { EPropertyInjectionType } from "models/enums/environments";
 
 interface IDeprecation {
     /**
@@ -29,12 +29,14 @@ export interface IInjectionPoint {
     beanName: string;
 
     /**
-     * Type of injected bean
+     * The type of the injection point.
      */
-    injectionType: EEnvironmentsInjectionType;
+    injectionType: EPropertyInjectionType;
 
     /**
-     * The name of the target subject
+     * The name of the "target". Can be the name of the method in
+     * case of method injection, the name of the field in case of
+     * a field injection, or a parameter name/number.
      */
     targetName: string;
 
@@ -44,7 +46,7 @@ export interface IInjectionPoint {
     propertyExpression: string;
 }
 
-export interface IEnvProperties {
+export interface IEnvProperty {
     /**
      * The property name
      */
@@ -71,7 +73,7 @@ export interface IEnvProperties {
     description: string | null;
 
     /**
-     * If true, the property is deprecated
+     * If this property exists, then the underlying spring environment's property is deprecated
      */
     deprecation?: IDeprecation;
 
@@ -95,7 +97,7 @@ export interface IEnvironmentPropertySource {
     /**
      * Environment properties list
      */
-    properties: IEnvProperties[];
+    properties: IEnvProperty[];
 }
 
 export interface IEnvironmentResponseBody {

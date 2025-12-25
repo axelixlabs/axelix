@@ -19,7 +19,7 @@ import { useLocation } from "react-router-dom";
 
 import styles from "./styles.module.css";
 
-export const HashNavigableHOC = ({ children }: PropsWithChildren) => {
+export const HashNavigable = ({ children }: PropsWithChildren) => {
     const { hash } = useLocation();
 
     // TODO:

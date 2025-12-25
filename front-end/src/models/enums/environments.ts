@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export enum EEnvironmentsInjectionType {
+
+/**
+ * Injection type of the given property, that is to say - information on
+ * how exactly this property is injected into the given bean.
+ */
+export enum EPropertyInjectionType {
     FIELD = "FIELD",
     METHOD = "METHOD",
     CONSTRUCTOR_PARAMETER = "CONSTRUCTOR_PARAMETER",

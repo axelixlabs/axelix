@@ -2,7 +2,6 @@
     display: flex;
     justify-content: flex-end;
     column-gap: 20px;
-    padding-right: 40px;
     width: 100%;
 }
 

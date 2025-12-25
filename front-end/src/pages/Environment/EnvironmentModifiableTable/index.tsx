@@ -17,7 +17,7 @@ import { Tooltip } from "antd";
 import InfoIcon from "assets/icons/info.svg?react";
 
 import { Accordion, Copy, EmptyHandler } from "components";
-import { isDropdownNeededProperty, sortEnvironmentsProperties } from "helpers";
+import { splitProperties } from "helpers";
 import type { IEnvironmentPropertySource } from "models";
 
 import { EnvironmentAccordionBody } from "../EnvironmentAccordionBody";
@@ -35,7 +35,7 @@ interface IProps {
 
 export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
     const { name, properties, description } = propertySource;
-    const sortedProperties = sortEnvironmentsProperties(properties);
+    const [withDropDown, withoutDropDown] = splitProperties(properties);
 
     return (
         <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
@@ -55,16 +55,17 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
             >
                 <div className="AccordionsWrapper">
                     <EmptyHandler isEmpty={!properties.length}>
-                        {sortedProperties.map((property) =>
-                            isDropdownNeededProperty(property) ? (
+                        {[
+                            ...withDropDown.map((property) => (
                                 <Accordion
                                     header={<EnvironmentAccordionHeader property={property} />}
-                                    headerStyles={property.deprecation ? styles.InnerAccordionsHeaderStyles : ""}
+                                    headerStyles={property.deprecation ? styles.DeprecatedPropertyAccordionsHeader : ""}
                                     key={property.name}
                                 >
                                     <EnvironmentAccordionBody property={property} />
                                 </Accordion>
-                            ) : (
+                            )),
+                            ...withoutDropDown.map((property) => (
                                 <div className={styles.CommonPropertyWrapper} key={property.name}>
                                     <div className={styles.KeyChunk}>
                                         {property.name} <Copy text={property.name} />
@@ -73,8 +74,8 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
                                         <EnvironmentPropertyValue property={property} />
                                     </div>
                                 </div>
-                            ),
-                        )}
+                            )),
+                        ]}
                     </EmptyHandler>
                 </div>
             </Accordion>

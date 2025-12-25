@@ -16,7 +16,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { EmptyHandler, HashNavigableHOC, Loader, PageSearch } from "components";
+import { EmptyHandler, HashNavigable, Loader, PageSearch } from "components";
 import { fetchData, filterBeans } from "helpers";
 import { type IBeansResponseBody, StatefulRequest } from "models";
 import { getBeansData } from "services";
@@ -50,9 +50,9 @@ const Beans = () => {
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
 
             <EmptyHandler isEmpty={!effectiveBeans.length}>
-                <HashNavigableHOC>
+                <HashNavigable>
                     <BeansAccordionsList effectiveBeans={effectiveBeans} />
-                </HashNavigableHOC>
+                </HashNavigable>
             </EmptyHandler>
         </>
     );

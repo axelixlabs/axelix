@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Copy } from "components";
-import type { IEnvProperties } from "models";
+import type { IEnvProperty } from "models";
 
 import { EnvironmentPropertyValue } from "../EnvironmentPropertyValue";
 
@@ -24,7 +24,7 @@ interface IProps {
     /**
      * Single property
      */
-    property: IEnvProperties;
+    property: IEnvProperty;
 }
 
 export const EnvironmentAccordionHeader = ({ property }: IProps) => {

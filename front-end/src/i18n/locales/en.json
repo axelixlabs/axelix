@@ -58,7 +58,7 @@
     },
     "Environments": {
         "activeProfiles": "Profiles",
-        "primaryProperty": "Primary property",
+        "primaryProperty": "Primary property value",
         "deprecated": "Deprecated",
         "description": "Description",
         "configProps": "Configuration Properties",

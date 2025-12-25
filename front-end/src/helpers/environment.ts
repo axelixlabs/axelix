@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { IEnvProperties, IEnvironmentPropertySource, IInjectionPoint } from "models";
+import type { IEnvProperty, IEnvironmentPropertySource, IInjectionPoint } from "models";
 
 import { canonicalize } from "./globals";
 
@@ -49,18 +49,28 @@ export const filterPropertySources = (
     }, []);
 };
 
-export const isDropdownNeededProperty = (property: IEnvProperties): boolean => {
+export const isDropdownNeededProperty = (property: IEnvProperty): boolean => {
     const { configPropsBeanName, deprecation, description, injectionPoints } = property;
 
     return !!(deprecation || description || injectionPoints || configPropsBeanName);
 };
 
-export const sortEnvironmentsProperties = (properties: IEnvProperties[]): IEnvProperties[] => {
-    return properties.toSorted((firstProperty, secondProperty) => {
-        const firstPropertySpecial = isDropdownNeededProperty(firstProperty) ? 1 : 0;
-        const secondPropertySpecial = isDropdownNeededProperty(secondProperty) ? 1 : 0;
-        return secondPropertySpecial - firstPropertySpecial;
+/**
+ * Spit passed properties into two parts - properties that are supposed to have the drop-down and those that do not.
+ */
+export const splitProperties = (properties: IEnvProperty[]): [IEnvProperty[], IEnvProperty[]] => {
+    const withDropDown: IEnvProperty[] = [];
+    const withoutDropDown: IEnvProperty[] = [];
+
+    properties.forEach((property) => {
+        if (isDropdownNeededProperty(property)) {
+            withDropDown.push(property);
+        } else {
+            withoutDropDown.push(property);
+        }
     });
+
+    return [withDropDown, withoutDropDown];
 };
 
 /**

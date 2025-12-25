@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { useAppDispatch } from "hooks";
-import type { IEnvProperties } from "models";
+import type { IEnvProperty } from "models";
 import { updatePropertyThunk } from "store/thunks";
 
 import styles from "./styles.module.css";
@@ -32,7 +32,7 @@ interface IProps {
     /**
      * Single property
      */
-    property: IEnvProperties;
+    property: IEnvProperty;
 }
 
 export const EnvironmentPropertyValue = ({ property }: IProps) => {
