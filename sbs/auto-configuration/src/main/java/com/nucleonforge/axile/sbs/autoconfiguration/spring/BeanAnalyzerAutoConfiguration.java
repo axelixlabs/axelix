@@ -17,6 +17,7 @@ package com.nucleonforge.axile.sbs.autoconfiguration.spring;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.actuate.autoconfigure.beans.BeansEndpointAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -28,12 +29,15 @@ import com.nucleonforge.axile.sbs.spring.beans.BeanMetaInfoExtractor;
 import com.nucleonforge.axile.sbs.spring.beans.BeansEndpointExtension;
 import com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractor;
 import com.nucleonforge.axile.sbs.spring.beans.QualifiersPersistencePostProcessor;
+import com.nucleonforge.axile.sbs.spring.conditions.ConditionalBeanRefBuilder;
+import com.nucleonforge.axile.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
 
 /**
  * {@code BeanAnalyzerAutoConfiguration} auto-configuration class for {@link BeanMetaInfoExtractor} bean.
  *
  * @since 07.07.2025
  * @author Nikita Kirillov
+ * @author Sergey  Cherkasov
  */
 @AutoConfiguration(after = BeansEndpointAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = BeansEndpoint.class)
@@ -41,8 +45,17 @@ public class BeanAnalyzerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public BeanMetaInfoExtractor defaultBeanMetaInfoExtractor(ConfigurableListableBeanFactory beanFactory) {
-        return new DefaultBeanMetaInfoExtractor(beanFactory);
+    public ConditionalBeanRefBuilder beanNameNormalizer() {
+        return new DefaultConditionalBeanRefBuilder();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public BeanMetaInfoExtractor defaultBeanMetaInfoExtractor(
+            ConfigurableListableBeanFactory beanFactory,
+            ConditionsReportEndpoint delegateConditions,
+            ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
+        return new DefaultBeanMetaInfoExtractor(beanFactory, delegateConditions, conditionalBeanRefBuilder);
     }
 
     @Bean

@@ -17,6 +17,8 @@ package com.nucleonforge.axile.sbs.spring.beans;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.common.api.BeansFeed.ProxyType;
 
@@ -24,8 +26,10 @@ import com.nucleonforge.axile.common.api.BeansFeed.ProxyType;
  * Additional bean metadata.
  *
  * @author Mikhail Polivakha
+ * @author Sergey  Cherkasov
  */
 public record BeanMetaInfo(
+        @Nullable String autoConfigurationRef,
         ProxyType proxyType,
         boolean isLazyInit,
         boolean isPrimary,

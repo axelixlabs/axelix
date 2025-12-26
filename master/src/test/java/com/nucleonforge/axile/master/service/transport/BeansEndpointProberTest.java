@@ -57,6 +57,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  *
  * @since 29.08.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
 class BeansEndpointProberTest {
@@ -97,6 +98,7 @@ class BeansEndpointProberTest {
                      "type": "JmxEndpointProperties",
                      "proxyType" : "CGLIB",
                      "aliases": [],
+                     "autoConfigurationRef" : null,
                      "dependencies": [],
                      "isLazyInit": false,
                      "isPrimary": false,
@@ -112,6 +114,7 @@ class BeansEndpointProberTest {
                      "proxyType" : "JDK_PROXY",
                      "resource": "class path resource JacksonObjectMapperBuilderConfiguration.class",
                      "aliases": [],
+                     "autoConfigurationRef" : "HibernateJpaConfiguration#entityManagerFactoryBuilder",
                      "dependencies": [
                        {
                          "name": "spring.cache-org.springframework.boot.autoconfigure.cache.CacheProperties",
@@ -135,6 +138,7 @@ class BeansEndpointProberTest {
                      "proxyType" : "NO_PROXYING",
                      "resource": "class path resource [org.example.com]",
                      "aliases": ["sessionBeanForProberTest"],
+                     "autoConfigurationRef" : null,
                      "dependencies": [],
                      "isLazyInit": false,
                      "isPrimary": false,
@@ -188,6 +192,7 @@ class BeansEndpointProberTest {
         assertThat(jmxEndpoint.scope()).isEqualTo("singleton");
         assertThat(jmxEndpoint.type()).isEqualTo("JmxEndpointProperties");
         assertThat(jmxEndpoint.aliases()).isEmpty();
+        assertThat(jmxEndpoint.autoConfigurationRef()).isNull();
         assertThat(jmxEndpoint.proxyType()).isEqualTo(ProxyType.CGLIB);
         assertThat(jmxEndpoint.dependencies()).isEmpty();
         assertThat(jmxEndpoint.isLazyInit()).isFalse();
@@ -201,6 +206,8 @@ class BeansEndpointProberTest {
         assertThat(jacksonBuilder.type()).isEqualTo("Jackson2ObjectMapperBuilder");
         assertThat(jacksonBuilder.proxyType()).isEqualTo(ProxyType.JDK_PROXY);
         assertThat(jacksonBuilder.aliases()).isEmpty();
+        assertThat(jacksonBuilder.autoConfigurationRef())
+                .isEqualTo("HibernateJpaConfiguration#entityManagerFactoryBuilder");
         assertThat(jacksonBuilder.dependencies())
                 .extracting(BeanDependency::name)
                 .containsExactlyInAnyOrder("spring.cache-org.springframework.boot.autoconfigure.cache.CacheProperties");
@@ -228,6 +235,7 @@ class BeansEndpointProberTest {
         assertThat(testSessionBean.type()).isEqualTo("TestSessionBean");
         assertThat(testSessionBean.proxyType()).isEqualTo(ProxyType.NO_PROXYING);
         assertThat(testSessionBean.aliases()).containsExactly("sessionBeanForProberTest");
+        assertThat(testSessionBean.autoConfigurationRef()).isNull();
         assertThat(testSessionBean.dependencies()).isEmpty();
         assertThat(testSessionBean.isLazyInit()).isFalse();
         assertThat(testSessionBean.isPrimary()).isFalse();

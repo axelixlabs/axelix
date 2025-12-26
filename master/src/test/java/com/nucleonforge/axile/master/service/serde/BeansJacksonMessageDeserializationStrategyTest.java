@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <a href="https://docs.spring.io/spring-boot/api/rest/actuator/beans.html">official doc.</a>.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 class BeansJacksonMessageDeserializationStrategyTest {
 
@@ -50,6 +51,7 @@ class BeansJacksonMessageDeserializationStrategyTest {
                   "scope" : "singleton",
                   "proxyType" : "JDK_PROXY",
                   "type" : "org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration$DispatcherServletRegistrationConfiguration",
+                  "autoConfigurationRef" : "DispatcherServletAutoConfiguration.DispatcherServletRegistrationConfiguration",
                   "dependencies" : [ ],
                   "isLazyInit" : false,
                   "isPrimary" : true,
@@ -64,6 +66,7 @@ class BeansJacksonMessageDeserializationStrategyTest {
                   "scope" : "singleton",
                   "proxyType" : "CGLIB",
                   "type" : "org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration",
+                  "autoConfigurationRef" : "HibernateJpaConfiguration#entityManagerFactoryBuilder",
                   "dependencies": [
                     {
                       "name": "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
@@ -90,6 +93,7 @@ class BeansJacksonMessageDeserializationStrategyTest {
                   "scope" : "singleton",
                   "proxyType" : "NO_PROXYING",
                   "type" : "org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration",
+                  "autoConfigurationRef" : null,
                   "dependencies" : [ ],
                   "isLazyInit" : false,
                   "isPrimary" : false,
@@ -116,6 +120,8 @@ class BeansJacksonMessageDeserializationStrategyTest {
                     .get(
                             "org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration$DispatcherServletRegistrationConfiguration");
             assertThat(first.aliases()).containsOnly("abc", "bcd");
+            assertThat(first.autoConfigurationRef())
+                    .isEqualTo("DispatcherServletAutoConfiguration.DispatcherServletRegistrationConfiguration");
             assertThat(first.dependencies()).isEmpty();
             assertThat(first.scope()).isEqualTo("singleton");
             assertThat(first.proxyType()).isEqualTo(BeansFeed.ProxyType.JDK_PROXY);
@@ -131,6 +137,8 @@ class BeansJacksonMessageDeserializationStrategyTest {
             BeansFeed.Bean second = context.beans()
                     .get("org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration");
             assertThat(second.aliases()).isEmpty();
+            assertThat(second.autoConfigurationRef())
+                    .isEqualTo("HibernateJpaConfiguration#entityManagerFactoryBuilder");
             assertThat(second.dependencies())
                     .hasSize(2)
                     .satisfiesExactlyInAnyOrder(
@@ -170,6 +178,7 @@ class BeansJacksonMessageDeserializationStrategyTest {
             BeansFeed.Bean third = context.beans()
                     .get("org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration");
             assertThat(third.aliases()).isEmpty();
+            assertThat(third.autoConfigurationRef()).isNull();
             assertThat(third.dependencies()).isEmpty();
             assertThat(third.scope()).isEqualTo("singleton");
             assertThat(third.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);

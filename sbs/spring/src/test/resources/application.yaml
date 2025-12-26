@@ -28,6 +28,7 @@ management:
           - configprops
           - axile-configprops
           - axile-caches
+          - conditions
 
 logging:
   level:

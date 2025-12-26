@@ -48,6 +48,7 @@ import com.nucleonforge.axile.common.api.BeansFeed.Context;
  *
  * @since 08.10.2025
  * @author Nikita Kirillov
+ * @author Sergey  Cherkasov
  */
 @EndpointWebExtension(endpoint = BeansEndpoint.class)
 public class BeansEndpointExtension {
@@ -94,6 +95,7 @@ public class BeansEndpointExtension {
                                     beanType,
                                     metaInfo.proxyType(),
                                     toSet(beanDescriptor.getAliases()),
+                                    metaInfo.autoConfigurationRef(),
                                     enrichedDependencies,
                                     metaInfo.isLazyInit(),
                                     metaInfo.isPrimary(),
