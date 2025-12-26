@@ -34,9 +34,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  *
  * @since 24.06.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-// TODO: same problem as in AxileCachesEndpointTest
 class DefaultCacheDispatcherTest {
+
+    // Cache Manager 1
+    private final String TEST_CACHE_MANAGER_1 = "cacheManager1";
+    private final String TEST_CACHE_1 = "cache1";
+    private final String TEST_CACHE_2 = "cache2";
+
+    // Cache Manager 2
+    private final String TEST_CACHE_MANAGER_2 = "cacheManager2";
 
     private CacheManager cacheManager1;
     private CacheManager cacheManager2;
@@ -44,26 +52,26 @@ class DefaultCacheDispatcherTest {
 
     @BeforeEach
     void setUp() {
-        cacheManager1 = new EnhancedCacheManager(new ConcurrentMapCacheManager());
-        cacheManager2 = new EnhancedCacheManager(new ConcurrentMapCacheManager());
         Map<String, CacheManager> managers = new HashMap<>();
-        managers.put("cacheManager1", cacheManager1);
-        managers.put("cacheManager2", cacheManager2);
+
+        cacheManager1 = new EnhancedCacheManager(new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2));
+        cacheManager2 = new EnhancedCacheManager(new ConcurrentMapCacheManager(TEST_CACHE_2));
+        managers.put(TEST_CACHE_MANAGER_1, cacheManager1);
+        managers.put(TEST_CACHE_MANAGER_2, cacheManager2);
         dispatcher = new DefaultCacheDispatcher(managers);
     }
 
     @Test
     void clear_shouldRemoveAllEntriesInCache() {
         String key = "key";
-        String cacheName = "cache";
-        String cacheManagerName = "cacheManager1";
+        String cacheName = TEST_CACHE_1;
         Cache cache = cacheManager1.getCache(cacheName);
         assertThat(cache).isNotNull();
 
         cache.put(key, "value");
         assertThat(cache.get(key)).isNotNull();
 
-        assertThat(dispatcher.clear(cacheManagerName, cacheName)).isTrue();
+        assertThat(dispatcher.clear(TEST_CACHE_MANAGER_1, cacheName)).isTrue();
         assertThat(cache.get(key)).isNull();
     }
 
@@ -74,9 +82,8 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void clearKey_shouldEvictSingleEntry() {
-        String cacheName = "cache";
+        String cacheName = TEST_CACHE_1;
         String keyToRemove = "keyToRemove", keyToKeep = "keyToKeep";
-        String cacheManagerName = "cacheManager1";
         Cache cache = cacheManager1.getCache(cacheName);
         assertThat(cache).isNotNull();
 
@@ -85,7 +92,8 @@ class DefaultCacheDispatcherTest {
         assertThat(cache.get(keyToRemove)).isNotNull();
         assertThat(cache.get(keyToKeep)).isNotNull();
 
-        assertThat(dispatcher.clear(cacheManagerName, cacheName, keyToRemove)).isTrue();
+        assertThat(dispatcher.clear(TEST_CACHE_MANAGER_1, cacheName, keyToRemove))
+                .isTrue();
 
         assertThat(cache.get(keyToRemove)).isNull();
         assertThat(cache.get(keyToKeep)).isNotNull().satisfies(cacheValue -> assertThat(cacheValue.get())
@@ -100,9 +108,8 @@ class DefaultCacheDispatcherTest {
     @Test
     void clearAll_shouldClearAllCaches() {
         String key1 = "key1", key2 = "key2";
-        String cacheManagerName = "cacheManager1";
-        Cache cache1 = cacheManager1.getCache("cache1");
-        Cache cache2 = cacheManager1.getCache("cache2");
+        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
+        Cache cache2 = cacheManager1.getCache(TEST_CACHE_2);
         assertThat(cache1).isNotNull();
         assertThat(cache2).isNotNull();
 
@@ -111,7 +118,7 @@ class DefaultCacheDispatcherTest {
         assertThat(cache1.get(key1)).isNotNull();
         assertThat(cache2.get(key2)).isNotNull();
 
-        assertThat(dispatcher.clearAll(cacheManagerName)).isTrue();
+        assertThat(dispatcher.clearAll(TEST_CACHE_MANAGER_1)).isTrue();
 
         assertThat(cache1.get(key1)).isNull();
         assertThat(cache2.get(key2)).isNull();
@@ -124,13 +131,12 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void disableCacheManager_shouldDisableSpecificManager() {
-        Cache cache1 = cacheManager1.getCache("cache1");
-        assert cache1 != null;
+        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
 
         cache1.put("key1", "value1");
         assertThat(cache1.get("key1")).isNotNull();
 
-        dispatcher.disableCacheManager("cacheManager1");
+        dispatcher.disableCacheManager(TEST_CACHE_MANAGER_1);
 
         cache1.put("key2", "value2");
         assertThat(cache1.get("key2")).isNull();
@@ -138,15 +144,14 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void enableCacheManager_shouldEnableSpecificManager() {
-        Cache cache = cacheManager1.getCache("cache1");
-        assert cache != null;
+        Cache cache = cacheManager1.getCache(TEST_CACHE_1);
 
-        dispatcher.disableCacheManager("cacheManager1");
+        dispatcher.disableCacheManager(TEST_CACHE_MANAGER_1);
 
         cache.put("key", "value");
         assertThat(cache.get("key")).isNull();
 
-        dispatcher.enableCacheManager("cacheManager1");
+        dispatcher.enableCacheManager(TEST_CACHE_MANAGER_1);
 
         cache.put("key2", "value2");
         assertThat(cache.get("key2")).isNotNull();
@@ -154,13 +159,12 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void disableCache_shouldDisableSpecificCache() {
-        Cache cache1 = cacheManager1.getCache("cache1");
-        assert cache1 != null;
+        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
 
         cache1.put("key1", "value1");
         assertThat(cache1.get("key1")).isNotNull();
 
-        dispatcher.disableCache("cacheManager1", "cache1");
+        dispatcher.disableCache(TEST_CACHE_MANAGER_1, TEST_CACHE_1);
 
         cache1.put("key2", "value2");
         assertThat(cache1.get("key2")).isNull();
@@ -168,15 +172,14 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void enableCache_shouldEnableSpecificCache() {
-        Cache cache1 = cacheManager1.getCache("cache1");
-        assert cache1 != null;
+        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
         cache1.put("key", "value");
-        dispatcher.disableCache("cacheManager1", "cache1");
+        dispatcher.disableCache(TEST_CACHE_MANAGER_1, TEST_CACHE_1);
 
         cache1.put("key", "value");
         assertThat(cache1.get("key")).isNull();
 
-        dispatcher.enableCache("cacheManager1", "cache1");
+        dispatcher.enableCache(TEST_CACHE_MANAGER_1, TEST_CACHE_1);
 
         cache1.put("key2", "value2");
         assertThat(cache1.get("key2")).isNotNull();
@@ -184,17 +187,15 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void disableCache_shouldNotAffectOtherCachesInSameManager() {
-        Cache cache1 = cacheManager1.getCache("cache1");
-        Cache cache2 = cacheManager1.getCache("cache2");
-        assert cache1 != null;
-        assert cache2 != null;
+        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
+        Cache cache2 = cacheManager1.getCache(TEST_CACHE_2);
 
         cache1.put("key1", "value1");
         cache2.put("key2", "value2");
         assertThat(cache1.get("key1")).isNotNull();
         assertThat(cache2.get("key2")).isNotNull();
 
-        dispatcher.disableCache("cacheManager1", "cache1");
+        dispatcher.disableCache(TEST_CACHE_MANAGER_1, TEST_CACHE_1);
 
         cache1.put("key3", "value3");
         cache2.put("key4", "value4");
@@ -205,17 +206,15 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void disableCacheManager_shouldNotAffectOtherManagers() {
-        Cache cache1 = cacheManager1.getCache("cache1");
-        Cache cache2 = cacheManager2.getCache("cache2");
-        assert cache1 != null;
-        assert cache2 != null;
+        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
+        Cache cache2 = cacheManager2.getCache(TEST_CACHE_2);
 
         cache1.put("key1", "value1");
         cache2.put("key2", "value2");
         assertThat(cache1.get("key1")).isNotNull();
         assertThat(cache2.get("key2")).isNotNull();
 
-        dispatcher.disableCacheManager("cacheManager1");
+        dispatcher.disableCacheManager(TEST_CACHE_MANAGER_1);
 
         cache1.put("key3", "value3");
         cache2.put("key4", "value4");
@@ -226,20 +225,14 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void isCacheEnabled_shouldReturnTrueForEnabledCache() {
-        String cacheManagerName = "cacheManager1";
-        String cacheName = "cache";
-        Cache cache = cacheManager1.getCache(cacheName);
-        assertThat(cache).isNotNull();
-
-        assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName)).isTrue();
+        assertThat(dispatcher.isCacheEnabled(TEST_CACHE_MANAGER_1, TEST_CACHE_1))
+                .isTrue();
     }
 
     @Test
     void isCacheEnabled_shouldReturnFalseForDisabledCache() {
-        String cacheManagerName = "cacheManager1";
-        String cacheName = "cache";
-        Cache cache = cacheManager1.getCache(cacheName);
-        assertThat(cache).isNotNull();
+        String cacheManagerName = TEST_CACHE_MANAGER_1;
+        String cacheName = TEST_CACHE_1;
 
         dispatcher.disableCache(cacheManagerName, cacheName);
 
@@ -248,10 +241,8 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void isCacheEnabled_shouldReturnTrueAfterDisableEnableCache() {
-        String cacheManagerName = "cacheManager1";
-        String cacheName = "cache";
-        Cache cache = cacheManager1.getCache(cacheName);
-        assertThat(cache).isNotNull();
+        String cacheManagerName = TEST_CACHE_MANAGER_1;
+        String cacheName = TEST_CACHE_1;
 
         dispatcher.disableCache(cacheManagerName, cacheName);
         dispatcher.enableCache(cacheManagerName, cacheName);
@@ -261,24 +252,18 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void isCacheEnabled_shouldReturnFalseWhenCacheManagerDisabled() {
-        String cacheManagerName = "cacheManager1";
-        String cacheName1 = "cache1";
-        cacheManager1.getCache(cacheName1);
-        String cacheName2 = "cache2";
-        cacheManager1.getCache(cacheName2);
+        String cacheManagerName = TEST_CACHE_MANAGER_1;
 
         dispatcher.disableCacheManager(cacheManagerName);
 
-        assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName1)).isFalse();
-        assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName2)).isFalse();
+        assertThat(dispatcher.isCacheEnabled(cacheManagerName, TEST_CACHE_1)).isFalse();
+        assertThat(dispatcher.isCacheEnabled(cacheManagerName, TEST_CACHE_2)).isFalse();
     }
 
     @Test
     void isCacheEnabled_shouldReturnTrueWhenCacheManagerDisableEnable() {
-        String cacheManagerName = "cacheManager1";
-        String cacheName = "cache";
-        Cache cache = cacheManager1.getCache(cacheName);
-        assertThat(cache).isNotNull();
+        String cacheManagerName = TEST_CACHE_MANAGER_1;
+        String cacheName = TEST_CACHE_1;
 
         dispatcher.disableCacheManager(cacheManagerName);
 
@@ -305,25 +290,25 @@ class DefaultCacheDispatcherTest {
 
     @Test
     void enableCache_shouldThrowExceptionForNonExistentManager() {
-        assertThatThrownBy(() -> dispatcher.enableCache("nonExistentManager", "cache1"))
+        assertThatThrownBy(() -> dispatcher.enableCache("nonExistentManager", TEST_CACHE_1))
                 .isInstanceOf(CacheManagerAdapterNotFoundException.class)
                 .hasMessageContaining("nonExistentManager");
     }
 
     @Test
     void disableCache_shouldThrowExceptionForNonExistentManager() {
-        assertThatThrownBy(() -> dispatcher.disableCache("nonExistentManager", "cache1"))
+        assertThatThrownBy(() -> dispatcher.disableCache("nonExistentManager", TEST_CACHE_1))
                 .isInstanceOf(CacheManagerAdapterNotFoundException.class)
                 .hasMessageContaining("nonExistentManager");
     }
 
     @Test
     void enableCache_shouldWorkWhenCacheDoesNotExist() {
-        assertThatNoException().isThrownBy(() -> dispatcher.enableCache("cacheManager1", "nonExistentCache"));
+        assertThatNoException().isThrownBy(() -> dispatcher.enableCache(TEST_CACHE_MANAGER_1, "nonExistentCache"));
     }
 
     @Test
     void disableCache_shouldWorkWhenCacheDoesNotExist() {
-        assertThatNoException().isThrownBy(() -> dispatcher.disableCache("cacheManager1", "nonExistentCache"));
+        assertThatNoException().isThrownBy(() -> dispatcher.disableCache(TEST_CACHE_MANAGER_1, "nonExistentCache"));
     }
 }

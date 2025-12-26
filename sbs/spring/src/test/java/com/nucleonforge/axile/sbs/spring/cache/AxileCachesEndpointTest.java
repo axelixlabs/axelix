@@ -53,6 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 24.06.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
 @Import({
