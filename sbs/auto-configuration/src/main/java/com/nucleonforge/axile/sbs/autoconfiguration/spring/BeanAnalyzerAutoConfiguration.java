@@ -26,11 +26,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axile.sbs.spring.beans.BeanMetaInfoExtractor;
-import com.nucleonforge.axile.sbs.spring.beans.BeanNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.beans.BeansEndpointExtension;
 import com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractor;
-import com.nucleonforge.axile.sbs.spring.beans.DefaultBeanNameNormalizer;
 import com.nucleonforge.axile.sbs.spring.beans.QualifiersPersistencePostProcessor;
+import com.nucleonforge.axile.sbs.spring.conditions.ConditionalBeanRefBuilder;
+import com.nucleonforge.axile.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
 
 /**
  * {@code BeanAnalyzerAutoConfiguration} auto-configuration class for {@link BeanMetaInfoExtractor} bean.
@@ -45,8 +45,8 @@ public class BeanAnalyzerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public BeanNameNormalizer beanNameNormalizer() {
-        return new DefaultBeanNameNormalizer();
+    public ConditionalBeanRefBuilder beanNameNormalizer() {
+        return new DefaultConditionalBeanRefBuilder();
     }
 
     @Bean
@@ -54,8 +54,8 @@ public class BeanAnalyzerAutoConfiguration {
     public BeanMetaInfoExtractor defaultBeanMetaInfoExtractor(
             ConfigurableListableBeanFactory beanFactory,
             ConditionsReportEndpoint delegateConditions,
-            BeanNameNormalizer beanNameNormalizer) {
-        return new DefaultBeanMetaInfoExtractor(beanFactory, delegateConditions, beanNameNormalizer);
+            ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
+        return new DefaultBeanMetaInfoExtractor(beanFactory, delegateConditions, conditionalBeanRefBuilder);
     }
 
     @Bean

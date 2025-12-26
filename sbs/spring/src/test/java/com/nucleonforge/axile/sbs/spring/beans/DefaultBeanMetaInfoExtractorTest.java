@@ -40,12 +40,12 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
+import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpointAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -66,6 +66,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nucleonforge.axile.common.api.BeansFeed;
 import com.nucleonforge.axile.common.api.BeansFeed.ComponentVariant;
+import com.nucleonforge.axile.sbs.spring.conditions.ConditionalBeanRefBuilder;
+import com.nucleonforge.axile.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
 
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.ANONYMOUS_BEAN;
 import static com.nucleonforge.axile.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.CONFIGURATION_BEAN;
@@ -87,9 +89,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 07.07.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.class)
-@Import(ConditionsReportEndpoint.class)
 class DefaultBeanMetaInfoExtractorTest {
 
     @Autowired
@@ -108,6 +110,42 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.qualifiers()).isEmpty();
             assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.autoConfigurationRef()).isNull();
+        });
+    }
+
+    @Test
+    void shouldExtractForAutoConfigurationBeanClass() {
+        BeanMetaInfo beanMetaInfo =
+                metaInfoExtractor.extract(ConditionsReportEndpointAutoConfiguration.class.getName(), testBeanFactory);
+
+        assertThat(beanMetaInfo).satisfies(it -> {
+            assertThat(it.isLazyInit()).isFalse();
+            assertThat(it.isPrimary()).isFalse();
+            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.qualifiers()).isEmpty();
+            assertThat(it.autoConfigurationRef()).isEqualTo("ConditionsReportEndpointAutoConfiguration");
+            assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
+        });
+    }
+
+    @Test
+    void shouldExtractForAutoConfigurationBeanMethod() {
+        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract("conditionsReportEndpoint", testBeanFactory);
+
+        assertThat(beanMetaInfo).satisfies(it -> {
+            assertThat(it.isLazyInit()).isFalse();
+            assertThat(it.isPrimary()).isFalse();
+            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.qualifiers()).isEmpty();
+            assertThat(it.autoConfigurationRef())
+                    .isEqualTo("ConditionsReportEndpointAutoConfiguration#conditionsReportEndpoint");
+            assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(beanMethod -> {
+                assertThat(beanMethod.enclosingClassFullName())
+                        .isEqualTo(ConditionsReportEndpointAutoConfiguration.class.getName());
+                assertThat(beanMethod.methodName()).isEqualTo("conditionsReportEndpoint");
+            });
         });
     }
 
@@ -121,6 +159,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.qualifiers()).isEmpty();
             assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.autoConfigurationRef()).isNull();
         });
     }
 
@@ -134,6 +173,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.qualifiers()).isEmpty();
             assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.autoConfigurationRef()).isNull();
         });
     }
 
@@ -147,6 +187,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
             assertThat(it.qualifiers()).contains(QUALIFIED_COMPONENT);
+            assertThat(it.autoConfigurationRef()).isNull();
         });
     }
 
@@ -160,6 +201,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.qualifiers()).isEmpty();
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat(it.autoConfigurationRef()).isNull();
             assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(bs -> {
                 assertThat(bs.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
                 assertThat(bs.enclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
@@ -178,6 +220,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.qualifiers()).contains(QUALIFIED_BEAN_METHOD);
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat(it.autoConfigurationRef()).isNull();
             assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(bs -> {
                 assertThat(bs.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
                 assertThat(bs.enclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
@@ -196,6 +239,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.JDK_PROXY);
             assertThat(it.qualifiers()).isEmpty();
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.FactoryBean.class);
+            assertThat(it.autoConfigurationRef()).isNull();
             assertThat((BeansFeed.FactoryBean) it.beanSource()).satisfies(bs -> {
                 assertThat(bs.factoryBeanName()).isEqualTo(JpaRepositoryFactoryBean.class.getName());
             });
@@ -212,6 +256,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.qualifiers()).contains(CUSTOM_DATABASE_QUALIFIER_BEAN);
             assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.autoConfigurationRef()).isNull();
         });
     }
 
@@ -224,6 +269,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.CGLIB);
             assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.autoConfigurationRef()).isNull();
         });
     }
 
@@ -236,6 +282,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.CGLIB);
             assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.autoConfigurationRef()).isNull();
         });
     }
 
@@ -248,6 +295,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat(it.autoConfigurationRef()).isNull();
 
             BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
             assertThat(source.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
@@ -265,6 +313,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat(it.autoConfigurationRef()).isNull();
 
             BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
             assertThat(source.enclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
@@ -282,6 +331,7 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.SyntheticBean.class);
+            assertThat(it.autoConfigurationRef()).isNull();
         });
     }
 
@@ -381,16 +431,16 @@ class DefaultBeanMetaInfoExtractorTest {
         }
 
         @Bean
-        public BeanNameNormalizer beanNameNormalizer() {
-            return new DefaultBeanNameNormalizer();
+        public ConditionalBeanRefBuilder beanNameNormalizer() {
+            return new DefaultConditionalBeanRefBuilder();
         }
 
         @Bean
         public DefaultBeanMetaInfoExtractor beanAnalyzer(
                 ConfigurableListableBeanFactory beanFactory,
                 ConditionsReportEndpoint delegateConditions,
-                BeanNameNormalizer beanNameNormalizer) {
-            return new DefaultBeanMetaInfoExtractor(beanFactory, delegateConditions, beanNameNormalizer);
+                ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
+            return new DefaultBeanMetaInfoExtractor(beanFactory, delegateConditions, conditionalBeanRefBuilder);
         }
 
         @Entity
