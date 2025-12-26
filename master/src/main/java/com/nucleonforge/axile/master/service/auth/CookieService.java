@@ -35,10 +35,11 @@ public interface CookieService {
     ResponseCookie buildAuthCookie(String token);
 
     /**
-     * Builds an authentication HTTP cookie with the provided JWT token.
+     * Builds an expired authentication HTTP cookie.
+     * <p>
+     * The value of the token
      *
-     * @param token JWT token to be stored in the cookie
      * @return configured ResponseCookie instance ready to be set in HTTP response
      */
-    ResponseCookie buildExpiredAuthCookie(String token);
+    ResponseCookie buildExpiredAuthCookie();
 }

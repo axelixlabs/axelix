@@ -28,7 +28,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +51,6 @@ import com.nucleonforge.axile.master.service.auth.UserLoginService;
 public class UserApi {
 
     private final UserLoginService userLoginService;
-
     private final CookieService cookieService;
 
     public UserApi(UserLoginService userLoginService, CookieService cookieService) {
@@ -139,11 +137,8 @@ public class UserApi {
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
     @PostMapping(path = ApiPaths.UsersApi.LOGOUT)
-    // TODO:
-    //  That is wrong. The name of the cookie must be configurable as it currently is in the
-    //  CookieProperties configuration properties class.
-    public ResponseEntity<?> login(@CookieValue(name = "auth_token") String authToken) {
-        ResponseCookie cookie = cookieService.buildExpiredAuthCookie(authToken);
+    public ResponseEntity<?> login() {
+        ResponseCookie cookie = cookieService.buildExpiredAuthCookie();
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())

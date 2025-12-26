@@ -43,8 +43,9 @@ public class DefaultCookieService implements CookieService {
     }
 
     @Override
-    public ResponseCookie buildExpiredAuthCookie(String token) {
-        return buildCookie(token, 0L);
+    public ResponseCookie buildExpiredAuthCookie() {
+        // The browser will expire the cookie anyway, so empty string is fine
+        return buildCookie("", 0L);
     }
 
     /**
