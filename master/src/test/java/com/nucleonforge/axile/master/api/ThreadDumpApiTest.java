@@ -24,6 +24,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,9 +38,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axile.master.ApplicationEntrypoint;
+import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
 import com.nucleonforge.axile.master.service.transport.EndpointInvocationException;
-import com.nucleonforge.axile.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axile.master.utils.TestObjectFactory.createInstance;
@@ -52,6 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 19.11.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ThreadDumpApiTest {
@@ -250,18 +252,26 @@ class ThreadDumpApiTest {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/threaddump-management/enable")) {
+                    return new MockResponse();
+                } else if (path.equals("/" + activeInstanceId + "/actuator/threaddump-management/disable")) {
+                    return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
             }
         });
+
+        registry.register(createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+    }
+
+    @AfterEach
+    void cleanup() {
+        registry.deRegister(InstanceId.of(activeInstanceId));
     }
 
     @Test
     void shouldReturnJSONThreadDumpFeed() {
-        registry.register(
-                TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
-
         ResponseEntity<String> response =
                 restTemplate.getForEntity("/api/axile/thread-dump/{instanceId}", String.class, activeInstanceId);
 
@@ -294,5 +304,27 @@ class ThreadDumpApiTest {
                 "/api/axile/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldEnableContentionMonitoring() throws InterruptedException {
+        // when.
+        restTemplate.postForObject("/api/axile/thread-dump/{instanceId}/enable", null, Void.class, activeInstanceId);
+
+        // then.
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertThat(recordedRequest.getPath())
+                .isEqualTo("/" + activeInstanceId + "/actuator/threaddump-management/enable");
+    }
+
+    @Test
+    void shouldDisableContentionMonitoring() throws InterruptedException {
+        // when.
+        restTemplate.postForObject("/api/axile/thread-dump/{instanceId}/disable", null, Void.class, activeInstanceId);
+
+        // then.
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertThat(recordedRequest.getPath())
+                .isEqualTo("/" + activeInstanceId + "/actuator/threaddump-management/disable");
     }
 }

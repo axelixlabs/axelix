@@ -25,6 +25,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,9 @@ import com.nucleonforge.axile.master.ApplicationEntrypoint;
 import com.nucleonforge.axile.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axile.master.model.instance.InstanceId;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
+import com.nucleonforge.axile.master.service.transport.threaddump.ThreadDumpDisableContentionMonitoringProber;
+import com.nucleonforge.axile.master.service.transport.threaddump.ThreadDumpEnableContentionMonitoringProber;
+import com.nucleonforge.axile.master.service.transport.threaddump.ThreadDumpEndpointProber;
 import com.nucleonforge.axile.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axile.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -55,6 +59,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  *
  * @since 19.11.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
 class ThreadDumpEndpointProberTest {
@@ -68,6 +73,12 @@ class ThreadDumpEndpointProberTest {
 
     @Autowired
     private ThreadDumpEndpointProber threadDumpEndpointProber;
+
+    @Autowired
+    private ThreadDumpEnableContentionMonitoringProber enableContentionMonitoringProber;
+
+    @Autowired
+    private ThreadDumpDisableContentionMonitoringProber disableContentionMonitoringProber;
 
     @BeforeAll
     static void startServer() throws IOException {
@@ -188,17 +199,26 @@ class ThreadDumpEndpointProberTest {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/threaddump-management/enable")) {
+                    return new MockResponse();
+                } else if (path.equals("/" + activeInstanceId + "/actuator/threaddump-management/disable")) {
+                    return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
             }
         });
+        registry.register(
+                TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+    }
+
+    @AfterEach
+    void cleanup() {
+        registry.deRegister(InstanceId.of(activeInstanceId));
     }
 
     @Test
     void shouldReturnThreadDumpFeed() {
-        registry.register(
-                TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         ThreadDumpFeed feed = threadDumpEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
@@ -313,5 +333,27 @@ class ThreadDumpEndpointProberTest {
 
         assertThatThrownBy(() -> threadDumpEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE))
                 .isInstanceOf(InstanceNotFoundException.class);
+    }
+
+    @Test
+    void shouldEnableContentionMonitoring() throws InterruptedException {
+        // when.
+        enableContentionMonitoringProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
+
+        // then.
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertThat(recordedRequest.getPath())
+                .isEqualTo("/" + activeInstanceId + "/actuator/threaddump-management/enable");
+    }
+
+    @Test
+    void shouldDisableContentionMonitoring() throws InterruptedException {
+        // when.
+        disableContentionMonitoringProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
+
+        // then.
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertThat(recordedRequest.getPath())
+                .isEqualTo("/" + activeInstanceId + "/actuator/threaddump-management/disable");
     }
 }
