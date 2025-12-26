@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 24.06.2025
  * @author Nikita Kirillov
  */
+// TODO: same problem as in AxileCachesEndpointTest
 class DefaultCacheDispatcherTest {
 
     private CacheManager cacheManager1;
