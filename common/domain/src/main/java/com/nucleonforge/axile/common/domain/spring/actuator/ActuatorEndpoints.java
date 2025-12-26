@@ -38,6 +38,8 @@ import static com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpo
  * <a href="https://docs.spring.io/spring-boot/api/rest/actuator/env.html">All Spring Boot supported endpoints</a>
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
@@ -166,6 +168,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     // Thread Dump
     public static final ActuatorEndpoint THREAD_DUMP = of("/threaddump", HttpMethod.GET);
+    public static final ActuatorEndpoint THREAD_DUMP_ENABLE_CONTENTION_MONITORING = of("/threaddump-management/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint THREAD_DUMP_DISABLE_CONTENTION_MONITORING = of("/threaddump-management/disable", HttpMethod.POST);
 
     // spotless:on
 
@@ -224,7 +228,9 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 DELETE_SESSION,
                 SHUTDOWN,
                 STARTUP,
-                THREAD_DUMP));
+                THREAD_DUMP,
+                THREAD_DUMP_ENABLE_CONTENTION_MONITORING,
+                THREAD_DUMP_DISABLE_CONTENTION_MONITORING));
     }
 
     @Override
