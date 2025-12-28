@@ -18,8 +18,7 @@ package com.nucleonforge.axile.sbs.spring.threaddump;
 /**
  * Interface to enable or disable thread contention monitoring.
  *
- * <p>
- * @apiNote <a href="https://github.com/openjdk/jdk/blob/master/src/java.management/share/classes/java/lang/management/ThreadMXBean.java#L364">
+ * @apiNote <a href="https://github.com/openjdk/jdk/blob/master/src/java.management/share/classes/java/lang/management/ThreadMXBean.java#L364"/>
  * Thread contention monitoring is disabled by default.
  *
  * @author Sergey Cherkasov

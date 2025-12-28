@@ -330,11 +330,11 @@ public final class ApiPaths {
         /**
          * Endpoint allows enabling thread contention monitoring.
          */
-        public static final String ENABLE_CONTENTION_MONITORING = "/{instanceId}/enable";
+        public static final String ENABLE_CONTENTION_MONITORING = "/{instanceId}/thread-contention-monitoring/enable";
 
         /**
          * Endpoint allows disabling thread contention monitoring.
          */
-        public static final String DISABLE_CONTENTION_MONITORING = "/{instanceId}/disable";
+        public static final String DISABLE_CONTENTION_MONITORING = "/{instanceId}/thread-contention-monitoring/disable";
     }
 }
