@@ -29,6 +29,8 @@ management:
           - axile-configprops
           - axile-caches
           - conditions
+          - threaddump
+          - threaddump-management
 
 logging:
   level:

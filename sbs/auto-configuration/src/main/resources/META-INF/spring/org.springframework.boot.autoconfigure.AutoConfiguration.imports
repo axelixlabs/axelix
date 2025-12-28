@@ -14,5 +14,6 @@ com.nucleonforge.axile.sbs.autoconfiguration.spring.ConditionsReportEndpointExte
 com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileEnvironmentEndpointAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileDetailsEndpointAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileConfigurationsPropertiesEndpointAutoConfiguration
+com.nucleonforge.axile.sbs.autoconfiguration.spring.ThreadDumpManagementEndpointAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.spring.AxileMetricsAutoConfiguration
 com.nucleonforge.axile.sbs.autoconfiguration.auth.JwtAuthAutoConfiguration

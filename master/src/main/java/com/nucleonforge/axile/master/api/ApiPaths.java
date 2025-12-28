@@ -21,6 +21,8 @@ import com.nucleonforge.axile.master.model.instance.Instance;
  * Constant class that holds the paths to the APIs that Axile Master exposes
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public final class ApiPaths {
 
@@ -324,5 +326,15 @@ public final class ApiPaths {
          * Thread dump endpoint with instance ID.
          */
         public static final String INSTANCE_ID = "/{instanceId}";
+
+        /**
+         * Endpoint allows enabling thread contention monitoring.
+         */
+        public static final String ENABLE_CONTENTION_MONITORING = "/{instanceId}/thread-contention-monitoring/enable";
+
+        /**
+         * Endpoint allows disabling thread contention monitoring.
+         */
+        public static final String DISABLE_CONTENTION_MONITORING = "/{instanceId}/thread-contention-monitoring/disable";
     }
 }

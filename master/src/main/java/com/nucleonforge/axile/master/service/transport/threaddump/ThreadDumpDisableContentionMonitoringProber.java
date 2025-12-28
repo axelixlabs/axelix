@@ -13,35 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axile.master.service.transport;
+package com.nucleonforge.axile.master.service.transport.threaddump;
 
 import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axile.common.api.ThreadDumpFeed;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
-import com.nucleonforge.axile.master.service.serde.MessageDeserializationStrategy;
 import com.nucleonforge.axile.master.service.state.InstanceRegistry;
+import com.nucleonforge.axile.master.service.transport.DiscardingAbstractEndpointProber;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#THREAD_DUMP /threaddump} endpoint.
+ * {@link DiscardingAbstractEndpointProber} that specifically works with
+ * {@link ActuatorEndpoints#THREAD_DUMP_DISABLE_CONTENTION_MONITORING} endpoint.
  *
- * @since 18.11.2025
- * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Service
-public class ThreadDumpEndpointProber extends AbstractEndpointProber<ThreadDumpFeed> {
-
-    protected ThreadDumpEndpointProber(
-            InstanceRegistry instanceRegistry,
-            MessageDeserializationStrategy<ThreadDumpFeed> messageDeserializationStrategy) {
-        super(instanceRegistry, messageDeserializationStrategy);
+public class ThreadDumpDisableContentionMonitoringProber extends DiscardingAbstractEndpointProber {
+    public ThreadDumpDisableContentionMonitoringProber(InstanceRegistry instanceRegistry) {
+        super(instanceRegistry);
     }
 
     @Override
     public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.THREAD_DUMP;
+        return ActuatorEndpoints.THREAD_DUMP_DISABLE_CONTENTION_MONITORING;
     }
 }
