@@ -30,7 +30,7 @@ import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
  * @since 18.09.2025
  * @author Nikita Kirillov
  */
-@Endpoint(id = "axile-metadata")
+@Endpoint(id = "axelix-metadata")
 public class AxileMetadataEndpoint {
 
     private static final Logger log = LoggerFactory.getLogger(AxileMetadataEndpoint.class);

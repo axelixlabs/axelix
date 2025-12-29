@@ -139,7 +139,7 @@ class KubernetesInstanceDiscovererTest {
                 String path = request.getPath();
                 assert request.getPath() != null;
 
-                if (path.equals("/actuator/axile-metadata")) {
+                if (path.equals("/actuator/axelix-metadata")) {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

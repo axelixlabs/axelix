@@ -69,7 +69,7 @@ class AxileMetadataEndpointTest {
         Mockito.when(healthEndpoint.health()).thenReturn(Health.up().build());
 
         // when.
-        ResponseEntity<String> result = testRestTemplate.getForEntity("/actuator/axile-metadata", String.class);
+        ResponseEntity<String> result = testRestTemplate.getForEntity("/actuator/axelix-metadata", String.class);
 
         // then.
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
