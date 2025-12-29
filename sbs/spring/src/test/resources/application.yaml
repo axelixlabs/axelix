@@ -23,7 +23,7 @@ management:
           - profile-management
           - beans
           - env
-          - axile-env
+          - axelix-env
           - axile-metrics
           - configprops
           - axile-configprops

@@ -79,7 +79,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint CONFIG_PROPS_BY_PREFIX = of("/axile-configprops/{prefix}", HttpMethod.GET);
 
     // Environment
-    public static final ActuatorEndpoint ENV = of("/axile-env", HttpMethod.GET);
+    public static final ActuatorEndpoint ENV = of("/axelix-env", HttpMethod.GET);
     public static final ActuatorEndpoint ENV_PROPERTY = of("/env/{property.name}", HttpMethod.GET);
 
     // Flyway

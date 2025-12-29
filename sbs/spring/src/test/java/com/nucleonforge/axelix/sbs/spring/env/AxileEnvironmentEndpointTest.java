@@ -108,7 +108,7 @@ class AxileEnvironmentEndpointTest {
     @MethodSource("propertyExpectations")
     void shouldSelectPrimaryPropertyFromHighestPrecedenceSource(String propertyName, String expectedValue) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.getForEntity("/actuator/axile-env", EnvironmentFeed.class);
+                restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         var propertyAppearances = response.getBody().propertySources().stream()
                 .flatMap(src -> src.properties().stream()
@@ -135,7 +135,7 @@ class AxileEnvironmentEndpointTest {
 
     @Test
     void shouldReturnValidJsonStructure() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axile-env", String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-env", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -180,7 +180,7 @@ class AxileEnvironmentEndpointTest {
     @MethodSource("propertyName")
     void shouldReturnTheBeanNameThatMatchesTheConfigProps(String propertyName) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.getForEntity("/actuator/axile-env", EnvironmentFeed.class);
+                restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         var propertyAppearances = response.getBody().propertySources().stream()
                 .flatMap(src -> src.properties().stream()
@@ -215,7 +215,7 @@ class AxileEnvironmentEndpointTest {
     @MethodSource("propertySourceDescription")
     void shouldReturnDescriptionKnownPropertySource(String sourceName, String sourceDescription) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.getForEntity("/actuator/axile-env", EnvironmentFeed.class);
+                restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         assertThat(response.getBody().propertySources())
                 .filteredOn(e -> e.sourceName().equals(sourceName))

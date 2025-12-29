@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
- * The response to axile-env actuator endpoint.
+ * The response to axelix-env actuator endpoint.
  *
  * @see ActuatorEndpoint
  * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/env.html">Env Endpoint</a>

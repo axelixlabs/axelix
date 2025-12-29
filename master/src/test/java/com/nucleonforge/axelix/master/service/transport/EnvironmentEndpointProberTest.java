@@ -170,7 +170,7 @@ class EnvironmentEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axile-env")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-env")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

@@ -30,7 +30,7 @@ import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
  * @since 21.10.2025
  * @author Nikita Kirillov
  */
-@RestControllerEndpoint(id = "axile-env")
+@RestControllerEndpoint(id = "axelix-env")
 public class AxileEnvironmentEndpoint {
 
     private final EnvironmentEndpoint delegate;
