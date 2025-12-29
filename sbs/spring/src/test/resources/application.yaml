@@ -18,7 +18,7 @@ management:
       exposure:
         include:
           - health
-          - axile-metadata
+          - axelix-metadata
           - property-management
           - profile-management
           - beans
