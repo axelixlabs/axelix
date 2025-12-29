@@ -30,13 +30,13 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescr
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDescriptor;
 import org.springframework.core.env.Environment;
 
+import com.nucleonforge.axelix.common.api.KeyValue;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.Deprecation;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.Property;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesCache;
-import com.nucleonforge.axile.common.api.KeyValue;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Deprecation;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionPoint;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 
 /**
  * Default implementation {@link EnvPropertyEnricher}

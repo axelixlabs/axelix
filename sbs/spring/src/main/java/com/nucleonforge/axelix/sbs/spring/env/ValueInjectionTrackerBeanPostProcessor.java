@@ -35,8 +35,8 @@ import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.util.ReflectionUtils;
 
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionPoint;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionType;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionType;
 
 /**
  * Tracks all @Value injections in Spring beans.

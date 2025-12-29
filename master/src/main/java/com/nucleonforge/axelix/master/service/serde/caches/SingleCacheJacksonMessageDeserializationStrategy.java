@@ -20,8 +20,8 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
+import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
-import com.nucleonforge.axile.common.api.caches.SingleCache;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for {@link SingleCache}.

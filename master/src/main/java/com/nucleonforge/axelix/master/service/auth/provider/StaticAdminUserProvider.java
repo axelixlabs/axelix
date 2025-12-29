@@ -18,11 +18,11 @@ package com.nucleonforge.axelix.master.service.auth.provider;
 import java.util.Objects;
 import java.util.Set;
 
+import com.nucleonforge.axelix.common.auth.core.DefaultUser;
+import com.nucleonforge.axelix.common.auth.core.User;
 import com.nucleonforge.axelix.master.autoconfiguration.auth.StaticAdminCredentialsProperties;
 import com.nucleonforge.axelix.master.exception.auth.UserNotFoundException;
 import com.nucleonforge.axelix.master.service.auth.UserLoginService;
-import com.nucleonforge.axile.common.auth.core.DefaultUser;
-import com.nucleonforge.axile.common.auth.core.User;
 
 /**
  * {@link UserLoginService} that authenticates a given user by the static pair of the username/password.

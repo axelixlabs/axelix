@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for {@link AxileDetails}.

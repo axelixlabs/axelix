@@ -23,14 +23,14 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axelix.master.api.response.EnvironmentFeedResponse;
 import com.nucleonforge.axelix.master.api.response.EnvironmentFeedResponse.InjectionPoint;
 import com.nucleonforge.axelix.master.api.response.EnvironmentFeedResponse.InjectionType;
 import com.nucleonforge.axelix.master.api.response.EnvironmentFeedResponse.PropertyEntry;
 import com.nucleonforge.axelix.master.api.response.EnvironmentFeedResponse.PropertySourceShortProfile;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 
 /**
  * The {@link Converter} from {@link EnvironmentFeed} to {@link EnvironmentFeedResponse}.

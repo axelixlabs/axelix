@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.nucleonforge.axile.common.api.caches.CachesFeed;
-import com.nucleonforge.axile.common.api.caches.CachesFeed.CacheManagers;
-import com.nucleonforge.axile.common.api.caches.CachesFeed.Caches;
+import com.nucleonforge.axelix.common.api.caches.CachesFeed;
+import com.nucleonforge.axelix.common.api.caches.CachesFeed.CacheManagers;
+import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
 
 /**
  * Custom Spring Boot Actuator endpoint that exposes operations for managing cache entries via HTTP.

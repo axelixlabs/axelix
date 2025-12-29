@@ -28,14 +28,14 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nucleonforge.axelix.common.auth.core.Authority;
+import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
+import com.nucleonforge.axelix.common.auth.core.DefaultRole;
+import com.nucleonforge.axelix.common.auth.core.DefaultUser;
+import com.nucleonforge.axelix.common.auth.core.Role;
+import com.nucleonforge.axelix.common.auth.core.User;
 import com.nucleonforge.axelix.master.exception.auth.UserNotFoundException;
 import com.nucleonforge.axelix.master.service.auth.jwt.JdbcAuthConfig;
-import com.nucleonforge.axile.common.auth.core.Authority;
-import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
-import com.nucleonforge.axile.common.auth.core.DefaultRole;
-import com.nucleonforge.axile.common.auth.core.DefaultUser;
-import com.nucleonforge.axile.common.auth.core.Role;
-import com.nucleonforge.axile.common.auth.core.User;
 
 /**
  * {@link UserProvider} that is capable to load user from RDBMS database.

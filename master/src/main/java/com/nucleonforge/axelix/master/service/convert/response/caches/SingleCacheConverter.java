@@ -19,9 +19,9 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.master.api.response.caches.CacheProfileResponse;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axile.common.api.caches.SingleCache;
 
 /**
  * The {@link Converter} from {@link SingleCache} to {@link CacheProfileResponse}.

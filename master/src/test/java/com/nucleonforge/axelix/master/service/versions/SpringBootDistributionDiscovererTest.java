@@ -18,8 +18,8 @@ package com.nucleonforge.axelix.master.service.versions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.domain.JarClassPathEntry;
 import com.nucleonforge.axelix.master.model.software.SoftwareDistribution;
-import com.nucleonforge.axile.common.domain.JarClassPathEntry;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createBuildInfo;
 import static org.assertj.core.api.Assertions.assertThat;

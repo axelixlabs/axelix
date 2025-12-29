@@ -22,9 +22,9 @@ import org.springframework.boot.actuate.health.Status;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import com.nucleonforge.axile.common.api.registration.GitInfo;
-import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
-import com.nucleonforge.axile.common.api.registration.ShortBuildInfo;
+import com.nucleonforge.axelix.common.api.registration.GitInfo;
+import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
+import com.nucleonforge.axelix.common.api.registration.ShortBuildInfo;
 
 /**
  * Default implementation of {@link ServiceMetadataAssembler}.

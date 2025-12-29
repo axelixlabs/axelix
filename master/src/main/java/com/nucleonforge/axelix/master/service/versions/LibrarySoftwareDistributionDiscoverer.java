@@ -18,11 +18,11 @@ package com.nucleonforge.axelix.master.service.versions;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.nucleonforge.axelix.common.domain.BuildInfo;
+import com.nucleonforge.axelix.common.domain.ClassPathEntry;
+import com.nucleonforge.axelix.common.domain.JarClassPathEntry;
 import com.nucleonforge.axelix.master.model.software.LibraryComponent;
 import com.nucleonforge.axelix.master.model.software.SoftwareDistribution;
-import com.nucleonforge.axile.common.domain.BuildInfo;
-import com.nucleonforge.axile.common.domain.ClassPathEntry;
-import com.nucleonforge.axile.common.domain.JarClassPathEntry;
 
 /**
  * @author Mikhail Polivakha

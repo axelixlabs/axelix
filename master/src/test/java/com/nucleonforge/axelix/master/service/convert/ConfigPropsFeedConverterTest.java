@@ -20,10 +20,10 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
+import com.nucleonforge.axelix.common.api.KeyValue;
 import com.nucleonforge.axelix.master.api.response.ConfigPropsFeedResponse;
 import com.nucleonforge.axelix.master.service.convert.response.ConfigPropsFeedConverter;
-import com.nucleonforge.axile.common.api.ConfigPropsFeed;
-import com.nucleonforge.axile.common.api.KeyValue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

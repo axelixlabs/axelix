@@ -19,8 +19,8 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
-import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.common.api.BeansFeed.ProxyType;
+import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.api.BeansFeed.ProxyType;
 
 /**
  * Additional bean metadata.

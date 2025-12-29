@@ -17,7 +17,7 @@ package com.nucleonforge.axelix.sbs.auth.filter;
 
 import java.util.Optional;
 
-import com.nucleonforge.axile.common.auth.core.Authority;
+import com.nucleonforge.axelix.common.auth.core.Authority;
 
 /**
  * Interface for resolving a required {@link Authority}

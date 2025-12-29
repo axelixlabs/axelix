@@ -24,13 +24,13 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
 import com.nucleonforge.axelix.master.api.response.ThreadDumpFeedResponse;
 import com.nucleonforge.axelix.master.api.response.ThreadDumpFeedResponse.LockInfo;
 import com.nucleonforge.axelix.master.api.response.ThreadDumpFeedResponse.MonitorInfo;
 import com.nucleonforge.axelix.master.api.response.ThreadDumpFeedResponse.StackTraceElement;
 import com.nucleonforge.axelix.master.api.response.ThreadDumpFeedResponse.State;
 import com.nucleonforge.axelix.master.api.response.ThreadDumpFeedResponse.ThreadInfo;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed;
 
 /**
  * The {@link Converter} from {@link ThreadDumpFeed} to {@link ThreadDumpFeedResponse}.

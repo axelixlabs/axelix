@@ -30,16 +30,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nucleonforge.axelix.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.BuildDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.OsDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.RuntimeDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.SpringDetails;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
-import com.nucleonforge.axile.common.api.AxileDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.BuildDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.GitDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.OsDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.RuntimeDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.SpringDetails;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;

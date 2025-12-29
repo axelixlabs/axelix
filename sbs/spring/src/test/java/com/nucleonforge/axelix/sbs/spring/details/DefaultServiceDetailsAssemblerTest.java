@@ -30,16 +30,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 
+import com.nucleonforge.axelix.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.BuildDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.OsDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.RuntimeDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.SpringDetails;
 import com.nucleonforge.axelix.sbs.spring.master.CommitIdPluginGitInformationProvider;
 import com.nucleonforge.axelix.sbs.spring.master.CycloneDXSBOMLibraryDiscoverer;
 import com.nucleonforge.axelix.sbs.spring.master.GitInformationProvider;
 import com.nucleonforge.axelix.sbs.spring.master.LibraryDiscoverer;
-import com.nucleonforge.axile.common.api.AxileDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.BuildDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.GitDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.OsDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.RuntimeDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.SpringDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

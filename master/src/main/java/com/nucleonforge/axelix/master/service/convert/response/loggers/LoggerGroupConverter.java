@@ -19,9 +19,9 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axelix.master.api.response.loggers.GroupProfileResponse;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
 
 /**
  * The {@link Converter} from {@link LoggerGroup} to {@link GroupProfileResponse}.

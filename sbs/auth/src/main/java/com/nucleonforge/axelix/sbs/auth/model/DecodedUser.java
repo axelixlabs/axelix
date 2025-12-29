@@ -17,7 +17,7 @@ package com.nucleonforge.axelix.sbs.auth.model;
 
 import java.util.Set;
 
-import com.nucleonforge.axile.common.auth.core.Role;
+import com.nucleonforge.axelix.common.auth.core.Role;
 
 /**
  * The user that gets decoded from JWT token.

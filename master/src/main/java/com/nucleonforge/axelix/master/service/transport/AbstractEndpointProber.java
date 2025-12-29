@@ -26,14 +26,14 @@ import java.time.Duration;
 
 import org.jspecify.annotations.NonNull;
 
+import com.nucleonforge.axelix.common.domain.http.HttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.serde.DeserializationException;
 import com.nucleonforge.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
-import com.nucleonforge.axile.common.domain.http.HttpPayload;
-import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
  * The common implementation of the {@link EndpointProber}.

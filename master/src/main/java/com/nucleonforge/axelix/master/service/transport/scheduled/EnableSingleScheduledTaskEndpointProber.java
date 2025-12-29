@@ -19,10 +19,10 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
-import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
-import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 
 /**
  * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#ENABLE_SCHEDULED_TASK} endpoint.

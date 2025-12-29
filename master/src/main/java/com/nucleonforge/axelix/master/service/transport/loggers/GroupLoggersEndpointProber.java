@@ -19,12 +19,12 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.AbstractEndpointProber;
-import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
-import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoint;
-import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 
 /**
  * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#LOGGER_GROUP /loggers/{group.name}} endpoint.

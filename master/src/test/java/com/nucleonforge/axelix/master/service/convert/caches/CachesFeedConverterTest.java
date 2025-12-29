@@ -19,11 +19,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.caches.CachesFeed;
+import com.nucleonforge.axelix.common.api.caches.CachesFeed.CacheManagers;
+import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
 import com.nucleonforge.axelix.master.api.response.caches.CachesResponse;
 import com.nucleonforge.axelix.master.service.convert.response.caches.CachesFeedConverter;
-import com.nucleonforge.axile.common.api.caches.CachesFeed;
-import com.nucleonforge.axile.common.api.caches.CachesFeed.CacheManagers;
-import com.nucleonforge.axile.common.api.caches.CachesFeed.Caches;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

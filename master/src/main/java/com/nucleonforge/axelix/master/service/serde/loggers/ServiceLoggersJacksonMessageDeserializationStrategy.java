@@ -20,8 +20,8 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
+import com.nucleonforge.axelix.common.api.loggers.ServiceLoggers;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
-import com.nucleonforge.axile.common.api.loggers.ServiceLoggers;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for {@link ServiceLoggers}.

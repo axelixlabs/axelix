@@ -30,13 +30,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nucleonforge.axelix.common.api.info.ServiceInfo;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.info.InfoResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.transport.InfoEndpointProber;
-import com.nucleonforge.axile.common.api.info.ServiceInfo;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 
 /**
  * The API for managing info.

@@ -21,10 +21,10 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
+import com.nucleonforge.axelix.common.api.metrics.MetricProfile;
 import com.nucleonforge.axelix.master.api.response.metrics.SingleMetricProfileResponse;
 import com.nucleonforge.axelix.master.api.response.metrics.SingleMetricProfileResponse.Measurement;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axile.common.api.metrics.MetricProfile;
 
 /**
  * Converter from {@link MetricProfile} to {@link SingleMetricProfileResponse}.

@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 
+import com.nucleonforge.axelix.common.auth.core.Authority;
+import com.nucleonforge.axelix.common.auth.core.JwtRole;
+import com.nucleonforge.axelix.common.auth.core.Role;
+import com.nucleonforge.axelix.common.auth.core.User;
+import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
+import com.nucleonforge.axelix.common.auth.spi.jwt.TokenClaim;
 import com.nucleonforge.axelix.master.exception.auth.JwtTokenGenerationException;
-import com.nucleonforge.axile.common.auth.core.Authority;
-import com.nucleonforge.axile.common.auth.core.JwtRole;
-import com.nucleonforge.axile.common.auth.core.Role;
-import com.nucleonforge.axile.common.auth.core.User;
-import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
-import com.nucleonforge.axile.common.auth.spi.jwt.TokenClaim;
 
 /**
  * Service responsible for generating JWT tokens from {@link User} instances.

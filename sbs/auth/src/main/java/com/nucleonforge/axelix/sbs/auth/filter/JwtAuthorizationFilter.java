@@ -31,6 +31,8 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.nucleonforge.axelix.common.auth.core.Authority;
+import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
 import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
 import com.nucleonforge.axelix.sbs.auth.model.DecodedUser;
 import com.nucleonforge.axelix.sbs.auth.spi.Authorizer;
@@ -39,8 +41,6 @@ import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.InvalidJwtTokenExcepti
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.JwtParsingException;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.JwtTokenDecodingException;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.JwtDecoderService;
-import com.nucleonforge.axile.common.auth.core.Authority;
-import com.nucleonforge.axile.common.auth.core.AuthorizationRequest;
 
 /**
  * A custom servlet filter that restricts access to Actuator endpoints based on JWT token presence, validity,

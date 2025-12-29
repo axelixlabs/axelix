@@ -20,9 +20,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axelix.master.api.response.metrics.MetricsGroupsFeedResponse;
 import com.nucleonforge.axelix.master.service.convert.response.metrics.MetricsGroupsFeedConverter;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

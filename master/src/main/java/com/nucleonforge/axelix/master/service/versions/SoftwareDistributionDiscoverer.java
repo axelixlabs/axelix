@@ -18,9 +18,9 @@ package com.nucleonforge.axelix.master.service.versions;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.nucleonforge.axelix.common.domain.BuildInfo;
 import com.nucleonforge.axelix.master.model.software.SoftwareComponent;
 import com.nucleonforge.axelix.master.model.software.SoftwareDistribution;
-import com.nucleonforge.axile.common.domain.BuildInfo;
 
 /**
  * The SPI interface that is capable to extract the information about specific {@link SoftwareDistribution}

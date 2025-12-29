@@ -30,6 +30,12 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.nucleonforge.axelix.common.auth.core.Authority;
+import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
+import com.nucleonforge.axelix.common.auth.core.DefaultRole;
+import com.nucleonforge.axelix.common.auth.core.Role;
+import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
+import com.nucleonforge.axelix.common.auth.spi.jwt.TokenClaim;
 import com.nucleonforge.axelix.sbs.auth.model.DecodedUser;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.InvalidJwtTokenException;
@@ -37,12 +43,6 @@ import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.JwtParsingException;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.JwtTokenDecodingException;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.verification.JwtVerificationStrategy;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.verification.JwtVerificationStrategyFactory;
-import com.nucleonforge.axile.common.auth.core.Authority;
-import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
-import com.nucleonforge.axile.common.auth.core.DefaultRole;
-import com.nucleonforge.axile.common.auth.core.Role;
-import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
-import com.nucleonforge.axile.common.auth.spi.jwt.TokenClaim;
 
 /**
  * Default implementation of {@link JwtDecoderService}.

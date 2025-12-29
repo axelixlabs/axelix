@@ -23,16 +23,16 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.transform.BaseUnitParser;
+import com.nucleonforge.axelix.common.api.transform.BaseUnitValueTransformer;
+import com.nucleonforge.axelix.common.api.transform.BytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
 import com.nucleonforge.axelix.master.api.response.DashboardResponse;
 import com.nucleonforge.axelix.master.api.response.software.DistributionResponse;
 import com.nucleonforge.axelix.master.api.response.software.SoftwareDistributions;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InMemoryInstanceRegistry;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
-import com.nucleonforge.axile.common.api.transform.BaseUnitParser;
-import com.nucleonforge.axile.common.api.transform.BaseUnitValueTransformer;
-import com.nucleonforge.axile.common.api.transform.BytesMemoryBaseUnitValueTransformer;
-import com.nucleonforge.axile.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;

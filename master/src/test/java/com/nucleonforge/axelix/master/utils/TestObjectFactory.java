@@ -23,11 +23,11 @@ import org.instancio.Instancio;
 import org.instancio.Select;
 import org.jspecify.annotations.Nullable;
 
+import com.nucleonforge.axelix.common.domain.BuildInfo;
+import com.nucleonforge.axelix.common.domain.ClassPath;
+import com.nucleonforge.axelix.common.domain.ClassPathEntry;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
-import com.nucleonforge.axile.common.domain.BuildInfo;
-import com.nucleonforge.axile.common.domain.ClassPath;
-import com.nucleonforge.axile.common.domain.ClassPathEntry;
 
 /**
  * Utility factory for creating test objects used in unit and integration tests.

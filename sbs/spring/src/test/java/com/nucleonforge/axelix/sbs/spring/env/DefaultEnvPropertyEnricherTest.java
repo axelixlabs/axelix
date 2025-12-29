@@ -25,9 +25,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.StandardEnvironment;
 
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.Property;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.PropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

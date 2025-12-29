@@ -20,7 +20,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
 
-import com.nucleonforge.axile.common.api.env.EnvironmentProperty;
+import com.nucleonforge.axelix.common.api.env.EnvironmentProperty;
 
 /**
  * The response object that represents an environment property in the application.

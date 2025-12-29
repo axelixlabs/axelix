@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nucleonforge.axelix.common.api.ProfileMutationResult;
+import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.request.ProfileUpdatedRequest;
 import com.nucleonforge.axelix.master.api.response.ProfileUpdateResponse;
@@ -40,8 +42,6 @@ import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.serde.MessageSerializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceStatusModifier;
 import com.nucleonforge.axelix.master.service.transport.ProfileManagementEndpointProber;
-import com.nucleonforge.axile.common.api.ProfileMutationResult;
-import com.nucleonforge.axile.common.domain.http.HttpPayload;
 
 /**
  * The API for managing profiles.

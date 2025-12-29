@@ -17,7 +17,7 @@ package com.nucleonforge.axelix.sbs.spring.master;
 
 import java.util.Optional;
 
-import com.nucleonforge.axile.common.api.registration.ShortBuildInfo;
+import com.nucleonforge.axelix.common.api.registration.ShortBuildInfo;
 
 /**
  * Component that is capable to discover the short build information for initial service discovery purposes.

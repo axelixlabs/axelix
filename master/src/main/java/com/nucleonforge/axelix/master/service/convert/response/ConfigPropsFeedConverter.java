@@ -19,9 +19,9 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 import com.nucleonforge.axelix.master.api.response.ConfigPropsFeedResponse;
 import com.nucleonforge.axelix.master.api.response.ConfigPropsFeedResponse.ConfigPropsProfile;
-import com.nucleonforge.axile.common.api.ConfigPropsFeed;
 
 /**
  * The {@link Converter} from {@link ConfigPropsFeed} to {@link ConfigPropsFeedResponse}.

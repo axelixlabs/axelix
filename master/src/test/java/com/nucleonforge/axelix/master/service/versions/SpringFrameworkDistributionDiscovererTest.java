@@ -21,9 +21,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.domain.BuildInfo;
+import com.nucleonforge.axelix.common.domain.JarClassPathEntry;
 import com.nucleonforge.axelix.master.model.software.SoftwareDistribution;
-import com.nucleonforge.axile.common.domain.BuildInfo;
-import com.nucleonforge.axile.common.domain.JarClassPathEntry;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createBuildInfo;
 

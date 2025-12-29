@@ -35,14 +35,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
+import com.nucleonforge.axelix.common.auth.core.DefaultRole;
+import com.nucleonforge.axelix.common.auth.core.DefaultUser;
+import com.nucleonforge.axelix.common.auth.core.Role;
+import com.nucleonforge.axelix.common.auth.core.User;
+import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
 import com.nucleonforge.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
 import com.nucleonforge.axelix.master.exception.auth.JwtTokenGenerationException;
-import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
-import com.nucleonforge.axile.common.auth.core.DefaultRole;
-import com.nucleonforge.axile.common.auth.core.DefaultUser;
-import com.nucleonforge.axile.common.auth.core.Role;
-import com.nucleonforge.axile.common.auth.core.User;
-import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;

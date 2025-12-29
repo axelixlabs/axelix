@@ -21,10 +21,10 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axelix.master.api.response.metrics.MetricsGroupsFeedResponse;
 import com.nucleonforge.axelix.master.api.response.metrics.MetricsGroupsFeedResponse.MetricsGroup;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
 
 /**
  * Converter from the {@link MetricsGroupsFeed} to the {@link MetricsGroupsFeedResponse}.

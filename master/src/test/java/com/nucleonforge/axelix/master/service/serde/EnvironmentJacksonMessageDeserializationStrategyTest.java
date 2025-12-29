@@ -21,11 +21,11 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionPoint;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionType;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionType;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.Property;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.PropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

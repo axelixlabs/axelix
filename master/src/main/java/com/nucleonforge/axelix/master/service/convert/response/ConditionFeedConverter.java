@@ -23,8 +23,8 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.ConditionsFeed;
 import com.nucleonforge.axelix.master.api.response.ConditionsFeedResponse;
-import com.nucleonforge.axile.common.api.ConditionsFeed;
 
 import static com.nucleonforge.axelix.master.api.response.ConditionsFeedResponse.ConditionMatch;
 import static com.nucleonforge.axelix.master.api.response.ConditionsFeedResponse.NegativeCondition;

@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 
-import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
+import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

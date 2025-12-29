@@ -37,15 +37,15 @@ import org.springframework.core.type.StandardMethodMetadata;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
+import com.nucleonforge.axelix.common.api.BeansFeed;
 import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
-import com.nucleonforge.axile.common.api.BeansFeed;
 
-import static com.nucleonforge.axile.common.api.BeansFeed.BeanMethod;
-import static com.nucleonforge.axile.common.api.BeansFeed.BeanSource;
-import static com.nucleonforge.axile.common.api.BeansFeed.ComponentVariant;
-import static com.nucleonforge.axile.common.api.BeansFeed.ProxyType;
-import static com.nucleonforge.axile.common.api.BeansFeed.SyntheticBean;
-import static com.nucleonforge.axile.common.api.BeansFeed.UnknownBean;
+import static com.nucleonforge.axelix.common.api.BeansFeed.BeanMethod;
+import static com.nucleonforge.axelix.common.api.BeansFeed.BeanSource;
+import static com.nucleonforge.axelix.common.api.BeansFeed.ComponentVariant;
+import static com.nucleonforge.axelix.common.api.BeansFeed.ProxyType;
+import static com.nucleonforge.axelix.common.api.BeansFeed.SyntheticBean;
+import static com.nucleonforge.axelix.common.api.BeansFeed.UnknownBean;
 
 /**
  * Default implementation of {@link BeanMetaInfoExtractor}.

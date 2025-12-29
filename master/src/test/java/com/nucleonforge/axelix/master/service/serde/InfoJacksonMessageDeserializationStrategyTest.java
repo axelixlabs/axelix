@@ -21,13 +21,13 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.info.ServiceInfo;
-import com.nucleonforge.axile.common.api.info.components.BuildInfo;
-import com.nucleonforge.axile.common.api.info.components.GitInfo;
-import com.nucleonforge.axile.common.api.info.components.JavaInfo;
-import com.nucleonforge.axile.common.api.info.components.OSInfo;
-import com.nucleonforge.axile.common.api.info.components.ProcessInfo;
-import com.nucleonforge.axile.common.api.info.components.SSLInfo;
+import com.nucleonforge.axelix.common.api.info.ServiceInfo;
+import com.nucleonforge.axelix.common.api.info.components.BuildInfo;
+import com.nucleonforge.axelix.common.api.info.components.GitInfo;
+import com.nucleonforge.axelix.common.api.info.components.JavaInfo;
+import com.nucleonforge.axelix.common.api.info.components.OSInfo;
+import com.nucleonforge.axelix.common.api.info.components.ProcessInfo;
+import com.nucleonforge.axelix.common.api.info.components.SSLInfo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

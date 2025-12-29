@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
+import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
 import com.nucleonforge.axelix.sbs.auth.filter.AuthorityResolver;
 import com.nucleonforge.axelix.sbs.auth.filter.DefaultAuthorityResolver;
 import com.nucleonforge.axelix.sbs.auth.filter.JwtAuthorizationFilter;
@@ -32,7 +33,6 @@ import com.nucleonforge.axelix.sbs.auth.spi.Authorizer;
 import com.nucleonforge.axelix.sbs.auth.spi.DefaultAuthorizer;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.DefaultJwtDecoderService;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.JwtDecoderService;
-import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
 
 /**
  * {@link AutoConfiguration} for JWT-based authentication support.

@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
+import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for {@link ServiceMetadata}.

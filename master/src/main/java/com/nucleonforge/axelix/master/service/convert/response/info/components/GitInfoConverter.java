@@ -20,9 +20,9 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.info.components.GitInfo;
 import com.nucleonforge.axelix.master.api.response.info.components.GitProfile;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axile.common.api.info.components.GitInfo;
 
 /**
  * The {@link Converter} from {@link GitInfo} to {@link GitProfile}.

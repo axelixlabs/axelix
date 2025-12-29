@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.env.EnvironmentProperty;
+import com.nucleonforge.axelix.common.api.env.EnvironmentProperty;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for {@link EnvironmentProperty}.

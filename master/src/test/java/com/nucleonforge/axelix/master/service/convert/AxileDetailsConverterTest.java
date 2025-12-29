@@ -23,6 +23,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nucleonforge.axelix.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.BuildDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.OsDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.RuntimeDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.SpringDetails;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.BuildProfile;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.GitProfile;
@@ -33,12 +39,6 @@ import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.details.AxileDetailsConverter;
 import com.nucleonforge.axelix.master.service.convert.response.details.DetailsConversionRequest;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
-import com.nucleonforge.axile.common.api.AxileDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.BuildDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.GitDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.OsDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.RuntimeDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.SpringDetails;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;

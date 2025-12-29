@@ -19,8 +19,8 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.ProfileMutationResult;
 import com.nucleonforge.axelix.master.api.response.ProfileUpdateResponse;
-import com.nucleonforge.axile.common.api.ProfileMutationResult;
 
 /**
  * The {@link Converter} from {@link ProfileMutationResult} to {@link ProfileUpdateResponse}

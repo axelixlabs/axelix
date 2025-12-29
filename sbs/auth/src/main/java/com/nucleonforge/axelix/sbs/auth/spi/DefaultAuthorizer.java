@@ -19,11 +19,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.nucleonforge.axelix.common.auth.core.Authority;
+import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
+import com.nucleonforge.axelix.common.auth.core.Role;
 import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
 import com.nucleonforge.axelix.sbs.auth.model.DecodedUser;
-import com.nucleonforge.axile.common.auth.core.Authority;
-import com.nucleonforge.axile.common.auth.core.AuthorizationRequest;
-import com.nucleonforge.axile.common.auth.core.Role;
 
 /**
  * Default implementation of {@link Authorizer}.

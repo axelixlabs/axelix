@@ -20,12 +20,12 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
+import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
+import com.nucleonforge.axelix.common.auth.core.DefaultRole;
+import com.nucleonforge.axelix.common.auth.core.Role;
 import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
 import com.nucleonforge.axelix.sbs.auth.model.DecodedUser;
-import com.nucleonforge.axile.common.auth.core.AuthorizationRequest;
-import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
-import com.nucleonforge.axile.common.auth.core.DefaultRole;
-import com.nucleonforge.axile.common.auth.core.Role;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

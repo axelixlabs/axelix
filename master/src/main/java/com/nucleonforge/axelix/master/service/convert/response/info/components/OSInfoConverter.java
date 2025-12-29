@@ -19,9 +19,9 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.info.components.OSInfo;
 import com.nucleonforge.axelix.master.api.response.info.components.OSProfile;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axile.common.api.info.components.OSInfo;
 
 /**
  * The {@link Converter} from {@link OSInfo} to {@link OSProfile}.

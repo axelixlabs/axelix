@@ -33,19 +33,19 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nucleonforge.axelix.common.api.info.ServiceInfo;
+import com.nucleonforge.axelix.common.api.info.components.BuildInfo;
+import com.nucleonforge.axelix.common.api.info.components.GitInfo;
+import com.nucleonforge.axelix.common.api.info.components.JavaInfo;
+import com.nucleonforge.axelix.common.api.info.components.OSInfo;
+import com.nucleonforge.axelix.common.api.info.components.ProcessInfo;
+import com.nucleonforge.axelix.common.api.info.components.SSLInfo;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
-import com.nucleonforge.axile.common.api.info.ServiceInfo;
-import com.nucleonforge.axile.common.api.info.components.BuildInfo;
-import com.nucleonforge.axile.common.api.info.components.GitInfo;
-import com.nucleonforge.axile.common.api.info.components.JavaInfo;
-import com.nucleonforge.axile.common.api.info.components.OSInfo;
-import com.nucleonforge.axile.common.api.info.components.ProcessInfo;
-import com.nucleonforge.axile.common.api.info.components.SSLInfo;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;

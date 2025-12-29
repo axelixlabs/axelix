@@ -35,6 +35,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nucleonforge.axelix.common.api.metrics.MetricProfile;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
+import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
+import com.nucleonforge.axelix.common.domain.http.MultiValueQueryParameter;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.http.QueryParameter;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.metrics.MetricsGroupsFeedResponse;
 import com.nucleonforge.axelix.master.api.response.metrics.SingleMetricProfileResponse;
@@ -42,12 +48,6 @@ import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.transport.metrics.GetMetricsGroupsEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.metrics.GetSingleMetricProfileEndpointProber;
-import com.nucleonforge.axile.common.api.metrics.MetricProfile;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
-import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
-import com.nucleonforge.axile.common.domain.http.MultiValueQueryParameter;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
-import com.nucleonforge.axile.common.domain.http.QueryParameter;
 
 /**
  * The API for managing metrics.

@@ -17,11 +17,11 @@ package com.nucleonforge.axelix.master.service.transport;
 
 import org.jspecify.annotations.NonNull;
 
+import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.serde.NoOpMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
-import com.nucleonforge.axile.common.domain.http.HttpPayload;
 
 /**
  * The {@link AbstractEndpointProber} that either do not return any value, or just discards the return value.

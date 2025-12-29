@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.caches.SingleCache;
+import com.nucleonforge.axelix.common.api.caches.SingleCache;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

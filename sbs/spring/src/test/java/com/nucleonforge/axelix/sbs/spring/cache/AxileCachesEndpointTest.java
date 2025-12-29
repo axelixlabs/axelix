@@ -36,9 +36,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.nucleonforge.axelix.Main;
-import com.nucleonforge.axile.common.api.caches.CachesFeed;
-import com.nucleonforge.axile.common.api.caches.CachesFeed.CacheManagers;
-import com.nucleonforge.axile.common.api.caches.CachesFeed.Caches;
+import com.nucleonforge.axelix.common.api.caches.CachesFeed;
+import com.nucleonforge.axelix.common.api.caches.CachesFeed.CacheManagers;
+import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

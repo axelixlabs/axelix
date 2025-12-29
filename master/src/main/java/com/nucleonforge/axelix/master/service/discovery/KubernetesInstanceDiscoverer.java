@@ -28,10 +28,10 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.kubernetes.commons.discovery.KubernetesServiceInstance;
 
+import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
-import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
 
 /**
  * Kubernetes implementation of {@link InstancesDiscoverer}.

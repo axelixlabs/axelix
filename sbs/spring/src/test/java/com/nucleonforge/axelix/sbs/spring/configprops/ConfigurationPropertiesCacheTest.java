@@ -23,7 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axile.common.api.ConfigPropsFeed;
+import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

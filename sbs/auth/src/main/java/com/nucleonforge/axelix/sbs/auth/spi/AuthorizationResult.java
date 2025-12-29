@@ -15,7 +15,7 @@
  */
 package com.nucleonforge.axelix.sbs.auth.spi;
 
-import com.nucleonforge.axile.common.auth.core.AuthorizationRequest;
+import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
 
 /**
  * Result of the {@link Authorizer} analysis of the given {@link AuthorizationRequest}.

@@ -22,9 +22,9 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.env.EnvironmentProperty;
 import com.nucleonforge.axelix.master.api.response.EnvironmentPropertyResponse;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axile.common.api.env.EnvironmentProperty;
 
 /**
  * The {@link Converter} from {@link EnvironmentProperty} to {@link EnvironmentPropertyResponse}.

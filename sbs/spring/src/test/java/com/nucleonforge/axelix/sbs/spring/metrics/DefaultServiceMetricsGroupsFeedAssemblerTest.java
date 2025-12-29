@@ -25,9 +25,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

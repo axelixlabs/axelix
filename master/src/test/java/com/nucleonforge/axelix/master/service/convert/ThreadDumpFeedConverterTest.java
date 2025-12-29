@@ -19,9 +19,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
 import com.nucleonforge.axelix.master.api.response.ThreadDumpFeedResponse;
 import com.nucleonforge.axelix.master.service.convert.response.ThreadDumpFeedConverter;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

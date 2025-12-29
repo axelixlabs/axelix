@@ -22,6 +22,9 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.api.BeansFeed.BeanDependency;
+import com.nucleonforge.axelix.common.utils.BeanNameUtils;
 import com.nucleonforge.axelix.master.api.response.BeanShortProfile;
 import com.nucleonforge.axelix.master.api.response.BeanShortProfile.BeanDependencyProfile;
 import com.nucleonforge.axelix.master.api.response.BeanShortProfile.BeanMethod;
@@ -31,9 +34,6 @@ import com.nucleonforge.axelix.master.api.response.BeanShortProfile.FactoryBean;
 import com.nucleonforge.axelix.master.api.response.BeanShortProfile.ProxyType;
 import com.nucleonforge.axelix.master.api.response.BeanShortProfile.UnknownBean;
 import com.nucleonforge.axelix.master.api.response.BeansFeedResponse;
-import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
-import com.nucleonforge.axile.common.utils.BeanNameUtils;
 
 /**
  * The {@link Converter} from {@link BeansFeed} to {@link BeansFeedResponse}.

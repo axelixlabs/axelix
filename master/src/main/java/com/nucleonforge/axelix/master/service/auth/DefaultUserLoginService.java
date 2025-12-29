@@ -19,11 +19,11 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.auth.core.User;
 import com.nucleonforge.axelix.master.exception.auth.AuthenticationException;
 import com.nucleonforge.axelix.master.exception.auth.InvalidCredentialsException;
 import com.nucleonforge.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.nucleonforge.axelix.master.service.auth.provider.UserProvider;
-import com.nucleonforge.axile.common.auth.core.User;
 
 /**
  * Default {@link UserLoginService}.

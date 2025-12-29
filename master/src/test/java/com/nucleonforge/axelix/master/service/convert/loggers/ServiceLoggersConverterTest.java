@@ -21,11 +21,11 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
+import com.nucleonforge.axelix.common.api.loggers.LoggerLevels;
+import com.nucleonforge.axelix.common.api.loggers.ServiceLoggers;
 import com.nucleonforge.axelix.master.api.response.loggers.LoggersResponse;
 import com.nucleonforge.axelix.master.service.convert.response.loggers.ServiceLoggersConverter;
-import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
-import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
-import com.nucleonforge.axile.common.api.loggers.ServiceLoggers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

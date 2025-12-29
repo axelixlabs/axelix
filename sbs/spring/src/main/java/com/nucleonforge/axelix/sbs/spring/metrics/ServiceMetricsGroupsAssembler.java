@@ -15,7 +15,7 @@
  */
 package com.nucleonforge.axelix.sbs.spring.metrics;
 
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
 
 /**
  * Assembles the metrics groups about this particular service.

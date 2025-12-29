@@ -17,9 +17,9 @@ package com.nucleonforge.axelix.master.service.convert;
 
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.ProfileMutationResult;
 import com.nucleonforge.axelix.master.api.response.ProfileUpdateResponse;
 import com.nucleonforge.axelix.master.service.convert.response.ProfileMutationResultConverter;
-import com.nucleonforge.axile.common.api.ProfileMutationResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

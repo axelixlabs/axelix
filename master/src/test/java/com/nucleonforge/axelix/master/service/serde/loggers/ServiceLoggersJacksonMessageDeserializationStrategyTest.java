@@ -21,9 +21,9 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
-import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
-import com.nucleonforge.axile.common.api.loggers.ServiceLoggers;
+import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
+import com.nucleonforge.axelix.common.api.loggers.LoggerLevels;
+import com.nucleonforge.axelix.common.api.loggers.ServiceLoggers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
