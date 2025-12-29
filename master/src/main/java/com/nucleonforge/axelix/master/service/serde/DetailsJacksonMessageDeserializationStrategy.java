@@ -20,21 +20,22 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axelix.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for {@link AxileDetails}.
+ * {@link JacksonMessageDeserializationStrategy} for {@link InstanceDetails}.
  *
  * @author Nikita Kirilov, Sergey Cherkasov
  */
 @Component
-public class DetailsJacksonMessageDeserializationStrategy extends JacksonMessageDeserializationStrategy<AxileDetails> {
+public class DetailsJacksonMessageDeserializationStrategy
+        extends JacksonMessageDeserializationStrategy<InstanceDetails> {
     public DetailsJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
     @Override
-    public @NonNull Class<AxileDetails> supported() {
-        return AxileDetails.class;
+    public @NonNull Class<InstanceDetails> supported() {
+        return InstanceDetails.class;
     }
 }

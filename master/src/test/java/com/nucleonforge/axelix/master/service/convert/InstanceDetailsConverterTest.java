@@ -23,12 +23,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axelix.common.api.AxileDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.BuildDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.OsDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.RuntimeDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.SpringDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.BuildDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.GitDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.OsDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.RuntimeDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.SpringDetails;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.BuildProfile;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.GitProfile;
@@ -49,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 @SpringBootTest
-public class AxileDetailsConverterTest {
+public class InstanceDetailsConverterTest {
 
     @Autowired
     private InstanceRegistry instanceRegistry;
@@ -104,23 +104,23 @@ public class AxileDetailsConverterTest {
         assertThat(os.arch()).isEqualTo("amd64");
     }
 
-    private static AxileDetails getAxileDetails() {
+    private static InstanceDetails getAxileDetails() {
         GitDetails.CommitAuthor commitAuthor =
-                new AxileDetails.GitDetails.CommitAuthor("sergeycherkasovv", "sergeycherkasovv@github.com");
+                new InstanceDetails.GitDetails.CommitAuthor("sergeycherkasovv", "sergeycherkasovv@github.com");
 
         GitDetails gitDetails =
-                new AxileDetails.GitDetails("7a663cb", "local/local-test", commitAuthor, "2025-11-23T02:25:22Z");
+                new InstanceDetails.GitDetails("7a663cb", "local/local-test", commitAuthor, "2025-11-23T02:25:22Z");
 
-        SpringDetails springDetails = new AxileDetails.SpringDetails("3.5.0", "7.0", "2023.0.1");
+        SpringDetails springDetails = new InstanceDetails.SpringDetails("3.5.0", "7.0", "2023.0.1");
 
         RuntimeDetails runtimeDetails =
-                new AxileDetails.RuntimeDetails("17.0.16", "Corretto-17.0.16.8.1", "G1 GC", null);
+                new InstanceDetails.RuntimeDetails("17.0.16", "Corretto-17.0.16.8.1", "G1 GC", null);
 
-        BuildDetails buildDetails = new AxileDetails.BuildDetails(
+        BuildDetails buildDetails = new InstanceDetails.BuildDetails(
                 "spring-petclinic", "3.5.0-SNAPSHOT", "org.springframework.samples", "2025-10-29T15:10:54.770Z");
 
-        OsDetails osDetails = new AxileDetails.OsDetails("Windows 10", "10.0", "amd64");
+        OsDetails osDetails = new InstanceDetails.OsDetails("Windows 10", "10.0", "amd64");
 
-        return new AxileDetails(gitDetails, springDetails, runtimeDetails, buildDetails, osDetails);
+        return new InstanceDetails(gitDetails, springDetails, runtimeDetails, buildDetails, osDetails);
     }
 }

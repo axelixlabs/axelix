@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
- * The response returned by the custom Axile details endpoint.
+ * The response returned by the custom details endpoint.
  *
  * @param git           The DTO containing git component details.
  * @param spring        The DTO containing spring component details.
@@ -30,7 +30,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Nikita Kirilov, Sergey Cherkasov
  */
-public record AxileDetails(
+public record InstanceDetails(
         @JsonProperty("git") GitDetails git,
         @JsonProperty("spring") SpringDetails spring,
         @JsonProperty("runtime") RuntimeDetails runtime,

@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nucleonforge.axelix.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse;
@@ -92,7 +92,7 @@ public class DetailsApi {
             throws InstanceNotFoundException {
 
         InstanceId id = InstanceId.of(instanceId);
-        AxileDetails axileDetails = detailsEndpointProber.invoke(id, NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(converter.convert(new DetailsConversionRequest(axileDetails, id)));
+        InstanceDetails instanceDetails = detailsEndpointProber.invoke(id, NoHttpPayload.INSTANCE);
+        return Objects.requireNonNull(converter.convert(new DetailsConversionRequest(instanceDetails, id)));
     }
 }

@@ -30,11 +30,11 @@ import org.springframework.core.env.MapPropertySource;
  * @since 07.04.2025
  * @author Mikhail Polivakha
  */
-public class AxilePropertySource extends MapPropertySource {
+public class AxelixPropertySource extends MapPropertySource {
 
-    public static final String AXILE_PROPERTY_SOURCE_NAME = "AXILE_PROPERTY_SOURCE_NAME";
+    public static final String AXILE_PROPERTY_SOURCE_NAME = "AXELIX_PROPERTY_SOURCE_NAME";
 
-    public AxilePropertySource(Map<String, Object> source) {
+    public AxelixPropertySource(Map<String, Object> source) {
         super(AXILE_PROPERTY_SOURCE_NAME, source);
     }
 
