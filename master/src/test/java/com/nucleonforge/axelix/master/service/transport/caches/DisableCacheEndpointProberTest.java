@@ -82,7 +82,7 @@ class DisableCacheEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axile-caches/cacheManager/vets/disable")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/cacheManager/vets/disable")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);

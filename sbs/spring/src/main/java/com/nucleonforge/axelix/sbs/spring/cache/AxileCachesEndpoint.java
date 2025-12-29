@@ -35,7 +35,7 @@ import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
  * @since 24.06.2025
  * @author Nikita Kirillov
  */
-@RestControllerEndpoint(id = "axile-caches")
+@RestControllerEndpoint(id = "axelix-caches")
 public class AxileCachesEndpoint {
 
     private final CacheDispatcher dispatcher;

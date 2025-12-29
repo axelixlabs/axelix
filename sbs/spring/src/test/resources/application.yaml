@@ -27,7 +27,7 @@ management:
           - axile-metrics
           - configprops
           - axile-configprops
-          - axile-caches
+          - axelix-caches
           - conditions
           - threaddump
           - threaddump-management

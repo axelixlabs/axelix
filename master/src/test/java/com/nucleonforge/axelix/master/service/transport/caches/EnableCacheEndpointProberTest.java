@@ -82,7 +82,7 @@ class EnableCacheEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axile-caches/cacheManager/vets/enable")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/cacheManager/vets/enable")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
