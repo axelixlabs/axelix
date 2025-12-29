@@ -26,7 +26,7 @@ import com.nucleonforge.axelix.master.service.serde.MessageDeserializationStrate
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#DETAILS /axile-info} endpoint.
+ * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#DETAILS} endpoint.
  *
  * @author Nikita Kirilov, Sergey Cherkasov
  */

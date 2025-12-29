@@ -27,7 +27,7 @@ import com.nucleonforge.axelix.common.api.InstanceDetails;
  * @since 29.10.2025
  * @author Nikita Kirillov
  */
-@Endpoint(id = "axile-details")
+@Endpoint(id = "axelix-details")
 public class AxileDetailsEndpoint {
 
     private final ServiceDetailsAssembler serviceDetailsAssembler;

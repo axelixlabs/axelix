@@ -238,11 +238,11 @@ public class DetailsApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axile-details")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-details")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + instanceWithoutPluginId + "/actuator/axile-details")) {
+                } else if (path.equals("/" + instanceWithoutPluginId + "/actuator/axelix-details")) {
                     return new MockResponse()
                             .setBody(jsonResponseWithoutPlugin)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

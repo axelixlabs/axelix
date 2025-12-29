@@ -196,7 +196,7 @@ public class MetricsApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axile-metrics")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-metrics")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

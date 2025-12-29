@@ -76,7 +76,7 @@ public class AxileConfigurationPropertiesEndpointTest {
     @MethodSource("propertyName")
     void shouldReturnPropertiesNameAndValue(String propertyName, String expectedValue) {
         ResponseEntity<ConfigPropsFeed> response =
-                restTemplate.getForEntity("/actuator/axile-configprops", ConfigPropsFeed.class);
+                restTemplate.getForEntity("/actuator/axelix-configprops", ConfigPropsFeed.class);
 
         List<KeyValue> properties = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())
@@ -115,7 +115,7 @@ public class AxileConfigurationPropertiesEndpointTest {
     @MethodSource("inputsName")
     void shouldReturnInputsName(String inputsName) {
         ResponseEntity<ConfigPropsFeed> response =
-                restTemplate.getForEntity("/actuator/axile-configprops", ConfigPropsFeed.class);
+                restTemplate.getForEntity("/actuator/axelix-configprops", ConfigPropsFeed.class);
 
         List<KeyValue> inputs = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())

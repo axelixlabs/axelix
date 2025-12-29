@@ -72,7 +72,7 @@ class AxileMetricsEndpointTest {
         // when.
         String metricName = "jvm.memory.max";
         ResponseEntity<MetricProfile> response =
-                testRestTemplate.getForEntity("/actuator/axile-metrics/" + metricName, MetricProfile.class);
+                testRestTemplate.getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -112,7 +112,7 @@ class AxileMetricsEndpointTest {
         // when.
         String metricName = "for.value.transformations";
         ResponseEntity<MetricProfile> response =
-                testRestTemplate.getForEntity("/actuator/axile-metrics/" + metricName, MetricProfile.class);
+                testRestTemplate.getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -128,7 +128,7 @@ class AxileMetricsEndpointTest {
         // when.
         String metricName = "jvm.gc.overhead";
         ResponseEntity<MetricProfile> response =
-                testRestTemplate.getForEntity("/actuator/axile-metrics/" + metricName, MetricProfile.class);
+                testRestTemplate.getForEntity("/actuator/axelix-metrics/" + metricName, MetricProfile.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -143,7 +143,7 @@ class AxileMetricsEndpointTest {
     void shouldReturnGroupedMetricsWithDescriptions(String groupName, String metricName, String metricDescription) {
         // when.
         ResponseEntity<MetricsGroupsFeed> response =
-                testRestTemplate.getForEntity("/actuator/axile-metrics", MetricsGroupsFeed.class);
+                testRestTemplate.getForEntity("/actuator/axelix-metrics", MetricsGroupsFeed.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();

@@ -27,7 +27,7 @@ import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
  * @since 13.11.2025
  * @author Sergey Cherkasov
  */
-@Endpoint(id = "axile-configprops")
+@Endpoint(id = "axelix-configprops")
 public class AxileConfigurationPropertiesEndpoint {
 
     private final ConfigurationPropertiesCache configurationPropertiesCache;

@@ -149,7 +149,7 @@ public class ConfigPropsEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axile-configprops")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-configprops")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
