@@ -443,7 +443,7 @@ class AxileCachesEndpointTest {
         relative = prefixPathIfNeeded(relative);
         cacheManagerName = prefixPathIfNeeded(cacheManagerName);
 
-        return "/actuator/axile-caches" + cacheManagerName + relative;
+        return "/actuator/axelix-caches" + cacheManagerName + relative;
     }
 
     private static String prefixPathIfNeeded(String path) {

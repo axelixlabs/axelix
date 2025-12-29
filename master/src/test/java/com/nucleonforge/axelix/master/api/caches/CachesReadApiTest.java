@@ -117,7 +117,7 @@ public class CachesReadApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/actuator/axile-caches")) {
+                if (path.equals("/actuator/axelix-caches")) {
                     return new MockResponse()
                             .setBody(responseFromManagedService)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
