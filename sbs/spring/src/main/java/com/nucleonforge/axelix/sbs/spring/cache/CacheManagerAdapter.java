@@ -15,6 +15,8 @@
  */
 package com.nucleonforge.axelix.sbs.spring.cache;
 
+import jakarta.annotation.Nullable;
+
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
@@ -22,12 +24,13 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
  * Adapter to Spring's {@link CacheManager}.
  *
  * <p>
- * Provides a unified interface for performing cache clearing operations.
- * All methods return {@code true} if at least one entry was removed,
- * and {@code false} if no entries were removed.
+ * Provides a unified interface for performing cache clearing operations and for retrieving information.
+ * Some methods return {@code true} if at least one entry was removed, and {@code false} if no entries were removed.
+ * Some methods return cache-related information.
  *
  * @since 23.06.2025
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public interface CacheManagerAdapter {
 
@@ -90,4 +93,25 @@ public interface CacheManagerAdapter {
      * @return {@code true} if the cache is enabled, {@code false} if it's disabled
      */
     boolean isCacheEnabled(String cacheName);
+
+    /**
+     * @param cacheName the name of the cache to check
+     * @return the estimated number of cache hits, or {@code null} if the cache is not found.
+     */
+    @Nullable
+    Long getHitsCount(String cacheName);
+
+    /**
+     * @param cacheName the name of the cache to check
+     * @return the estimated number of cache misses, or {@code null} if the cache is not found.
+     */
+    @Nullable
+    Long getMissesCount(String cacheName);
+
+    /**
+     * @param cacheName the name of the cache to check
+     * @return the underlying native cache provider, or {@code null} if the cache is not found.
+     */
+    @Nullable
+    Object getNativeCache(String cacheName);
 }

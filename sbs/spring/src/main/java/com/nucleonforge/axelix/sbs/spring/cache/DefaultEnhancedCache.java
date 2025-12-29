@@ -78,7 +78,23 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public ValueWrapper get(@NonNull Object key) {
-        return getIfEnabledOrElseNull(() -> delegate.get(key));
+        return getValueWrapperIfEnabledOrElseNull(() -> delegate.get(key));
+    }
+
+    @Nullable
+    private <T> T getValueWrapperIfEnabledOrElseNull(Supplier<T> supplier) {
+        if (!enabled.get()) {
+            return null;
+        }
+
+        T result = supplier.get();
+
+        if (result == null) {
+            missesCount.increment();
+        } else {
+            hitsCount.increment();
+        }
+        return result;
     }
 
     @Override
@@ -87,10 +103,26 @@ public class DefaultEnhancedCache implements EnhancedCache {
         return getIfEnabledOrElseNull(() -> delegate.get(key, type));
     }
 
+    @Nullable
+    private <T> T getIfEnabledOrElseNull(Supplier<T> supplier) {
+        return enabled.get() ? supplier.get() : null;
+    }
+
     @Override
     @Nullable
     public <T> T get(@NonNull Object key, @NonNull Callable<T> valueLoader) {
-        return getIfEnabledOrElseNull(() -> delegate.get(key, valueLoader));
+        AtomicBoolean miss = new AtomicBoolean();
+
+        T value = delegate.get(key, () -> {
+            miss.set(true);
+            return valueLoader.call();
+        });
+
+        if (enabled.get()) {
+            (miss.get() ? missesCount : hitsCount).increment();
+        }
+
+        return value;
     }
 
     @Override
@@ -106,22 +138,6 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     public void clear() {
         executeIfEnabled(delegate::clear);
-    }
-
-    @Nullable
-    private <T> T getIfEnabledOrElseNull(Supplier<T> supplier) {
-        if (!enabled.get()) {
-            return null;
-        }
-
-        T result = supplier.get();
-
-        if (result == null) {
-            missesCount.increment();
-        } else {
-            hitsCount.increment();
-        }
-        return result;
     }
 
     @Override

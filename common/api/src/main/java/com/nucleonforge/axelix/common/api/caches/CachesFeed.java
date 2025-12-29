@@ -51,16 +51,16 @@ public record CachesFeed(@JsonProperty("cacheManagers") List<CacheManagers> cach
      *
      * @param name                  The cache name.
      * @param target                The fully qualified name of the native cache.
-     * @param hitsCount             The number of cache hits.
-     * @param missesCount           The number of cache misses.
+     * @param hitsCount             The number of cache hits, or {@code null} if unknown.
+     * @param missesCount           The number of cache misses, or {@code null} if unknown.
      * @param estimatedEntrySize    The estimated number of entries in the cache, or {@code null} if unknown.
      * @param enabled               Whether the cache is enabled ({@code true}) or disabled ({@code false}).
      */
     public record Caches(
             @JsonProperty("name") String name,
             @JsonProperty("target") String target,
-            @JsonProperty("hitsCount") long hitsCount,
-            @JsonProperty("missesCount") long missesCount,
-            @JsonProperty("estimatedEntrySize") @Nullable Object estimatedEntrySize,
+            @JsonProperty("hitsCount") @Nullable Long hitsCount,
+            @JsonProperty("missesCount") @Nullable Long missesCount,
+            @JsonProperty("estimatedEntrySize") @Nullable Long estimatedEntrySize,
             @JsonProperty("enabled") boolean enabled) {}
 }

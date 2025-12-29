@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 24.06.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 class DefaultCacheDispatcherTest {
 
@@ -58,7 +59,9 @@ class DefaultCacheDispatcherTest {
         cacheManager2 = new EnhancedCacheManager(new ConcurrentMapCacheManager(TEST_CACHE_2));
         managers.put(TEST_CACHE_MANAGER_1, cacheManager1);
         managers.put(TEST_CACHE_MANAGER_2, cacheManager2);
-        dispatcher = new DefaultCacheDispatcher(managers);
+
+        CacheSizeProvider cacheSizeProvider = new DefaultCacheSizeProvider();
+        dispatcher = new DefaultCacheDispatcher(managers, cacheSizeProvider);
     }
 
     @Test
@@ -272,6 +275,46 @@ class DefaultCacheDispatcherTest {
         dispatcher.enableCacheManager(cacheManagerName);
 
         assertThat(dispatcher.isCacheEnabled(cacheManagerName, cacheName)).isTrue();
+    }
+
+    @Test
+    void shouldReturnCacheInformation_FromDifferentManagers() {
+        cacheManager1.getCache(TEST_CACHE_2).put("key1", "value");
+        cacheManager1.getCache(TEST_CACHE_2).put("key2", "value");
+        cacheManager1.getCache(TEST_CACHE_2).get("key1");
+        cacheManager1.getCache(TEST_CACHE_2).get("key2");
+        cacheManager1.getCache(TEST_CACHE_2).get("notCache");
+        cacheManager1.getCache(TEST_CACHE_2).get("notCache");
+
+        assertThat(dispatcher.getMissesCount(TEST_CACHE_MANAGER_1, TEST_CACHE_2))
+                .isEqualTo(2L);
+        assertThat(dispatcher.getHitsCount(TEST_CACHE_MANAGER_1, TEST_CACHE_2)).isEqualTo(2L);
+        assertThat(dispatcher.getEstimatedCacheSize(TEST_CACHE_MANAGER_1, TEST_CACHE_2))
+                .isEqualTo(2L);
+
+        cacheManager2.getCache(TEST_CACHE_2).put("key3", "value");
+        cacheManager2.getCache(TEST_CACHE_2).get("key3");
+        cacheManager2.getCache(TEST_CACHE_2).get("notCache2");
+
+        assertThat(dispatcher.getMissesCount(TEST_CACHE_MANAGER_2, TEST_CACHE_2))
+                .isEqualTo(1L);
+        assertThat(dispatcher.getHitsCount(TEST_CACHE_MANAGER_2, TEST_CACHE_2)).isEqualTo(1L);
+        assertThat(dispatcher.getEstimatedCacheSize(TEST_CACHE_MANAGER_2, TEST_CACHE_2))
+                .isEqualTo(1L);
+    }
+
+    @Test
+    void shouldReturnNull_ForNonExistentManager() {
+        String cacheManagerName = "nonExistentManager";
+        String cacheName = TEST_CACHE_1;
+        cacheManager1.getCache(TEST_CACHE_1).put("key1", "value");
+        cacheManager1.getCache(TEST_CACHE_1).get("key1");
+        cacheManager1.getCache(TEST_CACHE_1).get("notCache");
+
+        assertThat(dispatcher.getMissesCount(cacheManagerName, cacheName)).isNull();
+        assertThat(dispatcher.getHitsCount(cacheManagerName, cacheName)).isNull();
+        assertThat(dispatcher.getEstimatedCacheSize(cacheManagerName, cacheName))
+                .isNull();
     }
 
     @Test

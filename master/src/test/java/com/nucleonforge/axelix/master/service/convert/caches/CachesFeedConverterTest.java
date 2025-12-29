@@ -108,9 +108,9 @@ public class CachesFeedConverterTest {
 
     public CachesFeed getCaches() {
         // Caches
-        Caches cities = new Caches("cities", "java.util.concurrent.ConcurrentHashMap", 11, 2, 5, true);
-        Caches countries = new Caches("countries", "java.util.concurrent.ConcurrentHashMap", 0, 0, 0, false);
-        Caches test = new Caches("test", "java.util.concurrent.TestHashMap", 5, 0, 5, true);
+        Caches cities = new Caches("cities", "java.util.concurrent.ConcurrentHashMap", 11L, 2L, 5L, true);
+        Caches countries = new Caches("countries", "java.util.concurrent.ConcurrentHashMap", 0L, 0L, 0L, false);
+        Caches test = new Caches("test", "java.util.concurrent.TestHashMap", 5L, 0L, 5L, true);
 
         // CacheManagers
         CacheManagers anotherCacheManager = new CacheManagers("anotherCacheManager", List.of(countries));

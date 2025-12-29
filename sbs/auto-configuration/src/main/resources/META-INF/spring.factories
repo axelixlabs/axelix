@@ -1,2 +1,2 @@
 org.springframework.context.ApplicationListener=\
-context.com.nucleonforge.axelix.sbs.spring.RestartListener
+com.nucleonforge.axelix.sbs.spring.context.RestartListener

@@ -64,15 +64,6 @@ import static org.assertj.core.api.Assertions.assertThat;
     AxilixCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class,
     CachesEndpoint.class
 })
-
-// TODO:
-//  This is required since we tinker with caches. However, ideally, we should clean everything up in
-//  BeforeEach callback or some sort.
-
-// TODO:
-//  This test has no clear test data to operate upon.
-//  It just relies on whatever cache managers are present in the cotnext right now. That approach
-//  will produce a flaky, unstable and unclear test
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AxilixCachesEndpointTest {
 
@@ -287,6 +278,51 @@ class AxilixCachesEndpointTest {
     }
 
     @Test
+    void concurrentCache_shouldReturnCacheInformation() {
+        Cache cache1 = cacheManager.getCache(TEST_CACHE_1);
+        cache1.put("key1", "value1");
+        cache1.put("key2", "value2");
+        cache1.put("key3", "value3");
+        cache1.get("key1");
+        cache1.get("key2");
+
+        Cache cache2 = cacheManager.getCache(TEST_CACHE_2);
+        cache2.put("key", "value");
+        cache2.get("key");
+        cache2.get("notCache1");
+        cache2.get("notCache2");
+
+        ResponseEntity<CachesFeed> response = testRestTemplate.getForEntity(rootPath(), CachesFeed.class);
+
+        CacheManagers cacheManagers = response.getBody().cacheManagers().stream()
+                .filter(cm -> TEST_CACHE_MANAGER.equals(cm.name()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(cacheManagers.caches()).hasSize(2);
+
+        Caches cache1Info = cacheManagers.caches().stream()
+                .filter(c -> TEST_CACHE_1.equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(cache1Info.enabled()).isTrue();
+        assertThat(cache1Info.target()).isNotNull();
+        assertThat(cache1Info.missesCount()).isEqualTo(0L);
+        assertThat(cache1Info.hitsCount()).isEqualTo(2L);
+        assertThat(cache1Info.estimatedEntrySize()).isEqualTo(3L);
+
+        Caches cache2Info = cacheManagers.caches().stream()
+                .filter(c -> TEST_CACHE_2.equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(cache2Info.enabled()).isTrue();
+        assertThat(cache2Info.target()).isNotNull();
+        assertThat(cache2Info.missesCount()).isEqualTo(2L);
+        assertThat(cache2Info.hitsCount()).isEqualTo(1L);
+        assertThat(cache2Info.estimatedEntrySize()).isEqualTo(1L);
+    }
+
+    @Test
     void caches_shouldShowDisableEnabledCache() {
         cacheManager.getCache(TEST_CACHE_1);
 
@@ -305,9 +341,6 @@ class AxilixCachesEndpointTest {
                 .findFirst()
                 .orElseThrow();
         assertThat(disabledCache.enabled()).isFalse();
-        assertThat(disabledCache.hitsCount()).isEqualTo(0);
-        assertThat(disabledCache.missesCount()).isEqualTo(0);
-        assertThat(disabledCache.estimatedEntrySize()).isEqualTo(0);
 
         testRestTemplate.postForObject(path(TEST_CACHE_1 + "/enable"), defaultEntity(), Void.class);
 
@@ -324,9 +357,6 @@ class AxilixCachesEndpointTest {
                 .findFirst()
                 .orElseThrow();
         assertThat(enabledCache.enabled()).isTrue();
-        assertThat(enabledCache.hitsCount()).isEqualTo(0);
-        assertThat(enabledCache.missesCount()).isEqualTo(0);
-        assertThat(enabledCache.estimatedEntrySize()).isEqualTo(0);
     }
 
     @Test
@@ -342,12 +372,8 @@ class AxilixCachesEndpointTest {
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(cacheManagers.caches()).allSatisfy(cacheInfo -> {
-            assertThat(cacheInfo.enabled()).isFalse();
-            assertThat(cacheInfo.hitsCount()).isEqualTo(0);
-            assertThat(cacheInfo.missesCount()).isEqualTo(0);
-            assertThat(cacheInfo.estimatedEntrySize()).isEqualTo(0);
-        });
+        assertThat(cacheManagers.caches())
+                .allSatisfy(cacheInfo -> assertThat(cacheInfo.enabled()).isFalse());
     }
 
     @Test
@@ -368,18 +394,12 @@ class AxilixCachesEndpointTest {
                 .findFirst()
                 .orElseThrow();
         assertThat(cache1Info.enabled()).isFalse();
-        assertThat(cache1Info.missesCount()).isEqualTo(0);
-        assertThat(cache1Info.hitsCount()).isEqualTo(0);
-        assertThat(cache1Info.estimatedEntrySize()).isEqualTo(0);
 
         Caches cache2Info = cacheManagers.caches().stream()
                 .filter(c -> TEST_CACHE_2.equals(c.name()))
                 .findFirst()
                 .orElseThrow();
         assertThat(cache2Info.enabled()).isTrue();
-        assertThat(cache2Info.missesCount()).isEqualTo(0);
-        assertThat(cache2Info.hitsCount()).isEqualTo(0);
-        assertThat(cache2Info.estimatedEntrySize()).isEqualTo(0);
     }
 
     @Test
@@ -485,7 +505,6 @@ class AxilixCachesEndpointTest {
 
     @TestConfiguration
     public static class CacheDispatcherEndpointTestConfiguration {
-
         @Bean
         @ConditionalOnMissingBean
         public CacheSizeProvider cacheSizeProvider() {

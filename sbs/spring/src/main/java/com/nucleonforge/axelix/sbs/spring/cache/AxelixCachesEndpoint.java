@@ -69,14 +69,13 @@ public class AxelixCachesEndpoint {
 
             cacheManagerDescriptor.getCaches().forEach((cacheName, cacheDescriptor) -> {
                 boolean isEnabled = dispatcher.isCacheEnabled(managerName, cacheName);
-                enhancedCacheManager.getCache(cacheName);
 
                 Caches extendedCache = new Caches(
                         cacheName,
                         cacheDescriptor.getTarget(),
-                        enhancedCacheManager.getHitsCount(cacheName),
-                        enhancedCacheManager.getMissesCount(cacheName),
-                        cacheSizeProvider.getEstimatedCacheSize(enhancedCacheManager.getNativeCache(cacheName)),
+                        dispatcher.getHitsCount(managerName, cacheName),
+                        dispatcher.getMissesCount(managerName, cacheName),
+                        dispatcher.getEstimatedCacheSize(managerName, cacheName),
                         isEnabled);
                 extendedCaches.add(extendedCache);
             });

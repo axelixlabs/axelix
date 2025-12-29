@@ -18,23 +18,29 @@ package com.nucleonforge.axelix.sbs.spring.cache;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.cache.CacheManager;
 
 /**
- * Central component responsible for dispatching
- * cache-related operations to the appropriate {@link CacheManager} based on its name.
+ * Central component responsible for dispatching cache-related operations
+ * and retrieving information from the appropriate {@link CacheManager} based on its name.
  *
  * @since 26.06.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public class DefaultCacheDispatcher implements CacheDispatcher {
 
     private final Map<String, CacheManagerAdapter> adapters;
 
-    public DefaultCacheDispatcher(Map<String, CacheManager> managers) {
+    private final CacheSizeProvider cacheSizeProvider;
+
+    public DefaultCacheDispatcher(Map<String, CacheManager> managers, CacheSizeProvider cacheSizeProvider) {
         this.adapters = managers.entrySet().stream()
                 .collect(
                         Collectors.toMap(Map.Entry::getKey, entry -> new DefaultCacheManagerAdapter(entry.getValue())));
+        this.cacheSizeProvider = cacheSizeProvider;
     }
 
     @Override
@@ -111,5 +117,26 @@ public class DefaultCacheDispatcher implements CacheDispatcher {
                     "Adapter for cache manager '%s' not found. Cannot check enabled status for cache '%s'.",
                     cacheManagerName, cacheName));
         }
+    }
+
+    @Override
+    @Nullable
+    public Long getHitsCount(String cacheManagerName, String cacheName) {
+        CacheManagerAdapter adapter = adapters.get(cacheManagerName);
+        return adapter != null ? adapter.getHitsCount(cacheName) : null;
+    }
+
+    @Override
+    @Nullable
+    public Long getMissesCount(String cacheManagerName, String cacheName) {
+        CacheManagerAdapter adapter = adapters.get(cacheManagerName);
+        return adapter != null ? adapter.getMissesCount(cacheName) : null;
+    }
+
+    @Override
+    @Nullable
+    public Long getEstimatedCacheSize(String cacheManagerName, String cacheName) {
+        CacheManagerAdapter adapter = adapters.get(cacheManagerName);
+        return adapter != null ? cacheSizeProvider.getEstimatedCacheSize(adapter.getNativeCache(cacheName)) : null;
     }
 }

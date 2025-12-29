@@ -18,8 +18,7 @@ package com.nucleonforge.axelix.sbs.spring.cache;
 import io.micrometer.common.lang.Nullable;
 
 /**
- * Interface for detecting the underlying cache provider (for example, Caffeine, ConcurrentHashMap, Guava, etc.)
- * and retrieving the estimated number of entries in a given cache.
+ * Interface for providing the estimate size of the provided cache (for example, Caffeine, ConcurrentHashMap, Guava, etc.)
  *
  * @author Sergey Cherkasov
  */
@@ -27,7 +26,7 @@ public interface CacheSizeProvider {
 
     /**
      * @param nativeCache the underlying native cache provider.
-     * @return the estimated cache size, or {@code null} if the value cannot be determined.
+     * @return the estimated cache size, or {@code null} if the value cannot be determined, or if the provided cache is not supported.
      */
     @Nullable
     Long getEstimatedCacheSize(@Nullable Object nativeCache);

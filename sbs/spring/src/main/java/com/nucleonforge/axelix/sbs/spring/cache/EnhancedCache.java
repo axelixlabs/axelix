@@ -52,12 +52,12 @@ public interface EnhancedCache extends Cache {
     boolean isEnabled();
 
     /**
-     * @return the number of cache hits.
+     * @return the estimated number of cache hits.
      */
     long getHitsCount();
 
     /**
-     * @return the number of cache misses.
+     * @return the estimated number of cache misses.
      */
     long getMissesCount();
 }

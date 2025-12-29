@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 public class DefaultCacheSizeProviderTest {
-    private final DefaultCacheSizeProvider provider = new DefaultCacheSizeProvider();
+    private final CacheSizeProvider provider = new DefaultCacheSizeProvider();
 
     @Test
     void caffeineCache_shouldReturnEstimatedSize() {

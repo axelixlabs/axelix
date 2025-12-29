@@ -48,8 +48,8 @@ public record CachesResponse(List<CacheManagers> cacheManagers) {
      *
      * @param name                  The cache name.
      * @param target                The fully qualified name of the native cache.
-     * @param hitsCount             The number of cache hits.
-     * @param missesCount           The number of cache misses.
+     * @param hitsCount             The number of cache hits, or {@code null} if unknown.
+     * @param missesCount           The number of cache misses, or {@code null} if unknown.
      * @param estimatedEntrySize    The estimated number of entries in the cache, or {@code null} if unknown.
      * @param enabled               Whether the cache is enabled ({@code true}) or disabled ({@code false}).
      *
@@ -58,8 +58,8 @@ public record CachesResponse(List<CacheManagers> cacheManagers) {
     public record Caches(
             String name,
             String target,
-            long hitsCount,
-            long missesCount,
-            @Nullable Object estimatedEntrySize,
+            @Nullable Long hitsCount,
+            @Nullable Long missesCount,
+            @Nullable Long estimatedEntrySize,
             boolean enabled) {}
 }

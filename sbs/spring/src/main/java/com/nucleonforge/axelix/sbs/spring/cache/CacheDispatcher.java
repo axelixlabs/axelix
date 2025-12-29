@@ -15,15 +15,18 @@
  */
 package com.nucleonforge.axelix.sbs.spring.cache;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 /**
- * Dispatcher interface for executing cache operations
- * (such as evicting entries or clearing caches) across different CacheManager instances.
+ * Dispatcher interface for executing cache operations (such as evicting entries or clearing caches)
+ * and for retrieving information across different CacheManager instances.
  *
  * @since 26.06.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public interface CacheDispatcher {
 
@@ -104,4 +107,29 @@ public interface CacheDispatcher {
      * @return {@code true} if the cache is enabled, {@code false} if it's disabled
      */
     boolean isCacheEnabled(String managerName, String cacheName);
+
+    /**
+     * @param managerName the name of the cache manager
+     * @param cacheName the name of the cache to check
+     * @return the estimated number of cache hits, or {@code null} if the cache manager is not found.
+     */
+    @Nullable
+    Long getHitsCount(String managerName, String cacheName);
+
+    /**
+     * @param managerName the name of the cache manager
+     * @param cacheName the name of the cache to check
+     * @return the estimated number of cache misses, or {@code null} if the cache manager is not found.
+     */
+    @Nullable
+    Long getMissesCount(String managerName, String cacheName);
+
+    /**
+     * @param managerName the name of the cache manager
+     * @param cacheName the name of the cache to check
+     * @return the estimated cache size, or {@code null} if the value cannot be determined,
+     *         or if the provided cache is not supported, or if the cache manager is not found.
+     */
+    @Nullable
+    Long getEstimatedCacheSize(String managerName, String cacheName);
 }
