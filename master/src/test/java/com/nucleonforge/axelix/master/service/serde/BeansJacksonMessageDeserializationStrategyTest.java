@@ -73,7 +73,7 @@ class BeansJacksonMessageDeserializationStrategyTest {
                       "isConfigPropsDependency": true
                     },
                     {
-                      "name": "com.nucleonforge.axile.sbs.autoconfiguration.spring.BeanAnalyzerAutoConfiguration",
+                      "name": "com.nucleonforge.axelix.sbs.autoconfiguration.spring.BeanAnalyzerAutoConfiguration",
                       "isConfigPropsDependency": false
                     }
                  ],
@@ -151,7 +151,7 @@ class BeansJacksonMessageDeserializationStrategyTest {
                             dep -> {
                                 assertThat(dep.name())
                                         .isEqualTo(
-                                                "com.nucleonforge.axile.sbs.autoconfiguration.spring.BeanAnalyzerAutoConfiguration");
+                                                "com.nucleonforge.axelix.sbs.autoconfiguration.spring.BeanAnalyzerAutoConfiguration");
                                 assertThat(dep.isConfigPropsDependency()).isFalse();
                             });
             assertThat(second.scope()).isEqualTo("singleton");
