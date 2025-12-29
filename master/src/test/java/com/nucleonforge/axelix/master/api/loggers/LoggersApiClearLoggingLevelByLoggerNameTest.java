@@ -1,0 +1,148 @@
+/*
+ * Copyright 2025-present, Nucleon Forge Software.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.nucleonforge.axelix.master.api.loggers;
+
+import java.io.IOException;
+import java.util.UUID;
+
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.api.LoggersApi;
+import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationStrategy;
+import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.TestObjectFactory;
+
+import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Integration tests for {@link LoggersApi}.
+ *
+ * @author Sergey Cherkasov
+ */
+@SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class LoggersApiClearLoggingLevelByLoggerNameTest {
+
+    private static final String activeInstanceId = UUID.randomUUID().toString();
+
+    private static MockWebServer mockWebServer;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
+
+    @Autowired
+    private InstanceRegistry registry;
+
+    @BeforeAll
+    static void startServer() throws IOException {
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
+    }
+
+    @AfterAll
+    static void shutdownServer() throws IOException {
+        mockWebServer.shutdown();
+    }
+
+    @BeforeEach
+    void prepare() {
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String path = request.getPath();
+                assert path != null;
+
+                if (path.equals("/" + activeInstanceId + "/loggers/com.example")) {
+                    return new MockResponse();
+                } else {
+                    return new MockResponse().setResponseCode(404);
+                }
+            }
+        });
+    }
+
+    @Test
+    void shouldClearLoggingLevelByLoggerName() {
+        String loggerName = "com.example";
+
+        registry.register(TestObjectFactory.createInstance(
+                activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
+
+        // when
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                "/api/axile/loggers/{instanceId}/logger/{loggerName}/clear",
+                null,
+                String.class,
+                activeInstanceId,
+                loggerName);
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    @DisplayName("Should return 500 on EndpointInvocationError")
+    void shouldReturnInternalServerError() {
+        String instanceId = UUID.randomUUID().toString();
+        String loggerName = "com.example";
+
+        registry.register(createInstance(instanceId));
+
+        // when.
+        ResponseEntity<?> response = restTemplate.postForEntity(
+                "/api/axile/loggers/{instanceId}/logger/{loggerName}/clear", null, Void.class, instanceId, loggerName);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void shouldReturnBadRequestForUnregisteredInstance() {
+        String instanceId = "unregistered-logger-instance";
+        String loggerName = "com.example";
+
+        // when.
+        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
+                "/api/axile/loggers/{instanceId}/logger/{loggerName}/clear",
+                null,
+                EndpointInvocationException.class,
+                instanceId,
+                loggerName);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+}

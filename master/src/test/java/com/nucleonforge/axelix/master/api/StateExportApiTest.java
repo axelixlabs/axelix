@@ -1,0 +1,472 @@
+/*
+ * Copyright 2025-present, Nucleon Forge Software.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.nucleonforge.axelix.master.api;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.service.export.HeapDumpAnonymizer;
+import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
+import com.nucleonforge.axelix.master.utils.TestObjectFactory;
+
+import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
+import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+/**
+ * Integration tests for {@link StateExportApi}.
+ *
+ * @since 27.10.2025
+ * @author Nikita Kirillov
+ */
+@SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class StateExportApiTest {
+
+    private static final String activeInstanceId = UUID.randomUUID().toString();
+
+    private static MockWebServer mockWebServer;
+
+    @MockBean
+    private HeapDumpAnonymizer heapDumpAnonymizer;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private InstanceRegistry registry;
+
+    // language=json
+    private static final String HTTP_REQUEST_BODY =
+            """
+            {
+                "components" : [
+                    {
+                        "component" : "BEANS"
+                    },
+                    {
+                        "component" : "CACHES"
+                    },
+                    {
+                        "component" : "CONDITIONS"
+                    },
+                    {
+                        "component" : "CONFIG_PROPS"
+                    },
+                    {
+                        "component" : "ENV"
+                    },
+                    {
+                        "component" : "SCHEDULED_TASKS"
+                    },
+                    {
+                        "component" : "THREAD_DUMP"
+                    },
+                    {
+                        "component" : "HEAP_DUMP",
+                        "sanitized" : true
+                    }
+                ]
+            }
+            """;
+
+    @BeforeAll
+    static void startServer() throws IOException {
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
+    }
+
+    @AfterAll
+    static void shutdownServer() throws IOException {
+        mockWebServer.shutdown();
+    }
+
+    @SuppressWarnings("PMD.CyclomaticComplexity")
+    @BeforeEach
+    void prepare() {
+        // language=json
+        String beansJsonResponse =
+                """
+        {
+          "contexts": {
+            "application": {
+              "parentId": null,
+              "beans": {
+                "jmxEndpointProperties": {
+                  "scope": "singleton",
+                  "type": "JmxEndpointProperties",
+                  "proxyType" : "CGLIB",
+                  "aliases": [],
+                  "dependencies": [],
+                  "isLazyInit": false,
+                  "isPrimary": false,
+                  "qualifiers": [],
+                  "beanSource": {
+                     "origin": "COMPONENT_ANNOTATION"
+                  }
+                }
+              }
+            }
+          }
+        }
+        """;
+
+        // language=json
+        String envJsonResponse =
+                """
+        {
+          "activeProfiles": ["production"],
+          "defaultProfiles": ["default", "development"],
+          "propertySources": [
+            {
+              "name": "systemProperties",
+              "properties": [
+                {
+                  "name": "java.vm.vendor",
+                  "value": "BellSoft",
+                  "isPrimary": true,
+                  "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
+                  "description": null
+                }
+              ]
+            }
+          ]
+        }
+        """;
+
+        // language=json
+        String jsonConditionsResponse =
+                """
+    {
+      "positiveConditions": [
+        {
+          "target": "EndpointAutoConfiguration#propertiesEndpointAccessResolver",
+          "matches": [
+            {
+              "condition": "OnBeanCondition",
+              "message": "@ConditionalOnMissingBean (types: org.springframework.boot.actuate.endpoint.EndpointAccessResolver; SearchStrategy: all) did not find any beans"
+            }
+          ]
+        }
+      ],
+      "negativeConditions": [
+        {
+          "target": "WebFluxEndpointManagementContextConfiguration",
+          "notMatched": [
+            {
+              "condition": "OnWebApplicationCondition",
+              "message": "not a reactive web application"
+            }
+          ]
+        }
+      ]
+    }
+    """;
+
+        String jsonCacheResponse =
+                // language=json
+                """
+    {
+      "cacheManagers" : [
+        {
+          "name": "anotherCacheManager",
+          "caches": [
+            {
+              "name": "countries",
+              "target" : "java.util.concurrent.ConcurrentHashMap",
+              "enabled": true
+            }
+          ]
+        }
+      ]
+    }
+    """;
+
+        // language=json
+        String jsonConfigpropsResponse =
+                """
+            {
+          "contexts" : {
+            "application1" : {
+              "beans" : {
+                "management.endpoints.web.cors-org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties" : {
+                  "prefix" : "management.endpoints.web.cors",
+                  "properties": [
+                        { "key": "allowedOrigins", "value": null },
+                        { "key": "maxAge", "value": "PT30M" }
+                      ],
+                      "inputs": [
+                        { "key": "allowedOrigins", "value": null },
+                        { "key": "maxAge", "value": null }
+                      ]
+                }
+              }
+            }
+          }
+        }
+    """;
+
+        // language=json
+        String jsonSchedulesTasksResponse =
+                """
+        {
+          "cron": [
+            {
+              "delegate": {
+                "runnable": {
+                  "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
+                },
+                "expression": "*/2 * * * * *",
+                "nextExecution": {
+                  "time": "2025-10-14T06:33:49.999631800Z"
+                },
+                "lastExecution": {
+                  "exception": null,
+                  "time": "2025-10-14T06:33:48.014578100Z",
+                  "status": "STARTED"
+                }
+              },
+              "enabled": true
+            }
+          ],
+          "fixedDelay": [],
+          "fixedRate": [],
+          "custom": []
+        }
+        """;
+
+        // language=json
+        String jsonThreadDumpResponse =
+                """
+    {
+       "threads" : [ {
+         "threadName" : "Test worker",
+         "threadId" : 1,
+         "blockedTime" : -1,
+         "blockedCount" : 37,
+         "waitedTime" : -1,
+         "waitedCount" : 109,
+         "lockOwnerId" : -1,
+         "daemon" : false,
+         "inNative" : false,
+         "suspended" : false,
+         "threadState" : "RUNNABLE",
+         "priority" : 5,
+         "stackTrace" : [ {
+           "moduleName" : "java.management",
+           "moduleVersion" : "17.0.17",
+           "methodName" : "dumpThreads0",
+           "fileName" : "ThreadImpl.java",
+           "lineNumber" : -2,
+           "nativeMethod" : true,
+           "className" : "sun.management.ThreadImpl"
+         }, {
+           "moduleName" : "java.management",
+           "moduleVersion" : "17.0.17",
+           "methodName" : "dumpAllThreads",
+           "fileName" : "ThreadImpl.java",
+           "lineNumber" : 528,
+           "nativeMethod" : false,
+           "className" : "sun.management.ThreadImpl"
+         } ],
+         "lockedMonitors" : [ ],
+         "lockedSynchronizers" : [ ]
+       } ]
+    }
+    """;
+
+        String mockLogFileResponse =
+                """
+             2025-11-12T14:05:13.795+05:00  INFO 1868 --- [main] o.s.s.petclinic.PetClinicApplication: Starting PetClinicApplication using Java 17.0.16 with PID 1868 (C:\\Project\\spring-petclinic\\target\\classes started in C:\\Project\\spring-petclinic)
+             2025-11-12T14:05:13.795+05:00  INFO 1868 --- [main] o.s.s.petclinic.PetClinicApplication     : No active profile set, falling back to 1 default profile: "default"
+             2025-11-12T14:05:14.382+05:00  INFO 1868 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+             2025-11-12T14:05:14.429+05:00  INFO 1868 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 30 ms. Found 3 JPA repository interfaces.
+             2025-11-12T14:05:14.531+05:00  INFO 1868 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=4c03ca02-57eb-3d79-a155-785dae504167
+             """;
+
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
+                String path = request.getPath();
+                assert path != null;
+
+                if (path.equals("/" + activeInstanceId + "/actuator/beans")) {
+                    return new MockResponse()
+                            .setBody(beansJsonResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axile-env")) {
+                    return new MockResponse()
+                            .setBody(envJsonResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/conditions")) {
+                    return new MockResponse()
+                            .setBody(jsonConditionsResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axile-caches")) {
+                    return new MockResponse()
+                            .setBody(jsonCacheResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axile-configprops")) {
+                    return new MockResponse()
+                            .setBody(jsonConfigpropsResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/scheduledtasks")) {
+                    return new MockResponse()
+                            .setBody(jsonSchedulesTasksResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/threaddump")) {
+                    return new MockResponse()
+                            .setBody(jsonThreadDumpResponse)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/heapdump")) {
+                    return new MockResponse()
+                            .setBody("Mock HPROF binary data")
+                            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+                } else if (path.equals("/" + activeInstanceId + "/actuator/logfile")) {
+                    return new MockResponse()
+                            .setBody(mockLogFileResponse)
+                            .addHeader("Content-Type", "text/plain;charset=UTF-8");
+                } else {
+                    return new MockResponse().setResponseCode(404);
+                }
+            }
+        });
+    }
+
+    @Test
+    @DisplayName("Should return 500 on EndpointInvocationError")
+    void shouldReturnInternalServerError() {
+        String instanceId = UUID.randomUUID().toString();
+
+        registry.register(createInstance(instanceId));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+        ResponseEntity<?> response = restTemplate.postForEntity(
+                "/api/axile/export-state/{instanceId}",
+                new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                Void.class,
+                instanceId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void shouldReturnNotFoundForUnregisteredInstance() {
+        String unknownInstanceId = UUID.randomUUID().toString();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                "/api/axile/export-state/{instanceId}",
+                new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                String.class,
+                unknownInstanceId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void shouldReturnZipArchiveWithJsonFiles() throws IOException {
+        when(heapDumpAnonymizer.anonymize(any(Resource.class)))
+                .thenReturn(new ByteArrayResource("sanitized".getBytes()));
+
+        registry.register(
+                TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+        ResponseEntity<byte[]> response = restTemplate.postForEntity(
+                "/api/axile/export-state/{instanceId}",
+                new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                byte[].class,
+                activeInstanceId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));
+        assertThat(response.getHeaders().getContentDisposition().getFilename()).endsWith(".zip");
+
+        byte[] zipData = response.getBody();
+        assertThat(zipData).isNotEmpty();
+
+        assertZipArchiveContent(zipData);
+    }
+
+    private static void assertZipArchiveContent(byte[] zipData) throws IOException {
+        String hprofData = null;
+
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipData))) {
+            Set<String> zipEntriesNames = new HashSet<>();
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                zipEntriesNames.add(entry.getName());
+
+                if (entry.getName().equals("heap_dump.hprof")) {
+                    byte[] buffer = zis.readAllBytes();
+                    hprofData = new String(buffer, StandardCharsets.UTF_8);
+                }
+
+                zis.closeEntry();
+            }
+
+            assertThat(hprofData).isEqualTo("sanitized");
+            assertThat(zipEntriesNames)
+                    .containsOnly(
+                            "beans.json",
+                            "caches.json",
+                            "conditions.json",
+                            "config_props.json",
+                            "env.json",
+                            "scheduled_tasks.json",
+                            "thread_dump.json",
+                            "heap_dump.hprof");
+        }
+    }
+}

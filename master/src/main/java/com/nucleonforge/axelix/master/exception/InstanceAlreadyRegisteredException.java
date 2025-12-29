@@ -1,0 +1,27 @@
+/*
+ * Copyright 2025-present, Nucleon Forge Software.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.nucleonforge.axelix.master.exception;
+
+import com.nucleonforge.axelix.master.model.instance.Instance;
+import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
+
+/**
+ * Typically thrown by the {@link InstanceRegistry} in case the given {@link Instance} cannot be registered
+ * due to the conflict - the same instance is already registered.
+ *
+ * @author Mikhail Polivakha
+ */
+public class InstanceAlreadyRegisteredException extends RuntimeException {}

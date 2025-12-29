@@ -76,7 +76,7 @@ subprojects {
     configure<PublishingExtension> {
         repositories {
             maven {
-                name = "NucleonForgeAxile"
+                name = "Axelix"
                 url = uri("https://158.160.69.73:8443/repository/axile-monorepo/")
                 credentials {
                     username = project.findProperty("nexus.user") as String? ?: System.getenv("NEXUS_USER")
