@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nucleonforge.axelix.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
@@ -36,8 +38,6 @@ import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.convert.response.details.DetailsConversionRequest;
 import com.nucleonforge.axelix.master.service.transport.DetailsEndpointProber;
-import com.nucleonforge.axile.common.api.AxileDetails;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 
 /**
  * The API for managing details.

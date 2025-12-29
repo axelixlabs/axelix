@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-import com.nucleonforge.axile.common.api.registration.GitInfo;
+import com.nucleonforge.axelix.common.api.registration.GitInfo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

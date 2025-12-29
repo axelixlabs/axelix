@@ -19,9 +19,9 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.info.components.BuildInfo;
 import com.nucleonforge.axelix.master.api.response.info.components.BuildProfile;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axile.common.api.info.components.BuildInfo;
 
 /**
  * The {@link Converter} from {@link BuildInfo} to {@link BuildProfile}.

@@ -34,13 +34,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nucleonforge.axelix.common.api.caches.SingleCache;
+import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
+import com.nucleonforge.axelix.common.domain.http.HttpPayload;
+import com.nucleonforge.axelix.common.domain.http.SingleValueQueryParameter;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
-import com.nucleonforge.axile.common.api.caches.SingleCache;
-import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
-import com.nucleonforge.axile.common.domain.http.HttpPayload;
-import com.nucleonforge.axile.common.domain.http.SingleValueQueryParameter;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;

@@ -17,7 +17,7 @@ package com.nucleonforge.axelix.sbs.spring.configprops;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
 
-import com.nucleonforge.axile.common.api.ConfigPropsFeed;
+import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 
 /**
  * Interface that is capable to convert values from type {@code ConfigurationPropertiesDescriptor}

@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.ServiceScheduledTasks;
+import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for {@link ServiceScheduledTasks}.

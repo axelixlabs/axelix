@@ -20,10 +20,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.env.EnvironmentProperty;
+import com.nucleonforge.axelix.common.api.env.PropertyValue;
 import com.nucleonforge.axelix.master.api.response.EnvironmentPropertyResponse;
 import com.nucleonforge.axelix.master.service.convert.response.environment.EnvironmentPropertyConverter;
-import com.nucleonforge.axile.common.api.env.EnvironmentProperty;
-import com.nucleonforge.axile.common.api.env.PropertyValue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

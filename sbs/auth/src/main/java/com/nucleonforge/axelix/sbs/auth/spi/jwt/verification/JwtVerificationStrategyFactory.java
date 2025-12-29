@@ -15,7 +15,7 @@
  */
 package com.nucleonforge.axelix.sbs.auth.spi.jwt.verification;
 
-import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
+import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
 
 /**
  * Factory class for creating JWT verification strategy instances based on the specified algorithm.

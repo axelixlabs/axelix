@@ -33,6 +33,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed.LockInfo;
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed.MonitorInfo;
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed.StackTraceElement;
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed.State;
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed.ThreadInfo;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
@@ -41,13 +48,6 @@ import com.nucleonforge.axelix.master.service.transport.threaddump.ThreadDumpDis
 import com.nucleonforge.axelix.master.service.transport.threaddump.ThreadDumpEnableContentionMonitoringProber;
 import com.nucleonforge.axelix.master.service.transport.threaddump.ThreadDumpEndpointProber;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed.LockInfo;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed.MonitorInfo;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed.StackTraceElement;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed.State;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed.ThreadInfo;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;

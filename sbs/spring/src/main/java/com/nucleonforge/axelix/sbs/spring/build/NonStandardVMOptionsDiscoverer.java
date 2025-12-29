@@ -15,7 +15,7 @@
  */
 package com.nucleonforge.axelix.sbs.spring.build;
 
-import com.nucleonforge.axile.common.domain.JvmNonStandardOptions;
+import com.nucleonforge.axelix.common.domain.JvmNonStandardOptions;
 
 /**
  * Service that is capable to discover the {@link JvmNonStandardOptions non-standard VM options}

@@ -15,8 +15,8 @@
  */
 package com.nucleonforge.axelix.master.exception.auth;
 
+import com.nucleonforge.axelix.common.auth.core.User;
 import com.nucleonforge.axelix.master.service.auth.provider.UserProvider;
-import com.nucleonforge.axile.common.auth.core.User;
 
 /**
  * Thrown in case the {@link User} is not found by {@link UserProvider}.

@@ -1,0 +1,64 @@
+/*
+ * Copyright 2025-present, Nucleon Forge Software.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.nucleonforge.axelix.common.api.transform;
+
+import java.util.stream.Stream;
+
+import org.assertj.core.api.Assertions;
+import org.assertj.core.data.Percentage;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import com.nucleonforge.axelix.common.api.transform.units.BaseUnit;
+import com.nucleonforge.axelix.common.api.transform.units.GigabytesMemoryBaseUnit;
+import com.nucleonforge.axelix.common.api.transform.units.KilobytesMemoryBaseUnit;
+import com.nucleonforge.axelix.common.api.transform.units.MegabytesMemoryBaseUnit;
+
+import static org.junit.jupiter.params.provider.Arguments.of;
+
+/**
+ * Unit test for {@link KilobytesMemoryBaseUnitValueTransformer}.
+ *
+ * @author Mikhail Polivakha
+ */
+class KilobytesMemoryBaseUnitValueTransformerTest {
+
+    private KilobytesMemoryBaseUnitValueTransformer subject;
+
+    @BeforeEach
+    void setUp() {
+        subject = new KilobytesMemoryBaseUnitValueTransformer();
+    }
+
+    @ParameterizedTest
+    @MethodSource("arguments")
+    void shouldTransformByteValue(double value, BaseUnit expectedBaseUnit, double expectedValue) {
+        TransformedMetricValue result = subject.transform(value);
+
+        Assertions.assertThat(result.baseUnit()).isEqualTo(expectedBaseUnit);
+        Assertions.assertThat(result.value()).isCloseTo(expectedValue, Percentage.withPercentage(1));
+    }
+
+    static Stream<Arguments> arguments() {
+        return Stream.of(
+                of(121, KilobytesMemoryBaseUnit.INSTANCE, 121),
+                of(1044, MegabytesMemoryBaseUnit.INSTANCE, (double) 1044 / 1024),
+                of(12024, MegabytesMemoryBaseUnit.INSTANCE, (double) 12024 / 1024),
+                of(1024 * 1024 * 6 * 1.2, GigabytesMemoryBaseUnit.INSTANCE, (double) 6 * 1.2));
+    }
+}

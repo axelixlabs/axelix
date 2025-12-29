@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.domain.JvmNonStandardOption;
-import com.nucleonforge.axile.common.domain.JvmNonStandardOptions;
+import com.nucleonforge.axelix.common.domain.JvmNonStandardOption;
+import com.nucleonforge.axelix.common.domain.JvmNonStandardOptions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

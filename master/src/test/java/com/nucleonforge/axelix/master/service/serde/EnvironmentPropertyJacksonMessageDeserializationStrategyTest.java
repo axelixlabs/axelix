@@ -21,7 +21,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.env.EnvironmentProperty;
+import com.nucleonforge.axelix.common.api.env.EnvironmentProperty;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

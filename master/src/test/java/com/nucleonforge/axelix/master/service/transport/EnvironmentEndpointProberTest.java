@@ -32,17 +32,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionType;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.Property;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.PropertySource;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionPoint;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionType;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;

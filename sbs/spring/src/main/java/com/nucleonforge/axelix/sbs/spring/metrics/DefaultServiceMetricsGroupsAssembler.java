@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
 
 /**
  * Default implementation of {@link ServiceMetricsGroupsAssembler}.

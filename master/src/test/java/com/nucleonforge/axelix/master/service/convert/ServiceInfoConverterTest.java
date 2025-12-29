@@ -21,6 +21,13 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.info.ServiceInfo;
+import com.nucleonforge.axelix.common.api.info.components.BuildInfo;
+import com.nucleonforge.axelix.common.api.info.components.GitInfo;
+import com.nucleonforge.axelix.common.api.info.components.JavaInfo;
+import com.nucleonforge.axelix.common.api.info.components.OSInfo;
+import com.nucleonforge.axelix.common.api.info.components.ProcessInfo;
+import com.nucleonforge.axelix.common.api.info.components.SSLInfo;
 import com.nucleonforge.axelix.master.api.response.info.InfoResponse;
 import com.nucleonforge.axelix.master.api.response.info.components.BuildProfile;
 import com.nucleonforge.axelix.master.api.response.info.components.GitProfile;
@@ -35,13 +42,6 @@ import com.nucleonforge.axelix.master.service.convert.response.info.components.J
 import com.nucleonforge.axelix.master.service.convert.response.info.components.OSInfoConverter;
 import com.nucleonforge.axelix.master.service.convert.response.info.components.ProcessInfoConverter;
 import com.nucleonforge.axelix.master.service.convert.response.info.components.SSLInfoConverter;
-import com.nucleonforge.axile.common.api.info.ServiceInfo;
-import com.nucleonforge.axile.common.api.info.components.BuildInfo;
-import com.nucleonforge.axile.common.api.info.components.GitInfo;
-import com.nucleonforge.axile.common.api.info.components.JavaInfo;
-import com.nucleonforge.axile.common.api.info.components.OSInfo;
-import com.nucleonforge.axile.common.api.info.components.ProcessInfo;
-import com.nucleonforge.axile.common.api.info.components.SSLInfo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

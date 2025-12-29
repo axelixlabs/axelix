@@ -32,11 +32,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
 import com.nucleonforge.axelix.sbs.auth.spi.Authorizer;
 import com.nucleonforge.axelix.sbs.auth.spi.DefaultAuthorizer;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.DefaultJwtDecoderService;
 import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.JwtDecoderService;
-import com.nucleonforge.axile.common.auth.spi.jwt.JwtAlgorithm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -22,12 +22,12 @@ import java.util.Set;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.api.BeansFeed.BeanDependency;
 import com.nucleonforge.axelix.master.api.response.BeanShortProfile;
 import com.nucleonforge.axelix.master.api.response.BeanShortProfile.BeanDependencyProfile;
 import com.nucleonforge.axelix.master.api.response.BeansFeedResponse;
 import com.nucleonforge.axelix.master.service.convert.response.BeansFeedConverter;
-import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

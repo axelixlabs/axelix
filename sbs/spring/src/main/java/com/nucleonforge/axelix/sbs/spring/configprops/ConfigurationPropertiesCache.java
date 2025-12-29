@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 
-import com.nucleonforge.axile.common.api.ConfigPropsFeed;
+import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 
 /**
  * Service caching the application's {@code @ConfigurationProperties}

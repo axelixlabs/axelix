@@ -30,8 +30,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 
-import com.nucleonforge.axile.common.api.ConfigPropsFeed;
-import com.nucleonforge.axile.common.api.KeyValue;
+import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
+import com.nucleonforge.axelix.common.api.KeyValue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

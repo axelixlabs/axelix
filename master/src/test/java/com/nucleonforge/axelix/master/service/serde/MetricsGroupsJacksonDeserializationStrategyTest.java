@@ -20,10 +20,10 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
 import com.nucleonforge.axelix.master.service.serde.metrics.MetricsGroupsJacksonDeserializationStrategy;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed.MetricsGroup.MetricDescription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -17,7 +17,7 @@ package com.nucleonforge.axelix.sbs.spring.env;
 
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
 
 /**
  * Enriches environment property information with additional metadata.

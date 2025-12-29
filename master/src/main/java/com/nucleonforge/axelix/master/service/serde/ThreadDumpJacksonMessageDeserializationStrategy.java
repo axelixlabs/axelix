@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.ThreadDumpFeed;
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for {@link ThreadDumpFeed}.

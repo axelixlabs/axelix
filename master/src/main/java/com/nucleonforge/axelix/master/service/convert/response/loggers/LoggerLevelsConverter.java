@@ -19,9 +19,9 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axelix.master.api.response.loggers.LoggerProfileResponse;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axile.common.api.loggers.LoggerLevels;
 
 /**
  * The {@link Converter} from {@link LoggerLevels} to {@link LoggerProfileResponse}.

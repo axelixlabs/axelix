@@ -17,7 +17,7 @@ package com.nucleonforge.axelix.sbs.spring.master;
 
 import java.util.Optional;
 
-import com.nucleonforge.axile.common.api.registration.GitInfo;
+import com.nucleonforge.axelix.common.api.registration.GitInfo;
 
 /**
  * The SPI interface that is capable to discover the git commit information.

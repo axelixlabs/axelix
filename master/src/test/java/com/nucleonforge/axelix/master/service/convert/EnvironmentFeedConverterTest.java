@@ -20,14 +20,14 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionType;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.Property;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.PropertySource;
 import com.nucleonforge.axelix.master.api.response.EnvironmentFeedResponse;
 import com.nucleonforge.axelix.master.api.response.EnvironmentFeedResponse.PropertySourceShortProfile;
 import com.nucleonforge.axelix.master.service.convert.response.environment.EnvironmentFeedConverter;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionPoint;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionType;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.Property;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.PropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

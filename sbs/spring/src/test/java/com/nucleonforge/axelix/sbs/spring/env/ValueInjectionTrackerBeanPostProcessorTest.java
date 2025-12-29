@@ -31,8 +31,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestPropertySource;
 
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionPoint;
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed.InjectionType;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.InjectionType;
 
 import static com.nucleonforge.axelix.sbs.spring.env.ValueInjectionTrackerBeanPostProcessorTest.TestBeanWithCustomAnnotations;
 import static com.nucleonforge.axelix.sbs.spring.env.ValueInjectionTrackerBeanPostProcessorTest.TestBeanWithSpEL;

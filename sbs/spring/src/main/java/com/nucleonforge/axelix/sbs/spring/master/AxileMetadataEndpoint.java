@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
+import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
 
 /**
  * Custom Spring Boot Actuator endpoint. Provides access to basic build information

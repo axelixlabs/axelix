@@ -20,9 +20,9 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
-import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for the {@link ActuatorEndpoints#METRICS_GROUP} API.

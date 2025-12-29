@@ -15,8 +15,8 @@
  */
 package com.nucleonforge.axelix.master.service.auth.provider;
 
+import com.nucleonforge.axelix.common.auth.core.User;
 import com.nucleonforge.axelix.master.exception.auth.UserNotFoundException;
-import com.nucleonforge.axile.common.auth.core.User;
 
 /**
  * {@link UserProvider} that is capable to load user from LDAP directory servers.

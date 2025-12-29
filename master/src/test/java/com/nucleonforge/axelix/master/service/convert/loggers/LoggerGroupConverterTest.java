@@ -19,9 +19,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axelix.master.api.response.loggers.GroupProfileResponse;
 import com.nucleonforge.axelix.master.service.convert.response.loggers.LoggerGroupConverter;
-import com.nucleonforge.axile.common.api.loggers.LoggerGroup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

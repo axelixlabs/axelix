@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
 
 /**
  * The feed of the environment used in the application.

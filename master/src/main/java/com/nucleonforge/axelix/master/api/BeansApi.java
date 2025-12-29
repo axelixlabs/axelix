@@ -30,13 +30,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.BeansFeedResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.transport.BeansEndpointProber;
-import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 
 /**
  * The API for managing beans.

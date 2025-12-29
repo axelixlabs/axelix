@@ -18,7 +18,7 @@ package com.nucleonforge.axelix.sbs.spring.configprops;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.nucleonforge.axile.common.api.ConfigPropsFeed;
+import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 
 /**
  * Custom Actuator endpoint exposing the application's {@code @ConfigurationProperties}

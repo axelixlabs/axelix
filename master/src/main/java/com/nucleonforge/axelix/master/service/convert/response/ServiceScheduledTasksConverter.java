@@ -23,8 +23,8 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 import com.nucleonforge.axelix.master.api.response.ScheduledTasksResponse;
-import com.nucleonforge.axile.common.api.ServiceScheduledTasks;
 
 /**
  * The {@link Converter} from {@link ServiceScheduledTasks} to {@link ScheduledTasksResponse}.

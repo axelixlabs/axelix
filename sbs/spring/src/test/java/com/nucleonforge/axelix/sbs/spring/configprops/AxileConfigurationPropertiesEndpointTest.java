@@ -35,8 +35,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.nucleonforge.axile.common.api.ConfigPropsFeed;
-import com.nucleonforge.axile.common.api.KeyValue;
+import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
+import com.nucleonforge.axelix.common.api.KeyValue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

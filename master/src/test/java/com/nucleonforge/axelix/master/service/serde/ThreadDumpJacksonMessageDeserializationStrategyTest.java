@@ -20,10 +20,10 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import com.nucleonforge.axile.common.api.ThreadDumpFeed;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed.StackTraceElement;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed.State;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed.ThreadInfo;
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed.StackTraceElement;
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed.State;
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed.ThreadInfo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -22,7 +22,7 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.nucleonforge.axile.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.

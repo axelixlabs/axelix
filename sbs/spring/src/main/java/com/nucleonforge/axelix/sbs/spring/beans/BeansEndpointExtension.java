@@ -35,12 +35,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.ClassUtils;
 
-import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.common.api.BeansFeed.Bean;
-import com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
-import com.nucleonforge.axile.common.api.BeansFeed.BeanMethod;
-import com.nucleonforge.axile.common.api.BeansFeed.BeanSource;
-import com.nucleonforge.axile.common.api.BeansFeed.Context;
+import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.api.BeansFeed.Bean;
+import com.nucleonforge.axelix.common.api.BeansFeed.BeanDependency;
+import com.nucleonforge.axelix.common.api.BeansFeed.BeanMethod;
+import com.nucleonforge.axelix.common.api.BeansFeed.BeanSource;
+import com.nucleonforge.axelix.common.api.BeansFeed.Context;
 
 /**
  * Web extension for Spring Boot Beans Actuator endpoint.

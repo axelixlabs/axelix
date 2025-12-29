@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.nucleonforge.axile.common.domain.JvmNonStandardOption;
-import com.nucleonforge.axile.common.domain.JvmNonStandardOptions;
+import com.nucleonforge.axelix.common.domain.JvmNonStandardOption;
+import com.nucleonforge.axelix.common.domain.JvmNonStandardOptions;
 
 /**
  * Default implementation of {@link NonStandardVMOptionsDiscoverer}.

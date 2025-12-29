@@ -29,12 +29,12 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
 
+import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
-import com.nucleonforge.axile.common.api.registration.ServiceMetadata;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
-import com.nucleonforge.axile.common.domain.spring.actuator.ActuatorEndpoints;
 
 /**
  * Abstract implementation of {@link InstancesDiscoverer} that performs common tasks like checking

@@ -35,12 +35,12 @@ import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint.MetricDescriptor;
 import org.springframework.lang.Nullable;
 
-import com.nucleonforge.axile.common.api.metrics.MetricProfile;
-import com.nucleonforge.axile.common.api.metrics.MetricProfile.Measurement;
-import com.nucleonforge.axile.common.api.metrics.MetricsGroupsFeed;
-import com.nucleonforge.axile.common.api.transform.BaseUnitParser;
-import com.nucleonforge.axile.common.api.transform.BaseUnitValueTransformer;
-import com.nucleonforge.axile.common.api.transform.units.BaseUnit;
+import com.nucleonforge.axelix.common.api.metrics.MetricProfile;
+import com.nucleonforge.axelix.common.api.metrics.MetricProfile.Measurement;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
+import com.nucleonforge.axelix.common.api.transform.BaseUnitParser;
+import com.nucleonforge.axelix.common.api.transform.BaseUnitValueTransformer;
+import com.nucleonforge.axelix.common.api.transform.units.BaseUnit;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.

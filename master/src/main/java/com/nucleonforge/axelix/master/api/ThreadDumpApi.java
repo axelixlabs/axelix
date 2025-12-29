@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.ThreadDumpFeedResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
@@ -38,8 +40,6 @@ import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.transport.threaddump.ThreadDumpDisableContentionMonitoringProber;
 import com.nucleonforge.axelix.master.service.transport.threaddump.ThreadDumpEnableContentionMonitoringProber;
 import com.nucleonforge.axelix.master.service.transport.threaddump.ThreadDumpEndpointProber;
-import com.nucleonforge.axile.common.api.ThreadDumpFeed;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 
 /**
  * The API for thread dump.

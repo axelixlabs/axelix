@@ -20,8 +20,8 @@ import java.util.Optional;
 
 import org.springframework.util.AntPathMatcher;
 
-import com.nucleonforge.axile.common.auth.core.Authority;
-import com.nucleonforge.axile.common.auth.core.DefaultAuthority;
+import com.nucleonforge.axelix.common.auth.core.Authority;
+import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
 
 /**
  * Default implementation of {@link AuthorityResolver}.

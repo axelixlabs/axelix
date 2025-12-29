@@ -33,15 +33,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
+import com.nucleonforge.axelix.common.domain.http.HttpPayload;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.http.SingleValueQueryParameter;
 import com.nucleonforge.axelix.master.api.ApiPaths;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.transport.caches.ClearAllCachesEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.caches.ClearCacheByNameEndpointProber;
-import com.nucleonforge.axile.common.domain.http.DefaultHttpPayload;
-import com.nucleonforge.axile.common.domain.http.HttpPayload;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
-import com.nucleonforge.axile.common.domain.http.SingleValueQueryParameter;
 
 /**
  * The API for managing caches. Endpoints for clearing the application caches.

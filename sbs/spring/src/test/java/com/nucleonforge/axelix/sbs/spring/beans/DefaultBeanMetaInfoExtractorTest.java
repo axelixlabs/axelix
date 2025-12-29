@@ -64,10 +64,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.api.BeansFeed.ComponentVariant;
 import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
 import com.nucleonforge.axelix.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
-import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.common.api.BeansFeed.ComponentVariant;
 
 import static com.nucleonforge.axelix.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.ANONYMOUS_BEAN;
 import static com.nucleonforge.axelix.sbs.spring.beans.DefaultBeanMetaInfoExtractorTest.DefaultBeanAnalyzerTestConfig.CONFIGURATION_BEAN;

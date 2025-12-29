@@ -32,9 +32,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 
+import com.nucleonforge.axelix.common.api.BeansFeed;
 import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
 import com.nucleonforge.axelix.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
-import com.nucleonforge.axile.common.api.BeansFeed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;

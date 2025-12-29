@@ -19,9 +19,9 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axile.common.api.transform.BaseUnitParser;
-import com.nucleonforge.axile.common.api.transform.BytesMemoryBaseUnitValueTransformer;
-import com.nucleonforge.axile.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axelix.common.api.transform.BaseUnitParser;
+import com.nucleonforge.axelix.common.api.transform.BytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
 
 /**
  * Auto-configuration for memory unit transformers.

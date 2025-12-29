@@ -15,7 +15,7 @@
  */
 package com.nucleonforge.axelix.sbs.spring.details;
 
-import com.nucleonforge.axile.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails;
 
 /**
  * Assembles the details about this particular service.

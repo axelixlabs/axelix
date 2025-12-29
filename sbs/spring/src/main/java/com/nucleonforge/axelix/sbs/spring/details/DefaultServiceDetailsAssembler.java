@@ -22,16 +22,16 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.info.BuildProperties;
 
+import com.nucleonforge.axelix.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.BuildDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails.CommitAuthor;
+import com.nucleonforge.axelix.common.api.AxileDetails.OsDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.RuntimeDetails;
+import com.nucleonforge.axelix.common.api.AxileDetails.SpringDetails;
+import com.nucleonforge.axelix.common.api.registration.GitInfo;
 import com.nucleonforge.axelix.sbs.spring.master.GitInformationProvider;
 import com.nucleonforge.axelix.sbs.spring.master.LibraryDiscoverer;
-import com.nucleonforge.axile.common.api.AxileDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.BuildDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.GitDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.GitDetails.CommitAuthor;
-import com.nucleonforge.axile.common.api.AxileDetails.OsDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.RuntimeDetails;
-import com.nucleonforge.axile.common.api.AxileDetails.SpringDetails;
-import com.nucleonforge.axile.common.api.registration.GitInfo;
 
 import static com.nucleonforge.axelix.sbs.spring.details.GarbageCollectorInfoAssembler.getGarbageCollectorInfo;
 import static com.nucleonforge.axelix.sbs.spring.utils.StringUtils.emptyIfNull;

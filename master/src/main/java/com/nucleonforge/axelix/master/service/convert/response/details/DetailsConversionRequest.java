@@ -15,8 +15,8 @@
  */
 package com.nucleonforge.axelix.master.service.convert.response.details;
 
+import com.nucleonforge.axelix.common.api.AxileDetails;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
-import com.nucleonforge.axile.common.api.AxileDetails;
 
 /**
  * Request for details conversion. Required by {@link AxileDetailsConverter}.

@@ -21,7 +21,7 @@ import org.springframework.boot.info.GitProperties;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
-import com.nucleonforge.axile.common.api.registration.ShortBuildInfo;
+import com.nucleonforge.axelix.common.api.registration.ShortBuildInfo;
 
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class CommitIdPluginShortBuildInfoProvider implements ShortBuildInfoProvider {

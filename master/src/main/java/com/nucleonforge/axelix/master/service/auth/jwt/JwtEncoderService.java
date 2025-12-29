@@ -15,8 +15,8 @@
  */
 package com.nucleonforge.axelix.master.service.auth.jwt;
 
+import com.nucleonforge.axelix.common.auth.core.User;
 import com.nucleonforge.axelix.master.exception.auth.JwtTokenGenerationException;
-import com.nucleonforge.axile.common.auth.core.User;
 
 /**
  * Contract for generating signed JWT tokens from {@link User} representations.

@@ -20,10 +20,10 @@ import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 
+import com.nucleonforge.axelix.common.api.ConditionsFeed;
 import com.nucleonforge.axelix.master.api.response.ConditionsFeedResponse;
 import com.nucleonforge.axelix.master.service.convert.response.BeansFeedConverter;
 import com.nucleonforge.axelix.master.service.convert.response.ConditionFeedConverter;
-import com.nucleonforge.axile.common.api.ConditionsFeed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

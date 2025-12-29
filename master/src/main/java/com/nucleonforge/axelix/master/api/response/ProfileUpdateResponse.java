@@ -17,7 +17,7 @@ package com.nucleonforge.axelix.master.api.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import com.nucleonforge.axile.common.api.ProfileMutationResult;
+import com.nucleonforge.axelix.common.api.ProfileMutationResult;
 
 /**
  * The response of a profile update operation in the application.

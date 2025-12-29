@@ -20,8 +20,8 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.common.api.ProfileMutationResult;
+import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.api.ProfileMutationResult;
 
 /**
  * {@link JacksonMessageDeserializationStrategy} for {@link BeansFeed}.

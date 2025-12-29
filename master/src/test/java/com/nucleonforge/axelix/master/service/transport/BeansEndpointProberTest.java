@@ -32,23 +32,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.api.BeansFeed.ProxyType;
+import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
-import com.nucleonforge.axile.common.api.BeansFeed;
-import com.nucleonforge.axile.common.api.BeansFeed.ProxyType;
-import com.nucleonforge.axile.common.domain.http.NoHttpPayload;
 
+import static com.nucleonforge.axelix.common.api.BeansFeed.Bean;
+import static com.nucleonforge.axelix.common.api.BeansFeed.BeanDependency;
+import static com.nucleonforge.axelix.common.api.BeansFeed.BeanMethod;
+import static com.nucleonforge.axelix.common.api.BeansFeed.ComponentVariant;
+import static com.nucleonforge.axelix.common.api.BeansFeed.Context;
+import static com.nucleonforge.axelix.common.api.BeansFeed.FactoryBean;
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
-import static com.nucleonforge.axile.common.api.BeansFeed.Bean;
-import static com.nucleonforge.axile.common.api.BeansFeed.BeanDependency;
-import static com.nucleonforge.axile.common.api.BeansFeed.BeanMethod;
-import static com.nucleonforge.axile.common.api.BeansFeed.ComponentVariant;
-import static com.nucleonforge.axile.common.api.BeansFeed.Context;
-import static com.nucleonforge.axile.common.api.BeansFeed.FactoryBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
