@@ -49,7 +49,7 @@ import com.nucleonforge.axelix.common.api.transform.units.BaseUnit;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@Endpoint(id = "axile-metrics")
+@Endpoint(id = "axelix-metrics")
 public class AxileMetricsEndpoint {
 
     private final MetricsEndpoint delegate;

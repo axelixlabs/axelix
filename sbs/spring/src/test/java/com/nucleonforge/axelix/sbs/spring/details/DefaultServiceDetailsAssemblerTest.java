@@ -83,7 +83,7 @@ class DefaultServiceDetailsAssemblerTest {
         assertThat(runtime.kotlinVersion()).isNull();
 
         BuildDetails build = result.build();
-        assertThat(build.artifact()).isEqualTo("axile-sbs");
+        assertThat(build.artifact()).isEqualTo("axelix-sbs");
         assertThat(build.version()).isEqualTo("1.0.0-SNAPSHOT");
         assertThat(build.group()).isEqualTo("com.nucleonforge.axile");
         assertThat(build.time()).isEqualTo("2025-10-30T09:10:13.428Z");
@@ -103,7 +103,7 @@ class DefaultServiceDetailsAssemblerTest {
         public BuildProperties buildProperties() {
             Properties props = new Properties();
             props.setProperty("group", "com.nucleonforge.axile");
-            props.setProperty("artifact", "axile-sbs");
+            props.setProperty("artifact", "axelix-sbs");
             props.setProperty("version", "1.0.0-SNAPSHOT");
             props.setProperty("name", "test-application");
             props.setProperty("time", "2025-10-30T09:10:13.428Z");

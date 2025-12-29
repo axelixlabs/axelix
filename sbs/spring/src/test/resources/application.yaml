@@ -24,9 +24,9 @@ management:
           - beans
           - env
           - axelix-env
-          - axile-metrics
+          - axelix-metrics
           - configprops
-          - axile-configprops
+          - axelix-configprops
           - axelix-caches
           - conditions
           - threaddump

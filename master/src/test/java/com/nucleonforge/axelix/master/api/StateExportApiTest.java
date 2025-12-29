@@ -350,7 +350,7 @@ class StateExportApiTest {
                     return new MockResponse()
                             .setBody(jsonCacheResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axile-configprops")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-configprops")) {
                     return new MockResponse()
                             .setBody(jsonConfigpropsResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

@@ -117,7 +117,7 @@ public class DetailsEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axile-details")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-details")) {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

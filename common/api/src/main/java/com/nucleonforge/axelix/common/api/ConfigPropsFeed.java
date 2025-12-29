@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
- * The response to axile-configprops actuator endpoint.
+ * The response to axelix-configprops actuator endpoint.
  *
  * @param contexts  The application contexts keyed by context id.
  *

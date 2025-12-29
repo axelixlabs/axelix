@@ -45,7 +45,7 @@ import static org.assertj.core.data.MapEntry.entry;
  */
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"management.endpoints.web.exposure.include=axile-details"})
+        properties = {"management.endpoints.web.exposure.include=axelix-details"})
 @Import({
     DefaultServiceDetailsAssemblerTest.DefaultServiceDetailsAssemblerTestConfig.class,
     InstanceDetailsEndpointTest.AxileDetailsEndpointTestConfig.class
@@ -57,7 +57,7 @@ class InstanceDetailsEndpointTest {
 
     @Test
     void shouldReturnValidDetailsStructure() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axile-details", String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-details", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -99,7 +99,7 @@ class InstanceDetailsEndpointTest {
                 .inPath("build")
                 .isObject()
                 .containsOnly(
-                        entry("artifact", "axile-sbs"),
+                        entry("artifact", "axelix-sbs"),
                         entry("version", "1.0.0-SNAPSHOT"),
                         entry("group", "com.nucleonforge.axile"),
                         entry("time", "2025-10-30T09:10:13.428Z"));
@@ -110,7 +110,7 @@ class InstanceDetailsEndpointTest {
     @Test
     void shouldContainValidDetails() {
         ResponseEntity<InstanceDetails> response =
-                restTemplate.getForEntity("/actuator/axile-details", InstanceDetails.class);
+                restTemplate.getForEntity("/actuator/axelix-details", InstanceDetails.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -139,7 +139,7 @@ class InstanceDetailsEndpointTest {
 
         BuildDetails build = details.build();
         assertThat(build).isNotNull();
-        assertThat(build.artifact()).isEqualTo("axile-sbs");
+        assertThat(build.artifact()).isEqualTo("axelix-sbs");
         assertThat(build.version()).isEqualTo("1.0.0-SNAPSHOT");
         assertThat(build.group()).isEqualTo("com.nucleonforge.axile");
         assertThat(build.time()).isEqualTo("2025-10-30T09:10:13.428Z");

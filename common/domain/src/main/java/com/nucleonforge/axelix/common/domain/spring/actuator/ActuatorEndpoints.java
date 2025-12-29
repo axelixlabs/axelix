@@ -75,8 +75,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint CONDITIONS = of("/conditions", HttpMethod.GET);
 
     // @ConfigurationProperties beans
-    public static final ActuatorEndpoint CONFIG_PROPS = of("/axile-configprops", HttpMethod.GET);
-    public static final ActuatorEndpoint CONFIG_PROPS_BY_PREFIX = of("/axile-configprops/{prefix}", HttpMethod.GET);
+    public static final ActuatorEndpoint CONFIG_PROPS = of("/axelix-configprops", HttpMethod.GET);
+    public static final ActuatorEndpoint CONFIG_PROPS_BY_PREFIX = of("/axelix-configprops/{prefix}", HttpMethod.GET);
 
     // Environment
     public static final ActuatorEndpoint ENV = of("/axelix-env", HttpMethod.GET);
@@ -100,7 +100,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint INFO = of("/info", HttpMethod.GET);
 
     // Details
-    public static final ActuatorEndpoint DETAILS = of("/axile-details", HttpMethod.GET);
+    public static final ActuatorEndpoint DETAILS = of("/axelix-details", HttpMethod.GET);
 
     // Integration Graph (Spring Integrations project)
     public static final ActuatorEndpoint INTEGRATIONS_GRAPH = of("/integrationgraph", HttpMethod.GET);
@@ -127,8 +127,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint METADATA = of("/axelix-metadata", HttpMethod.GET);
 
     // Metric
-    public static final ActuatorEndpoint METRICS_GROUP = of("/axile-metrics", HttpMethod.GET);
-    public static final ActuatorEndpoint SINGLE_METRIC = of("/axile-metrics/{metric.name}", HttpMethod.GET);
+    public static final ActuatorEndpoint METRICS_GROUP = of("/axelix-metrics", HttpMethod.GET);
+    public static final ActuatorEndpoint SINGLE_METRIC = of("/axelix-metrics/{metric.name}", HttpMethod.GET);
 
     // ProfileManagement
     public static final ActuatorEndpoint PROFILE_MANAGEMENT = of("/profile-management", HttpMethod.POST);
