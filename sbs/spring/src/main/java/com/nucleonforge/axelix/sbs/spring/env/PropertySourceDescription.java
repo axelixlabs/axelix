@@ -26,7 +26,7 @@ import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.web.context.support.StandardServletEnvironment;
 
-import com.nucleonforge.axelix.sbs.spring.properties.AxilePropertySource;
+import com.nucleonforge.axelix.sbs.spring.properties.AxelixPropertySource;
 
 /**
  * This enum holds the name of the property source along with a custom description
@@ -35,9 +35,9 @@ import com.nucleonforge.axelix.sbs.spring.properties.AxilePropertySource;
  */
 public enum PropertySourceDescription {
 
-    // AxilePropertySource
+    // AxelixPropertySource
     AXILE_PROPERTY_SOURCE_NAME(
-            AxilePropertySource.AXILE_PROPERTY_SOURCE_NAME,
+            AxelixPropertySource.AXILE_PROPERTY_SOURCE_NAME,
             "A custom {@link MapPropertySource} implementation used to hold mutable property values, managed dynamically during application runtime, and having the highest priority"),
 
     SERVER_PORTS(

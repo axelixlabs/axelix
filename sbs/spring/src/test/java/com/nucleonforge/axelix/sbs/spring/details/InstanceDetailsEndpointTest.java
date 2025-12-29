@@ -26,12 +26,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.nucleonforge.axelix.common.api.AxileDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.BuildDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.OsDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.RuntimeDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.SpringDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.BuildDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.GitDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.OsDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.RuntimeDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.SpringDetails;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,9 +48,9 @@ import static org.assertj.core.data.MapEntry.entry;
         properties = {"management.endpoints.web.exposure.include=axile-details"})
 @Import({
     DefaultServiceDetailsAssemblerTest.DefaultServiceDetailsAssemblerTestConfig.class,
-    AxileDetailsEndpointTest.AxileDetailsEndpointTestConfig.class
+    InstanceDetailsEndpointTest.AxileDetailsEndpointTestConfig.class
 })
-class AxileDetailsEndpointTest {
+class InstanceDetailsEndpointTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -109,12 +109,12 @@ class AxileDetailsEndpointTest {
 
     @Test
     void shouldContainValidDetails() {
-        ResponseEntity<AxileDetails> response =
-                restTemplate.getForEntity("/actuator/axile-details", AxileDetails.class);
+        ResponseEntity<InstanceDetails> response =
+                restTemplate.getForEntity("/actuator/axile-details", InstanceDetails.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        AxileDetails details = response.getBody();
+        InstanceDetails details = response.getBody();
         assertThat(details).isNotNull();
 
         GitDetails git = details.git();

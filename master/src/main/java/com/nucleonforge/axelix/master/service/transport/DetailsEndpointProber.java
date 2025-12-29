@@ -19,7 +19,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axelix.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.serde.MessageDeserializationStrategy;
@@ -31,11 +31,11 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
  * @author Nikita Kirilov, Sergey Cherkasov
  */
 @Service
-public class DetailsEndpointProber extends AbstractEndpointProber<AxileDetails> {
+public class DetailsEndpointProber extends AbstractEndpointProber<InstanceDetails> {
 
     public DetailsEndpointProber(
             InstanceRegistry instanceRegistry,
-            MessageDeserializationStrategy<AxileDetails> messageDeserializationStrategy) {
+            MessageDeserializationStrategy<InstanceDetails> messageDeserializationStrategy) {
         super(instanceRegistry, messageDeserializationStrategy);
     }
 

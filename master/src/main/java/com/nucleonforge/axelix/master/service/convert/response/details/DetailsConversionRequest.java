@@ -15,7 +15,7 @@
  */
 package com.nucleonforge.axelix.master.service.convert.response.details;
 
-import com.nucleonforge.axelix.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 
 /**
@@ -23,4 +23,4 @@ import com.nucleonforge.axelix.master.model.instance.InstanceId;
  *
  * @author Mikhail Polivakha
  */
-public record DetailsConversionRequest(AxileDetails axileDetails, InstanceId instanceId) {}
+public record DetailsConversionRequest(InstanceDetails instanceDetails, InstanceId instanceId) {}

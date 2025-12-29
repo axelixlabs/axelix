@@ -18,12 +18,12 @@ package com.nucleonforge.axelix.sbs.spring.details;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.nucleonforge.axelix.common.api.AxileDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
 
 /**
  * Custom Spring Boot Actuator endpoint. Provides comprehensive instance operational details.
  *
- * @see AxileDetails
+ * @see InstanceDetails
  * @since 29.10.2025
  * @author Nikita Kirillov
  */
@@ -37,7 +37,7 @@ public class AxileDetailsEndpoint {
     }
 
     @ReadOperation
-    public AxileDetails details() {
+    public InstanceDetails details() {
         return serviceDetailsAssembler.assemble();
     }
 }

@@ -30,12 +30,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.nucleonforge.axelix.common.api.AxileDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.BuildDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.OsDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.RuntimeDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.SpringDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.BuildDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.GitDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.OsDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.RuntimeDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.SpringDetails;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
@@ -132,34 +132,34 @@ public class DetailsEndpointProberTest {
     void shouldReturnAxileDetailsResponse() {
         // when.
         registry.register(createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
-        AxileDetails axileDetails =
+        InstanceDetails instanceDetails =
                 detailsEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
-        GitDetails git = axileDetails.git();
+        GitDetails git = instanceDetails.git();
         assertThat(git.commitShaShort()).isEqualTo("7a663cb");
         assertThat(git.branch()).isEqualTo("local/local-test");
         assertThat(git.commitAuthor().name()).isEqualTo("Ashot Sargsyan");
         assertThat(git.commitAuthor().email()).isEqualTo("AshotSargsyan@github.com");
         assertThat(git.commitTimestamp()).isEqualTo("2025-11-23T02:25:22Z");
 
-        SpringDetails spring = axileDetails.spring();
+        SpringDetails spring = instanceDetails.spring();
         assertThat(spring.springBootVersion()).isEqualTo("3.5.0");
         assertThat(spring.springFrameworkVersion()).isEqualTo("7.0");
         assertThat(spring.springCloudVersion()).isNull();
 
-        RuntimeDetails runtime = axileDetails.runtime();
+        RuntimeDetails runtime = instanceDetails.runtime();
         assertThat(runtime.javaVersion()).isEqualTo("17.0.16");
         assertThat(runtime.jdkVendor()).isEqualTo("Corretto-17.0.16.8.1");
         assertThat(runtime.garbageCollector()).isEqualTo("G1 GC");
         assertThat(runtime.kotlinVersion()).isNull();
 
-        BuildDetails build = axileDetails.build();
+        BuildDetails build = instanceDetails.build();
         assertThat(build.artifact()).isEqualTo("spring-petclinic");
         assertThat(build.version()).isEqualTo("3.5.0-SNAPSHOT");
         assertThat(build.group()).isEqualTo("org.springframework.samples");
         assertThat(build.time()).isEqualTo("2025-10-29T15:10:54.770Z");
 
-        OsDetails os = axileDetails.os();
+        OsDetails os = instanceDetails.os();
         assertThat(os.name()).isEqualTo("Windows 10");
         assertThat(os.version()).isEqualTo("10.0");
         assertThat(os.arch()).isEqualTo("amd64");

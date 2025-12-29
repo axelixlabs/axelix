@@ -25,7 +25,7 @@ import org.springframework.core.env.PropertySource;
 
 import com.nucleonforge.axelix.sbs.spring.context.ContextRestarter;
 
-import static com.nucleonforge.axelix.sbs.spring.properties.AxilePropertySource.AXILE_PROPERTY_SOURCE_NAME;
+import static com.nucleonforge.axelix.sbs.spring.properties.AxelixPropertySource.AXILE_PROPERTY_SOURCE_NAME;
 
 /**
  * {@link PropertyMutator} that reloads the {@link ApplicationContext} after property change so that the change
@@ -54,9 +54,9 @@ public class ContextReloadingPropertyMutator implements PropertyMutator {
         if (potentiallyAxilePropertySource == null) {
             Map<String, Object> source = new HashMap<>();
             source.put(propertyName, newValue);
-            propertySources.addFirst(new AxilePropertySource(source));
+            propertySources.addFirst(new AxelixPropertySource(source));
         } else {
-            var axilePropertySource = (AxilePropertySource) potentiallyAxilePropertySource;
+            var axilePropertySource = (AxelixPropertySource) potentiallyAxilePropertySource;
             axilePropertySource.addProperty(propertyName, newValue);
         }
 

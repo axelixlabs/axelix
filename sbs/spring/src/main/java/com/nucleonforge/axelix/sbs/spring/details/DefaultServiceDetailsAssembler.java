@@ -22,13 +22,13 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.info.BuildProperties;
 
-import com.nucleonforge.axelix.common.api.AxileDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.BuildDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails.CommitAuthor;
-import com.nucleonforge.axelix.common.api.AxileDetails.OsDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.RuntimeDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.SpringDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.BuildDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.GitDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.GitDetails.CommitAuthor;
+import com.nucleonforge.axelix.common.api.InstanceDetails.OsDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.RuntimeDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.SpringDetails;
 import com.nucleonforge.axelix.common.api.registration.GitInfo;
 import com.nucleonforge.axelix.sbs.spring.master.GitInformationProvider;
 import com.nucleonforge.axelix.sbs.spring.master.LibraryDiscoverer;
@@ -58,14 +58,14 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
     }
 
     @Override
-    public AxileDetails assemble() {
+    public InstanceDetails assemble() {
         GitDetails git = getGitDetails();
         SpringDetails spring = getSpringDetails();
         RuntimeDetails runtime = getRuntimeDetails();
         BuildDetails build = getBuildDetails();
         OsDetails os = getOsDetails();
 
-        return new AxileDetails(git, spring, runtime, build, os);
+        return new InstanceDetails(git, spring, runtime, build, os);
     }
 
     private GitDetails getGitDetails() {

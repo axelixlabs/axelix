@@ -19,12 +19,12 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axelix.common.api.AxileDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.BuildDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.GitDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.OsDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.RuntimeDetails;
-import com.nucleonforge.axelix.common.api.AxileDetails.SpringDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.BuildDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.GitDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.OsDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.RuntimeDetails;
+import com.nucleonforge.axelix.common.api.InstanceDetails.SpringDetails;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.BuildProfile;
 import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.GitProfile;
@@ -38,7 +38,7 @@ import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
 /**
- * The {@link Converter} from {@link AxileDetails} to {@link AxileDetailsResponse}.
+ * The {@link Converter} from {@link InstanceDetails} to {@link AxileDetailsResponse}.
  *
  * @author Nikita Kirilov
  * @author Sergey Cherkasov
@@ -58,7 +58,7 @@ public class AxileDetailsConverter implements Converter<DetailsConversionRequest
 
     @Override
     public @NonNull AxileDetailsResponse convertInternal(@NonNull DetailsConversionRequest request) {
-        AxileDetails source = request.axileDetails();
+        InstanceDetails source = request.instanceDetails();
         InstanceId instanceId = request.instanceId();
 
         Instance instance = instanceRegistry.get(instanceId).orElseThrow(InstanceNotFoundException::new);

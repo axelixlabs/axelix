@@ -20,7 +20,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.nucleonforge.axile"
+    group = "com.nucleonforge.axelix"
     version = "1.0.0-SNAPSHOT"
 
     repositories {
@@ -117,7 +117,7 @@ subprojects {
             disableAllChecks = true
 
             check("NullAway", CheckSeverity.ERROR)
-            option("NullAway:AnnotatedPackages", "com.nucleonforge.axile")
+            option("NullAway:AnnotatedPackages", "com.nucleonforge.axelix")
             option("NullAway:JSpecifyMode", true)
             option("NullAway:CheckOptionalEmptiness", true)
         }
