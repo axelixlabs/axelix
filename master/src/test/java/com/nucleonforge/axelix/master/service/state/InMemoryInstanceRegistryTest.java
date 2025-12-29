@@ -1,0 +1,138 @@
+/*
+ * Copyright 2025-present, Nucleon Forge Software.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.nucleonforge.axelix.master.service.state;
+
+import org.junit.jupiter.api.Test;
+
+import com.nucleonforge.axelix.master.exception.InstanceAlreadyRegisteredException;
+import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axelix.master.model.instance.Instance;
+import com.nucleonforge.axelix.master.model.instance.InstanceId;
+
+import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+/**
+ * Unit tests for {@link InMemoryInstanceRegistry}.
+ *
+ * @since 31.07.2025
+ * @author Nikita Kirillov
+ */
+class InMemoryInstanceRegistryTest {
+
+    private final InMemoryInstanceRegistry registry = new InMemoryInstanceRegistry();
+
+    @Test
+    void shouldRegisterAndRetrieveInstance() {
+        String id = "id-1";
+        Instance instance = createInstance(id);
+        registry.register(instance);
+
+        assertThat(registry.get(InstanceId.of(id))).isPresent().contains(instance);
+    }
+
+    @Test
+    void shouldThrowWhenRegisteringInstanceWithDuplicate() {
+        String id = "id-2";
+        Instance instance = createInstance(id);
+        registry.register(instance);
+
+        assertThatExceptionOfType(InstanceAlreadyRegisteredException.class)
+                .isThrownBy(() -> registry.register(instance));
+    }
+
+    @Test
+    void shouldDeregisterInstance() {
+        String id = "id-3";
+        Instance instance = createInstance(id);
+
+        assertThatCode(() -> registry.register(instance)).doesNotThrowAnyException();
+        assertThat(registry.get(InstanceId.of(id))).isPresent();
+
+        registry.deRegister(InstanceId.of(id));
+
+        assertThat(registry.get(InstanceId.of(id))).isNotPresent();
+    }
+
+    @Test
+    void shouldThrowWhenDeregisterInstanceDoesNotExist() {
+        String id = "id-4";
+        Instance instance = createInstance(id);
+        registry.register(instance);
+
+        assertThat(registry.get(InstanceId.of(id))).isPresent();
+
+        registry.deRegister(InstanceId.of(id));
+
+        assertThatExceptionOfType(InstanceNotFoundException.class)
+                .isThrownBy(() -> registry.deRegister(InstanceId.of(id)));
+    }
+
+    @Test
+    void shouldGetAllInstances() {
+        Instance instance1 = createInstance("id-5");
+        Instance instance2 = createInstance("id-6");
+
+        registry.register(instance1);
+        registry.register(instance2);
+
+        assertThat(registry.getAll()).containsOnly(instance1, instance2);
+    }
+
+    @Test
+    void shouldReplaceExistingInstance() {
+        String id = "id-7";
+        Instance first = createInstance(id);
+        Instance second = createInstance(first.id().instanceId());
+        registry.register(first);
+
+        // when.
+        registry.replace(second);
+
+        // then.
+        Instance actual = registry.get(InstanceId.of(id)).orElse(null);
+        assertThat(actual).isNotNull();
+        assertThat(actual).isEqualTo(second);
+    }
+
+    @Test
+    void shouldReplaceInstanceWhenItDoesNotExist() {
+        String id = "id-8";
+        Instance instance = createInstance(id);
+        assertThat(registry.get(InstanceId.of(id))).isEmpty();
+
+        // when.
+        registry.replace(instance);
+
+        // then
+        Instance actual = registry.get(InstanceId.of(id)).orElse(null);
+        assertThat(actual).isNotNull();
+        assertThat(actual).isEqualTo(instance);
+    }
+
+    @Test
+    void shouldThrowIfInstanceToDeregisterNotFound() {
+        assertThatExceptionOfType(InstanceNotFoundException.class)
+                .isThrownBy(() -> registry.deRegister(InstanceId.of("not-existing")));
+    }
+
+    @Test
+    void shouldThrowIfInstanceToDeregisterNotFound1() {
+        assertThat(registry.get(InstanceId.of("not-existing"))).isEmpty();
+    }
+}
