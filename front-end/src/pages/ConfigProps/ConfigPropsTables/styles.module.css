@@ -1,8 +1,8 @@
 .Prefix {
-    color: var(--axile-text-grey);
+    color: var(--axile-text-grey); /* TODO: This CSS variable does not exist, from where it comes from? */
     margin-top: 8px;
 }
 
 .PrefixTitle {
-    color: var(--axile-primary-green);
+    color: var(--axelix-primary-green);
 }

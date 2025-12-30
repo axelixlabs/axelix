@@ -9,7 +9,7 @@
     right: 0;
     z-index: 1000;
     width: 100%;
-    height: var(--axile-header-height);
+    height: var(--axelix-header-height);
     background-color: #fff;
     display: flex;
     justify-content: center;
@@ -26,8 +26,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: var(--axile-header-height);
-    min-height: calc(100vh - var(--axile-header-height));
+    margin-top: var(--axelix-header-height);
+    min-height: calc(100vh - var(--axelix-header-height));
     padding-block: 30px;
 }
 

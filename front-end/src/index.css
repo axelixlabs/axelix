@@ -7,17 +7,17 @@
 }
 
 :root {
-    --axile-header-height: 65px;
-    --axile-primary-green: #00ab55;
-    --axile-primary-light-green: #00ab551a;
-    --axile-light-grey: #f0f0f0;
-    --axile-medium-grey: #d9d9d9;
-    --axile-bold-grey: #838383;
-    --axile-primary-red: #ff000a;
-    --axile-primary-light-red: #ff000a1a;
-    --axile-border-radius-large: 8px;
-    --axile-border-radius-small: 4px;
-    --axile-scroll-margin-top: 150px;
+    --axelix-header-height: 65px;
+    --axelix-primary-green: #00ab55;
+    --axelix-primary-light-green: #00ab551a;
+    --axelix-light-grey: #f0f0f0;
+    --axelix-medium-grey: #d9d9d9;
+    --axelix-bold-grey: #838383;
+    --axelix-primary-red: #ff000a;
+    --axelix-primary-light-red: #ff000a1a;
+    --axelix-border-radius-large: 8px;
+    --axelix-border-radius-small: 4px;
+    --axelix-scroll-margin-top: 150px;
 }
 
 *,
@@ -66,8 +66,8 @@ a {
 }
 
 .AccordionsWrapper {
-    border: 1px solid var(--axile-medium-grey);
-    border-radius: var(--axile-border-radius-large);
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
     overflow: hidden;
 }
 

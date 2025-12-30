@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border-radius: var(--axile-border-radius-large);
+    border-radius: var(--axelix-border-radius-large);
     box-shadow: 4px 4px 10px 0 #00000040;
 
 }
@@ -19,40 +19,40 @@
     padding: 8px;
     text-align: center;
     font-weight: 500;
-    border-radius: var(--axile-border-radius-large);
+    border-radius: var(--axelix-border-radius-large);
     word-break: break-all;
     transition: color 0.3s ease;
 }
 
 .Card:hover > .CardHeader {
-    color: var(--axile-primary-green);
+    color: var(--axelix-primary-green);
 }
 
 .CardUP {
-    border: 1px solid var(--axile-primary-green);
+    border: 1px solid var(--axelix-primary-green);
 }
 
 .CardHeaderUP {
-    background-color: var(--axile-primary-light-green);
-    outline: 1px solid var(--axile-primary-green);
+    background-color: var(--axelix-primary-light-green);
+    outline: 1px solid var(--axelix-primary-green);
 }
 
 .CardDOWN {
-    border: 1px solid var(--axile-primary-red);
+    border: 1px solid var(--axelix-primary-red);
 }
 
 .CardHeaderDOWN {
-    background-color: var(--axile-primary-light-red);
-    outline: 1px solid var(--axile-primary-red);
+    background-color: var(--axelix-primary-light-red);
+    outline: 1px solid var(--axelix-primary-red);
 }
 
 .CardUNKNOWN {
-    border: 1px solid var(--axile-bold-grey);
+    border: 1px solid var(--axelix-bold-grey);
 }
 
 .CardHeaderUNKNOWN {
-    background-color: var(--axile-medium-grey);
-    outline: 1px solid var(--axile-bold-grey);
+    background-color: var(--axelix-medium-grey);
+    outline: 1px solid var(--axelix-bold-grey);
 }
 
 /* TODO: Add correct color in future */

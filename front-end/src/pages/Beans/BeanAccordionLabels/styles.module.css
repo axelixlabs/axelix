@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   column-gap: 20px;
-  scroll-margin-top: var(--axile-scroll-margin-top);
+  scroll-margin-top: var(--axelix-scroll-margin-top);
 }
 
 .BeanNameWrapper {
@@ -20,7 +20,7 @@
 }
 
 .ClassName {
-  color: var(--axile-bold-grey);
+  color: var(--axelix-bold-grey);
   margin-top: 8px;
 }
 

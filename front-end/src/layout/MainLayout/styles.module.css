@@ -4,7 +4,7 @@
 
 .Sider {
     position: fixed;
-    top: var(--axile-header-height);
+    top: var(--axelix-header-height);
     height: 100vh;
     background-color: #fff;
     z-index: 10;
@@ -21,7 +21,7 @@
 }
 
 .ContentLayout {
-    margin-top: var(--axile-header-height);
+    margin-top: var(--axelix-header-height);
     padding: 24px;
 }
 

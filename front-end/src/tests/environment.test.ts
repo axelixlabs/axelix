@@ -26,7 +26,7 @@ describe("Filter propertySources", () => {
             properties: [],
         },
         {
-            name: "AXILE_PROPERTY_SOURCE_NAME",
+            name: "AXELIX_PROPERTY_SOURCE_NAME",
             description: null,
             properties: [
                 {
@@ -53,7 +53,7 @@ describe("Filter propertySources", () => {
     });
 
     it("A match by the propertySource name (partially entered) - returns the original propertySource object", () => {
-        const result = filterPropertySources(propertySources, "            AXILE_PROPERTY_SOURCE_           ");
+        const result = filterPropertySources(propertySources, "            AXELIX_PROPERTY_SOURCE_           ");
         expect(result).toHaveLength(1);
         expect(result[0]).toBe(propertySources[1]);
     });

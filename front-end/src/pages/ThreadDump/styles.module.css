@@ -1,7 +1,7 @@
 .TitleAndTimelineWrapper {
     height: 58px;
     position: sticky;
-    top: var(--axile-header-height);
+    top: var(--axelix-header-height);
     background-color: #fff;
     display: flex;
     align-items: center;

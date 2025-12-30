@@ -20,7 +20,7 @@ import type { IErrorResponse } from "models";
 import { IS_AUTH } from "utils";
 
 const apiFetch = axios.create({
-    baseURL: `${import.meta.env.VITE_APP_API_URL}/api/axile`,
+    baseURL: `${import.meta.env.VITE_APP_API_URL}/api/axelix`,
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",

@@ -10,7 +10,7 @@
 }
 
 .MainAccordionHeaderStyles {
-    background-color: var(--axile-primary-light-green);
+    background-color: var(--axelix-primary-light-green);
     padding: 16px;
 }
 
@@ -33,7 +33,7 @@
     align-items: center;
     padding: 12px 16px 12px 44px;
     background-color: #fafafa;
-    border-bottom: 1px solid var(--axile-medium-grey);
+    border-bottom: 1px solid var(--axelix-medium-grey);
 }
 
 .LinkIcon {
@@ -41,5 +41,5 @@
 }
 
 .DeprecatedPropertyAccordionsHeader {
-    background-color: var(--axile-primary-light-red);
+    background-color: var(--axelix-primary-light-red);
 }

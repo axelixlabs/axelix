@@ -29,7 +29,7 @@ export const AdminHeader = () => {
 
     return (
         <div className={styles.Header}>
-            <img src={LogoIcon} alt="Axile logo" onClick={() => navigate("/wallboard")} className={styles.Logo} />
+            <img src={LogoIcon} alt="Axelix logo" onClick={() => navigate("/wallboard")} className={styles.Logo} />
             <div className={styles.LinksAndAvatarWrapper}>
                 <NavigationBar />
                 <Help />

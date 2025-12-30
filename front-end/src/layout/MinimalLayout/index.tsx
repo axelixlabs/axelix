@@ -26,7 +26,7 @@ export const MinimalLayout = () => {
             <div className={styles.Header}>
                 <div className="MainContainer">
                     <div className={styles.LanguageSwitcherWrapper}>
-                        <img src={LogoIcon} alt="Axile logo" className={styles.Logo} />
+                        <img src={LogoIcon} alt="Axelix logo" className={styles.Logo} />
                         <LanguageSwitcher />
                     </div>
                 </div>

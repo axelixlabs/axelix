@@ -1,8 +1,8 @@
 .MainWrapper {
     background-color: #fff;
-    border: 1px solid var(--axile-light-grey);
+    border: 1px solid var(--axelix-light-grey);
     box-shadow: 0 6px 18px rgb(15 23 42 / 20%);
-    border-radius: var(--axile-border-radius-large);
+    border-radius: var(--axelix-border-radius-large);
     padding: 16px;
     width: 100%;
     align-self: flex-start;
@@ -19,9 +19,9 @@
 }
 
 .CardWrapper {
-    border-radius: var(--axile-border-radius-large);
+    border-radius: var(--axelix-border-radius-large);
     padding: 30px 8px;
-    border: 1px solid var(--axile-light-grey);
+    border: 1px solid var(--axelix-light-grey);
     flex-basis: 33%;
     text-align: center;
     box-shadow: 0 6px 18px rgb(15 23 42 / 20%);

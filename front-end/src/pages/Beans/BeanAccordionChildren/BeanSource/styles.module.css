@@ -13,11 +13,11 @@
 }
 
 .ClickableBeanTreeItem:hover {
-    color: var(--axile-primary-green);
+    color: var(--axelix-primary-green);
 }
 
 .BeanTreeItemHover:hover {
-    color: var(--axile-primary-green);
+    color: var(--axelix-primary-green);
 }
 
 .BeanTreeLabel {

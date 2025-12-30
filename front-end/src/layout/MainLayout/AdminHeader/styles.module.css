@@ -8,8 +8,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: var(--axile-header-height);
-    border-bottom: 1px solid var(--axile-medium-grey);
+    height: var(--axelix-header-height);
+    border-bottom: 1px solid var(--axelix-medium-grey);
     box-shadow: 0 4px 20px rgb(0 0 0 / 5%);
     padding: 0 50px;
 }

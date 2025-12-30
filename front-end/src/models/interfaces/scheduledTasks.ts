@@ -48,7 +48,7 @@ export interface IFixedTasks extends IRunnable {
     initialDelay: number;
 }
 
-// TODO: See the comment: https://github.com/Nucleon-Forge/axile/pull/205#discussion_r2431398757
+// TODO: See the comment: https://github.com/Nucleon-Forge/axelix/pull/205#discussion_r2431398757
 export interface IScheduledTaskItem {
     // TODO: migrate to enum later in the future
     /**

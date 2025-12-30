@@ -18,8 +18,8 @@
     display: grid;
     place-items: center;
     padding: 8px;
-    border: 1px solid var(--axile-medium-grey);
-    border-radius: var(--axile-border-radius-large);
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
     box-shadow: 0 6px 18px rgb(15 23 42 / 20%);
 }
 

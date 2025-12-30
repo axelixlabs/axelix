@@ -11,13 +11,13 @@
 }
 
 .ProfileTitle {
-    background: var(--axile-primary-light-green);
-    border-radius: var(--axile-border-radius-small);
+    background: var(--axelix-primary-light-green);
+    border-radius: var(--axelix-border-radius-small);
 }
 
 .ProfileValue {
-    background: var(--axile-light-grey);
-    border-radius: var(--axile-border-radius-small);
+    background: var(--axelix-light-grey);
+    border-radius: var(--axelix-border-radius-small);
 }
 
 .ProfileTitle,

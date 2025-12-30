@@ -11,7 +11,7 @@
     position: absolute;
     width: 50%;
     height: 100%;
-    background-color: var(--axile-primary-green);
+    background-color: var(--axelix-primary-green);
     animation: loading 1s linear infinite;
 }
 
