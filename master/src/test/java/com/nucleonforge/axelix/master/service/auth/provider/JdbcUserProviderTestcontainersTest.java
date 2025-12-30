@@ -144,12 +144,12 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
      * Test configuration for {@link JdbcUserProvider} tests.
      *
      * <ul>
-     *     <li>A {@link JdbcAuthConfig} bean loaded from properties prefixed with {@code axile.config.auth.tables}.</li>
+     *     <li>A {@link JdbcAuthConfig} bean loaded from properties prefixed with {@code axelix.config.auth.tables}.</li>
      *     <li>A {@link JdbcUserProvider} bean configured with the test DataSource and JdbcAuthConfig.</li>
      * </ul>
      *
-     * <p>Note: The default table names defined in {@link JdbcAuthConfig} have the prefix "axile_",
-     * such as {@code axile_user_table}, {@code axile_role_table}, etc.</p>
+     * <p>Note: The default table names defined in {@link JdbcAuthConfig} have the prefix "axelix_",
+     * such as {@code axelix_user_table}, {@code axelix_role_table}, etc.</p>
      *
      * <p>In the {@code application.yaml}, these default table names are explicitly overridden with
      * table names like {@code users}, {@code roles}, etc. to verify that the system works
@@ -161,7 +161,7 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
     public static class JdbcAuthTestConfig {
 
         @Bean
-        @ConfigurationProperties(prefix = "axile.config.auth.tables")
+        @ConfigurationProperties(prefix = "axelix.config.auth.tables")
         public JdbcAuthConfig authTablesConfig() {
             return new JdbcAuthConfig();
         }

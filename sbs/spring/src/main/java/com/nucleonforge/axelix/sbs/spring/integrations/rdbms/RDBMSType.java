@@ -20,7 +20,7 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 /**
- * Represents different types of the relational databases Axile can work with.
+ * Represents different types of the relational databases Axelix can work with.
  *
  * @since 07.07.2025
  * @author Mikhail Polivakha

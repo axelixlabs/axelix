@@ -76,19 +76,19 @@ import static org.assertj.core.api.Assertions.assertThat;
         })
 @TestPropertySource(
         properties = {
-            "axile.my-empty.property= ",
-            "axile.not-empty.property=not-empty",
-            "axile.prop.test.dynamic-properties=old-dynamic-value",
-            "AXILE_ENABLED_CONTEXT=old-value-context",
-            "axile.http-client.requests[0].name=old-value-name",
-            "axile.http-client.requests[0].base-url=old-value-baseUrl",
-            "axile.http-client.requests[0].methods[0].type=old-value-type1",
-            "axile.http-client.requests[0].methods[0].retries[0].count=old-value-count1",
-            "axile.http-client.requests[0].methods[0].retries[0].parameters.timeout=old-value-timeout",
-            "axile.http-client.requests[0].methods[1].type=old-value-type2",
-            "axile.http-client.requests[1].methods[0].type=old-value-type3",
-            "axile.http-client.requests[1].methods[0].retries[0].count=old-value-count2",
-            "axile.http-client.requests[1].methods[0].retries[0].parameters.log-level=old-value-logLevel"
+            "axelix.my-empty.property= ",
+            "axelix.not-empty.property=not-empty",
+            "axelix.prop.test.dynamic-properties=old-dynamic-value",
+            "AXELIX_ENABLED_CONTEXT=old-value-context",
+            "axelix.http-client.requests[0].name=old-value-name",
+            "axelix.http-client.requests[0].base-url=old-value-baseUrl",
+            "axelix.http-client.requests[0].methods[0].type=old-value-type1",
+            "axelix.http-client.requests[0].methods[0].retries[0].count=old-value-count1",
+            "axelix.http-client.requests[0].methods[0].retries[0].parameters.timeout=old-value-timeout",
+            "axelix.http-client.requests[0].methods[1].type=old-value-type2",
+            "axelix.http-client.requests[1].methods[0].type=old-value-type3",
+            "axelix.http-client.requests[1].methods[0].retries[0].count=old-value-count2",
+            "axelix.http-client.requests[1].methods[0].retries[0].parameters.log-level=old-value-logLevel"
         })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Import({
@@ -106,7 +106,7 @@ class PropertyManagementEndpointTest {
 
     @DynamicPropertySource
     static void registerDynamic(DynamicPropertyRegistry registry) {
-        registry.add("axile.prop.test.dynamicProperties", () -> "new-dynamic-value");
+        registry.add("axelix.prop.test.dynamicProperties", () -> "new-dynamic-value");
     }
 
     @ParameterizedTest
@@ -127,43 +127,46 @@ class PropertyManagementEndpointTest {
 
     private static Stream<Arguments> updateProperty() {
         return Stream.of(
-                Arguments.of("axile.my-empty.property", "axile.myEmpty.property", "new-value"),
-                Arguments.of("axile.not-empty.property", "axile.notEmpty.property", ""),
+                Arguments.of("axelix.my-empty.property", "axelix.myEmpty.property", "new-value"),
+                Arguments.of("axelix.not-empty.property", "axelix.notEmpty.property", ""),
                 Arguments.of(
-                        "axile.prop.test.dynamicProperties", "axile.prop.test.dynamic-properties", "new-dynamic-value"),
-                Arguments.of("AXILE_ENABLED_CONTEXT", "AXILE_ENABLED_CONTEXT", "new-value-context"),
-                Arguments.of("axile.http-client.requests[0].name", "axile.httpClient.requests.name", "new-value-name"),
+                        "axelix.prop.test.dynamicProperties",
+                        "axelix.prop.test.dynamic-properties",
+                        "new-dynamic-value"),
+                Arguments.of("AXELIX_ENABLED_CONTEXT", "AXELIX_ENABLED_CONTEXT", "new-value-context"),
                 Arguments.of(
-                        "axile.http-client.requests[0].base-url",
-                        "axile.httpClient.requests[0].baseUrl",
+                        "axelix.http-client.requests[0].name", "axelix.httpClient.requests.name", "new-value-name"),
+                Arguments.of(
+                        "axelix.http-client.requests[0].base-url",
+                        "axelix.httpClient.requests[0].baseUrl",
                         "new-value-baseUrl"),
                 Arguments.of(
-                        "axile.http-client.requests[0].methods[0].type",
-                        "axile.httpClient.requests.methods.type",
+                        "axelix.http-client.requests[0].methods[0].type",
+                        "axelix.httpClient.requests.methods.type",
                         "new-value-type1"),
                 Arguments.of(
-                        "axile.http-client.requests[0].methods[0].retries[0].count",
-                        "axile.httpClient.requests[0].methods[0].retries[0].count",
+                        "axelix.http-client.requests[0].methods[0].retries[0].count",
+                        "axelix.httpClient.requests[0].methods[0].retries[0].count",
                         "new-value-count1"),
                 Arguments.of(
-                        "axile.http-client.requests[0].methods[0].retries[0].parameters.timeout",
-                        "axile.httpClient.requests.methods[0].retries.parameters.timeout",
+                        "axelix.http-client.requests[0].methods[0].retries[0].parameters.timeout",
+                        "axelix.httpClient.requests.methods[0].retries.parameters.timeout",
                         "new-value-timeout"),
                 Arguments.of(
-                        "axile.http-client.requests[0].methods[1].type",
-                        "axile.httpClient.requests.methods[1].type",
+                        "axelix.http-client.requests[0].methods[1].type",
+                        "axelix.httpClient.requests.methods[1].type",
                         "new-value-type2"),
                 Arguments.of(
-                        "axile.http-client.requests[1].methods[0].type",
-                        "axile.httpClient.requests[1].Methods.type",
+                        "axelix.http-client.requests[1].methods[0].type",
+                        "axelix.httpClient.requests[1].Methods.type",
                         "new-value-type3"),
                 Arguments.of(
-                        "axile.http-client.requests[1].methods[0].retries[0].count",
-                        "axile.httpClient.requests[1].methods.retries[0].count",
+                        "axelix.http-client.requests[1].methods[0].retries[0].count",
+                        "axelix.httpClient.requests[1].methods.retries[0].count",
                         "new-value-count2"),
                 Arguments.of(
-                        "axile.http-client.requests[1].methods[0].retries[0].parameters.log-level",
-                        "axile.httpClient.requests[1].methods.retries.parameters.logLevel",
+                        "axelix.http-client.requests[1].methods[0].retries[0].parameters.log-level",
+                        "axelix.httpClient.requests[1].methods.retries.parameters.logLevel",
                         "new-value-logLevel"));
     }
 

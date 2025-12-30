@@ -19,9 +19,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Represents the metadata of a service instance as exposed by the Axile SBS actuator endpoint.
+ * Represents the metadata of a service instance as exposed by the custom starter actuator endpoint.
  *
- * @param version the version of <strong>the axile starter</strong> in the remote instance.
+ * @param version the version of <strong>the axelix starter</strong> in the remote instance.
  *                Might be {@code null} in case the instance is not supposed to be managed.
  *
  * @param serviceVersion the version of the <strong>managed service itself</strong>, i.e. the version

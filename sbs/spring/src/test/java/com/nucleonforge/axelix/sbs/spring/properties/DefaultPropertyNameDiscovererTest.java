@@ -43,19 +43,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
         properties = {
-            "axile.prop.test.dynamic-properties=dynamicValue",
-            "axile.prop.test.enabled-contexts=user-service, payment-service",
-            "axile.prop.test.http-client.requests[0].name=user-api",
-            "axile.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
-            "axile.prop.test.http-client.requests[0].methods[0].type=GET",
-            "axile.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
-            "axile.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
-            "AXILE_PROP_TEST_HTTP_CLIENT_REQUESTS_0_METHODS_1_TYPE=POST",
-            "axile.prop.test.http-client.requests[1].name=payment-api",
-            "axile.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
-            "axile.prop.test.http-client.requests[1].methods[0].type=PUT",
-            "axile.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
-            "axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
+            "axelix.prop.test.dynamic-properties=dynamicValue",
+            "axelix.prop.test.enabled-contexts=user-service, payment-service",
+            "axelix.prop.test.http-client.requests[0].name=user-api",
+            "axelix.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
+            "axelix.prop.test.http-client.requests[0].methods[0].type=GET",
+            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
+            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
+            "AXELIX_PROP_TEST_HTTP_CLIENT_REQUESTS_0_METHODS_1_TYPE=POST",
+            "axelix.prop.test.http-client.requests[1].name=payment-api",
+            "axelix.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
+            "axelix.prop.test.http-client.requests[1].methods[0].type=PUT",
+            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
+            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
 public class DefaultPropertyNameDiscovererTest {
 
@@ -64,7 +64,7 @@ public class DefaultPropertyNameDiscovererTest {
 
     @DynamicPropertySource
     static void registerDynamic(DynamicPropertyRegistry registry) {
-        registry.add("axile.prop.test.dynamicProperties", () -> "dynamicValue");
+        registry.add("axelix.prop.test.dynamicProperties", () -> "dynamicValue");
     }
 
     @ParameterizedTest
@@ -75,40 +75,41 @@ public class DefaultPropertyNameDiscovererTest {
 
     private static Stream<Arguments> propertyName() {
         return Stream.of(
-                Arguments.of("axile.property.not-found", null),
-                Arguments.of("axile.prop.test.dynamic-properties", "axile.prop.test.dynamicProperties"),
-                Arguments.of("AXILE_PROP_TEST_ENABLED_CONTEXTS", "axile.prop.test.enabled-contexts"),
+                Arguments.of("axelix.property.not-found", null),
+                Arguments.of("axelix.prop.test.dynamic-properties", "axelix.prop.test.dynamicProperties"),
+                Arguments.of("AXELIX_PROP_TEST_ENABLED_CONTEXTS", "axelix.prop.test.enabled-contexts"),
                 Arguments.of(
-                        "axile.prop.test.httpClient.requests.name", "axile.prop.test.http-client.requests[0].name"),
+                        "axelix.prop.test.httpClient.requests.name", "axelix.prop.test.http-client.requests[0].name"),
                 Arguments.of(
-                        "axile.prop.test.httpClient.requests.baseUrl",
-                        "axile.prop.test.http-client.requests[0].base-url"),
+                        "axelix.prop.test.httpClient.requests.baseUrl",
+                        "axelix.prop.test.http-client.requests[0].base-url"),
                 Arguments.of(
-                        "axile.prop.test.httpClient.requests.methods.type",
-                        "axile.prop.test.http-client.requests[0].methods[0].type"),
+                        "axelix.prop.test.httpClient.requests.methods.type",
+                        "axelix.prop.test.http-client.requests[0].methods[0].type"),
                 Arguments.of(
-                        "axile.prop.test.http-client.requests[0].methods[0].retries[0].count",
-                        "axile.prop.test.http-client.requests[0].methods[0].retries[0].count"),
+                        "axelix.prop.test.http-client.requests[0].methods[0].retries[0].count",
+                        "axelix.prop.test.http-client.requests[0].methods[0].retries[0].count"),
                 Arguments.of(
-                        "axile.prop.test.httpClient.requests.methods.retries.parameters.timeout",
-                        "axile.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout"),
+                        "axelix.prop.test.httpClient.requests.methods.retries.parameters.timeout",
+                        "axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout"),
                 Arguments.of(
-                        "AXILE_PROP_TEST_HTTP_CLIENT_REQUESTS_METHODS_1_TYPE",
-                        "AXILE_PROP_TEST_HTTP_CLIENT_REQUESTS_0_METHODS_1_TYPE"),
+                        "AXELIX_PROP_TEST_HTTP_CLIENT_REQUESTS_METHODS_1_TYPE",
+                        "AXELIX_PROP_TEST_HTTP_CLIENT_REQUESTS_0_METHODS_1_TYPE"),
                 Arguments.of(
-                        "axile.prop.test.httpClient.requests[1].name", "axile.prop.test.http-client.requests[1].name"),
+                        "axelix.prop.test.httpClient.requests[1].name",
+                        "axelix.prop.test.http-client.requests[1].name"),
                 Arguments.of(
-                        "axile.prop.test.http-client.requests[1].base-url",
-                        "axile.prop.test.http-client.requests[1].base-url"),
+                        "axelix.prop.test.http-client.requests[1].base-url",
+                        "axelix.prop.test.http-client.requests[1].base-url"),
                 Arguments.of(
-                        "axile.prop.test.httpClient.requests[1].methods.type",
-                        "axile.prop.test.http-client.requests[1].methods[0].type"),
+                        "axelix.prop.test.httpClient.requests[1].methods.type",
+                        "axelix.prop.test.http-client.requests[1].methods[0].type"),
                 Arguments.of(
-                        "axile.prop.test.http-client.requests[1].methods.retries[0].count",
-                        "axile.prop.test.http-client.requests[1].methods[0].retries[0].count"),
+                        "axelix.prop.test.http-client.requests[1].methods.retries[0].count",
+                        "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count"),
                 Arguments.of(
-                        "axile.prop.test.httpClient.requests[1].methods.retries.parameters.logLevel",
-                        "axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
+                        "axelix.prop.test.httpClient.requests[1].methods.retries.parameters.logLevel",
+                        "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
     }
 
     @TestConfiguration

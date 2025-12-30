@@ -156,7 +156,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
         Map<String, String> configPropsMapping = new HashMap<>();
 
-        configurationPropertiesCache.getAxileConfigProps().contexts().values().forEach(context -> context.beans()
+        configurationPropertiesCache.getConfigProps().contexts().values().forEach(context -> context.beans()
                 .forEach((beanName, bean) -> {
                     applyPrefixAndProperty(bean.prefix(), bean.properties(), configPropsMapping, beanName);
                 }));

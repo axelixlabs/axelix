@@ -23,7 +23,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axelix.sbs.spring.master.AxileMetadataEndpoint;
+import com.nucleonforge.axelix.sbs.spring.master.AxelixMetadataEndpoint;
 import com.nucleonforge.axelix.sbs.spring.master.CommitIdPluginGitInformationProvider;
 import com.nucleonforge.axelix.sbs.spring.master.CommitIdPluginShortBuildInfoProvider;
 import com.nucleonforge.axelix.sbs.spring.master.DefaultServiceMetadataAssembler;
@@ -33,7 +33,7 @@ import com.nucleonforge.axelix.sbs.spring.master.ServiceMetadataAssembler;
 import com.nucleonforge.axelix.sbs.spring.master.ShortBuildInfoProvider;
 
 /**
- * Auto-configuration for the {@link AxileMetadataEndpoint}.
+ * Auto-configuration for the {@link AxelixMetadataEndpoint}.
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
@@ -45,7 +45,7 @@ import com.nucleonforge.axelix.sbs.spring.master.ShortBuildInfoProvider;
             CommitIdPluginShortBuildInfoProvider.class,
             LibraryDiscovererAutoConfiguration.class
         })
-public class AxileMetadataEndpointConfiguration {
+public class AxelixMetadataEndpointConfiguration {
 
     @Bean
     ServiceMetadataAssembler serviceMetadataAssembler(
@@ -59,7 +59,7 @@ public class AxileMetadataEndpointConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxileMetadataEndpoint axileMetadataEndpoint(ServiceMetadataAssembler serviceMetadataAssembler) {
-        return new AxileMetadataEndpoint(serviceMetadataAssembler);
+    public AxelixMetadataEndpoint axelixMetadataEndpoint(ServiceMetadataAssembler serviceMetadataAssembler) {
+        return new AxelixMetadataEndpoint(serviceMetadataAssembler);
     }
 }

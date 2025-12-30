@@ -22,20 +22,20 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axelix.sbs.spring.configprops.AxileConfigurationPropertiesEndpoint;
+import com.nucleonforge.axelix.sbs.spring.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesConverter;
 import com.nucleonforge.axelix.sbs.spring.configprops.DefaultConfigurationPropertiesConverter;
 
 /**
- * Auto-configuration for the {@link AxileConfigurationPropertiesEndpoint}.
+ * Auto-configuration for the {@link AxelixConfigurationPropertiesEndpoint}.
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
  */
 @AutoConfiguration(after = ConfigurationPropertiesReportEndpointAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = ConfigurationPropertiesReportEndpoint.class)
-public class AxileConfigurationsPropertiesEndpointAutoConfiguration {
+public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
@@ -54,8 +54,8 @@ public class AxileConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxileConfigurationPropertiesEndpoint axileConfigurationPropertiesEndpoint(
+    public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
             ConfigurationPropertiesCache configurationPropertiesCache) {
-        return new AxileConfigurationPropertiesEndpoint(configurationPropertiesCache);
+        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesCache);
     }
 }

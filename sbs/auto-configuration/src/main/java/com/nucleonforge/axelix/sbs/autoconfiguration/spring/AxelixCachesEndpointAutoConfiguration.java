@@ -26,7 +26,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axelix.sbs.spring.cache.AxileCachesEndpoint;
+import com.nucleonforge.axelix.sbs.spring.cache.AxilixCachesEndpoint;
 import com.nucleonforge.axelix.sbs.spring.cache.CacheDispatcher;
 import com.nucleonforge.axelix.sbs.spring.cache.CacheManagerBeanPostProcessor;
 import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheDispatcher;
@@ -39,7 +39,7 @@ import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheDispatcher;
  * <ul>
  *     <li>{@link DefaultCacheDispatcher} — dispatcher that coordinates cache operations across
  *  *     all registered {@link CacheManager} beans,</li>
- *     <li>{@link AxileCachesEndpoint} — a custom Spring Boot Actuator endpoint for cache management.</li>
+ *     <li>{@link AxilixCachesEndpoint} — a custom Spring Boot Actuator endpoint for cache management.</li>
  * </ul>
  * <p>Auto-configuration is only activated if a {@link CacheManager}
  * bean is available in the application context.
@@ -54,7 +54,7 @@ import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheDispatcher;
 @AutoConfiguration(after = {CacheAutoConfiguration.class, CachesEndpoint.class})
 @ConditionalOnAvailableEndpoint(endpoint = CachesEndpoint.class)
 @ConditionalOnBean(CacheManager.class)
-public class AxileCachesEndpointAutoConfiguration {
+public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
@@ -64,8 +64,8 @@ public class AxileCachesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxileCachesEndpoint cacheDispatcherEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
-        return new AxileCachesEndpoint(dispatcher, delegate);
+    public AxilixCachesEndpoint cacheDispatcherEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
+        return new AxilixCachesEndpoint(dispatcher, delegate);
     }
 
     @Bean

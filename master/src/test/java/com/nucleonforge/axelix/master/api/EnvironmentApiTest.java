@@ -333,7 +333,7 @@ class EnvironmentApiTest {
     @Test
     void shouldReturnJSONEnvironmentFeed() {
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/env/feed/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axelix/env/feed/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -348,7 +348,7 @@ class EnvironmentApiTest {
         String propertyName = "sun.management.compiler";
 
         ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axile/env/{instanceId}/property/{propertyName}", String.class, activeInstanceId, propertyName);
+                "/api/axelix/env/{instanceId}/property/{propertyName}", String.class, activeInstanceId, propertyName);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -366,7 +366,7 @@ class EnvironmentApiTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -380,7 +380,7 @@ class EnvironmentApiTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axile/env/{instanceId}/property/{propertyName}", String.class, instanceId, propertyName);
+                "/api/axelix/env/{instanceId}/property/{propertyName}", String.class, instanceId, propertyName);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -390,7 +390,7 @@ class EnvironmentApiTest {
         String instanceId = "unregistered-env-instance";
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

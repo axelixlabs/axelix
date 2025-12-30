@@ -276,7 +276,7 @@ class BeansApiTest {
                 TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/beans/feed/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axelix/beans/feed/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -294,7 +294,7 @@ class BeansApiTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<?> response =
-                restTemplate.getForEntity("/api/axile/beans/feed/{instanceId}", Void.class, instanceId);
+                restTemplate.getForEntity("/api/axelix/beans/feed/{instanceId}", Void.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -304,7 +304,7 @@ class BeansApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

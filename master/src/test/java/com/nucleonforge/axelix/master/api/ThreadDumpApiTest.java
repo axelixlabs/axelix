@@ -273,7 +273,7 @@ class ThreadDumpApiTest {
     @Test
     void shouldReturnJSONThreadDumpFeed() {
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/thread-dump/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axelix/thread-dump/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -291,7 +291,7 @@ class ThreadDumpApiTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<?> response =
-                restTemplate.getForEntity("/api/axile/thread-dump/{instanceId}", Void.class, instanceId);
+                restTemplate.getForEntity("/api/axelix/thread-dump/{instanceId}", Void.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -301,7 +301,7 @@ class ThreadDumpApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -309,7 +309,11 @@ class ThreadDumpApiTest {
     @Test
     void shouldEnableContentionMonitoring() throws InterruptedException {
         // when.
-        restTemplate.postForObject("/api/axile/thread-dump/{instanceId}/enable", null, Void.class, activeInstanceId);
+        restTemplate.postForObject(
+                "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring/enable",
+                null,
+                Void.class,
+                activeInstanceId);
 
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
@@ -320,7 +324,11 @@ class ThreadDumpApiTest {
     @Test
     void shouldDisableContentionMonitoring() throws InterruptedException {
         // when.
-        restTemplate.postForObject("/api/axile/thread-dump/{instanceId}/disable", null, Void.class, activeInstanceId);
+        restTemplate.postForObject(
+                "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring/disable",
+                null,
+                Void.class,
+                activeInstanceId);
 
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();

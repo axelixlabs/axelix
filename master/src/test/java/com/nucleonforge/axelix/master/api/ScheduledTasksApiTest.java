@@ -313,7 +313,7 @@ public class ScheduledTasksApiTest {
         // when.
 
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axelix/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -330,7 +330,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<String> body = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks/{instanceId}/enable", requestBody, String.class, activeInstanceId);
+                "/api/axelix/scheduled-tasks/{instanceId}/enable", requestBody, String.class, activeInstanceId);
 
         // then
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -343,7 +343,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<String> body = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks/{instanceId}/disable", requestBody, String.class, activeInstanceId);
+                "/api/axelix/scheduled-tasks/{instanceId}/disable", requestBody, String.class, activeInstanceId);
 
         // then
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -357,7 +357,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -369,7 +369,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -386,7 +386,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks/{instanceId}/enable",
+                "/api/axelix/scheduled-tasks/{instanceId}/enable",
                 requestBody,
                 EndpointInvocationException.class,
                 instanceId);
@@ -403,7 +403,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks/{instanceId}/enable",
+                "/api/axelix/scheduled-tasks/{instanceId}/enable",
                 requestBody,
                 EndpointInvocationException.class,
                 instanceId);
@@ -423,7 +423,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks/{instanceId}/disable",
+                "/api/axelix/scheduled-tasks/{instanceId}/disable",
                 requestBody,
                 EndpointInvocationException.class,
                 instanceId);
@@ -440,7 +440,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/scheduled-tasks/{instanceId}/disable",
+                "/api/axelix/scheduled-tasks/{instanceId}/disable",
                 requestBody,
                 EndpointInvocationException.class,
                 instanceId);

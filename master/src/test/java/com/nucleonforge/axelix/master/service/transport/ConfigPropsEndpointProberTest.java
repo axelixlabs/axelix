@@ -161,7 +161,7 @@ public class ConfigPropsEndpointProberTest {
     }
 
     @Test
-    void shouldReturnAxileConfigPropsFeed() {
+    void shouldReturnAxelixConfigPropsFeed() {
         registry.register(
                 TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 

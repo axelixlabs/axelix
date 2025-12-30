@@ -36,8 +36,8 @@ import com.nucleonforge.axelix.sbs.spring.properties.AxelixPropertySource;
 public enum PropertySourceDescription {
 
     // AxelixPropertySource
-    AXILE_PROPERTY_SOURCE_NAME(
-            AxelixPropertySource.AXILE_PROPERTY_SOURCE_NAME,
+    AXELIX_PROPERTY_SOURCE_NAME(
+            AxelixPropertySource.AXELIX_PROPERTY_SOURCE_NAME,
             "A custom {@link MapPropertySource} implementation used to hold mutable property values, managed dynamically during application runtime, and having the highest priority"),
 
     SERVER_PORTS(

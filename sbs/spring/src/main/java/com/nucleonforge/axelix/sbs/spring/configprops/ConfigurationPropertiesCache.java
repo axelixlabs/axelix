@@ -45,7 +45,7 @@ public class ConfigurationPropertiesCache {
         this.configurationPropertiesConverter = configurationPropertiesConverter;
     }
 
-    public ConfigPropsFeed getAxileConfigProps() {
+    public ConfigPropsFeed getConfigProps() {
         if (cachedResult == null) {
             synchronized (this) {
                 if (cachedResult == null) {

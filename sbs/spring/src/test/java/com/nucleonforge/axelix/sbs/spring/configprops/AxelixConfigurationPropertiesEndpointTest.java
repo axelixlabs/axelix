@@ -41,7 +41,7 @@ import com.nucleonforge.axelix.common.api.KeyValue;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link AxileConfigurationPropertiesEndpoint}.
+ * Integration tests for {@link AxelixConfigurationPropertiesEndpoint}.
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
@@ -51,23 +51,23 @@ import static org.assertj.core.api.Assertions.assertThat;
         properties = "management.endpoint.configprops.show-values=always")
 @TestPropertySource(
         properties = {
-            "axile.prop.test.tags.environment=test",
-            "axile.prop.test.tags.version=1.0.0",
-            "axile.prop.test.enabled-contexts=user-service, payment-service",
-            "axile.prop.test.http-client.requests[0].name=user-api",
-            "axile.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
-            "axile.prop.test.http-client.requests[0].methods[0].type=GET",
-            "axile.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
-            "axile.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
-            "axile.prop.test.http-client.requests[0].methods[1].type=POST",
-            "axile.prop.test.http-client.requests[1].name=payment-api",
-            "axile.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
-            "axile.prop.test.http-client.requests[1].methods[0].type=PUT",
-            "axile.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
-            "axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
+            "axelix.prop.test.tags.environment=test",
+            "axelix.prop.test.tags.version=1.0.0",
+            "axelix.prop.test.enabled-contexts=user-service, payment-service",
+            "axelix.prop.test.http-client.requests[0].name=user-api",
+            "axelix.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
+            "axelix.prop.test.http-client.requests[0].methods[0].type=GET",
+            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
+            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
+            "axelix.prop.test.http-client.requests[0].methods[1].type=POST",
+            "axelix.prop.test.http-client.requests[1].name=payment-api",
+            "axelix.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
+            "axelix.prop.test.http-client.requests[1].methods[0].type=PUT",
+            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
+            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
-@EnableConfigurationProperties(AxileConfigurationPropertiesEndpointTest.AxileConfigurationProperties.class)
-public class AxileConfigurationPropertiesEndpointTest {
+@EnableConfigurationProperties(AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.class)
+public class AxelixConfigurationPropertiesEndpointTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -80,7 +80,7 @@ public class AxileConfigurationPropertiesEndpointTest {
 
         List<KeyValue> properties = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())
-                .filter(e -> e.prefix().equals("axile.prop.test"))
+                .filter(e -> e.prefix().equals("axelix.prop.test"))
                 .flatMap(bean -> bean.properties().stream())
                 .toList();
 
@@ -119,7 +119,7 @@ public class AxileConfigurationPropertiesEndpointTest {
 
         List<KeyValue> inputs = response.getBody().contexts().values().stream()
                 .flatMap(ctx -> ctx.beans().values().stream())
-                .filter(e -> e.prefix().equals("axile.prop.test"))
+                .filter(e -> e.prefix().equals("axelix.prop.test"))
                 .flatMap(bean -> bean.inputs().stream())
                 .toList();
 
@@ -146,8 +146,8 @@ public class AxileConfigurationPropertiesEndpointTest {
                 Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level.value"));
     }
 
-    @ConfigurationProperties(prefix = "axile.prop.test")
-    public record AxileConfigurationProperties(
+    @ConfigurationProperties(prefix = "axelix.prop.test")
+    public record AxelixConfigurationProperties(
             Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
 
         public record HttpClient(List<Request> requests) {}
@@ -160,7 +160,7 @@ public class AxileConfigurationPropertiesEndpointTest {
     }
 
     @TestConfiguration
-    static class AxileConfigurationPropertiesTestConfiguration {
+    static class AxelixConfigurationPropertiesTestConfiguration {
 
         @Bean
         public ConfigurationPropertiesConverter configurationPropertiesConverter() {
@@ -176,9 +176,9 @@ public class AxileConfigurationPropertiesEndpointTest {
         }
 
         @Bean
-        public AxileConfigurationPropertiesEndpoint axileConfigurationPropertiesEndpoint(
+        public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
                 ConfigurationPropertiesCache configurationPropertiesCache) {
-            return new AxileConfigurationPropertiesEndpoint(configurationPropertiesCache);
+            return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesCache);
         }
     }
 }

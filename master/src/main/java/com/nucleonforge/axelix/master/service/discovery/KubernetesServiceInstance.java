@@ -23,7 +23,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 
 /**
- * Represents a Kubernetes service instance for {@link AxileKubernetesDiscoveryClient}.
+ * Represents a Kubernetes service instance for {@link KubernetesDiscoveryClient}.
  *
  * @param instanceId unique identifier (uid) of the pod instance.
  * @param serviceId id of the Kubernetes Service that managed this {@link Instance}.
@@ -37,7 +37,7 @@ import com.nucleonforge.axelix.master.model.instance.Instance;
  * @since 06.11.2025
  * @author Nikita Kirillov
  */
-public record AxileKubernetesServiceInstance(
+public record KubernetesServiceInstance(
         String instanceId,
         String serviceId,
         String podName,

@@ -54,7 +54,7 @@ public class WallboardApi {
     }
 
     @Operation(
-            summary = "Returns all instances that are managed by this Axile deployment",
+            summary = "Returns all instances that are managed by this Axelix deployment",
             responses = {
                 @ApiResponse(
                         description = "OK",

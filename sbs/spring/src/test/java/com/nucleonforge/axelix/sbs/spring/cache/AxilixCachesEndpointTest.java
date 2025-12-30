@@ -43,7 +43,7 @@ import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link AxileCachesEndpoint}.
+ * Integration tests for {@link AxilixCachesEndpoint}.
  * <p>
  * TODO:
  *  Gosh, we need to refactor this test to use String Templates if
@@ -57,13 +57,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
 @Import({
-    AxileCachesEndpoint.class,
+    AxilixCachesEndpoint.class,
     DefaultCacheDispatcher.class,
-    AxileCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class,
+    AxilixCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class,
     CachesEndpoint.class
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class AxileCachesEndpointTest {
+class AxilixCachesEndpointTest {
 
     // Cache names under test
     private static final String TEST_CACHE_1 = "cache1";

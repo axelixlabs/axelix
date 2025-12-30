@@ -108,7 +108,7 @@ class CachesManagementApiTest {
     @Test
     void shouldEnableSpecificCache() {
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axile/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
+                "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
                 null,
                 Void.class,
                 Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager", "cacheName", "vets"));
@@ -119,7 +119,7 @@ class CachesManagementApiTest {
     @Test
     void shouldDisableSpecificCache() {
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axile/caches/{instanceId}/{cacheManagerName}/{cacheName}/disable",
+                "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/disable",
                 null,
                 Void.class,
                 Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager", "cacheName", "vets"));
@@ -130,7 +130,7 @@ class CachesManagementApiTest {
     @Test
     void shouldEnableCacheManager() {
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axile/caches/{instanceId}/{cacheManagerName}/enable",
+                "/api/axelix/caches/{instanceId}/{cacheManagerName}/enable",
                 null,
                 Void.class,
                 Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
@@ -141,7 +141,7 @@ class CachesManagementApiTest {
     @Test
     void shouldDisableCacheManager() {
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axile/caches/{instanceId}/{cacheManagerName}/disable",
+                "/api/axelix/caches/{instanceId}/{cacheManagerName}/disable",
                 null,
                 Void.class,
                 Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
@@ -152,7 +152,7 @@ class CachesManagementApiTest {
     @Test
     void shouldReturnInternalServerErrorWhenInstanceReturns404() {
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axile/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
+                "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
                 null,
                 Void.class,
                 Map.of("instanceId", activeInstanceId, "cacheManagerName", "unknown", "cacheName", "unknown"));
@@ -163,7 +163,7 @@ class CachesManagementApiTest {
     @Test
     void shouldReturnBadRequestForUnregisteredInstance() {
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axile/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
+                "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
                 null,
                 Void.class,
                 Map.of(

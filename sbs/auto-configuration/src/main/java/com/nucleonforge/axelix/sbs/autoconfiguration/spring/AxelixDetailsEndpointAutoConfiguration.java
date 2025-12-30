@@ -24,14 +24,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axelix.sbs.spring.details.AxileDetailsEndpoint;
+import com.nucleonforge.axelix.sbs.spring.details.AxelixDetailsEndpoint;
 import com.nucleonforge.axelix.sbs.spring.details.DefaultServiceDetailsAssembler;
 import com.nucleonforge.axelix.sbs.spring.details.ServiceDetailsAssembler;
 import com.nucleonforge.axelix.sbs.spring.master.GitInformationProvider;
 import com.nucleonforge.axelix.sbs.spring.master.LibraryDiscoverer;
 
 /**
- * Auto-configuration for the {@link AxileDetailsEndpoint}.
+ * Auto-configuration for the {@link AxelixDetailsEndpoint}.
  *
  * @since 30.10.2025
  * @author Nikita Kirillov, Sergey Cherkasov
@@ -43,12 +43,12 @@ import com.nucleonforge.axelix.sbs.spring.master.LibraryDiscoverer;
             GitInformationProviderAutoConfiguration.class
         })
 @ConditionalOnAvailableEndpoint(endpoint = InfoEndpoint.class)
-public class AxileDetailsEndpointAutoConfiguration {
+public class AxelixDetailsEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxileDetailsEndpoint axileDetailsEndpoint(ServiceDetailsAssembler serviceDetailsAssembler) {
-        return new AxileDetailsEndpoint(serviceDetailsAssembler);
+    public AxelixDetailsEndpoint axelixDetailsEndpoint(ServiceDetailsAssembler serviceDetailsAssembler) {
+        return new AxelixDetailsEndpoint(serviceDetailsAssembler);
     }
 
     @Bean

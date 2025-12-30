@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * @param id                      The id of the instance. This id must be unique among all the other instances that are
- *                                managed by this Axile Master.
+ *                                managed by this Axelix Master.
  * @param name                    Displayable name of the instance
  * @param serviceVersion          Displayable version of the instance itself (not version of our starter inside Instance)
  * @param javaVersion             Version of the Java Platform used inside the service

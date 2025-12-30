@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.spring.configprops;
+package com.nucleonforge.axelix.sbs.spring.details;
 
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
+import com.nucleonforge.axelix.common.api.InstanceDetails;
 
 /**
- * Custom Actuator endpoint exposing the application's {@code @ConfigurationProperties}
- * data from the standard Spring Boot Actuator endpoint.
+ * Custom Spring Boot Actuator endpoint. Provides comprehensive instance operational details.
  *
- * @since 13.11.2025
- * @author Sergey Cherkasov
+ * @see InstanceDetails
+ * @since 29.10.2025
+ * @author Nikita Kirillov
  */
-@Endpoint(id = "axelix-configprops")
-public class AxileConfigurationPropertiesEndpoint {
+@Endpoint(id = "axelix-details")
+public class AxelixDetailsEndpoint {
 
-    private final ConfigurationPropertiesCache configurationPropertiesCache;
+    private final ServiceDetailsAssembler serviceDetailsAssembler;
 
-    public AxileConfigurationPropertiesEndpoint(ConfigurationPropertiesCache cache) {
-        this.configurationPropertiesCache = cache;
+    public AxelixDetailsEndpoint(ServiceDetailsAssembler serviceDetailsAssembler) {
+        this.serviceDetailsAssembler = serviceDetailsAssembler;
     }
 
     @ReadOperation
-    public ConfigPropsFeed configurationProperties() {
-        return configurationPropertiesCache.getAxileConfigProps();
+    public InstanceDetails details() {
+        return serviceDetailsAssembler.assemble();
     }
 }

@@ -214,7 +214,7 @@ class ConditionsApiTest {
                 TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/conditions/feed/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axelix/conditions/feed/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -232,7 +232,7 @@ class ConditionsApiTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<?> response =
-                restTemplate.getForEntity("/api/axile/conditions/feed/{instanceId}", Void.class, instanceId);
+                restTemplate.getForEntity("/api/axelix/conditions/feed/{instanceId}", Void.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -242,7 +242,7 @@ class ConditionsApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/conditions/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/conditions/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

@@ -31,13 +31,13 @@ import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
  * @author Nikita Kirillov
  */
 @Endpoint(id = "axelix-metadata")
-public class AxileMetadataEndpoint {
+public class AxelixMetadataEndpoint {
 
-    private static final Logger log = LoggerFactory.getLogger(AxileMetadataEndpoint.class);
+    private static final Logger log = LoggerFactory.getLogger(AxelixMetadataEndpoint.class);
 
     private final ServiceMetadataAssembler serviceMetadataAssembler;
 
-    public AxileMetadataEndpoint(ServiceMetadataAssembler serviceMetadataAssembler) {
+    public AxelixMetadataEndpoint(ServiceMetadataAssembler serviceMetadataAssembler) {
         this.serviceMetadataAssembler = serviceMetadataAssembler;
     }
 

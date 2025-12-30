@@ -100,7 +100,7 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
 
         // when.
         ResponseEntity<String> body = restTemplate.postForEntity(
-                "/api/axile/loggers/{instanceId}/group/{groupName}",
+                "/api/axelix/loggers/{instanceId}/group/{groupName}",
                 requestBody,
                 String.class,
                 activeInstanceId,
@@ -121,7 +121,7 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
 
         // when.
         ResponseEntity<?> response = restTemplate.postForEntity(
-                "/api/axile/loggers/{instanceId}/group/{groupName}", requestBody, Void.class, instanceId, groupName);
+                "/api/axelix/loggers/{instanceId}/group/{groupName}", requestBody, Void.class, instanceId, groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -135,7 +135,7 @@ public class LoggersApiSetLoggingLevelByGroupNameTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/loggers/{instanceId}/group/{groupName}",
+                "/api/axelix/loggers/{instanceId}/group/{groupName}",
                 requestBody,
                 EndpointInvocationException.class,
                 instanceId,

@@ -50,15 +50,15 @@ import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.JwtDecoderService;
  * @since 22.07.2025
  */
 @AutoConfiguration
-@ConditionalOnProperty(name = "axile.master.auth.jwt")
+@ConditionalOnProperty(name = "axelix.master.auth.jwt")
 @ConditionalOnClass({JwtDecoderService.class, JwtParser.class})
 public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
     public JwtDecoderService jwtDecoderService(
-            final @Value("${axile.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-            final @Value("${axile.master.auth.jwt.signing-key}") String signingKey) {
+            final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
+            final @Value("${axelix.master.auth.jwt.signing-key}") String signingKey) {
         return new DefaultJwtDecoderService(algorithm, signingKey);
     }
 

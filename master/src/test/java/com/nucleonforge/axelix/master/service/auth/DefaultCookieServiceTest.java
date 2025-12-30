@@ -34,7 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest
-@TestPropertySource(properties = {"axile.master.auth.cookie.domain=example.com", "axile.master.auth.jwt.lifespan=12h"})
+@TestPropertySource(
+        properties = {"axelix.master.auth.cookie.domain=example.com", "axelix.master.auth.jwt.lifespan=12h"})
 class DefaultCookieServiceTest {
 
     @Autowired

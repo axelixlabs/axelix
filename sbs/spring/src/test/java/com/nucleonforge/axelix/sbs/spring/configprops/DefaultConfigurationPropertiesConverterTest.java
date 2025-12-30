@@ -45,17 +45,17 @@ import static org.assertj.core.api.Assertions.assertThat;
         properties = "management.endpoint.configprops.show-values=always")
 @TestPropertySource(
         properties = {
-            "axile.prop.test.tags.environment=test",
-            "axile.prop.test.tags.version=1.0.0",
-            "axile.prop.test.enabled-contexts=user-service,payment-service",
-            "axile.prop.test.http-client.requests[0].name=user-api",
-            "axile.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
-            "axile.prop.test.http-client.requests[0].methods[0].type=GET",
-            "axile.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
-            "axile.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
-            "axile.prop.test.http-client.requests[0].methods[1].type=POST"
+            "axelix.prop.test.tags.environment=test",
+            "axelix.prop.test.tags.version=1.0.0",
+            "axelix.prop.test.enabled-contexts=user-service,payment-service",
+            "axelix.prop.test.http-client.requests[0].name=user-api",
+            "axelix.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
+            "axelix.prop.test.http-client.requests[0].methods[0].type=GET",
+            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
+            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
+            "axelix.prop.test.http-client.requests[0].methods[1].type=POST"
         })
-@EnableConfigurationProperties(DefaultConfigurationPropertiesConverterTest.AxileConfigurationProperties.class)
+@EnableConfigurationProperties(DefaultConfigurationPropertiesConverterTest.AxelixConfigurationProperties.class)
 public class DefaultConfigurationPropertiesConverterTest {
 
     @Autowired
@@ -68,27 +68,27 @@ public class DefaultConfigurationPropertiesConverterTest {
     void getConfigPropsDescriptor() {
         ConfigurationPropertiesDescriptor defaultDescriptor = endpoint.configurationProperties();
 
-        ConfigPropsFeed axileConfPropDescriptor = enricher.convert(defaultDescriptor);
+        ConfigPropsFeed axelixConfPropDescriptor = enricher.convert(defaultDescriptor);
 
-        assertThat(axileConfPropDescriptor).isNotNull();
+        assertThat(axelixConfPropDescriptor).isNotNull();
 
-        assertThat(axileConfPropDescriptor.contexts()).isNotEmpty();
+        assertThat(axelixConfPropDescriptor.contexts()).isNotEmpty();
 
-        assertThat(axileConfPropDescriptor.contexts().entrySet()).allSatisfy(entry -> {
+        assertThat(axelixConfPropDescriptor.contexts().entrySet()).allSatisfy(entry -> {
             var beans = entry.getValue().beans().entrySet();
 
             assertThat(beans)
-                    .filteredOn(e -> e.getValue().prefix().equals("axile.prop.test"))
+                    .filteredOn(e -> e.getValue().prefix().equals("axelix.prop.test"))
                     .singleElement()
                     .satisfies(bean -> {
                         var key = bean.getKey();
                         var value = bean.getValue();
 
                         // Bean
-                        assertThat(key).isEqualTo(AxileConfigurationProperties.class.getName());
+                        assertThat(key).isEqualTo(AxelixConfigurationProperties.class.getName());
 
                         // prefix
-                        assertThat(value.prefix()).isEqualTo("axile.prop.test");
+                        assertThat(value.prefix()).isEqualTo("axelix.prop.test");
 
                         // properties
                         assertThat(value.properties())
@@ -119,23 +119,23 @@ public class DefaultConfigurationPropertiesConverterTest {
         });
     }
 
-    @ConfigurationProperties(prefix = "axile.prop.test")
-    public record AxileConfigurationProperties(
+    @ConfigurationProperties(prefix = "axelix.prop.test")
+    public record AxelixConfigurationProperties(
             Map<String, String> tags,
             List<String> enabledContexts,
-            AxileConfigurationPropertiesEndpointTest.AxileConfigurationProperties.HttpClient httpClient) {
+            AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.HttpClient httpClient) {
 
         public record HttpClient(
-                List<AxileConfigurationPropertiesEndpointTest.AxileConfigurationProperties.Request> requests) {}
+                List<AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.Request> requests) {}
 
         public record Request(
                 String name,
                 String baseUrl,
-                List<AxileConfigurationPropertiesEndpointTest.AxileConfigurationProperties.Method> methods) {}
+                List<AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.Method> methods) {}
 
         public record Method(
                 String type,
-                List<AxileConfigurationPropertiesEndpointTest.AxileConfigurationProperties.Retry> retries) {}
+                List<AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.Retry> retries) {}
 
         public record Retry(Integer count, Map<String, Object> parameters) {}
     }

@@ -55,14 +55,14 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: test.axile.nucleon-forge.com
+    - host: test.axelix.nucleon-forge.com
       paths:
         - path: /
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
-  #      - test.axile.nucleon-forge.com
+  #      - test.axelix.nucleon-forge.com
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -79,12 +79,12 @@ resources: {}
 liveness:
   delay: 15
   timeout: 10
-  path: /api/axile/actuator/health/liveness
+  path: /api/axelix/actuator/health/liveness
 
 readiness:
   delay: 15
   timeout: 10
-  path: /api/axile/actuator/health/readiness
+  path: /api/axelix/actuator/health/readiness
 
 # Additional volumes on the output Deployment definition.
 volumes: []

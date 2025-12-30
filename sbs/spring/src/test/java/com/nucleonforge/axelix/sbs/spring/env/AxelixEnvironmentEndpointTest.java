@@ -48,7 +48,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link AxileEnvironmentEndpoint}.
+ * Integration tests for {@link AxelixEnvironmentEndpoint}.
  *
  * @since 21.10.2025
  * @author Nikita Kirillov
@@ -56,35 +56,35 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        args = {"--axile.env.test.prop3=fromCommandLine"},
+        args = {"--axelix.env.test.prop3=fromCommandLine"},
         properties = {
-            "axile.env.test.prop2=systemValue2",
+            "axelix.env.test.prop2=systemValue2",
             "management.endpoint.env.show-values=always",
         })
 @TestPropertySource(
         properties = {
             // properties -> shouldSelectPrimaryPropertyFromHighestPrecedenceSource
-            "axile.env.test.prop1=fromTestSource",
+            "axelix.env.test.prop1=fromTestSource",
 
             // properties -> shouldReturnTheBeanNameThatMatchesTheConfigProps
-            "axile.prop.test.tags.environment=test",
-            "axile.prop.test.tags.version=1.0.0",
-            "axile.prop.test.enabled-contexts=user-service,payment-service",
-            "axile.prop.test.http-client.requests[0].name=user-api",
-            "axile.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
-            "axile.prop.test.http-client.requests[0].methods[0].type=GET",
-            "axile.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
-            "axile.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
-            "axile.prop.test.http-client.requests[0].methods[1].type=POST",
-            "axile.prop.test.http-client.requests[1].name=payment-api",
-            "axile.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
-            "axile.prop.test.http-client.requests[1].methods[0].type=PUT",
-            "axile.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
-            "axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
+            "axelix.prop.test.tags.environment=test",
+            "axelix.prop.test.tags.version=1.0.0",
+            "axelix.prop.test.enabled-contexts=user-service,payment-service",
+            "axelix.prop.test.http-client.requests[0].name=user-api",
+            "axelix.prop.test.http-client.requests[0].base-url=https://api.users.example.com/v1",
+            "axelix.prop.test.http-client.requests[0].methods[0].type=GET",
+            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].count=3",
+            "axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
+            "axelix.prop.test.http-client.requests[0].methods[1].type=POST",
+            "axelix.prop.test.http-client.requests[1].name=payment-api",
+            "axelix.prop.test.http-client.requests[1].base-url=https://api.payments.example.com/v2",
+            "axelix.prop.test.http-client.requests[1].methods[0].type=PUT",
+            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
+            "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
-@EnableConfigurationProperties(AxileEnvironmentEndpointTest.AxilePropTest.class)
+@EnableConfigurationProperties(AxelixEnvironmentEndpointTest.AxelixPropTest.class)
 @Import({EnvironmentTestConfig.class})
-class AxileEnvironmentEndpointTest {
+class AxelixEnvironmentEndpointTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -94,14 +94,14 @@ class AxileEnvironmentEndpointTest {
 
     @BeforeEach
     void before() {
-        environment.getSystemProperties().put("axile.env.test.prop1", "systemValue");
-        environment.getSystemProperties().put("axile.env.test.prop2", "systemValue");
-        environment.getSystemProperties().put("axile.env.test.prop3", "systemValue");
+        environment.getSystemProperties().put("axelix.env.test.prop1", "systemValue");
+        environment.getSystemProperties().put("axelix.env.test.prop2", "systemValue");
+        environment.getSystemProperties().put("axelix.env.test.prop3", "systemValue");
     }
 
     @DynamicPropertySource
     static void registerDynamic(DynamicPropertyRegistry registry) {
-        registry.add("axile.env.test.prop2", () -> "dynamicValue");
+        registry.add("axelix.env.test.prop2", () -> "dynamicValue");
     }
 
     @ParameterizedTest(name = "Property ''{0}'' should resolve from highest-precedence source")
@@ -128,9 +128,9 @@ class AxileEnvironmentEndpointTest {
 
     private static Stream<Arguments> propertyExpectations() {
         return Stream.of(
-                Arguments.of("axile.env.test.prop1", "fromTestSource"),
-                Arguments.of("axile.env.test.prop2", "dynamicValue"),
-                Arguments.of("axile.env.test.prop3", "fromCommandLine"));
+                Arguments.of("axelix.env.test.prop1", "fromTestSource"),
+                Arguments.of("axelix.env.test.prop2", "dynamicValue"),
+                Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
     }
 
     @Test
@@ -190,25 +190,25 @@ class AxileEnvironmentEndpointTest {
 
         assertThat(propertyAppearances)
                 .extracting(e -> e.getValue().configPropsBeanName())
-                .containsOnly(AxilePropTest.class.getName());
+                .containsOnly(AxelixPropTest.class.getName());
     }
 
     private static Stream<Arguments> propertyName() {
         return Stream.of(
-                Arguments.of("axile.prop.test.tags.environment"),
-                Arguments.of("axile.prop.test.tags.version"),
-                Arguments.of("axile.prop.test.enabled-contexts"),
-                Arguments.of("axile.prop.test.http-client.requests[0].name"),
-                Arguments.of("axile.prop.test.http-client.requests[0].base-url"),
-                Arguments.of("axile.prop.test.http-client.requests[0].methods[0].type"),
-                Arguments.of("axile.prop.test.http-client.requests[0].methods[0].retries[0].count"),
-                Arguments.of("axile.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout"),
-                Arguments.of("axile.prop.test.http-client.requests[0].methods[1].type"),
-                Arguments.of("axile.prop.test.http-client.requests[1].name"),
-                Arguments.of("axile.prop.test.http-client.requests[1].base-url"),
-                Arguments.of("axile.prop.test.http-client.requests[1].methods[0].type"),
-                Arguments.of("axile.prop.test.http-client.requests[1].methods[0].retries[0].count"),
-                Arguments.of("axile.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
+                Arguments.of("axelix.prop.test.tags.environment"),
+                Arguments.of("axelix.prop.test.tags.version"),
+                Arguments.of("axelix.prop.test.enabled-contexts"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].name"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].base-url"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].type"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].retries[0].count"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].methods[1].type"),
+                Arguments.of("axelix.prop.test.http-client.requests[1].name"),
+                Arguments.of("axelix.prop.test.http-client.requests[1].base-url"),
+                Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].type"),
+                Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].count"),
+                Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
     }
 
     @ParameterizedTest
@@ -233,8 +233,8 @@ class AxileEnvironmentEndpointTest {
                         "Contains the 'server.port' property from 'application.*', which defines the web server port (8080 by default)."));
     }
 
-    @ConfigurationProperties(prefix = "axile.prop.test")
-    public record AxilePropTest(Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
+    @ConfigurationProperties(prefix = "axelix.prop.test")
+    public record AxelixPropTest(Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
 
         public record HttpClient(List<Request> requests) {}
 
@@ -246,12 +246,12 @@ class AxileEnvironmentEndpointTest {
     }
 
     @TestConfiguration
-    static class AxileEnvironmentEndpointTestConfiguration {
+    static class AxelixEnvironmentEndpointTestConfiguration {
 
         @Bean
-        public AxileEnvironmentEndpoint axileEnvironmentEndpoint(
+        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
                 EnvironmentEndpoint delegate, EnvPropertyEnricher envPropertyEnricher) {
-            return new AxileEnvironmentEndpoint(delegate, envPropertyEnricher);
+            return new AxelixEnvironmentEndpoint(delegate, envPropertyEnricher);
         }
     }
 }

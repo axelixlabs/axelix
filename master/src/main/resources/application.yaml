@@ -4,7 +4,7 @@ server:
 # TODO: we need to think about the design of properties in general
 spring:
   application:
-    name: axile
+    name: axelix
   mvc:
     servlet:
       path: /api/${spring.application.name}
@@ -14,7 +14,7 @@ management:
     web:
       exposure:
         include: [ "health" ]
-axile:
+axelix:
   master:
     discovery:
       auto: true

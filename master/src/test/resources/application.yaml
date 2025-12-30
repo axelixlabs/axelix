@@ -1,11 +1,11 @@
 spring:
   application:
-    name: axile
+    name: axelix
   mvc:
     servlet:
       path: /api/${spring.application.name}
 
-axile:
+axelix:
   config:
     auth:
       tables:

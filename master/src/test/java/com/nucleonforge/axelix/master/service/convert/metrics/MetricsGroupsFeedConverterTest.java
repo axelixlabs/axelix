@@ -120,7 +120,7 @@ class MetricsGroupsFeedConverterTest {
 
         MetricsGroupsFeed.MetricsGroup tomcatGroup = new MetricsGroupsFeed.MetricsGroup("tomcat", tomcat);
 
-        // return -> AxileMetricsGroups
+        // return -> AxelixMetricsGroups
         return new MetricsGroupsFeed(List.of(jvmGroup, processGroup, tomcatGroup));
     }
 }

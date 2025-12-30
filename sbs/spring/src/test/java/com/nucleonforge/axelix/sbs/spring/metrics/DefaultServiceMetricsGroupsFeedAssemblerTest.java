@@ -46,26 +46,26 @@ public class DefaultServiceMetricsGroupsFeedAssemblerTest {
     void shouldReturnGroupedMetricsWithDescriptions() {
         MetricsGroupsFeed metricsGroups = assembler.assemble();
 
-        MetricsGroup axile = getMetricsGroup(metricsGroups, "axileMetrics");
-        assertThat(axile.groupName()).isEqualTo("axileMetrics");
-        assertThat(axile.metrics())
+        MetricsGroup axelix = getMetricsGroup(metricsGroups, "axelixMetrics");
+        assertThat(axelix.groupName()).isEqualTo("axelixMetrics");
+        assertThat(axelix.metrics())
                 .containsOnly(
                         new MetricDescription(
-                                "axileMetrics.test.metric1",
-                                "Test metric belonging to the `axileMetrics` group with a description"),
+                                "axelixMetrics.test.metric1",
+                                "Test metric belonging to the `axelixMetrics` group with a description"),
                         new MetricDescription(
-                                "axileMetrics.test.metric2",
-                                "Test metric belonging to the `axileMetrics` group with a description"),
-                        new MetricDescription("axileMetrics.test.metric3", null));
+                                "axelixMetrics.test.metric2",
+                                "Test metric belonging to the `axelixMetrics` group with a description"),
+                        new MetricDescription("axelixMetrics.test.metric3", null));
 
         MetricsGroup test = getMetricsGroup(metricsGroups, "testMetrics");
         assertThat(test.groupName()).isEqualTo("testMetrics");
         assertThat(test.metrics())
                 .containsOnly(
                         new MetricDescription(
-                                "testMetrics.axile.metric1",
+                                "testMetrics.axelix.metric1",
                                 "Test metric belonging to the `testMetrics` group with a description"),
-                        new MetricDescription("testMetrics.axile.metric2", null));
+                        new MetricDescription("testMetrics.axelix.metric2", null));
 
         MetricsGroup other = getMetricsGroup(metricsGroups, "Others");
         assertThat(other.groupName()).isEqualTo("Others");
@@ -93,21 +93,21 @@ public class DefaultServiceMetricsGroupsFeedAssemblerTest {
         @Bean
         public MeterBinder groupingMetrics() {
             return registry -> {
-                Counter.builder("axileMetrics.test.metric1")
-                        .description("Test metric belonging to the `axileMetrics` group with a description")
+                Counter.builder("axelixMetrics.test.metric1")
+                        .description("Test metric belonging to the `axelixMetrics` group with a description")
                         .register(registry);
 
-                Counter.builder("axileMetrics.test.metric2")
-                        .description("Test metric belonging to the `axileMetrics` group with a description")
+                Counter.builder("axelixMetrics.test.metric2")
+                        .description("Test metric belonging to the `axelixMetrics` group with a description")
                         .register(registry);
 
-                Counter.builder("axileMetrics.test.metric3").register(registry);
+                Counter.builder("axelixMetrics.test.metric3").register(registry);
 
-                Counter.builder("testMetrics.axile.metric1")
+                Counter.builder("testMetrics.axelix.metric1")
                         .description("Test metric belonging to the `testMetrics` group with a description")
                         .register(registry);
 
-                Counter.builder("testMetrics.axile.metric2").register(registry);
+                Counter.builder("testMetrics.axelix.metric2").register(registry);
 
                 Counter.builder("standalone")
                         .description(

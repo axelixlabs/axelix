@@ -29,22 +29,22 @@ import com.nucleonforge.axelix.common.api.InstanceDetails.GitDetails;
 import com.nucleonforge.axelix.common.api.InstanceDetails.OsDetails;
 import com.nucleonforge.axelix.common.api.InstanceDetails.RuntimeDetails;
 import com.nucleonforge.axelix.common.api.InstanceDetails.SpringDetails;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.BuildProfile;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.GitProfile;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.OSProfile;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.RuntimeProfile;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.SpringProfile;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse.BuildProfile;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse.GitProfile;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse.OSProfile;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse.RuntimeProfile;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse.SpringProfile;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
-import com.nucleonforge.axelix.master.service.convert.response.details.AxileDetailsConverter;
 import com.nucleonforge.axelix.master.service.convert.response.details.DetailsConversionRequest;
+import com.nucleonforge.axelix.master.service.convert.response.details.InstanceDetailsConverter;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link AxileDetailsConverter}
+ * Unit tests for {@link InstanceDetailsConverter}
  *
  * @author Sergey Cherkasov
  */
@@ -56,19 +56,19 @@ public class InstanceDetailsConverterTest {
 
     private final String activeInstanceId = UUID.randomUUID().toString();
 
-    private AxileDetailsConverter converter;
+    private InstanceDetailsConverter converter;
 
     @BeforeEach
     void prepare() {
         instanceRegistry.register(createInstance(activeInstanceId));
-        converter = new AxileDetailsConverter(instanceRegistry);
+        converter = new InstanceDetailsConverter(instanceRegistry);
     }
 
     @Test
     void testConvertHappyPath() {
         // when.
-        AxileDetailsResponse response = converter.convertInternal(
-                new DetailsConversionRequest(getAxileDetails(), InstanceId.of(activeInstanceId)));
+        InstanceDetailsResponse response = converter.convertInternal(
+                new DetailsConversionRequest(getInstanceDetails(), InstanceId.of(activeInstanceId)));
 
         assertThat(response.serviceName()).isEqualTo("test-object-factory-instance");
 
@@ -104,7 +104,7 @@ public class InstanceDetailsConverterTest {
         assertThat(os.arch()).isEqualTo("amd64");
     }
 
-    private static InstanceDetails getAxileDetails() {
+    private static InstanceDetails getInstanceDetails() {
         GitDetails.CommitAuthor commitAuthor =
                 new InstanceDetails.GitDetails.CommitAuthor("sergeycherkasovv", "sergeycherkasovv@github.com");
 

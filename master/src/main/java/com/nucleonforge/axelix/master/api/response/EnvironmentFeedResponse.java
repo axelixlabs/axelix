@@ -49,7 +49,7 @@ public record EnvironmentFeedResponse(
             String name, @Nullable String description, List<PropertyEntry> properties) {}
 
     /**
-     * Represents a property value returned by the custom Axile environment endpoint.
+     * Represents a property value returned by the custom environment endpoint.
      *
      * @param name                 the property name
      * @param value                the string representation of the property's value

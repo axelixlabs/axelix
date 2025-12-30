@@ -43,7 +43,7 @@ public class SecurityAutoConfiguration {
     public static class JwtAutoConfiguration {
 
         @Bean
-        @ConfigurationProperties(prefix = "axile.master.auth.jwt")
+        @ConfigurationProperties(prefix = "axelix.master.auth.jwt")
         JwtProperties jwtProperties() {
             return new JwtProperties();
         }
@@ -60,14 +60,14 @@ public class SecurityAutoConfiguration {
      */
     @AutoConfiguration(after = JwtAutoConfiguration.class)
     @ConditionalOnProperty(
-            prefix = "axile.master.auth",
+            prefix = "axelix.master.auth",
             name = "cookie.enabled",
             havingValue = "true",
             matchIfMissing = true)
     public static class CookieAutoConfiguration {
 
         @Bean
-        @ConfigurationProperties(prefix = "axile.master.auth.cookie")
+        @ConfigurationProperties(prefix = "axelix.master.auth.cookie")
         public CookieProperties cookieProperties() {
             return new CookieProperties();
         }
@@ -82,13 +82,13 @@ public class SecurityAutoConfiguration {
      * Autoconfiguration for static-admin security option.
      */
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = "axile.master.auth", name = "type", havingValue = "static-admin")
+    @ConditionalOnProperty(prefix = "axelix.master.auth", name = "type", havingValue = "static-admin")
     static class StaticCredentialsConfig {
 
         private static final String USERNAME_NULL_MESSAGE =
-                "The username for the static-admin is 'null'. Make sure the axile.master.auth.static-admin.credentials.username is specified correctly";
+                "The username for the static-admin is 'null'. Make sure the axelix.master.auth.static-admin.credentials.username is specified correctly";
         private static final String PASSWORD_NULL_MESSAGE =
-                "The password for the static-admin is 'null'. Make sure the axile.master.auth.static-admin.credentials.password is specified correctly";
+                "The password for the static-admin is 'null'. Make sure the axelix.master.auth.static-admin.credentials.password is specified correctly";
 
         @Bean
         public StaticAdminUserProvider staticCredentialsUserProvider(
@@ -100,7 +100,7 @@ public class SecurityAutoConfiguration {
         }
 
         @Bean
-        @ConfigurationProperties(prefix = "axile.master.auth.static-admin.credentials")
+        @ConfigurationProperties(prefix = "axelix.master.auth.static-admin.credentials")
         public StaticAdminCredentialsProperties staticAdminCredentialsProperties() {
             return new StaticAdminCredentialsProperties();
         }

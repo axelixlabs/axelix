@@ -30,7 +30,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Nikita Kirilov, Sergey Cherkasov
  */
-public record AxileDetailsResponse(
+public record InstanceDetailsResponse(
         @Nullable String serviceName,
         @Nullable GitProfile git,
         RuntimeProfile runtime,

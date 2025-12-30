@@ -29,9 +29,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axelix.master.service.discovery.AxileKubernetesDiscoveryClient;
 import com.nucleonforge.axelix.master.service.discovery.InstancesDiscoverer;
 import com.nucleonforge.axelix.master.service.discovery.InstancesRegistrar;
+import com.nucleonforge.axelix.master.service.discovery.KubernetesDiscoveryClient;
 import com.nucleonforge.axelix.master.service.discovery.KubernetesInstanceDiscoverer;
 import com.nucleonforge.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -43,7 +43,7 @@ import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEn
  * @author Mikhail Polivakha
  */
 @AutoConfiguration
-@ConditionalOnProperty(prefix = "axile.master.discovery", name = "auto", havingValue = "true")
+@ConditionalOnProperty(prefix = "axelix.master.discovery", name = "auto", havingValue = "true")
 public class DiscoveryAutoConfiguration {
 
     @Bean
@@ -59,11 +59,11 @@ public class DiscoveryAutoConfiguration {
     }
 
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = "axile.master.discovery", name = "platform", havingValue = "kubernetes")
+    @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "platform", havingValue = "kubernetes")
     static class KubernetesDiscoveryAutoConfiguration {
 
         @Bean
-        @ConfigurationProperties(prefix = "axile.master.discovery.kubernetes")
+        @ConfigurationProperties(prefix = "axelix.master.discovery.kubernetes")
         public KubernetesDiscoveryProperties kubernetesDiscoveryProperties() {
             return new KubernetesDiscoveryProperties();
         }
@@ -84,7 +84,7 @@ public class DiscoveryAutoConfiguration {
         @Bean
         public DiscoveryClient discoveryClient(
                 KubernetesClient kubernetesClient, KubernetesDiscoveryProperties kubernetesDiscoveryProperties) {
-            return new AxileKubernetesDiscoveryClient(kubernetesClient, kubernetesDiscoveryProperties.getFilters());
+            return new KubernetesDiscoveryClient(kubernetesClient, kubernetesDiscoveryProperties.getFilters());
         }
 
         @Bean

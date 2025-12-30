@@ -83,7 +83,7 @@ public class ServiceInfoConverterTest {
         BuildProfile buildProfile = response.build();
         assertThat(buildProfile.artifact()).isEqualTo("application");
         assertThat(buildProfile.group()).isEqualTo("com.example");
-        assertThat(buildProfile.name()).isEqualTo("axile");
+        assertThat(buildProfile.name()).isEqualTo("axelix");
         assertThat(buildProfile.version()).isEqualTo("1.0.3");
         assertThat(buildProfile.time()).isNull();
     }
@@ -255,7 +255,7 @@ public class ServiceInfoConverterTest {
 
     private static ServiceInfo getInfo() {
         // BuildInfo
-        BuildInfo build = new BuildInfo("application", "axile", "1.0.3", "com.example", null);
+        BuildInfo build = new BuildInfo("application", "axelix", "1.0.3", "com.example", null);
 
         // GitInfo
         GitInfo git = new GitInfo("main", new GitInfo.Commit("df027cf", "2025-08-21T09:11:35Z"));

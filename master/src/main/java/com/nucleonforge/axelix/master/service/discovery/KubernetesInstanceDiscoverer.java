@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.kubernetes.commons.discovery.KubernetesServiceInstance;
 
 import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axelix.master.model.instance.Instance;
@@ -59,7 +58,7 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     protected Instance toDomainInstance(InstanceIntermediateProfile profile) throws IllegalArgumentException {
         ServiceInstance serviceInstance = profile.serviceInstance();
 
-        if (serviceInstance instanceof AxileKubernetesServiceInstance k8sInstance) {
+        if (serviceInstance instanceof KubernetesServiceInstance k8sInstance) {
 
             Instant deployedAt = extractPodDeployTimestamp(k8sInstance);
 
@@ -96,7 +95,7 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     }
 
     @Nullable
-    private static Instant extractPodDeployTimestamp(AxileKubernetesServiceInstance k8sInstance) {
+    private static Instant extractPodDeployTimestamp(KubernetesServiceInstance k8sInstance) {
         String deployedAtAsString = k8sInstance.getDeploymentAt();
 
         if (deployedAtAsString == null) {
@@ -127,7 +126,8 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
                 .formatted(
                         serviceInstance.getInstanceId(),
                         ServiceInstance.class.getSimpleName(),
-                        KubernetesServiceInstance.class.getName(),
+                        org.springframework.cloud.kubernetes.commons.discovery.KubernetesServiceInstance.class
+                                .getName(),
                         serviceInstance.getClass().getName());
     }
 }

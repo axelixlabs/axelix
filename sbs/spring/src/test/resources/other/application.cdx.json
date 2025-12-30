@@ -4780,8 +4780,8 @@
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/com.nucleonforge.axile/auto-configuration@1.0.0-SNAPSHOT?type=jar",
-      "group" : "com.nucleonforge.axile",
+      "bom-ref" : "pkg:maven/com.nucleonforge.axelix/auto-configuration@1.0.0-SNAPSHOT?type=jar",
+      "group" : "com.nucleonforge.axelix",
       "name" : "auto-configuration",
       "version" : "1.0.0-SNAPSHOT",
       "scope" : "required",

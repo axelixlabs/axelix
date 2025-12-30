@@ -30,29 +30,29 @@ import com.nucleonforge.axelix.common.api.transform.BaseUnitParser;
 import com.nucleonforge.axelix.common.api.transform.BaseUnitValueTransformer;
 import com.nucleonforge.axelix.common.api.transform.BytesMemoryBaseUnitValueTransformer;
 import com.nucleonforge.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
-import com.nucleonforge.axelix.sbs.spring.metrics.AxileMetricsEndpoint;
+import com.nucleonforge.axelix.sbs.spring.metrics.AxelixMetricsEndpoint;
 import com.nucleonforge.axelix.sbs.spring.metrics.DefaultServiceMetricsGroupsAssembler;
 import com.nucleonforge.axelix.sbs.spring.metrics.ServiceMetricsGroupsAssembler;
 
 /**
- * Auto-configuration for the {@link AxileMetricsEndpoint}.
+ * Auto-configuration for the {@link AxelixMetricsEndpoint}.
  *
  * @since 17.11.2025
  * @author Nikita Kirillov
  */
 @AutoConfiguration(after = MetricsAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = MetricsEndpoint.class)
-public class AxileMetricsAutoConfiguration {
+public class AxelixMetricsAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxileMetricsEndpoint axileMetricsEndpoint(
+    public AxelixMetricsEndpoint axelixMetricsEndpoint(
             MetricsEndpoint metricsEndpoint,
             MeterRegistry registry,
             BaseUnitParser baseUnitParser,
             Set<BaseUnitValueTransformer> baseUnitValueTransformers,
             ServiceMetricsGroupsAssembler serviceMetricsGroupsAssembler) {
-        return new AxileMetricsEndpoint(
+        return new AxelixMetricsEndpoint(
                 metricsEndpoint, registry, baseUnitParser, serviceMetricsGroupsAssembler, baseUnitValueTransformers);
     }
 

@@ -54,7 +54,7 @@ public record EnvironmentFeed(
             @JsonProperty("properties") List<Property> properties) {}
 
     /**
-     * DTO representing a property value returned by the custom Axile environment endpoint.
+     * DTO representing a property value returned by the custom actuator environment endpoint.
      *
      * @param propertyName         the property name.
      * @param value                the string representation of the property's value.

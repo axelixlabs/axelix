@@ -44,20 +44,20 @@ import com.nucleonforge.axelix.common.utils.CollectionUtils;
 import com.nucleonforge.axelix.master.autoconfiguration.discovery.KubernetesDiscoveryProperties.DiscoveryFilters;
 
 /**
- * Axile Kubernetes implementation of {@link DiscoveryClient}.
+ * Custom Kubernetes implementation of {@link DiscoveryClient}.
  *
  * @since 05.11.2025
  * @author Nikita Kirillov
  */
-public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
+public class KubernetesDiscoveryClient implements DiscoveryClient {
 
-    private static final Logger log = LoggerFactory.getLogger(AxileKubernetesDiscoveryClient.class);
+    private static final Logger log = LoggerFactory.getLogger(KubernetesDiscoveryClient.class);
 
     private final KubernetesClient kubernetesClient;
     private final Set<String> namespaces;
     private final Map<String, String> labels;
 
-    public AxileKubernetesDiscoveryClient(KubernetesClient kubernetesClient, DiscoveryFilters filters) {
+    public KubernetesDiscoveryClient(KubernetesClient kubernetesClient, DiscoveryFilters filters) {
         this.kubernetesClient = kubernetesClient;
         this.namespaces = CollectionUtils.defaultIfEmpty(filters.getNamespaces(), kubernetesClient.getNamespace());
         this.labels = filters.getLabels();
@@ -65,7 +65,7 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
 
     @Override
     public String description() {
-        return "Axile Kubernetes Discovery Client";
+        return "Axelix Kubernetes Discovery Client";
     }
 
     @Override
@@ -192,7 +192,7 @@ public class AxileKubernetesDiscoveryClient implements DiscoveryClient {
                 "servicePortName", port.getName(),
                 "protocol", port.getProtocol());
 
-        return new AxileKubernetesServiceInstance(
+        return new KubernetesServiceInstance(
                 pod.getMetadata().getUid(),
                 serviceId,
                 pod.getMetadata().getName(),

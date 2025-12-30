@@ -18,7 +18,7 @@ package com.nucleonforge.axelix.common.api.metrics;
 import java.util.List;
 
 /**
- * The response returned by the custom Axile metric groups list endpoint.
+ * The response returned by the custom metric groups list endpoint.
  *
  * @param metricsGroups the list of groups.
  *

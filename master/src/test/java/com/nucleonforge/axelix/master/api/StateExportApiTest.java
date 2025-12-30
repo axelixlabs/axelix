@@ -388,7 +388,7 @@ class StateExportApiTest {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         ResponseEntity<?> response = restTemplate.postForEntity(
-                "/api/axile/export-state/{instanceId}",
+                "/api/axelix/export-state/{instanceId}",
                 new HttpEntity<>(HTTP_REQUEST_BODY, headers),
                 Void.class,
                 instanceId);
@@ -404,7 +404,7 @@ class StateExportApiTest {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         ResponseEntity<String> response = restTemplate.postForEntity(
-                "/api/axile/export-state/{instanceId}",
+                "/api/axelix/export-state/{instanceId}",
                 new HttpEntity<>(HTTP_REQUEST_BODY, headers),
                 String.class,
                 unknownInstanceId);
@@ -424,7 +424,7 @@ class StateExportApiTest {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         ResponseEntity<byte[]> response = restTemplate.postForEntity(
-                "/api/axile/export-state/{instanceId}",
+                "/api/axelix/export-state/{instanceId}",
                 new HttpEntity<>(HTTP_REQUEST_BODY, headers),
                 byte[].class,
                 activeInstanceId);

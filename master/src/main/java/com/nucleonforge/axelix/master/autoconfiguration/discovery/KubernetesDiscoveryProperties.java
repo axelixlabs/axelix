@@ -29,18 +29,18 @@ import java.util.Set;
 public class KubernetesDiscoveryProperties {
 
     /**
-     * URL of the kube-apiserver to be used by Axile master when discovering
+     * URL of the kube-apiserver to be used by master when discovering
      * the potentially managed services.
      */
     private String kubeApiserverUrl;
 
     /**
-     * The path inside the K8S Axile Master pod where the Service Account token resides.
+     * The path inside the K8S Axelix Master pod where the Service Account token resides.
      */
     private String saTokenPath = "/var/run/secrets/kubernetes.io/serviceaccount/token";
 
     /**
-     * The path inside the K8S Axile Master pod where the certificate of the kube-apiserver resides.
+     * The path inside the K8S Axelix Master pod where the certificate of the kube-apiserver resides.
      */
     private String caCertPath = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt";
 

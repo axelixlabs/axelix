@@ -313,7 +313,7 @@ public class ConfigPropsApiFeedTest {
 
         // when.
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/configprops/feed/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axelix/configprops/feed/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -332,7 +332,7 @@ public class ConfigPropsApiFeedTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -344,7 +344,7 @@ public class ConfigPropsApiFeedTest {
         String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

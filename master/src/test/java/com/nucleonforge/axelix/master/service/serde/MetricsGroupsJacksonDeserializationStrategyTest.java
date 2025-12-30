@@ -37,7 +37,7 @@ public class MetricsGroupsJacksonDeserializationStrategyTest {
             new MetricsGroupsJacksonDeserializationStrategy(new ObjectMapper());
 
     @Test
-    void shouldDeserializeAxileMetricsGroups() {
+    void shouldDeserializeAxelixMetricsGroups() {
         // language=json
         String response =
                 """

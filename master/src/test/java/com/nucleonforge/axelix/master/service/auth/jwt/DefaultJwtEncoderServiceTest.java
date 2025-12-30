@@ -62,10 +62,10 @@ class DefaultJwtEncoderServiceTest {
     @Autowired
     private JwtEncoderService jwtEncoderService;
 
-    @Value("${axile.master.auth.jwt.signing_key}")
+    @Value("${axelix.master.auth.jwt.signing_key}")
     private String signingKey;
 
-    @Value("${axile.master.auth.jwt.lifespan}")
+    @Value("${axelix.master.auth.jwt.lifespan}")
     private Duration lifespan;
 
     @Test
@@ -393,17 +393,17 @@ class DefaultJwtEncoderServiceTest {
     //     * Minimal test configuration for {@link JwtEncoderService} integration testing.
     //     *
     //     * <p>Registers a {@link JwtEncoderService} bean for use in test cases. Relies on external configuration
-    //     * properties {@code axile.master.auth.jwt.algorithm}, {@code axile.master.auth.jwt.signing_key}
-    //     * and {@code axile.master.auth.jwt.lifespan} to initialize the service.</p>
+    //     * properties {@code axelix.master.auth.jwt.algorithm}, {@code axelix.master.auth.jwt.signing_key}
+    //     * and {@code axelix.master.auth.jwt.lifespan} to initialize the service.</p>
     //     */
     //    @TestConfiguration
     //    public static class JwtEncoderServiceConfig {
 
     //        @Bean
     //        public JwtEncoderService jwtEncoderService(
-    //                final @Value("${axile.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-    //                final @Value("${axile.master.auth.jwt.signing_key}") String signingKey,
-    //                final @Value("${axile.master.auth.jwt.lifespan}") Duration lifespan) {
+    //                final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
+    //                final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey,
+    //                final @Value("${axelix.master.auth.jwt.lifespan}") Duration lifespan) {
     //            return new DefaultJwtEncoderService(algorithm, signingKey, lifespan);
     //        }
     //    }

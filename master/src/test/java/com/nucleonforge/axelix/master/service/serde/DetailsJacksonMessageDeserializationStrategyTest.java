@@ -40,7 +40,7 @@ public class DetailsJacksonMessageDeserializationStrategyTest {
             new DetailsJacksonMessageDeserializationStrategy(new ObjectMapper());
 
     @Test
-    void shouldDeserializeAxileDetails() {
+    void shouldDeserializeAxelixDetails() {
         // language=json
         String response =
                 """

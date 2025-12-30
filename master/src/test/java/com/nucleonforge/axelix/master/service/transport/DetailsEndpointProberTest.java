@@ -129,7 +129,7 @@ public class DetailsEndpointProberTest {
     }
 
     @Test
-    void shouldReturnAxileDetailsResponse() {
+    void shouldReturnaxelixDetailsResponse() {
         // when.
         registry.register(createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
         InstanceDetails instanceDetails =

@@ -131,7 +131,7 @@ class ProfileManagementApiTest {
                 Instance.InstanceStatus.UP));
 
         ResponseEntity<String> response = restTemplate.postForEntity(
-                "/api/axile/profile-management/{instanceId}", defaultEntity(request), String.class, activeInstanceId);
+                "/api/axelix/profile-management/{instanceId}", defaultEntity(request), String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -153,7 +153,7 @@ class ProfileManagementApiTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/profile-management/{instanceId}",
+                "/api/axelix/profile-management/{instanceId}",
                 defaultEntity(request),
                 EndpointInvocationException.class,
                 instanceId);
@@ -167,7 +167,7 @@ class ProfileManagementApiTest {
         ProfileUpdatedRequest request = new ProfileUpdatedRequest(List.of("test-profile"));
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axile/profile-management/{instanceId}", request, EndpointInvocationException.class, instanceId);
+                "/api/axelix/profile-management/{instanceId}", request, EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

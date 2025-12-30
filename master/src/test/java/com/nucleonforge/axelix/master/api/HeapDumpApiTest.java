@@ -128,7 +128,7 @@ class HeapDumpApiTest {
                 TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         ResponseEntity<byte[]> response =
-                restTemplate.getForEntity("/api/axile/heapdump/{instanceId}", byte[].class, activeInstanceId);
+                restTemplate.getForEntity("/api/axelix/heapdump/{instanceId}", byte[].class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
@@ -148,7 +148,7 @@ class HeapDumpApiTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/heapdump/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/heapdump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -158,7 +158,7 @@ class HeapDumpApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<InstanceNotFoundException> response = restTemplate.getForEntity(
-                "/api/axile/heapdump/{instanceId}", InstanceNotFoundException.class, instanceId);
+                "/api/axelix/heapdump/{instanceId}", InstanceNotFoundException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

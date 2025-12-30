@@ -49,8 +49,8 @@ public class ShortPollingInstanceDiscoveryScheduler {
     }
 
     @Scheduled(
-            fixedDelayString = "${axile.master.discovery.polling.fixed-delay:60000}",
-            initialDelayString = "${axile.master.discovery.polling.initial-delay:30000}")
+            fixedDelayString = "${axelix.master.discovery.polling.fixed-delay:60000}",
+            initialDelayString = "${axelix.master.discovery.polling.initial-delay:30000}")
     public void performDiscovery() {
         logger.debug("Starting instance discovery refresh cycle");
 

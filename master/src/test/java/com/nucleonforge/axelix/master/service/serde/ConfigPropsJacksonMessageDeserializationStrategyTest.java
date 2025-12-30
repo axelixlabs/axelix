@@ -38,7 +38,7 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
             new ConfigPropsJacksonMessageDeserializationStrategy(new ObjectMapper());
 
     @Test
-    void shouldDeserializeAxileConfigPropsFeed() {
+    void shouldDeserializeAxelixConfigPropsFeed() {
         // language=json
         String response =
                 """

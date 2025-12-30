@@ -31,13 +31,13 @@ import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
  * @author Nikita Kirillov
  */
 @RestControllerEndpoint(id = "axelix-env")
-public class AxileEnvironmentEndpoint {
+public class AxelixEnvironmentEndpoint {
 
     private final EnvironmentEndpoint delegate;
 
     private final EnvPropertyEnricher envPropertyEnricher;
 
-    public AxileEnvironmentEndpoint(EnvironmentEndpoint delegate, EnvPropertyEnricher envPropertyEnricher) {
+    public AxelixEnvironmentEndpoint(EnvironmentEndpoint delegate, EnvPropertyEnricher envPropertyEnricher) {
         this.delegate = delegate;
         this.envPropertyEnricher = envPropertyEnricher;
     }

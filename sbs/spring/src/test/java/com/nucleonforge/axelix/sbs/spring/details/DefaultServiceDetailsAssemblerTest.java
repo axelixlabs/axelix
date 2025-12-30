@@ -85,7 +85,7 @@ class DefaultServiceDetailsAssemblerTest {
         BuildDetails build = result.build();
         assertThat(build.artifact()).isEqualTo("axelix-sbs");
         assertThat(build.version()).isEqualTo("1.0.0-SNAPSHOT");
-        assertThat(build.group()).isEqualTo("com.nucleonforge.axile");
+        assertThat(build.group()).isEqualTo("com.nucleonforge.axelix");
         assertThat(build.time()).isEqualTo("2025-10-30T09:10:13.428Z");
 
         OsDetails os = result.os();
@@ -102,7 +102,7 @@ class DefaultServiceDetailsAssemblerTest {
         @Primary
         public BuildProperties buildProperties() {
             Properties props = new Properties();
-            props.setProperty("group", "com.nucleonforge.axile");
+            props.setProperty("group", "com.nucleonforge.axelix");
             props.setProperty("artifact", "axelix-sbs");
             props.setProperty("version", "1.0.0-SNAPSHOT");
             props.setProperty("name", "test-application");

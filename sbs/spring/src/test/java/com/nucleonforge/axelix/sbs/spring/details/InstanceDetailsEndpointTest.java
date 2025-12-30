@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.MapEntry.entry;
 
 /**
- * Integration tests for {@link AxileDetailsEndpoint}.
+ * Integration tests for {@link AxelixDetailsEndpoint}.
  *
  * @since 30.10.2025
  * @author Nikita Kirillov
@@ -48,7 +48,7 @@ import static org.assertj.core.data.MapEntry.entry;
         properties = {"management.endpoints.web.exposure.include=axelix-details"})
 @Import({
     DefaultServiceDetailsAssemblerTest.DefaultServiceDetailsAssemblerTestConfig.class,
-    InstanceDetailsEndpointTest.AxileDetailsEndpointTestConfig.class
+    InstanceDetailsEndpointTest.AxelixDetailsEndpointTestConfig.class
 })
 class InstanceDetailsEndpointTest {
 
@@ -101,7 +101,7 @@ class InstanceDetailsEndpointTest {
                 .containsOnly(
                         entry("artifact", "axelix-sbs"),
                         entry("version", "1.0.0-SNAPSHOT"),
-                        entry("group", "com.nucleonforge.axile"),
+                        entry("group", "com.nucleonforge.axelix"),
                         entry("time", "2025-10-30T09:10:13.428Z"));
 
         assertThatJson(responseBody).inPath("os").isObject().containsOnlyKeys("name", "version", "arch");
@@ -141,7 +141,7 @@ class InstanceDetailsEndpointTest {
         assertThat(build).isNotNull();
         assertThat(build.artifact()).isEqualTo("axelix-sbs");
         assertThat(build.version()).isEqualTo("1.0.0-SNAPSHOT");
-        assertThat(build.group()).isEqualTo("com.nucleonforge.axile");
+        assertThat(build.group()).isEqualTo("com.nucleonforge.axelix");
         assertThat(build.time()).isEqualTo("2025-10-30T09:10:13.428Z");
 
         OsDetails os = details.os();
@@ -152,11 +152,11 @@ class InstanceDetailsEndpointTest {
     }
 
     @TestConfiguration
-    static class AxileDetailsEndpointTestConfig {
+    static class AxelixDetailsEndpointTestConfig {
 
         @Bean
-        public AxileDetailsEndpoint axileDetailsEndpoint(ServiceDetailsAssembler serviceDetailsAssembler) {
-            return new AxileDetailsEndpoint(serviceDetailsAssembler);
+        public AxelixDetailsEndpoint axelixDetailsEndpoint(ServiceDetailsAssembler serviceDetailsAssembler) {
+            return new AxelixDetailsEndpoint(serviceDetailsAssembler);
         }
     }
 }

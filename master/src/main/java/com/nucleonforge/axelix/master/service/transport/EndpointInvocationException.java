@@ -18,7 +18,7 @@ package com.nucleonforge.axelix.master.service.transport;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
- * The exception that occurs when Axile Master tried to reach a particular {@link ActuatorEndpoint}
+ * The exception that occurs when Axelix Master tried to reach a particular {@link ActuatorEndpoint}
  * on the managed service, but the managed service is either not available, or responded with non 2xx status
  * code.
  *

@@ -148,7 +148,7 @@ public class GetMetricsGroupsEndpointProberTest {
     }
 
     @Test
-    void shouldReturnAxileMetricsGroups() {
+    void shouldReturnAxelixMetricsGroups() {
         registry.register(
                 TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 

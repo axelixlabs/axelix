@@ -41,9 +41,7 @@ public class ConfigurationPropertiesCacheTest {
 
     @Test
     void shouldReturnConfigurationProperties() {
-        assertThat(configurationPropertiesCache.getAxileConfigProps())
-                .isNotNull()
-                .isInstanceOf(ConfigPropsFeed.class);
+        assertThat(configurationPropertiesCache.getConfigProps()).isNotNull().isInstanceOf(ConfigPropsFeed.class);
     }
 
     @TestConfiguration

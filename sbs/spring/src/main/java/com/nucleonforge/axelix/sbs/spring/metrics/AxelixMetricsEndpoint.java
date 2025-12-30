@@ -50,7 +50,7 @@ import com.nucleonforge.axelix.common.api.transform.units.BaseUnit;
  * @author Mikhail Polivakha
  */
 @Endpoint(id = "axelix-metrics")
-public class AxileMetricsEndpoint {
+public class AxelixMetricsEndpoint {
 
     private final MetricsEndpoint delegate;
     private final MeterRegistry registry;
@@ -60,7 +60,7 @@ public class AxileMetricsEndpoint {
 
     private final Set<Statistic> ACTUAL_VALUE_STATISTICS = Set.of(Statistic.VALUE, Statistic.TOTAL);
 
-    public AxileMetricsEndpoint(
+    public AxelixMetricsEndpoint(
             MetricsEndpoint delegate,
             MeterRegistry registry,
             BaseUnitParser baseUnitParser,

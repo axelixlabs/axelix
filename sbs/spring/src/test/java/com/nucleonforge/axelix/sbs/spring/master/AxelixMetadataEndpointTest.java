@@ -34,19 +34,19 @@ import org.springframework.http.ResponseEntity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link AxileMetadataEndpoint}.
+ * Integration tests for {@link AxelixMetadataEndpoint}.
  *
  * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({
-    AxileMetadataEndpoint.class,
-    AxileMetadataEndpointTest.CurrentConfig.class,
+    AxelixMetadataEndpoint.class,
+    AxelixMetadataEndpointTest.CurrentConfig.class,
     DefaultServiceMetadataAssembler.class,
     CommitIdPluginGitInformationProvider.class,
     CommitIdPluginShortBuildInfoProvider.class
 })
-class AxileMetadataEndpointTest {
+class AxelixMetadataEndpointTest {
 
     @Autowired
     private TestRestTemplate testRestTemplate;

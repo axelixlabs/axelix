@@ -56,10 +56,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(
         properties = {
-            "axile.master.discovery.auto=true",
-            "axile.master.discovery.platform=kubernetes",
-            "axile.master.discovery.polling.fixed-delay=1000",
-            "axile.master.discovery.polling.initial-delay=0"
+            "axelix.master.discovery.auto=true",
+            "axelix.master.discovery.platform=kubernetes",
+            "axelix.master.discovery.polling.fixed-delay=1000",
+            "axelix.master.discovery.polling.initial-delay=0"
         })
 class ShortPollingInstanceDiscoverySchedulerTest {
 
@@ -130,7 +130,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         mockWebServer.enqueue(
                 new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
-        ServiceInstance k8sInstance1 = Instancio.of(AxileKubernetesServiceInstance.class)
+        ServiceInstance k8sInstance1 = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instance1Id)
                 .set(Select.field("serviceId"), service1)
                 .set(Select.field("secure"), false)
@@ -138,7 +138,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 .set(Select.field("port"), uri.getPort())
                 .create();
 
-        ServiceInstance k8sInstance2 = Instancio.of(AxileKubernetesServiceInstance.class)
+        ServiceInstance k8sInstance2 = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instance2Id)
                 .set(Select.field("serviceId"), service2)
                 .set(Select.field("secure"), false)
@@ -208,7 +208,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         mockWebServer.enqueue(
                 new MockResponse().setBody(secondResponse).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
-        ServiceInstance k8sInstance = Instancio.of(AxileKubernetesServiceInstance.class)
+        ServiceInstance k8sInstance = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instanceId)
                 .set(Select.field("serviceId"), service)
                 .set(Select.field("secure"), false)
@@ -270,7 +270,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             }
         });
 
-        ServiceInstance k8sServiceInstance = Instancio.of(AxileKubernetesServiceInstance.class)
+        ServiceInstance k8sServiceInstance = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), instanceId)
                 .set(Select.field("serviceId"), serviceId)
                 .set(Select.field("secure"), false)

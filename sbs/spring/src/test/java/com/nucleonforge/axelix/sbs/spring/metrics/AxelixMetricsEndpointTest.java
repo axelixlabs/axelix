@@ -48,21 +48,21 @@ import com.nucleonforge.axelix.common.api.transform.units.MegabytesMemoryBaseUni
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link AxileMetricsEndpoint}.
+ * Integration tests for {@link AxelixMetricsEndpoint}.
  *
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({
-    AxileMetricsEndpoint.class,
+    AxelixMetricsEndpoint.class,
     MetricsEndpoint.class,
     DefaultServiceMetricsGroupsAssembler.class,
     BaseUnitParser.class,
     KilobytesMemoryBaseUnitValueTransformer.class,
     BytesMemoryBaseUnitValueTransformer.class
 })
-class AxileMetricsEndpointTest {
+class AxelixMetricsEndpointTest {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -171,21 +171,21 @@ class AxileMetricsEndpointTest {
     private static Stream<Arguments> metricsGroups() {
         return Stream.of(
                 Arguments.of(
-                        "axileMetrics",
-                        "axileMetrics.test.metric1",
-                        "Test metric belonging to the `axileMetrics` group with a description"),
+                        "axelixMetrics",
+                        "axelixMetrics.test.metric1",
+                        "Test metric belonging to the `axelixMetrics` group with a description"),
                 Arguments.of(
-                        "axileMetrics",
-                        "axileMetrics.test.metric2",
-                        "Test metric belonging to the `axileMetrics` group with a description"),
-                Arguments.of("axileMetrics", "axileMetrics.test.metric3", null),
+                        "axelixMetrics",
+                        "axelixMetrics.test.metric2",
+                        "Test metric belonging to the `axelixMetrics` group with a description"),
+                Arguments.of("axelixMetrics", "axelixMetrics.test.metric3", null),
                 Arguments.of(
                         "testMetrics",
-                        "testMetrics.axile.metric1",
+                        "testMetrics.axelix.metric1",
                         "Test metric belonging to the `testMetrics` group with a description"),
                 Arguments.of(
                         "testMetrics",
-                        "testMetrics.axile.metric2",
+                        "testMetrics.axelix.metric2",
                         "Test metric belonging to the `testMetrics` group with a description"),
                 Arguments.of(
                         "Others",
@@ -194,26 +194,26 @@ class AxileMetricsEndpointTest {
     }
 
     @TestConfiguration
-    static class AxileMetricsEndpointTestConfiguration {
+    static class AxelixMetricsEndpointTestConfiguration {
 
         @Bean
         public MeterBinder groupingMetrics() {
             return registry -> {
-                Counter.builder("axileMetrics.test.metric1")
-                        .description("Test metric belonging to the `axileMetrics` group with a description")
+                Counter.builder("axelixMetrics.test.metric1")
+                        .description("Test metric belonging to the `axelixMetrics` group with a description")
                         .register(registry);
 
-                Counter.builder("axileMetrics.test.metric2")
-                        .description("Test metric belonging to the `axileMetrics` group with a description")
+                Counter.builder("axelixMetrics.test.metric2")
+                        .description("Test metric belonging to the `axelixMetrics` group with a description")
                         .register(registry);
 
-                Counter.builder("axileMetrics.test.metric3").register(registry);
+                Counter.builder("axelixMetrics.test.metric3").register(registry);
 
-                Counter.builder("testMetrics.axile.metric1")
+                Counter.builder("testMetrics.axelix.metric1")
                         .description("Test metric belonging to the `testMetrics` group with a description")
                         .register(registry);
 
-                Counter.builder("testMetrics.axile.metric2").register(registry);
+                Counter.builder("testMetrics.axelix.metric2").register(registry);
 
                 Counter.builder("standalone")
                         .description(

@@ -26,7 +26,7 @@ import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 
 /**
- * Central registry of all the {@link Instance instances} that this Axile Master instance is aware about.
+ * Central registry of all the {@link Instance instances} that this Master deployment is aware about.
  * It is guaranteed that all the instances inside this registry have the unique instance id. The implementations
  * must be thread safe.
  *

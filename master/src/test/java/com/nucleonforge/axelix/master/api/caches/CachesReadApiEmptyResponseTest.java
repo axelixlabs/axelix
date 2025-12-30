@@ -115,7 +115,7 @@ public class CachesReadApiEmptyResponseTest {
 
         // when
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/caches/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axelix/caches/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

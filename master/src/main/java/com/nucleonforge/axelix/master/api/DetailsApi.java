@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nucleonforge.axelix.common.api.InstanceDetails;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
@@ -52,11 +52,11 @@ import com.nucleonforge.axelix.master.service.transport.DetailsEndpointProber;
 public class DetailsApi {
 
     private final DetailsEndpointProber detailsEndpointProber;
-    private final Converter<DetailsConversionRequest, AxileDetailsResponse> converter;
+    private final Converter<DetailsConversionRequest, InstanceDetailsResponse> converter;
 
     public DetailsApi(
             DetailsEndpointProber detailsEndpointProber,
-            Converter<DetailsConversionRequest, AxileDetailsResponse> converter) {
+            Converter<DetailsConversionRequest, InstanceDetailsResponse> converter) {
         this.detailsEndpointProber = detailsEndpointProber;
         this.converter = converter;
     }
@@ -70,7 +70,7 @@ public class DetailsApi {
                         content =
                                 @Content(
                                         mediaType = "application/json",
-                                        schema = @Schema(implementation = AxileDetailsResponse.class))),
+                                        schema = @Schema(implementation = InstanceDetailsResponse.class))),
                 @ApiResponse(
                         description = "Bad Request",
                         responseCode = "400",
@@ -88,7 +88,7 @@ public class DetailsApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.DetailsApi.INSTANCE_ID)
-    public AxileDetailsResponse getDetailsResponse(@PathVariable("instanceId") String instanceId)
+    public InstanceDetailsResponse getDetailsResponse(@PathVariable("instanceId") String instanceId)
             throws InstanceNotFoundException {
 
         InstanceId id = InstanceId.of(instanceId);

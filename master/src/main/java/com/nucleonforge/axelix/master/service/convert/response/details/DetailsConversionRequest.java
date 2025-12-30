@@ -19,7 +19,7 @@ import com.nucleonforge.axelix.common.api.InstanceDetails;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 
 /**
- * Request for details conversion. Required by {@link AxileDetailsConverter}.
+ * Request for details conversion. Required by {@link InstanceDetailsConverter}.
  *
  * @author Mikhail Polivakha
  */

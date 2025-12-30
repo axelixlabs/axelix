@@ -16,7 +16,7 @@
 package com.nucleonforge.axelix.master.autoconfiguration.auth;
 
 /**
- * Configuration for static-admin for the Axile Master - the username/password pair.
+ * Configuration of the static-admin.
  *
  * @author Mikhail Polivakha
  */

@@ -26,7 +26,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesCache;
-import com.nucleonforge.axelix.sbs.spring.env.AxileEnvironmentEndpoint;
+import com.nucleonforge.axelix.sbs.spring.env.AxelixEnvironmentEndpoint;
 import com.nucleonforge.axelix.sbs.spring.env.DefaultEnvPropertyEnricher;
 import com.nucleonforge.axelix.sbs.spring.env.DefaultPropertyMetadataExtractor;
 import com.nucleonforge.axelix.sbs.spring.env.DefaultPropertyNameNormalizer;
@@ -36,7 +36,7 @@ import com.nucleonforge.axelix.sbs.spring.env.PropertyNameNormalizer;
 import com.nucleonforge.axelix.sbs.spring.env.ValueInjectionTrackerBeanPostProcessor;
 
 /**
- * Auto-configuration for the {@link AxileEnvironmentEndpoint}.
+ * Auto-configuration for the {@link AxelixEnvironmentEndpoint}.
  *
  * @since 21.10.2025
  * @author Nikita Kirillov
@@ -44,10 +44,10 @@ import com.nucleonforge.axelix.sbs.spring.env.ValueInjectionTrackerBeanPostProce
 @AutoConfiguration(
         after = {
             EnvironmentEndpointAutoConfiguration.class,
-            AxileConfigurationsPropertiesEndpointAutoConfiguration.class
+            AxelixConfigurationsPropertiesEndpointAutoConfiguration.class
         })
 @ConditionalOnAvailableEndpoint(endpoint = EnvironmentEndpoint.class)
-public class AxileEnvironmentEndpointAutoConfiguration {
+public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
@@ -76,9 +76,9 @@ public class AxileEnvironmentEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxileEnvironmentEndpoint axileEnvironmentEndpoint(
+    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
             EnvironmentEndpoint environmentEndpoint, EnvPropertyEnricher envPropertyEnricher) {
-        return new AxileEnvironmentEndpoint(environmentEndpoint, envPropertyEnricher);
+        return new AxelixEnvironmentEndpoint(environmentEndpoint, envPropertyEnricher);
     }
 
     @Bean

@@ -25,12 +25,12 @@ import com.nucleonforge.axelix.common.api.InstanceDetails.GitDetails;
 import com.nucleonforge.axelix.common.api.InstanceDetails.OsDetails;
 import com.nucleonforge.axelix.common.api.InstanceDetails.RuntimeDetails;
 import com.nucleonforge.axelix.common.api.InstanceDetails.SpringDetails;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.BuildProfile;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.GitProfile;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.OSProfile;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.RuntimeProfile;
-import com.nucleonforge.axelix.master.api.response.AxileDetailsResponse.SpringProfile;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse.BuildProfile;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse.GitProfile;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse.OSProfile;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse.RuntimeProfile;
+import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse.SpringProfile;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
@@ -38,7 +38,7 @@ import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
 /**
- * The {@link Converter} from {@link InstanceDetails} to {@link AxileDetailsResponse}.
+ * The {@link Converter} from {@link InstanceDetails} to {@link InstanceDetailsResponse}.
  *
  * @author Nikita Kirilov
  * @author Sergey Cherkasov
@@ -48,16 +48,16 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 //  available in the Instance itself. But it is also present in the axelix-details endpoint response.
 //  What should we do about it?
 @Service
-public class AxileDetailsConverter implements Converter<DetailsConversionRequest, AxileDetailsResponse> {
+public class InstanceDetailsConverter implements Converter<DetailsConversionRequest, InstanceDetailsResponse> {
 
     private final InstanceRegistry instanceRegistry;
 
-    public AxileDetailsConverter(InstanceRegistry instanceRegistry) {
+    public InstanceDetailsConverter(InstanceRegistry instanceRegistry) {
         this.instanceRegistry = instanceRegistry;
     }
 
     @Override
-    public @NonNull AxileDetailsResponse convertInternal(@NonNull DetailsConversionRequest request) {
+    public @NonNull InstanceDetailsResponse convertInternal(@NonNull DetailsConversionRequest request) {
         InstanceDetails source = request.instanceDetails();
         InstanceId instanceId = request.instanceId();
 
@@ -70,12 +70,12 @@ public class AxileDetailsConverter implements Converter<DetailsConversionRequest
         BuildProfile buildProfile = buildDetailsConverter(source.build());
         OSProfile osProfile = osDetailsConverter(source.os());
 
-        return new AxileDetailsResponse(
+        return new InstanceDetailsResponse(
                 serviceName, gitProfile, runtimeProfile, springProfile, buildProfile, osProfile);
     }
 
     private GitProfile gitDetailsConverter(GitDetails gitDetails) {
-        return new AxileDetailsResponse.GitProfile(
+        return new InstanceDetailsResponse.GitProfile(
                 gitDetails.commitShaShort(),
                 gitDetails.branch(),
                 gitDetails.commitAuthor().name(),
@@ -99,7 +99,7 @@ public class AxileDetailsConverter implements Converter<DetailsConversionRequest
     }
 
     private BuildProfile buildDetailsConverter(BuildDetails buildDetails) {
-        return new AxileDetailsResponse.BuildProfile(
+        return new InstanceDetailsResponse.BuildProfile(
                 buildDetails.artifact(), buildDetails.version(), buildDetails.group(), buildDetails.time());
     }
 

@@ -141,7 +141,7 @@ public class LoggersApiGroupByNameTest {
 
         // when.
         ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axile/loggers/{instanceId}/group/{groupName}", String.class, activeInstanceId, groupName);
+                "/api/axelix/loggers/{instanceId}/group/{groupName}", String.class, activeInstanceId, groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -164,7 +164,7 @@ public class LoggersApiGroupByNameTest {
 
         // when.
         ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axile/loggers/{instanceId}/group/{groupName}", String.class, activeInstanceId, groupName);
+                "/api/axelix/loggers/{instanceId}/group/{groupName}", String.class, activeInstanceId, groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -184,7 +184,7 @@ public class LoggersApiGroupByNameTest {
 
         // when.
         ResponseEntity<?> response = restTemplate.getForEntity(
-                "/api/axile/loggers/{instanceId}/group/{groupName}", Void.class, instanceId, groupName);
+                "/api/axelix/loggers/{instanceId}/group/{groupName}", Void.class, instanceId, groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -197,7 +197,7 @@ public class LoggersApiGroupByNameTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/loggers/{instanceId}/group/{groupName}",
+                "/api/axelix/loggers/{instanceId}/group/{groupName}",
                 EndpointInvocationException.class,
                 instanceId,
                 groupName);

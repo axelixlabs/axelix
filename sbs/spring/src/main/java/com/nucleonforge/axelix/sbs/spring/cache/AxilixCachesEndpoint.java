@@ -36,13 +36,13 @@ import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
  * @author Nikita Kirillov
  */
 @RestControllerEndpoint(id = "axelix-caches")
-public class AxileCachesEndpoint {
+public class AxilixCachesEndpoint {
 
     private final CacheDispatcher dispatcher;
 
     private final CachesEndpoint delegate;
 
-    public AxileCachesEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
+    public AxilixCachesEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
         this.dispatcher = dispatcher;
         this.delegate = delegate;
     }

@@ -242,8 +242,8 @@ class JwtAuthorizationFilterTest {
 
         @Bean
         public JwtDecoderService jwtDecoderService(
-                final @Value("${axile.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-                final @Value("${axile.master.auth.jwt.signing-key}") String signingKey) {
+                final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
+                final @Value("${axelix.master.auth.jwt.signing-key}") String signingKey) {
             return new DefaultJwtDecoderService(algorithm, signingKey);
         }
 

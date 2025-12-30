@@ -149,7 +149,7 @@ class KubernetesInstanceDiscovererTest {
         });
 
         // TODO: that is not compile-time safe. Can we do better?
-        ServiceInstance serviceInstance = Instancio.of(AxileKubernetesServiceInstance.class)
+        ServiceInstance serviceInstance = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), activeInstanceId)
                 .set(Select.field("secure"), false)
                 .set(Select.field("host"), uri.getHost())
@@ -229,7 +229,7 @@ class KubernetesInstanceDiscovererTest {
         // spotless:off
         // firstService -> bad application version instance
         ServiceInstance firstServiceBadVersion = Instancio
-            .of(AxileKubernetesServiceInstance.class)
+            .of(KubernetesServiceInstance.class)
             .set(Select.field("instanceId"), firstServiceInstanceBadVersionId)
             .set(Select.field("serviceId"), firstServiceId)
             .set(Select.field("secure"), false)
@@ -239,7 +239,7 @@ class KubernetesInstanceDiscovererTest {
 
         // secondService -> good application version instance
         ServiceInstance secondServiceGoodVersion = Instancio
-            .of(AxileKubernetesServiceInstance.class)
+            .of(KubernetesServiceInstance.class)
             .set(Select.field("instanceId"), secondServiceInstanceGoodVersionId)
             .set(Select.field("serviceId"), secondServiceId)
             .set(Select.field("secure"), false)
@@ -280,7 +280,7 @@ class KubernetesInstanceDiscovererTest {
             }
         });
 
-        ServiceInstance k8sPod = Instancio.of(AxileKubernetesServiceInstance.class)
+        ServiceInstance k8sPod = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), testInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
@@ -347,7 +347,7 @@ class KubernetesInstanceDiscovererTest {
             }
         });
 
-        ServiceInstance healthyK8sPod = Instancio.of(AxileKubernetesServiceInstance.class)
+        ServiceInstance healthyK8sPod = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), healthyInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
@@ -355,7 +355,7 @@ class KubernetesInstanceDiscovererTest {
                 .set(Select.field("port"), uri.getPort())
                 .create();
 
-        ServiceInstance timeoutK8sPod = Instancio.of(AxileKubernetesServiceInstance.class)
+        ServiceInstance timeoutK8sPod = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), timeoutInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
@@ -398,7 +398,7 @@ class KubernetesInstanceDiscovererTest {
         mockWebServer.enqueue(
                 new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
-        ServiceInstance healthyK8SPod = Instancio.of(AxileKubernetesServiceInstance.class)
+        ServiceInstance healthyK8SPod = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), healthyK8SInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)
@@ -406,7 +406,7 @@ class KubernetesInstanceDiscovererTest {
                 .set(Select.field("port"), uri.getPort())
                 .create();
 
-        ServiceInstance connectionRefusedPod = Instancio.of(AxileKubernetesServiceInstance.class)
+        ServiceInstance connectionRefusedPod = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), connectionRefusedInstanceId)
                 .set(Select.field("serviceId"), testServiceId)
                 .set(Select.field("secure"), false)

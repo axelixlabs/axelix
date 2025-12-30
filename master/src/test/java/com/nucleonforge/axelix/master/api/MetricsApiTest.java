@@ -214,7 +214,7 @@ public class MetricsApiTest {
                 TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axile/metrics/{instanceId}", String.class, activeInstanceId);
+                restTemplate.getForEntity("/api/axelix/metrics/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -232,7 +232,7 @@ public class MetricsApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/metrics/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/metrics/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -244,7 +244,7 @@ public class MetricsApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axile/metrics/{instanceId}", EndpointInvocationException.class, instanceId);
+                "/api/axelix/metrics/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

@@ -21,7 +21,7 @@ import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 
 /**
  * Interface that is capable to convert values from type {@code ConfigurationPropertiesDescriptor}
- * to type {@code AxileConfigPropsFeed}.
+ * to type {@link ConfigPropsFeed}.
  *
  * @author Sergey Cherkasov
  */
@@ -29,7 +29,7 @@ public interface ConfigurationPropertiesConverter {
 
     /**
      * Converts the original configprops response of type {@code ConfigurationPropertiesDescriptor}
-     * to type {@code AxileConfigPropsFeed}
+     * to type {@link ConfigPropsFeed}.
      *
      * @param originalDescriptor the original {@code @ConfigurationProperties} descriptor from Spring Boot
      * @return converted {@code @ConfigurationProperties} descriptor

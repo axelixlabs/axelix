@@ -89,7 +89,7 @@ public class LibraryDiscovererAutoConfiguration {
         // TODO:
         //  Again, we're not exactly sure about the shape of our properties and their prefixes.
         //  We're going to return to that in the future.
-        @ConditionalOnProperty(prefix = "axile.sbom.cyclonedx", value = "location")
+        @ConditionalOnProperty(prefix = "axelix.sbom.cyclonedx", value = "location")
         static class OnExplicitPathToCycloneDXSbom {}
     }
 }
