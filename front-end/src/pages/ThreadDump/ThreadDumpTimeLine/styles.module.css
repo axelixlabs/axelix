@@ -1,6 +1,5 @@
 .MainWrapper {
     display: flex;
-    column-gap: 75px;
     position: relative;
 }
 
@@ -16,6 +15,8 @@
 
 .TimeSlot {
     font-weight: 600;
+    width: 75px;
+    text-align: center;
     position: relative;
 }
 

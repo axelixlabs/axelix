@@ -177,3 +177,20 @@ export interface IThreadDumpResponseBody {
      */
     threads: IThread[];
 }
+
+export interface IThreadGroup {
+    /**
+     * Id for the thread group
+     */
+    id: string;
+
+    /**
+     * The thread associated with this group
+     */
+    thread: IThread;
+
+    /**
+     * Number of threads combined in the group
+     */
+    count: number;
+}

@@ -18,8 +18,8 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { Accordion, EmptyHandler, Loader } from "components";
-import { fetchData } from "helpers";
-import { type IThreadDumpResponseBody, StatefulRequest } from "models";
+import { fetchData, getDisplayedThreadGroup } from "helpers";
+import { type IThread, type IThreadDumpResponseBody, type IThreadGroup, StatefulRequest } from "models";
 import { getThreadDumpData } from "services";
 
 import { ThreadDumpAccordionBody } from "./ThreadDumpAccordionBody";
@@ -32,6 +32,7 @@ const ThreadDump = () => {
     const { instanceId } = useParams();
 
     const [threadDumpData, setThreadDumpData] = useState(StatefulRequest.loading<IThreadDumpResponseBody>());
+    const [selectedGroups, setSelectedGroups] = useState<Record<string, IThreadGroup>>({});
 
     useEffect(() => {
         const doFetch = () => {
@@ -54,9 +55,17 @@ const ThreadDump = () => {
     }
 
     const threadDumpFeed = threadDumpData.response!.threads;
-    const sortedThreadDump = threadDumpFeed.sort(
+    const sortedThreadDump = threadDumpFeed.toSorted(
         (currentThread, nextThread) => nextThread.priority - currentThread.priority,
     );
+
+    const onAccordionClose = (threadDump: IThread): void => {
+        setSelectedGroups((prev) => {
+            const prevGroups = { ...prev };
+            delete prevGroups[threadDump.threadId];
+            return prevGroups;
+        });
+    };
 
     return (
         <>
@@ -66,14 +75,21 @@ const ThreadDump = () => {
                 <ThreadDumpTimeLine />
             </div>
 
-            <div className="AccordionsWrapper">
+            <div className={`AccordionsWrapper ${styles.AccordionsWrapper}`}>
                 {sortedThreadDump.map((threadDump) => (
                     <Accordion
-                        header={<ThreadDumpAccordionHeader threadDump={threadDump} />}
+                        header={
+                            <ThreadDumpAccordionHeader
+                                threadDump={threadDump}
+                                selectedGroups={selectedGroups}
+                                setSelectedGroups={setSelectedGroups}
+                            />
+                        }
                         key={threadDump.threadId}
+                        onClose={() => onAccordionClose(threadDump)}
                         hideArrowIcon
                     >
-                        <ThreadDumpAccordionBody thread={threadDump} />
+                        <ThreadDumpAccordionBody thread={getDisplayedThreadGroup(threadDump, selectedGroups)} />
                     </Accordion>
                 ))}
             </div>

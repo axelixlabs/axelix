@@ -16,7 +16,7 @@
 import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { statePalette } from "utils";
+import { loggersColors } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -51,8 +51,7 @@ export const Levels = ({ levels, checkedLevel, configuredLevel, handleChange }: 
         <div className={styles.MainWrapper}>
             <div className={styles.LevelsWrapper}>
                 {levels.map((level) => {
-                    // @ts-expect-error todo fix type in future
-                    const color = statePalette[level] || statePalette.DEFAULT;
+                    const color = loggersColors[level] || loggersColors.DEFAULT;
 
                     return (
                         <div className={styles.RadioGroupWrapper} key={level}>

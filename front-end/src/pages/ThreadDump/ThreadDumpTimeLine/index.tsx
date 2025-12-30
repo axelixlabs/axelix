@@ -16,7 +16,7 @@
 import { useEffect, useState } from "react";
 
 import { generateTimeSlots } from "helpers";
-import { TEN_MINUTES_MILLISECDONDS } from "utils";
+import { THREAD_DUMP_INTERVAL_MS } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -28,7 +28,7 @@ export const ThreadDumpTimeLine = () => {
 
         const intervalId = setInterval(() => {
             setTimeSlots(generateTimeSlots());
-        }, TEN_MINUTES_MILLISECDONDS);
+        }, THREAD_DUMP_INTERVAL_MS);
 
         return () => clearInterval(intervalId);
     }, []);
@@ -36,9 +36,9 @@ export const ThreadDumpTimeLine = () => {
     return (
         <div className={styles.MainWrapper}>
             {timeSlots.map((timeSlot, index) => (
-                <span className={styles.TimeSlot} key={index}>
+                <div className={styles.TimeSlot} key={index}>
                     {timeSlot.toLocaleTimeString([], { hour12: false })}
-                </span>
+                </div>
             ))}
         </div>
     );

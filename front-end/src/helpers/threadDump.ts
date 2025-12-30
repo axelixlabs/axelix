@@ -13,45 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { EThreadDumpStateColors, EThreadState, type IThread } from "models";
-import { FIFTEEN_SECONDS, TEN_MINUTES_MILLISECDONDS } from "utils";
+import accordionStyles from "components/Accordion/styles.module.css";
+import type { MouseEvent } from "react";
 
-export const getThreadStateColor = (threadDump: IThread) => {
+import { EThreadState, type IColorPallete, type IThread, type IThreadGroup } from "models";
+import { THREAD_DUMP_INTERVAL_MS, TIMELINE_SEGMENT_INTERVAL_MS, colorPalette } from "utils";
+
+export const getThreadStateColor = (threadDump: IThread): IColorPallete => {
     const { threadState, inNative, suspended } = threadDump;
 
     if (threadState === EThreadState.RUNNABLE) {
-        return inNative ? EThreadDumpStateColors.BLUE : EThreadDumpStateColors.GREEN;
+        return inNative ? colorPalette.BLUE : colorPalette.GREEN;
     }
 
     if ((threadState === EThreadState.WAITING && !suspended) || threadState === EThreadState.TIMED_WAITING) {
-        return EThreadDumpStateColors.ORANGE;
+        return colorPalette.ORANGE;
     }
 
     if (threadState === EThreadState.WAITING) {
-        return EThreadDumpStateColors.YELLOW;
+        return colorPalette.YELLOW;
     }
 
     if (threadState === EThreadState.BLOCKED) {
-        return EThreadDumpStateColors.RED;
+        return colorPalette.RED;
     }
 
     if (threadState === EThreadState.NEW) {
-        return EThreadDumpStateColors.WHITE;
+        return colorPalette.WHITE;
     }
 
     if (threadState === EThreadState.TERMINATED) {
-        return EThreadDumpStateColors.GREY;
+        return colorPalette.GREY;
     }
+
+    return colorPalette.PURPLE;
 };
 
-export const generateTimeSlots = () => {
+export const generateTimeSlots = (): Date[] => {
     const now = new Date();
 
     // 15 seconds interval between time slots
-    const stepMilliseconds = FIFTEEN_SECONDS;
+    const stepMilliseconds = TIMELINE_SEGMENT_INTERVAL_MS;
 
-    // 10 minutes ahead from now
-    const endTime = new Date(now.getTime() + TEN_MINUTES_MILLISECDONDS);
+    // 5 minutes ahead from now
+    const endTime = new Date(now.getTime() + THREAD_DUMP_INTERVAL_MS);
     const slots: Date[] = [];
 
     let currentTime = new Date(now);
@@ -63,4 +68,56 @@ export const generateTimeSlots = () => {
     }
 
     return slots;
+};
+
+const isSameThreadDumpGroup = (currentThreadGroup: IThreadGroup | null, thread: IThread): boolean => {
+    const isSameState = currentThreadGroup!.thread.threadState === thread.threadState;
+    const isSameBlockedCount = currentThreadGroup!.thread.blockedCount === thread.blockedCount;
+    const isSameWaitedCount = currentThreadGroup!.thread.waitedCount === thread.waitedCount;
+
+    return isSameState && isSameBlockedCount && isSameWaitedCount;
+};
+
+export const generateThreadGroups = (history: IThread[]): IThreadGroup[] => {
+    const threadGroups: IThreadGroup[] = [];
+    let currentThreadGroup: IThreadGroup | null = null;
+
+    history.forEach((thread, index) => {
+        if (currentThreadGroup && isSameThreadDumpGroup(currentThreadGroup, thread)) {
+            currentThreadGroup!.count++;
+            currentThreadGroup.thread = thread;
+        } else {
+            const id = `${thread.threadId}-${thread.threadState}-${thread.blockedCount}-${thread.waitedCount}-${index}`;
+
+            currentThreadGroup = {
+                id: id,
+                thread: thread,
+                count: 1,
+            };
+
+            threadGroups.push(currentThreadGroup);
+        }
+    });
+
+    return threadGroups;
+};
+
+export const getDisplayedThreadGroup = (thread: IThread, selectedGroups: Record<string, IThreadGroup>): IThread => {
+    const threadGroup = selectedGroups[String(thread.threadId)];
+
+    if (threadGroup) {
+        return threadGroup.thread;
+    }
+
+    return thread;
+};
+
+export const stopPropagationOnAccordionExpand = (e: MouseEvent<HTMLDivElement>): void => {
+    const timelineMainWrapper = e.currentTarget;
+    const accordionWrapper = timelineMainWrapper.closest(`.${accordionStyles.MainWrapper}`) as HTMLElement | null;
+    const contentVisible = accordionWrapper?.classList.contains(accordionStyles.Open) ?? false;
+
+    if (contentVisible) {
+        e.stopPropagation();
+    }
 };

@@ -24,5 +24,8 @@ export const threadDumpStateLetters: Record<EThreadState, string> = {
     [EThreadState.TERMINATED]: "F",
 };
 
-export const TEN_MINUTES_MILLISECDONDS = 10 * 60 * 1000;
-export const FIFTEEN_SECONDS = 15 * 1000;
+// 5 minutes in milliseconds
+export const THREAD_DUMP_INTERVAL_MS = 5 * 60 * 1000;
+
+// 15 seconds in milliseconds
+export const TIMELINE_SEGMENT_INTERVAL_MS = 15 * 1000;

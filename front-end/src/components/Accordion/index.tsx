@@ -44,6 +44,11 @@ interface IProps {
      * If true, the arrow icon will not be displayed.
      */
     hideArrowIcon?: boolean;
+
+    /**
+     * Function triggered when the accordion is closed.
+     */
+    onClose?: () => void;
 }
 
 export const Accordion = ({
@@ -53,10 +58,15 @@ export const Accordion = ({
     contentStyles,
     accordionExpanded = false,
     hideArrowIcon = false,
+    onClose,
 }: PropsWithChildren<IProps>) => {
     const [open, setOpen] = useState<boolean>(accordionExpanded);
 
     const handlerClick = (): void => {
+        if (open && onClose) {
+            onClose();
+        }
+
         setOpen(!open);
     };
 
@@ -66,11 +76,9 @@ export const Accordion = ({
                 {!hideArrowIcon && <img src={ArrowIcon} alt="Arrow icon" className={styles.Icon} />}
                 <div className={styles.Header}>{header}</div>
             </div>
-            {open && (
-                <div className={styles.ContentWrapper}>
-                    <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
-                </div>
-            )}
+            <div className={styles.ContentWrapper}>
+                <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
+            </div>
         </div>
     );
 };

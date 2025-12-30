@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getThreadStateColor } from "helpers";
-import { type IThread } from "models";
+import type { Dispatch, SetStateAction } from "react";
+
+import { generateThreadGroups, getThreadStateColor, stopPropagationOnAccordionExpand } from "helpers";
+import type { IThread, IThreadGroup } from "models";
 
 import styles from "./styles.module.css";
 
@@ -23,20 +25,54 @@ interface IProps {
      * An array of thread snapshots representing the thread's history.
      */
     history: IThread[];
+
+    /**
+     * Map of selected thread groups
+     */
+    selectedGroups: Record<string, IThreadGroup>;
+
+    /**
+     * Setter to update the selected thread groups
+     */
+    setSelectedGroups: Dispatch<SetStateAction<Record<string, IThreadGroup>>>;
 }
 
-export const ThreadDumpTimeline = ({ history }: IProps) => {
+export const ThreadDumpTimeline = ({ history, selectedGroups, setSelectedGroups }: IProps) => {
+    const threadGroups = generateThreadGroups(history);
+
     return (
         <div className={styles.MainWrapper}>
-            {history.map((thread, index) => (
-                <div
-                    className={styles.SingleHistoryChunk}
-                    style={{
-                        backgroundColor: getThreadStateColor(thread),
-                    }}
-                    key={index}
-                />
-            ))}
+            {threadGroups.map((threadGroup) => {
+                const { id, count, thread } = threadGroup;
+                const threadId = String(thread.threadId);
+
+                const isGroupSelected = selectedGroups[threadId]?.id === id;
+
+                const color = getThreadStateColor(thread);
+
+                return (
+                    <div
+                        key={id}
+                        className={`${styles.ThreadGroup} ${isGroupSelected ? styles.SelectedThreadGroup : ""}`}
+                        style={
+                            {
+                                width: `${5 * count}px`,
+                                "--color-primary": color.colorPrimary,
+                                "--color-primary-hover": color.colorPrimaryHover,
+                                "--color-primary-active": color.colorPrimaryActive,
+                            } as React.CSSProperties
+                        }
+                        onClick={(e) => {
+                            stopPropagationOnAccordionExpand(e);
+
+                            setSelectedGroups((prev) => ({
+                                ...prev,
+                                [String(thread.threadId)]: threadGroup,
+                            }));
+                        }}
+                    />
+                );
+            })}
         </div>
     );
 };

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
 import { getThreadStateColor } from "helpers";
-import type { IThread } from "models";
-import { TEN_MINUTES_MILLISECDONDS, threadDumpStateLetters } from "utils";
+import type { IThread, IThreadGroup } from "models";
+import { THREAD_DUMP_INTERVAL_MS, threadDumpStateLetters } from "utils";
 
 import { ThreadDumpTimeline } from "../ThreadDumpStatusTimeline";
 
@@ -28,15 +28,26 @@ interface IProps {
      *  An object representing the thread dump.
      */
     threadDump: IThread;
+
+    /**
+     * Map of selected thread groups
+     */
+    selectedGroups: Record<string, IThreadGroup>;
+
+    /**
+     * Setter to update the selected thread groups
+     */
+    setSelectedGroups: Dispatch<SetStateAction<Record<string, IThreadGroup>>>;
 }
 
-export const ThreadDumpAccordionHeader = ({ threadDump }: IProps) => {
+export const ThreadDumpAccordionHeader = ({ threadDump, selectedGroups, setSelectedGroups }: IProps) => {
     const [history, setHistory] = useState<IThread[]>([]);
 
     useEffect(() => {
         const id = setInterval(() => {
             setHistory([]);
-        }, TEN_MINUTES_MILLISECDONDS);
+            setSelectedGroups({});
+        }, THREAD_DUMP_INTERVAL_MS);
 
         return () => clearInterval(id);
     }, []);
@@ -45,18 +56,25 @@ export const ThreadDumpAccordionHeader = ({ threadDump }: IProps) => {
         setHistory((prev) => [...prev, threadDump]);
     }, [threadDump]);
 
+    const { colorPrimary } = getThreadStateColor(threadDump);
+
     return (
         <div className={styles.MainWrapper}>
             <div
                 className={styles.ThreadNameAvatar}
                 style={{
-                    backgroundColor: getThreadStateColor(threadDump),
+                    backgroundColor: colorPrimary,
                 }}
             >
                 {threadDumpStateLetters[threadDump.threadState]}
             </div>
             <div>{threadDump.threadName}</div>
-            <ThreadDumpTimeline history={history} />
+
+            <ThreadDumpTimeline
+                history={history}
+                selectedGroups={selectedGroups}
+                setSelectedGroups={setSelectedGroups}
+            />
         </div>
     );
 };

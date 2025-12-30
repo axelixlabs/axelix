@@ -3,11 +3,26 @@
     border-radius: var(--axelix-border-radius-small);
     overflow: hidden;
 
-    /* Our timeline grows by 5px for each thread. Since our monitoring lasts 10 minutes, that’s 10 * 60 * 5 = 3000 */
-    width: 3000px;
+    /* Our timeline grows by 5px for each thread. Since our monitoring lasts 10 minutes, that’s 5 * 60 * 5 = 1500 */
+    width: 1500px;
+    margin-left: 6px;
 }
 
-.SingleHistoryChunk {
+.ThreadGroup {
     width: 5px;
     height: 30px;
+    transition: background-color 0.2s ease;
+    background-color: var(--color-primary);
+}
+
+.ThreadGroup:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.ThreadGroup:active {
+    background-color: var(--color-primary-active);
+}
+
+.SelectedThreadGroup {
+    border: 2px solid #000;
 }
