@@ -23,8 +23,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
 
 /**
- * Central component responsible for dispatching cache-related operations
- * and retrieving information from the appropriate {@link CacheManager} based on its name.
+ * Default implementation of {@link CacheDispatcher}.
  *
  * @since 26.06.2025
  * @author Nikita Kirillov

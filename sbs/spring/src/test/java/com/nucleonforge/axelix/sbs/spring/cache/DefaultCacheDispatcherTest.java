@@ -307,9 +307,6 @@ class DefaultCacheDispatcherTest {
     void shouldReturnNull_ForNonExistentManager() {
         String cacheManagerName = "nonExistentManager";
         String cacheName = TEST_CACHE_1;
-        cacheManager1.getCache(TEST_CACHE_1).put("key1", "value");
-        cacheManager1.getCache(TEST_CACHE_1).get("key1");
-        cacheManager1.getCache(TEST_CACHE_1).get("notCache");
 
         assertThat(dispatcher.getMissesCount(cacheManagerName, cacheName)).isNull();
         assertThat(dispatcher.getHitsCount(cacheManagerName, cacheName)).isNull();

@@ -78,16 +78,11 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public ValueWrapper get(@NonNull Object key) {
-        return getValueWrapperIfEnabledOrElseNull(() -> delegate.get(key));
-    }
-
-    @Nullable
-    private <T> T getValueWrapperIfEnabledOrElseNull(Supplier<T> supplier) {
         if (!enabled.get()) {
             return null;
         }
 
-        T result = supplier.get();
+        ValueWrapper result = delegate.get(key);
 
         if (result == null) {
             missesCount.increment();
@@ -100,25 +95,26 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public <T> T get(@NonNull Object key, @Nullable Class<T> type) {
-        return getIfEnabledOrElseNull(() -> delegate.get(key, type));
-    }
-
-    @Nullable
-    private <T> T getIfEnabledOrElseNull(Supplier<T> supplier) {
-        return enabled.get() ? supplier.get() : null;
+        if (enabled.get()) {
+            return delegate.get(key, type);
+        } else {
+            return null;
+        }
     }
 
     @Override
     @Nullable
     public <T> T get(@NonNull Object key, @NonNull Callable<T> valueLoader) {
-        AtomicBoolean miss = new AtomicBoolean();
-
-        T value = delegate.get(key, () -> {
-            miss.set(true);
-            return valueLoader.call();
-        });
+        T value = null;
 
         if (enabled.get()) {
+            AtomicBoolean miss = new AtomicBoolean();
+
+            value = delegate.get(key, () -> {
+                miss.set(true);
+                return valueLoader.call();
+            });
+
             (miss.get() ? missesCount : hitsCount).increment();
         }
 

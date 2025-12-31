@@ -25,6 +25,7 @@ import org.springframework.cache.CacheManager;
  *
  * @since 23.06.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
 

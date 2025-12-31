@@ -23,11 +23,6 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 /**
  * Adapter to Spring's {@link CacheManager}.
  *
- * <p>
- * Provides a unified interface for performing cache clearing operations and for retrieving information.
- * Some methods return {@code true} if at least one entry was removed, and {@code false} if no entries were removed.
- * Some methods return cache-related information.
- *
  * @since 23.06.2025
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov

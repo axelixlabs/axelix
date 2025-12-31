@@ -21,8 +21,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 /**
- * Dispatcher interface for executing cache operations (such as evicting entries or clearing caches)
- * and for retrieving information across different CacheManager instances.
+ * Dispatcher interface for executing cache operations across different {@link CacheManager CacheManagers}.
  *
  * @since 26.06.2025
  * @author Nikita Kirillov

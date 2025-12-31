@@ -17,3 +17,4 @@ com.nucleonforge.axelix.sbs.autoconfiguration.spring.AxelixConfigurationsPropert
 com.nucleonforge.axelix.sbs.autoconfiguration.spring.ThreadDumpManagementEndpointAutoConfiguration
 com.nucleonforge.axelix.sbs.autoconfiguration.spring.AxelixMetricsAutoConfiguration
 com.nucleonforge.axelix.sbs.autoconfiguration.auth.JwtAuthAutoConfiguration
+com.nucleonforge.axelix.sbs.autoconfiguration.auth.JwtAuthAutoConfiguration
