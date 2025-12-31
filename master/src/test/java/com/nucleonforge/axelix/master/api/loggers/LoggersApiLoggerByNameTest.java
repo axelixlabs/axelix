@@ -32,12 +32,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.api.LoggersApi;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -63,7 +63,7 @@ public class LoggersApiLoggerByNameTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -140,8 +140,13 @@ public class LoggersApiLoggerByNameTest {
         String loggerName = "com.example";
 
         // when.
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axelix/loggers/{instanceId}/logger/{loggerName}", String.class, activeInstanceId, loggerName);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
+                        String.class,
+                        activeInstanceId,
+                        loggerName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -162,8 +167,13 @@ public class LoggersApiLoggerByNameTest {
         String loggerName = "org.springframework.web";
 
         // when.
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axelix/loggers/{instanceId}/logger/{loggerName}", String.class, activeInstanceId, loggerName);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
+                        String.class,
+                        activeInstanceId,
+                        loggerName);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -182,8 +192,10 @@ public class LoggersApiLoggerByNameTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<?> response = restTemplate.getForEntity(
-                "/api/axelix/loggers/{instanceId}/logger/{loggerName}", Void.class, instanceId, loggerName);
+        ResponseEntity<?> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}", Void.class, instanceId, loggerName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -195,11 +207,13 @@ public class LoggersApiLoggerByNameTest {
         String loggerName = "com.example";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
-                EndpointInvocationException.class,
-                instanceId,
-                loggerName);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
+                        EndpointInvocationException.class,
+                        instanceId,
+                        loggerName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

@@ -32,9 +32,9 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
@@ -54,7 +54,7 @@ public class CachesClearApiTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -99,7 +99,7 @@ public class CachesClearApiTest {
     @Test
     void shouldClearAllCaches() throws InterruptedException {
         // when
-        restTemplate.delete("/api/axelix/caches/{instanceId}", activeInstanceId);
+        restTemplate.withoutAuthorities().delete("/api/axelix/caches/{instanceId}", activeInstanceId);
 
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
@@ -112,9 +112,11 @@ public class CachesClearApiTest {
         String cacheName = "cities";
 
         // when
-        restTemplate.delete(
-                "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
-                Map.of("instanceId", activeInstanceId, "cacheName", cacheName));
+        restTemplate
+                .withoutAuthorities()
+                .delete(
+                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
+                        Map.of("instanceId", activeInstanceId, "cacheName", cacheName));
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");

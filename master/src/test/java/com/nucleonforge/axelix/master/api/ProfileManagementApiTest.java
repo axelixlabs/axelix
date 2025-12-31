@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.api.request.ProfileUpdatedRequest;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.Instance;
@@ -76,7 +76,7 @@ class ProfileManagementApiTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -130,8 +130,13 @@ class ProfileManagementApiTest {
                 mockWebServer.url(activeInstanceId + "/actuator").toString(),
                 Instance.InstanceStatus.UP));
 
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                "/api/axelix/profile-management/{instanceId}", defaultEntity(request), String.class, activeInstanceId);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/profile-management/{instanceId}",
+                        defaultEntity(request),
+                        String.class,
+                        activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -152,11 +157,13 @@ class ProfileManagementApiTest {
 
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axelix/profile-management/{instanceId}",
-                defaultEntity(request),
-                EndpointInvocationException.class,
-                instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/profile-management/{instanceId}",
+                        defaultEntity(request),
+                        EndpointInvocationException.class,
+                        instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -166,8 +173,13 @@ class ProfileManagementApiTest {
         String instanceId = UUID.randomUUID().toString();
         ProfileUpdatedRequest request = new ProfileUpdatedRequest(List.of("test-profile"));
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axelix/profile-management/{instanceId}", request, EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/profile-management/{instanceId}",
+                        request,
+                        EndpointInvocationException.class,
+                        instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

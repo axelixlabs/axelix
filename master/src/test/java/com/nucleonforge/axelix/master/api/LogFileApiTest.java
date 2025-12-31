@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -72,7 +72,7 @@ class LogFileApiTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -128,8 +128,9 @@ class LogFileApiTest {
 
     @Test
     void shouldReturnLogFileAsPlainText() {
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axelix/logfile/{instanceId}", String.class, activeInstanceId);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/logfile/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
@@ -142,8 +143,9 @@ class LogFileApiTest {
         headers.set("Range", "bytes=0-151");
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                "/api/axelix/logfile/{instanceId}", HttpMethod.GET, entity, String.class, activeInstanceId);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .exchange("/api/axelix/logfile/{instanceId}", HttpMethod.GET, entity, String.class, activeInstanceId);
 
         String expectedPartialContent = logContent.substring(0, 152);
 
@@ -158,8 +160,9 @@ class LogFileApiTest {
         String instanceId = UUID.randomUUID().toString();
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/logfile/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/logfile/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -168,8 +171,9 @@ class LogFileApiTest {
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = UUID.randomUUID().toString();
 
-        ResponseEntity<InstanceNotFoundException> response = restTemplate.getForEntity(
-                "/api/axelix/env/feed/{instanceId}", InstanceNotFoundException.class, instanceId);
+        ResponseEntity<InstanceNotFoundException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/env/feed/{instanceId}", InstanceNotFoundException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

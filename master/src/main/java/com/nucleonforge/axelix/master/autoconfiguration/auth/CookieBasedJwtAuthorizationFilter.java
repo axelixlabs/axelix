@@ -26,7 +26,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.nucleonforge.axelix.common.auth.JwtDecoderService;
@@ -45,12 +44,11 @@ import com.nucleonforge.axelix.common.auth.exception.JwtTokenDecodingException;
 public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtDecoderService jwtDecoderService;
-    private final String authCookie;
+    private final String authCookieName;
 
-    public CookieBasedJwtAuthorizationFilter(
-            JwtDecoderService jwtDecoderService, @Value("${axile.master.auth.cookie.name}") String authCookie) {
+    public CookieBasedJwtAuthorizationFilter(JwtDecoderService jwtDecoderService, String authCookieName) {
         this.jwtDecoderService = jwtDecoderService;
-        this.authCookie = authCookie;
+        this.authCookieName = authCookieName;
     }
 
     @Override
@@ -92,7 +90,7 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
     private String resolveToken(Cookie[] cookies) {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (authCookie.equals(cookie.getName())) {
+                if (authCookieName.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }

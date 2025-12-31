@@ -31,11 +31,11 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.api.LoggersApi;
 import com.nucleonforge.axelix.master.api.request.LogLevelChangeRequest;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -57,7 +57,7 @@ public class LoggersApiSetLoggingLevelByLoggerNameTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -99,12 +99,14 @@ public class LoggersApiSetLoggingLevelByLoggerNameTest {
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
         // when.
-        ResponseEntity<String> body = restTemplate.postForEntity(
-                "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
-                requestBody,
-                String.class,
-                activeInstanceId,
-                loggerName);
+        ResponseEntity<String> body = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
+                        requestBody,
+                        String.class,
+                        activeInstanceId,
+                        loggerName);
 
         // then.
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -120,12 +122,14 @@ public class LoggersApiSetLoggingLevelByLoggerNameTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<?> response = restTemplate.postForEntity(
-                "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
-                requestBody,
-                Void.class,
-                instanceId,
-                loggerName);
+        ResponseEntity<?> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
+                        requestBody,
+                        Void.class,
+                        instanceId,
+                        loggerName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -138,12 +142,14 @@ public class LoggersApiSetLoggingLevelByLoggerNameTest {
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG");
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
-                requestBody,
-                EndpointInvocationException.class,
-                instanceId,
-                loggerName);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
+                        requestBody,
+                        EndpointInvocationException.class,
+                        instanceId,
+                        loggerName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

@@ -38,7 +38,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -48,6 +47,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.service.export.HeapDumpAnonymizer;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
@@ -75,7 +75,7 @@ class StateExportApiTest {
     private HeapDumpAnonymizer heapDumpAnonymizer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -387,11 +387,13 @@ class StateExportApiTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        ResponseEntity<?> response = restTemplate.postForEntity(
-                "/api/axelix/export-state/{instanceId}",
-                new HttpEntity<>(HTTP_REQUEST_BODY, headers),
-                Void.class,
-                instanceId);
+        ResponseEntity<?> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/export-state/{instanceId}",
+                        new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                        Void.class,
+                        instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -403,11 +405,13 @@ class StateExportApiTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                "/api/axelix/export-state/{instanceId}",
-                new HttpEntity<>(HTTP_REQUEST_BODY, headers),
-                String.class,
-                unknownInstanceId);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/export-state/{instanceId}",
+                        new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                        String.class,
+                        unknownInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -423,11 +427,13 @@ class StateExportApiTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        ResponseEntity<byte[]> response = restTemplate.postForEntity(
-                "/api/axelix/export-state/{instanceId}",
-                new HttpEntity<>(HTTP_REQUEST_BODY, headers),
-                byte[].class,
-                activeInstanceId);
+        ResponseEntity<byte[]> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/export-state/{instanceId}",
+                        new HttpEntity<>(HTTP_REQUEST_BODY, headers),
+                        byte[].class,
+                        activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.parseMediaType("application/zip"));

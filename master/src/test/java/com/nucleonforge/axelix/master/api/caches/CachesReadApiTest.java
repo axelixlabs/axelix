@@ -30,12 +30,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
@@ -57,7 +57,7 @@ public class CachesReadApiTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -182,8 +182,9 @@ public class CachesReadApiTest {
         }
         """;
         // when
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axelix/caches/{instanceId}", String.class, activeInstanceId);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/caches/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -201,8 +202,9 @@ public class CachesReadApiTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<?> response =
-                restTemplate.getForEntity("/api/axelix/caches/{instanceId}", Void.class, instanceId);
+        ResponseEntity<?> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/caches/{instanceId}", Void.class, instanceId);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -213,8 +215,9 @@ public class CachesReadApiTest {
         String instanceId = "unregistered-caches-instance";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/caches/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/caches/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -271,11 +274,13 @@ public class CachesReadApiTest {
                         .formatted(requestedCacheName, requestedCacheManagerName);
 
         // when.
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=" + requestedCacheManagerName,
-                String.class,
-                activeInstanceId,
-                requestedCacheName);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=" + requestedCacheManagerName,
+                        String.class,
+                        activeInstanceId,
+                        requestedCacheName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -293,11 +298,13 @@ public class CachesReadApiTest {
         String cacheName = "cities";
 
         // when.
-        ResponseEntity<?> response = restTemplate.getForEntity(
-                "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
-                Void.class,
-                instanceId,
-                cacheName);
+        ResponseEntity<?> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
+                        Void.class,
+                        instanceId,
+                        cacheName);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -309,11 +316,13 @@ public class CachesReadApiTest {
         String cacheName = "cities";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
-                EndpointInvocationException.class,
-                instanceId,
-                cacheName);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
+                        EndpointInvocationException.class,
+                        instanceId,
+                        cacheName);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

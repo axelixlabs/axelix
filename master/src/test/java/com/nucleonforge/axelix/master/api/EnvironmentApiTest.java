@@ -32,12 +32,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
@@ -162,7 +162,7 @@ class EnvironmentApiTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -332,8 +332,9 @@ class EnvironmentApiTest {
 
     @Test
     void shouldReturnJSONEnvironmentFeed() {
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axelix/env/feed/{instanceId}", String.class, activeInstanceId);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/env/feed/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -347,8 +348,13 @@ class EnvironmentApiTest {
     void shouldReturnJSONEnvironmentProperty() {
         String propertyName = "sun.management.compiler";
 
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axelix/env/{instanceId}/property/{propertyName}", String.class, activeInstanceId, propertyName);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/env/{instanceId}/property/{propertyName}",
+                        String.class,
+                        activeInstanceId,
+                        propertyName);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -365,8 +371,9 @@ class EnvironmentApiTest {
 
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -379,8 +386,10 @@ class EnvironmentApiTest {
 
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axelix/env/{instanceId}/property/{propertyName}", String.class, instanceId, propertyName);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/env/{instanceId}/property/{propertyName}", String.class, instanceId, propertyName);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -389,8 +398,9 @@ class EnvironmentApiTest {
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = "unregistered-env-instance";
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

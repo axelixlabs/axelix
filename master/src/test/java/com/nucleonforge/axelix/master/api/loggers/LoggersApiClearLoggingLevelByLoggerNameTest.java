@@ -31,13 +31,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.api.LoggersApi;
-import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
@@ -58,10 +57,7 @@ public class LoggersApiClearLoggingLevelByLoggerNameTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
-
-    @Autowired
-    private JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -102,12 +98,14 @@ public class LoggersApiClearLoggingLevelByLoggerNameTest {
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
 
         // when
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                "/api/axelix/loggers/{instanceId}/logger/{loggerName}/clear",
-                null,
-                String.class,
-                activeInstanceId,
-                loggerName);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}/clear",
+                        null,
+                        String.class,
+                        activeInstanceId,
+                        loggerName);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -122,8 +120,14 @@ public class LoggersApiClearLoggingLevelByLoggerNameTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<?> response = restTemplate.postForEntity(
-                "/api/axelix/loggers/{instanceId}/logger/{loggerName}/clear", null, Void.class, instanceId, loggerName);
+        ResponseEntity<?> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}/clear",
+                        null,
+                        Void.class,
+                        instanceId,
+                        loggerName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -135,12 +139,14 @@ public class LoggersApiClearLoggingLevelByLoggerNameTest {
         String loggerName = "com.example";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axelix/loggers/{instanceId}/logger/{loggerName}/clear",
-                null,
-                EndpointInvocationException.class,
-                instanceId,
-                loggerName);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}/clear",
+                        null,
+                        EndpointInvocationException.class,
+                        instanceId,
+                        loggerName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
