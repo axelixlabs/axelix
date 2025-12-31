@@ -15,9 +15,13 @@
  */
 package com.nucleonforge.axelix.master.service.auth.provider;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
+import com.nucleonforge.axelix.common.auth.core.DefaultRole;
 import com.nucleonforge.axelix.common.auth.core.DefaultUser;
 import com.nucleonforge.axelix.common.auth.core.User;
 import com.nucleonforge.axelix.master.autoconfiguration.auth.StaticAdminCredentialsProperties;
@@ -31,6 +35,8 @@ import com.nucleonforge.axelix.master.service.auth.UserLoginService;
  */
 public class StaticAdminUserProvider implements UserProvider {
 
+    private static final String ADMIN_ROLE = "ADMIN";
+
     private final StaticAdminCredentialsProperties staticCredentialsConfig;
 
     public StaticAdminUserProvider(StaticAdminCredentialsProperties staticCredentialsConfig) {
@@ -40,8 +46,11 @@ public class StaticAdminUserProvider implements UserProvider {
     @Override
     public User load(String username) throws UserNotFoundException {
         if (Objects.equals(staticCredentialsConfig.getUsername(), username)) {
-            // TODO: We need to revisit our roles API here.
-            return new DefaultUser(username, staticCredentialsConfig.getPassword(), Set.of());
+            return new DefaultUser(
+                    username,
+                    staticCredentialsConfig.getPassword(),
+                    Set.of(new DefaultRole(
+                            ADMIN_ROLE, Arrays.stream(DefaultAuthority.values()).collect(Collectors.toSet()))));
         } else {
             throw new UserNotFoundException(username);
         }

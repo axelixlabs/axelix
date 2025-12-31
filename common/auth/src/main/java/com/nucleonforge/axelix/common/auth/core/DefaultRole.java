@@ -27,6 +27,10 @@ import java.util.Set;
  */
 public record DefaultRole(String name, Set<Authority> authorities, Set<Role> components) implements Role {
 
+    public DefaultRole(String name, Set<Authority> authorities) {
+        this(name, authorities, Set.of());
+    }
+
     public DefaultRole {
         if (authorities == null) {
             authorities = Collections.emptySet();

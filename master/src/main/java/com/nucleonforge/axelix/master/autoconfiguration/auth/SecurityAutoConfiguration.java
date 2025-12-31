@@ -16,11 +16,14 @@
 package com.nucleonforge.axelix.master.autoconfiguration.auth;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 
+import com.nucleonforge.axelix.common.auth.DefaultJwtDecoderService;
+import com.nucleonforge.axelix.common.auth.JwtDecoderService;
 import com.nucleonforge.axelix.master.service.auth.CookieService;
 import com.nucleonforge.axelix.master.service.auth.DefaultCookieService;
 import com.nucleonforge.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
@@ -53,6 +56,12 @@ public class SecurityAutoConfiguration {
             return new DefaultJwtEncoderService(
                     jwtProperties.getAlgorithm(), jwtProperties.getSigningKey(), jwtProperties.getLifespan());
         }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties) {
+            return new DefaultJwtDecoderService(jwtProperties.getAlgorithm(), jwtProperties.getSigningKey());
+        }
     }
 
     /**
@@ -60,8 +69,8 @@ public class SecurityAutoConfiguration {
      */
     @AutoConfiguration(after = JwtAutoConfiguration.class)
     @ConditionalOnProperty(
-            prefix = "axelix.master.auth",
-            name = "cookie.enabled",
+            prefix = "axelix.master.auth.cookie",
+            name = "enabled",
             havingValue = "true",
             matchIfMissing = true)
     public static class CookieAutoConfiguration {
@@ -75,6 +84,12 @@ public class SecurityAutoConfiguration {
         @Bean
         public CookieService cookieService(CookieProperties cookieProperties, JwtProperties jwtProperties) {
             return new DefaultCookieService(cookieProperties, jwtProperties);
+        }
+
+        @Bean
+        public CookieBasedJwtAuthorizationFilter cookieBasedJwtAuthorizationFilter(
+                JwtDecoderService jwtDecoderService, CookieProperties cookieProperties) {
+            return new CookieBasedJwtAuthorizationFilter(jwtDecoderService, cookieProperties.getName());
         }
     }
 
