@@ -77,8 +77,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token == null) {
-            // TODO: it is wrong. If token is not present then the response should be unauthorized
-            respondWith(response, HttpServletResponse.SC_FORBIDDEN, "Authorization token is missing");
+            respondWith(response, HttpServletResponse.SC_UNAUTHORIZED, "Authorization token is missing");
             return;
         }
 
@@ -86,10 +85,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         try {
             DecodedUser user = jwtDecoderService.decodeTokenToUser(token);
-            Optional<Authority> requiredOpt = defaultAuthorityResolver.resolve(requestPath);
+            Optional<Authority> requiredAuthority = defaultAuthorityResolver.resolve(requestPath);
 
             AuthorizationRequest authorizationRequest =
-                    new AuthorizationRequest(requiredOpt.map(Set::of).orElse(Collections.emptySet()));
+                    new AuthorizationRequest(requiredAuthority.map(Set::of).orElse(Collections.emptySet()));
 
             authorizer.authorize(user, authorizationRequest);
 

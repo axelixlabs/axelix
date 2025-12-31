@@ -17,12 +17,10 @@ package com.nucleonforge.axelix.master.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nucleonforge.axelix.master.api.request.LoginRequest;
-import com.nucleonforge.axelix.master.autoconfiguration.auth.CookieProperties;
-import com.nucleonforge.axelix.master.autoconfiguration.auth.JwtProperties;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -31,6 +29,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
+import com.nucleonforge.axelix.master.api.request.LoginRequest;
+import com.nucleonforge.axelix.master.autoconfiguration.auth.CookieProperties;
+import com.nucleonforge.axelix.master.autoconfiguration.auth.JwtProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,6 +53,9 @@ class UserApiTest {
 
     @Autowired
     private JwtProperties jwtProperties;
+
+    @Value("${test-tokens.valid-token}")
+    private String validToken;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -90,7 +95,7 @@ class UserApiTest {
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
         ResponseEntity<String> response =
-            restTemplate.exchange("/api/axelix/users/login", HttpMethod.POST, request, String.class);
+                restTemplate.exchange("/api/axelix/users/login", HttpMethod.POST, request, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
@@ -100,7 +105,7 @@ class UserApiTest {
 
     @Test
     void logout_shouldClearCookie() {
-        String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0VXNlciIsImlhdCI6MTc1NDUwMjA4MCwiZXhwIjozMzMxMzAyMDgwLCJyb2xlcyI6W3sibmFtZSI6IlJPTEVfVVNFUiIsImF1dGhvcml0aWVzIjpbIkVOViIsIklORk8iXSwiY29tcG9uZW50cyI6W119LHsibmFtZSI6IlJPTEVfRU5HSU5FRVIiLCJhdXRob3JpdGllcyI6WyJCRUFOUyIsIkhFQUxUSCJdLCJjb21wb25lbnRzIjpbXX1dfQ.xLuprlFUgeslSlZEp1Btf20EjQ8w_-Dx3V0RM2xUjq-PU48iiXCZ2BT4EzzOCferYB9wCxV-LyX3DObiqg_X-A";
+        String token = validToken;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -109,7 +114,7 @@ class UserApiTest {
         HttpEntity<Void> logoutEntity = new HttpEntity<>(headers);
 
         ResponseEntity<String> logoutResponse =
-            restTemplate.exchange("/api/axelix/users/logout", HttpMethod.POST, logoutEntity, String.class);
+                restTemplate.exchange("/api/axelix/users/logout", HttpMethod.POST, logoutEntity, String.class);
 
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -126,7 +131,7 @@ class UserApiTest {
         HttpEntity<Void> logoutEntity = new HttpEntity<>(headers);
 
         ResponseEntity<String> logoutResponse =
-            restTemplate.exchange("/api/axelix/users/logout", HttpMethod.POST, logoutEntity, String.class);
+                restTemplate.exchange("/api/axelix/users/logout", HttpMethod.POST, logoutEntity, String.class);
 
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }

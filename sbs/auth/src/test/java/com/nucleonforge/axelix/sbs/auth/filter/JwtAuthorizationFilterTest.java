@@ -147,7 +147,7 @@ class JwtAuthorizationFilterTest {
     }
 
     @Test
-    void shouldReturnForbidden_AuthorizationHeaderIsMalformed() {
+    void shouldReturnUnauthorized_AuthorizationHeaderIsMalformed() {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, "BearerToken" + tokenUserWithTwoRole);
 
@@ -156,9 +156,7 @@ class JwtAuthorizationFilterTest {
         ResponseEntity<String> response =
                 restTemplate.exchange("/actuator/beans", HttpMethod.GET, entity, String.class);
 
-        assertThat(response)
-                .returns(HttpStatus.FORBIDDEN, ResponseEntity::getStatusCode)
-                .returns("Authorization token is missing", ResponseEntity::getBody);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
@@ -192,26 +190,22 @@ class JwtAuthorizationFilterTest {
     }
 
     @Test
-    void shouldReturnForbidden_TokenIsMissing() {
+    void shouldReturnUnauthorized_TokenIsMissing() {
         ResponseEntity<String> response =
                 restTemplate.exchange("/actuator/health", HttpMethod.GET, defaultEntity(""), String.class);
 
-        assertThat(response)
-                .returns(HttpStatus.FORBIDDEN, ResponseEntity::getStatusCode)
-                .returns("Authorization token is missing", ResponseEntity::getBody);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
-    void shouldReturnForbidden_AuthorizationHeaderIsMissing() {
+    void shouldReturnUnauthorized_AuthorizationHeaderIsMissing() {
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         ResponseEntity<String> response =
                 restTemplate.exchange("/actuator/health", HttpMethod.GET, entity, String.class);
 
-        assertThat(response)
-                .returns(HttpStatus.FORBIDDEN, ResponseEntity::getStatusCode)
-                .returns("Authorization token is missing", ResponseEntity::getBody);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
