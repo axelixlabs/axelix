@@ -16,7 +16,7 @@
 import { useEffect, useState } from "react";
 
 import { generateTimeSlots } from "helpers";
-import { THREAD_DUMP_INTERVAL_MS } from "utils";
+import { THREAD_DUMP_SLIDING_WINDOW_MS } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -28,7 +28,7 @@ export const ThreadDumpTimeLine = () => {
 
         const intervalId = setInterval(() => {
             setTimeSlots(generateTimeSlots());
-        }, THREAD_DUMP_INTERVAL_MS);
+        }, THREAD_DUMP_SLIDING_WINDOW_MS);
 
         return () => clearInterval(intervalId);
     }, []);

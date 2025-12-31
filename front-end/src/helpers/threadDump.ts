@@ -17,7 +17,7 @@ import accordionStyles from "components/Accordion/styles.module.css";
 import type { MouseEvent } from "react";
 
 import { EThreadState, type IColorPallete, type IThread, type IThreadGroup } from "models";
-import { THREAD_DUMP_INTERVAL_MS, TIMELINE_SEGMENT_INTERVAL_MS, colorPalette } from "utils";
+import { THREAD_DUMP_SLIDING_WINDOW_MS, TIMELINE_SEGMENT_INTERVAL_MS, colorPalette } from "utils";
 
 export const getThreadStateColor = (threadDump: IThread): IColorPallete => {
     const { threadState, inNative, suspended } = threadDump;
@@ -56,7 +56,7 @@ export const generateTimeSlots = (): Date[] => {
     const stepMilliseconds = TIMELINE_SEGMENT_INTERVAL_MS;
 
     // 5 minutes ahead from now
-    const endTime = new Date(now.getTime() + THREAD_DUMP_INTERVAL_MS);
+    const endTime = new Date(now.getTime() + THREAD_DUMP_SLIDING_WINDOW_MS);
     const slots: Date[] = [];
 
     let currentTime = new Date(now);
