@@ -28,6 +28,7 @@ import org.jspecify.annotations.Nullable;
  * This class mainly exists to cope the {@code null} values limitation of {@link ConcurrentHashMap}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 class NonExistentEnhancedCache implements EnhancedCache {
 
@@ -83,5 +84,15 @@ class NonExistentEnhancedCache implements EnhancedCache {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    @Override
+    public long getHitsCount() {
+        return 0;
+    }
+
+    @Override
+    public long getMissesCount() {
+        return 0;
     }
 }

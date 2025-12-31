@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  *
  * @since 23.06.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 class DefaultCacheManagerAdapterTest {
 
@@ -333,5 +334,24 @@ class DefaultCacheManagerAdapterTest {
 
         assertThatThrownBy(() -> regularAdapter.isCacheEnabled("cache"))
                 .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void shouldReturnCacheInformation() {
+        String cacheName = "cache";
+        String key = "key";
+
+        CacheManager manager = new EnhancedCacheManager(new ConcurrentMapCacheManager());
+        CacheManagerAdapter managerAdapter = new DefaultCacheManagerAdapter(manager);
+        Cache cache = manager.getCache(cacheName);
+
+        cache.put(key, "value");
+        cache.get(key);
+        cache.get("notCache");
+        cache.get("notCache");
+
+        assertThat(managerAdapter.getHitsCount(cacheName)).isEqualTo(1L);
+        assertThat(managerAdapter.getMissesCount(cacheName)).isEqualTo(2L);
+        assertThat(managerAdapter.getNativeCache(cacheName)).isEqualTo(cache.getNativeCache());
     }
 }

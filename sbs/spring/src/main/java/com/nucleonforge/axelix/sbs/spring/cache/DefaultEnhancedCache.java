@@ -17,8 +17,8 @@ package com.nucleonforge.axelix.sbs.spring.cache;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -31,15 +31,20 @@ import org.springframework.cache.Cache;
  * @since 25.11.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public class DefaultEnhancedCache implements EnhancedCache {
 
     private final Cache delegate;
     private final AtomicBoolean enabled;
+    private final LongAdder hitsCount;
+    private final LongAdder missesCount;
 
     public DefaultEnhancedCache(@NonNull Cache delegate) {
         this.delegate = delegate;
         this.enabled = new AtomicBoolean(true);
+        this.hitsCount = new LongAdder();
+        this.missesCount = new LongAdder();
     }
 
     @Override
@@ -72,19 +77,47 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     @Nullable
     public ValueWrapper get(@NonNull Object key) {
-        return getIfEnabledOrElseNull(() -> delegate.get(key));
+        if (!enabled.get()) {
+            return null;
+        }
+
+        ValueWrapper result = delegate.get(key);
+
+        if (result == null) {
+            missesCount.increment();
+        } else {
+            hitsCount.increment();
+        }
+        return result;
     }
 
     @Override
     @Nullable
     public <T> T get(@NonNull Object key, @Nullable Class<T> type) {
-        return getIfEnabledOrElseNull(() -> delegate.get(key, type));
+        if (enabled.get()) {
+            return delegate.get(key, type);
+        } else {
+            return null;
+        }
     }
 
     @Override
     @Nullable
     public <T> T get(@NonNull Object key, @NonNull Callable<T> valueLoader) {
-        return getIfEnabledOrElseNull(() -> delegate.get(key, valueLoader));
+        T value = null;
+
+        if (enabled.get()) {
+            AtomicBoolean miss = new AtomicBoolean();
+
+            value = delegate.get(key, () -> {
+                miss.set(true);
+                return valueLoader.call();
+            });
+
+            (miss.get() ? missesCount : hitsCount).increment();
+        }
+
+        return value;
     }
 
     @Override
@@ -102,11 +135,6 @@ public class DefaultEnhancedCache implements EnhancedCache {
         executeIfEnabled(delegate::clear);
     }
 
-    @Nullable
-    private <T> T getIfEnabledOrElseNull(Supplier<T> supplier) {
-        return enabled.get() ? supplier.get() : null;
-    }
-
     @Override
     public boolean invalidate() {
         return executeIfEnabledOrElseFalse(delegate::invalidate);
@@ -115,6 +143,16 @@ public class DefaultEnhancedCache implements EnhancedCache {
     @Override
     public boolean evictIfPresent(@NonNull Object key) {
         return executeIfEnabledOrElseFalse(() -> delegate.evictIfPresent(key));
+    }
+
+    @Override
+    public long getHitsCount() {
+        return hitsCount.sum();
+    }
+
+    @Override
+    public long getMissesCount() {
+        return missesCount.sum();
     }
 
     private boolean executeIfEnabledOrElseFalse(BooleanSupplier supplier) {

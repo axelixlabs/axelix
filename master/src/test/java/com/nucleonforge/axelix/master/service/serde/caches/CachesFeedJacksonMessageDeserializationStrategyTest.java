@@ -47,6 +47,9 @@ public class CachesFeedJacksonMessageDeserializationStrategyTest {
                 {
                   "name": "countries",
                   "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "hitsCount" : 15,
+                  "missesCount" : 2,
+                  "estimatedEntrySize": 10,
                   "enabled": false
                 }
               ]
@@ -57,11 +60,17 @@ public class CachesFeedJacksonMessageDeserializationStrategyTest {
                 {
                   "name": "cities",
                   "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "hitsCount" : 25,
+                  "missesCount" : 5,
+                  "estimatedEntrySize": 6,
                   "enabled": false
                 },
                 {
                   "name": "countries",
                   "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "hitsCount" : 35,
+                  "missesCount" : 5,
+                  "estimatedEntrySize": 10,
                   "enabled": false
                 }
               ]
@@ -94,6 +103,9 @@ public class CachesFeedJacksonMessageDeserializationStrategyTest {
         CachesFeed.Caches anotherCountries = another.caches().get(0);
         assertThat(anotherCountries.name()).isEqualTo("countries");
         assertThat(anotherCountries.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        assertThat(anotherCountries.hitsCount()).isEqualTo(15);
+        assertThat(anotherCountries.missesCount()).isEqualTo(2);
+        assertThat(anotherCountries.estimatedEntrySize()).isEqualTo(10);
         assertThat(anotherCountries.enabled()).isFalse();
 
         // "cacheManager" -> Caches -> "countries"
@@ -102,6 +114,9 @@ public class CachesFeedJacksonMessageDeserializationStrategyTest {
                 .findFirst()
                 .orElseThrow();
         assertThat(mainCountries.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        assertThat(mainCountries.hitsCount()).isEqualTo(35);
+        assertThat(mainCountries.missesCount()).isEqualTo(5);
+        assertThat(mainCountries.estimatedEntrySize()).isEqualTo(10);
         assertThat(mainCountries.enabled()).isFalse();
 
         // "cacheManager" -> Caches -> "cities"
@@ -110,6 +125,9 @@ public class CachesFeedJacksonMessageDeserializationStrategyTest {
                 .findFirst()
                 .orElseThrow();
         assertThat(mainCities.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        assertThat(mainCities.hitsCount()).isEqualTo(25);
+        assertThat(mainCities.missesCount()).isEqualTo(5);
+        assertThat(mainCities.estimatedEntrySize()).isEqualTo(6);
         assertThat(mainCities.enabled()).isFalse();
     }
 }

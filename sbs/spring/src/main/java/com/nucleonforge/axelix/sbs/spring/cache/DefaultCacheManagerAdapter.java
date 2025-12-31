@@ -15,6 +15,8 @@
  */
 package com.nucleonforge.axelix.sbs.spring.cache;
 
+import jakarta.annotation.Nullable;
+
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
@@ -23,6 +25,7 @@ import org.springframework.cache.CacheManager;
  *
  * @since 23.06.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
 
@@ -107,5 +110,29 @@ public class DefaultCacheManagerAdapter implements CacheManagerAdapter {
         } else {
             throw new UnsupportedOperationException();
         }
+    }
+
+    @Nullable
+    public Long getHitsCount(String cacheName) {
+        if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
+            return enhancedCacheManager.getHitsCount(cacheName);
+        }
+        return null;
+    }
+
+    @Nullable
+    public Long getMissesCount(String cacheName) {
+        if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
+            return enhancedCacheManager.getMissesCount(cacheName);
+        }
+        return null;
+    }
+
+    @Nullable
+    public Object getNativeCache(String cacheName) {
+        if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
+            return enhancedCacheManager.getNativeCache(cacheName);
+        }
+        return null;
     }
 }
