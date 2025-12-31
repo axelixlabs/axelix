@@ -32,12 +32,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.api.request.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -155,7 +155,7 @@ public class ScheduledTasksApiTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -312,8 +312,9 @@ public class ScheduledTasksApiTest {
     void shouldReturnJSONScheduledTasksResponse() {
         // when.
 
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axelix/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -329,8 +330,10 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
 
         // when.
-        ResponseEntity<String> body = restTemplate.postForEntity(
-                "/api/axelix/scheduled-tasks/{instanceId}/enable", requestBody, String.class, activeInstanceId);
+        ResponseEntity<String> body = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}/enable", requestBody, String.class, activeInstanceId);
 
         // then
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -342,8 +345,13 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
 
         // when.
-        ResponseEntity<String> body = restTemplate.postForEntity(
-                "/api/axelix/scheduled-tasks/{instanceId}/disable", requestBody, String.class, activeInstanceId);
+        ResponseEntity<String> body = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}/disable",
+                        requestBody,
+                        String.class,
+                        activeInstanceId);
 
         // then
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -356,8 +364,10 @@ public class ScheduledTasksApiTest {
 
         // when.
         registry.register(createInstance(instanceId));
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -368,8 +378,10 @@ public class ScheduledTasksApiTest {
         String instanceId = "unregistered-scheduled-tasks-management-instance";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -385,11 +397,13 @@ public class ScheduledTasksApiTest {
 
         // when.
         registry.register(createInstance(instanceId));
-        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axelix/scheduled-tasks/{instanceId}/enable",
-                requestBody,
-                EndpointInvocationException.class,
-                instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}/enable",
+                        requestBody,
+                        EndpointInvocationException.class,
+                        instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -402,11 +416,13 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axelix/scheduled-tasks/{instanceId}/enable",
-                requestBody,
-                EndpointInvocationException.class,
-                instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}/enable",
+                        requestBody,
+                        EndpointInvocationException.class,
+                        instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -422,11 +438,13 @@ public class ScheduledTasksApiTest {
 
         // when.
         registry.register(createInstance(instanceId));
-        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axelix/scheduled-tasks/{instanceId}/disable",
-                requestBody,
-                EndpointInvocationException.class,
-                instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}/disable",
+                        requestBody,
+                        EndpointInvocationException.class,
+                        instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -439,11 +457,13 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate.postForEntity(
-                "/api/axelix/scheduled-tasks/{instanceId}/disable",
-                requestBody,
-                EndpointInvocationException.class,
-                instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}/disable",
+                        requestBody,
+                        EndpointInvocationException.class,
+                        instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

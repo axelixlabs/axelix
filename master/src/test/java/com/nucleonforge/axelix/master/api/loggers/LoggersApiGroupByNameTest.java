@@ -32,12 +32,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.api.LoggersApi;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -63,7 +63,7 @@ public class LoggersApiGroupByNameTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -140,8 +140,13 @@ public class LoggersApiGroupByNameTest {
         String groupName = "test";
 
         // when.
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axelix/loggers/{instanceId}/group/{groupName}", String.class, activeInstanceId, groupName);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/loggers/{instanceId}/group/{groupName}",
+                        String.class,
+                        activeInstanceId,
+                        groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -163,8 +168,13 @@ public class LoggersApiGroupByNameTest {
         String groupName = "web";
 
         // when.
-        ResponseEntity<String> response = restTemplate.getForEntity(
-                "/api/axelix/loggers/{instanceId}/group/{groupName}", String.class, activeInstanceId, groupName);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/loggers/{instanceId}/group/{groupName}",
+                        String.class,
+                        activeInstanceId,
+                        groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -183,8 +193,9 @@ public class LoggersApiGroupByNameTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<?> response = restTemplate.getForEntity(
-                "/api/axelix/loggers/{instanceId}/group/{groupName}", Void.class, instanceId, groupName);
+        ResponseEntity<?> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/loggers/{instanceId}/group/{groupName}", Void.class, instanceId, groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -196,11 +207,13 @@ public class LoggersApiGroupByNameTest {
         String groupName = "test";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/loggers/{instanceId}/group/{groupName}",
-                EndpointInvocationException.class,
-                instanceId,
-                groupName);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/loggers/{instanceId}/group/{groupName}",
+                        EndpointInvocationException.class,
+                        instanceId,
+                        groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

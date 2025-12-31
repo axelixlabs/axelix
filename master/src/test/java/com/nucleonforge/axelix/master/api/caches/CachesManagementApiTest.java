@@ -32,11 +32,11 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
@@ -57,7 +57,7 @@ class CachesManagementApiTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -107,72 +107,96 @@ class CachesManagementApiTest {
 
     @Test
     void shouldEnableSpecificCache() {
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
-                null,
-                Void.class,
-                Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager", "cacheName", "vets"));
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
+                        null,
+                        Void.class,
+                        Map.of(
+                                "instanceId",
+                                activeInstanceId,
+                                "cacheManagerName",
+                                "cacheManager",
+                                "cacheName",
+                                "vets"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     void shouldDisableSpecificCache() {
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/disable",
-                null,
-                Void.class,
-                Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager", "cacheName", "vets"));
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/disable",
+                        null,
+                        Void.class,
+                        Map.of(
+                                "instanceId",
+                                activeInstanceId,
+                                "cacheManagerName",
+                                "cacheManager",
+                                "cacheName",
+                                "vets"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     void shouldEnableCacheManager() {
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axelix/caches/{instanceId}/{cacheManagerName}/enable",
-                null,
-                Void.class,
-                Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/enable",
+                        null,
+                        Void.class,
+                        Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     void shouldDisableCacheManager() {
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axelix/caches/{instanceId}/{cacheManagerName}/disable",
-                null,
-                Void.class,
-                Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/disable",
+                        null,
+                        Void.class,
+                        Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     void shouldReturnInternalServerErrorWhenInstanceReturns404() {
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
-                null,
-                Void.class,
-                Map.of("instanceId", activeInstanceId, "cacheManagerName", "unknown", "cacheName", "unknown"));
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
+                        null,
+                        Void.class,
+                        Map.of("instanceId", activeInstanceId, "cacheManagerName", "unknown", "cacheName", "unknown"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     void shouldReturnBadRequestForUnregisteredInstance() {
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
-                null,
-                Void.class,
-                Map.of(
-                        "instanceId",
-                        UUID.randomUUID().toString(),
-                        "cacheManagerName",
-                        "cacheManager",
-                        "cacheName",
-                        "vets"));
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
+                        null,
+                        Void.class,
+                        Map.of(
+                                "instanceId",
+                                UUID.randomUUID().toString(),
+                                "cacheManagerName",
+                                "cacheManager",
+                                "cacheName",
+                                "vets"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

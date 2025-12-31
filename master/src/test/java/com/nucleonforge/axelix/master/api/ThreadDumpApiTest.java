@@ -32,12 +32,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
@@ -148,7 +148,7 @@ class ThreadDumpApiTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -272,8 +272,9 @@ class ThreadDumpApiTest {
 
     @Test
     void shouldReturnJSONThreadDumpFeed() {
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axelix/thread-dump/{instanceId}", String.class, activeInstanceId);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/thread-dump/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -290,8 +291,9 @@ class ThreadDumpApiTest {
 
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<?> response =
-                restTemplate.getForEntity("/api/axelix/thread-dump/{instanceId}", Void.class, instanceId);
+        ResponseEntity<?> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/thread-dump/{instanceId}", Void.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -300,8 +302,9 @@ class ThreadDumpApiTest {
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = UUID.randomUUID().toString();
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
@@ -309,11 +312,13 @@ class ThreadDumpApiTest {
     @Test
     void shouldEnableContentionMonitoring() throws InterruptedException {
         // when.
-        restTemplate.postForObject(
-                "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring/enable",
-                null,
-                Void.class,
-                activeInstanceId);
+        restTemplate
+                .withoutAuthorities()
+                .postForObject(
+                        "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring/enable",
+                        null,
+                        Void.class,
+                        activeInstanceId);
 
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
@@ -324,11 +329,13 @@ class ThreadDumpApiTest {
     @Test
     void shouldDisableContentionMonitoring() throws InterruptedException {
         // when.
-        restTemplate.postForObject(
-                "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring/disable",
-                null,
-                Void.class,
-                activeInstanceId);
+        restTemplate
+                .withoutAuthorities()
+                .postForObject(
+                        "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring/disable",
+                        null,
+                        Void.class,
+                        activeInstanceId);
 
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();

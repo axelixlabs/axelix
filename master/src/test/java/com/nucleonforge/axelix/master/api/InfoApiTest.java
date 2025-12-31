@@ -33,12 +33,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
@@ -169,7 +169,7 @@ public class InfoApiTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -316,8 +316,9 @@ public class InfoApiTest {
         registry.register(
                 TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/api/axelix/info/{instanceId}", String.class, activeInstanceId);
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/info/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -334,8 +335,9 @@ public class InfoApiTest {
 
         // when.
         registry.register(createInstance(instanceId));
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/info/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/info/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -346,8 +348,9 @@ public class InfoApiTest {
         String instanceId = "unregistered-info-instance";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/info/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/info/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

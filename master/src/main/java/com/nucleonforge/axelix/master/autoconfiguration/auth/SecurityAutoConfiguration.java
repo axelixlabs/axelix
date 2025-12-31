@@ -68,11 +68,6 @@ public class SecurityAutoConfiguration {
      * Autoconfiguration for cookie.
      */
     @AutoConfiguration(after = JwtAutoConfiguration.class)
-    @ConditionalOnProperty(
-            prefix = "axelix.master.auth.cookie",
-            name = "enabled",
-            havingValue = "true",
-            matchIfMissing = true)
     public static class CookieAutoConfiguration {
 
         @Bean

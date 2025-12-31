@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +40,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
+import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.service.export.HeapDumpAnonymizer;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -68,7 +68,7 @@ class HeapDumpApiTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private InstanceRegistry registry;
@@ -127,8 +127,9 @@ class HeapDumpApiTest {
         registry.register(
                 TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
 
-        ResponseEntity<byte[]> response =
-                restTemplate.getForEntity("/api/axelix/heapdump/{instanceId}", byte[].class, activeInstanceId);
+        ResponseEntity<byte[]> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/heapdump/{instanceId}", byte[].class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
@@ -147,8 +148,9 @@ class HeapDumpApiTest {
         String instanceId = UUID.randomUUID().toString();
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate.getForEntity(
-                "/api/axelix/heapdump/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/heapdump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -157,8 +159,9 @@ class HeapDumpApiTest {
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = UUID.randomUUID().toString();
 
-        ResponseEntity<InstanceNotFoundException> response = restTemplate.getForEntity(
-                "/api/axelix/heapdump/{instanceId}", InstanceNotFoundException.class, instanceId);
+        ResponseEntity<InstanceNotFoundException> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/heapdump/{instanceId}", InstanceNotFoundException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
