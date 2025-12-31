@@ -17,7 +17,7 @@ import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
 import { getThreadStateColor } from "helpers";
 import type { IThread, IThreadGroup } from "models";
-import { THREAD_DUMP_INTERVAL_MS, threadDumpStateLetters } from "utils";
+import { THREAD_DUMP_SLIDING_WINDOW_MS, threadDumpStateLetters } from "utils";
 
 import { ThreadDumpTimeline } from "../ThreadDumpStatusTimeline";
 
@@ -47,7 +47,7 @@ export const ThreadDumpAccordionHeader = ({ threadDump, selectedGroups, setSelec
         const id = setInterval(() => {
             setHistory([]);
             setSelectedGroups({});
-        }, THREAD_DUMP_INTERVAL_MS);
+        }, THREAD_DUMP_SLIDING_WINDOW_MS);
 
         return () => clearInterval(id);
     }, []);

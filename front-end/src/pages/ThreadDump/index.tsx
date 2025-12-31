@@ -21,6 +21,7 @@ import { Accordion, EmptyHandler, Loader } from "components";
 import { fetchData, getDisplayedThreadGroup } from "helpers";
 import { type IThread, type IThreadDumpResponseBody, type IThreadGroup, StatefulRequest } from "models";
 import { getThreadDumpData } from "services";
+import { THREAD_DUMP_SHORT_POLLING_INTERVAL_MS } from "utils";
 
 import { ThreadDumpAccordionBody } from "./ThreadDumpAccordionBody";
 import { ThreadDumpAccordionHeader } from "./ThreadDumpAccordionHeader";
@@ -41,7 +42,7 @@ const ThreadDump = () => {
 
         doFetch();
 
-        const intervalId = setInterval(doFetch, 1000);
+        const intervalId = setInterval(doFetch, THREAD_DUMP_SHORT_POLLING_INTERVAL_MS);
 
         return () => clearInterval(intervalId);
     }, []);
@@ -69,7 +70,7 @@ const ThreadDump = () => {
 
     return (
         <>
-            {/* Empty attribute required for the correct styling to be applied un MainLayout */}
+            {/* Empty attribute required for the correct styling to be applied, see MainLayout component styling */}
             <div data-thread-layout className={styles.TitleAndTimelineWrapper}>
                 <div className={`TextMedium ${styles.MainTitle}`}>{t("ThreadDump.title")}</div>
                 <ThreadDumpTimeLine />
