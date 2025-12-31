@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 
 import com.nucleonforge.axelix.common.auth.core.Authority;
 import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
+import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.core.Role;
 import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
-import com.nucleonforge.axelix.sbs.auth.model.DecodedUser;
 
 /**
  * Default implementation of {@link Authorizer}.

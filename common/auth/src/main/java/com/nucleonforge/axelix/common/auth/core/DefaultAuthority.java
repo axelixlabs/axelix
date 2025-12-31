@@ -68,6 +68,16 @@ public enum DefaultAuthority implements Authority {
     INFO,
 
     /**
+     * Grants authority to view Configuration Properties.
+     */
+    CONFIGPROPS,
+
+    /**
+     * Grants authority custom details endpoint.
+     */
+    DETAILS,
+
+    /**
      * Grants authority to view auto-configuration conditions.
      */
     CONDITIONS,
@@ -91,6 +101,21 @@ public enum DefaultAuthority implements Authority {
      * Grants authority to access application metrics.
      */
     METRICS,
+
+    /**
+     * Grants authority to access application loggers.
+     */
+    LOGGERS,
+
+    /**
+     * Grants authority to view scheduledtasks endpoint.
+     */
+    SCHEDULED_TASKS,
+
+    /**
+     * Grants authority to view custom scheduled-tasks-management endpoint.
+     */
+    SCHEDULED_TASKS_MANAGEMENT,
 
     /**
      * Grants authority to view controller and endpoint mappings.

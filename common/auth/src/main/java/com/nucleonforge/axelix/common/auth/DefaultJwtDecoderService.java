@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi.jwt.service;
+package com.nucleonforge.axelix.common.auth;
 
 import java.util.List;
 import java.util.Map;
@@ -31,18 +31,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.nucleonforge.axelix.common.auth.core.Authority;
+import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axelix.common.auth.core.DefaultRole;
+import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
 import com.nucleonforge.axelix.common.auth.core.Role;
-import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
-import com.nucleonforge.axelix.common.auth.spi.jwt.TokenClaim;
-import com.nucleonforge.axelix.sbs.auth.model.DecodedUser;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.ExpiredJwtTokenException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.InvalidJwtTokenException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.JwtParsingException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.JwtTokenDecodingException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.verification.JwtVerificationStrategy;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.verification.JwtVerificationStrategyFactory;
+import com.nucleonforge.axelix.common.auth.core.TokenClaim;
+import com.nucleonforge.axelix.common.auth.exception.ExpiredJwtTokenException;
+import com.nucleonforge.axelix.common.auth.exception.InvalidJwtTokenException;
+import com.nucleonforge.axelix.common.auth.exception.JwtParsingException;
+import com.nucleonforge.axelix.common.auth.exception.JwtTokenDecodingException;
 
 /**
  * Default implementation of {@link JwtDecoderService}.

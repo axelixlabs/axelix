@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi.jwt.exception;
-
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.JwtDecoderService;
+package com.nucleonforge.axelix.common.auth.exception;
 
 /**
  * Thrown when decoding or parsing a JWT token fails.
  *
- * @see JwtDecoderService
+ * @see com.nucleonforge.axelix.common.auth.JwtDecoderService
  * @since 23.07.2025
  * @author Nikita Kirillov
  */

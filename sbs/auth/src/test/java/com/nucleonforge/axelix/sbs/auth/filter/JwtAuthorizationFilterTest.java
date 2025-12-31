@@ -32,11 +32,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
+import com.nucleonforge.axelix.common.auth.DefaultJwtDecoderService;
+import com.nucleonforge.axelix.common.auth.JwtDecoderService;
+import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
 import com.nucleonforge.axelix.sbs.auth.spi.Authorizer;
 import com.nucleonforge.axelix.sbs.auth.spi.DefaultAuthorizer;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.DefaultJwtDecoderService;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.JwtDecoderService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -128,7 +128,7 @@ class JwtAuthorizationFilterTest {
     @Test
     void shouldReturnForbidden_UserWithoutRequiredAuthority() {
         ResponseEntity<String> response = restTemplate.exchange(
-                "/actuator/env", HttpMethod.GET, defaultEntity(tokenWithoutAuthorities), String.class);
+                "/actuator/axelix-env", HttpMethod.GET, defaultEntity(tokenWithoutAuthorities), String.class);
 
         assertThat(response)
                 .returns(HttpStatus.FORBIDDEN, ResponseEntity::getStatusCode)

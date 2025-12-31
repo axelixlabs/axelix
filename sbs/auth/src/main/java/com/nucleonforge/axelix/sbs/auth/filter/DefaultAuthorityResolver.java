@@ -34,19 +34,24 @@ import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
 public class DefaultAuthorityResolver implements AuthorityResolver {
 
     private final Map<String, Authority> pathAuthoritiesMap = Map.ofEntries(
+            Map.entry("/actuator/beans", DefaultAuthority.BEANS),
+            Map.entry("/actuator/axelix-caches/**", DefaultAuthority.CACHES),
             Map.entry("/actuator/cache-dispatcher/**", DefaultAuthority.CACHE_DISPATCHER),
             Map.entry("/actuator/property-management/**", DefaultAuthority.PROPERTY_MANAGEMENT),
             Map.entry("/actuator/profile-management/**", DefaultAuthority.PROFILE_MANAGEMENT),
-            Map.entry("/actuator/beans", DefaultAuthority.BEANS),
-            Map.entry("/actuator/caches/**", DefaultAuthority.CACHES),
             Map.entry("/actuator/health/**", DefaultAuthority.HEALTH),
             Map.entry("/actuator/info", DefaultAuthority.INFO),
             Map.entry("/actuator/conditions", DefaultAuthority.CONDITIONS),
-            Map.entry("/actuator/env**", DefaultAuthority.ENV),
+            Map.entry("/actuator/configprops", DefaultAuthority.CONFIGPROPS),
+            Map.entry("/actuator/axelix-details", DefaultAuthority.DETAILS),
+            Map.entry("/actuator/axelix-env/**", DefaultAuthority.ENV),
             Map.entry("/actuator/heapdump", DefaultAuthority.HEAP_DUMP),
             Map.entry("/actuator/threaddump", DefaultAuthority.THREAD_DUMP),
-            Map.entry("/actuator/metrics/**", DefaultAuthority.METRICS),
-            Map.entry("/actuator/mappings", DefaultAuthority.MAPPINGS));
+            Map.entry("/actuator/axelix-metrics/**", DefaultAuthority.METRICS),
+            Map.entry("/actuator/loggers/**", DefaultAuthority.LOGGERS),
+            Map.entry("/actuator/mappings", DefaultAuthority.MAPPINGS),
+            Map.entry("/actuator/scheduledtasks/**", DefaultAuthority.SCHEDULED_TASKS),
+            Map.entry("/actuator/scheduled-tasks-management/**", DefaultAuthority.SCHEDULED_TASKS_MANAGEMENT));
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 

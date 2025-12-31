@@ -17,7 +17,7 @@ package com.nucleonforge.axelix.master.autoconfiguration.auth;
 
 import java.time.Duration;
 
-import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
+import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
 
 /**
  * JWT configuration properties.

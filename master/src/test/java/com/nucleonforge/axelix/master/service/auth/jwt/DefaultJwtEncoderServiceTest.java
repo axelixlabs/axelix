@@ -38,9 +38,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axelix.common.auth.core.DefaultRole;
 import com.nucleonforge.axelix.common.auth.core.DefaultUser;
+import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
 import com.nucleonforge.axelix.common.auth.core.Role;
 import com.nucleonforge.axelix.common.auth.core.User;
-import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
 import com.nucleonforge.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
 import com.nucleonforge.axelix.master.exception.auth.JwtTokenGenerationException;
 

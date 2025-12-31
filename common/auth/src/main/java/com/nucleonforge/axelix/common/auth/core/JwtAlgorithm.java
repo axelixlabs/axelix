@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.common.auth.spi.jwt;
+package com.nucleonforge.axelix.common.auth.core;
 
 import java.util.Arrays;
 

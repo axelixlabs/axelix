@@ -25,15 +25,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import com.nucleonforge.axelix.common.auth.DefaultJwtDecoderService;
+import com.nucleonforge.axelix.common.auth.JwtDecoderService;
+import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axelix.common.auth.core.DefaultRole;
+import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
 import com.nucleonforge.axelix.common.auth.core.Role;
-import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
-import com.nucleonforge.axelix.sbs.auth.model.DecodedUser;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.ExpiredJwtTokenException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.InvalidJwtTokenException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.DefaultJwtDecoderService;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.JwtDecoderService;
+import com.nucleonforge.axelix.common.auth.exception.ExpiredJwtTokenException;
+import com.nucleonforge.axelix.common.auth.exception.InvalidJwtTokenException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

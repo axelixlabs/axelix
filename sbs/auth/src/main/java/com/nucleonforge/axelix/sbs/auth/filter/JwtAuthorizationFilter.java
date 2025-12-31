@@ -31,16 +31,16 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.nucleonforge.axelix.common.auth.JwtDecoderService;
 import com.nucleonforge.axelix.common.auth.core.Authority;
 import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
+import com.nucleonforge.axelix.common.auth.core.DecodedUser;
+import com.nucleonforge.axelix.common.auth.exception.ExpiredJwtTokenException;
+import com.nucleonforge.axelix.common.auth.exception.InvalidJwtTokenException;
+import com.nucleonforge.axelix.common.auth.exception.JwtParsingException;
+import com.nucleonforge.axelix.common.auth.exception.JwtTokenDecodingException;
 import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
-import com.nucleonforge.axelix.sbs.auth.model.DecodedUser;
 import com.nucleonforge.axelix.sbs.auth.spi.Authorizer;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.ExpiredJwtTokenException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.InvalidJwtTokenException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.JwtParsingException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.JwtTokenDecodingException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.JwtDecoderService;
 
 /**
  * A custom servlet filter that restricts access to Actuator endpoints based on JWT token presence, validity,

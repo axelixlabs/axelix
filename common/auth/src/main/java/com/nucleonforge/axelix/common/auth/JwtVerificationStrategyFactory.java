@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi.jwt.verification;
+package com.nucleonforge.axelix.common.auth;
 
-import com.nucleonforge.axelix.common.auth.spi.jwt.JwtAlgorithm;
+import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
 
 /**
  * Factory class for creating JWT verification strategy instances based on the specified algorithm.

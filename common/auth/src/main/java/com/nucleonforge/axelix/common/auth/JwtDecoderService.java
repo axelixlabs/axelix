@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi.jwt.service;
+package com.nucleonforge.axelix.common.auth;
 
+import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.core.User;
-import com.nucleonforge.axelix.sbs.auth.model.DecodedUser;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.ExpiredJwtTokenException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.InvalidJwtTokenException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.JwtParsingException;
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.exception.JwtTokenDecodingException;
+import com.nucleonforge.axelix.common.auth.exception.ExpiredJwtTokenException;
+import com.nucleonforge.axelix.common.auth.exception.InvalidJwtTokenException;
+import com.nucleonforge.axelix.common.auth.exception.JwtParsingException;
+import com.nucleonforge.axelix.common.auth.exception.JwtTokenDecodingException;
 
 /**
  * Contract for decoding and validating JWT tokens into {@link User} representations.

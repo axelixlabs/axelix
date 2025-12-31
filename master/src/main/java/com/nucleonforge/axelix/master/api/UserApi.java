@@ -110,7 +110,6 @@ public class UserApi {
     /**
      * Logout current user.
      *
-     * @param authToken the auth token. Expected to be sent in the {@link HttpHeaders#COOKIE Cookie Header}.
      * @return the HTTP Response with expired aut token cookie.
      */
     @Operation(

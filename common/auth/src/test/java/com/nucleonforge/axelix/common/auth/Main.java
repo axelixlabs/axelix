@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi.jwt.exception;
+package com.nucleonforge.axelix.common.auth;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Indicates that an error occurred while parsing a JWT (JSON Web Token).
+ * Minimal Spring Boot application used exclusively for testing this application.
  *
- * @since 26.08.2025
- * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public class JwtParsingException extends RuntimeException {
-
-    public JwtParsingException(String message) {
-        super(message);
+@SpringBootApplication
+public class Main {
+    public static void main(String[] args) {
+        SpringApplication.run(Main.class, args);
     }
 }

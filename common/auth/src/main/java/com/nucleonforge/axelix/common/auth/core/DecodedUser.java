@@ -13,20 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi.jwt.exception;
+package com.nucleonforge.axelix.common.auth.core;
 
-import com.nucleonforge.axelix.sbs.auth.spi.jwt.service.JwtDecoderService;
+import java.util.Set;
 
 /**
- * Indicates that the JWT token has expired and can no longer be used.
+ * The user that gets decoded from JWT token.
  *
- * @see JwtDecoderService
- * @since 23.07.2025
- * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public class ExpiredJwtTokenException extends RuntimeException {
-
-    public ExpiredJwtTokenException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
-}
+public record DecodedUser(String username, Set<Role> roles) {}

@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.model;
+package com.nucleonforge.axelix.common.auth.exception;
 
-import java.util.Set;
-
-import com.nucleonforge.axelix.common.auth.core.Role;
+import com.nucleonforge.axelix.common.auth.JwtDecoderService;
 
 /**
- * The user that gets decoded from JWT token.
+ * Indicates that a provided JWT token is invalid.
  *
- * @author Mikhail Polivakha
+ * <p>This may occur due to tampering, incorrect signature, or structural issues in the token.</p>
+ *
+ * @see JwtDecoderService
+ * @since 23.07.2025
+ * @author Nikita Kirillov
  */
-public record DecodedUser(String username, Set<Role> roles) {}
+public class InvalidJwtTokenException extends RuntimeException {
+
+    public InvalidJwtTokenException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+}

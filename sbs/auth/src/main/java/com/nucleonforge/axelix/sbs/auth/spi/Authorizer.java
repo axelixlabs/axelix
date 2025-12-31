@@ -16,9 +16,9 @@
 package com.nucleonforge.axelix.sbs.auth.spi;
 
 import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
+import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.core.User;
 import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
-import com.nucleonforge.axelix.sbs.auth.model.DecodedUser;
 
 /**
  * SPI interface that is capable of authorizing the given {@link User} against an {@link AuthorizationRequest}.
