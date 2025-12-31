@@ -52,7 +52,8 @@ public class CachesFeedConverter implements Converter<CachesFeed, CachesResponse
 
     private List<Caches> convertCache(List<CachesFeed.Caches> caches) {
         return caches.stream()
-                .map(c -> new Caches(c.name(), c.target(), c.enabled()))
+                .map(c -> new Caches(
+                        c.name(), c.target(), c.hitsCount(), c.missesCount(), c.estimatedEntrySize(), c.enabled()))
                 .toList();
     }
 }

@@ -88,6 +88,9 @@ public class CachesReadApiTest {
                 {
                   "name": "countries",
                   "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "hitsCount" : 15,
+                  "missesCount" : 2,
+                  "estimatedEntrySize": 10,
                   "enabled": true
                 }
               ]
@@ -98,11 +101,17 @@ public class CachesReadApiTest {
                 {
                   "name": "cities",
                   "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "hitsCount" : 25,
+                  "missesCount" : 5,
+                  "estimatedEntrySize": 6,
                   "enabled": false
                 },
                 {
                   "name": "countries",
                   "target" : "java.util.concurrent.ConcurrentHashMap",
+                  "hitsCount" : 35,
+                  "missesCount" : 5,
+                  "estimatedEntrySize": 10,
                   "enabled": true
                 }
               ]
@@ -141,6 +150,9 @@ public class CachesReadApiTest {
                 {
                   "name": "countries",
                   "target": "java.util.concurrent.ConcurrentHashMap",
+                  "hitsCount" : 15,
+                  "missesCount" : 2,
+                  "estimatedEntrySize": 10,
                   "enabled" : true
                 }
               ]
@@ -151,11 +163,17 @@ public class CachesReadApiTest {
                 {
                   "name": "cities",
                   "target": "java.util.concurrent.ConcurrentHashMap",
+                  "hitsCount" : 25,
+                  "missesCount" : 5,
+                  "estimatedEntrySize": 6,
                   "enabled" : false
                 },
                 {
                   "name": "countries",
                   "target": "java.util.concurrent.ConcurrentHashMap",
+                  "hitsCount" : 35,
+                  "missesCount" : 5,
+                  "estimatedEntrySize": 10,
                   "enabled" : true
                 }
               ]

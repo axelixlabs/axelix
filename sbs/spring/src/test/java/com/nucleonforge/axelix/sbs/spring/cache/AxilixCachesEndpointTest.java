@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.cache.CachesEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -43,7 +44,7 @@ import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link AxilixCachesEndpoint}.
+ * Integration tests for {@link AxelixCachesEndpoint}.
  * <p>
  * TODO:
  *  Gosh, we need to refactor this test to use String Templates if
@@ -54,10 +55,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 24.06.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
 @Import({
-    AxilixCachesEndpoint.class,
+    AxelixCachesEndpoint.class,
     DefaultCacheDispatcher.class,
     AxilixCachesEndpointTest.CacheDispatcherEndpointTestConfiguration.class,
     CachesEndpoint.class
@@ -260,6 +262,9 @@ class AxilixCachesEndpointTest {
                 .orElseThrow();
         assertThat(cache1Info.enabled()).isTrue();
         assertThat(cache1Info.target()).isNotNull();
+        assertThat(cache1Info.missesCount()).isEqualTo(0);
+        assertThat(cache1Info.hitsCount()).isEqualTo(0);
+        assertThat(cache1Info.estimatedEntrySize()).isEqualTo(0);
 
         Caches cache2Info = cacheManagers.caches().stream()
                 .filter(c -> TEST_CACHE_2.equals(c.name()))
@@ -267,6 +272,54 @@ class AxilixCachesEndpointTest {
                 .orElseThrow();
         assertThat(cache2Info.enabled()).isTrue();
         assertThat(cache2Info.target()).isNotNull();
+        assertThat(cache2Info.missesCount()).isEqualTo(0);
+        assertThat(cache2Info.hitsCount()).isEqualTo(0);
+        assertThat(cache2Info.estimatedEntrySize()).isEqualTo(0);
+    }
+
+    @Test
+    void concurrentCache_shouldReturnCacheInformation() {
+        Cache cache1 = cacheManager.getCache(TEST_CACHE_1);
+        cache1.put("key1", "value1");
+        cache1.put("key2", "value2");
+        cache1.put("key3", "value3");
+        cache1.get("key1");
+        cache1.get("key2");
+
+        Cache cache2 = cacheManager.getCache(TEST_CACHE_2);
+        cache2.put("key", "value");
+        cache2.get("key");
+        cache2.get("notCache1");
+        cache2.get("notCache2");
+
+        ResponseEntity<CachesFeed> response = testRestTemplate.getForEntity(rootPath(), CachesFeed.class);
+
+        CacheManagers cacheManagers = response.getBody().cacheManagers().stream()
+                .filter(cm -> TEST_CACHE_MANAGER.equals(cm.name()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(cacheManagers.caches()).hasSize(2);
+
+        Caches cache1Info = cacheManagers.caches().stream()
+                .filter(c -> TEST_CACHE_1.equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(cache1Info.enabled()).isTrue();
+        assertThat(cache1Info.target()).isNotNull();
+        assertThat(cache1Info.missesCount()).isEqualTo(0L);
+        assertThat(cache1Info.hitsCount()).isEqualTo(2L);
+        assertThat(cache1Info.estimatedEntrySize()).isEqualTo(3L);
+
+        Caches cache2Info = cacheManagers.caches().stream()
+                .filter(c -> TEST_CACHE_2.equals(c.name()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(cache2Info.enabled()).isTrue();
+        assertThat(cache2Info.target()).isNotNull();
+        assertThat(cache2Info.missesCount()).isEqualTo(2L);
+        assertThat(cache2Info.hitsCount()).isEqualTo(1L);
+        assertThat(cache2Info.estimatedEntrySize()).isEqualTo(1L);
     }
 
     @Test
@@ -452,6 +505,11 @@ class AxilixCachesEndpointTest {
 
     @TestConfiguration
     public static class CacheDispatcherEndpointTestConfiguration {
+        @Bean
+        @ConditionalOnMissingBean
+        public CacheSizeProvider cacheSizeProvider() {
+            return new DefaultCacheSizeProvider();
+        }
 
         @Bean
         public static CacheManagerBeanPostProcessor cacheManagerBeanPostProcessor() {

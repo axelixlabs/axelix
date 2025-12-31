@@ -26,10 +26,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axelix.sbs.spring.cache.AxilixCachesEndpoint;
+import com.nucleonforge.axelix.sbs.spring.cache.AxelixCachesEndpoint;
 import com.nucleonforge.axelix.sbs.spring.cache.CacheDispatcher;
 import com.nucleonforge.axelix.sbs.spring.cache.CacheManagerBeanPostProcessor;
+import com.nucleonforge.axelix.sbs.spring.cache.CacheSizeProvider;
 import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheDispatcher;
+import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheSizeProvider;
+import com.nucleonforge.axelix.sbs.spring.cache.EnhancedCacheManager;
 
 /**
  * {@code CacheDispatcherAutoConfiguration} provides auto-configuration
@@ -39,7 +42,7 @@ import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheDispatcher;
  * <ul>
  *     <li>{@link DefaultCacheDispatcher} — dispatcher that coordinates cache operations across
  *  *     all registered {@link CacheManager} beans,</li>
- *     <li>{@link AxilixCachesEndpoint} — a custom Spring Boot Actuator endpoint for cache management.</li>
+ *     <li>{@link AxelixCachesEndpoint} — a custom Spring Boot Actuator endpoint for cache management.</li>
  * </ul>
  * <p>Auto-configuration is only activated if a {@link CacheManager}
  * bean is available in the application context.
@@ -50,6 +53,7 @@ import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheDispatcher;
  *
  * @since 24.06.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @AutoConfiguration(after = {CacheAutoConfiguration.class, CachesEndpoint.class})
 @ConditionalOnAvailableEndpoint(endpoint = CachesEndpoint.class)
@@ -58,14 +62,24 @@ public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CacheDispatcher cacheDispatcher(Map<String, CacheManager> managerMap) {
-        return new DefaultCacheDispatcher(managerMap);
+    public CacheSizeProvider cacheSizeProvider() {
+        return new DefaultCacheSizeProvider();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public AxilixCachesEndpoint cacheDispatcherEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
-        return new AxilixCachesEndpoint(dispatcher, delegate);
+    public CacheDispatcher cacheDispatcher(Map<String, CacheManager> managerMap, CacheSizeProvider cacheSizeProvider) {
+        return new DefaultCacheDispatcher(managerMap, cacheSizeProvider);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AxelixCachesEndpoint cacheDispatcherEndpoint(
+            CacheDispatcher dispatcher,
+            CachesEndpoint delegate,
+            EnhancedCacheManager enhancedCacheManager,
+            CacheSizeProvider cacheSizeProvider) {
+        return new AxelixCachesEndpoint(dispatcher, delegate, enhancedCacheManager, cacheSizeProvider);
     }
 
     @Bean

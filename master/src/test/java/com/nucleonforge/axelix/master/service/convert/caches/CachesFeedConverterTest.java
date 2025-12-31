@@ -59,6 +59,9 @@ public class CachesFeedConverterTest {
                 .first()
                 .satisfies(caches -> assertThat(caches.name()).isEqualTo("countries"))
                 .satisfies(caches -> assertThat(caches.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap"))
+                .satisfies(caches -> assertThat(caches.hitsCount()).isEqualTo(0))
+                .satisfies(caches -> assertThat(caches.missesCount()).isEqualTo(0))
+                .satisfies(caches -> assertThat(caches.estimatedEntrySize()).isEqualTo(0))
                 .satisfies(caches -> assertThat(caches.enabled()).isFalse());
 
         // CacheManagers -> "cacheManager"
@@ -75,6 +78,9 @@ public class CachesFeedConverterTest {
                 .first()
                 .satisfies(caches -> assertThat(caches.name()).isEqualTo("countries"))
                 .satisfies(caches -> assertThat(caches.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap"))
+                .satisfies(caches -> assertThat(caches.hitsCount()).isEqualTo(0))
+                .satisfies(caches -> assertThat(caches.missesCount()).isEqualTo(0))
+                .satisfies(caches -> assertThat(caches.estimatedEntrySize()).isEqualTo(0))
                 .satisfies(caches -> assertThat(caches.enabled()).isFalse());
 
         // "cacheManager" -> Caches -> "cities"
@@ -83,6 +89,9 @@ public class CachesFeedConverterTest {
                 .first()
                 .satisfies(caches -> assertThat(caches.name()).isEqualTo("cities"))
                 .satisfies(caches -> assertThat(caches.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap"))
+                .satisfies(caches -> assertThat(caches.hitsCount()).isEqualTo(11))
+                .satisfies(caches -> assertThat(caches.missesCount()).isEqualTo(2))
+                .satisfies(caches -> assertThat(caches.estimatedEntrySize()).isEqualTo(5))
                 .satisfies(caches -> assertThat(caches.enabled()).isTrue());
 
         // "cacheManager" -> Caches -> "test"
@@ -91,14 +100,17 @@ public class CachesFeedConverterTest {
                 .first()
                 .satisfies(caches -> assertThat(caches.name()).isEqualTo("test"))
                 .satisfies(caches -> assertThat(caches.target()).isEqualTo("java.util.concurrent.TestHashMap"))
+                .satisfies(caches -> assertThat(caches.hitsCount()).isEqualTo(5))
+                .satisfies(caches -> assertThat(caches.missesCount()).isEqualTo(0))
+                .satisfies(caches -> assertThat(caches.estimatedEntrySize()).isEqualTo(5))
                 .satisfies(caches -> assertThat(caches.enabled()).isTrue());
     }
 
     public CachesFeed getCaches() {
         // Caches
-        Caches cities = new Caches("cities", "java.util.concurrent.ConcurrentHashMap", true);
-        Caches countries = new Caches("countries", "java.util.concurrent.ConcurrentHashMap", false);
-        Caches test = new Caches("test", "java.util.concurrent.TestHashMap", true);
+        Caches cities = new Caches("cities", "java.util.concurrent.ConcurrentHashMap", 11L, 2L, 5L, true);
+        Caches countries = new Caches("countries", "java.util.concurrent.ConcurrentHashMap", 0L, 0L, 0L, false);
+        Caches test = new Caches("test", "java.util.concurrent.TestHashMap", 5L, 0L, 5L, true);
 
         // CacheManagers
         CacheManagers anotherCacheManager = new CacheManagers("anotherCacheManager", List.of(countries));

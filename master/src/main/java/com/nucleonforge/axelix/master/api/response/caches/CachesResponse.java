@@ -18,6 +18,8 @@ package com.nucleonforge.axelix.master.api.response.caches;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
+
 /**
  * The profile contains a list of all cache managers in the application.
  *
@@ -44,11 +46,20 @@ public record CachesResponse(List<CacheManagers> cacheManagers) {
     /**
      * The profile contains details about the cache.
      *
-     * @param name    The cache name.
-     * @param target  The fully qualified name of the native cache.
-     * @param enabled Whether the cache is enabled ({@code true}) or disabled ({@code false}).
+     * @param name                  The cache name.
+     * @param target                The fully qualified name of the native cache.
+     * @param hitsCount             The number of cache hits, or {@code null} if unknown.
+     * @param missesCount           The number of cache misses, or {@code null} if unknown.
+     * @param estimatedEntrySize    The estimated number of entries in the cache, or {@code null} if unknown.
+     * @param enabled               Whether the cache is enabled ({@code true}) or disabled ({@code false}).
      *
      * @author Sergey Cherkasov
      */
-    public record Caches(String name, String target, boolean enabled) {}
+    public record Caches(
+            String name,
+            String target,
+            @Nullable Long hitsCount,
+            @Nullable Long missesCount,
+            @Nullable Long estimatedEntrySize,
+            boolean enabled) {}
 }

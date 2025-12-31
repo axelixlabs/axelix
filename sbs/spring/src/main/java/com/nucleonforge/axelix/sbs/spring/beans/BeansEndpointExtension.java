@@ -48,7 +48,7 @@ import com.nucleonforge.axelix.common.api.BeansFeed.Context;
  *
  * @since 08.10.2025
  * @author Nikita Kirillov
- * @author Sergey  Cherkasov
+ * @author Sergey Cherkasov
  */
 @EndpointWebExtension(endpoint = BeansEndpoint.class)
 public class BeansEndpointExtension {
