@@ -53,7 +53,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Integration tests for {@link JwtEncoderService}, verifying correct JWT generation logic.
  *
  * @author Nikita Kirillov
- * @since 22.07.2025
+ * @author Mikhail Polivakha
  */
 @EnableConfigurationProperties
 @SpringBootTest(classes = SecurityAutoConfiguration.JwtAutoConfiguration.class)
@@ -388,23 +388,4 @@ class DefaultJwtEncoderServiceTest {
         String[] parts = token.split("\\.");
         return new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
     }
-
-    //    /**
-    //     * Minimal test configuration for {@link JwtEncoderService} integration testing.
-    //     *
-    //     * <p>Registers a {@link JwtEncoderService} bean for use in test cases. Relies on external configuration
-    //     * properties {@code axelix.master.auth.jwt.algorithm}, {@code axelix.master.auth.jwt.signing_key}
-    //     * and {@code axelix.master.auth.jwt.lifespan} to initialize the service.</p>
-    //     */
-    //    @TestConfiguration
-    //    public static class JwtEncoderServiceConfig {
-
-    //        @Bean
-    //        public JwtEncoderService jwtEncoderService(
-    //                final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-    //                final @Value("${axelix.master.auth.jwt.signing_key}") String signingKey,
-    //                final @Value("${axelix.master.auth.jwt.lifespan}") Duration lifespan) {
-    //            return new DefaultJwtEncoderService(algorithm, signingKey, lifespan);
-    //        }
-    //    }
 }
