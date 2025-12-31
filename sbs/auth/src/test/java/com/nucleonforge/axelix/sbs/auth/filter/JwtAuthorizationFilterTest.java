@@ -19,12 +19,12 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -55,8 +55,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @since 28.07.2025
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration.class)
+@SpringBootTest(
+        classes = JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration.class,
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class JwtAuthorizationFilterTest {
 
     @Autowired
@@ -237,7 +238,8 @@ class JwtAuthorizationFilterTest {
      * <p>Registers required beans including {@link JwtDecoderService}, and
      * {@link JwtAuthorizationFilter} for use in the test suite.
      */
-    @TestConfiguration
+    @SpringBootConfiguration
+    @EnableAutoConfiguration
     static class JwtAuthorizationFilterTestConfiguration {
 
         @Bean

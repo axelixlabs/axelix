@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi;
+package com.nucleonforge.axelix.common.auth;
 
 import java.util.Set;
 
@@ -21,12 +21,10 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axelix.common.auth.DefaultJwtDecoderService;
-import com.nucleonforge.axelix.common.auth.JwtDecoderService;
 import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axelix.common.auth.core.DefaultRole;
@@ -201,7 +199,7 @@ class DefaultJwtDecoderServiceTest {
      * <p>Registers beans for {@link JwtDecoderService}, allowing
      * full-stack testing of JWT encoding and decoding within a Spring context.</p>
      */
-    @TestConfiguration
+    @SpringBootConfiguration
     public static class JwtDecoderServiceConfig {
 
         @Bean
