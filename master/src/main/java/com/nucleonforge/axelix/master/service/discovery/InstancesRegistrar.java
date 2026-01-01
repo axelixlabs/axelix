@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -50,6 +51,7 @@ public class InstancesRegistrar {
         this.instanceRegistry = instanceRegistry;
     }
 
+    @Async
     @EventListener(ApplicationReadyEvent.class)
     public void register() {
         Set<Instance> discovered = instancesDiscoverer.discoverSafely();
