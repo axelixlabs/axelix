@@ -21,6 +21,11 @@ export const HEALTH_STATUSES_COLORS: Record<EInstanceStatus, string> = {
     [EInstanceStatus.UNKNOWN]: "#838383",
 };
 
+/**
+ * Constant that represents how many radians are in the single degree.
+ */
+export const RADIAN = Math.PI / 180;
+
 const PIE_CHARTS_COLORS_PALETTE = ["#0366a6", "#9061aa", "#d68026", "#ffff00", "#006600"];
 
 /**

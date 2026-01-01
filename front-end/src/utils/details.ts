@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {format} from "date-fns";
+import { format } from "date-fns";
 
 export const DETAILS_I18N_PREFIX = "Details";
 
