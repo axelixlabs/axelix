@@ -15,6 +15,8 @@
  */
 package com.nucleonforge.axelix.sbs.spring.master;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.util.List;
 
 import org.springframework.boot.actuate.health.HealthEndpoint;
@@ -32,6 +34,8 @@ import com.nucleonforge.axelix.common.api.registration.ShortBuildInfo;
  * @author Mikhail Polivakha
  */
 public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler {
+
+    private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 
     private final HealthEndpoint healthEndpoint;
     private final GitInformationProvider gitInformationProvider;
@@ -73,7 +77,9 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                         libraryDiscoverer
                                 .getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin")
                                 .orElse(null)),
-                getCurrentHealth());
+                getCurrentHealth(),
+                new ServiceMetadata.MemoryDetails(
+                        memoryMXBean.getHeapMemoryUsage().getUsed()));
     }
 
     private ServiceMetadata.HealthStatus getCurrentHealth() {

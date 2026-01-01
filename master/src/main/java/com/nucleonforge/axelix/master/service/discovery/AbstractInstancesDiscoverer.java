@@ -33,6 +33,7 @@ import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.model.instance.Instance;
+import com.nucleonforge.axelix.master.service.MemoryUsageCache;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
@@ -49,14 +50,17 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     private final Logger logger;
     private final DiscoveryClient discoveryClient;
     private final ManagedServiceMetadataEndpointProber managedServiceProber;
+    private final MemoryUsageCache memoryUsageCache;
 
     public AbstractInstancesDiscoverer(
             Logger logger,
             DiscoveryClient discoveryClient,
-            ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber) {
+            ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
+            MemoryUsageCache memoryUsageCache) {
         this.discoveryClient = discoveryClient;
         this.managedServiceProber = managedServiceMetadataEndpointProber;
         this.logger = logger;
+        this.memoryUsageCache = memoryUsageCache;
     }
 
     @Override
@@ -125,7 +129,9 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
 
     private @Nullable Instance toDomainInstanceSafe(InstanceIntermediateProfile intermediateProfile) {
         try {
-            return toDomainInstance(intermediateProfile);
+            Instance domainInstance = toDomainInstance(intermediateProfile);
+            recordMemoryUsage(intermediateProfile, domainInstance);
+            return domainInstance;
         } catch (IllegalArgumentException e) {
             logger.warn(
                     "Unable to convert the discovered service : {} to its internal representation to make it manageable. Skipping registration",
@@ -133,6 +139,11 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
                     e);
             return null;
         }
+    }
+
+    private void recordMemoryUsage(InstanceIntermediateProfile intermediateProfile, Instance domainInstance) {
+        long heapSize = intermediateProfile.metadata.memoryDetails().heap();
+        memoryUsageCache.putHeapSize(domainInstance.id(), heapSize);
     }
 
     /**

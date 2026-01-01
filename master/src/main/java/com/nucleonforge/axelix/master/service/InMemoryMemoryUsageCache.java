@@ -42,17 +42,17 @@ public class InMemoryMemoryUsageCache implements MemoryUsageCache {
     }
 
     @Override
-    public double getRss(InstanceId instanceId) {
+    public double getHeapSize(InstanceId instanceId) {
         return Optional.ofNullable(cache.get(instanceId)).orElse(-1d);
     }
 
     @Override
-    public void putRss(InstanceId instanceId, double rss) {
+    public void putHeapSize(InstanceId instanceId, double rss) {
         cache.put(instanceId, rss);
     }
 
     @Override
-    public double getAverageRss() {
+    public double getAverageHeapSize() {
         return cache.values().stream()
                 .mapToDouble(Double::doubleValue)
                 .average()
@@ -60,7 +60,7 @@ public class InMemoryMemoryUsageCache implements MemoryUsageCache {
     }
 
     @Override
-    public double getTotalRss() {
+    public double getTotalHeapSize() {
         return cache.values().stream().reduce(0d, Double::sum);
     }
 }

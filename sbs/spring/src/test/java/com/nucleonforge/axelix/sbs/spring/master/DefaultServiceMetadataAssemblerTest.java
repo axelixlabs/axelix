@@ -76,5 +76,6 @@ class DefaultServiceMetadataAssemblerTest {
         assertThat(serviceMetadata.version()).isEqualTo("1.0.0-SNAPSHOT");
         assertThat(serviceMetadata.versions().springBoot()).isEqualTo("3.5.0");
         assertThat(serviceMetadata.healthStatus()).isEqualTo(ServiceMetadata.HealthStatus.UP);
+        assertThat(serviceMetadata.memoryDetails()).isNotNull();
     }
 }

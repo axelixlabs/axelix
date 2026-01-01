@@ -43,15 +43,15 @@ export const MemoryCards = ({ memoryUsage, statusesTotalCount }: IProps) => {
                     <div className={`TextMedium ${styles.CardValue}`}>{statusesTotalCount}</div>
                 </div>
                 <div className={styles.CardWrapper}>
-                    <div className={styles.CardTitle}>Average RSS</div>
+                    <div className={styles.CardTitle}>Average Heap Size</div>
                     <div className={`TextMedium ${styles.CardValue}`}>
-                        {memoryUsage.averageRss.value} {memoryUsage.averageRss.unit}
+                        {memoryUsage.averageHeapSize.value} {memoryUsage.averageHeapSize.unit}
                     </div>
                 </div>
                 <div className={styles.CardWrapper}>
-                    <div className={styles.CardTitle}>Total RSS</div>
+                    <div className={styles.CardTitle}>Total Heap Size</div>
                     <div className={`TextMedium ${styles.CardValue}`}>
-                        {memoryUsage.totalRss.value} {memoryUsage.totalRss.unit}
+                        {memoryUsage.totalHeapSize.value} {memoryUsage.totalHeapSize.unit}
                     </div>
                 </div>
             </div>

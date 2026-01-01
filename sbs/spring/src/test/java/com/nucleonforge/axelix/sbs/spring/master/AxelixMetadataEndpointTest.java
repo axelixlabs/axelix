@@ -75,7 +75,7 @@ class AxelixMetadataEndpointTest {
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
         JsonAssertions.assertThatJson(result.getBody())
                 // we do not want to know exactly the java version on which the test is going to run
-                .whenIgnoringPaths("jdkVendor", "versions")
+                .whenIgnoringPaths("versions")
                 .isEqualTo(
                         // language=json
                         """
@@ -83,14 +83,17 @@ class AxelixMetadataEndpointTest {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
-              "jdkVendor" : "BellSoft",
+              "jdkVendor" : "#{json-unit.ignore}",
               "versions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
-              "healthStatus" : "UP"
+              "healthStatus" : "UP",
+              "memory" : {
+                "heap" : "#{json-unit.ignore}"
+              }
             }
             """);
     }

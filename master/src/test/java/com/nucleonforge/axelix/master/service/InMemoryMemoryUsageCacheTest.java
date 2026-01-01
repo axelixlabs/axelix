@@ -37,26 +37,26 @@ class InMemoryMemoryUsageCacheTest {
     }
 
     @Test
-    void shouldGetRssForExistingService() {
+    void shouldGetHeapSizeForExistingService() {
         // given.
         InstanceId instanceId = InstanceId.of("1");
         double rssUsage = 150d;
-        subject.putRss(instanceId, rssUsage);
+        subject.putHeapSize(instanceId, rssUsage);
 
         // when.
-        double result = subject.getRss(instanceId);
+        double result = subject.getHeapSize(instanceId);
 
         // then.
         Assertions.assertThat(result).isEqualTo(rssUsage);
     }
 
     @Test
-    void shouldGetRssForNonRegisteredService() {
+    void shouldGetHeapSizeForNonRegisteredService() {
         // given.
         InstanceId instanceId = InstanceId.of("1");
 
         // when.
-        double result = subject.getRss(instanceId);
+        double result = subject.getHeapSize(instanceId);
 
         // then.
         Assertions.assertThat(result).isEqualTo(-1d);
@@ -65,12 +65,12 @@ class InMemoryMemoryUsageCacheTest {
     @Test
     void shouldReturnAverageRssUsage() {
         // given.
-        subject.putRss(InstanceId.of("1"), 150d);
-        subject.putRss(InstanceId.of("2"), 440d);
-        subject.putRss(InstanceId.of("3"), 333d);
+        subject.putHeapSize(InstanceId.of("1"), 150d);
+        subject.putHeapSize(InstanceId.of("2"), 440d);
+        subject.putHeapSize(InstanceId.of("3"), 333d);
 
         // when.
-        double result = subject.getAverageRss();
+        double result = subject.getAverageHeapSize();
 
         // then.
         Assertions.assertThat(result).isCloseTo((150d + 440d + 333d) / 3, Percentage.withPercentage(0.5d));

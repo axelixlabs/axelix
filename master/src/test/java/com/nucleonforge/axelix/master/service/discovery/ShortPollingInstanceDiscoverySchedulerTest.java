@@ -121,7 +121,10 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
-              "healthStatus" : "UP"
+              "healthStatus" : "UP",
+              "memory" : {
+                "heap" : 12000
+              }
             }
         """;
 
@@ -181,7 +184,10 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
-              "healthStatus" : "UP"
+              "healthStatus" : "UP",
+              "memory" : {
+                "heap" : 12000
+              }
             }
             """;
 
@@ -199,7 +205,10 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
-              "healthStatus" : "DOWN"
+              "healthStatus" : "DOWN",
+              "memory" : {
+                "heap" : 12000
+              }
             }
             """;
 
@@ -251,7 +260,10 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
-              "healthStatus" : "DOWN"
+              "healthStatus" : "DOWN",
+              "memory" : {
+                "heap" : 12000
+              }
             }
             """;
 

@@ -45,6 +45,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.nucleonforge.axelix.master.model.instance.Instance;
+import com.nucleonforge.axelix.master.service.InMemoryMemoryUsageCache;
+import com.nucleonforge.axelix.master.service.MemoryUsageCache;
 import com.nucleonforge.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InMemoryInstanceRegistry;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -72,6 +74,9 @@ class KubernetesInstanceDiscovererTest {
     @Autowired
     private ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber;
 
+    @Autowired
+    private MemoryUsageCache memoryUsageCache;
+
     private URI uri;
 
     private KubernetesInstanceDiscoverer subject;
@@ -95,6 +100,11 @@ class KubernetesInstanceDiscovererTest {
         public MetadataJacksonMessageDeserializationStrategy deserializationStrategy() {
             return new MetadataJacksonMessageDeserializationStrategy(new ObjectMapper());
         }
+
+        @Bean
+        public MemoryUsageCache memoryUsageCache() {
+            return new InMemoryMemoryUsageCache();
+        }
     }
 
     @BeforeEach
@@ -103,7 +113,8 @@ class KubernetesInstanceDiscovererTest {
         mockWebServer.start();
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
 
-        subject = new KubernetesInstanceDiscoverer(discoveryClient, managedServiceMetadataEndpointProber);
+        subject = new KubernetesInstanceDiscoverer(
+                discoveryClient, managedServiceMetadataEndpointProber, memoryUsageCache);
     }
 
     @AfterEach
@@ -129,7 +140,10 @@ class KubernetesInstanceDiscovererTest {
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
-              "healthStatus" : "UP"
+              "healthStatus" : "UP",
+              "memory" : {
+                "heap" : 12000
+              }
             }
             """;
 
@@ -198,7 +212,10 @@ class KubernetesInstanceDiscovererTest {
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
-              "healthStatus" : "UP"
+              "healthStatus" : "UP",
+              "memory" : {
+                "heap" : 12000
+              }
             }
             """;
         // language=json
@@ -215,7 +232,10 @@ class KubernetesInstanceDiscovererTest {
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
-              "healthStatus" : "UP"
+              "healthStatus" : "UP",
+              "memory" : {
+                "heap" : 12000
+              }
             }
             """;
 
@@ -315,7 +335,10 @@ class KubernetesInstanceDiscovererTest {
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
-              "healthStatus" : "UP"
+              "healthStatus" : "UP",
+              "memory" : {
+                "heap" : 12000
+              }
             }
         """;
 
@@ -391,7 +414,10 @@ class KubernetesInstanceDiscovererTest {
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
-              "healthStatus" : "UP"
+              "healthStatus" : "UP",
+              "memory" : {
+                "heap" : 12000
+              }
             }
         """;
 

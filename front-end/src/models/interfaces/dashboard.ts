@@ -48,7 +48,7 @@ export interface IDashboardResponseBody {
     healthStatus: IHealthStatus;
 
     /**
-     * Мemory usage metrics
+     * Memory usage metrics
      */
     memoryUsage: IMemoryUsage;
 }
@@ -57,12 +57,12 @@ export interface IMemoryUsage {
     /**
      * Average resident set size (RSS) memory usage
      */
-    averageRss: IMemoryMetric;
+    averageHeapSize: IMemoryMetric;
 
     /**
      * Total resident set size (RSS) memory usage
      * */
-    totalRss: IMemoryMetric;
+    totalHeapSize: IMemoryMetric;
 }
 
 interface IMemoryMetric {

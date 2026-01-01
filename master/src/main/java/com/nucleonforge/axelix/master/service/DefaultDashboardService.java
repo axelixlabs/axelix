@@ -109,8 +109,8 @@ public class DefaultDashboardService implements DashboardService {
                 .map(baseUnitValueTransformers::get)
                 .orElse(null);
 
-        double averageRss = memoryUsageCache.getAverageRss();
-        double totalRss = memoryUsageCache.getTotalRss();
+        double averageRss = memoryUsageCache.getAverageHeapSize();
+        double totalRss = memoryUsageCache.getTotalHeapSize();
 
         if (baseUnitValueTransformer != null) {
             TransformedMetricValue transformedAverageRss = baseUnitValueTransformer.transform(averageRss);

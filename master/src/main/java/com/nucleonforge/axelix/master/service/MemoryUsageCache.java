@@ -29,33 +29,33 @@ import com.nucleonforge.axelix.master.model.instance.InstanceId;
 public interface MemoryUsageCache {
 
     /**
-     * Get the RSS usage for the {@link Instance} with the given {@link InstanceId}.
+     * Get the heap usage for the {@link Instance} with the given {@link InstanceId}.
      *
-     * @param instanceId the id of the {@link Instance} for which RSS usage is recorded.
-     * @return the estimated amount of RSS in bytes that is occupied by instance,
-     *         identified by passed {@link InstanceId}, or -1 if the RSS usage for the
+     * @param instanceId the id of the {@link Instance} for which heap usage is recorded.
+     * @return the estimated amount of heap in bytes that is occupied by instance,
+     *         identified by passed {@link InstanceId}, or -1 if the heap usage for the
      *         given {@link InstanceId} is not recorded.
      */
-    double getRss(InstanceId instanceId);
+    double getHeapSize(InstanceId instanceId);
 
     /**
-     * Record the RSS usage for the {@link Instance} with the given {@link InstanceId}.
+     * Record the heap usage for the {@link Instance} with the given {@link InstanceId}.
      *
-     * @param instanceId the id of the {@link Instance} for which RSS usage is recorded.
-     * @param rss the estimated amount of RSS in bytes that have been used
+     * @param instanceId the id of the {@link Instance} for which heap usage is recorded.
+     * @param heap the estimated amount of heap in bytes that have been used
      *           by an {@link Instance} identified by passed {@link InstanceId}.
      */
-    void putRss(InstanceId instanceId, double rss);
+    void putHeapSize(InstanceId instanceId, double heap);
 
     /**
-     * @return the estimate of an average RSS in bytes among all the recorded services,
-     *         or -1 if this {@link MemoryUsageCache} does not have any RSS usages recorded yet.
+     * @return the estimate of an average heap in bytes among all the recorded services,
+     *         or -1 if this {@link MemoryUsageCache} does not have any heap usages recorded yet.
      */
-    double getAverageRss();
+    double getAverageHeapSize();
 
     /**
-     * @return get estimate of total rss usage by all instances or -1 if this
-     *         {@link MemoryUsageCache} does not have any RSS usages recorded yet.
+     * @return get estimate of total heap usage by all instances or -1 if this
+     *         {@link MemoryUsageCache} does not have any heap usages recorded yet.
      */
-    double getTotalRss();
+    double getTotalHeapSize();
 }

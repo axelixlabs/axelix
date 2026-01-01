@@ -69,9 +69,9 @@ class DefaultDashboardServiceTest {
 
     private static InMemoryMemoryUsageCache createInMemoryUsageCache() {
         var cache = new InMemoryMemoryUsageCache();
-        cache.putRss(InstanceId.of("123"), 300d);
-        cache.putRss(InstanceId.of("456"), 550d);
-        cache.putRss(InstanceId.of("789"), 410d);
+        cache.putHeapSize(InstanceId.of("123"), 300d);
+        cache.putHeapSize(InstanceId.of("456"), 550d);
+        cache.putHeapSize(InstanceId.of("789"), 410d);
 
         return cache;
     }

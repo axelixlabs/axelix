@@ -29,6 +29,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 
+import com.nucleonforge.axelix.master.service.MemoryUsageCache;
 import com.nucleonforge.axelix.master.service.discovery.InstancesDiscoverer;
 import com.nucleonforge.axelix.master.service.discovery.InstancesRegistrar;
 import com.nucleonforge.axelix.master.service.discovery.KubernetesDiscoveryClient;
@@ -90,8 +91,10 @@ public class DiscoveryAutoConfiguration {
         @Bean
         public KubernetesInstanceDiscoverer kubernetesInstanceDiscoverer(
                 DiscoveryClient discoveryClient,
-                ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber) {
-            return new KubernetesInstanceDiscoverer(discoveryClient, managedServiceMetadataEndpointProber);
+                ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
+                MemoryUsageCache memoryUsageCache) {
+            return new KubernetesInstanceDiscoverer(
+                    discoveryClient, managedServiceMetadataEndpointProber, memoryUsageCache);
         }
     }
 }

@@ -46,7 +46,8 @@ public record ServiceMetadata(
         @JsonProperty("commitShortSha") String commitShortSha,
         @JsonProperty("jdkVendor") String jdkVendor,
         @JsonProperty("versions") SoftwareVersions versions,
-        @JsonProperty("healthStatus") HealthStatus healthStatus) {
+        @JsonProperty("healthStatus") HealthStatus healthStatus,
+        @JsonProperty("memory") MemoryDetails memoryDetails) {
 
     /**
      * The health status of the given instance during registration.
@@ -80,4 +81,11 @@ public record ServiceMetadata(
             @JsonProperty("springBoot") String springBoot,
             @JsonProperty("springFramework") String springFramework,
             @JsonProperty("kotlin") @Nullable String kotlin) {}
+
+    /**
+     * Memory details of the given Instance.
+     *
+     * @param heap the estimated heap size of the given instance.
+     */
+    public record MemoryDetails(@JsonProperty("heap") long heap) {}
 }
