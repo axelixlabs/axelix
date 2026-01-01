@@ -10,6 +10,9 @@ spring:
       path: /api/${spring.application.name}
 
 management:
+  endpoint:
+    health:
+      enabled: true
   endpoints:
     web:
       exposure:

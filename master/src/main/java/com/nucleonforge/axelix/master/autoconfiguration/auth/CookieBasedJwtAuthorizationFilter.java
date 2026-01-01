@@ -16,6 +16,7 @@
 package com.nucleonforge.axelix.master.autoconfiguration.auth;
 
 import java.io.IOException;
+import java.util.Set;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -53,11 +54,15 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-
         // TODO:
         //  Here, the login endpoint URL is hardcoded, which is not really a good thing to be doing
-        return path.equals("/api/axelix/users/login");
+        return Set
+            .of(
+                "/api/axelix/users/login",
+                "/api/axelix/actuator/health/readiness",
+                "/api/axelix/actuator/health/liveness"
+            )
+            .contains(request.getRequestURI());
     }
 
     @Override
