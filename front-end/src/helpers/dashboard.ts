@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import type { EInstanceStatus, IDistribution, IHealthStatus } from "models";
-import { HEALTH_STATUSES_COLORS } from "utils";
+import { HEALTH_STATUSES_COLORS, pickColor } from "utils";
 
 export const prepareHealthStatusesChartData = (statuses: IHealthStatus["statuses"]) => {
     const statusesEntries = Object.entries(statuses) as [EInstanceStatus, number][];
@@ -30,19 +30,17 @@ export const getTotalStatusesCount = (statuses: IHealthStatus["statuses"]): numb
     return Object.entries(statuses).reduce((acc, [, statusCount]) => acc + statusCount, 0);
 };
 
-const generateRandomColor = (): string => {
-    return `#${Math.floor(Math.random() * 16777215)
-        .toString(16)
-        .padStart(6, "0")}`;
-};
-
 export const prepareDistributionDataPerChart = (distributions: IDistribution[]) => {
     return distributions.map(({ softwareComponentName, versions }) => {
-        const parsedVersions = Object.entries(versions).map(([version, value]) => ({
-            name: version,
-            value: value,
-            versionColor: generateRandomColor(),
-        }));
+        const parsedVersions = Object.entries(versions)
+            .sort(([ver1], [ver2]) => {
+                return ver1.localeCompare(ver2);
+            })
+            .map(([version, value]) => ({
+                name: version,
+                value: value,
+                versionColor: pickColor(softwareComponentName, version),
+            }));
 
         return {
             softwareComponentName: softwareComponentName,

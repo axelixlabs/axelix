@@ -51,6 +51,8 @@ export function Distributions({ distributions }: IProps) {
                                     cy="50%"
                                     outerRadius={100}
                                     label
+                                    labelLine={false}
+                                    stroke={versions.length > 1 ? "#fff" : "none"}
                                 >
                                     {versions.map(({ versionColor }) => (
                                         <Cell key={versionColor} fill={versionColor} />
