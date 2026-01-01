@@ -45,7 +45,7 @@ export const prepareDistributionDataPerChart = (distributions: IDistribution[]) 
         }));
 
         return {
-            name: softwareComponentName,
+            softwareComponentName: softwareComponentName,
             versions: parsedVersions,
         };
     });

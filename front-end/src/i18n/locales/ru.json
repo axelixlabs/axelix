@@ -169,6 +169,13 @@
     },
     "Dashboard": {
         "distributions": "Карта Системы",
+        "components" : {
+          "SpringBoot" : "Spring Boot",
+          "SpringFramework" : "Spring Framework",
+          "Java" : "Java",
+          "Kotlin": "Kotlin",
+          "JdkVendor": "JDK Vendor"
+        },
         "healthStatus": "Состояние системы",
         "totalCount": "Общее кол-во",
         "statistics": "Статистика",

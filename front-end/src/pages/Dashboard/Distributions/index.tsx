@@ -37,9 +37,9 @@ export function Distributions({ distributions }: IProps) {
         <div className={styles.MainWrapper}>
             <div className={`TextMedium ${styles.Title}`}>{t("Dashboard.distributions")}</div>
             <div className={styles.ChartsWrapper}>
-                {components.map(({ name, versions }) => (
-                    <div className={styles.SingleChartWrapper} key={name}>
-                        <div className={styles.CardTitle}>{name}</div>
+                {components.map(({ softwareComponentName, versions }) => (
+                    <div className={styles.SingleChartWrapper} key={softwareComponentName}>
+                        <div className={styles.CardTitle}>{t(`Dashboard.components.${softwareComponentName}`)}</div>
 
                         <ResponsiveContainer height={330} width="100%">
                             <PieChart>

@@ -26,5 +26,5 @@ public final class SoftwareDistributions {
     public static final String SPRING_BOOT = "SpringBoot";
     public static final String SPRING_FRAMEWORK = "SpringFramework";
     public static final String JDK_VENDOR = "JdkVendor";
-    public static final String KOTLIN = "KOT";
+    public static final String KOTLIN = "Kotlin";
 }
