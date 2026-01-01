@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { useTranslation } from "react-i18next";
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { Cell, Legend, Pie, PieChart, type PieLabelRenderProps, ResponsiveContainer, Tooltip } from "recharts";
 
-import { prepareDistributionDataPerChart } from "helpers";
+import { calculateInnerValueCoordinates, prepareDistributionDataPerChart } from "helpers";
 import type { IDistribution } from "models";
 
 import styles from "./styles.module.css";
@@ -32,6 +32,19 @@ export function Distributions({ distributions }: IProps) {
     const { t } = useTranslation();
 
     const components = prepareDistributionDataPerChart(distributions);
+
+    /**
+     * Function that renders an inner label (the actual value for the given category)
+     */
+    const renderInnerLabel = (props: PieLabelRenderProps, totalCategoriesCount: number) => {
+        const [x, y, value] = calculateInnerValueCoordinates(props, totalCategoriesCount);
+
+        return (
+            <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central">
+                {value}
+            </text>
+        );
+    };
 
     return (
         <div className={styles.MainWrapper}>
@@ -50,7 +63,15 @@ export function Distributions({ distributions }: IProps) {
                                     cx="50%"
                                     cy="50%"
                                     outerRadius={100}
-                                    label
+                                    label={(props: PieLabelRenderProps) => {
+                                        let sum = 0;
+
+                                        for (const version of versions) {
+                                            sum += version.value;
+                                        }
+
+                                        return renderInnerLabel(props, sum);
+                                    }}
                                     labelLine={false}
                                     stroke={versions.length > 1 ? "#fff" : "none"}
                                 >
