@@ -21,7 +21,7 @@ import { fetchData, isCopyableField, resolveLangIcon, resolveOsIcon } from "help
 import { type IDetailsCardRecord, type IDetailsResponseBody, StatefulRequest } from "models";
 import type { DetailsBuildValuesData } from "models/types/details";
 import { getDetailsData } from "services";
-import { DETAILS_I18N_PREFIX } from "utils";
+import { DETAILS_I18N_PREFIX, VALUE_TRANSFORMERS } from "utils";
 
 import { DetailsCard } from "./DetailsCard";
 import { DetailsHeader } from "./DetailsFirstSection";
@@ -56,7 +56,7 @@ const Details = () => {
                     key: key,
                     value: (
                         <>
-                            {value as string}
+                            {VALUE_TRANSFORMERS[key] ? VALUE_TRANSFORMERS[key](value) : value}
                             {isCopyableField(key as string) && <Copy text={value} />}
                         </>
                     ),

@@ -13,4 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {format} from "date-fns";
+
 export const DETAILS_I18N_PREFIX = "Details";
+
+export const VALUE_TRANSFORMERS: { [key: string]: (value: string) => string } = {
+    commitTimestamp: (timestamp: string) => {
+        const unixEpochTime = Number(timestamp);
+        if (Number.isFinite(unixEpochTime)) {
+            return format(new Date(unixEpochTime), "yyyy-MM-dd HH:mm:ss");
+        } else {
+            return timestamp;
+        }
+    },
+};

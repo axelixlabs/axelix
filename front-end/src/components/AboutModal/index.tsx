@@ -105,7 +105,7 @@ export function AboutModal({ open, setOpen }: IProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    {"About.githubSource"}
+                    {t("About.githubSource")}
                 </Button>
 
                 <Button size="small" shape="round" icon={<ReadOutlined />} href={referenceGuideLink} target="_blank">
