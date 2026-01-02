@@ -63,7 +63,10 @@ subprojects {
             removeUnusedImports()
             removeWildcardImports()
             trimTrailingWhitespace()
-            toggleOffOn()
+//            TODO:
+//             For some reason, toggling comments like spotless:off / spotless:on
+//             stopped working, disabled it for now
+//            toggleOffOn()
 
             licenseHeader(
                 Paths

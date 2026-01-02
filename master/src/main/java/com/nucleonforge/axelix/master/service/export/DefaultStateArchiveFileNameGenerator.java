@@ -34,13 +34,9 @@ public class DefaultStateArchiveFileNameGenerator implements StateArchiveFileNam
     public static final String STATE_ARCHIVE_FILE_TEMPLATE = "instance-state-%s-%s.zip";
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'mm-HH-ss");
 
-    // spotless:off
     @Override
     public String generate(InstanceId instanceId) {
         return STATE_ARCHIVE_FILE_TEMPLATE.formatted(
-            instanceId.instanceId(),
-            FORMATTER.format(Instant.now().atZone(ZoneOffset.systemDefault()))
-        );
+                instanceId.instanceId(), FORMATTER.format(Instant.now().atZone(ZoneOffset.systemDefault())));
     }
-    // spotless:on
 }

@@ -19,13 +19,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Properties;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * {@link AxelixVersionDiscoverer} that is based on the java properties file.
  *
  * @author Mikhail Polivakha
  */
+// TODO: introduce the caching decorator for this class.
 public class PropertiesAxelixVersionDiscoverer implements AxelixVersionDiscoverer {
 
     private static final String VERSION_KEY = "version";
@@ -43,25 +47,38 @@ public class PropertiesAxelixVersionDiscoverer implements AxelixVersionDiscovere
     @Override
     public String getVersion() throws IllegalStateException {
         try {
-            File proeprtiesFile = new File(ClassLoader.getSystemClassLoader()
-                    .getResource(propertiesFilePath)
-                    .toURI());
+            URL resource = ClassLoader.getSystemClassLoader().getResource(propertiesFilePath);
+
+            checkResourceFound(resource);
+
+            File proeprtiesFile = new File(resource.toURI());
             Properties properties = new Properties();
 
             properties.load(new FileReader(proeprtiesFile));
 
             String version = properties.getProperty(VERSION_KEY);
 
-            if (version == null) {
-                throw new IllegalStateException(
-                        "Axelix properties file under '%s' does not contain version mapping (value for key '%s')"
-                                .formatted(propertiesFilePath, VERSION_KEY));
-            }
+            checkVersionFound(version);
 
             return version;
 
         } catch (URISyntaxException | IOException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    private void checkVersionFound(@Nullable String version) {
+        if (version == null) {
+            throw new IllegalStateException(
+                    "Axelix properties file under '%s' does not contain version mapping (value for key '%s')"
+                            .formatted(propertiesFilePath, VERSION_KEY));
+        }
+    }
+
+    private void checkResourceFound(@Nullable URL resource) {
+        if (resource == null) {
+            throw new IllegalStateException(
+                    "The provided path to axelix properties file '%s' cannot be found".formatted(propertiesFilePath));
         }
     }
 }

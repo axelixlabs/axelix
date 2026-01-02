@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -45,6 +44,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.service.InMemoryMemoryUsageCache;
 import com.nucleonforge.axelix.master.service.MemoryUsageCache;
@@ -108,6 +108,11 @@ class KubernetesInstanceDiscovererTest {
         @Bean
         public MemoryUsageCache memoryUsageCache() {
             return new InMemoryMemoryUsageCache();
+        }
+
+        @Bean
+        public AxelixVersionDiscoverer axelixVersionDiscoverer() {
+            return () -> "1.0.0-SNAPSHOT";
         }
     }
 
@@ -250,31 +255,27 @@ class KubernetesInstanceDiscovererTest {
                 .setBody(goodVersionResponse)
                 .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
 
-        // spotless:off
         // firstService -> bad application version instance
-        ServiceInstance firstServiceBadVersion = Instancio
-            .of(KubernetesServiceInstance.class)
-            .set(Select.field("instanceId"), firstServiceInstanceBadVersionId)
-            .set(Select.field("serviceId"), firstServiceId)
-            .set(Select.field("secure"), false)
-            .set(Select.field("host"), uri.getHost())
-            .set(Select.field("port"), uri.getPort())
-            .create();
+        ServiceInstance firstServiceBadVersion = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), firstServiceInstanceBadVersionId)
+                .set(Select.field("serviceId"), firstServiceId)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
 
         // secondService -> good application version instance
-        ServiceInstance secondServiceGoodVersion = Instancio
-            .of(KubernetesServiceInstance.class)
-            .set(Select.field("instanceId"), secondServiceInstanceGoodVersionId)
-            .set(Select.field("serviceId"), secondServiceId)
-            .set(Select.field("secure"), false)
-            .set(Select.field("host"), uri.getHost())
-            .set(Select.field("port"), uri.getPort())
-            .create();
+        ServiceInstance secondServiceGoodVersion = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), secondServiceInstanceGoodVersionId)
+                .set(Select.field("serviceId"), secondServiceId)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
 
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of(firstServiceId, secondServiceId));
         Mockito.when(discoveryClient.getInstances(firstServiceId)).thenReturn(List.of(firstServiceBadVersion));
         Mockito.when(discoveryClient.getInstances(secondServiceId)).thenReturn(List.of(secondServiceGoodVersion));
-        // spotless:on
 
         Set<Instance> instances = subject.discover();
 

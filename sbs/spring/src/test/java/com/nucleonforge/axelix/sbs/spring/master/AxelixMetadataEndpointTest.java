@@ -31,6 +31,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 
+import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -61,6 +63,11 @@ class AxelixMetadataEndpointTest {
         CycloneDXSBOMLibraryDiscoverer cycloneDXSBOMLibraryDiscoverer() {
             return new CycloneDXSBOMLibraryDiscoverer(new ClassPathResource("other/application.cdx.json"));
         }
+
+        @Bean
+        AxelixVersionDiscoverer axelixVersionDiscoverer() {
+            return () -> "1.1.3";
+        }
     }
 
     @Test
@@ -80,7 +87,7 @@ class AxelixMetadataEndpointTest {
                         // language=json
                         """
             {
-              "version": "1.0.0-SNAPSHOT",
+              "version": "1.1.3",
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "#{json-unit.ignore}",

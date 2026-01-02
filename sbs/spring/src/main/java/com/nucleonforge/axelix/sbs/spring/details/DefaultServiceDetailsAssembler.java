@@ -83,12 +83,12 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
     }
 
     private SpringDetails getSpringDetails() {
-        // spotless:off
         var springBootVersion = libraryDiscoverer.getLibraryVersion("spring-boot", "org.springframework.boot");
         var springVersion = libraryDiscoverer.getLibraryVersion("spring-core", "org.springframework");
-        var springCloudVersion = libraryDiscoverer.getLibraryVersion("spring-cloud-commons", "org.springframework.cloud");
-        return new SpringDetails(springBootVersion.orElse(""), springVersion.orElse(""), springCloudVersion.orElse(null));
-        // spotless:on
+        var springCloudVersion =
+                libraryDiscoverer.getLibraryVersion("spring-cloud-commons", "org.springframework.cloud");
+        return new SpringDetails(
+                springBootVersion.orElse(""), springVersion.orElse(""), springCloudVersion.orElse(null));
     }
 
     private RuntimeDetails getRuntimeDetails() {

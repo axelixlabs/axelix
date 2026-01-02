@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 
 import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
+import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,6 +60,11 @@ class DefaultServiceMetadataAssemblerTest {
         CycloneDXSBOMLibraryDiscoverer cycloneDXSBOMLibraryDiscoverer() {
             return new CycloneDXSBOMLibraryDiscoverer(new ClassPathResource("other/application.cdx.json"));
         }
+
+        @Bean
+        AxelixVersionDiscoverer axelixVersionDiscoverer() {
+            return () -> "1.1.3";
+        }
     }
 
     @Test
@@ -73,7 +79,7 @@ class DefaultServiceMetadataAssemblerTest {
         assertThat(serviceMetadata.commitShortSha()).isEqualTo("a8b0929");
         assertThat(serviceMetadata.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
         assertThat(serviceMetadata.versions().java()).isEqualTo(System.getProperty("java.version"));
-        assertThat(serviceMetadata.version()).isEqualTo("1.0.0-SNAPSHOT");
+        assertThat(serviceMetadata.version()).isEqualTo("1.1.3");
         assertThat(serviceMetadata.versions().springBoot()).isEqualTo("3.5.0");
         assertThat(serviceMetadata.healthStatus()).isEqualTo(ServiceMetadata.HealthStatus.UP);
         assertThat(serviceMetadata.memoryDetails()).isNotNull();

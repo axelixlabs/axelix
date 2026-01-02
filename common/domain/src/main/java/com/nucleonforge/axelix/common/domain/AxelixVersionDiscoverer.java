@@ -15,11 +15,17 @@
  */
 package com.nucleonforge.axelix.common.domain;
 
+/**
+ * Interface for discovering the current version of Axelix software distribution.
+ *
+ * @author Mikhail Polivakha
+ */
 public interface AxelixVersionDiscoverer {
 
     /**
-     * @return the version of the Axelix distribution
-     * @throws IllegalStateException in case version cannot be determined.
+     * @return the version of the Axelix distribution. Never {@code null}.
+     * @throws IllegalStateException in case version cannot be determined or
+     *         there is an error in the process.
      */
     String getVersion() throws IllegalStateException;
 }

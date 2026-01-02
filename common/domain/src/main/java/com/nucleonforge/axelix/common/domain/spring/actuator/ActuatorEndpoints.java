@@ -66,10 +66,14 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint CLEAR_ALL_CACHES = of("/caches", HttpMethod.DELETE);
     public static final ActuatorEndpoint CLEAR_SINGLE_CACHES = of("/caches/{name}", HttpMethod.DELETE);
 
-    public static final ActuatorEndpoint ENABLE_CACHE = of("/axelix-caches/{cacheManagerName}/{cacheName}/enable", HttpMethod.POST);
-    public static final ActuatorEndpoint DISABLE_CACHE = of("/axelix-caches/{cacheManagerName}/{cacheName}/disable", HttpMethod.POST);
-    public static final ActuatorEndpoint ENABLE_CACHE_MANAGER = of("/axelix-caches/{cacheManagerName}/enable", HttpMethod.POST);
-    public static final ActuatorEndpoint DISABLE_CACHES_MANAGER = of("/axelix-caches/{cacheManagerName}/disable", HttpMethod.POST);
+    public static final ActuatorEndpoint ENABLE_CACHE =
+            of("/axelix-caches/{cacheManagerName}/{cacheName}/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint DISABLE_CACHE =
+            of("/axelix-caches/{cacheManagerName}/{cacheName}/disable", HttpMethod.POST);
+    public static final ActuatorEndpoint ENABLE_CACHE_MANAGER =
+            of("/axelix-caches/{cacheManagerName}/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint DISABLE_CACHES_MANAGER =
+            of("/axelix-caches/{cacheManagerName}/disable", HttpMethod.POST);
 
     // Conditions
     public static final ActuatorEndpoint CONDITIONS = of("/axelix-conditions", HttpMethod.GET);
@@ -88,7 +92,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // Health
     public static final ActuatorEndpoint HEALTH = of("/health", HttpMethod.GET);
     public static final ActuatorEndpoint HEALTH_COMPONENT = of("/health/{component}", HttpMethod.GET);
-    public static final ActuatorEndpoint HEALTH_SUB_COMPONENT = of("/health/{component}/{sub-component}", HttpMethod.GET);
+    public static final ActuatorEndpoint HEALTH_SUB_COMPONENT =
+            of("/health/{component}/{sub-component}", HttpMethod.GET);
 
     // Heap Dump
     public static final ActuatorEndpoint HEAP_DUMP = of("/heapdump", HttpMethod.GET);
@@ -152,8 +157,10 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     // @Scheduled tasks
     public static final ActuatorEndpoint SCHEDULED_TASKS = of("/axelix-scheduledtasks", HttpMethod.GET);
-    public static final ActuatorEndpoint ENABLE_SCHEDULED_TASK = of("/scheduled-tasks-management/enable", HttpMethod.POST);
-    public static final ActuatorEndpoint DISABLE_SCHEDULED_TASK = of("/scheduled-tasks-management/disable", HttpMethod.POST);
+    public static final ActuatorEndpoint ENABLE_SCHEDULED_TASK =
+            of("/scheduled-tasks-management/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint DISABLE_SCHEDULED_TASK =
+            of("/scheduled-tasks-management/disable", HttpMethod.POST);
 
     // Sessions
     public static final ActuatorEndpoint SESSION = of("/sessions", HttpMethod.GET);
@@ -168,8 +175,10 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     // Thread Dump
     public static final ActuatorEndpoint THREAD_DUMP = of("/threaddump", HttpMethod.GET);
-    public static final ActuatorEndpoint THREAD_DUMP_ENABLE_CONTENTION_MONITORING = of("/threaddump-management/enable", HttpMethod.POST);
-    public static final ActuatorEndpoint THREAD_DUMP_DISABLE_CONTENTION_MONITORING = of("/threaddump-management/disable", HttpMethod.POST);
+    public static final ActuatorEndpoint THREAD_DUMP_ENABLE_CONTENTION_MONITORING =
+            of("/threaddump-management/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint THREAD_DUMP_DISABLE_CONTENTION_MONITORING =
+            of("/threaddump-management/disable", HttpMethod.POST);
 
     // spotless:on
 

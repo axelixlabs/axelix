@@ -37,10 +37,14 @@ import org.mockito.Mockito;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
+import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -93,6 +97,16 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             }
         });
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
+    }
+
+    @TestConfiguration
+    static class CurrentConfiguration {
+
+        @Bean
+        @Primary
+        public AxelixVersionDiscoverer testAxelixVersionDiscoverer() {
+            return () -> "1.0.0-SNAPSHOT";
+        }
     }
 
     @AfterEach
