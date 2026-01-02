@@ -34,6 +34,8 @@ public class PropertiesAxelixVersionDiscoverer implements AxelixVersionDiscovere
 
     private static final String VERSION_KEY = "version";
 
+    private static final ClassLoader CLASS_LOADER = PropertiesAxelixVersionDiscoverer.class.getClassLoader();
+
     private final String propertiesFilePath;
 
     /**
@@ -47,7 +49,7 @@ public class PropertiesAxelixVersionDiscoverer implements AxelixVersionDiscovere
     @Override
     public String getVersion() throws IllegalStateException {
         try {
-            URL resource = ClassLoader.getSystemClassLoader().getResource(propertiesFilePath);
+            URL resource = CLASS_LOADER.getResource(propertiesFilePath);
 
             checkResourceFound(resource);
 
