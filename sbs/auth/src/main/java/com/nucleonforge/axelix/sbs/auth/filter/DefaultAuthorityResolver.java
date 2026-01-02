@@ -34,7 +34,7 @@ import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
 public class DefaultAuthorityResolver implements AuthorityResolver {
 
     private final Map<String, Authority> pathAuthoritiesMap = Map.ofEntries(
-            Map.entry("/actuator/beans", DefaultAuthority.BEANS),
+            Map.entry("/actuator/axelix-beans", DefaultAuthority.BEANS),
             Map.entry("/actuator/axelix-caches/**", DefaultAuthority.CACHES),
             Map.entry("/actuator/cache-dispatcher/**", DefaultAuthority.CACHE_DISPATCHER),
             Map.entry("/actuator/property-management/**", DefaultAuthority.PROPERTY_MANAGEMENT),

@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * Custom endpoint to expose Conditions information.
@@ -37,6 +38,7 @@ public class AxelixConditionsEndpoint {
         this.delegate = delegate;
     }
 
+    @GetMapping
     public FlattenedConditionsDescriptor conditions() {
         ConditionsReportEndpoint.ConditionsDescriptor original = delegate.conditions();
 

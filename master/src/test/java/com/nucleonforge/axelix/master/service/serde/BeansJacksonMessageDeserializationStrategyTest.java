@@ -25,8 +25,7 @@ import com.nucleonforge.axelix.common.api.BeansFeed;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link BeansJacksonMessageDeserializationStrategy}. The json for deserialization was taken from
- * <a href="https://docs.spring.io/spring-boot/api/rest/actuator/beans.html">official doc.</a>.
+ * Unit tests for {@link BeansJacksonMessageDeserializationStrategy}.
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov

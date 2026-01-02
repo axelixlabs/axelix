@@ -26,7 +26,7 @@ import com.nucleonforge.axelix.master.service.serde.MessageDeserializationStrate
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#BEANS /beans} endpoint.
+ * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#BEANS} endpoint.
  *
  * @author Mikhail Polivakha
  */

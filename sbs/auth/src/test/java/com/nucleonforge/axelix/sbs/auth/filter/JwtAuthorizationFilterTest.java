@@ -92,7 +92,7 @@ class JwtAuthorizationFilterTest {
         HttpEntity<Void> entity = defaultEntity(tokenUserWithTwoRole);
 
         ResponseEntity<String> responseBeans =
-                restTemplate.exchange("/actuator/beans", HttpMethod.GET, entity, String.class);
+                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, entity, String.class);
 
         assertThat(responseBeans.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -120,7 +120,7 @@ class JwtAuthorizationFilterTest {
     @Test
     void shouldReturnForbidden_UserWithEmptyRoles() {
         ResponseEntity<String> response = restTemplate.exchange(
-                "/actuator/beans", HttpMethod.GET, defaultEntity(tokenWithEmptyRoles), String.class);
+                "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(tokenWithEmptyRoles), String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(response.getBody()).isNotNull().contains("Access denied: missing required authorities ");
@@ -139,7 +139,7 @@ class JwtAuthorizationFilterTest {
     @Test
     void shouldReturnForbidden_UserHasRoleWithInvalidAuthority() {
         ResponseEntity<String> response = restTemplate.exchange(
-                "/actuator/beans", HttpMethod.GET, defaultEntity(tokenWithInvalidAuthority), String.class);
+                "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(tokenWithInvalidAuthority), String.class);
 
         assertThat(response)
                 .returns(HttpStatus.FORBIDDEN, ResponseEntity::getStatusCode)
@@ -154,7 +154,7 @@ class JwtAuthorizationFilterTest {
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         ResponseEntity<String> response =
-                restTemplate.exchange("/actuator/beans", HttpMethod.GET, entity, String.class);
+                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, entity, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
@@ -162,7 +162,7 @@ class JwtAuthorizationFilterTest {
     @Test
     void shouldReturnUnauthorized_TokenIsTampered() {
         ResponseEntity<String> response = restTemplate.exchange(
-                "/actuator/beans", HttpMethod.GET, defaultEntity(tokenWithInvalidAuthority + "x"), String.class);
+                "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(tokenWithInvalidAuthority + "x"), String.class);
 
         assertThat(response)
                 .returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode)
@@ -172,7 +172,7 @@ class JwtAuthorizationFilterTest {
     @Test
     void shouldReturnUnauthorized_TokenSigningKeyIsTampered() {
         ResponseEntity<String> response = restTemplate.exchange(
-                "/actuator/beans", HttpMethod.GET, defaultEntity(tokenSignedWithWrongKey), String.class);
+                "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(tokenSignedWithWrongKey), String.class);
 
         assertThat(response)
                 .returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode)
@@ -181,8 +181,8 @@ class JwtAuthorizationFilterTest {
 
     @Test
     void shouldReturnUnauthorized_TokenIsExpired() {
-        ResponseEntity<String> response =
-                restTemplate.exchange("/actuator/beans", HttpMethod.GET, defaultEntity(expiredToken), String.class);
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(expiredToken), String.class);
 
         assertThat(response)
                 .returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode)
@@ -211,7 +211,7 @@ class JwtAuthorizationFilterTest {
     @Test
     void shouldReturnForbidden_TokenWithNullNameRoles() {
         ResponseEntity<String> response = restTemplate.exchange(
-                "/actuator/beans", HttpMethod.GET, defaultEntity(tokenWithNullNameRoles), String.class);
+                "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(tokenWithNullNameRoles), String.class);
 
         assertThat(response)
                 .returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode)

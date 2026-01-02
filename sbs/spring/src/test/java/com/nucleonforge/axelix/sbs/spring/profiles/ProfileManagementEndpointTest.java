@@ -89,7 +89,7 @@ class ProfileManagementEndpointTest {
         activateProfiles(new ProfileMutationRequest(List.of("profile-premium")));
 
         // Verify bean after activating profile
-        Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
+        Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/axelix-beans", Map.class);
         assertThat(containsBean(updatedBeans, premiumService)).isTrue();
     }
 
@@ -105,7 +105,7 @@ class ProfileManagementEndpointTest {
         activateProfiles(new ProfileMutationRequest(List.of("profile-premium", "profile-basic")));
 
         // Verify beans after activating profiles
-        Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
+        Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/axelix-beans", Map.class);
         assertThat(containsBean(updatedBeans, basicService)).isTrue();
         assertThat(containsBean(updatedBeans, premiumService)).isTrue();
 
@@ -113,7 +113,7 @@ class ProfileManagementEndpointTest {
         activateProfiles(new ProfileMutationRequest(List.of("profile-advanced", "profile-legacy")));
 
         // Verify beans after replacing profiles
-        updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
+        updatedBeans = restTemplate.getForObject("/actuator/axelix-beans", Map.class);
         assertThat(containsBean(updatedBeans, legacyService)).isTrue();
         assertThat(containsBean(updatedBeans, advancedService)).isTrue();
         assertThat(containsBean(updatedBeans, basicService)).isFalse();
@@ -129,7 +129,7 @@ class ProfileManagementEndpointTest {
         activateProfiles(new ProfileMutationRequest(List.of("profile-advanced", "profile-legacy")));
 
         // Verify beans after activating profiles
-        Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
+        Map<?, ?> updatedBeans = restTemplate.getForObject("/actuator/axelix-beans", Map.class);
         assertThat(containsBean(updatedBeans, advancedService)).isTrue();
         assertThat(containsBean(updatedBeans, legacyService)).isTrue();
 
@@ -137,7 +137,7 @@ class ProfileManagementEndpointTest {
         activateProfiles(new ProfileMutationRequest(Collections.emptyList()));
 
         // Verify beans after disabling all profiles
-        updatedBeans = restTemplate.getForObject("/actuator/beans", Map.class);
+        updatedBeans = restTemplate.getForObject("/actuator/axelix-beans", Map.class);
         assertThat(containsBean(updatedBeans, advancedService)).isFalse();
         assertThat(containsBean(updatedBeans, legacyService)).isFalse();
     }
@@ -192,7 +192,7 @@ class ProfileManagementEndpointTest {
         List<String> activeProfiles = (List<String>) env.get("activeProfiles");
         assertThat(activeProfiles).isEmpty();
 
-        Map<?, ?> beans = restTemplate.getForObject("/actuator/beans", Map.class);
+        Map<?, ?> beans = restTemplate.getForObject("/actuator/axelix-beans", Map.class);
         for (String beanName : expectedMissingBeans) {
             assertThat(containsBean(beans, beanName)).isFalse();
         }

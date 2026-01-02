@@ -25,8 +25,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
+import com.nucleonforge.axelix.sbs.spring.beans.AxelixBeansEndpoint;
 import com.nucleonforge.axelix.sbs.spring.beans.BeanMetaInfoExtractor;
-import com.nucleonforge.axelix.sbs.spring.beans.BeansEndpointExtension;
 import com.nucleonforge.axelix.sbs.spring.beans.DefaultBeanMetaInfoExtractor;
 import com.nucleonforge.axelix.sbs.spring.beans.QualifiersPersistencePostProcessor;
 import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
@@ -60,11 +60,11 @@ public class BeanAnalyzerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public BeansEndpointExtension beansEndpointExtension(
+    public AxelixBeansEndpoint beansEndpointExtension(
             BeansEndpoint beansEndpoint,
             BeanMetaInfoExtractor beanMetaInfoExtractor,
             ConfigurableApplicationContext context) {
-        return new BeansEndpointExtension(beansEndpoint, beanMetaInfoExtractor, context);
+        return new AxelixBeansEndpoint(beansEndpoint, beanMetaInfoExtractor, context);
     }
 
     @Bean

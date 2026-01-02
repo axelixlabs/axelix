@@ -259,7 +259,7 @@ class BeansApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/beans")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-beans")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

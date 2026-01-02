@@ -31,7 +31,7 @@ public interface AuthorityResolver {
     /**
      * Resolves the required {@link Authority} for the given request path.
      *
-     * @param path the request path (e.g. "/actuator/beans")
+     * @param path the request path (e.g. "/actuator/axelix-beans")
      * @return an {@link Optional} containing the required {@link Authority},
      * or {@link Optional#empty()} if no authority is associated with the path
      */

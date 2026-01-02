@@ -27,13 +27,13 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint.BeanDescriptor;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
-import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
+import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.ClassUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.nucleonforge.axelix.common.api.BeansFeed;
 import com.nucleonforge.axelix.common.api.BeansFeed.Bean;
@@ -50,21 +50,21 @@ import com.nucleonforge.axelix.common.api.BeansFeed.Context;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@EndpointWebExtension(endpoint = BeansEndpoint.class)
-public class BeansEndpointExtension {
+@RestControllerEndpoint(id = "axelix-beans")
+public class AxelixBeansEndpoint {
 
     private final BeansEndpoint delegate;
     private final BeanMetaInfoExtractor enricher;
     private final ConfigurableApplicationContext context;
 
-    public BeansEndpointExtension(
+    public AxelixBeansEndpoint(
             BeansEndpoint delegate, BeanMetaInfoExtractor enricher, ConfigurableApplicationContext context) {
         this.delegate = delegate;
         this.enricher = enricher;
         this.context = context;
     }
 
-    @ReadOperation
+    @GetMapping
     public WebEndpointResponse<BeansFeed> beans() {
         BeansEndpoint.BeansDescriptor actuatorResponse = delegate.beans();
 

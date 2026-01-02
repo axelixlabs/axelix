@@ -33,7 +33,6 @@ import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
  * The response to beans actuator endpoint.
  *
  * @see ActuatorEndpoint
- * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/beans.html">Beans Endpoint</a>
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov

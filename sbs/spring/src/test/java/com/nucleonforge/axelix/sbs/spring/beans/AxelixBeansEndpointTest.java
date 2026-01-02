@@ -40,15 +40,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
 
 /**
- * Integration tests for {@link BeansEndpointExtension}.
+ * Integration tests for {@link AxelixBeansEndpoint}.
  *
  * @author Mikhail Polivakha
  */
 @SpringBootTest(
-        classes = BeansEndpointExtensionTest.CurrentConfiguration.class,
+        classes = AxelixBeansEndpointTest.CurrentConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({BeansEndpoint.class, BeansEndpointExtension.class, ConditionsReportEndpoint.class})
-class BeansEndpointExtensionTest {
+@Import({BeansEndpoint.class, AxelixBeansEndpoint.class, ConditionsReportEndpoint.class})
+class AxelixBeansEndpointTest {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -89,7 +89,7 @@ class BeansEndpointExtensionTest {
     void shouldReturnEnrichedBeansFeed() {
 
         // when.
-        ResponseEntity<BeansFeed> response = testRestTemplate.getForEntity("/actuator/beans", BeansFeed.class);
+        ResponseEntity<BeansFeed> response = testRestTemplate.getForEntity("/actuator/axelix-beans", BeansFeed.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();

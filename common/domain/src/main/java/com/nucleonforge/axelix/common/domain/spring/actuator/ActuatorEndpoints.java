@@ -57,7 +57,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // spotless:off
 
     // Beans
-    public static final ActuatorEndpoint BEANS = of("/beans", HttpMethod.GET);
+    public static final ActuatorEndpoint BEANS = of("/axelix-beans", HttpMethod.GET);
 
     // Caches
     public static final ActuatorEndpoint GET_ALL_CACHES = of("/axelix-caches", HttpMethod.GET);
