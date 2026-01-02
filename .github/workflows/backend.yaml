@@ -12,6 +12,7 @@ on:
       - '!.gitignore'
       - 'master/**'
       - 'sbs/**'
+      - 'common/**'
       - '.github/workflows/backend.yaml'
   pull_request:
     branches: [ master ]
