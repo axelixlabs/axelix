@@ -34,7 +34,9 @@ class AxelixPropertiesPlugin : Plugin<Project> {
         project.plugins.withId("java") {
             project.extensions.configure<SourceSetContainer> {
                 named("main") {
-                    resources.srcDir(genTask.map { it.outputFile.get().asFile.parent })
+                    // we want to put the entire META-INF directory's content into final resources
+                    // bundle, that is why we have two parent calls below
+                    resources.srcDir(genTask.map { it.outputFile.get().asFile.parentFile.parent })
                 }
             }
         }

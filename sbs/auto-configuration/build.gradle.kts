@@ -16,7 +16,7 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-starter-web")
     compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
     compileOnly("org.springframework.kafka:spring-kafka")
-    compileOnly("com.zaxxer:HikariCP:6.3.0")
+    compileOnly("com.zaxxer:HikariCP:6.3.0") // TODO: why? why we need hikari connection pool?
 }
 
 axelix {
