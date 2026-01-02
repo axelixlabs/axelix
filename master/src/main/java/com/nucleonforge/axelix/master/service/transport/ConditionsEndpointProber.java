@@ -26,7 +26,7 @@ import com.nucleonforge.axelix.master.service.serde.MessageDeserializationStrate
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#CONDITIONS /conditions} endpoint.
+ * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#CONDITIONS} endpoint.
  *
  * @since 16.10.2025
  * @author Nikita Kirillov

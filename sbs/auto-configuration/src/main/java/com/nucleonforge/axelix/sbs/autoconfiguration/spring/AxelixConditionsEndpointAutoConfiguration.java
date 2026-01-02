@@ -22,22 +22,22 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axelix.sbs.spring.conditions.ConditionsReportEndpointExtension;
+import com.nucleonforge.axelix.sbs.spring.conditions.AxelixConditionsEndpoint;
 
 /**
- * Auto-configuration for the {@link ConditionsReportEndpointExtension}.
+ * Auto-configuration for the {@link AxelixConditionsEndpoint}.
  *
  * @since 20.10.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @AutoConfiguration(after = ConditionsReportEndpointAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = ConditionsReportEndpoint.class)
-public class ConditionsReportEndpointExtensionAutoConfiguration {
+public class AxelixConditionsEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ConditionsReportEndpointExtension conditionsReportEndpointExtension(
-            ConditionsReportEndpoint conditionsReportEndpoint) {
-        return new ConditionsReportEndpointExtension(conditionsReportEndpoint);
+    public AxelixConditionsEndpoint axelixConditionsEndpoint(ConditionsReportEndpoint conditionsReportEndpoint) {
+        return new AxelixConditionsEndpoint(conditionsReportEndpoint);
     }
 }

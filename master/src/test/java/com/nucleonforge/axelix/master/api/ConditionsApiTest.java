@@ -197,7 +197,7 @@ class ConditionsApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/conditions")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-conditions")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

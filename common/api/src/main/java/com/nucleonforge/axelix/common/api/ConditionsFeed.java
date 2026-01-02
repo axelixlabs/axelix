@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
- * The response to conditions actuator endpoint.
+ * The flattened version of conditions response from the actuator endpoint.
  *
  * @see ActuatorEndpoint
  * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/conditions.html">Conditions Endpoint</a>

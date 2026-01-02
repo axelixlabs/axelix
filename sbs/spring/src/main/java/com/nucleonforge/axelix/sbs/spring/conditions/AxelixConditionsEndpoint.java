@@ -20,29 +20,23 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
+import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 
 /**
- * Web extension for the {@link ConditionsReportEndpoint}.
- * <p>
- * This class exists to provide a simplified, flattened representation of
- * auto-configuration condition reports for web consumers of the Actuator endpoint.
- * </p>
+ * Custom endpoint to expose Conditions information.
  *
- * @since 20.10.2025
- * @author Nikita Kirillov
+ * @author Nikita Kirilov
+ * @author Mikhail Polivakha
  */
-@EndpointWebExtension(endpoint = ConditionsReportEndpoint.class)
-public class ConditionsReportEndpointExtension {
+@RestControllerEndpoint(id = "axelix-conditions")
+public class AxelixConditionsEndpoint {
 
     private final ConditionsReportEndpoint delegate;
 
-    public ConditionsReportEndpointExtension(ConditionsReportEndpoint delegate) {
+    public AxelixConditionsEndpoint(ConditionsReportEndpoint delegate) {
         this.delegate = delegate;
     }
 
-    @ReadOperation
     public FlattenedConditionsDescriptor conditions() {
         ConditionsReportEndpoint.ConditionsDescriptor original = delegate.conditions();
 

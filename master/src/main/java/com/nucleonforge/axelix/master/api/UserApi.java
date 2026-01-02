@@ -106,7 +106,6 @@ public class UserApi {
                 .build();
     }
 
-    // TODO: Cover this API with tests.
     /**
      * Logout current user.
      *

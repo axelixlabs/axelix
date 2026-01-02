@@ -72,7 +72,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint DISABLE_CACHES_MANAGER = of("/axelix-caches/{cacheManagerName}/disable", HttpMethod.POST);
 
     // Conditions
-    public static final ActuatorEndpoint CONDITIONS = of("/conditions", HttpMethod.GET);
+    public static final ActuatorEndpoint CONDITIONS = of("/axelix-conditions", HttpMethod.GET);
 
     // @ConfigurationProperties beans
     public static final ActuatorEndpoint CONFIG_PROPS = of("/axelix-configprops", HttpMethod.GET);
