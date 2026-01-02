@@ -18,30 +18,30 @@ package com.nucleonforge.axelix.sbs.spring.scheduled;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-import org.springframework.boot.actuate.endpoint.web.annotation.EndpointWebExtension;
+import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * Web extension for the {@link ScheduledTasksEndpoint} that enhances the standard
- * scheduled tasks information with additional management capabilities.
+ * Custom actuator endpoint that provides information about {@link Scheduled @Scheduled} tasks.
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-@EndpointWebExtension(endpoint = ScheduledTasksEndpoint.class)
-public class ScheduledTasksEndpointExtension {
+@RestControllerEndpoint(id = "axelix-scheduledtasks")
+public class AxelixScheduledTasksEndpoint {
 
     private final ScheduledTasksEndpoint delegate;
-
     private final ScheduledTasksRegistry registry;
 
-    public ScheduledTasksEndpointExtension(ScheduledTasksEndpoint delegate, ScheduledTasksRegistry registry) {
+    public AxelixScheduledTasksEndpoint(ScheduledTasksEndpoint delegate, ScheduledTasksRegistry registry) {
         this.delegate = delegate;
         this.registry = registry;
     }
 
-    @ReadOperation
+    @GetMapping
     public ExtendedScheduledTasksDescriptor scheduledTasks() {
         ScheduledTasksEndpoint.ScheduledTasksDescriptor scheduledTasksDescriptor = delegate.scheduledTasks();
 

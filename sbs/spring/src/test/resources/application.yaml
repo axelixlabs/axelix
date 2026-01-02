@@ -18,16 +18,17 @@ management:
       exposure:
         include:
           - health
-          - axelix-metadata
           - property-management
           - profile-management
-          - beans
-          - env
+          - axelix-metadata
+          - axelix-beans
           - axelix-env
           - axelix-metrics
-          - configprops
           - axelix-configprops
           - axelix-caches
+          - axelix-conditions
+          - configprops
+          - env
           - conditions
           - threaddump
           - threaddump-management

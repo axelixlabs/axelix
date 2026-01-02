@@ -25,9 +25,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 
+import com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpoint;
 import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTaskManagementEndpoint;
 import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTaskService;
-import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksEndpointExtension;
 import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksRegistry;
 
 /**
@@ -56,9 +56,9 @@ public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ScheduledTasksEndpointExtension scheduledTasksEndpointExtension(
+    public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
             ScheduledTasksEndpoint delegate, ScheduledTasksRegistry scheduledTasksRegistry) {
-        return new ScheduledTasksEndpointExtension(delegate, scheduledTasksRegistry);
+        return new AxelixScheduledTasksEndpoint(delegate, scheduledTasksRegistry);
     }
 
     @Bean

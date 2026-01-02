@@ -285,7 +285,7 @@ public class ScheduledTasksApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/scheduledtasks")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduledtasks")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

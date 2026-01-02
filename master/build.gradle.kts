@@ -1,6 +1,7 @@
 plugins {
     id("shared")
     id("org.springframework.boot") version Dependencies.springBootVersion
+    id("com.nucleonforge.axelix-internal")
 }
 
 val testcontainersVersion = "1.21.3"
@@ -56,4 +57,8 @@ publishing {
             artifact(tasks.bootJar.get())
         }
     }
+}
+
+axelix {
+    properties.put("version", rootProject.version.toString())
 }
