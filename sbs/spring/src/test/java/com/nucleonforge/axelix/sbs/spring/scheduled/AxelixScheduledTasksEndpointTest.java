@@ -55,7 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(AxelixScheduledTasksEndpointTest.ScheduledTasksEndpointExtensionTestConfiguration.class)
-@TestPropertySource(properties = {"management.endpoints.web.exposure.include=scheduledtasks"})
+@TestPropertySource(properties = {"management.endpoints.web.exposure.include=scheduledtasks,axelix-scheduledtasks"})
 class AxelixScheduledTasksEndpointTest {
 
     private static final String EXPECTED_JSON =
@@ -66,7 +66,7 @@ class AxelixScheduledTasksEndpointTest {
          {
              "delegate": {
                   "runnable": {
-                     "target": "com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksEndpointExtensionTest$ScheduledTasksEndpointExtensionTestConfiguration.testCronTask"
+                     "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testCronTask"
                  },
                   "expression": "*/1 * * * * *"
               },
@@ -77,7 +77,7 @@ class AxelixScheduledTasksEndpointTest {
           {
               "delegate": {
                   "runnable": {
-                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksEndpointExtensionTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedDelayTask"
+                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedDelayTask"
                   },
                   "initialDelay": 0,
                   "interval": 1000
@@ -89,7 +89,7 @@ class AxelixScheduledTasksEndpointTest {
           {
               "delegate": {
                   "runnable": {
-                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksEndpointExtensionTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedRateTask"
+                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedRateTask"
                   },
                  "initialDelay": 100,
                   "interval": 1000
@@ -101,7 +101,7 @@ class AxelixScheduledTasksEndpointTest {
           {
               "delegate": {
                   "runnable": {
-                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksEndpointExtensionTest$ScheduledTasksEndpointExtensionTestConfiguration$CustomTestTask"
+                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration$CustomTestTask"
                   },
                   "trigger": "CustomTestTrigger"
               },
@@ -171,7 +171,7 @@ class AxelixScheduledTasksEndpointTest {
 
             @Override
             public String toString() {
-                return "com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksEndpointExtensionTest$ScheduledTasksEndpointExtensionTestConfiguration$CustomTestTask";
+                return "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration$CustomTestTask";
             }
         }
 
