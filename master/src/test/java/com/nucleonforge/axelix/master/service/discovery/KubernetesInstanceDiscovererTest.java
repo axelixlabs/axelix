@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -77,6 +78,9 @@ class KubernetesInstanceDiscovererTest {
     @Autowired
     private MemoryUsageCache memoryUsageCache;
 
+    @Autowired
+    private AxelixVersionDiscoverer axelixVersionDiscoverer;
+
     private URI uri;
 
     private KubernetesInstanceDiscoverer subject;
@@ -114,7 +118,7 @@ class KubernetesInstanceDiscovererTest {
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
 
         subject = new KubernetesInstanceDiscoverer(
-                discoveryClient, managedServiceMetadataEndpointProber, memoryUsageCache);
+                discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer, memoryUsageCache);
     }
 
     @AfterEach

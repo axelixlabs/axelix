@@ -27,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 import com.nucleonforge.axelix.common.api.registration.GitInfo;
 import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axelix.common.api.registration.ShortBuildInfo;
+import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 
 /**
  * Default implementation of {@link ServiceMetadataAssembler}.
@@ -39,6 +40,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
 
     private final HealthEndpoint healthEndpoint;
     private final GitInformationProvider gitInformationProvider;
+    private final AxelixVersionDiscoverer axelixVersionDiscoverer;
     private final ShortBuildInfoProvider shortBuildInfoProvider;
     private final LibraryDiscoverer libraryDiscoverer;
 
@@ -46,11 +48,13 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     public DefaultServiceMetadataAssembler(
             HealthEndpoint healthEndpoint,
             LibraryDiscoverer libraryDiscoverer,
+            AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
             List<ShortBuildInfoProvider> shortBuildInfoProviders) {
 
         this.healthEndpoint = healthEndpoint;
         this.libraryDiscoverer = libraryDiscoverer;
+        this.axelixVersionDiscoverer = axelixVersionDiscoverer;
         this.gitInformationProvider = CollectionUtils.firstElement(gitInformationProviders);
         this.shortBuildInfoProvider = CollectionUtils.firstElement(shortBuildInfoProviders);
 
@@ -65,8 +69,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
         var gitCommitInfo = gitInformationProvider.getGitCommitInfo();
 
         return new ServiceMetadata(
-                // TODO: remove the hardcoded version later
-                "1.0.0-SNAPSHOT",
+                axelixVersionDiscoverer.getVersion(),
                 shortBuildInfo.map(ShortBuildInfo::serviceVersion).orElse(""),
                 gitCommitInfo.map(GitInfo::commitShaShort).orElse(""),
                 System.getProperty("java.vendor"),
