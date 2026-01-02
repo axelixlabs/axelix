@@ -15,11 +15,8 @@
  */
 package com.nucleonforge.axelix.common.domain;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.Properties;
 
 import org.jspecify.annotations.Nullable;
@@ -48,15 +45,13 @@ public class PropertiesAxelixVersionDiscoverer implements AxelixVersionDiscovere
 
     @Override
     public String getVersion() throws IllegalStateException {
-        try {
-            URL resource = CLASS_LOADER.getResource(propertiesFilePath);
+        try (InputStream propertiesFileStream = CLASS_LOADER.getResourceAsStream(propertiesFilePath)) {
 
-            checkResourceFound(resource);
+            checkResourceFound(propertiesFileStream);
 
-            File proeprtiesFile = new File(resource.toURI());
             Properties properties = new Properties();
 
-            properties.load(new FileReader(proeprtiesFile));
+            properties.load(propertiesFileStream);
 
             String version = properties.getProperty(VERSION_KEY);
 
@@ -64,7 +59,7 @@ public class PropertiesAxelixVersionDiscoverer implements AxelixVersionDiscovere
 
             return version;
 
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
@@ -77,7 +72,7 @@ public class PropertiesAxelixVersionDiscoverer implements AxelixVersionDiscovere
         }
     }
 
-    private void checkResourceFound(@Nullable URL resource) {
+    private void checkResourceFound(@Nullable InputStream resource) {
         if (resource == null) {
             throw new IllegalStateException(
                     "The provided path to axelix properties file '%s' cannot be found".formatted(propertiesFilePath));
