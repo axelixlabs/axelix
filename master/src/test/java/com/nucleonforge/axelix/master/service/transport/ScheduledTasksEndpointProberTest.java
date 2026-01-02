@@ -172,7 +172,7 @@ public class ScheduledTasksEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/scheduledtasks")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-scheduledtasks")) {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

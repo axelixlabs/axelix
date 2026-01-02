@@ -1,5 +1,6 @@
 plugins {
     id("sbs")
+    id("com.nucleonforge.axelix-internal")
 }
 
 dependencies {
@@ -16,4 +17,8 @@ dependencies {
     compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
     compileOnly("org.springframework.kafka:spring-kafka")
     compileOnly("com.zaxxer:HikariCP:6.3.0")
+}
+
+axelix {
+    properties.put("version", rootProject.version.toString())
 }

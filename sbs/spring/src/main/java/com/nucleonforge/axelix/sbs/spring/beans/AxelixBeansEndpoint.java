@@ -27,7 +27,6 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint.BeanDescriptor;
-import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBean;
 import org.springframework.context.ApplicationContext;
@@ -43,12 +42,12 @@ import com.nucleonforge.axelix.common.api.BeansFeed.BeanSource;
 import com.nucleonforge.axelix.common.api.BeansFeed.Context;
 
 /**
- * Web extension for Spring Boot Beans Actuator endpoint.
- * Extends standard beans response with additional bean metadata.
+ * Custom actuator endpoint that provides the beans feed.
  *
  * @since 08.10.2025
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @RestControllerEndpoint(id = "axelix-beans")
 public class AxelixBeansEndpoint {
@@ -65,7 +64,7 @@ public class AxelixBeansEndpoint {
     }
 
     @GetMapping
-    public WebEndpointResponse<BeansFeed> beans() {
+    public BeansFeed beans() {
         BeansEndpoint.BeansDescriptor actuatorResponse = delegate.beans();
 
         Map<String, Context> contexts = new HashMap<>();
@@ -108,7 +107,7 @@ public class AxelixBeansEndpoint {
             contexts.put(contextId, new Context(contextDescriptor.getParentId(), beans));
         });
 
-        return new WebEndpointResponse<>(new BeansFeed(contexts));
+        return new BeansFeed(contexts);
     }
 
     private static Set<String> toSet(String... strings) {

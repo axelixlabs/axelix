@@ -48,15 +48,15 @@ import static net.javacrumbs.jsonunit.core.Option.IGNORING_EXTRA_FIELDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link ScheduledTasksEndpointExtension}
+ * Integration tests for {@link AxelixScheduledTasksEndpoint}
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(ScheduledTasksEndpointExtensionTest.ScheduledTasksEndpointExtensionTestConfiguration.class)
+@Import(AxelixScheduledTasksEndpointTest.ScheduledTasksEndpointExtensionTestConfiguration.class)
 @TestPropertySource(properties = {"management.endpoints.web.exposure.include=scheduledtasks"})
-class ScheduledTasksEndpointExtensionTest {
+class AxelixScheduledTasksEndpointTest {
 
     private static final String EXPECTED_JSON =
             // language=json
@@ -116,7 +116,7 @@ class ScheduledTasksEndpointExtensionTest {
 
     @Test
     void shouldReturnExpectedJson() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/scheduledtasks", String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-scheduledtasks", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -146,9 +146,9 @@ class ScheduledTasksEndpointExtensionTest {
         }
 
         @Bean
-        public ScheduledTasksEndpointExtension scheduledTasksEndpointExtension(
+        public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
                 ScheduledTasksEndpoint delegate, ScheduledTasksRegistry registry) {
-            return new ScheduledTasksEndpointExtension(delegate, registry);
+            return new AxelixScheduledTasksEndpoint(delegate, registry);
         }
 
         @Scheduled(cron = "*/1 * * * * *")

@@ -42,7 +42,7 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
             Map.entry("/actuator/health/**", DefaultAuthority.HEALTH),
             Map.entry("/actuator/info", DefaultAuthority.INFO),
             Map.entry("/actuator/axelix-conditions", DefaultAuthority.CONDITIONS),
-            Map.entry("/actuator/configprops", DefaultAuthority.CONFIGPROPS),
+            Map.entry("/actuator/axelix-configprops", DefaultAuthority.CONFIGPROPS),
             Map.entry("/actuator/axelix-details", DefaultAuthority.DETAILS),
             Map.entry("/actuator/axelix-env/**", DefaultAuthority.ENV),
             Map.entry("/actuator/heapdump", DefaultAuthority.HEAP_DUMP),
@@ -50,7 +50,7 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
             Map.entry("/actuator/axelix-metrics/**", DefaultAuthority.METRICS),
             Map.entry("/actuator/loggers/**", DefaultAuthority.LOGGERS),
             Map.entry("/actuator/mappings", DefaultAuthority.MAPPINGS),
-            Map.entry("/actuator/scheduledtasks/**", DefaultAuthority.SCHEDULED_TASKS),
+            Map.entry("/actuator/axelix-scheduledtasks/**", DefaultAuthority.SCHEDULED_TASKS),
             Map.entry("/actuator/scheduled-tasks-management/**", DefaultAuthority.SCHEDULED_TASKS_MANAGEMENT));
 
     private final AntPathMatcher matcher = new AntPathMatcher();

@@ -270,7 +270,7 @@ class ScheduledTaskManagementEndpointTest {
     }
 
     private String getScheduledTasks() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/scheduledtasks", String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-scheduledtasks", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -305,9 +305,9 @@ class ScheduledTaskManagementEndpointTest {
         }
 
         @Bean
-        public ScheduledTasksEndpointExtension scheduledTasksEndpointExtension(
+        public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
                 ScheduledTasksEndpoint delegate, ScheduledTasksRegistry registry) {
-            return new ScheduledTasksEndpointExtension(delegate, registry);
+            return new AxelixScheduledTasksEndpoint(delegate, registry);
         }
 
         @Bean
