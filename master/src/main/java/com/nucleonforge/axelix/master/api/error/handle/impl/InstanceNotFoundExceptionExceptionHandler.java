@@ -16,7 +16,6 @@
 package com.nucleonforge.axelix.master.api.error.handle.impl;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axelix.master.api.error.ApiError;
@@ -32,9 +31,11 @@ import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 @Component
 public class InstanceNotFoundExceptionExceptionHandler implements ExceptionHandler<InstanceNotFoundException> {
 
+    private static final String INSTANCE_NOT_FOUND_CODE = "INSTANCE_NOT_FOUND";
+
     @Override
-    public ResponseEntity<ApiError> handle(InstanceNotFoundException exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new SimpleApiError("INSTANCE_NOT_FOUND"));
+    public ApiError handle(InstanceNotFoundException exception) {
+        return new SimpleApiError(INSTANCE_NOT_FOUND_CODE, HttpStatus.BAD_REQUEST.value());
     }
 
     @Override

@@ -15,6 +15,7 @@
  */
 package com.nucleonforge.axelix.master.api.error;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -22,4 +23,4 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Mikhail Polivakha
  */
-public record SimpleApiError(@NonNull String code) implements ApiError {}
+public record SimpleApiError(@NonNull String errorCode, @JsonIgnore int statusCode) implements ApiError {}

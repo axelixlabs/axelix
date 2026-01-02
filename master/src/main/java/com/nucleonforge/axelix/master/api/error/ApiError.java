@@ -28,7 +28,13 @@ public interface ApiError {
      * @return Code of the error. Guaranteed to be not null.
      */
     @NonNull
-    String code();
+    String errorCode();
+
+    /**
+     * @return the HTTP status code to return.
+     */
+    int statusCode();
+
     //
     //    /**
     //     * Any possible additional parameters that may communicate some context about

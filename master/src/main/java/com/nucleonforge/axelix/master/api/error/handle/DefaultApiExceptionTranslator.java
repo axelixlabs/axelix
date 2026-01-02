@@ -27,7 +27,6 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -57,7 +56,7 @@ public class DefaultApiExceptionTranslator implements ApiExceptionTranslator {
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public ResponseEntity<ApiError> translateException(Exception e) {
+    public ApiError translateException(Exception e) {
         ExceptionHandler exceptionHandler = cache.computeIfAbsent(e.getClass(), this::deriveExceptionHandler);
         return exceptionHandler.handle(e);
     }

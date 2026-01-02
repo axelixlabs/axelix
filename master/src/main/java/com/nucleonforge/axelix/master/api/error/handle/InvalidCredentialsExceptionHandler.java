@@ -16,7 +16,6 @@
 package com.nucleonforge.axelix.master.api.error.handle;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axelix.master.api.error.ApiError;
@@ -34,8 +33,8 @@ public class InvalidCredentialsExceptionHandler implements ExceptionHandler<Inva
     private static final String INVALID_CREDENTIALS_CODE = "INVALID_CREDENTIALS";
 
     @Override
-    public ResponseEntity<ApiError> handle(InvalidCredentialsException exception) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new SimpleApiError(INVALID_CREDENTIALS_CODE));
+    public ApiError handle(InvalidCredentialsException exception) {
+        return new SimpleApiError(INVALID_CREDENTIALS_CODE, HttpStatus.UNAUTHORIZED.value());
     }
 
     @Override

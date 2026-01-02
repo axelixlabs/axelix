@@ -15,8 +15,6 @@
  */
 package com.nucleonforge.axelix.master.api.error.handle;
 
-import org.springframework.http.ResponseEntity;
-
 import com.nucleonforge.axelix.master.api.error.ApiError;
 
 /**
@@ -28,10 +26,10 @@ import com.nucleonforge.axelix.master.api.error.ApiError;
 public interface ApiExceptionTranslator {
 
     /**
-     * Translate given Exception.
+     * Translate given Exception into an {@link ApiError}.
      *
-     * @param e exception to translate. Cannot be null
-     * @return Spring's abstraction over http response
+     * @param e exception to translate. Cannot be {@code null}.
+     * @return the ApiError which is a representation of an occurred exception for the API layer.
      */
-    ResponseEntity<ApiError> translateException(Exception e);
+    ApiError translateException(Exception e);
 }

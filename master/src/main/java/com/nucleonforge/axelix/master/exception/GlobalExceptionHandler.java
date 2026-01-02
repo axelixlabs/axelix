@@ -27,6 +27,7 @@ import com.nucleonforge.axelix.master.api.error.handle.ApiExceptionTranslator;
  *
  * @since 29.08.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -39,6 +40,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleEndpointException(Exception ex) {
-        return apiExceptionTranslator.translateException(ex);
+        ApiError apiError = apiExceptionTranslator.translateException(ex);
+        return ResponseEntity.status(apiError.statusCode()).body(apiError);
     }
 }
