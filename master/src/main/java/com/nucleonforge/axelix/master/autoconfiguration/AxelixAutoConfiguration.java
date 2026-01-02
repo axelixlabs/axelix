@@ -13,38 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.autoconfiguration.memory;
+package com.nucleonforge.axelix.master.autoconfiguration;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
-import com.nucleonforge.axelix.common.api.transform.BaseUnitParser;
-import com.nucleonforge.axelix.common.api.transform.BytesMemoryBaseUnitValueTransformer;
-import com.nucleonforge.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTransformer;
+import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
+import com.nucleonforge.axelix.common.domain.PropertiesAxelixVersionDiscoverer;
 
 /**
- * Auto-configuration for memory unit transformers.
+ * General Auto-configuration of Axelix project.
  *
- * @since 18.12.2025
- * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @AutoConfiguration
-public class MemoryTransformerAutoConfiguration {
+public class AxelixAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public BaseUnitParser baseUnitParser() {
-        return new BaseUnitParser();
-    }
-
-    @Bean
-    public BytesMemoryBaseUnitValueTransformer bytesMemoryBaseUnitValueTransformer() {
-        return new BytesMemoryBaseUnitValueTransformer();
-    }
-
-    @Bean
-    public KilobytesMemoryBaseUnitValueTransformer kilobytesMemoryBaseUnitValueTransformer() {
-        return new KilobytesMemoryBaseUnitValueTransformer();
+    public AxelixVersionDiscoverer axelixVersionDiscoverer() {
+        return new PropertiesAxelixVersionDiscoverer("META-INF/axelix.properties");
     }
 }

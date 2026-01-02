@@ -28,6 +28,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
+import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.MemoryUsageCache;
@@ -52,8 +53,9 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     public KubernetesInstanceDiscoverer(
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
+            AxelixVersionDiscoverer axelixVersionDiscoverer,
             MemoryUsageCache memoryUsageCache) {
-        super(log, discoveryClient, managedServiceMetadataEndpointProber, memoryUsageCache);
+        super(log, discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer, memoryUsageCache);
     }
 
     @Override

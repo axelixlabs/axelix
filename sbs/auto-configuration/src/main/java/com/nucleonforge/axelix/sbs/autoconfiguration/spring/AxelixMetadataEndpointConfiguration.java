@@ -23,6 +23,8 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
+import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
+import com.nucleonforge.axelix.common.domain.PropertiesAxelixVersionDiscoverer;
 import com.nucleonforge.axelix.sbs.spring.master.AxelixMetadataEndpoint;
 import com.nucleonforge.axelix.sbs.spring.master.CommitIdPluginGitInformationProvider;
 import com.nucleonforge.axelix.sbs.spring.master.CommitIdPluginShortBuildInfoProvider;
@@ -48,13 +50,24 @@ import com.nucleonforge.axelix.sbs.spring.master.ShortBuildInfoProvider;
 public class AxelixMetadataEndpointConfiguration {
 
     @Bean
+    @ConditionalOnMissingBean
+    public AxelixVersionDiscoverer axelixVersionDiscoverer() {
+        return new PropertiesAxelixVersionDiscoverer("META-INF/axelix.properties");
+    }
+
+    @Bean
     ServiceMetadataAssembler serviceMetadataAssembler(
             HealthEndpoint healthEndpoint,
             LibraryDiscoverer libraryDiscoverer,
+            AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
             List<ShortBuildInfoProvider> shortBuildInfoProviders) {
         return new DefaultServiceMetadataAssembler(
-                healthEndpoint, libraryDiscoverer, gitInformationProviders, shortBuildInfoProviders);
+                healthEndpoint,
+                libraryDiscoverer,
+                axelixVersionDiscoverer,
+                gitInformationProviders,
+                shortBuildInfoProviders);
     }
 
     @Bean

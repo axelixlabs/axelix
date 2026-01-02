@@ -30,6 +30,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
 
 import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
+import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.model.instance.Instance;
@@ -50,17 +51,20 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     private final Logger logger;
     private final DiscoveryClient discoveryClient;
     private final ManagedServiceMetadataEndpointProber managedServiceProber;
+    private final AxelixVersionDiscoverer axelixVersionDiscoverer;
     private final MemoryUsageCache memoryUsageCache;
 
     public AbstractInstancesDiscoverer(
             Logger logger,
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
+            AxelixVersionDiscoverer axelixVersionDiscoverer,
             MemoryUsageCache memoryUsageCache) {
         this.discoveryClient = discoveryClient;
         this.managedServiceProber = managedServiceMetadataEndpointProber;
         this.logger = logger;
         this.memoryUsageCache = memoryUsageCache;
+        this.axelixVersionDiscoverer = axelixVersionDiscoverer;
     }
 
     @Override
@@ -108,8 +112,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     }
 
     private boolean isCompatibleVersion(@NonNull InstanceIntermediateProfile profile) {
-        // TODO: currently version hardcoded - is ok, waiting for issue #88 to be implemented
-        if (profile.metadata().version().equals("1.0.0-SNAPSHOT")) {
+        if (profile.metadata().version().equals(axelixVersionDiscoverer.getVersion())) {
             return true;
         } else {
             logger.warn(

@@ -27,6 +27,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Mikhail Polivakha
  */
+// TODO: This is supposed to be in the utils submodule, does not it?
 public class Lazy<T> {
 
     private @Nullable T value;

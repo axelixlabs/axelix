@@ -8,7 +8,7 @@ dependencies {
     api(project(":common_auth"))
     api(project(":common:api"))
     api(project(":sbs:auth"))
-    api(project(":sbs:postgres"))
+//    api(project(":sbs:postgres"))
     api(project(":sbs:spring"))
 
     // Compile
