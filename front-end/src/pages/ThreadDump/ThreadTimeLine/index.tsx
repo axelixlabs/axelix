@@ -27,10 +27,9 @@ interface IProps {
     history: IThread[];
 
     /**
-     * Map of selected thread groups. Keys are thread ids, values are
-     * the selected groups for the given threads.
+     * Selected thread group for this thread
      */
-    selectedGroups: Record<string, IThreadGroup>;
+    selectedGroup: IThreadGroup | undefined;
 
     /**
      * Setter to update the selected thread groups
@@ -38,7 +37,7 @@ interface IProps {
     setSelectedGroups: Dispatch<SetStateAction<Record<string, IThreadGroup>>>;
 }
 
-export const ThreadTimeLine = ({ history, selectedGroups, setSelectedGroups }: IProps) => {
+export const ThreadTimeLine = ({ history, selectedGroup, setSelectedGroups }: IProps) => {
     const threadGroups = partitionToThreadGroups(history);
 
     return (
@@ -46,7 +45,7 @@ export const ThreadTimeLine = ({ history, selectedGroups, setSelectedGroups }: I
             {threadGroups.map((threadGroup) => {
                 const { id, count, thread } = threadGroup;
 
-                const isGroupSelected = selectedGroups[String(thread.threadId)]?.id === id;
+                const isGroupSelected = selectedGroup?.id === id;
 
                 const color = getThreadStateColor(thread);
 

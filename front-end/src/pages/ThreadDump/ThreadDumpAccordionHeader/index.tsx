@@ -30,10 +30,9 @@ interface IProps {
     currentThreadSnapshot: IThread;
 
     /**
-     * Map of selected thread groups. Keys are thread ids, values are
-     * the selected groups for the given threads.
+     * Selected thread group for this thread
      */
-    selectedGroups: Record<string, IThreadGroup>;
+    selectedGroup: IThreadGroup | undefined;
 
     /**
      * Setter to update the selected thread groups
@@ -41,7 +40,7 @@ interface IProps {
     setSelectedGroups: Dispatch<SetStateAction<Record<string, IThreadGroup>>>;
 }
 
-export const SingleThreadAccordionHeader = ({ currentThreadSnapshot, selectedGroups, setSelectedGroups }: IProps) => {
+export const SingleThreadAccordionHeader = ({ currentThreadSnapshot, selectedGroup, setSelectedGroups }: IProps) => {
     const [history, setHistory] = useState<IThread[]>([]);
 
     useEffect(() => {
@@ -71,7 +70,7 @@ export const SingleThreadAccordionHeader = ({ currentThreadSnapshot, selectedGro
             </div>
             <div>{currentThreadSnapshot.threadName}</div>
 
-            <ThreadTimeLine history={history} selectedGroups={selectedGroups} setSelectedGroups={setSelectedGroups} />
+            <ThreadTimeLine history={history} selectedGroup={selectedGroup} setSelectedGroups={setSelectedGroups} />
         </div>
     );
 };

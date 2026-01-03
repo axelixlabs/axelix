@@ -82,7 +82,7 @@ const ThreadDump = () => {
                         header={
                             <SingleThreadAccordionHeader
                                 currentThreadSnapshot={threadDump}
-                                selectedGroups={selectedGroups}
+                                selectedGroup={selectedGroups[threadDump.threadId]}
                                 setSelectedGroups={setSelectedGroups}
                             />
                         }
