@@ -34,6 +34,7 @@ import com.nucleonforge.axelix.master.service.DashboardService;
  *
  * @author Mikhail Polivakha
  */
+// TODO: Cover with tests
 @Tag(name = "Dashboard API", description = "API for rendering the dashboard")
 @RestController
 @RequestMapping(path = ApiPaths.DashboardApi.MAIN)

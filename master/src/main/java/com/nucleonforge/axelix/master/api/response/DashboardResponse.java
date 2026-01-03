@@ -31,10 +31,10 @@ public record DashboardResponse(
         List<DistributionResponse> distributions, HealthStatus healthStatus, MemoryUsageMap memoryUsage) {
 
     /**
-     * @param averageRss the average RSS consumed by average microservice
-     * @param totalRss the total RSS consumed by the entire spring microservices' ecosystem.
+     * @param averageHeapSize the average heap size among all the managed instances
+     * @param totalHeapSize the total heap size among all the managed instances
      */
-    public record MemoryUsageMap(MemoryUsage averageRss, MemoryUsage totalRss) {}
+    public record MemoryUsageMap(MemoryUsage averageHeapSize, MemoryUsage totalHeapSize) {}
 
     /**
      * @param unit the unit in which the {@link #value()} is measured (MB/GB etc.)

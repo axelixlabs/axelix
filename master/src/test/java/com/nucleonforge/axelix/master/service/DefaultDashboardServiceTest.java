@@ -89,12 +89,12 @@ class DefaultDashboardServiceTest {
                 .isEqualTo(3);
 
         var memoryUsageMap = dashboardInfo.memoryUsage();
-        assertThat(memoryUsageMap.averageRss().value())
+        assertThat(memoryUsageMap.averageHeapSize().value())
                 .isCloseTo((300d + 550d + 410d) / 3, Percentage.withPercentage(0.5));
-        assertThat(memoryUsageMap.averageRss().unit()).isEqualTo("bytes");
-        assertThat(memoryUsageMap.totalRss().value())
+        assertThat(memoryUsageMap.averageHeapSize().unit()).isEqualTo("bytes");
+        assertThat(memoryUsageMap.totalHeapSize().value())
                 .isCloseTo((300d + 550d + 410d) / 1024, Percentage.withPercentage(0.5));
-        assertThat(memoryUsageMap.totalRss().unit()).isEqualTo("KB");
+        assertThat(memoryUsageMap.totalHeapSize().unit()).isEqualTo("KB");
 
         var distributions = dashboardInfo.distributions();
 

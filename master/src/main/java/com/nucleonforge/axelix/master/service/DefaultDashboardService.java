@@ -109,18 +109,19 @@ public class DefaultDashboardService implements DashboardService {
                 .map(baseUnitValueTransformers::get)
                 .orElse(null);
 
-        double averageRss = memoryUsageCache.getAverageHeapSize();
-        double totalRss = memoryUsageCache.getTotalHeapSize();
+        double averageHeapSize = memoryUsageCache.getAverageHeapSize();
+        double totalHeapSize = memoryUsageCache.getTotalHeapSize();
 
         if (baseUnitValueTransformer != null) {
-            TransformedMetricValue transformedAverageRss = baseUnitValueTransformer.transform(averageRss);
-            TransformedMetricValue transformedTotalRss = baseUnitValueTransformer.transform(totalRss);
+            TransformedMetricValue transformedAverageRss = baseUnitValueTransformer.transform(averageHeapSize);
+            TransformedMetricValue transformedTotalRss = baseUnitValueTransformer.transform(totalHeapSize);
+
             return new MemoryUsageMap(
                     new MemoryUsage(transformedAverageRss.baseUnit().getDisplayName(), transformedAverageRss.value()),
                     new MemoryUsage(transformedTotalRss.baseUnit().getDisplayName(), transformedTotalRss.value()));
         }
 
-        return new MemoryUsageMap(new MemoryUsage("bytes", averageRss), new MemoryUsage("bytes", totalRss));
+        return new MemoryUsageMap(new MemoryUsage("bytes", averageHeapSize), new MemoryUsage("bytes", totalHeapSize));
     }
 
     private static BiFunction<Status, Integer, Integer> counterIncrementFunction() {
