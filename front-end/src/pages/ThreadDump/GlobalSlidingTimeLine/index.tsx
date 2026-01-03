@@ -20,7 +20,7 @@ import { THREAD_DUMP_SLIDING_WINDOW_MS } from "utils";
 
 import styles from "./styles.module.css";
 
-export const ThreadDumpTimeLine = () => {
+export const GlobalSlidingTimeLine = () => {
     const [timeSlots, setTimeSlots] = useState<Date[]>([]);
 
     useEffect(() => {

@@ -3,7 +3,7 @@
     border-radius: var(--axelix-border-radius-small);
     overflow: hidden;
 
-    /* Our timeline grows by 5px for each thread. Since our monitoring lasts 10 minutes, that’s 5 * 60 * 5 = 1500 */
+    /* Our timeline grows by 5px for each thread. Since our monitoring lasts 5 minutes, that’s 5 * 60 * 5 = 1500 */
     width: 1500px;
     margin-left: 6px;
 }

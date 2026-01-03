@@ -19,18 +19,19 @@ import { getThreadStateColor } from "helpers";
 import type { IThread, IThreadGroup } from "models";
 import { THREAD_DUMP_SLIDING_WINDOW_MS, threadDumpStateLetters } from "utils";
 
-import { ThreadDumpTimeline } from "../ThreadDumpStatusTimeline";
+import { ThreadTimeLine } from "../ThreadTimeLine";
 
 import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     *  An object representing the thread dump.
+     *  An object representing the current thread dump snapshot.
      */
-    threadDump: IThread;
+    currentThreadSnapshot: IThread;
 
     /**
-     * Map of selected thread groups
+     * Map of selected thread groups. Keys are thread ids, values are
+     * the selected groups for the given threads.
      */
     selectedGroups: Record<string, IThreadGroup>;
 
@@ -40,7 +41,7 @@ interface IProps {
     setSelectedGroups: Dispatch<SetStateAction<Record<string, IThreadGroup>>>;
 }
 
-export const ThreadDumpAccordionHeader = ({ threadDump, selectedGroups, setSelectedGroups }: IProps) => {
+export const SingleThreadAccordionHeader = ({ currentThreadSnapshot, selectedGroups, setSelectedGroups }: IProps) => {
     const [history, setHistory] = useState<IThread[]>([]);
 
     useEffect(() => {
@@ -53,10 +54,10 @@ export const ThreadDumpAccordionHeader = ({ threadDump, selectedGroups, setSelec
     }, []);
 
     useEffect(() => {
-        setHistory((prev) => [...prev, threadDump]);
-    }, [threadDump]);
+        setHistory((prev) => [...prev, currentThreadSnapshot]);
+    }, [currentThreadSnapshot]);
 
-    const { colorPrimary } = getThreadStateColor(threadDump);
+    const { colorPrimary } = getThreadStateColor(currentThreadSnapshot);
 
     return (
         <div className={styles.MainWrapper}>
@@ -66,15 +67,11 @@ export const ThreadDumpAccordionHeader = ({ threadDump, selectedGroups, setSelec
                     backgroundColor: colorPrimary,
                 }}
             >
-                {threadDumpStateLetters[threadDump.threadState]}
+                {threadDumpStateLetters[currentThreadSnapshot.threadState]}
             </div>
-            <div>{threadDump.threadName}</div>
+            <div>{currentThreadSnapshot.threadName}</div>
 
-            <ThreadDumpTimeline
-                history={history}
-                selectedGroups={selectedGroups}
-                setSelectedGroups={setSelectedGroups}
-            />
+            <ThreadTimeLine history={history} selectedGroups={selectedGroups} setSelectedGroups={setSelectedGroups} />
         </div>
     );
 };

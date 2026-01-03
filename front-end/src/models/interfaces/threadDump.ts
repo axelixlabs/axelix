@@ -178,19 +178,29 @@ export interface IThreadDumpResponseBody {
     threads: IThread[];
 }
 
+/**
+ * The group of thread dump snapshots that logically represent a single state of the thread.
+ * For example, if we have two snapshots of the thread dump - A and B, and in both cases the
+ * thread was in WAITING state for the same monitor, then we can safely merge these two snapshots
+ * together into a single logical "Thread Group".
+ *
+ * This concept is purely for visual purposes. It is not meant to represent any kind of thread group
+ * inside the Java Virtual Machine. It is there just to provide the developer with information, that
+ * for these N thread dump snapshots, thread 'X' was in the same state.
+ */
 export interface IThreadGroup {
     /**
-     * Id for the thread group
+     * Id of the thread group. Each thread group has a unique id, even across groups within single thread.
      */
     id: string;
 
     /**
-     * The thread associated with this group
+     * Single thread dump, that represents the entire group.
      */
     thread: IThread;
 
     /**
-     * Number of threads combined in the group
+     * Number of thread dumps snapshots combined in the group
      */
     count: number;
 }

@@ -15,7 +15,7 @@
  */
 import type { Dispatch, SetStateAction } from "react";
 
-import { generateThreadGroups, getThreadStateColor, stopPropagationOnAccordionExpand } from "helpers";
+import { getThreadStateColor, partitionToThreadGroups, stopPropagationOnAccordionExpand } from "helpers";
 import type { IThread, IThreadGroup } from "models";
 
 import styles from "./styles.module.css";
@@ -27,7 +27,8 @@ interface IProps {
     history: IThread[];
 
     /**
-     * Map of selected thread groups
+     * Map of selected thread groups. Keys are thread ids, values are
+     * the selected groups for the given threads.
      */
     selectedGroups: Record<string, IThreadGroup>;
 
@@ -37,16 +38,15 @@ interface IProps {
     setSelectedGroups: Dispatch<SetStateAction<Record<string, IThreadGroup>>>;
 }
 
-export const ThreadDumpTimeline = ({ history, selectedGroups, setSelectedGroups }: IProps) => {
-    const threadGroups = generateThreadGroups(history);
+export const ThreadTimeLine = ({ history, selectedGroups, setSelectedGroups }: IProps) => {
+    const threadGroups = partitionToThreadGroups(history);
 
     return (
         <div className={styles.MainWrapper}>
             {threadGroups.map((threadGroup) => {
                 const { id, count, thread } = threadGroup;
-                const threadId = String(thread.threadId);
 
-                const isGroupSelected = selectedGroups[threadId]?.id === id;
+                const isGroupSelected = selectedGroups[String(thread.threadId)]?.id === id;
 
                 const color = getThreadStateColor(thread);
 
@@ -65,6 +65,7 @@ export const ThreadDumpTimeline = ({ history, selectedGroups, setSelectedGroups 
                         onClick={(e) => {
                             stopPropagationOnAccordionExpand(e);
 
+                            // overwriting the previous selected group for this thread.
                             setSelectedGroups((prev) => ({
                                 ...prev,
                                 [String(thread.threadId)]: threadGroup,

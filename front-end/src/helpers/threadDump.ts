@@ -70,21 +70,21 @@ export const generateTimeSlots = (): Date[] => {
     return slots;
 };
 
-const isSameThreadDumpGroup = (currentThreadGroup: IThreadGroup | null, thread: IThread): boolean => {
-    const isSameState = currentThreadGroup!.thread.threadState === thread.threadState;
-    const isSameBlockedCount = currentThreadGroup!.thread.blockedCount === thread.blockedCount;
-    const isSameWaitedCount = currentThreadGroup!.thread.waitedCount === thread.waitedCount;
+const isSameThreadDumpGroup = (currentThreadGroup: IThreadGroup, thread: IThread): boolean => {
+    const sameState = currentThreadGroup.thread.threadState === thread.threadState;
+    const sameBlockedCount = currentThreadGroup.thread.blockedCount === thread.blockedCount;
+    const sameWaitedCount = currentThreadGroup.thread.waitedCount === thread.waitedCount;
 
-    return isSameState && isSameBlockedCount && isSameWaitedCount;
+    return sameState && sameBlockedCount && sameWaitedCount;
 };
 
-export const generateThreadGroups = (history: IThread[]): IThreadGroup[] => {
+export const partitionToThreadGroups = (history: IThread[]): IThreadGroup[] => {
     const threadGroups: IThreadGroup[] = [];
     let currentThreadGroup: IThreadGroup | null = null;
 
     history.forEach((thread, index) => {
         if (currentThreadGroup && isSameThreadDumpGroup(currentThreadGroup, thread)) {
-            currentThreadGroup!.count++;
+            currentThreadGroup.count++;
             currentThreadGroup.thread = thread;
         } else {
             const id = `${thread.threadId}-${thread.threadState}-${thread.blockedCount}-${thread.waitedCount}-${index}`;
@@ -102,7 +102,7 @@ export const generateThreadGroups = (history: IThread[]): IThreadGroup[] => {
     return threadGroups;
 };
 
-export const getDisplayedThreadGroup = (thread: IThread, selectedGroups: Record<string, IThreadGroup>): IThread => {
+export const getDisplayedThreadDump = (thread: IThread, selectedGroups: Record<string, IThreadGroup>): IThread => {
     const threadGroup = selectedGroups[String(thread.threadId)];
 
     if (threadGroup) {
