@@ -141,3 +141,20 @@ export interface IErrorResponse {
      */
     code?: string;
 }
+
+export interface IColorPallete {
+    /**
+     * The primary color
+     */
+    colorPrimary: string;
+
+    /**
+     * The color used when the element is hovered
+     */
+    colorPrimaryHover: string;
+
+    /**
+     * The color used when the element is active
+     */
+    colorPrimaryActive: string;
+}

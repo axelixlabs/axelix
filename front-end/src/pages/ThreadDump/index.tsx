@@ -18,13 +18,14 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { Accordion, EmptyHandler, Loader } from "components";
-import { fetchData } from "helpers";
-import { type IThreadDumpResponseBody, StatefulRequest } from "models";
+import { fetchData, getDisplayedThreadDump } from "helpers";
+import { type IThread, type IThreadDumpResponseBody, type IThreadGroup, StatefulRequest } from "models";
 import { getThreadDumpData } from "services";
+import { THREAD_DUMP_SHORT_POLLING_INTERVAL_MS } from "utils";
 
+import { GlobalSlidingTimeLine } from "./GlobalSlidingTimeLine";
 import { ThreadDumpAccordionBody } from "./ThreadDumpAccordionBody";
-import { ThreadDumpAccordionHeader } from "./ThreadDumpAccordionHeader";
-import { ThreadDumpTimeLine } from "./ThreadDumpTimeLine";
+import { SingleThreadAccordionHeader } from "./ThreadDumpAccordionHeader";
 import styles from "./styles.module.css";
 
 const ThreadDump = () => {
@@ -32,6 +33,7 @@ const ThreadDump = () => {
     const { instanceId } = useParams();
 
     const [threadDumpData, setThreadDumpData] = useState(StatefulRequest.loading<IThreadDumpResponseBody>());
+    const [selectedGroups, setSelectedGroups] = useState<Record<string, IThreadGroup>>({});
 
     useEffect(() => {
         const doFetch = () => {
@@ -40,7 +42,7 @@ const ThreadDump = () => {
 
         doFetch();
 
-        const intervalId = setInterval(doFetch, 1000);
+        const intervalId = setInterval(doFetch, THREAD_DUMP_SHORT_POLLING_INTERVAL_MS);
 
         return () => clearInterval(intervalId);
     }, []);
@@ -54,26 +56,41 @@ const ThreadDump = () => {
     }
 
     const threadDumpFeed = threadDumpData.response!.threads;
-    const sortedThreadDump = threadDumpFeed.sort(
+    const sortedThreadDump = threadDumpFeed.toSorted(
         (currentThread, nextThread) => nextThread.priority - currentThread.priority,
     );
 
+    const onAccordionClose = (threadDump: IThread): void => {
+        setSelectedGroups((prev) => {
+            const prevGroups = { ...prev };
+            delete prevGroups[threadDump.threadId];
+            return prevGroups;
+        });
+    };
+
     return (
         <>
-            {/* Empty attribute required for the correct styling to be applied un MainLayout */}
+            {/* Empty attribute required for the correct styling to be applied, see MainLayout component styling */}
             <div data-thread-layout className={styles.TitleAndTimelineWrapper}>
                 <div className={`TextMedium ${styles.MainTitle}`}>{t("ThreadDump.title")}</div>
-                <ThreadDumpTimeLine />
+                <GlobalSlidingTimeLine />
             </div>
 
-            <div className="AccordionsWrapper">
+            <div className={`AccordionsWrapper ${styles.AccordionsWrapper}`}>
                 {sortedThreadDump.map((threadDump) => (
                     <Accordion
-                        header={<ThreadDumpAccordionHeader threadDump={threadDump} />}
+                        header={
+                            <SingleThreadAccordionHeader
+                                currentThreadSnapshot={threadDump}
+                                selectedGroups={selectedGroups}
+                                setSelectedGroups={setSelectedGroups}
+                            />
+                        }
                         key={threadDump.threadId}
+                        onClose={() => onAccordionClose(threadDump)}
                         hideArrowIcon
                     >
-                        <ThreadDumpAccordionBody thread={threadDump} />
+                        <ThreadDumpAccordionBody thread={getDisplayedThreadDump(threadDump, selectedGroups)} />
                     </Accordion>
                 ))}
             </div>

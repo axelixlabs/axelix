@@ -1,3 +1,7 @@
+.AccordionsWrapper {
+    width: max-content;
+}
+
 .TitleAndTimelineWrapper {
     height: 58px;
     position: sticky;

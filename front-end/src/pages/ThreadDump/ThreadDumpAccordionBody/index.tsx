@@ -44,22 +44,12 @@ export const ThreadDumpAccordionBody = ({ thread }: IProps) => {
                 <ThreadDumpRow title={t("ThreadDump.blockedCount")} value={thread.blockedCount} />
                 <ThreadDumpRow
                     title={t("ThreadDump.blockedTime")}
-                    value={
-                        <ThreadDumpTrackableValue
-                            value={thread.blockedTime}
-                            parameterName={"blockedTime"}
-                        ></ThreadDumpTrackableValue>
-                    }
+                    value={<ThreadDumpTrackableValue value={thread.blockedTime} parameterName={"blockedTime"} />}
                 />
                 <ThreadDumpRow title={t("ThreadDump.waitedCount")} value={thread.waitedCount} />
                 <ThreadDumpRow
                     title={t("ThreadDump.waitedTime")}
-                    value={
-                        <ThreadDumpTrackableValue
-                            value={thread.waitedTime}
-                            parameterName={"waitedTime"}
-                        ></ThreadDumpTrackableValue>
-                    }
+                    value={<ThreadDumpTrackableValue value={thread.waitedTime} parameterName={"waitedTime"} />}
                 />
 
                 <ThreadDumpRow title={t("ThreadDump.daemon")} value={String(thread.daemon)} />

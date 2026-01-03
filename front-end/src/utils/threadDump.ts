@@ -24,5 +24,20 @@ export const threadDumpStateLetters: Record<EThreadState, string> = {
     [EThreadState.TERMINATED]: "F",
 };
 
-export const TEN_MINUTES_MILLISECDONDS = 10 * 60 * 1000;
-export const FIFTEEN_SECONDS = 15 * 1000;
+/**
+ * Constant that represents the length of the sliding window of the thread dump in milliseconds.
+ *
+ * The sliding window is the window that essentially answers the question - for how long do we
+ * retain the previous thread dump snapshots.
+ */
+export const THREAD_DUMP_SLIDING_WINDOW_MS = 5 * 60 * 1000; // 5 min.
+
+/**
+ * The length of the single segment as it is displayed in the timeline.
+ */
+export const TIMELINE_SEGMENT_INTERVAL_MS = 15 * 1000;
+
+/**
+ * The interval between short-polling calls to the backend for the thread dump snapshot.
+ */
+export const THREAD_DUMP_SHORT_POLLING_INTERVAL_MS = 1000;

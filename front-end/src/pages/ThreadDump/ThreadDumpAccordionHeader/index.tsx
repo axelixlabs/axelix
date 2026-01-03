@@ -13,50 +13,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
 import { getThreadStateColor } from "helpers";
-import type { IThread } from "models";
-import { TEN_MINUTES_MILLISECDONDS, threadDumpStateLetters } from "utils";
+import type { IThread, IThreadGroup } from "models";
+import { THREAD_DUMP_SLIDING_WINDOW_MS, threadDumpStateLetters } from "utils";
 
-import { ThreadDumpTimeline } from "../ThreadDumpStatusTimeline";
+import { ThreadTimeLine } from "../ThreadTimeLine";
 
 import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     *  An object representing the thread dump.
+     *  An object representing the current thread dump snapshot.
      */
-    threadDump: IThread;
+    currentThreadSnapshot: IThread;
+
+    /**
+     * Map of selected thread groups. Keys are thread ids, values are
+     * the selected groups for the given threads.
+     */
+    selectedGroups: Record<string, IThreadGroup>;
+
+    /**
+     * Setter to update the selected thread groups
+     */
+    setSelectedGroups: Dispatch<SetStateAction<Record<string, IThreadGroup>>>;
 }
 
-export const ThreadDumpAccordionHeader = ({ threadDump }: IProps) => {
+export const SingleThreadAccordionHeader = ({ currentThreadSnapshot, selectedGroups, setSelectedGroups }: IProps) => {
     const [history, setHistory] = useState<IThread[]>([]);
 
     useEffect(() => {
         const id = setInterval(() => {
             setHistory([]);
-        }, TEN_MINUTES_MILLISECDONDS);
+            setSelectedGroups({});
+        }, THREAD_DUMP_SLIDING_WINDOW_MS);
 
         return () => clearInterval(id);
     }, []);
 
     useEffect(() => {
-        setHistory((prev) => [...prev, threadDump]);
-    }, [threadDump]);
+        setHistory((prev) => [...prev, currentThreadSnapshot]);
+    }, [currentThreadSnapshot]);
+
+    const { colorPrimary } = getThreadStateColor(currentThreadSnapshot);
 
     return (
         <div className={styles.MainWrapper}>
             <div
                 className={styles.ThreadNameAvatar}
                 style={{
-                    backgroundColor: getThreadStateColor(threadDump),
+                    backgroundColor: colorPrimary,
                 }}
             >
-                {threadDumpStateLetters[threadDump.threadState]}
+                {threadDumpStateLetters[currentThreadSnapshot.threadState]}
             </div>
-            <div>{threadDump.threadName}</div>
-            <ThreadDumpTimeline history={history} />
+            <div>{currentThreadSnapshot.threadName}</div>
+
+            <ThreadTimeLine history={history} selectedGroups={selectedGroups} setSelectedGroups={setSelectedGroups} />
         </div>
     );
 };

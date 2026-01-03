@@ -21,13 +21,3 @@ export enum EThreadState {
     TIMED_WAITING = "TIMED_WAITING",
     TERMINATED = "TERMINATED",
 }
-
-export enum EThreadDumpStateColors {
-    BLUE = "#1890ff",
-    GREEN = "#52c41a",
-    ORANGE = "#faad14",
-    RED = "#ff4d4f",
-    YELLOW = "#fadb14",
-    WHITE = "#fff",
-    GREY = "#838383",
-}

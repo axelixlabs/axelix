@@ -44,7 +44,7 @@ const ThreadDumpTrackableValue = ({ value, parameterName }: IProps) => {
                     text={`JVM does not track '${parameterName}' by default. 
             To track the '${parameterName}', you need to explicitly enable 
             thread contention monitoring`}
-                ></InfoTooltip>
+                />
             </div>
         );
     }
