@@ -20,21 +20,17 @@ import java.util.concurrent.ScheduledFuture;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.config.ScheduledTask;
-import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
 
 /**
- * Represents a managed scheduled task with additional control capabilities.
- *
- * <p>Wraps a standard Spring {@link ScheduledTask} and provides functionality
- * to enable/disable task execution at runtime, as well as track the task's
- * current state.
+ * Decorates the standard {@link ScheduledTask}, and provides additional information
+ * about the decorated task, such as the {@link #id} of the task.
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public class ManagedScheduledTask {
 
@@ -53,22 +49,6 @@ public class ManagedScheduledTask {
      */
     private final ScheduledTask scheduledTask;
 
-    /**
-     * The task scheduler used for rescheduling operations.
-     */
-    private final TaskScheduler taskScheduler;
-
-    /**
-     * The runnable task to be executed.
-     */
-    private final Runnable runnable;
-
-    /**
-     * Optional trigger for custom scheduled tasks, {@code null} for fixed-rate and fixed-delay tasks.
-     */
-    @Nullable
-    private final Trigger trigger;
-
     static {
         try {
             SCHEDULED_TASK_FUTURE_FIELD = ScheduledTask.class.getDeclaredField("future");
@@ -78,19 +58,9 @@ public class ManagedScheduledTask {
         }
     }
 
-    public ManagedScheduledTask(String id, ScheduledTask scheduledTask, TaskScheduler taskScheduler) {
+    public ManagedScheduledTask(String id, ScheduledTask scheduledTask) {
         this.id = id;
         this.scheduledTask = scheduledTask;
-        this.taskScheduler = taskScheduler;
-
-        Task t = scheduledTask.getTask();
-        this.runnable = t.getRunnable();
-
-        if (t instanceof TriggerTask triggerTask) {
-            this.trigger = triggerTask.getTrigger();
-        } else {
-            this.trigger = null;
-        }
     }
 
     public String getId() {
@@ -101,16 +71,19 @@ public class ManagedScheduledTask {
         return scheduledTask;
     }
 
-    public TaskScheduler getTaskScheduler() {
-        return taskScheduler;
-    }
-
     public Runnable getRunnable() {
-        return runnable;
+        return scheduledTask.getTask().getRunnable();
     }
 
+    /**
+     * Optional trigger for custom scheduled tasks, {@code null} for fixed-rate and fixed-delay tasks.
+     */
     public @Nullable Trigger getTrigger() {
-        return trigger;
+        if (scheduledTask.getTask() instanceof TriggerTask triggerTask) {
+            return triggerTask.getTrigger();
+        } else {
+            return null;
+        }
     }
 
     public ScheduledFuture<?> getFuture() {
@@ -121,9 +94,10 @@ public class ManagedScheduledTask {
         }
     }
 
-    public void setFuture(ScheduledFuture<?> future) {
+    public void replaceScheduledFuture(ScheduledFuture<?> actual) {
         try {
-            SCHEDULED_TASK_FUTURE_FIELD.set(scheduledTask, future);
+            this.scheduledTask.cancel();
+            SCHEDULED_TASK_FUTURE_FIELD.set(this.scheduledTask, actual);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException("Failed to set 'future' in ScheduledTask", e);
         }

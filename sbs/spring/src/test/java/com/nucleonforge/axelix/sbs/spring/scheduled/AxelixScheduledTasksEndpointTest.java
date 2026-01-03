@@ -16,6 +16,7 @@
 package com.nucleonforge.axelix.sbs.spring.scheduled;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -135,14 +136,24 @@ class AxelixScheduledTasksEndpointTest {
         }
 
         @Bean
-        public ScheduledTasksRegistry scheduledTaskRegistry(
-                ScheduledAnnotationBeanPostProcessor processor, TaskScheduler scheduler) {
-            return new ScheduledTasksRegistry(processor, scheduler);
+        public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
+            return new ScheduledTasksRegistry(processor);
         }
 
         @Bean
-        public ScheduledTaskService scheduledTaskService(ScheduledTasksRegistry registry) {
-            return new ScheduledTaskService(registry);
+        TaskRescheduler testTriggerBasedTaskRescheduler(TaskScheduler taskScheduler) {
+            return new TriggerBasedTaskRescheduler(taskScheduler);
+        }
+
+        @Bean
+        TaskRescheduler testIntervalBasedTaskRescheduler(TaskScheduler taskScheduler) {
+            return new IntervalBasedTaskRescheduler(taskScheduler);
+        }
+
+        @Bean
+        public ScheduledTaskService scheduledTaskService(
+                ScheduledTasksRegistry registry, List<TaskRescheduler> taskReschedulers) {
+            return new ScheduledTaskService(registry, taskReschedulers);
         }
 
         @Bean

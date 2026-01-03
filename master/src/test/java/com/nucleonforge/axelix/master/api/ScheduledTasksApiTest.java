@@ -327,7 +327,7 @@ public class ScheduledTasksApiTest {
     @Test
     void shouldEnableSingleScheduledTask() {
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         ResponseEntity<String> body = restTemplate
@@ -342,7 +342,7 @@ public class ScheduledTasksApiTest {
     @Test
     void shouldDisableSingleScheduledTask() {
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         ResponseEntity<String> body = restTemplate
@@ -393,7 +393,7 @@ public class ScheduledTasksApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         registry.register(createInstance(instanceId));
@@ -413,7 +413,7 @@ public class ScheduledTasksApiTest {
     void shouldReturnBadRequestForUnregisteredInstanceOnEnableSingleScheduledTask() {
         String instanceId = "unregistered-scheduled-tasks-management-enable--instance";
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
@@ -434,7 +434,7 @@ public class ScheduledTasksApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         registry.register(createInstance(instanceId));
@@ -454,7 +454,7 @@ public class ScheduledTasksApiTest {
     void shouldReturnBadRequestForUnregisteredInstanceOnDisableSingleScheduledTask() {
         String instanceId = "unregistered-scheduled-tasks-management-enable--instance";
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate

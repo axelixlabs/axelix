@@ -28,14 +28,12 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.lang.Nullable;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.FixedDelayTask;
 import org.springframework.scheduling.config.FixedRateTask;
@@ -113,14 +111,8 @@ class ScheduledTasksRegistryTest {
     static class ScheduledTaskRegistryTestConfiguration implements SchedulingConfigurer {
 
         @Bean
-        public TaskScheduler taskScheduler() {
-            return new ConcurrentTaskScheduler();
-        }
-
-        @Bean
-        public ScheduledTasksRegistry scheduledTaskRegistry(
-                ScheduledAnnotationBeanPostProcessor processor, TaskScheduler scheduler) {
-            return new ScheduledTasksRegistry(processor, scheduler);
+        public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
+            return new ScheduledTasksRegistry(processor);
         }
 
         @Scheduled(cron = "*/2 * * * * *")

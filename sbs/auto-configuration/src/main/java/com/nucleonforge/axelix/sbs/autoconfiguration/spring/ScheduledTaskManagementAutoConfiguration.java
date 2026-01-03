@@ -15,6 +15,12 @@
  */
 package com.nucleonforge.axelix.sbs.autoconfiguration.spring;
 
+import java.util.List;
+
+import org.jspecify.annotations.NonNull;
+
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.autoconfigure.scheduling.ScheduledTasksEndpointAutoConfiguration;
 import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
@@ -26,14 +32,18 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 
 import com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpoint;
+import com.nucleonforge.axelix.sbs.spring.scheduled.IntervalBasedTaskRescheduler;
 import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTaskManagementEndpoint;
 import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTaskService;
 import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksRegistry;
+import com.nucleonforge.axelix.sbs.spring.scheduled.TaskRescheduler;
+import com.nucleonforge.axelix.sbs.spring.scheduled.TriggerBasedTaskRescheduler;
 
 /**
  * Auto-configuration for scheduled task management functionality.
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  * @since 14.10.2025
  */
 @AutoConfiguration(after = ScheduledTasksEndpointAutoConfiguration.class)
@@ -43,15 +53,29 @@ public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ScheduledTasksRegistry scheduledTasksRegistry(
-            ScheduledAnnotationBeanPostProcessor processor, TaskScheduler scheduler) {
-        return new ScheduledTasksRegistry(processor, scheduler);
+    public ScheduledTasksRegistry scheduledTasksRegistry(ScheduledAnnotationBeanPostProcessor processor) {
+        return new ScheduledTasksRegistry(processor);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public ScheduledTaskService scheduledTaskService(ScheduledTasksRegistry scheduledTasksRegistry) {
-        return new ScheduledTaskService(scheduledTasksRegistry);
+    public ScheduledTaskService scheduledTaskService(
+            ScheduledTasksRegistry scheduledTasksRegistry, List<TaskRescheduler> taskReschedulers) {
+        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers);
+    }
+
+    @Bean
+    public TaskRescheduler intervalBasedTaskRescheduler(ObjectProvider<TaskScheduler> scheduler) {
+        TaskScheduler taskScheduler = requireTaskScheduler(scheduler);
+
+        return new IntervalBasedTaskRescheduler(taskScheduler);
+    }
+
+    @Bean
+    public TaskRescheduler triggerBasedTaskRescheduler(ObjectProvider<TaskScheduler> scheduler) {
+        TaskScheduler taskScheduler = requireTaskScheduler(scheduler);
+
+        return new TriggerBasedTaskRescheduler(taskScheduler);
     }
 
     @Bean
@@ -65,5 +89,18 @@ public class ScheduledTaskManagementAutoConfiguration {
     @ConditionalOnMissingBean
     public ScheduledTaskManagementEndpoint scheduledTaskManagementEndpoint(ScheduledTaskService scheduledTaskService) {
         return new ScheduledTaskManagementEndpoint(scheduledTaskService);
+    }
+
+    @NonNull
+    private static TaskScheduler requireTaskScheduler(ObjectProvider<TaskScheduler> scheduler) {
+        TaskScheduler taskScheduler = scheduler.getIfAvailable();
+
+        if (taskScheduler == null) {
+            throw new NoSuchBeanDefinitionException(
+                    "For @Scheduled-related abilities to work, Axelix requires a bean of type %s that cannot be found"
+                            .formatted(TaskScheduler.class.getName()));
+        }
+
+        return taskScheduler;
     }
 }
