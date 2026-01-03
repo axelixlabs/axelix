@@ -35,6 +35,6 @@ public class QueryStringRenderer {
             return "";
         }
 
-        return queryParameters.stream().map(QueryParameter::asString).collect(Collectors.joining("&", "?", ""));
+        return queryParameters.stream().map(QueryParameter::toEncodedString).collect(Collectors.joining("&", "?", ""));
     }
 }

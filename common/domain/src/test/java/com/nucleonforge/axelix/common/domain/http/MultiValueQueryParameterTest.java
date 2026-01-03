@@ -16,9 +16,14 @@
 package com.nucleonforge.axelix.common.domain.http;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.params.provider.Arguments.of;
 
 /**
  * Unit test for {@link MultiValueQueryParameter}.
@@ -27,15 +32,24 @@ import org.junit.jupiter.api.Test;
  */
 class MultiValueQueryParameterTest {
 
-    @Test
-    void shouldRenderCorrectMultiValuesParameter() {
+    @ParameterizedTest
+    @MethodSource("args")
+    void shouldRenderCorrectMultiValuesParameter(String key, List<String> values, String result) {
         // given.
-        var subject = new MultiValueQueryParameter("key", List.of("value1", "value2", "value3"));
+        var subject = new MultiValueQueryParameter(key, values);
 
         // when.
-        String rendered = subject.asString();
+        String rendered = subject.toEncodedString();
 
         // then.
-        Assertions.assertThat(rendered).isEqualTo("key=value1,value2,value3");
+        Assertions.assertThat(rendered).isEqualTo(result);
+    }
+
+    static Stream<Arguments> args() {
+        return Stream.of(
+                of("k1", List.of("v1"), "k1=v1"), // simple case
+                of("k1", List.of("v1", "v2", "v3"), "k1=v1,v2,v3"), // multiple values
+                of("k1", List.of("v1 v2", "v3"), "k1=v1%20v2,v3") // reserved characters in use
+                );
     }
 }

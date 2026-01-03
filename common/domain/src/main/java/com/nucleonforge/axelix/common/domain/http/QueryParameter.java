@@ -37,17 +37,18 @@ public sealed interface QueryParameter<T> permits SingleValueQueryParameter, Mul
     T value();
 
     /**
-     * @return the String representation of {@link #value()}
+     * @return the encoded (URL reserved and unsafe characters are escaped) {@link String}
+     * representation of {@link #value()}.
      */
-    default String asString() {
-        String encodedKey = URLEncoder.encode(key(), StandardCharsets.UTF_8).replace("+", "%20");
+    String toEncodedString();
 
-        T value = value();
-
-        String encodedValue = value != null
-                ? URLEncoder.encode(value.toString(), StandardCharsets.UTF_8).replace("+", "%20")
-                : null;
-
-        return encodedKey + "=" + encodedValue;
+    /**
+     * Encode the given part of the URL.
+     *
+     * @param part part of the URL that needs to be encoded.
+     * @return the encoded part of the URL.
+     */
+    static String encodeUrlComponent(String part) {
+        return URLEncoder.encode(part, StandardCharsets.UTF_8).replace("+", "%20");
     }
 }

@@ -67,6 +67,9 @@ class HttpUrlTest {
                 of("/health", "/health?key2=value2", Map.of(), new QueryParameter[] {
                     new SingleValueQueryParameter("key2", "value2")
                 }),
+                of("/health", "/health?action=end%20of%20minor", Map.of(), new QueryParameter[] {
+                    new SingleValueQueryParameter("action", "end of minor")
+                }),
                 of("/health/data", "/health/data", Map.of(), new QueryParameter[] {}),
                 of("/{cache.name}", "/my-cache", Map.of("cache.name", "my-cache"), new QueryParameter[] {}),
                 of(

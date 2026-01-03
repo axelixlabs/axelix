@@ -32,4 +32,13 @@ public record SingleValueQueryParameter(String key, String value) implements Que
     public String value() {
         return value;
     }
+
+    @Override
+    public String toEncodedString() {
+        String encodedKey = QueryParameter.encodeUrlComponent(key());
+
+        String encodedValue = QueryParameter.encodeUrlComponent(value());
+
+        return encodedKey + "=" + encodedValue;
+    }
 }

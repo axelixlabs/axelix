@@ -16,6 +16,7 @@
 package com.nucleonforge.axelix.common.domain.http;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The {@link QueryParameter} that can have multiple values. Renders to a
@@ -25,7 +26,7 @@ import java.util.List;
  *
  * @author Mikhail Polivakha
  */
-public record MultiValueQueryParameter(String key, List<String> values) implements QueryParameter<String> {
+public record MultiValueQueryParameter(String key, List<String> values) implements QueryParameter<List<String>> {
 
     @Override
     public String key() {
@@ -33,7 +34,17 @@ public record MultiValueQueryParameter(String key, List<String> values) implemen
     }
 
     @Override
-    public String value() {
-        return String.join(",", values);
+    public List<String> value() {
+        return values;
+    }
+
+    @Override
+    public String toEncodedString() {
+        String encodedKey = QueryParameter.encodeUrlComponent(key());
+
+        String encodedValue =
+                value().stream().map(QueryParameter::encodeUrlComponent).collect(Collectors.joining(","));
+
+        return encodedKey + "=" + encodedValue;
     }
 }
