@@ -19,8 +19,11 @@ import { extractErrorCode, showErrorNotification } from "helpers";
 import type { IErrorResponse } from "models";
 import { IS_AUTH } from "utils";
 
+/**
+ * Browser will route such requests (with no host:port) to the same origin as the current
+ */
 const apiFetch = axios.create({
-    baseURL: `${import.meta.env.VITE_APP_API_URL}/api/axelix`,
+    baseURL: `/api/axelix`,
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",
@@ -33,7 +36,9 @@ apiFetch.interceptors.response.use(
     (error: AxiosError<IErrorResponse>) => {
         const errorCode: string | undefined = extractErrorCode(error?.response?.data);
 
-        showErrorNotification(errorCode);
+        if (errorCode != "INVALID_JWT_EXCEPTION") {
+            showErrorNotification(errorCode);
+        }
 
         if (error.response?.status === 401) {
             localStorage.removeItem(IS_AUTH);

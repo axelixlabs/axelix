@@ -29,11 +29,13 @@ export const Help = () => {
 
     const [open, setOpen] = useState<boolean>(false);
 
+    const version = import.meta.env.VITE_APP_VERSION;
+
     const items: MenuProps["items"] = [
         {
             key: "1",
             type: "group",
-            label: "Axelix V1.0.10",
+            label: `Axelix V${version}`,
         },
         {
             type: "divider",

@@ -32,6 +32,13 @@ export default defineConfig({
     ],
     server: {
         port: 3000,
+        proxy: {
+            "/api/axelix": {
+                target: "http://158.160.200.59",
+                changeOrigin: true,
+                secure: false,
+            },
+        },
     },
     build: {
         rollupOptions: {
