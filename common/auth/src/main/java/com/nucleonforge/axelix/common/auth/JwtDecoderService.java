@@ -20,7 +20,6 @@ import com.nucleonforge.axelix.common.auth.core.User;
 import com.nucleonforge.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.JwtParsingException;
-import com.nucleonforge.axelix.common.auth.exception.JwtTokenDecodingException;
 
 /**
  * Contract for decoding and validating JWT tokens into {@link User} representations.
@@ -37,9 +36,8 @@ public interface JwtDecoderService {
      * @return the reconstructed {@link User}
      * @throws ExpiredJwtTokenException if the JWT token has expired
      * @throws InvalidJwtTokenException if the JWT token is invalid or tampered with
-     * @throws JwtTokenDecodingException if an unexpected error occurs during token decoding
      * @throws JwtParsingException if the token cannot be parsed or contains insufficient data
      */
     DecodedUser decodeTokenToUser(String token)
-            throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtTokenDecodingException, JwtParsingException;
+            throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtParsingException;
 }

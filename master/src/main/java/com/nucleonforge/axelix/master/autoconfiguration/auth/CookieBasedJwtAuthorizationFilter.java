@@ -33,7 +33,6 @@ import com.nucleonforge.axelix.common.auth.JwtDecoderService;
 import com.nucleonforge.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.JwtParsingException;
-import com.nucleonforge.axelix.common.auth.exception.JwtTokenDecodingException;
 
 /**
  * Auth filter that is based on the {@link org.springframework.http.HttpHeaders#SET_COOKIE Set-Cookie} header.
@@ -84,8 +83,6 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 
         } catch (JwtParsingException | ExpiredJwtTokenException | InvalidJwtTokenException e) {
             respondWith(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-        } catch (JwtTokenDecodingException e) {
-            respondWith(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 

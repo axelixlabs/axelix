@@ -40,7 +40,6 @@ import com.nucleonforge.axelix.common.auth.core.TokenClaim;
 import com.nucleonforge.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.JwtParsingException;
-import com.nucleonforge.axelix.common.auth.exception.JwtTokenDecodingException;
 
 /**
  * Default implementation of {@link JwtDecoderService}.
@@ -63,7 +62,7 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
 
     @Override
     public DecodedUser decodeTokenToUser(String token)
-            throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtTokenDecodingException, JwtParsingException {
+            throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtParsingException {
 
         try {
             Claims claims = parseClaims(token).getPayload();
@@ -75,7 +74,7 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
         } catch (JwtException e) {
             throw new InvalidJwtTokenException("JWT token is invalid or tampered", e);
         } catch (Exception e) {
-            throw new JwtTokenDecodingException("Unexpected error while decoding JWT token", e);
+            throw new JwtParsingException("Unexpected error while decoding JWT token", e);
         }
     }
 

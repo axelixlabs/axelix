@@ -23,7 +23,12 @@ import com.nucleonforge.axelix.master.api.error.ApiError;
 import com.nucleonforge.axelix.master.api.error.handle.ApiExceptionTranslator;
 
 /**
- * Global exception handler.
+ * Global exception handler. Handles exceptions that occurred in standard spring-web
+ * endpoints like {@link org.springframework.web.bind.annotation.GetMapping @GetMapping} or
+ * similar. It does not however handle exceptions in filter chain, which is where auth is
+ * implemented - {@link ExceptionHandlingFilter} is responsible for that.
+ *
+ * @see ExceptionHandlingFilter
  *
  * @since 29.08.2025
  * @author Nikita Kirillov

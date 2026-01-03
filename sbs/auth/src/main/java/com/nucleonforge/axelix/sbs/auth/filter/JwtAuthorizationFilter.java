@@ -20,17 +20,6 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import com.nucleonforge.axelix.common.auth.JwtDecoderService;
 import com.nucleonforge.axelix.common.auth.core.Authority;
 import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
@@ -38,9 +27,17 @@ import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.JwtParsingException;
-import com.nucleonforge.axelix.common.auth.exception.JwtTokenDecodingException;
 import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
 import com.nucleonforge.axelix.sbs.auth.spi.Authorizer;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * A custom servlet filter that restricts access to Actuator endpoints based on JWT token presence, validity,
@@ -98,8 +95,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             respondWith(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } catch (AuthorizationException e) {
             respondWith(response, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
-        } catch (JwtTokenDecodingException e) {
-            respondWith(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
