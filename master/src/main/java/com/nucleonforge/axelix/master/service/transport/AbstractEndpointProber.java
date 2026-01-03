@@ -35,8 +35,6 @@ import com.nucleonforge.axelix.master.service.serde.DeserializationException;
 import com.nucleonforge.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
 /**
  * The common implementation of the {@link EndpointProber}.
  *

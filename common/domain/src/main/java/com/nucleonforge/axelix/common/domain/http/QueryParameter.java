@@ -44,7 +44,9 @@ public sealed interface QueryParameter<T> permits SingleValueQueryParameter, Mul
 
         T value = value();
 
-        String encodedValue = value != null ? URLEncoder.encode(value.toString(), StandardCharsets.UTF_8).replace("+", "%20") : null;
+        String encodedValue = value != null
+                ? URLEncoder.encode(value.toString(), StandardCharsets.UTF_8).replace("+", "%20")
+                : null;
 
         return encodedKey + "=" + encodedValue;
     }
