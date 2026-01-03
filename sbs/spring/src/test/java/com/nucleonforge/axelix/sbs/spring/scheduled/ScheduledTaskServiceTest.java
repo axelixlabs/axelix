@@ -16,6 +16,7 @@
 package com.nucleonforge.axelix.sbs.spring.scheduled;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -96,7 +97,7 @@ class ScheduledTaskServiceTest {
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
         assertThat(task.getFuture().isCancelled()).isTrue();
 
-        taskService.enableTask(taskId, true);
+        taskService.enableTask(taskId);
         Thread.sleep(200);
 
         task = taskRegistry.find(taskId).orElseThrow();
@@ -127,7 +128,7 @@ class ScheduledTaskServiceTest {
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
         assertThat(task.getFuture().isCancelled()).isTrue();
 
-        taskService.enableTask(taskId, true);
+        taskService.enableTask(taskId);
         Thread.sleep(100);
 
         task = taskRegistry.find(taskId).orElseThrow();
@@ -158,7 +159,7 @@ class ScheduledTaskServiceTest {
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
         assertThat(task.getFuture().isCancelled()).isTrue();
 
-        taskService.enableTask(taskId, true);
+        taskService.enableTask(taskId);
         Thread.sleep(200);
 
         task = taskRegistry.find(taskId).orElseThrow();
@@ -189,7 +190,7 @@ class ScheduledTaskServiceTest {
         ManagedScheduledTask task = taskRegistry.find(taskId).orElseThrow();
         assertThat(task.getFuture().isCancelled()).isTrue();
 
-        taskService.enableTask(taskId, true);
+        taskService.enableTask(taskId);
         Thread.sleep(200);
 
         task = taskRegistry.find(taskId).orElseThrow();
@@ -206,14 +207,24 @@ class ScheduledTaskServiceTest {
         }
 
         @Bean
-        public ScheduledTasksRegistry scheduledTaskRegistry(
-                ScheduledAnnotationBeanPostProcessor processor, TaskScheduler scheduler) {
-            return new ScheduledTasksRegistry(processor, scheduler);
+        public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
+            return new ScheduledTasksRegistry(processor);
         }
 
         @Bean
-        public ScheduledTaskService scheduledTaskService(ScheduledTasksRegistry registry) {
-            return new ScheduledTaskService(registry);
+        TaskRescheduler testTriggerBasedTaskRescheduler(TaskScheduler taskScheduler) {
+            return new TriggerBasedTaskRescheduler(taskScheduler);
+        }
+
+        @Bean
+        TaskRescheduler testIntervalBasedTaskRescheduler(TaskScheduler taskScheduler) {
+            return new IntervalBasedTaskRescheduler(taskScheduler);
+        }
+
+        @Bean
+        public ScheduledTaskService scheduledTaskService(
+                ScheduledTasksRegistry registry, List<TaskRescheduler> taskReschedulers) {
+            return new ScheduledTaskService(registry, taskReschedulers);
         }
 
         @Scheduled(cron = "*/1 * * * * *")

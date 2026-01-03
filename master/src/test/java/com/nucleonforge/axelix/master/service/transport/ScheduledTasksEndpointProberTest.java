@@ -257,12 +257,11 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
           {
-             "targetScheduledTask": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask",
-             "force": true
+             "targetScheduledTask": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
           }
           """;
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(requestBody));
 
@@ -282,12 +281,11 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
             {
-               "targetScheduledTask": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask",
-               "force": true
+               "targetScheduledTask": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
             }
             """;
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", true);
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(requestBody));
 

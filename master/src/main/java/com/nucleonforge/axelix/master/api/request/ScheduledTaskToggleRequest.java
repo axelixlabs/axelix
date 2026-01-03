@@ -16,13 +16,11 @@
 package com.nucleonforge.axelix.master.api.request;
 
 /**
- * Request to enable eecution of a scheduled task.
+ * Request to enable execution of a scheduled task.
  *
- * @param targetScheduledTask   The target scheduled task to be enabled.
- * @param force                 The value {@code true} forces an immediate change of the task state:
- *                              it will forcibly enable the task if inactive, or interrupt it if currently running,
- *                              regardless of the schedule settings. {@code false} means the task will follow the configured schedule.
+ * @param targetScheduledTask The target scheduled task to be enabled.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
-public record ScheduledTaskToggleRequest(String targetScheduledTask, boolean force) {}
+public record ScheduledTaskToggleRequest(String targetScheduledTask) {}

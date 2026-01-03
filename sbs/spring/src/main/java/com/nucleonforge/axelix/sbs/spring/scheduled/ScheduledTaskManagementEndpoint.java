@@ -19,6 +19,7 @@ import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEn
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Custom Spring Boot Actuator endpoint
@@ -38,13 +39,16 @@ public class ScheduledTaskManagementEndpoint {
 
     @PostMapping("/enable")
     public ResponseEntity<Void> enableTask(@RequestBody ScheduledTaskToggleRequest request) {
-        taskService.enableTask(request.targetScheduledTask(), request.force());
+        taskService.enableTask(request.targetScheduledTask());
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/disable")
-    public ResponseEntity<Void> disableTask(@RequestBody ScheduledTaskToggleRequest request) {
-        taskService.disableTask(request.targetScheduledTask(), request.force());
+    public ResponseEntity<Void> disableTask(
+            @RequestBody ScheduledTaskToggleRequest request,
+            @RequestParam(value = "force", defaultValue = "false") boolean force) {
+
+        taskService.disableTask(request.targetScheduledTask(), force);
         return ResponseEntity.noContent().build();
     }
 }

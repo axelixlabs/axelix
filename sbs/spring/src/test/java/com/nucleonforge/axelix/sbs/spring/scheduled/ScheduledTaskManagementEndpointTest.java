@@ -16,6 +16,7 @@
 package com.nucleonforge.axelix.sbs.spring.scheduled;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -92,7 +93,7 @@ class ScheduledTaskManagementEndpointTest {
     void shouldEnableDisabledTask_testCronTask() throws InterruptedException {
         String taskId = CRON_TASK_ID;
 
-        disableScheduledTask(taskId, true);
+        forceDisableTask(taskId);
         Thread.sleep(200);
         cronFlag = false;
         Thread.sleep(1200);
@@ -108,7 +109,7 @@ class ScheduledTaskManagementEndpointTest {
     void shouldForceRescheduleEnabledTask_testCronTask() throws InterruptedException {
         String taskId = CRON_TASK_ID;
 
-        disableScheduledTask(taskId, true);
+        forceDisableTask(taskId);
         Thread.sleep(200);
         cronFlag = false;
         Thread.sleep(1200);
@@ -119,8 +120,8 @@ class ScheduledTaskManagementEndpointTest {
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
-        enableScheduledTask(taskId, true);
-        Thread.sleep(200);
+        enableScheduledTask(taskId);
+        Thread.sleep(1200);
         assertThat(cronFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
@@ -133,7 +134,7 @@ class ScheduledTaskManagementEndpointTest {
     void shouldEnableDisabledTask_testFixedDelayTask() throws InterruptedException {
         String taskId = FIXED_DELAY_TASK_ID;
 
-        disableScheduledTask(taskId, true);
+        forceDisableTask(taskId);
         Thread.sleep(200);
         fixedDelayFlag = false;
         Thread.sleep(200);
@@ -149,7 +150,7 @@ class ScheduledTaskManagementEndpointTest {
     void shouldForceRescheduleEnabledTask_testFixedDelayTask() throws InterruptedException {
         String taskId = FIXED_DELAY_TASK_ID;
 
-        disableScheduledTask(taskId, true);
+        forceDisableTask(taskId);
         Thread.sleep(200);
         fixedDelayFlag = false;
         Thread.sleep(200);
@@ -160,7 +161,7 @@ class ScheduledTaskManagementEndpointTest {
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
-        enableScheduledTask(taskId, true);
+        enableScheduledTask(taskId);
         Thread.sleep(200);
         assertThat(fixedDelayFlag).isTrue();
 
@@ -174,7 +175,7 @@ class ScheduledTaskManagementEndpointTest {
     void shouldEnableDisabledTask_testFixedRateTask() throws InterruptedException {
         String taskId = FIXED_RATE_TASK_ID;
 
-        disableScheduledTask(taskId, true);
+        forceDisableTask(taskId);
         Thread.sleep(200);
         fixedRateFlag = false;
         Thread.sleep(200);
@@ -190,7 +191,7 @@ class ScheduledTaskManagementEndpointTest {
     void shouldForceRescheduleEnabledTask_testFixedRateTask() throws InterruptedException {
         String taskId = FIXED_RATE_TASK_ID;
 
-        disableScheduledTask(taskId, true);
+        forceDisableTask(taskId);
         Thread.sleep(200);
         fixedRateFlag = false;
         Thread.sleep(200);
@@ -201,7 +202,7 @@ class ScheduledTaskManagementEndpointTest {
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
-        enableScheduledTask(taskId, true);
+        enableScheduledTask(taskId);
         Thread.sleep(200);
         assertThat(fixedRateFlag).isTrue();
 
@@ -215,7 +216,7 @@ class ScheduledTaskManagementEndpointTest {
     void shouldEnableDisabledTask_customTestTask() throws InterruptedException {
         String taskId = CUSTOM_TASK_ID;
 
-        disableScheduledTask(taskId, true);
+        forceDisableTask(taskId);
         Thread.sleep(200);
         customTaskFlag = false;
         Thread.sleep(200);
@@ -232,7 +233,7 @@ class ScheduledTaskManagementEndpointTest {
     void shouldForceRescheduleEnabledTask_customTestTask() throws InterruptedException {
         String taskId = CUSTOM_TASK_ID;
 
-        disableScheduledTask(taskId, true);
+        forceDisableTask(taskId);
         Thread.sleep(200);
         customTaskFlag = false;
         Thread.sleep(200);
@@ -243,7 +244,7 @@ class ScheduledTaskManagementEndpointTest {
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
-        enableScheduledTask(taskId, true);
+        enableScheduledTask(taskId);
         Thread.sleep(200);
         assertThat(customTaskFlag).isTrue();
 
@@ -253,8 +254,8 @@ class ScheduledTaskManagementEndpointTest {
         });
     }
 
-    private void enableScheduledTask(String target, boolean force) {
-        ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(target, force);
+    private void enableScheduledTask(String target) {
+        ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(target);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
                 "/actuator/scheduled-tasks-management/enable", defaultEntity(request), Void.class);
@@ -262,11 +263,11 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
 
-    private void disableScheduledTask(String targetScheduledTask, boolean force) {
-        ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(targetScheduledTask, force);
+    private void forceDisableTask(String targetScheduledTask) {
+        ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(targetScheduledTask);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/scheduled-tasks-management/disable", defaultEntity(request), Void.class);
+                "/actuator/scheduled-tasks-management/disable?force=true", defaultEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
@@ -296,14 +297,24 @@ class ScheduledTaskManagementEndpointTest {
         }
 
         @Bean
-        public ScheduledTasksRegistry scheduledTaskRegistry(
-                ScheduledAnnotationBeanPostProcessor processor, TaskScheduler scheduler) {
-            return new ScheduledTasksRegistry(processor, scheduler);
+        public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
+            return new ScheduledTasksRegistry(processor);
         }
 
         @Bean
-        public ScheduledTaskService scheduledTaskService(ScheduledTasksRegistry registry) {
-            return new ScheduledTaskService(registry);
+        TaskRescheduler testTriggerBasedTaskRescheduler(TaskScheduler taskScheduler) {
+            return new TriggerBasedTaskRescheduler(taskScheduler);
+        }
+
+        @Bean
+        TaskRescheduler testIntervalBasedTaskRescheduler(TaskScheduler taskScheduler) {
+            return new IntervalBasedTaskRescheduler(taskScheduler);
+        }
+
+        @Bean
+        public ScheduledTaskService scheduledTaskService(
+                ScheduledTasksRegistry registry, List<TaskRescheduler> taskReschedulers) {
+            return new ScheduledTaskService(registry, taskReschedulers);
         }
 
         @Bean

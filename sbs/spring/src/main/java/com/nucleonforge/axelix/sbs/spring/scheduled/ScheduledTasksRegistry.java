@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
@@ -38,6 +37,7 @@ import org.springframework.scheduling.config.Task;
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public class ScheduledTasksRegistry implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -45,37 +45,19 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
 
     private final Map<String, ManagedScheduledTask> tasks = new ConcurrentHashMap<>();
 
-    private final ScheduledAnnotationBeanPostProcessor processor;
+    private final ScheduledAnnotationBeanPostProcessor postProcessor;
 
-    private final TaskScheduler scheduler;
-
-    public ScheduledTasksRegistry(ScheduledAnnotationBeanPostProcessor processor, TaskScheduler scheduler) {
-        this.processor = processor;
-        this.scheduler = scheduler;
+    public ScheduledTasksRegistry(ScheduledAnnotationBeanPostProcessor postProcessor) {
+        this.postProcessor = postProcessor;
     }
 
     @Override
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
-        Set<ScheduledTask> allTasks = processor.getScheduledTasks();
+        Set<ScheduledTask> allTasks = postProcessor.getScheduledTasks();
         for (ScheduledTask task : allTasks) {
-            register(task);
+            tasks.computeIfAbsent(resolveId(task), taskId -> new ManagedScheduledTask(taskId, task));
         }
         log.info("Registered {} managed scheduled tasks", tasks.size());
-    }
-
-    private void register(ScheduledTask task) {
-        String id = resolveId(task);
-        if (tasks.containsKey(id)) {
-            return;
-        }
-        ManagedScheduledTask managed = new ManagedScheduledTask(id, task, scheduler);
-        tasks.put(id, managed);
-    }
-
-    private String resolveId(ScheduledTask task) {
-        Task t = task.getTask();
-        Runnable r = t.getRunnable();
-        return r.toString();
     }
 
     public Collection<ManagedScheduledTask> getAll() {
@@ -84,5 +66,16 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
 
     public Optional<ManagedScheduledTask> find(String id) {
         return Optional.ofNullable(tasks.get(id));
+    }
+
+    public ManagedScheduledTask findRequired(String id) {
+        return Optional.ofNullable(tasks.get(id))
+                .orElseThrow(() -> new ScheduledTaskNotFoundException("Task not found: " + id));
+    }
+
+    private String resolveId(ScheduledTask task) {
+        Task t = task.getTask();
+        Runnable r = t.getRunnable();
+        return r.toString();
     }
 }
