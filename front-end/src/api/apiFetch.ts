@@ -28,6 +28,9 @@ const apiFetch = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
+    paramsSerializer: {
+        indexes: null,
+    },
 });
 
 apiFetch.interceptors.response.use(

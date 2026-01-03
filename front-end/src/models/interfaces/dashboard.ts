@@ -61,7 +61,7 @@ export interface IMemoryUsage {
 
     /**
      * Total resident set size (RSS) memory usage
-     * */
+     */
     totalHeapSize: IMemoryMetric;
 }
 
