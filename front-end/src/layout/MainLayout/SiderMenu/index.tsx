@@ -35,7 +35,7 @@ export const SiderMenu = () => {
             items={getItems(instanceId!, t)}
             onClick={({ key }) => navigate(key)}
             selectedKeys={[location.pathname]}
-            defaultOpenKeys={findOpenKeys(getItems(instanceId!, t), location.pathname)}
+            defaultOpenKeys={findOpenKeys(getItems(instanceId!, t))}
             className={styles.Menu}
         />
     );

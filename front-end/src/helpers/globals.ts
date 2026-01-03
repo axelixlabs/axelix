@@ -21,11 +21,9 @@ import type { Dispatch, SetStateAction } from "react";
 import { type IConfigPropsBean, type IEnvironmentPropertySource, type MenuItem, StatefulRequest } from "models";
 import { UNKNOWN_ERROR } from "utils";
 
-export const findOpenKeys = (items: MenuItem[], path: string): string[] => {
-    const parent = items.find(
-        (item) => item && "children" in item && item.children?.some((child) => child?.key === path),
-    );
-    return parent ? [parent.key as string] : [];
+export const findOpenKeys = (items: MenuItem[]): string[] => {
+    const parent = items.filter((item) => item && "children" in item);
+    return parent ? [...parent.map((it) => it!.key as string)] : [];
 };
 
 export type SetRequestState<S> = Dispatch<SetStateAction<StatefulRequest<S>>>;

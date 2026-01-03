@@ -84,6 +84,7 @@
         "insights": "Аналитика",
         "details": "Детали",
         "metrics": "Метрики",
+        "beans": "Бины",
         "environment": "Окружение",
         "configurationProperties": "Свойства конфигурации",
         "scheduledTasks": "Запланированные задачи",
@@ -91,7 +92,8 @@
         "loggers": "Логгеры",
         "mappings": "Сопоставления",
         "caches": "Кэши",
-        "threadDump": "Дамп потоков"
+        "threadDump": "Дамп потоков",
+        "garbageCollector": "Сборщик Мусора"
     },
     "Caches": {
         "clearAll": "Очистить все кэши",

@@ -84,14 +84,16 @@
         "insights": "Insights",
         "details": "Details",
         "metrics": "Metrics",
-        "environment": "Environment",
+        "environment": "Properties",
+        "beans" : "Beans",
         "configurationProperties": "Configuration Properties",
         "scheduledTasks": "Scheduled Tasks",
         "conditions": "Conditions",
         "loggers": "Loggers",
         "mappings": "Mappings",
         "caches": "Caches",
-        "threadDump": "Thread Dump"
+        "threadDump": "Thread Dump",
+        "garbageCollector": "Garbage Collector"
     },
     "Caches": {
         "clearAll": "Clear All Caches",
