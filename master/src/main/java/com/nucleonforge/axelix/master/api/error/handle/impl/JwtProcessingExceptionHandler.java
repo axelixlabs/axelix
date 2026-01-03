@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import com.nucleonforge.axelix.common.auth.exception.JwtProcessingException;
 import com.nucleonforge.axelix.master.api.error.ApiError;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
+import com.nucleonforge.axelix.master.api.error.handle.ApiErrorCodes;
 import com.nucleonforge.axelix.master.api.error.handle.ExceptionHandler;
 
 /**
@@ -31,11 +32,10 @@ import com.nucleonforge.axelix.master.api.error.handle.ExceptionHandler;
 @Component
 public class JwtProcessingExceptionHandler implements ExceptionHandler<JwtProcessingException> {
 
-    private static final String INVALID_JWT_EXCEPTION = "INVALID_JWT_EXCEPTION";
-
     @Override
     public ApiError handle(JwtProcessingException exception) {
-        return new SimpleApiError(INVALID_JWT_EXCEPTION, HttpStatus.UNAUTHORIZED.value());
+        return new SimpleApiError(
+                ApiErrorCodes.INVALID_JWT_EXCEPTION_CODE.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Override

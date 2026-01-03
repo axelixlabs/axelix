@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 
 import com.nucleonforge.axelix.master.api.error.ApiError;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
+import com.nucleonforge.axelix.master.api.error.handle.ApiErrorCodes;
 import com.nucleonforge.axelix.master.api.error.handle.ExceptionHandler;
 
 /**
@@ -32,15 +33,14 @@ import com.nucleonforge.axelix.master.api.error.handle.ExceptionHandler;
  */
 public class DefaultExceptionHandler implements ExceptionHandler<Exception> {
 
-    private static final String INTERNAL_SERVER_ERROR_CODE = "INTERNAL_SERVER_ERROR";
-
     public static final DefaultExceptionHandler INSTANCE = new DefaultExceptionHandler();
     private static final Logger log = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
     @Override
     public ApiError handle(Exception exception) {
         log.warn("Default exception handler received an exception", exception);
-        return new SimpleApiError(INTERNAL_SERVER_ERROR_CODE, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return new SimpleApiError(
+                ApiErrorCodes.INTERNAL_SERVER_ERROR_CODE.getErrorCode(), HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @Override

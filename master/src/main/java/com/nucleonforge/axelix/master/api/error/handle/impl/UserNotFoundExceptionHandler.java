@@ -22,23 +22,24 @@ import com.nucleonforge.axelix.master.api.error.ApiError;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.error.handle.ApiErrorCodes;
 import com.nucleonforge.axelix.master.api.error.handle.ExceptionHandler;
-import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axelix.master.exception.auth.UserNotFoundException;
 
 /**
- * {@link ExceptionHandler} for {@link InstanceNotFoundException}.
+ * {@link ExceptionHandler} for {@link UserNotFoundException}.
  *
  * @author Mikhail Polivakha
  */
 @Component
-public class InstanceNotFoundExceptionExceptionHandler implements ExceptionHandler<InstanceNotFoundException> {
+public class UserNotFoundExceptionHandler implements ExceptionHandler<UserNotFoundException> {
 
     @Override
-    public ApiError handle(InstanceNotFoundException exception) {
-        return new SimpleApiError(ApiErrorCodes.INSTANCE_NOT_FOUND_CODE.getErrorCode(), HttpStatus.BAD_REQUEST.value());
+    public ApiError handle(UserNotFoundException exception) {
+        return new SimpleApiError(
+                ApiErrorCodes.INVALID_CREDENTIALS_CODE.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Override
-    public Class<InstanceNotFoundException> supported() {
-        return InstanceNotFoundException.class;
+    public Class<UserNotFoundException> supported() {
+        return UserNotFoundException.class;
     }
 }

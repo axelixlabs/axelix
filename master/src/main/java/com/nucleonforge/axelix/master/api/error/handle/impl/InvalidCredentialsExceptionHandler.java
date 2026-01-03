@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axelix.master.api.error.ApiError;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
+import com.nucleonforge.axelix.master.api.error.handle.ApiErrorCodes;
 import com.nucleonforge.axelix.master.api.error.handle.ExceptionHandler;
 import com.nucleonforge.axelix.master.exception.auth.InvalidCredentialsException;
 
@@ -31,11 +32,10 @@ import com.nucleonforge.axelix.master.exception.auth.InvalidCredentialsException
 @Component
 public class InvalidCredentialsExceptionHandler implements ExceptionHandler<InvalidCredentialsException> {
 
-    private static final String INVALID_CREDENTIALS_CODE = "INVALID_CREDENTIALS";
-
     @Override
     public ApiError handle(InvalidCredentialsException exception) {
-        return new SimpleApiError(INVALID_CREDENTIALS_CODE, HttpStatus.UNAUTHORIZED.value());
+        return new SimpleApiError(
+                ApiErrorCodes.INVALID_CREDENTIALS_CODE.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Override
