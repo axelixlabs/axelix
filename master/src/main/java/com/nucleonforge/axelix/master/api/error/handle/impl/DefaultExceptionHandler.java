@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.api.error.handle;
+package com.nucleonforge.axelix.master.api.error.handle.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 
 import com.nucleonforge.axelix.master.api.error.ApiError;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
+import com.nucleonforge.axelix.master.api.error.handle.ExceptionHandler;
 
 /**
  * The default {@link ExceptionHandler} where calls are forwarded when no specific

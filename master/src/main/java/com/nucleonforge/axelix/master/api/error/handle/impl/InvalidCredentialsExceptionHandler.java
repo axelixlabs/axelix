@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.api.error.handle;
+package com.nucleonforge.axelix.master.api.error.handle.impl;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axelix.master.api.error.ApiError;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
+import com.nucleonforge.axelix.master.api.error.handle.ExceptionHandler;
 import com.nucleonforge.axelix.master.exception.auth.InvalidCredentialsException;
 
 /**

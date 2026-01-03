@@ -17,9 +17,26 @@ package com.nucleonforge.axelix.master.api.error.handle;
 
 import com.nucleonforge.axelix.master.api.error.ApiError;
 
+/**
+ * Implementations are capable to handle a very particular {@link Exception}
+ * in the exception hierarchy. By "handling" in this context we mean the
+ * act of translation {@link Exception} to an {@link ApiError}.
+ *
+ * @author Mikhail Polivakha
+ */
 public interface ExceptionHandler<T extends Exception> {
 
+    /**
+     * Handle/Translate the exception to {@link ApiError}.
+     *
+     * @param exception to handle
+     * @return {@link ApiError} resulting from incoming exception.
+     */
     ApiError handle(T exception);
 
+    /**
+     * @return the class of the exception for processing of
+     * which this {@link ExceptionHandler} is responsible for.
+     */
     Class<T> supported();
 }

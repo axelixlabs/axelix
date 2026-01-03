@@ -33,6 +33,7 @@ import com.nucleonforge.axelix.common.auth.JwtDecoderService;
 import com.nucleonforge.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.JwtParsingException;
+import com.nucleonforge.axelix.common.auth.exception.JwtProcessingException;
 
 /**
  * Auth filter that is based on the {@link org.springframework.http.HttpHeaders#SET_COOKIE Set-Cookie} header.
@@ -40,7 +41,7 @@ import com.nucleonforge.axelix.common.auth.exception.JwtParsingException;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@SuppressWarnings("NullAway") // TODO: Pending issue GH-42 – introduce exception translator and refactor this filter
+@SuppressWarnings("NullAway")
 public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtDecoderService jwtDecoderService;
@@ -72,8 +73,7 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         String token = resolveToken(request.getCookies());
 
         if (token == null || token.isBlank()) {
-            respondWith(response, HttpServletResponse.SC_UNAUTHORIZED, "Authorization token is missing");
-            return;
+            throw new ServletException(new JwtProcessingException("Authorization token is missing"));
         }
 
         try {
@@ -82,7 +82,7 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (JwtParsingException | ExpiredJwtTokenException | InvalidJwtTokenException e) {
-            respondWith(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            throw new ServletException(e);
         }
     }
 
@@ -96,11 +96,5 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
             }
         }
         return null;
-    }
-
-    private void respondWith(HttpServletResponse response, int status, String message) throws IOException {
-        response.setStatus(status);
-        response.getWriter().write(message);
-        response.getWriter().flush();
     }
 }

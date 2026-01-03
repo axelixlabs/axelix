@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.nucleonforge.axelix.master.api.error.ApiError;
+import com.nucleonforge.axelix.master.api.error.handle.impl.DefaultExceptionHandler;
 
 /**
  * The default implementation of the {@link ApiExceptionTranslator}. Also applies the caching
