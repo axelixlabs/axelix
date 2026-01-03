@@ -26,7 +26,7 @@ import com.nucleonforge.axelix.common.auth.JwtDecoderService;
  * @since 23.07.2025
  * @author Nikita Kirillov
  */
-public class InvalidJwtTokenException extends RuntimeException {
+public class InvalidJwtTokenException extends JwtProcessingException {
 
     public InvalidJwtTokenException(final String message, final Throwable cause) {
         super(message, cause);

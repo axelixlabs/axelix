@@ -68,7 +68,7 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
             Claims claims = parseClaims(token).getPayload();
             return new DecodedUser(claims.getSubject(), extractRoles(claims));
         } catch (JwtParsingException e) {
-            throw e;
+            throw new JwtParsingException(e);
         } catch (ExpiredJwtException e) {
             throw new ExpiredJwtTokenException("JWT token has expired", e);
         } catch (JwtException e) {

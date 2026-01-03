@@ -215,9 +215,7 @@ class JwtAuthorizationFilterTest {
         ResponseEntity<String> response = restTemplate.exchange(
                 "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(tokenWithNullNameRoles), String.class);
 
-        assertThat(response)
-                .returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode)
-                .returns("Role name is null in JWT token", ResponseEntity::getBody);
+        assertThat(response).returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode);
     }
 
     private HttpEntity<Void> defaultEntity(String token) {

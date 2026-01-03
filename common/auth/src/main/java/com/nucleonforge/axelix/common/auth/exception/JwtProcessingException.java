@@ -16,22 +16,22 @@
 package com.nucleonforge.axelix.common.auth.exception;
 
 /**
- * Indicates that an error occurred while parsing a JWT (JSON Web Token).
+ * Base class for all the exceptions that happen during processing
+ * of the jwt token.
  *
- * @since 26.08.2025
- * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public class JwtParsingException extends JwtProcessingException {
+public class JwtProcessingException extends RuntimeException {
 
-    public JwtParsingException(String message) {
+    public JwtProcessingException(String message) {
         super(message);
     }
 
-    public JwtParsingException(Throwable cause) {
-        super(cause);
+    public JwtProcessingException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public JwtParsingException(String message, Throwable cause) {
-        super(message, cause);
+    public JwtProcessingException(Throwable cause) {
+        super(cause);
     }
 }

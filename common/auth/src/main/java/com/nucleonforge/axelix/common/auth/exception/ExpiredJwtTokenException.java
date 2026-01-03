@@ -24,7 +24,7 @@ import com.nucleonforge.axelix.common.auth.JwtDecoderService;
  * @since 23.07.2025
  * @author Nikita Kirillov
  */
-public class ExpiredJwtTokenException extends RuntimeException {
+public class ExpiredJwtTokenException extends JwtProcessingException {
 
     public ExpiredJwtTokenException(final String message, final Throwable cause) {
         super(message, cause);
