@@ -15,6 +15,9 @@
  */
 package com.nucleonforge.axelix.common.domain.http;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 /**
  * The HTTP query parameter.
  *
@@ -37,6 +40,12 @@ public sealed interface QueryParameter<T> permits SingleValueQueryParameter, Mul
      * @return the String representation of {@link #value()}
      */
     default String asString() {
-        return key() + "=" + value();
+        String encodedKey = URLEncoder.encode(key(), StandardCharsets.UTF_8).replace("+", "%20");
+
+        T value = value();
+
+        String encodedValue = value != null ? URLEncoder.encode(value.toString(), StandardCharsets.UTF_8).replace("+", "%20") : null;
+
+        return encodedKey + "=" + encodedValue;
     }
 }
