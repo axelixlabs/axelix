@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
-import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -293,10 +292,8 @@ class JwtAuthorizationFilterTest {
 
         @Bean
         public AxelixBeansEndpoint beansEndpointExtension(
-                BeansEndpoint beansEndpoint,
-                BeanMetaInfoExtractor beanMetaInfoExtractor,
-                ConfigurableApplicationContext context) {
-            return new AxelixBeansEndpoint(beansEndpoint, beanMetaInfoExtractor, context);
+                BeanMetaInfoExtractor beanMetaInfoExtractor, ConfigurableApplicationContext context) {
+            return new AxelixBeansEndpoint(beanMetaInfoExtractor, context);
         }
 
         @Bean
