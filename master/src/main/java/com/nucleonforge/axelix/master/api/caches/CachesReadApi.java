@@ -15,7 +15,6 @@
  */
 package com.nucleonforge.axelix.master.api.caches;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -39,7 +38,6 @@ import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
-import com.nucleonforge.axelix.common.domain.http.SingleValueQueryParameter;
 import com.nucleonforge.axelix.master.api.ApiPaths;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.caches.CacheProfileResponse;
@@ -156,8 +154,7 @@ public class CachesReadApi {
             @PathVariable("cacheName") String cacheName,
             @RequestParam("cacheManager") String cacheManager) {
 
-        SingleValueQueryParameter queryParameter = new SingleValueQueryParameter("cacheManager", cacheManager);
-        HttpPayload payload = new DefaultHttpPayload(List.of(queryParameter), Map.of("name", cacheName));
+        HttpPayload payload = new DefaultHttpPayload(Map.of("cacheManagerName", cacheManager, "cacheName", cacheName));
         SingleCache response = getCacheByNameEndpointProber.invoke(InstanceId.of(instanceId), payload);
         return Objects.requireNonNull(singleCacheConverter.convert(response));
     }

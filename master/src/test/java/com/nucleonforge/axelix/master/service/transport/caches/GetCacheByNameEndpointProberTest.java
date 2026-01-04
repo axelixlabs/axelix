@@ -16,7 +16,6 @@
 package com.nucleonforge.axelix.master.service.transport.caches;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,7 +36,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
-import com.nucleonforge.axelix.common.domain.http.SingleValueQueryParameter;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -103,11 +101,7 @@ public class GetCacheByNameEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/caches/cities")) {
-                    return new MockResponse()
-                            .setBody(jsonResponseCities)
-                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/caches/countries?cacheManager=cacheManager")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-caches/cacheManager/countries")) {
                     return new MockResponse()
                             .setBody(jsonResponseCountries)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
@@ -128,23 +122,9 @@ public class GetCacheByNameEndpointProberTest {
 
     @Test
     void shouldReturnSingleCache() {
-        String cacheName = "cities";
-        HttpPayload payload = new DefaultHttpPayload(Map.of("name", cacheName));
-
-        // when.
-        SingleCache cache = getCacheByNameEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
-
-        // then
-        assertThat(cache.name()).isEqualTo("cities");
-        assertThat(cache.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
-        assertThat(cache.cacheManager()).isEqualTo("cacheManager");
-    }
-
-    @Test
-    void shouldReturnSingleCacheWithQueryParameter() {
         String cacheName = "countries";
-        HttpPayload payload = new DefaultHttpPayload(
-                List.of(new SingleValueQueryParameter("cacheManager", "cacheManager")), Map.of("name", cacheName));
+        HttpPayload payload =
+                new DefaultHttpPayload(Map.of("cacheName", cacheName, "cacheManagerName", "cacheManager"));
 
         // when.
         SingleCache cache = getCacheByNameEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);

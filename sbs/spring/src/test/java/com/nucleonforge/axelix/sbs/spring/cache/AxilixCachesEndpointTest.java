@@ -15,6 +15,7 @@
  */
 package com.nucleonforge.axelix.sbs.spring.cache;
 
+import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -52,10 +53,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  *  deliver this. Come on Brian, I know you can do this! Push, push,
  *  push, push! We're praying for you and the team!
  *
- * @since 24.06.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @since 24.06.2025
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
 @Import({
@@ -69,7 +70,9 @@ class AxilixCachesEndpointTest {
 
     // Cache names under test
     private static final String TEST_CACHE_1 = "cache1";
+
     private static final String TEST_CACHE_2 = "cache2";
+
     private static final String TEST_CACHE_MANAGER = TEST_CACHE_2;
 
     @Autowired
@@ -85,6 +88,26 @@ class AxilixCachesEndpointTest {
         for (String cacheName : cacheManager.getCacheNames()) {
             cacheManager.getCache(cacheName).invalidate();
         }
+    }
+
+    @Test
+    void shouldGetSingleCacheByName() {
+
+        // when.
+        ResponseEntity<String> response = testRestTemplate.getForEntity(path(TEST_CACHE_1), String.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        JsonAssertions.assertThatJson(response.getBody())
+                .isEqualTo(
+                        // language=json
+                        """
+                {
+                    "cacheManager" : "cache2",
+                    "name" : "cache1",
+                    "target" : "java.util.concurrent.ConcurrentHashMap"
+                }
+                """);
     }
 
     @Test

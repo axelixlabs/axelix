@@ -247,7 +247,7 @@ public class CachesReadApiTest {
                 assert path != null;
 
                 boolean expectedPath = path.equals(
-                        "/actuator/caches/%s?cacheManager=%s".formatted(requestedCacheName, requestedCacheManagerName));
+                        "/actuator/axelix-caches/%s/%s".formatted(requestedCacheManagerName, requestedCacheName));
 
                 if (expectedPath) {
                     return new MockResponse()

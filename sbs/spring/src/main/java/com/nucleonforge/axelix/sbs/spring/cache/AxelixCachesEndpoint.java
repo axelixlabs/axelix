@@ -47,8 +47,14 @@ public class AxelixCachesEndpoint {
         this.delegate = delegate;
     }
 
+    @GetMapping(path = "{cacheManagerName}/{cacheName}")
+    public CachesEndpoint.CacheEntryDescriptor getSingleCache(
+            @PathVariable String cacheName, @PathVariable String cacheManagerName) {
+        return delegate.cache(cacheName, cacheManagerName);
+    }
+
     @GetMapping
-    public CachesFeed caches() {
+    public CachesFeed getAllCaches() {
         CachesEndpoint.CachesDescriptor originalDescriptor = delegate.caches();
 
         List<CacheManagers> extendedCacheManagers = new ArrayList<>();
