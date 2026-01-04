@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi;
+package com.nucleonforge.axelix.sbs.spring.auth;
 
 import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
 import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.core.User;
-import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
 
 /**
  * SPI interface that is capable of authorizing the given {@link User} against an {@link AuthorizationRequest}.

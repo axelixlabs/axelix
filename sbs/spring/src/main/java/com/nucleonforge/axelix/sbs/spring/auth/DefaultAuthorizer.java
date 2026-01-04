@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi;
+package com.nucleonforge.axelix.sbs.spring.auth;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +23,6 @@ import com.nucleonforge.axelix.common.auth.core.Authority;
 import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
 import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.core.Role;
-import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
 
 /**
  * Default implementation of {@link Authorizer}.

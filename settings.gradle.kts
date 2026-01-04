@@ -7,7 +7,6 @@ project(":common_auth").projectDir = file("common/auth")
 include(
     ":master",
     ":sbs",
-    ":sbs:auth",
     ":sbs:auto-configuration",
     ":sbs:metrics",
     ":sbs:postgres",

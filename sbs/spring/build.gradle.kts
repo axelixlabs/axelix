@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     // Self
+    implementation(project(":common_auth"))
     implementation(project(":common:domain"))
     implementation(project(":common:utils"))
     api(project(":common:api"))

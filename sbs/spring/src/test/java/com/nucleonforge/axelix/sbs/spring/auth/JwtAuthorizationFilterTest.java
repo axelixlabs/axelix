@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.filter;
+package com.nucleonforge.axelix.sbs.spring.auth;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
+import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,24 +41,30 @@ import org.springframework.http.ResponseEntity;
 import com.nucleonforge.axelix.common.auth.DefaultJwtDecoderService;
 import com.nucleonforge.axelix.common.auth.JwtDecoderService;
 import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
-import com.nucleonforge.axelix.sbs.auth.spi.Authorizer;
-import com.nucleonforge.axelix.sbs.auth.spi.DefaultAuthorizer;
+import com.nucleonforge.axelix.sbs.spring.beans.AxelixBeansEndpoint;
+import com.nucleonforge.axelix.sbs.spring.beans.BeanMetaInfoExtractor;
+import com.nucleonforge.axelix.sbs.spring.beans.DefaultBeanMetaInfoExtractor;
+import com.nucleonforge.axelix.sbs.spring.beans.QualifiersPersistencePostProcessor;
+import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
+import com.nucleonforge.axelix.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for {@link JwtAuthorizationFilter}.
- *
- * <p>Note: these tests assume that management endpoints are fully exposed via the following configuration:</p>
+ * <p>
+ * The tests here assume that some actuator management endpoints are exposed, for instance via:
  * <pre>
  * management:
  *   endpoints:
  *     web:
  *       exposure:
- *         include: "*"
+ *         include:
+ *           - axelix-beans
  * </pre>
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  * @since 28.07.2025
  */
 @SpringBootTest(
@@ -88,8 +99,10 @@ class JwtAuthorizationFilterTest {
     @Value("${test-tokens.token-with-null-name-roles}")
     private String tokenWithNullNameRoles;
 
+    @Autowired
+    private ApplicationContext applicationContext;
+
     @Test
-    @Disabled // TODO: uncomment once the auth module is merged into 'spring'
     void shouldAllowAccess_UserHasSingleRoleWithRequiredAuthorities() {
         HttpEntity<Void> entity = defaultEntity(tokenUserWithTwoRole);
 
@@ -114,7 +127,7 @@ class JwtAuthorizationFilterTest {
         assertThat(responseEnv.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         ResponseEntity<String> responseMappings =
-                restTemplate.exchange("/actuator/info", HttpMethod.GET, entity, String.class);
+                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, entity, String.class);
 
         assertThat(responseMappings.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -237,6 +250,25 @@ class JwtAuthorizationFilterTest {
     static class JwtAuthorizationFilterTestConfiguration {
 
         @Bean
+        public ConditionalBeanRefBuilder beanNameNormalizer() {
+            return new DefaultConditionalBeanRefBuilder();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
+            return new QualifiersPersistencePostProcessor();
+        }
+
+        @Bean
+        public BeanMetaInfoExtractor defaultBeanMetaInfoExtractor(
+                ConfigurableListableBeanFactory beanFactory,
+                ConditionsReportEndpoint delegateConditions,
+                ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
+            return new DefaultBeanMetaInfoExtractor(beanFactory, delegateConditions, conditionalBeanRefBuilder);
+        }
+
+        @Bean
         public JwtDecoderService jwtDecoderService(
                 final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
                 final @Value("${axelix.master.auth.jwt.signing-key}") String signingKey) {
@@ -257,6 +289,14 @@ class JwtAuthorizationFilterTest {
         public JwtAuthorizationFilter jwtAuthorizationFilter(
                 JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
             return new JwtAuthorizationFilter(jwtDecoderService, authorityResolver, authorizer);
+        }
+
+        @Bean
+        public AxelixBeansEndpoint beansEndpointExtension(
+                BeansEndpoint beansEndpoint,
+                BeanMetaInfoExtractor beanMetaInfoExtractor,
+                ConfigurableApplicationContext context) {
+            return new AxelixBeansEndpoint(beansEndpoint, beanMetaInfoExtractor, context);
         }
 
         @Bean

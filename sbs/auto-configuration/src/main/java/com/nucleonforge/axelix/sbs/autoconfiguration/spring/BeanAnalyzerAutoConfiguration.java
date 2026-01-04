@@ -68,8 +68,7 @@ public class BeanAnalyzerAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
+    public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
         return new QualifiersPersistencePostProcessor();
     }
 }

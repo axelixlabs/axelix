@@ -28,11 +28,11 @@ import org.springframework.context.annotation.Bean;
 import com.nucleonforge.axelix.common.auth.DefaultJwtDecoderService;
 import com.nucleonforge.axelix.common.auth.JwtDecoderService;
 import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
-import com.nucleonforge.axelix.sbs.auth.filter.AuthorityResolver;
-import com.nucleonforge.axelix.sbs.auth.filter.DefaultAuthorityResolver;
-import com.nucleonforge.axelix.sbs.auth.filter.JwtAuthorizationFilter;
-import com.nucleonforge.axelix.sbs.auth.spi.Authorizer;
-import com.nucleonforge.axelix.sbs.auth.spi.DefaultAuthorizer;
+import com.nucleonforge.axelix.sbs.spring.auth.AuthorityResolver;
+import com.nucleonforge.axelix.sbs.spring.auth.Authorizer;
+import com.nucleonforge.axelix.sbs.spring.auth.DefaultAuthorityResolver;
+import com.nucleonforge.axelix.sbs.spring.auth.DefaultAuthorizer;
+import com.nucleonforge.axelix.sbs.spring.auth.JwtAuthorizationFilter;
 
 /**
  * {@link AutoConfiguration} for JWT-based authentication support.

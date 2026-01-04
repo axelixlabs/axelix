@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.filter;
+package com.nucleonforge.axelix.sbs.spring.auth;
 
 import java.util.Map;
 import java.util.Optional;

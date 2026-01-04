@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi;
+package com.nucleonforge.axelix.sbs.spring.auth;
 
 import java.util.Collections;
 import java.util.Set;
@@ -25,7 +25,6 @@ import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.core.DefaultAuthority;
 import com.nucleonforge.axelix.common.auth.core.DefaultRole;
 import com.nucleonforge.axelix.common.auth.core.Role;
-import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Unit tests for {@link DefaultAuthorizer}.
  *
- * @since 30.07.2025
+ * @author Mikhail Polivakha
  */
 class DefaultAuthorizerTest {
 

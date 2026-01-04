@@ -13,20 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.spi;
-
-import com.nucleonforge.axelix.common.auth.core.AuthorizationRequest;
+package com.nucleonforge.axelix.sbs.spring.auth;
 
 /**
- * Result of the {@link Authorizer} analysis of the given {@link AuthorizationRequest}.
+ * The exception that happened during the authorization
  *
  * @since 16.07.25
  * @author Mikhail Polivakha
  */
-public interface AuthorizationResult {
+public class AuthorizationException extends RuntimeException {
 
-    /**
-     * @return whether the access is authorized
-     */
-    boolean accessAuthorized();
+    public AuthorizationException() {
+        super();
+    }
+
+    public AuthorizationException(final String message) {
+        super(message);
+    }
+
+    public AuthorizationException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

@@ -1,4 +1,13 @@
+axelix:
+  master:
+    auth:
+      jwt:
+        algorithm: "HMAC512"
+        signing-key: "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff"
+
 spring:
+  config:
+    import: "classpath:tokens.yml"
   info:
     git:
       location: classpath:other/git.properties
@@ -22,6 +31,7 @@ management:
           - profile-management
           - axelix-metadata
           - axelix-beans
+          - beans
           - axelix-env
           - axelix-metrics
           - axelix-configprops

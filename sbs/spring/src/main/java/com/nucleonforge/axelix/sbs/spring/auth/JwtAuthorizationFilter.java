@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.auth.filter;
+package com.nucleonforge.axelix.sbs.spring.auth;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -38,8 +38,6 @@ import com.nucleonforge.axelix.common.auth.core.DecodedUser;
 import com.nucleonforge.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.nucleonforge.axelix.common.auth.exception.JwtParsingException;
-import com.nucleonforge.axelix.sbs.auth.AuthorizationException;
-import com.nucleonforge.axelix.sbs.auth.spi.Authorizer;
 
 /**
  * A custom servlet filter that restricts access to Actuator endpoints based on JWT token presence, validity,
