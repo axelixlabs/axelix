@@ -21,7 +21,6 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.condition.Conditi
 import org.springframework.boot.actuate.cache.CachesEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +31,6 @@ import com.nucleonforge.axelix.sbs.spring.cache.CacheManagerBeanPostProcessor;
 import com.nucleonforge.axelix.sbs.spring.cache.CacheSizeProvider;
 import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheDispatcher;
 import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheSizeProvider;
-import com.nucleonforge.axelix.sbs.spring.cache.EnhancedCacheManager;
 
 /**
  * {@code CacheDispatcherAutoConfiguration} provides auto-configuration
@@ -57,7 +55,6 @@ import com.nucleonforge.axelix.sbs.spring.cache.EnhancedCacheManager;
  */
 @AutoConfiguration(after = {CacheAutoConfiguration.class, CachesEndpoint.class})
 @ConditionalOnAvailableEndpoint(endpoint = CachesEndpoint.class)
-@ConditionalOnBean(CacheManager.class)
 public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
@@ -74,12 +71,8 @@ public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxelixCachesEndpoint cacheDispatcherEndpoint(
-            CacheDispatcher dispatcher,
-            CachesEndpoint delegate,
-            EnhancedCacheManager enhancedCacheManager,
-            CacheSizeProvider cacheSizeProvider) {
-        return new AxelixCachesEndpoint(dispatcher, delegate, enhancedCacheManager, cacheSizeProvider);
+    public AxelixCachesEndpoint cacheDispatcherEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
+        return new AxelixCachesEndpoint(dispatcher, delegate);
     }
 
     @Bean

@@ -39,23 +39,12 @@ import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
 @RestControllerEndpoint(id = "axelix-caches")
 public class AxelixCachesEndpoint {
 
-    private final EnhancedCacheManager enhancedCacheManager;
-
-    private final CacheSizeProvider cacheSizeProvider;
-
     private final CacheDispatcher dispatcher;
-
     private final CachesEndpoint delegate;
 
-    public AxelixCachesEndpoint(
-            CacheDispatcher dispatcher,
-            CachesEndpoint delegate,
-            EnhancedCacheManager enhancedCacheManager,
-            CacheSizeProvider cacheSizeProvider) {
+    public AxelixCachesEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
         this.dispatcher = dispatcher;
         this.delegate = delegate;
-        this.enhancedCacheManager = enhancedCacheManager;
-        this.cacheSizeProvider = cacheSizeProvider;
     }
 
     @GetMapping
