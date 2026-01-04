@@ -16,15 +16,13 @@
 package com.nucleonforge.axelix.sbs.autoconfiguration.spring;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.actuate.autoconfigure.beans.BeansEndpointAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.sbs.spring.beans.AxelixBeansEndpoint;
 import com.nucleonforge.axelix.sbs.spring.beans.BeanMetaInfoExtractor;
 import com.nucleonforge.axelix.sbs.spring.beans.DefaultBeanMetaInfoExtractor;
@@ -33,15 +31,15 @@ import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
 import com.nucleonforge.axelix.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
 
 /**
- * {@code BeanAnalyzerAutoConfiguration} auto-configuration class for {@link BeanMetaInfoExtractor} bean.
+ * Auto-configuration class for {@link ActuatorEndpoints#BEANS} endpoint.
  *
  * @since 07.07.2025
  * @author Nikita Kirillov
- * @author Sergey  Cherkasov
+ * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
-@AutoConfiguration(after = BeansEndpointAutoConfiguration.class)
-@ConditionalOnAvailableEndpoint(endpoint = BeansEndpoint.class)
-public class BeanAnalyzerAutoConfiguration {
+@AutoConfiguration
+public class AxelixBeansAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
@@ -61,10 +59,8 @@ public class BeanAnalyzerAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AxelixBeansEndpoint beansEndpointExtension(
-            BeansEndpoint beansEndpoint,
-            BeanMetaInfoExtractor beanMetaInfoExtractor,
-            ConfigurableApplicationContext context) {
-        return new AxelixBeansEndpoint(beansEndpoint, beanMetaInfoExtractor, context);
+            BeanMetaInfoExtractor beanMetaInfoExtractor, ConfigurableApplicationContext context) {
+        return new AxelixBeansEndpoint(beanMetaInfoExtractor, context);
     }
 
     @Bean

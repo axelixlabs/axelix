@@ -1,4 +1,4 @@
-com.nucleonforge.axelix.sbs.autoconfiguration.spring.BeanAnalyzerAutoConfiguration
+com.nucleonforge.axelix.sbs.autoconfiguration.spring.AxelixBeansAutoConfiguration
 com.nucleonforge.axelix.sbs.autoconfiguration.spring.AxelixCachesEndpointAutoConfiguration
 com.nucleonforge.axelix.sbs.autoconfiguration.spring.SpringCloudFeignAutoConfiguration
 com.nucleonforge.axelix.sbs.autoconfiguration.spring.ContextRestarterAutoConfiguration

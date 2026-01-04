@@ -56,9 +56,8 @@ public class AxelixBeansEndpoint {
     private final BeanMetaInfoExtractor enricher;
     private final ConfigurableApplicationContext context;
 
-    public AxelixBeansEndpoint(
-            BeansEndpoint delegate, BeanMetaInfoExtractor enricher, ConfigurableApplicationContext context) {
-        this.delegate = delegate;
+    public AxelixBeansEndpoint(BeanMetaInfoExtractor enricher, ConfigurableApplicationContext context) {
+        this.delegate = new BeansEndpoint(context);
         this.enricher = enricher;
         this.context = context;
     }
