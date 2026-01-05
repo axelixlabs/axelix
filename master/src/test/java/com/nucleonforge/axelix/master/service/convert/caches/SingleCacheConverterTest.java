@@ -33,7 +33,8 @@ public class SingleCacheConverterTest {
 
     @Test
     void testConvertHappyPath() {
-        SingleCache cache = new SingleCache("cities", "java.util.concurrent.ConcurrentHashMap", "cacheManager");
+        SingleCache cache =
+                new SingleCache("cities", "java.util.concurrent.ConcurrentHashMap", "cacheManager", 1L, 2L, 3L, true);
 
         // when
         CacheProfileResponse response = subject.convertInternal(cache);

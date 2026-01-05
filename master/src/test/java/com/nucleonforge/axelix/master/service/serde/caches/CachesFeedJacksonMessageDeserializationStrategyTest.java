@@ -83,16 +83,16 @@ public class CachesFeedJacksonMessageDeserializationStrategyTest {
         CachesFeed caches = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         // ServiceCaches -> CacheManagers
-        List<CachesFeed.CacheManagers> cacheManagersList = caches.cacheManagers();
-        assertThat(cacheManagersList).hasSize(2);
+        List<CachesFeed.CacheManager> cacheManagerList = caches.cacheManagers();
+        assertThat(cacheManagerList).hasSize(2);
 
-        CachesFeed.CacheManagers another = cacheManagersList.stream()
+        CachesFeed.CacheManager another = cacheManagerList.stream()
                 .filter(cm -> "anotherCacheManager".equals(cm.name()))
                 .findFirst()
                 .orElseThrow();
         assertThat(another.caches()).hasSize(1);
 
-        CachesFeed.CacheManagers main = cacheManagersList.stream()
+        CachesFeed.CacheManager main = cacheManagerList.stream()
                 .filter(cm -> "cacheManager".equals(cm.name()))
                 .findFirst()
                 .orElseThrow();
@@ -100,7 +100,7 @@ public class CachesFeedJacksonMessageDeserializationStrategyTest {
 
         // "anotherCacheManager" -> Caches -> "countries"
         assertThat(another.caches()).hasSize(1);
-        CachesFeed.Caches anotherCountries = another.caches().get(0);
+        CachesFeed.Cache anotherCountries = another.caches().get(0);
         assertThat(anotherCountries.name()).isEqualTo("countries");
         assertThat(anotherCountries.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
         assertThat(anotherCountries.hitsCount()).isEqualTo(15);
@@ -109,7 +109,7 @@ public class CachesFeedJacksonMessageDeserializationStrategyTest {
         assertThat(anotherCountries.enabled()).isFalse();
 
         // "cacheManager" -> Caches -> "countries"
-        CachesFeed.Caches mainCountries = main.caches().stream()
+        CachesFeed.Cache mainCountries = main.caches().stream()
                 .filter(c -> "countries".equals(c.name()))
                 .findFirst()
                 .orElseThrow();
@@ -120,7 +120,7 @@ public class CachesFeedJacksonMessageDeserializationStrategyTest {
         assertThat(mainCountries.enabled()).isFalse();
 
         // "cacheManager" -> Caches -> "cities"
-        CachesFeed.Caches mainCities = main.caches().stream()
+        CachesFeed.Cache mainCities = main.caches().stream()
                 .filter(c -> "cities".equals(c.name()))
                 .findFirst()
                 .orElseThrow();

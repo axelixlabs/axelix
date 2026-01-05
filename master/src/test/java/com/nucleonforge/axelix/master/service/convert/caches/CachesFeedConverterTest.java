@@ -20,8 +20,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axelix.common.api.caches.CachesFeed;
-import com.nucleonforge.axelix.common.api.caches.CachesFeed.CacheManagers;
-import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
+import com.nucleonforge.axelix.common.api.caches.CachesFeed.Cache;
+import com.nucleonforge.axelix.common.api.caches.CachesFeed.CacheManager;
 import com.nucleonforge.axelix.master.api.response.caches.CachesResponse;
 import com.nucleonforge.axelix.master.service.convert.response.caches.CachesFeedConverter;
 
@@ -108,13 +108,13 @@ public class CachesFeedConverterTest {
 
     public CachesFeed getCaches() {
         // Caches
-        Caches cities = new Caches("cities", "java.util.concurrent.ConcurrentHashMap", 11L, 2L, 5L, true);
-        Caches countries = new Caches("countries", "java.util.concurrent.ConcurrentHashMap", 0L, 0L, 0L, false);
-        Caches test = new Caches("test", "java.util.concurrent.TestHashMap", 5L, 0L, 5L, true);
+        Cache cities = new Cache("cities", "java.util.concurrent.ConcurrentHashMap", 11L, 2L, 5L, true);
+        Cache countries = new Cache("countries", "java.util.concurrent.ConcurrentHashMap", 0L, 0L, 0L, false);
+        Cache test = new Cache("test", "java.util.concurrent.TestHashMap", 5L, 0L, 5L, true);
 
         // CacheManagers
-        CacheManagers anotherCacheManager = new CacheManagers("anotherCacheManager", List.of(countries));
-        CacheManagers cacheManager = new CacheManagers("cacheManager", List.of(cities, countries, test));
+        CacheManager anotherCacheManager = new CacheManager("anotherCacheManager", List.of(countries));
+        CacheManager cacheManager = new CacheManager("cacheManager", List.of(cities, countries, test));
 
         // return -> CachesFeed
         return new CachesFeed(List.of(anotherCacheManager, cacheManager));

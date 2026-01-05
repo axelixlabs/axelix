@@ -15,10 +15,6 @@
  */
 package com.nucleonforge.axelix.sbs.spring.cache;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.boot.actuate.cache.CachesEndpoint;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,8 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nucleonforge.axelix.common.api.caches.CachesFeed;
-import com.nucleonforge.axelix.common.api.caches.CachesFeed.CacheManagers;
-import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
+import com.nucleonforge.axelix.common.api.caches.SingleCache;
 
 /**
  * Custom Spring Boot Actuator endpoint that exposes operations for managing cache entries via HTTP.
@@ -40,69 +35,44 @@ import com.nucleonforge.axelix.common.api.caches.CachesFeed.Caches;
 @RestControllerEndpoint(id = "axelix-caches")
 public class AxelixCachesEndpoint {
 
-    private final CacheDispatcher dispatcher;
-    private final CachesEndpoint delegate;
+    private final CacheOperationsDispatcher dispatcher;
 
-    public AxelixCachesEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
+    public AxelixCachesEndpoint(CacheOperationsDispatcher dispatcher) {
         this.dispatcher = dispatcher;
-        this.delegate = delegate;
     }
 
     @GetMapping(path = "{cacheManagerName}/{cacheName}")
-    public CachesEndpoint.CacheEntryDescriptor getSingleCache(
+    public SingleCache getSingleCache(
             @PathVariable("cacheName") String cacheName, @PathVariable("cacheManagerName") String cacheManagerName) {
-        return delegate.cache(cacheName, cacheManagerName);
+        return dispatcher.get(cacheManagerName, cacheName);
     }
 
     @GetMapping
     public CachesFeed getAllCaches() {
-        CachesEndpoint.CachesDescriptor originalDescriptor = delegate.caches();
-
-        List<CacheManagers> extendedCacheManagers = new ArrayList<>();
-
-        originalDescriptor.getCacheManagers().forEach((managerName, cacheManagerDescriptor) -> {
-            List<Caches> extendedCaches = new ArrayList<>();
-
-            cacheManagerDescriptor.getCaches().forEach((cacheName, cacheDescriptor) -> {
-                boolean isEnabled = dispatcher.isCacheEnabled(managerName, cacheName);
-
-                Caches extendedCache = new Caches(
-                        cacheName,
-                        cacheDescriptor.getTarget(),
-                        dispatcher.getHitsCount(managerName, cacheName),
-                        dispatcher.getMissesCount(managerName, cacheName),
-                        dispatcher.getEstimatedCacheSize(managerName, cacheName),
-                        isEnabled);
-                extendedCaches.add(extendedCache);
-            });
-
-            CacheManagers extendedCacheManager = new CacheManagers(managerName, extendedCaches);
-            extendedCacheManagers.add(extendedCacheManager);
-        });
-
-        return new CachesFeed(extendedCacheManagers);
+        return dispatcher.getAll();
     }
 
     @DeleteMapping
     public void clearAllCaches() {
-        delegate.clearCaches();
+        dispatcher.clearAll();
     }
 
     @DeleteMapping("/{cacheManagerName}/{cacheName}/clear")
-    public CacheClearResponse clearKey(
+    public void clearKey(
             @PathVariable String cacheManagerName,
             @PathVariable String cacheName,
             @RequestParam(required = false) Object key) {
 
-        boolean result = key == null
-                ? dispatcher.clear(cacheManagerName, cacheName)
-                : dispatcher.clear(cacheManagerName, cacheName, key);
-        return new CacheClearResponse(result);
+        if (key == null) {
+            dispatcher.clear(cacheManagerName, cacheName);
+        } else {
+            dispatcher.clear(cacheManagerName, cacheName, key);
+        }
     }
 
     @DeleteMapping("/{cacheManagerName}/clear-all")
-    public CacheClearResponse clearAll(@PathVariable String cacheManagerName) {
-        return new CacheClearResponse(dispatcher.clearAll(cacheManagerName));
+    public void clearAll(@PathVariable String cacheManagerName) {
+        dispatcher.clear(cacheManagerName);
     }
 
     @PostMapping("/{cacheManagerName}/enable")

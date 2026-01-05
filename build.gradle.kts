@@ -61,7 +61,7 @@ subprojects {
                 "\\#"
             )
             removeUnusedImports()
-            removeWildcardImports()
+            forbidWildcardImports()
             trimTrailingWhitespace()
 //            TODO:
 //             For some reason, toggling comments like spotless:off / spotless:on

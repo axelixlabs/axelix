@@ -16,22 +16,27 @@
 package com.nucleonforge.axelix.common.api.caches;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
+import org.jspecify.annotations.Nullable;
 
 /**
  * DTO that encapsulates the details of the requested cache.
  *
- * @see ActuatorEndpoint
- * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/caches.html">Caches Endpoint</a>
- *
- * @param name            The cache name.
- * @param target          The fully qualified name of the native cache.
- * @param cacheManager    The cache manager name.
+ * @param name                The cache name.
+ * @param target              The fully qualified name of the native cache.
+ * @param cacheManager        The name of the cache manager that manages current cache.
+ * @param hitsCount           The estimated number of cache hits, or {@code null} if unknown.
+ * @param missesCount         The estimated number of cache misses, or {@code null} if unknown.
+ * @param estimatedEntrySize  The estimated number of entries in the cache, or {@code null} if unknown.
+ * @param enabled             Whether the cache is enabled ({@code true}) or disabled ({@code false}).
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public record SingleCache(
         @JsonProperty("name") String name,
         @JsonProperty("target") String target,
-        @JsonProperty("cacheManager") String cacheManager) {}
+        @JsonProperty("cacheManager") String cacheManager,
+        @JsonProperty("hitsCount") @Nullable Long hitsCount,
+        @JsonProperty("missesCount") @Nullable Long missesCount,
+        @JsonProperty("estimatedEntrySize") @Nullable Long estimatedEntrySize,
+        @JsonProperty("enabled") boolean enabled) {}

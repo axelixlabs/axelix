@@ -33,18 +33,18 @@ import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
  *
  * @author Sergey Cherkasov
  */
-public record CachesFeed(@JsonProperty("cacheManagers") List<CacheManagers> cacheManagers) {
+public record CachesFeed(@JsonProperty("cacheManagers") List<CacheManager> cacheManagers) {
     public CachesFeed() {
         this(Collections.emptyList());
     }
 
     /**
-     * DTO that encapsulates a map of all caches in the cache manager.
+     * DTO that encapsulates a map of all caches inside the given cache manager.
      *
      * @param name   The cache manager name.
      * @param caches The caches are identified by the cache name.
      */
-    public record CacheManagers(@JsonProperty("name") String name, @JsonProperty("caches") List<Caches> caches) {}
+    public record CacheManager(@JsonProperty("name") String name, @JsonProperty("caches") List<Cache> caches) {}
 
     /**
      * DTO that encapsulates the full cache name.
@@ -56,7 +56,7 @@ public record CachesFeed(@JsonProperty("cacheManagers") List<CacheManagers> cach
      * @param estimatedEntrySize    The estimated number of entries in the cache, or {@code null} if unknown.
      * @param enabled               Whether the cache is enabled ({@code true}) or disabled ({@code false}).
      */
-    public record Caches(
+    public record Cache(
             @JsonProperty("name") String name,
             @JsonProperty("target") String target,
             @JsonProperty("hitsCount") @Nullable Long hitsCount,

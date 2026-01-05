@@ -142,23 +142,23 @@ public class GetAllCachesEndpointProberTest {
         CachesFeed caches = getAllCachesEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
         // ServiceCaches -> CacheManagers
-        List<CachesFeed.CacheManagers> cacheManagersList = caches.cacheManagers();
-        assertThat(cacheManagersList).hasSize(2);
+        List<CachesFeed.CacheManager> cacheManagerList = caches.cacheManagers();
+        assertThat(cacheManagerList).hasSize(2);
 
-        CachesFeed.CacheManagers another = cacheManagersList.stream()
+        CachesFeed.CacheManager another = cacheManagerList.stream()
                 .filter(cm -> "anotherCacheManager".equals(cm.name()))
                 .findFirst()
                 .orElseThrow();
         assertThat(another.caches()).hasSize(1);
 
-        CachesFeed.CacheManagers main = cacheManagersList.stream()
+        CachesFeed.CacheManager main = cacheManagerList.stream()
                 .filter(cm -> "cacheManager".equals(cm.name()))
                 .findFirst()
                 .orElseThrow();
         assertThat(main.caches()).hasSize(2);
 
         // "anotherCacheManager" -> Caches -> "countries"
-        CachesFeed.Caches anotherCountries = another.caches().stream()
+        CachesFeed.Cache anotherCountries = another.caches().stream()
                 .filter(c -> "countries".equals(c.name()))
                 .findFirst()
                 .orElseThrow();
@@ -169,7 +169,7 @@ public class GetAllCachesEndpointProberTest {
         assertThat(anotherCountries.enabled()).isTrue();
 
         // "cacheManager" -> Caches -> "countries"
-        CachesFeed.Caches mainCountries = main.caches().stream()
+        CachesFeed.Cache mainCountries = main.caches().stream()
                 .filter(c -> "countries".equals(c.name()))
                 .findFirst()
                 .orElseThrow();
@@ -180,7 +180,7 @@ public class GetAllCachesEndpointProberTest {
         assertThat(mainCountries.enabled()).isTrue();
 
         // "cacheManager" -> Caches -> "cities"
-        CachesFeed.Caches mainCities = main.caches().stream()
+        CachesFeed.Cache mainCities = main.caches().stream()
                 .filter(c -> "cities".equals(c.name()))
                 .findFirst()
                 .orElseThrow();

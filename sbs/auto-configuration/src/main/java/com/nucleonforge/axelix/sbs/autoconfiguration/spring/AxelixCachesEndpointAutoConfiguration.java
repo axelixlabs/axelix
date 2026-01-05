@@ -17,8 +17,6 @@ package com.nucleonforge.axelix.sbs.autoconfiguration.spring;
 
 import java.util.Map;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.cache.CachesEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -26,10 +24,10 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axelix.sbs.spring.cache.AxelixCachesEndpoint;
-import com.nucleonforge.axelix.sbs.spring.cache.CacheDispatcher;
 import com.nucleonforge.axelix.sbs.spring.cache.CacheManagerBeanPostProcessor;
+import com.nucleonforge.axelix.sbs.spring.cache.CacheOperationsDispatcher;
 import com.nucleonforge.axelix.sbs.spring.cache.CacheSizeProvider;
-import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheDispatcher;
+import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheOperationsDispatcher;
 import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheSizeProvider;
 
 /**
@@ -38,7 +36,7 @@ import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheSizeProvider;
  *
  * <p>This configuration registers the following beans if they are not already defined in the context:
  * <ul>
- *     <li>{@link DefaultCacheDispatcher} — dispatcher that coordinates cache operations across
+ *     <li>{@link DefaultCacheOperationsDispatcher} — dispatcher that coordinates cache operations across
  *  *     all registered {@link CacheManager} beans,</li>
  *     <li>{@link AxelixCachesEndpoint} — a custom Spring Boot Actuator endpoint for cache management.</li>
  * </ul>
@@ -53,8 +51,7 @@ import com.nucleonforge.axelix.sbs.spring.cache.DefaultCacheSizeProvider;
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
-@AutoConfiguration(after = {CacheAutoConfiguration.class, CachesEndpoint.class})
-@ConditionalOnAvailableEndpoint(endpoint = CachesEndpoint.class)
+@AutoConfiguration(after = {CacheAutoConfiguration.class})
 public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
@@ -65,14 +62,17 @@ public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CacheDispatcher cacheDispatcher(Map<String, CacheManager> managerMap, CacheSizeProvider cacheSizeProvider) {
-        return new DefaultCacheDispatcher(managerMap, cacheSizeProvider);
+    public CacheOperationsDispatcher cacheDispatcher(
+            // we have to inject here by CacheManager rather than by EnhancedCacheManager, since the bean definition
+            // in spring for the EnhancedCacheManager still has CacheManager type.
+            Map<String, CacheManager> managerMap, CacheSizeProvider cacheSizeProvider) {
+        return new DefaultCacheOperationsDispatcher(managerMap, cacheSizeProvider);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public AxelixCachesEndpoint cacheDispatcherEndpoint(CacheDispatcher dispatcher, CachesEndpoint delegate) {
-        return new AxelixCachesEndpoint(dispatcher, delegate);
+    public AxelixCachesEndpoint cacheDispatcherEndpoint(CacheOperationsDispatcher dispatcher) {
+        return new AxelixCachesEndpoint(dispatcher);
     }
 
     @Bean

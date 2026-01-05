@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.spring.cache;
+package com.nucleonforge.axelix.sbs.spring.cache.exception;
+
+import org.springframework.cache.Cache;
 
 /**
- * Response wrapper that indicates the result of a cache clear operation.
+ * Exception thrown when a requested {@link Cache} is not found.
  *
- * @param cleared {@code true} if the cache was successfully cleared, {@code false} otherwise.
- *
- * @since 26.06.2025
- * @author Nikita Kirillov
+ * @since 25.11.2025
+ * @author Mikhail Polivakha
  */
-public record CacheClearResponse(boolean cleared) {}
+public class CacheNotFoundException extends RuntimeException {
+
+    public CacheNotFoundException(String cacheName, String cacheManagerName) {
+        super("Cache '%s' is not found inside the cache manager '%s'".formatted(cacheName, cacheManagerName));
+    }
+}

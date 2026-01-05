@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.spring.cache;
+package com.nucleonforge.axelix.sbs.spring.cache.exception;
+
+import org.springframework.cache.CacheManager;
 
 /**
- * Exception thrown when a requested CacheManagerAdapter is not found in the application context.
+ * Exception thrown when a requested {@link CacheManager} is not found.
  *
  * @since 25.11.2025
  * @author Nikita Kirillov
  */
-public class CacheManagerAdapterNotFoundException extends RuntimeException {
+public class CacheManagerNotFoundException extends RuntimeException {
 
-    public CacheManagerAdapterNotFoundException(String message) {
+    public CacheManagerNotFoundException(String message) {
         super(message);
     }
 }

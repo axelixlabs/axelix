@@ -218,7 +218,10 @@ class StateExportApiTest {
             {
               "name": "countries",
               "target" : "java.util.concurrent.ConcurrentHashMap",
-              "enabled": true
+              "enabled": true,
+              "hitsCount" : 12,
+              "missesCount" : 4,
+              "estimatedEntrySize" : 1
             }
           ]
         }
