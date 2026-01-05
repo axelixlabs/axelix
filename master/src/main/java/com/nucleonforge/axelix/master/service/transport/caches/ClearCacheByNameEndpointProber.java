@@ -25,7 +25,7 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
 
 /**
- * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#CLEAR_SINGLE_CACHES /caches/{name}} endpoint.
+ * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#CLEAR_SINGLE_CACHE} endpoint.
  *
  * @author Sergey Cherkasov
  */
@@ -38,6 +38,6 @@ public class ClearCacheByNameEndpointProber extends DiscardingAbstractEndpointPr
 
     @Override
     public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.CLEAR_SINGLE_CACHES;
+        return ActuatorEndpoints.CLEAR_SINGLE_CACHE;
     }
 }

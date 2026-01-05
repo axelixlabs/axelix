@@ -15,7 +15,6 @@
  */
 package com.nucleonforge.axelix.master.api.caches;
 
-import java.util.List;
 import java.util.Map;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
-import com.nucleonforge.axelix.common.domain.http.SingleValueQueryParameter;
 import com.nucleonforge.axelix.master.api.ApiPaths;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
@@ -123,20 +121,18 @@ public class CachesClearApi {
             })
     @Parameters({
         @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "cacheName", description = "The name of the cache to find", required = true),
+        @Parameter(name = "cacheName", description = "The name of the cache to clear", required = true),
         @Parameter(
                 name = "cacheManager",
                 description = "The name of the cache manager where the cache with the given 'cacheName' resides",
                 required = true)
     })
     @DeleteMapping(path = ApiPaths.CachesApi.CACHE_NAME)
-    public void clearCacheByNameWithQueryParameter(
+    public void clearSpecificCacheEntity(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("cacheName") String cacheName,
             @RequestParam("cacheManager") String cacheManager) {
-
-        SingleValueQueryParameter queryParameter = new SingleValueQueryParameter("cacheManager", cacheManager);
-        HttpPayload payload = new DefaultHttpPayload(List.of(queryParameter), Map.of("name", cacheName));
+        HttpPayload payload = new DefaultHttpPayload(Map.of("cacheName", cacheName, "cacheManagerName", cacheManager));
         clearCacheByNameEndpointProber.invoke(InstanceId.of(instanceId), payload);
     }
 }

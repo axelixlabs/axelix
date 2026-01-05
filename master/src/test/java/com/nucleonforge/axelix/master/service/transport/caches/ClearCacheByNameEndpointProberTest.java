@@ -16,7 +16,6 @@
 package com.nucleonforge.axelix.master.service.transport.caches;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,7 +35,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
-import com.nucleonforge.axelix.common.domain.http.SingleValueQueryParameter;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -48,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link ClearCacheByNameEndpointProber}.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
 public class ClearCacheByNameEndpointProberTest {
@@ -80,9 +79,9 @@ public class ClearCacheByNameEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/caches/cities")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-caches/testCacheManager")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/caches/countries?cacheManager=cacheManager")) {
+                } else if (path.equals("/" + activeInstanceId + "/axelix-caches/testCacheManager/countries")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -100,9 +99,9 @@ public class ClearCacheByNameEndpointProberTest {
     }
 
     @Test
-    void shouldEvictCacheByName() throws InterruptedException {
-        String cacheName = "cities";
-        HttpPayload payload = new DefaultHttpPayload(Map.of("name", cacheName));
+    void shouldEvictEntireCacheManager() throws InterruptedException {
+        String cacheManagerName = "testCacheManager";
+        HttpPayload payload = new DefaultHttpPayload(Map.of("cacheManagerName", cacheManagerName));
 
         // when
         clearCacheByNameEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
@@ -110,14 +109,13 @@ public class ClearCacheByNameEndpointProberTest {
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/caches/cities");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/axelix-caches/testCacheManager");
     }
 
     @Test
     void shouldClearCacheByNameWithQueryParameter() throws InterruptedException {
-        String cacheName = "countries";
-        HttpPayload payload = new DefaultHttpPayload(
-                List.of(new SingleValueQueryParameter("cacheManager", "cacheManager")), Map.of("name", cacheName));
+        HttpPayload payload =
+                new DefaultHttpPayload(Map.of("cacheManagerName", "testCacheManager", "cacheName", "countries"));
 
         // when
         clearCacheByNameEndpointProber.invoke(InstanceId.of(activeInstanceId), payload);
@@ -126,6 +124,6 @@ public class ClearCacheByNameEndpointProberTest {
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
         assertThat(recordedRequest.getPath())
-                .isEqualTo("/" + activeInstanceId + "/caches/countries?cacheManager=cacheManager");
+                .isEqualTo("/" + activeInstanceId + "/axelix-caches/testCacheManager/countries");
     }
 }

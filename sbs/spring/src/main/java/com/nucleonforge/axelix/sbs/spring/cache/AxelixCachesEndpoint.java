@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.springframework.boot.actuate.cache.CachesEndpoint;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,7 +50,7 @@ public class AxelixCachesEndpoint {
 
     @GetMapping(path = "{cacheManagerName}/{cacheName}")
     public CachesEndpoint.CacheEntryDescriptor getSingleCache(
-            @PathVariable String cacheName, @PathVariable String cacheManagerName) {
+            @PathVariable("cacheName") String cacheName, @PathVariable("cacheManagerName") String cacheManagerName) {
         return delegate.cache(cacheName, cacheManagerName);
     }
 
@@ -82,7 +83,12 @@ public class AxelixCachesEndpoint {
         return new CachesFeed(extendedCacheManagers);
     }
 
-    @PostMapping("/{cacheManagerName}/{cacheName}/clear")
+    @DeleteMapping
+    public void clearAllCaches() {
+        delegate.clearCaches();
+    }
+
+    @DeleteMapping("/{cacheManagerName}/{cacheName}/clear")
     public CacheClearResponse clearKey(
             @PathVariable String cacheManagerName,
             @PathVariable String cacheName,
@@ -94,7 +100,7 @@ public class AxelixCachesEndpoint {
         return new CacheClearResponse(result);
     }
 
-    @PostMapping("/{cacheManagerName}/clear-all")
+    @DeleteMapping("/{cacheManagerName}/clear-all")
     public CacheClearResponse clearAll(@PathVariable String cacheManagerName) {
         return new CacheClearResponse(dispatcher.clearAll(cacheManagerName));
     }

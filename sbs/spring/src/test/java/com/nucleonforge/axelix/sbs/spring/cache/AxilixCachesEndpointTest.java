@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -121,10 +122,11 @@ class AxilixCachesEndpointTest {
         assertThat(cache.get(key1)).isNotNull();
         assertThat(cache.get(key2)).isNotNull();
 
-        CacheClearResponse response = testRestTemplate.postForObject(
-                path(TEST_CACHE_1 + "/clear?key=key2"), defaultEntity(), CacheClearResponse.class);
+        ResponseEntity<CacheClearResponse> response = testRestTemplate.exchange(
+                path(TEST_CACHE_1 + "/clear?key=key2"), HttpMethod.DELETE, defaultEntity(), CacheClearResponse.class);
 
-        assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache.get(key2)).isNull();
         assertThat(cache.get(key1)).isNotNull();
     }
@@ -140,10 +142,11 @@ class AxilixCachesEndpointTest {
         assertThat(cache.get(key1)).isNotNull();
         assertThat(cache.get(key2)).isNotNull();
 
-        CacheClearResponse response = testRestTemplate.postForObject(
-                path(TEST_CACHE_1 + "/clear"), defaultEntity(), CacheClearResponse.class);
+        ResponseEntity<CacheClearResponse> response = testRestTemplate.exchange(
+                path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE, defaultEntity(), CacheClearResponse.class);
 
-        assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache.get(key1)).isNull();
         assertThat(cache.get(key2)).isNull();
     }
@@ -173,18 +176,15 @@ class AxilixCachesEndpointTest {
         String key1 = "key1", key2 = "key2";
         Cache cache1 = cacheManager.getCache(TEST_CACHE_1);
         Cache cache2 = cacheManager.getCache(TEST_CACHE_2);
-        assertThat(cache1).isNotNull();
-        assertThat(cache2).isNotNull();
 
         cache1.put(key1, "value1");
         cache2.put(key2, "value2");
-        assertThat(cache1.get(key1)).isNotNull();
-        assertThat(cache2.get(key2)).isNotNull();
 
-        CacheClearResponse response =
-                testRestTemplate.postForObject(path("/clear-all"), defaultEntity(), CacheClearResponse.class);
+        ResponseEntity<CacheClearResponse> response = testRestTemplate.exchange(
+                path("/clear-all"), HttpMethod.DELETE, defaultEntity(), CacheClearResponse.class);
 
-        assertThat(response).isNotNull().returns(true, CacheClearResponse::cleared);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull().returns(true, CacheClearResponse::cleared);
         assertThat(cache1.get(key1)).isNull();
         assertThat(cache2.get(key2)).isNull();
     }

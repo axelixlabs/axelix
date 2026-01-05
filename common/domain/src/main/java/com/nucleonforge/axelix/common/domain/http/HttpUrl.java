@@ -58,10 +58,14 @@ public final class HttpUrl {
         List<PathVariable> reversed = new ArrayList<>(pathVariables);
         Collections.reverse(reversed);
 
-        for (PathVariable pathVariable : reversed) {
+        for (int i = 0; i < reversed.size(); i++) {
+            PathVariable pathVariable = reversed.get(i);
             String variableValue = pathVariableValues.get(pathVariable.name());
             if (variableValue != null) {
                 result.replace(pathVariable.starts(), pathVariable.ends(), variableValue);
+            } else if (i == 0) {
+                // omitting the last path variable if not present. -1 to account for leading slash ('/')
+                result.replace(pathVariable.starts() - 1, pathVariable.ends(), "");
             }
         }
 

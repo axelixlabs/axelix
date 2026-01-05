@@ -76,7 +76,7 @@ public class ClearAllCachesEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/caches")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-caches")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -93,9 +93,9 @@ public class ClearAllCachesEndpointProberTest {
         // when
         clearAllCachesEndpointProber.invoke(InstanceId.of(activeInstanceId), NoHttpPayload.INSTANCE);
 
-        // then.
+        // then.caches
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/caches");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/axelix-caches");
     }
 }

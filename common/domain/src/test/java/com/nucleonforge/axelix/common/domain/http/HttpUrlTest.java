@@ -56,9 +56,11 @@ class HttpUrlTest {
                             new SingleValueQueryParameter("key1", "value1"),
                             new SingleValueQueryParameter("key2", "value2")
                         }),
-                of("/health", "/health?key1=value1", Map.of("component", "database"), new QueryParameter[] {
+                of("/health", "/health?key1=value1", Map.of(), new QueryParameter[] {
                     new SingleValueQueryParameter("key1", "value1")
                 }),
+                of("/path/{var1}/{var2}", "/path/value1", Map.of("var1", "value1"), new QueryParameter[] {}),
+                of("/path/{var1}", "/path", Map.of(), new QueryParameter[] {}),
                 of(
                         "/health/{component}/sub-component",
                         "/health/redis/sub-component?key2=value2",

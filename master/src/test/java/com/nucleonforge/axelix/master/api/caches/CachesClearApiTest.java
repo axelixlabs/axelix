@@ -45,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link CachesClearApi}
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CachesClearApiTest {
@@ -78,9 +79,9 @@ public class CachesClearApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/caches")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/actuator/caches/cities?cacheManager=cacheManager")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/testCacheManager/cities")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -104,7 +105,7 @@ public class CachesClearApiTest {
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/actuator/caches");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/actuator/axelix-caches");
     }
 
     @Test
@@ -115,12 +116,12 @@ public class CachesClearApiTest {
         restTemplate
                 .withoutAuthorities()
                 .delete(
-                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
+                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=testCacheManager",
                         Map.of("instanceId", activeInstanceId, "cacheName", cacheName));
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
         assertThat(recordedRequest.getPath())
-                .isEqualTo("/" + activeInstanceId + "/actuator/caches/cities?cacheManager=cacheManager");
+                .isEqualTo("/" + activeInstanceId + "/actuator/axelix-caches/testCacheManager/%s".formatted(cacheName));
     }
 }
