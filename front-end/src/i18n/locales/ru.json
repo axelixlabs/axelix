@@ -129,12 +129,12 @@
         "jdkProxy": "JDK Динамический Прокси",
         "noProxy": "Не проксирован",
         "beanSource": {
-            "titles": {
+            "tree": {
                 "main": "Происхождение",
                 "beanMethod": "@Bean метод",
                 "enclosingClass": "Декларирущий класс",
                 "factoryBeanClassName": "Factory Bean",
-                "autoConfigurationEnclosingClass" : "Declaring AutoConfiguration class",
+                "autoConfigurationEnclosingClass" : "Класс Авто-Конфигурации",
                 "conditionsPageRef" : "Происхождение бина"
             },
             "AUTO_CONFIGURATION_BEAN_METHOD" : "@Bean метод в классе авто-конфигурации",

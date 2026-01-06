@@ -49,9 +49,7 @@ export const BeanSourceTree = ({ bean }: IProps) => {
                         {
                             title: (
                                 <div className={styles.BeanTreeItem}>
-                                    <div className={styles.BeanTreeLabel}>
-                                        {t("Beans.beanSource.titles.beanMethod")}:
-                                    </div>
+                                    <div className={styles.BeanTreeLabel}>{t("Beans.beanSource.tree.beanMethod")}:</div>
                                     <div className={styles.BeanTreeValue}>{beanSource.methodName}</div>
                                 </div>
                             ),
@@ -71,8 +69,8 @@ export const BeanSourceTree = ({ bean }: IProps) => {
                                 >
                                     <div className={styles.BeanTreeLabel}>
                                         {autoConfigurationRef
-                                            ? t("Beans.beanSource.titles.autoConfigurationEnclosingClass")
-                                            : t("Beans.beanSource.titles.enclosingClass")}
+                                            ? t("Beans.beanSource.tree.autoConfigurationEnclosingClass")
+                                            : t("Beans.beanSource.tree.enclosingClass")}
                                         :
                                     </div>
                                     <div className={styles.BeanTreeValue}>{beanSource.enclosingClassName}</div>
@@ -86,7 +84,7 @@ export const BeanSourceTree = ({ bean }: IProps) => {
                                       title: (
                                           <div className={styles.BeanTreeItem}>
                                               <div className={styles.BeanTreeLabel}>
-                                                  {t("Beans.beanSource.titles.conditionsPageRef")}
+                                                  {t("Beans.beanSource.tree.conditionsPageRef")}
                                               </div>
                                               <Link
                                                   to={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}
@@ -115,7 +113,7 @@ export const BeanSourceTree = ({ bean }: IProps) => {
                             title: (
                                 <div className={styles.BeanTreeItem}>
                                     <div className={styles.BeanTreeLabel}>
-                                        {t("Beans.beanSource.titles.factoryBeanClassName")}:
+                                        {t("Beans.beanSource.tree.factoryBeanClassName")}:
                                     </div>
                                     <div className={styles.BeanTreeValue}>{beanSource.factoryBeanName}</div>
                                 </div>
