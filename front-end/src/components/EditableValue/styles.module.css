@@ -10,14 +10,13 @@
 
 .DefaultEditPropertyWrapper {
     display: flex;
-    justify-content: flex-end;
     width: 100%;
     column-gap: 8px;
 }
 
 .DefaultPropertyValueWrapper {
+    width: 100%;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
-    column-gap: 20px;
 }
