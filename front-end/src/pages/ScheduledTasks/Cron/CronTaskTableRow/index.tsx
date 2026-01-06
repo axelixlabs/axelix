@@ -61,7 +61,7 @@ export const CronTaskTableRow = ({ task }: IProps) => {
                         }}
                     />
                 </div>
-                <div className="RowChunk">
+                <div className={`RowChunk ${styles.RowChunk}`}>
                     <ScheduledTasksStatusSwitch runnable={task} />
                 </div>
             </div>
