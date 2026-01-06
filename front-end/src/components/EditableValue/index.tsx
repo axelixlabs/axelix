@@ -43,13 +43,18 @@ interface IProps {
     onNewValue: (value: string) => void;
 }
 
-const EditableValue = ({ initialValue, onNewValue, className, editClassName }: IProps) => {
-    const [editingValue, setEditingValue] = useState(false);
-    const [actualValue, setActualValue] = useState(initialValue);
+export const EditableValue = ({
+    initialValue,
+    onNewValue,
+    className = styles.DefaultPropertyValueWrapper,
+    editClassName = styles.DefaultEditPropertyWrapper,
+}: IProps) => {
+    const [editingValue, setEditingValue] = useState<boolean>(false);
+    const [actualValue, setActualValue] = useState<string>(initialValue);
 
     if (!editingValue) {
         return (
-            <div className={className ?? styles.DefaultPropertyValueWrapper}>
+            <div className={className}>
                 {actualValue}
                 <Button
                     icon={<EditOutlined />}
@@ -61,7 +66,7 @@ const EditableValue = ({ initialValue, onNewValue, className, editClassName }: I
         );
     } else {
         return (
-            <div className={editClassName ?? styles.DefaultEditPropertyWrapper}>
+            <div className={editClassName}>
                 <Input
                     value={actualValue}
                     onChange={(e) => setActualValue(e.target.value)}
@@ -92,5 +97,3 @@ const EditableValue = ({ initialValue, onNewValue, className, editClassName }: I
         );
     }
 };
-
-export default EditableValue;

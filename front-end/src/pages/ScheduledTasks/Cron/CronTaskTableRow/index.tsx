@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 import { message } from "antd";
-import EditableValue from "components/EditableValue";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { TooltipWithCopy } from "components";
+import { EditableValue, TooltipWithCopy } from "components";
 import { type ICron } from "models";
-
 import { changeCronExpression } from "services";
+
 import { ScheduledTasksStatusSwitch } from "../../ScheduledTasksStatusSwitch";
 
 import styles from "./styles.module.css";
@@ -45,21 +44,23 @@ export const CronTaskTableRow = ({ task }: IProps) => {
                 <div className={`RowChunk ${styles.TooltipWrapperChunk}`}>
                     <TooltipWithCopy text={task.runnable.target} />
                 </div>
-                <EditableValue
-                    initialValue={task.expression}
-                    onNewValue={(newValue) => {
-                        changeCronExpression({
-                            instanceId: instanceId!,
-                            newCronExpression: newValue,
-                        })
-                            .then(() => {
-                                messageApi.success(t("ScheduledTasks.cronExpressionChangeSuccess"));
+                <div className="RowChunk">
+                    <EditableValue
+                        initialValue={task.expression}
+                        onNewValue={(newValue) => {
+                            changeCronExpression({
+                                instanceId: instanceId!,
+                                newCronExpression: newValue,
                             })
-                            .catch(() => {
-                                messageApi.error(t("ScheduledTasks.cronExpressionChangeError"));
-                            });
-                    }}
-                />
+                                .then(() => {
+                                    messageApi.success(t("ScheduledTasks.cronExpressionChangeSuccess"));
+                                })
+                                .catch(() => {
+                                    messageApi.error(t("ScheduledTasks.cronExpressionChangeError"));
+                                });
+                        }}
+                    />
+                </div>
                 <div className="RowChunk">
                     <ScheduledTasksStatusSwitch runnable={task} />
                 </div>
