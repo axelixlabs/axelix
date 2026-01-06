@@ -46,7 +46,7 @@ export const BeanSource = ({ bean }: IProps) => {
 
     return (
         <>
-            <div className={sharedStyles.AccordionBodyChunkTitle}>{t(`Beans.beanSource.titles.main`)}:</div>
+            <div className={sharedStyles.AccordionBodyChunkTitle}>{t(`Beans.beanSource.tree.main`)}:</div>
 
             {beanSource.origin === EBeanOrigin.COMPONENT_ANNOTATION && autoConfigurationRef ? (
                 <div className={styles.LinkedTitleWrapper}>

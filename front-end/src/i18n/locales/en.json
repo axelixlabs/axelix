@@ -129,7 +129,7 @@
         "jdkProxy": "JDK Dynamic Proxy",
         "noProxy": "No Proxying",
         "beanSource": {
-            "titles": {
+            "tree": {
                 "main": "Origin",
                 "beanMethod": "@Bean method",
                 "enclosingClass": "Declaring class",
