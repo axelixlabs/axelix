@@ -17,7 +17,7 @@ import { BeanSourceTree } from "./BeanSourceTree/BeanSourceTree";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
-import { getBeanSourceTranslatedTitle, normalizeHtmlElementId } from "helpers";
+import { normalizeHtmlElementId } from "helpers";
 import { EBeanOrigin, type IBean } from "models";
 
 import sharedStyles from "../styles.module.css";
@@ -37,14 +37,12 @@ export const BeanSource = ({ bean }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
-    const { beanSource, isConfigPropsBean, autoConfigurationRef } = bean;
+    const { beanSource, autoConfigurationRef } = bean;
 
     const statelessBeanSource =
         beanSource.origin === EBeanOrigin.UNKNOWN ||
         beanSource.origin === EBeanOrigin.COMPONENT_ANNOTATION ||
         beanSource.origin === EBeanOrigin.SYNTHETIC_BEAN;
-
-    const translatedTitle = getBeanSourceTranslatedTitle(beanSource, isConfigPropsBean, t);
 
     return (
         <>
@@ -52,15 +50,15 @@ export const BeanSource = ({ bean }: IProps) => {
 
             {beanSource.origin === EBeanOrigin.COMPONENT_ANNOTATION && autoConfigurationRef ? (
                 <div className={styles.LinkedTitleWrapper}>
-                    <div>Autoconfiguration {translatedTitle}</div>
+                    <div>{t("Beans.beanSource.AUTO_CONFIGURATION_CLASS")}</div>
                     <Link to={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}>
                         <img src={LinkIcon} alt="Link icon" />
                     </Link>
                 </div>
             ) : statelessBeanSource ? (
-                translatedTitle
+                t(`Beans.beanSource.${beanSource.origin}`)
             ) : (
-                <BeanSourceTree bean={bean} translatedTitle={translatedTitle} />
+                <BeanSourceTree bean={bean} />
             )}
         </>
     );

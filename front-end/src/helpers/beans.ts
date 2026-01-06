@@ -15,7 +15,7 @@
  */
 import type { TFunction } from "i18next";
 
-import { EBeanOrigin, EProxyType, type IBean } from "models";
+import { EProxyType, type IBean } from "models";
 
 export const resolveProxying = (t: TFunction, proxyType: EProxyType | null): string => {
     if (!proxyType) {
@@ -79,16 +79,4 @@ export const defineBeanScopeColor = (scope: string): string => {
         default:
             return "magenta";
     }
-};
-
-export const getBeanSourceTranslatedTitle = (
-    beanSource: IBean["beanSource"],
-    isConfigPropsBean: boolean,
-    t: TFunction,
-): string => {
-    if (beanSource.origin === EBeanOrigin.UNKNOWN && isConfigPropsBean) {
-        return t(`Beans.beanSource.CONFIG_PROPS_BEAN`);
-    }
-
-    return t(`Beans.beanSource.${beanSource.origin}`);
 };

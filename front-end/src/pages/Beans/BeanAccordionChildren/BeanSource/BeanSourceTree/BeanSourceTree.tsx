@@ -30,14 +30,9 @@ interface IProps {
      * The data of a single bean
      */
     bean: IBean;
-
-    /**
-     * The translated title of a bean source
-     */
-    translatedTitle: string;
 }
 
-export const BeanSourceTree = ({ bean, translatedTitle }: IProps) => {
+export const BeanSourceTree = ({ bean }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { beanSource, autoConfigurationRef } = bean;
@@ -46,7 +41,9 @@ export const BeanSourceTree = ({ bean, translatedTitle }: IProps) => {
         if (beanSource.origin === EBeanOrigin.BEAN_METHOD) {
             return [
                 {
-                    title: `${autoConfigurationRef ? "Autoconfiguration " : ""} ${translatedTitle}`,
+                    title: autoConfigurationRef
+                        ? t("Beans.beanSource.AUTO_CONFIGURATION_BEAN_METHOD")
+                        : t("Beans.beanSource.BEAN_METHOD"),
                     key: beanSource.origin,
                     children: [
                         {
@@ -73,7 +70,10 @@ export const BeanSourceTree = ({ bean, translatedTitle }: IProps) => {
                                     }
                                 >
                                     <div className={styles.BeanTreeLabel}>
-                                        {t("Beans.beanSource.titles.enclosingClass")}:
+                                        {autoConfigurationRef
+                                            ? t("Beans.beanSource.titles.autoConfigurationEnclosingClass")
+                                            : t("Beans.beanSource.titles.enclosingClass")}
+                                        :
                                     </div>
                                     <div className={styles.BeanTreeValue}>{beanSource.enclosingClassName}</div>
                                 </div>
@@ -85,7 +85,9 @@ export const BeanSourceTree = ({ bean, translatedTitle }: IProps) => {
                                   {
                                       title: (
                                           <div className={styles.BeanTreeItem}>
-                                              <div className={styles.BeanTreeLabel}>Autoconfiguration ref</div>
+                                              <div className={styles.BeanTreeLabel}>
+                                                  {t("Beans.beanSource.titles.conditionsPageRef")}
+                                              </div>
                                               <Link
                                                   to={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}
                                                   onClick={(e) => e.stopPropagation()}
@@ -106,7 +108,7 @@ export const BeanSourceTree = ({ bean, translatedTitle }: IProps) => {
         if (beanSource.origin === EBeanOrigin.FACTORY_BEAN) {
             return [
                 {
-                    title: translatedTitle,
+                    title: t(`Beans.beanSource.${EBeanOrigin.FACTORY_BEAN}`),
                     key: beanSource.origin,
                     children: [
                         {

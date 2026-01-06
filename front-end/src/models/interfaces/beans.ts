@@ -97,6 +97,11 @@ export interface IBean {
      */
     isConfigPropsBean: boolean;
 
+    /**
+     * Reference to autoconfiguration (or to the conditional class/bean for that matter) from which the
+     * bean has come from. If the given bean did not come from @Conditional-like annotated class/method,
+     * then this field is null.
+     */
     autoConfigurationRef: string | null;
 }
 
