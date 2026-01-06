@@ -28,7 +28,6 @@ export * from "./interfaces/caches";
 export * from "./interfaces/beans";
 export * from "./interfaces/auth";
 
-export * from "./types/scheduledTasks";
 export * from "./types/conditions";
 export * from "./types/antd";
 

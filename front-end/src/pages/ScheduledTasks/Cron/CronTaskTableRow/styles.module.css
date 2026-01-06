@@ -1,5 +1,5 @@
 .CronTaskTableRow {
-    grid-template-columns: 1fr 170px 110px;
+    grid-template-columns: 1fr 200px 110px;
 }
 
 .TooltipWrapperChunk {

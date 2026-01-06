@@ -13,11 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ICommonSliceState } from "./globals";
-
-interface IEnable {
-    enabled: boolean;
-}
 
 interface ITarget {
     /**
@@ -26,11 +21,16 @@ interface ITarget {
     target: string;
 }
 
-export interface IRunnable extends IEnable {
+export interface IRunnable {
     /**
      * Runnable field of scheduled tasks types body
      */
     runnable: ITarget;
+
+    /**
+     * Whether the given runnable is enabled or not
+     */
+    enabled: boolean;
 }
 
 /**
@@ -48,26 +48,6 @@ export interface IFixedTasks extends IRunnable {
     initialDelay: number;
 }
 
-// TODO: See the comment: https://github.com/Nucleon-Forge/axelix/pull/205#discussion_r2431398757
-export interface IScheduledTaskItem {
-    // TODO: migrate to enum later in the future
-    /**
-     * Scheduled tasks type
-     */
-    type: "cron" | "fixedDelay" | "fixedRate" | "custom";
-    /**
-     * Scheduled tasks list
-     */
-    tasks: ICron[] | IFixedTasks[];
-}
-
-export interface IScheduledTasksSliceState extends ICommonSliceState {
-    /**
-     * Scheduled tasks data after changes in frontend for better comfort
-     */
-    scheduledTasksTypes: IScheduledTaskItem[];
-}
-
 /**
  * Initial scheduled tasks response data
  */
@@ -82,4 +62,9 @@ export interface IUpdateScheduledTasksStatusRequestData {
     targetScheduledTask: string;
     force: boolean;
     statusType: "enable" | "disable";
+}
+
+export interface IUpdateScheduledTasksCronExpressionData {
+    instanceId: string;
+    newCronExpression: string;
 }

@@ -43,7 +43,7 @@ export interface ICachesResponseBody {
     /**
      * List of cache managers
      */
-    cacheManagers: ICachesManager[];
+    cacheManager: ICachesManager[];
 }
 
 export interface IClearCacheRequestData {

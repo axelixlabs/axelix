@@ -13,9 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { message } from "antd";
+import EditableValue from "components/EditableValue";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+
 import { TooltipWithCopy } from "components";
 import { type ICron } from "models";
 
+import { changeCronExpression } from "services";
 import { ScheduledTasksStatusSwitch } from "../../ScheduledTasksStatusSwitch";
 
 import styles from "./styles.module.css";
@@ -28,15 +34,36 @@ interface IProps {
 }
 
 export const CronTaskTableRow = ({ task }: IProps) => {
+    const { instanceId } = useParams();
+    const [messageApi, contextHolder] = message.useMessage();
+    const { t } = useTranslation();
+
     return (
-        <div className={`TableRow ${styles.CronTaskTableRow}`}>
-            <div className={`RowChunk ${styles.TooltipWrapperChunk}`}>
-                <TooltipWithCopy text={task.runnable.target} />
+        <>
+            {contextHolder}
+            <div className={`TableRow ${styles.CronTaskTableRow}`}>
+                <div className={`RowChunk ${styles.TooltipWrapperChunk}`}>
+                    <TooltipWithCopy text={task.runnable.target} />
+                </div>
+                <EditableValue
+                    initialValue={task.expression}
+                    onNewValue={(newValue) => {
+                        changeCronExpression({
+                            instanceId: instanceId!,
+                            newCronExpression: newValue,
+                        })
+                            .then(() => {
+                                messageApi.success(t("ScheduledTasks.cronExpressionChangeSuccess"));
+                            })
+                            .catch(() => {
+                                messageApi.error(t("ScheduledTasks.cronExpressionChangeError"));
+                            });
+                    }}
+                />
+                <div className="RowChunk">
+                    <ScheduledTasksStatusSwitch runnable={task} />
+                </div>
             </div>
-            <div className="RowChunk">{task.expression}</div>
-            <div className="RowChunk">
-                <ScheduledTasksStatusSwitch runnable={task} />
-            </div>
-        </div>
+        </>
     );
 };

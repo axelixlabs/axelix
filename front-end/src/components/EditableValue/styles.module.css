@@ -1,0 +1,23 @@
+.EditButton,
+.CloseButton,
+.UpdateButton {
+    flex-shrink: 0;
+}
+
+.EditPropertyField {
+    width: min(300px, 100%);
+}
+
+.DefaultEditPropertyWrapper {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    column-gap: 8px;
+}
+
+.DefaultPropertyValueWrapper {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    column-gap: 20px;
+}
