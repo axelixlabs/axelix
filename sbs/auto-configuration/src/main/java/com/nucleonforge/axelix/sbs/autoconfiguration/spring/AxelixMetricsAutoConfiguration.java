@@ -39,6 +39,7 @@ import com.nucleonforge.axelix.sbs.spring.metrics.ServiceMetricsGroupsAssembler;
  *
  * @since 17.11.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @AutoConfiguration(after = MetricsAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = MetricsEndpoint.class)
@@ -47,13 +48,12 @@ public class AxelixMetricsAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AxelixMetricsEndpoint axelixMetricsEndpoint(
-            MetricsEndpoint metricsEndpoint,
             MeterRegistry registry,
             BaseUnitParser baseUnitParser,
             Set<BaseUnitValueTransformer> baseUnitValueTransformers,
             ServiceMetricsGroupsAssembler serviceMetricsGroupsAssembler) {
         return new AxelixMetricsEndpoint(
-                metricsEndpoint, registry, baseUnitParser, serviceMetricsGroupsAssembler, baseUnitValueTransformers);
+                registry, baseUnitParser, serviceMetricsGroupsAssembler, baseUnitValueTransformers);
     }
 
     @Bean

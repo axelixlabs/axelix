@@ -31,6 +31,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
 import org.springframework.core.type.StandardMethodMetadata;
@@ -51,7 +52,8 @@ import static com.nucleonforge.axelix.common.api.BeansFeed.UnknownBean;
  * Default implementation of {@link BeanMetaInfoExtractor}.
  *
  * @author Nikita Kirillov
- * @author Sergey  Cherkasov
+ * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  * @since 04.07.2025
  */
 @NullMarked
@@ -63,12 +65,11 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     private final ConditionalBeanRefBuilder conditionalBeanRefBuilder;
 
     public DefaultBeanMetaInfoExtractor(
-            ConfigurableListableBeanFactory configurableBeanFactory,
-            ConditionsReportEndpoint delegateConditions,
+            ConfigurableApplicationContext configurableApplicationContext,
             ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-        this.beanFactory = configurableBeanFactory;
+        this.beanFactory = configurableApplicationContext.getBeanFactory();
         this.qualifiersRegistry = DefaultQualifiersRegistry.INSTANCE;
-        this.delegateConditions = delegateConditions;
+        this.delegateConditions = new ConditionsReportEndpoint(configurableApplicationContext);
         this.conditionalBeanRefBuilder = conditionalBeanRefBuilder;
     }
 
