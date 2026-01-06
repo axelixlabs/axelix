@@ -15,8 +15,6 @@
  */
 package com.nucleonforge.axelix.sbs.autoconfiguration.spring;
 
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -50,10 +48,9 @@ public class AxelixBeansAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public BeanMetaInfoExtractor defaultBeanMetaInfoExtractor(
-            ConfigurableListableBeanFactory beanFactory,
-            ConditionsReportEndpoint delegateConditions,
+            ConfigurableApplicationContext configurableApplicationContext,
             ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-        return new DefaultBeanMetaInfoExtractor(beanFactory, delegateConditions, conditionalBeanRefBuilder);
+        return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
     }
 
     @Bean

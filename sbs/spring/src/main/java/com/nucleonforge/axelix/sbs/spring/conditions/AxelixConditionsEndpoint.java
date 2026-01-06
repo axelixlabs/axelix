@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -34,8 +35,8 @@ public class AxelixConditionsEndpoint {
 
     private final ConditionsReportEndpoint delegate;
 
-    public AxelixConditionsEndpoint(ConditionsReportEndpoint delegate) {
-        this.delegate = delegate;
+    public AxelixConditionsEndpoint(ConfigurableApplicationContext configurableApplicationContext) {
+        this.delegate = new ConditionsReportEndpoint(configurableApplicationContext);
     }
 
     @GetMapping

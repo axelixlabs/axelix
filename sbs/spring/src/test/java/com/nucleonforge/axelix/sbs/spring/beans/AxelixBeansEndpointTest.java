@@ -22,12 +22,12 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
@@ -67,11 +67,9 @@ class AxelixBeansEndpointTest {
 
         @Bean(BEAN_META_INFO_EXTRACTOR)
         BeanMetaInfoExtractor beanMetaInfoExtractor(
-                ConfigurableListableBeanFactory configurableListableBeanFactory,
-                ConditionsReportEndpoint delegateConditions,
+                ConfigurableApplicationContext configurableApplicationContext,
                 ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-            return new DefaultBeanMetaInfoExtractor(
-                    configurableListableBeanFactory, delegateConditions, conditionalBeanRefBuilder);
+            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
         }
 
         @Bean(QUALIFIERS_PERSISTENCE_POST_PROCESSOR)

@@ -15,11 +15,10 @@
  */
 package com.nucleonforge.axelix.sbs.autoconfiguration.spring;
 
-import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpointAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axelix.sbs.spring.conditions.AxelixConditionsEndpoint;
@@ -32,12 +31,12 @@ import com.nucleonforge.axelix.sbs.spring.conditions.AxelixConditionsEndpoint;
  * @author Mikhail Polivakha
  */
 @AutoConfiguration(after = ConditionsReportEndpointAutoConfiguration.class)
-@ConditionalOnAvailableEndpoint(endpoint = ConditionsReportEndpoint.class)
 public class AxelixConditionsEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxelixConditionsEndpoint axelixConditionsEndpoint(ConditionsReportEndpoint conditionsReportEndpoint) {
-        return new AxelixConditionsEndpoint(conditionsReportEndpoint);
+    public AxelixConditionsEndpoint axelixConditionsEndpoint(
+            ConfigurableApplicationContext configurableApplicationContext) {
+        return new AxelixConditionsEndpoint(configurableApplicationContext);
     }
 }

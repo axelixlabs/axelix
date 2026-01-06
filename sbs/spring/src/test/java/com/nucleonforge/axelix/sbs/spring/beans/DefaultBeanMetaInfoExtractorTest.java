@@ -39,11 +39,11 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
-import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpointAutoConfiguration;
+import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -116,35 +116,32 @@ class DefaultBeanMetaInfoExtractorTest {
 
     @Test
     void shouldExtractForAutoConfigurationBeanClass() {
-        BeanMetaInfo beanMetaInfo =
-                metaInfoExtractor.extract(ConditionsReportEndpointAutoConfiguration.class.getName(), testBeanFactory);
+        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract(CacheAutoConfiguration.class.getName(), testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.qualifiers()).isEmpty();
-            assertThat(it.autoConfigurationRef()).isEqualTo("ConditionsReportEndpointAutoConfiguration");
+            assertThat(it.autoConfigurationRef()).isEqualTo("CacheAutoConfiguration");
             assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
         });
     }
 
     @Test
     void shouldExtractForAutoConfigurationBeanMethod() {
-        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract("conditionsReportEndpoint", testBeanFactory);
+        BeanMetaInfo beanMetaInfo = metaInfoExtractor.extract("cacheManagerCustomizers", testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.qualifiers()).isEmpty();
-            assertThat(it.autoConfigurationRef())
-                    .isEqualTo("ConditionsReportEndpointAutoConfiguration#conditionsReportEndpoint");
+            assertThat(it.autoConfigurationRef()).isEqualTo("CacheAutoConfiguration#cacheManagerCustomizers");
             assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
             assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(beanMethod -> {
-                assertThat(beanMethod.enclosingClassFullName())
-                        .isEqualTo(ConditionsReportEndpointAutoConfiguration.class.getName());
-                assertThat(beanMethod.methodName()).isEqualTo("conditionsReportEndpoint");
+                assertThat(beanMethod.enclosingClassFullName()).isEqualTo(CacheAutoConfiguration.class.getName());
+                assertThat(beanMethod.methodName()).isEqualTo("cacheManagerCustomizers");
             });
         });
     }
@@ -437,10 +434,9 @@ class DefaultBeanMetaInfoExtractorTest {
 
         @Bean
         public DefaultBeanMetaInfoExtractor beanAnalyzer(
-                ConfigurableListableBeanFactory beanFactory,
-                ConditionsReportEndpoint delegateConditions,
+                ConfigurableApplicationContext configurableApplicationContext,
                 ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-            return new DefaultBeanMetaInfoExtractor(beanFactory, delegateConditions, conditionalBeanRefBuilder);
+            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
         }
 
         @Entity

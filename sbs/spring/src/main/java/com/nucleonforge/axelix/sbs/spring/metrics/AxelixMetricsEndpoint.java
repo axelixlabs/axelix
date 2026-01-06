@@ -61,12 +61,11 @@ public class AxelixMetricsEndpoint {
     private final Set<Statistic> ACTUAL_VALUE_STATISTICS = Set.of(Statistic.VALUE, Statistic.TOTAL, Statistic.COUNT);
 
     public AxelixMetricsEndpoint(
-            MetricsEndpoint delegate,
             MeterRegistry registry,
             BaseUnitParser baseUnitParser,
             ServiceMetricsGroupsAssembler defaultMetricsGroupsAssembler,
             Set<BaseUnitValueTransformer> baseUnitValueTransformers) {
-        this.delegate = delegate;
+        this.delegate = new MetricsEndpoint(registry);
         this.registry = registry;
         this.defaultMetricsGroupsAssembler = defaultMetricsGroupsAssembler;
         this.baseUnitParser = baseUnitParser;
