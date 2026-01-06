@@ -42,12 +42,8 @@ export const BeansAccordionsList = ({ effectiveBeans }: IProps) => {
                 const accordionExpanded = id === activeId;
 
                 return (
-                    <div id={id} className={styles.MainWrapper}>
-                        <Accordion
-                            header={<BeanAccordionLabels bean={bean} />}
-                            accordionExpanded={accordionExpanded}
-                            key={bean.beanName}
-                        >
+                    <div id={id} key={id} className={styles.MainWrapper}>
+                        <Accordion header={<BeanAccordionLabels bean={bean} />} accordionExpanded={accordionExpanded}>
                             <BeanAccordionChildren bean={bean} />
                         </Accordion>
                     </div>

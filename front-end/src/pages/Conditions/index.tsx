@@ -16,9 +16,9 @@
 import { Tabs, type TabsProps } from "antd";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
-import { EmptyHandler, Loader, PageSearch } from "components";
+import { EmptyHandler, HashNavigable, Loader, PageSearch } from "components";
 import { fetchData, filterMatches } from "helpers";
 import {
     type ConditionBeanCollection,
@@ -37,9 +37,12 @@ import styles from "./styles.module.css";
 
 const Conditions = () => {
     const { t } = useTranslation();
+    const { hash } = useLocation();
     const { instanceId } = useParams();
 
-    const [activeKey, setActiveKey] = useState<EConditionsTabs>(EConditionsTabs.NEGATIVE_MATCHES);
+    const [activeKey, setActiveKey] = useState<EConditionsTabs>(
+        hash ? EConditionsTabs.POSITIVE_MATCHES : EConditionsTabs.NEGATIVE_MATCHES,
+    );
     const [dataState, setDataState] = useState(StatefulRequest.loading<IConditionsResponseBody>());
     const [search, setSearch] = useState<string>("");
 
@@ -80,7 +83,9 @@ const Conditions = () => {
             label: t("Conditions.positiveMatches"),
             children: (
                 <Matches title={t("Conditions.positiveMatches")}>
-                    <PositiveConditions positiveMatches={effectiveMatches as IConditionBeanPositive[]} />
+                    <HashNavigable className={styles.ConditionHeaderWrapper}>
+                        <PositiveConditions positiveMatches={effectiveMatches as IConditionBeanPositive[]} />
+                    </HashNavigable>
                 </Matches>
             ),
         },

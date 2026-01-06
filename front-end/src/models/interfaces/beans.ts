@@ -96,6 +96,8 @@ export interface IBean {
      * flag that designates that the bean is the config props bean.
      */
     isConfigPropsBean: boolean;
+
+    autoConfigurationRef: string | null;
 }
 
 /**

@@ -28,3 +28,7 @@
     align-items: center;
     column-gap: 8px;
 }
+
+.ScrollableWrapper {
+    scroll-margin-top: var(--axelix-scroll-margin-top);
+}

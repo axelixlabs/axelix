@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 export { LanguageSwitcher } from "./LanguageSwitcher";
-export { HashNavigable } from "./HashNavigableHOC";
 export { TooltipWithCopy } from "./TooltipWithCopy";
 export { LinearProgress } from "./LinearProgress";
+export { HashNavigable } from "./HashNavigable";
 export { EmptyHandler } from "./EmptyHandler";
 export { InfoTooltip } from "./InfoTooltip";
 export { PageSearch } from "./PageSearch";
