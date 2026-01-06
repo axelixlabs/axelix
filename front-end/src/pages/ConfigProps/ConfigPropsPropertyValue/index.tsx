@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
-
-import { Button, Input } from "antd";
-import { useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { EditableValue } from "components";
 import { useAppDispatch } from "hooks";
 import { updatePropertyThunk } from "store/thunks";
 
@@ -40,57 +37,24 @@ export const ConfigPropsPropertyValue = ({ propertyName, propertyValue }: IProps
     const dispatch = useAppDispatch();
     const { instanceId } = useParams();
 
-    const [editProperty, setEditProperty] = useState<boolean>(false);
-    const [newPropertyValue, setNewPropertyValue] = useState<string>(propertyValue);
-
-    const updatePropertyClickHandler = (): void => {
+    const updatePropertyClickHandler = (newValue: string): void => {
         dispatch(
             updatePropertyThunk({
                 instanceId: instanceId!,
                 propertyName: propertyName,
-                newValue: newPropertyValue,
+                newValue: newValue,
             }),
         );
     };
 
     return (
         <div className={styles.MainWrapper}>
-            {editProperty ? (
-                <div className={styles.EditPropertyWrapper}>
-                    <Input
-                        value={newPropertyValue || "null"}
-                        onChange={(e) => setNewPropertyValue(e.target.value)}
-                        className={styles.EditPropertyField}
-                    />
-
-                    <Button
-                        icon={<CloseOutlined />}
-                        type="primary"
-                        onClick={() => {
-                            setEditProperty(false);
-                            setNewPropertyValue(propertyValue);
-                        }}
-                        className={styles.CloseButton}
-                    />
-
-                    <Button
-                        icon={<CheckOutlined />}
-                        type="primary"
-                        onClick={updatePropertyClickHandler}
-                        className={styles.UpdateButton}
-                    />
-                </div>
-            ) : (
-                <div className={styles.PropertyValueWrapper}>
-                    {propertyValue || "null"}
-                    <Button
-                        icon={<EditOutlined />}
-                        type="primary"
-                        onClick={() => setEditProperty(true)}
-                        className={styles.EditButton}
-                    />
-                </div>
-            )}
+            <EditableValue
+                className={styles.PropertyValueWrapper}
+                editClassName={styles.EditPropertyWrapper}
+                initialValue={propertyValue}
+                onNewValue={updatePropertyClickHandler}
+            />
         </div>
     );
 };

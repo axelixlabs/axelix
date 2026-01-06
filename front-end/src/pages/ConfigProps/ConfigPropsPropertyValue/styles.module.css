@@ -1,16 +1,5 @@
 .MainWrapper {
     width: 100%;
-    padding-right: 100px;
-}
-
-.EditPropertyField {
-    width: min(300px, 100%);
-}
-
-.EditButton,
-.CloseButton,
-.UpdateButton {
-    flex-shrink: 0;
 }
 
 .PropertyValueWrapper {
