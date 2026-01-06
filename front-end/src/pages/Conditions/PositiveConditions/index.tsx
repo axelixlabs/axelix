@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Fragment } from "react/jsx-runtime";
-
 import { Copy } from "components";
+import { normalizeHtmlElementId } from "helpers";
 import { EConditionStatus, type IConditionBeanPositive } from "models";
 
 import { ConditionsAccordionEntry } from "../ConditionAccordionEntry";
@@ -39,24 +38,29 @@ export const PositiveConditions = ({ positiveMatches }: IProps) => {
                     };
                 });
 
+                const id = normalizeHtmlElementId(`${className}${methodName ? methodName : ""}`);
+
                 return (
-                    <Fragment key={className + methodName}>
-                        <div className={styles.ConditionHeaderWrapper}>
-                            <div className={styles.ConditionHeaderSection}>
-                                <span style={{ fontWeight: 300 }}>Class:</span> {className}
-                                <Copy text={className} />
+                    <>
+                        {/* TODO: There is a problem with scrolling here, fix it in the future */}
+                        <div id={id} className={styles.ScrollableWrapper} key={id}>
+                            <div className={styles.ConditionHeaderWrapper}>
+                                <div className={styles.ConditionHeaderSection}>
+                                    <span style={{ fontWeight: 300 }}>Class:</span> {className}
+                                    <Copy text={className} />
+                                </div>
+                                {methodName && (
+                                    <>
+                                        <div className={styles.ConditionHeaderSection}>
+                                            <span style={{ fontWeight: 300 }}>Method:</span> {methodName}
+                                            <Copy text={className} />
+                                        </div>
+                                    </>
+                                )}
                             </div>
-                            {methodName && (
-                                <>
-                                    <div className={styles.ConditionHeaderSection}>
-                                        <span style={{ fontWeight: 300 }}>Method:</span> {methodName}
-                                        <Copy text={className} />
-                                    </div>
-                                </>
-                            )}
                         </div>
                         <ConditionsAccordionEntry items={items} />
-                    </Fragment>
+                    </>
                 );
             })}
         </>

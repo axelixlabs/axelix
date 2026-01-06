@@ -19,7 +19,14 @@ import { useLocation } from "react-router-dom";
 
 import styles from "./styles.module.css";
 
-export const HashNavigable = ({ children }: PropsWithChildren) => {
+interface IProps {
+    /**
+     * The class to which we add a highlight style to indicate that it has been scrolled into view
+     */
+    className?: string;
+}
+
+export const HashNavigable = ({ children, className = accordionStyles.HeaderWrapper }: PropsWithChildren<IProps>) => {
     const { hash } = useLocation();
 
     // TODO:
@@ -40,7 +47,7 @@ export const HashNavigable = ({ children }: PropsWithChildren) => {
 
         element.scrollIntoView();
 
-        const header = element.querySelector(`.${accordionStyles.HeaderWrapper}`);
+        const header = element.querySelector(`.${className}`);
         if (!header) {
             return;
         }

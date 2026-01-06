@@ -1,0 +1,33 @@
+.BeanTreeItem {
+    display: flex;
+    column-gap: 8px;
+}
+
+.BeanTreeItem:hover {
+    cursor: default;
+}
+
+.ClickableBeanTreeItem {
+    display: flex;
+    column-gap: 8px;
+}
+
+.ClickableBeanTreeItem:hover {
+    color: var(--axelix-primary-green);
+}
+
+.BeanTreeItemHover:hover {
+    color: var(--axelix-primary-green);
+}
+
+.BeanTreeLabel {
+    flex-shrink: 0;
+}
+
+.BeanTreeValue {
+    word-break: break-all;
+}
+
+.Tree {
+    margin-left: -5px;
+}

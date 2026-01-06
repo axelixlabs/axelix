@@ -1,5 +1,5 @@
 .Highlight {
-    animation: highlight-fade 4s;
+    animation: highlight-fade 8s;
 }
 
 @keyframes highlight-fade {

@@ -129,12 +129,16 @@
         "jdkProxy": "JDK Dynamic Proxy",
         "noProxy": "No Proxying",
         "beanSource": {
-            "titles": {
+            "tree": {
                 "main": "Origin",
-                "beanMethod": "Bean method",
+                "beanMethod": "@Bean method",
                 "enclosingClass": "Declaring class",
-                "factoryBeanClassName": "Factory Bean"
+                "factoryBeanClassName": "Factory Bean",
+                "autoConfigurationEnclosingClass" : "Declaring AutoConfiguration class",
+                "conditionsPageRef" : "Who defines this bean?"
             },
+            "AUTO_CONFIGURATION_BEAN_METHOD" : "AutoConfiguration @Bean method",
+            "AUTO_CONFIGURATION_CLASS" : "@AutoConfiguration class",
             "COMPONENT_ANNOTATION": "@Component or variants",
             "SYNTHETIC_BEAN": "Synthetic bean",
             "UNKNOWN": "Unknown",
