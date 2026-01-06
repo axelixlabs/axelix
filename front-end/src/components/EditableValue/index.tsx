@@ -76,7 +76,8 @@ export const EditableValue = ({
                 <Button
                     icon={<CloseOutlined />}
                     type="primary"
-                    onClick={() => {
+                    onClick={(e) => {
+                        e.stopPropagation();
                         setEditingValue(false);
                         setActualValue(initialValue);
                     }}
@@ -86,7 +87,8 @@ export const EditableValue = ({
                 <Button
                     icon={<CheckOutlined />}
                     type="primary"
-                    onClick={() => {
+                    onClick={(e) => {
+                        e.stopPropagation();
                         setEditingValue(false);
                         setActualValue(actualValue);
                         onNewValue(actualValue);

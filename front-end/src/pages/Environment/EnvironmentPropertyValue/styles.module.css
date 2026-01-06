@@ -17,16 +17,6 @@
     pointer-events: none;
 }
 
-.EditPropertyField {
-    width: min(300px, 100%);
-}
-
-.EditButton,
-.CloseButton,
-.UpdateButton {
-    flex-shrink: 0;
-}
-
 .EditPropertyWrapper {
     display: flex;
     justify-content: flex-end;

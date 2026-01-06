@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
-
-import { Button, Input, Tooltip } from "antd";
-import { type MouseEvent, useState } from "react";
+import { Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
+import { EditableValue } from "components";
 import { useAppDispatch } from "hooks";
 import type { IEnvProperty } from "models";
 import { updatePropertyThunk } from "store/thunks";
@@ -39,66 +37,27 @@ export const EnvironmentPropertyValue = ({ property }: IProps) => {
     const { name, value, isPrimary } = property;
 
     const { t } = useTranslation();
-    const dispatch = useAppDispatch();
     const { instanceId } = useParams();
+    const dispatch = useAppDispatch();
 
-    const [editProperty, setEditProperty] = useState<boolean>(false);
-    const [newPropertyValue, setNewPropertyValue] = useState<string>(value);
-
-    const updatePropertyClickHandler = (e: MouseEvent<HTMLButtonElement>): void => {
-        e.stopPropagation();
+    const updatePropertyClickHandler = (newValue: string): void => {
         dispatch(
             updatePropertyThunk({
                 instanceId: instanceId!,
                 propertyName: name,
-                newValue: newPropertyValue,
+                newValue: newValue,
             }),
         );
     };
 
-    // TODO: Create separate components in future for this component
     return (
         <div className={styles.MainWrapper}>
-            {editProperty ? (
-                <div className={styles.EditPropertyWrapper}>
-                    <Input
-                        value={newPropertyValue || "null"}
-                        onChange={(e) => setNewPropertyValue(e.target.value)}
-                        className={styles.EditPropertyField}
-                    />
-
-                    <Button
-                        icon={<CloseOutlined />}
-                        type="primary"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setEditProperty(false);
-                            setNewPropertyValue(value);
-                        }}
-                        className={styles.CloseButton}
-                    />
-
-                    <Button
-                        icon={<CheckOutlined />}
-                        type="primary"
-                        onClick={updatePropertyClickHandler}
-                        className={styles.UpdateButton}
-                    />
-                </div>
-            ) : (
-                <div className={styles.PropertyValueWrapper}>
-                    {value || "null"}
-                    <Button
-                        icon={<EditOutlined />}
-                        type="primary"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setEditProperty(true);
-                        }}
-                        className={styles.EditButton}
-                    />
-                </div>
-            )}
+            <EditableValue
+                editClassName={styles.EditPropertyWrapper}
+                className={styles.PropertyValueWrapper}
+                initialValue={value}
+                onNewValue={(newValue) => updatePropertyClickHandler(newValue)}
+            />
             <Tooltip title={t("Environments.primaryProperty")}>
                 <img src={CrownIcon} alt="Crown icon" className={!isPrimary ? styles.IconPlaceholder : ""} />
             </Tooltip>
