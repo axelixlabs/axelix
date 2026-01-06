@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import apiFetch from "api/apiFetch";
-import type { IUpdateScheduledTasksStatusRequestData } from "models";
+import type { IUpdateScheduledTasksCronExpressionData, IUpdateScheduledTasksStatusRequestData } from "models";
 
 export const getScheduledTasksData = (instanceId: string) => {
     return apiFetch.get(`/scheduled-tasks/${instanceId}`);
@@ -26,5 +26,13 @@ export const updateScheduledTasksStatus = (data: IUpdateScheduledTasksStatusRequ
     return apiFetch.post(`/scheduled-tasks/${instanceId}/${statusType}`, {
         targetScheduledTask: targetScheduledTask,
         force: force,
+    });
+};
+
+export const changeCronExpression = (data: IUpdateScheduledTasksCronExpressionData) => {
+    const { instanceId, newCronExpression } = data;
+
+    return apiFetch.post(`/scheduled-tasks/${instanceId}/cron`, {
+        newCronExpression: newCronExpression,
     });
 };
