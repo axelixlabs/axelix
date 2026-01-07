@@ -137,7 +137,8 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                     // @Configuration class as their dependency.
                     if (beanSource instanceof BeansFeed.BeanMethod beanMethod) {
                         try {
-                            String[] beanNamesForType = context.getBeanNamesForType(Class.forName(beanMethod.enclosingClassFullName()));
+                            String[] beanNamesForType =
+                                    context.getBeanNamesForType(Class.forName(beanMethod.enclosingClassFullName()));
                             return !Arrays.asList(beanNamesForType).contains(dep);
                         } catch (ClassNotFoundException e) {
                             // TODO: Refactor this later
