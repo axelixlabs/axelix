@@ -35,7 +35,7 @@ export interface ICacheData {
      */
     missesCount: number;
     /**
-     * Estimated size of a single cache entry
+     * Estimated amount of entries inside the cache. May be absent.
      */
     estimatedEntrySize?: number;
 }
@@ -55,7 +55,7 @@ export interface ICachesResponseBody {
     /**
      * List of cache managers
      */
-    cacheManager: ICachesManager[];
+    cacheManagers: ICachesManager[];
 }
 
 export interface IClearCacheRequestData {

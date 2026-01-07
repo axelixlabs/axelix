@@ -68,7 +68,7 @@ const Caches = () => {
         }
     };
 
-    const requiredCacheManagers = cacheData.response!.cacheManager;
+    const requiredCacheManagers = cacheData.response!.cacheManagers;
     const effectiveCacheManagers = search ? filterCacheManagers(requiredCacheManagers, search) : requiredCacheManagers;
 
     return (

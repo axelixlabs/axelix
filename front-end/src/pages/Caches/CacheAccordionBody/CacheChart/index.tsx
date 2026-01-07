@@ -68,7 +68,13 @@ export const CacheChart = ({ cache }: IProps) => {
     };
 
     return (
-        <ResponsiveContainer height={100}>
+        <ResponsiveContainer
+            height={100}
+            // Only inlined styles are permitted here
+            style={{
+                marginTop: -8,
+            }}
+        >
             <BarChart data={data} layout="vertical" margin={{ left: 40, right: 90 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" />
