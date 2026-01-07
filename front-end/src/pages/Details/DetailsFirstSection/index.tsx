@@ -62,13 +62,17 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                     ...(value === EExportableComponent.HEAP_DUMP && { sanitize: sanitizeHeapDump }),
                 })),
             },
-        }).then((value) => {
-            setIsModalOpen(false);
-            // We have to manually download the file here since the request to the server is a POST http
-            // request and therefore the browser might not catch up the possible Content-Disposition header
-            downloadFile(value.data);
-            setLoading(false);
-        });
+        })
+            .then((value) => {
+                setIsModalOpen(false);
+                // We have to manually download the file here since the request to the server is a POST http
+                // request and therefore the browser might not catch up the possible Content-Disposition header
+                downloadFile(value.data);
+                setLoading(false);
+            })
+            .finally(() => {
+                setStateComponents([]);
+            });
     };
 
     const handleChange = (stateComponent: EExportableComponent): void => {
