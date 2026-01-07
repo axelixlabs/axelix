@@ -52,7 +52,7 @@ export const ConfigPropsPropertyValue = ({ propertyName, propertyValue }: IProps
             <EditableValue
                 className={styles.PropertyValueWrapper}
                 editClassName={styles.EditPropertyWrapper}
-                initialValue={propertyValue}
+                initialValue={propertyValue || "null"}
                 onNewValue={updatePropertyClickHandler}
             />
         </div>

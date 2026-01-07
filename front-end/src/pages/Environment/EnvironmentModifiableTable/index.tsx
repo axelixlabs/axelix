@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Tooltip } from "antd";
 import InfoIcon from "assets/icons/info.svg?react";
 
-import { Accordion, Copy, EmptyHandler } from "components";
+import { Accordion, Copy, EmptyHandler, InfoTooltip } from "components";
 import { splitProperties } from "helpers";
 import type { IEnvironmentPropertySource } from "models";
 
@@ -44,9 +43,9 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
                     <div className={styles.AccordionHeader}>
                         {name}
                         {description && (
-                            <Tooltip title={description}>
+                            <InfoTooltip text={description}>
                                 <InfoIcon color="#2196F3" />
-                            </Tooltip>
+                            </InfoTooltip>
                         )}
                     </div>
                 }

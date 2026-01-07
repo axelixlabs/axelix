@@ -57,7 +57,7 @@ export const getPropertiesCount = <T extends IEnvironmentPropertySource | IConfi
  * @param data any JSON response body that was received from the server
  */
 export const extractErrorCode = (data: any): string => {
-    return data?.code ?? UNKNOWN_ERROR;
+    return data?.errorCode ?? UNKNOWN_ERROR;
 };
 
 /**
