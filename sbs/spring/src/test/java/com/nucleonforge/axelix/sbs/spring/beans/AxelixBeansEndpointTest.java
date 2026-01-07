@@ -19,9 +19,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
-import com.nucleonforge.axelix.common.api.BeansFeed;
-import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
-import com.nucleonforge.axelix.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +27,14 @@ import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ContextConfiguration;
+
+import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
+import com.nucleonforge.axelix.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
@@ -142,11 +140,10 @@ class AxelixBeansEndpointTest {
         assertThat(bean.isConfigPropsBean()).isFalse();
         assertThat(bean.autoConfigurationRef()).isNull();
         assertThat(bean.aliases()).isEmpty();
-        assertThat(bean.dependencies()).hasSize(2).contains(
-            new BeansFeed.BeanDependency(
-                "defaultConditionalBeanRefBuilder", false
-            )
-        ); // second bean is the application context itself
+        assertThat(bean.dependencies())
+                .hasSize(2)
+                .contains(new BeansFeed.BeanDependency(
+                        "defaultConditionalBeanRefBuilder", false)); // second bean is the application context itself
         assertThat(bean.isLazyInit()).isFalse();
         assertThat(bean.isPrimary()).isFalse();
         assertThat(bean.qualifiers()).isEmpty();
