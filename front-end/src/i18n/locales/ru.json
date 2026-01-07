@@ -102,7 +102,10 @@
         "cleared": "Очищено",
         "clear": "Очистить",
         "enabled": "Кэш включён",
-        "disabled": "Кэш выключен"
+        "disabled": "Кэш выключен",
+        "hitsCount": "Попадания",
+        "missesCount": "Промахи",
+        "estimatedEntrySize": "Количество записей"
     },
     "Authentication": {
         "login": "Вход",
