@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.common.domain.utils;
+package com.nucleonforge.axelix.common.utils;
 
 import java.util.function.Supplier;
 
@@ -27,7 +27,6 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Mikhail Polivakha
  */
-// TODO: This is supposed to be in the utils submodule, does not it?
 public class Lazy<T> {
 
     private @Nullable T value;
@@ -57,6 +56,16 @@ public class Lazy<T> {
             value = supplier.get();
             resolved = true;
         }
+        return value;
+    }
+
+    public @NonNull T required() {
+        T value = get();
+
+        if (value == null) {
+            throw new IllegalStateException("Expected a lazily-resolved value to be not null, but it is null");
+        }
+
         return value;
     }
 }

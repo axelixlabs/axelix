@@ -15,6 +15,8 @@
  */
 package com.nucleonforge.axelix.sbs.spring.auth;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +37,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.nucleonforge.axelix.common.api.BeansFeed;
 import com.nucleonforge.axelix.common.auth.DefaultJwtDecoderService;
 import com.nucleonforge.axelix.common.auth.JwtDecoderService;
 import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
 import com.nucleonforge.axelix.sbs.spring.beans.AxelixBeansEndpoint;
 import com.nucleonforge.axelix.sbs.spring.beans.BeanMetaInfoExtractor;
+import com.nucleonforge.axelix.sbs.spring.beans.BeansFeedBuilder;
 import com.nucleonforge.axelix.sbs.spring.beans.DefaultBeanMetaInfoExtractor;
 import com.nucleonforge.axelix.sbs.spring.beans.QualifiersPersistencePostProcessor;
 import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
@@ -288,9 +292,13 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
-        public AxelixBeansEndpoint beansEndpointExtension(
-                BeanMetaInfoExtractor beanMetaInfoExtractor, ConfigurableApplicationContext context) {
-            return new AxelixBeansEndpoint(beanMetaInfoExtractor, context);
+        public BeansFeedBuilder noOpBeanFeedBuilder() {
+            return () -> new BeansFeed(Map.of());
+        }
+
+        @Bean
+        public AxelixBeansEndpoint beansEndpointExtension(BeansFeedBuilder noOpBeanFeedBuilder) {
+            return new AxelixBeansEndpoint(noOpBeanFeedBuilder);
         }
 
         @Bean

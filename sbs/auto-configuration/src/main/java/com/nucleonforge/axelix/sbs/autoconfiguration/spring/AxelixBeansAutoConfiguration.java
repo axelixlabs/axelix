@@ -19,11 +19,15 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.sbs.spring.beans.AxelixBeansEndpoint;
 import com.nucleonforge.axelix.sbs.spring.beans.BeanMetaInfoExtractor;
+import com.nucleonforge.axelix.sbs.spring.beans.BeansFeedBuilder;
+import com.nucleonforge.axelix.sbs.spring.beans.CachingBeansFeedBuilder;
 import com.nucleonforge.axelix.sbs.spring.beans.DefaultBeanMetaInfoExtractor;
+import com.nucleonforge.axelix.sbs.spring.beans.DefaultBeansFeedBuilder;
 import com.nucleonforge.axelix.sbs.spring.beans.QualifiersPersistencePostProcessor;
 import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
 import com.nucleonforge.axelix.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
@@ -41,7 +45,7 @@ public class AxelixBeansAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ConditionalBeanRefBuilder beanNameNormalizer() {
+    public ConditionalBeanRefBuilder defaultConditionalBeanRefBuilder() {
         return new DefaultConditionalBeanRefBuilder();
     }
 
@@ -54,10 +58,21 @@ public class AxelixBeansAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public AxelixBeansEndpoint beansEndpointExtension(
+    public BeansFeedBuilder defaultBeansFeedBuilder(
             BeanMetaInfoExtractor beanMetaInfoExtractor, ConfigurableApplicationContext context) {
-        return new AxelixBeansEndpoint(beanMetaInfoExtractor, context);
+        return new DefaultBeansFeedBuilder(beanMetaInfoExtractor, context);
+    }
+
+    @Bean
+    @Primary
+    public BeansFeedBuilder cachingBeansFeedBuilder(BeansFeedBuilder defaultBeansFeedBuilder) {
+        return new CachingBeansFeedBuilder(defaultBeansFeedBuilder);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AxelixBeansEndpoint beansEndpointExtension(BeansFeedBuilder cachingBeansFeedBuilder) {
+        return new AxelixBeansEndpoint(cachingBeansFeedBuilder);
     }
 
     @Bean

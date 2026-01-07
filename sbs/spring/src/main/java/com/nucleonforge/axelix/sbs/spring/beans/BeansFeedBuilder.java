@@ -13,35 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.common.domain.utils;
+package com.nucleonforge.axelix.sbs.spring.beans;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.jspecify.annotations.NonNull;
+
+import com.nucleonforge.axelix.common.api.BeansFeed;
 
 /**
- * Unit tests for {@link Lazy}.
+ * Interface that is capable to assemble the {@link com.nucleonforge.axelix.common.api.BeansFeed}.
  *
  * @author Mikhail Polivakha
  */
-class LazyTest {
+public interface BeansFeedBuilder {
 
-    @Test
-    void testAlreadyResolved() {
-        Lazy<String> value = Lazy.resolved("value");
-
-        String first = value.get();
-        String second = value.get();
-
-        Assertions.assertThat(first).isEqualTo(second);
-    }
-
-    @Test
-    void testFromSupplier() {
-        Lazy<String> value = Lazy.of(() -> "value");
-
-        String first = value.get();
-        String second = value.get();
-
-        Assertions.assertThat(first).isEqualTo(second);
-    }
+    /**
+     * @return feed of beans inside the given application.
+     */
+    @NonNull
+    BeansFeed buildBeansFeed();
 }

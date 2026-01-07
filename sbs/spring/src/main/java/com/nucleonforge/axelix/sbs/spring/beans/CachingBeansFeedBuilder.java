@@ -15,30 +15,27 @@
  */
 package com.nucleonforge.axelix.sbs.spring.beans;
 
-import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.jspecify.annotations.NonNull;
 
 import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.utils.Lazy;
 
 /**
- * Custom actuator endpoint that provides the beans feed.
+ * Caching decorator over the actual {@link BeansFeedBuilder}.
  *
- * @since 08.10.2025
- * @author Nikita Kirillov
- * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@RestControllerEndpoint(id = "axelix-beans")
-public class AxelixBeansEndpoint {
+public class CachingBeansFeedBuilder implements BeansFeedBuilder {
 
-    private final BeansFeedBuilder beansFeedBuilder;
+    private final Lazy<BeansFeed> lazyBeansFeed;
 
-    public AxelixBeansEndpoint(BeansFeedBuilder beansFeedBuilder) {
-        this.beansFeedBuilder = beansFeedBuilder;
+    public CachingBeansFeedBuilder(BeansFeedBuilder delegate) {
+        this.lazyBeansFeed = Lazy.of(delegate::buildBeansFeed);
     }
 
-    @GetMapping
-    public BeansFeed beans() {
-        return beansFeedBuilder.buildBeansFeed();
+    @Override
+    @NonNull
+    public BeansFeed buildBeansFeed() {
+        return lazyBeansFeed.required();
     }
 }
