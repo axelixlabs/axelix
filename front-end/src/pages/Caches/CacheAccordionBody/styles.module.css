@@ -1,0 +1,15 @@
+.MainWrapper {
+    display: grid;
+    align-items: flex-start;
+    grid-template-columns: max-content 1fr;
+    column-gap: 20px;
+}
+
+.CacheDataWrapper {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    grid-template-rows: 18px 18px;
+    grid-auto-rows: auto;
+    gap: 20px;
+    align-items: center;
+}

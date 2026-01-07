@@ -1,6 +1,6 @@
 .AccordionHeader {
     display: grid;
-    grid-template-columns: 1fr 110px 110px;
+    grid-template-columns: 1fr 150px 110px;
     align-items: center;
     column-gap: 8px;
 }
@@ -21,15 +21,10 @@
 }
 
 .RowChunk {
-    justify-content: center;
-    padding-block: 0;
+    text-align: center;
 }
 
-.ContentRowChunkWrapper {
-    min-width: 0;
-    padding-block: 0;
-}
-
+.ContentRowChunkWrapper,
 .ContentWrapper {
     min-width: 0;
 }
