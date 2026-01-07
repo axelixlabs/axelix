@@ -102,7 +102,10 @@
         "cleared": "Cleared",
         "clear": "Clear",
         "enabled": "Cache is enabled at runtime",
-        "disabled": "Cache is disabled at runtime"
+        "disabled": "Cache is disabled at runtime",
+        "hitsCount": "Hits count",
+        "missesCount": "Misses count",
+        "estimatedEntrySize": "Estimated entry size"
     },
     "Authentication": {
         "login": "Login",

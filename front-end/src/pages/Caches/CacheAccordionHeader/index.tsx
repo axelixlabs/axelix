@@ -35,13 +35,14 @@ interface IProps {
      * Name of the cache manager
      */
     cacheManagerName: string;
+
     /**
      * Single cache data
      */
     cache: ICacheData;
 }
 
-export const CacheTableRow = ({ cacheManagerName, cache }: IProps) => {
+export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
@@ -65,8 +66,8 @@ export const CacheTableRow = ({ cacheManagerName, cache }: IProps) => {
     };
 
     return (
-        <div className={`TableRow ${styles.MainWrapper}`}>
-            <div className={`RowChunk ${styles.ContentRowChunkWrapper}`}>
+        <div className={styles.AccordionHeader}>
+            <div className={styles.ContentRowChunkWrapper}>
                 <div className={styles.ContentWrapper}>
                     <span>{t("Caches.name")}: </span>
                     <span className={styles.CacheName}>{cache.name}</span>
@@ -76,7 +77,7 @@ export const CacheTableRow = ({ cacheManagerName, cache }: IProps) => {
                     </div>
                 </div>
             </div>
-            <div className={`RowChunk ${styles.RowChunk}`}>
+            <div className={styles.RowChunk}>
                 <Button
                     icon={<ReloadOutlined />}
                     type="primary"
@@ -84,7 +85,7 @@ export const CacheTableRow = ({ cacheManagerName, cache }: IProps) => {
                     onClick={clearCacheClickHandler}
                 />
             </div>
-            <div className={`RowChunk ${styles.RowChunk}`}>
+            <div className={styles.RowChunk}>
                 <CacheStatusSwitch cacheManagerName={cacheManagerName} cache={cache} />
             </div>
         </div>

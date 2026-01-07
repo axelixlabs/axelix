@@ -26,6 +26,18 @@ export interface ICacheData {
      * When true, caching is active; when false, caching is inactive
      */
     enabled: boolean;
+    /**
+     * Number of cache hits
+     */
+    hitsCount: number;
+    /**
+     * Number of cache misses
+     */
+    missesCount: number;
+    /**
+     * Estimated size of a single cache entry
+     */
+    estimatedEntrySize?: number;
 }
 
 export interface ICachesManager {
