@@ -103,9 +103,9 @@
         "clear": "Очистить",
         "enabled": "Кэш включён",
         "disabled": "Кэш выключен",
-        "hitsCount": "Количество попаданий",
-        "missesCount": "Количество промахов",
-        "estimatedEntrySize": "Оценочный размер записи"
+        "hitsCount": "Попадания",
+        "missesCount": "Промахи",
+        "estimatedEntrySize": "Количество записей"
     },
     "Authentication": {
         "login": "Вход",
