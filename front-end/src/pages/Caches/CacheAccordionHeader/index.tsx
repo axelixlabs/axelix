@@ -15,7 +15,7 @@
  */
 import { ReloadOutlined } from "@ant-design/icons";
 
-import { Button, message } from "antd";
+import { App, Button } from "antd";
 import type { AxiosError } from "axios";
 import { type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -45,6 +45,7 @@ interface IProps {
 export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
+    const { message } = App.useApp();
 
     const [clearSingleCache, setClearSingleCache] = useState(StatelessRequest.inactive());
 

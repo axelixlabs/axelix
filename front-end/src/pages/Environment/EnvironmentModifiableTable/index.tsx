@@ -44,7 +44,7 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
                         {name}
                         {description && (
                             <InfoTooltip text={description}>
-                                <InfoIcon color="#2196F3" />
+                                <InfoIcon color="#1890ff" />
                             </InfoTooltip>
                         )}
                     </div>

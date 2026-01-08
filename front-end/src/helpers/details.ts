@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import FreeBSD from "assets/icons/freeBSD.svg";
+import FreeBSD from "assets/icons/freeBSD.svg?react";
+import JavaIcon from "assets/icons/java.svg?react";
+import KotlinIcon from "assets/icons/kotlin.svg?react";
+import LinuxIcon from "assets/icons/linux.svg?react";
+import WindowsIcon from "assets/icons/windows.svg?react";
+import type { FC, SVGProps } from "react";
 
 import { ECopyableField, type IDetailsRuntime } from "models";
-
-import JavaIcon from "assets/icons/java.svg";
-import KotlinIcon from "assets/icons/kotlin.svg";
-import LinuxIcon from "assets/icons/linux.svg";
-import WindowsIcon from "assets/icons/windows.svg";
 
 /**
  * Resolve the Icon to be used on the details card for the given Operating System.
  *
  * @param osName operating system name
  */
-export function resolveOsIcon(osName: string): string {
+export function resolveOsIcon(osName: string): FC<SVGProps<SVGSVGElement>> {
     switch (osName.trim().toLowerCase()) {
         case "windows":
             return WindowsIcon;
@@ -47,7 +47,7 @@ export function isCopyableField(field: string): boolean {
  *
  * @param runtime the runtime information
  */
-export function resolveLangIcon(runtime: IDetailsRuntime): string {
+export function resolveLangIcon(runtime: IDetailsRuntime): FC<SVGProps<SVGSVGElement>> {
     return runtime.kotlinVersion ? KotlinIcon : JavaIcon;
 }
 

@@ -2,7 +2,7 @@
     width: min(420px, 100%);
     border-radius: var(--axelix-border-radius-large);
     padding: 16px;
-    box-shadow: 0 6px 18px rgb(15 23 42 / 20%);
+    box-shadow: var(--axelix-box-shadow-bold);
 }
 
 .Title {

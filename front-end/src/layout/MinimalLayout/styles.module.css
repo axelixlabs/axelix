@@ -1,5 +1,5 @@
 .MainWrapper {
-    background-color: #edeaec;
+    background-color: #f5f5f5;
 }
 
 .Header {
@@ -14,6 +14,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    box-shadow: var(--axelix-box-shadow-light);
 }
 
 .LanguageSwitcherWrapper {

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { App as AntdApp, ConfigProvider, type ThemeConfig } from "antd";
 import { Provider } from "react-redux";
 
 import { store } from "store";
@@ -21,12 +22,32 @@ import { AppRoutes } from "./routes";
 
 import "./i18n/i18n";
 
-function App() {
-    return (
-        <Provider store={store}>
-            <AppRoutes />
-        </Provider>
-    );
-}
+export const App = () => {
+    const theme: ThemeConfig = {
+        token: {
+            colorPrimary: "#00ab55",
+            fontFamily: "Golos, Helvetica, Arial, sans-serif",
+            fontSize: 15,
+        },
+    };
 
-export default App;
+    return (
+        <ConfigProvider
+            theme={theme}
+            tooltip={{
+                styles: {
+                    root: {
+                        maxWidth: "600px",
+                        whiteSpace: "normal",
+                    },
+                },
+            }}
+        >
+            <AntdApp>
+                <Provider store={store}>
+                    <AppRoutes />
+                </Provider>
+            </AntdApp>
+        </ConfigProvider>
+    );
+};

@@ -16,7 +16,8 @@
 import { BookOutlined, CommentOutlined } from "@ant-design/icons";
 
 import { Dropdown, type MenuProps } from "antd";
-import AboutIcon from "assets/icons/info-black.svg";
+import ArrowIcon from "assets/icons/arrow.svg?react";
+import AboutIcon from "assets/icons/info.svg?react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -51,8 +52,7 @@ export const Help = () => {
         },
         {
             key: "3",
-            // TODO: Replace this via svgr in future and delete the info-black.svg icon
-            icon: <img src={AboutIcon} alt="About icon" />,
+            icon: <AboutIcon />,
             label: <a onClick={() => setOpen(true)}>{t("Header.Help.about")}</a>,
         },
         {
@@ -72,23 +72,7 @@ export const Help = () => {
                 <a onClick={(e) => e.preventDefault()} className={styles.HelpLabelWrapper}>
                     <div className={styles.HelpLabel}>
                         {t("Header.Help.title")}
-
-                        {/* TODO: Replace this in future via svgr */}
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            strokeWidth="2"
-                            stroke="currentColor"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className={styles.ArrowIcon}
-                        >
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <polyline points="6 9 12 15 18 9" />
-                        </svg>
+                        <ArrowIcon className={styles.ArrowIcon} />
                     </div>
                 </a>
             </Dropdown>

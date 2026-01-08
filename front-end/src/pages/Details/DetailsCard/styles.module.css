@@ -1,5 +1,5 @@
 .Card {
-    box-shadow: 3px 8px 30px 0 #00000040;
+    box-shadow: var(--axelix-box-shadow-bold);
 }
 
 .TableHeaderRowChunk {
@@ -7,11 +7,6 @@
     align-items: center;
     justify-content: flex-start;
     column-gap: 8px;
-}
-
-.CardIcon {
-    height: 16px;
-    width: 16px;
 }
 
 .ValueWrapper {

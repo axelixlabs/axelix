@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Tabs, type TabsProps, message } from "antd";
+import { App, Tabs, type TabsProps } from "antd";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -30,8 +30,9 @@ import styles from "./styles.module.css";
 const Loggers = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
-    const [activeKey, setActiveKey] = useState<ELoggersTabs>(ELoggersTabs.LOGGERS);
+    const { message } = App.useApp();
 
+    const [activeKey, setActiveKey] = useState<ELoggersTabs>(ELoggersTabs.LOGGERS);
     const [loggersData, setLoggersData] = useState(StatefulRequest.loading<ILoggersResponseBody>());
     const [search, setSearch] = useState<string>("");
     const [updateLoggerLevel, setUpdateLoggerLevel] = useState(StatelessRequest.inactive());

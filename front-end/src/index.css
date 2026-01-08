@@ -1,6 +1,6 @@
 @font-face {
     font-family: Golos;
-    src: url("fonts/Variable_Golos_Text.woff2") format("woff2");
+    src: url("assets/fonts/Variable_Golos_Text.woff2") format("woff2");
     font-weight: 100 900;
     font-style: normal;
     font-display: swap;
@@ -18,6 +18,8 @@
     --axelix-border-radius-large: 8px;
     --axelix-border-radius-small: 4px;
     --axelix-scroll-margin-top: 150px;
+    --axelix-box-shadow-bold: 4px 6px 14px rgb(15 23 42 / 25%);
+    --axelix-box-shadow-light: 0 4px 20px rgb(0 0 0 / 10%);
 }
 
 *,
@@ -33,12 +35,7 @@ html {
 }
 
 body {
-    font-family:
-        Golos,
-        Helvetica,
-        Arial,
-        sans-serif,
-        -apple-system;
+    font-family: Golos, Helvetica, Arial, sans-serif;
 }
 
 ul,
