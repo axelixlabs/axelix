@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { JSX } from "react";
 import { useTranslation } from "react-i18next";
 import { Cell, Legend, Pie, PieChart, type PieLabelRenderProps, ResponsiveContainer, Tooltip } from "recharts";
 
@@ -36,7 +37,7 @@ export function Distributions({ distributions }: IProps) {
     /**
      * Function that renders an inner label (the actual value for the given category)
      */
-    const renderInnerLabel = (props: PieLabelRenderProps, totalCategoriesCount: number) => {
+    const renderInnerLabel = (props: PieLabelRenderProps, totalCategoriesCount: number): JSX.Element => {
         const [x, y, value] = calculateInnerValueCoordinates(props, totalCategoriesCount);
 
         return (

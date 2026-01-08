@@ -4,12 +4,11 @@
     padding: 32px;
     background-color: #fff;
     border-radius: 16px;
-    box-shadow: 0 6px 4px rgb(0 0 0 / 25%);
+    box-shadow: var(--axelix-box-shadow-bold);
 }
 
 .LoginTitle {
     margin-bottom: 30px;
-    color: #212121;
 }
 
 .SubmitButton {

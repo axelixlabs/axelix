@@ -1,5 +1,5 @@
 .Prefix {
-    color: var(--axile-text-grey); /* TODO: This CSS variable does not exist, from where it comes from? */
+    color: var(--axelix-bold-grey);
     margin-top: 8px;
 }
 

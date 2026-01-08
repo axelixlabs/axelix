@@ -11,16 +11,16 @@
 }
 
 .ArrowIcon {
+    transition: transform 0.3s ease;
     transform: rotate(180deg);
-    transition: transform 0.5s;
+    margin-top: 4px;
 }
 
-.HelpLabelWrapper:hover .ArrowIcon {
+.OpenArrowIcon {
     transform: rotate(0);
 }
 
 .HelpLabel {
     display: flex;
-    align-items: flex-end;
     column-gap: 4px;
 }

@@ -25,7 +25,7 @@ import JvmIcon from "assets/icons/jvm.svg?react";
 import LoggersIcon from "assets/icons/loggers.svg?react";
 import MetricsIcon from "assets/icons/metrics.svg?react";
 import ScheduledTasksIcon from "assets/icons/scheduledTasks.svg?react";
-import SpringIcon from "assets/icons/spring_black.svg?react";
+import SpringIcon from "assets/icons/spring.svg?react";
 import ThreadDumpIcon from "assets/icons/threadDump.svg?react";
 import type { TFunction } from "i18next";
 

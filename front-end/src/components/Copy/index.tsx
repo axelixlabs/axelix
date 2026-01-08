@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { message } from "antd";
+import { App } from "antd";
 import { type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -30,6 +30,7 @@ interface IProps {
 
 export const Copy = ({ text }: IProps) => {
     const { t } = useTranslation();
+    const { message } = App.useApp();
 
     const handleCopy = async (e: MouseEvent<HTMLImageElement>): Promise<void> => {
         e.stopPropagation();

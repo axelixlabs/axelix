@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, message } from "antd";
+import { App, Button } from "antd";
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -30,7 +30,7 @@ import styles from "./styles.module.css";
 const Caches = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message } = App.useApp();
 
     const [search, setSearch] = useState<string>("");
 
@@ -57,7 +57,7 @@ const Caches = () => {
                 .then((value) => {
                     if (value.status === 200) {
                         setClearAllCaches(StatelessRequest.success());
-                        messageApi.success(t("Caches.cleared"));
+                        message.success(t("Caches.cleared"));
                     } else {
                         setClearAllCaches(StatelessRequest.error(""));
                     }
@@ -73,7 +73,6 @@ const Caches = () => {
 
     return (
         <>
-            {contextHolder}
             <div className={styles.TopSection}>
                 <PageSearch setSearch={setSearch} />
                 <Button type="primary" onClick={clearAllCachesClickHandler} loading={clearAllCaches.loading}>

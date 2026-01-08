@@ -38,28 +38,35 @@ export const BeanSource = ({ bean }: IProps) => {
     const { instanceId } = useParams();
 
     const { beanSource, autoConfigurationRef } = bean;
+    const { origin } = beanSource;
 
     const statelessBeanSource =
-        beanSource.origin === EBeanOrigin.UNKNOWN ||
-        beanSource.origin === EBeanOrigin.COMPONENT_ANNOTATION ||
-        beanSource.origin === EBeanOrigin.SYNTHETIC_BEAN;
+        origin === EBeanOrigin.UNKNOWN ||
+        origin === EBeanOrigin.COMPONENT_ANNOTATION ||
+        origin === EBeanOrigin.SYNTHETIC_BEAN;
+
+    let beanSourceTitle;
+
+    if (origin === EBeanOrigin.COMPONENT_ANNOTATION && autoConfigurationRef) {
+        beanSourceTitle = (
+            <div className={styles.LinkedTitleWrapper}>
+                <div>{t("Beans.beanSource.AUTO_CONFIGURATION_CLASS")}</div>
+                <Link to={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}>
+                    <img src={LinkIcon} alt="Link icon" />
+                </Link>
+            </div>
+        );
+    } else if (origin == EBeanOrigin.UNKNOWN && bean.isConfigPropsBean) {
+        beanSourceTitle = t(`Beans.beanSource.CONFIG_PROPS_BEAN`);
+    } else {
+        beanSourceTitle = t(`Beans.beanSource.${origin}`);
+    }
 
     return (
         <>
             <div className={sharedStyles.AccordionBodyChunkTitle}>{t(`Beans.beanSource.tree.main`)}:</div>
 
-            {beanSource.origin === EBeanOrigin.COMPONENT_ANNOTATION && autoConfigurationRef ? (
-                <div className={styles.LinkedTitleWrapper}>
-                    <div>{t("Beans.beanSource.AUTO_CONFIGURATION_CLASS")}</div>
-                    <Link to={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}>
-                        <img src={LinkIcon} alt="Link icon" />
-                    </Link>
-                </div>
-            ) : statelessBeanSource ? (
-                t(`Beans.beanSource.${beanSource.origin}`)
-            ) : (
-                <BeanSourceTree bean={bean} />
-            )}
+            {statelessBeanSource ? beanSourceTitle : <BeanSourceTree bean={bean} />}
         </>
     );
 };

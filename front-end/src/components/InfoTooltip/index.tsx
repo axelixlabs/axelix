@@ -46,7 +46,7 @@ export const InfoTooltip = ({ children, text, placement = "right" }: PropsWithCh
                 </div>
             }
             placement={placement}
-            color="#2196F3"
+            color="#1890ff"
         >
             {children || <img src={QuestionIcon} alt="Question icon" />}
         </Tooltip>
