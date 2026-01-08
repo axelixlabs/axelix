@@ -62,6 +62,7 @@ class ThreadDumpApiTest {
             // language=json
             """
       {
+        "threadContentionMonitoringEnabled" : true,
         "threads" : [ {
           "threadName" : "Test worker",
           "threadId" : 1,
@@ -170,6 +171,7 @@ class ThreadDumpApiTest {
         String jsonResponse =
                 """
     {
+       "threadContentionMonitoringEnabled" : true,
        "threads" : [ {
          "threadName" : "Test worker",
          "threadId" : 1,
@@ -248,13 +250,13 @@ class ThreadDumpApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/threaddump")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-thread-dump")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/threaddump-management/enable")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-thread-dump/enable")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/actuator/threaddump-management/disable")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-thread-dump/disable")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -322,8 +324,7 @@ class ThreadDumpApiTest {
 
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertThat(recordedRequest.getPath())
-                .isEqualTo("/" + activeInstanceId + "/actuator/threaddump-management/enable");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/actuator/axelix-thread-dump/enable");
     }
 
     @Test
@@ -340,6 +341,6 @@ class ThreadDumpApiTest {
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getPath())
-                .isEqualTo("/" + activeInstanceId + "/actuator/threaddump-management/disable");
+                .isEqualTo("/" + activeInstanceId + "/actuator/axelix-thread-dump/disable");
     }
 }

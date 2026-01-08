@@ -32,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link ThreadDumpManagementEndpoint}
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ThreadDumpManagementEndpointTest {
@@ -44,7 +45,7 @@ public class ThreadDumpManagementEndpointTest {
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 
         // when.
-        restTemplate.postForEntity("/actuator/threaddump-management/enable", null, Void.class);
+        restTemplate.postForEntity("/actuator/axelix-thread-dump/enable", null, Void.class);
 
         // then.
         assertThat(threadMXBean.isThreadContentionMonitoringEnabled()).isTrue();
@@ -56,7 +57,7 @@ public class ThreadDumpManagementEndpointTest {
         threadMXBean.setThreadContentionMonitoringEnabled(true);
 
         // when.
-        restTemplate.postForEntity("/actuator/threaddump-management/disable", null, Void.class);
+        restTemplate.postForEntity("/actuator/axelix-thread-dump/disable", null, Void.class);
 
         // then.
         assertThat(threadMXBean.isThreadContentionMonitoringEnabled()).isFalse();

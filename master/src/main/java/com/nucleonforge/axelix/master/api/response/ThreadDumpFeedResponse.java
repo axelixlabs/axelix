@@ -22,10 +22,14 @@ import org.jspecify.annotations.Nullable;
 /**
  * The feed of the thread-dump in the application.
  *
+ * @param threadContentionMonitoringEnabled whether the thread contention monitoring is enabled.
+ * @param threads thread dump itself.
+ *
  * @since 19.11.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public record ThreadDumpFeedResponse(List<ThreadInfo> threads) {
+public record ThreadDumpFeedResponse(boolean threadContentionMonitoringEnabled, List<ThreadInfo> threads) {
 
     /**
      * @param threadName name of the thread.

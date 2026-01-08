@@ -72,7 +72,7 @@ public class ThreadDumpFeedConverter implements Converter<ThreadDumpFeed, Thread
                                 .map(this::convertLockInfo)
                                 .toArray(LockInfo[]::new))));
 
-        return new ThreadDumpFeedResponse(result);
+        return new ThreadDumpFeedResponse(source.threadContentionMonitoringEnabled(), result);
     }
 
     private @Nullable LockInfo convertLockInfo(ThreadDumpFeed.@Nullable LockInfo source) {

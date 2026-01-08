@@ -15,21 +15,36 @@
  */
 package com.nucleonforge.axelix.sbs.spring.threaddump;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
 
 /**
  * Custom Spring Boot Actuator endpoint to enable or disable thread contention monitoring.
  *
  * @author Sergey Cherkasov
  */
-@RestControllerEndpoint(id = "threaddump-management")
+@RestControllerEndpoint(id = "axelix-thread-dump")
 public class ThreadDumpManagementEndpoint {
+
+    private static final ThreadMXBean THREAD_MX_BEAN = ManagementFactory.getThreadMXBean();
 
     private final ThreadDumpContentionMonitoringManagement management;
 
     public ThreadDumpManagementEndpoint(ThreadDumpContentionMonitoringManagement management) {
         this.management = management;
+    }
+
+    @GetMapping
+    public ThreadDumpFeed getThreadDump() {
+        ThreadInfo[] jmxThreads = THREAD_MX_BEAN.dumpAllThreads(true, true);
+        return new ThreadDumpFeed(THREAD_MX_BEAN.isThreadContentionMonitoringEnabled(), jmxThreads);
     }
 
     @PostMapping("/enable")

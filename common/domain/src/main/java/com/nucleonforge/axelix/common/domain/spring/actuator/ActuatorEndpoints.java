@@ -175,11 +175,11 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint STARTUP = of("/startup", HttpMethod.POST);
 
     // Thread Dump
-    public static final ActuatorEndpoint THREAD_DUMP = of("/threaddump", HttpMethod.GET);
+    public static final ActuatorEndpoint THREAD_DUMP = of("/axelix-thread-dump", HttpMethod.GET);
     public static final ActuatorEndpoint THREAD_DUMP_ENABLE_CONTENTION_MONITORING =
-            of("/threaddump-management/enable", HttpMethod.POST);
+            of("/axelix-thread-dump/enable", HttpMethod.POST);
     public static final ActuatorEndpoint THREAD_DUMP_DISABLE_CONTENTION_MONITORING =
-            of("/threaddump-management/disable", HttpMethod.POST);
+            of("/axelix-thread-dump/disable", HttpMethod.POST);
 
     // spotless:on
 

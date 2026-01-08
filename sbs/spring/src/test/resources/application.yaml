@@ -38,8 +38,7 @@ management:
           - axelix-conditions
           - configprops
           - env
-          - threaddump
-          - threaddump-management
+          - axelix-thread-dump
 
 logging:
   level:

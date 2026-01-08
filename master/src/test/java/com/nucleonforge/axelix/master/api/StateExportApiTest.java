@@ -361,7 +361,7 @@ class StateExportApiTest {
                     return new MockResponse()
                             .setBody(jsonSchedulesTasksResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/threaddump")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-thread-dump")) {
                     return new MockResponse()
                             .setBody(jsonThreadDumpResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
