@@ -28,6 +28,7 @@ import styles from "./styles.module.css";
 export const Help = () => {
     const { t } = useTranslation();
 
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const [open, setOpen] = useState<boolean>(false);
 
     const version = import.meta.env.VITE_APP_VERSION;
@@ -68,11 +69,11 @@ export const Help = () => {
 
     return (
         <>
-            <Dropdown menu={{ items }}>
+            <Dropdown menu={{ items }} onOpenChange={(open) => setDropdownOpen(open)}>
                 <a onClick={(e) => e.preventDefault()} className={styles.HelpLabelWrapper}>
                     <div className={styles.HelpLabel}>
                         {t("Header.Help.title")}
-                        <ArrowIcon className={styles.ArrowIcon} />
+                        <ArrowIcon className={`${styles.ArrowIcon} ${dropdownOpen && styles.OpenArrowIcon}`} />
                     </div>
                 </a>
             </Dropdown>
