@@ -8,3 +8,8 @@
     flex-direction: column;
     width: 100%;
 }
+
+.CardIcon {
+    height: 16px;
+    width: 16px;
+}

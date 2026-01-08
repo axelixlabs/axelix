@@ -15,8 +15,6 @@
  */
 import { format } from "date-fns";
 
-export const DETAILS_I18N_PREFIX = "Details";
-
 export const VALUE_TRANSFORMERS: { [key: string]: (value: string) => string } = {
     commitTimestamp: (timestamp: string) => {
         const unixEpochTime = Number(timestamp);

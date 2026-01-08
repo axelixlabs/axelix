@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Switch, message } from "antd";
+import { App, Switch } from "antd";
 import type { AxiosError } from "axios";
 import { type MouseEvent, useState } from "react";
 import * as React from "react";
@@ -38,7 +38,7 @@ interface IProps {
 export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message } = App.useApp();
     const [mutationRequest, setMutationRequest] = useState(StatelessRequest.inactive());
 
     const switchTaskStatus = (e: MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLButtonElement>) => {
@@ -53,7 +53,7 @@ export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
 
         (cache.enabled ? disableCache(requestBody) : enableCache(requestBody))
             .then(() => {
-                messageApi.success(t(`${cache.enabled ? "Caches.disabled" : "Caches.enabled"}`));
+                message.success(t(`${cache.enabled ? "Caches.disabled" : "Caches.enabled"}`));
                 cache.enabled = !cache.enabled;
                 setMutationRequest(StatelessRequest.success());
             })
@@ -63,15 +63,12 @@ export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
     };
 
     return (
-        <>
-            {contextHolder}
-            <Switch
-                checkedChildren={t("on")}
-                unCheckedChildren={t("off")}
-                onChange={(checked, event) => switchTaskStatus(event)}
-                loading={mutationRequest.loading}
-                checked={cache.enabled}
-            />
-        </>
+        <Switch
+            checkedChildren={t("on")}
+            unCheckedChildren={t("off")}
+            onChange={(checked, event) => switchTaskStatus(event)}
+            loading={mutationRequest.loading}
+            checked={cache.enabled}
+        />
     );
 };

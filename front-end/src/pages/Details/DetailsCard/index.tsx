@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type { PropsWithChildren } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { IDetailsCardRecord } from "models";
@@ -20,10 +21,6 @@ import type { IDetailsCardRecord } from "models";
 import styles from "./styles.module.css";
 
 interface IProps {
-    /**
-     * Icon for the details card
-     */
-    icon: string;
     /**
      * Details card title
      */
@@ -38,14 +35,14 @@ interface IProps {
     records: IDetailsCardRecord[];
 }
 
-export const DetailsCard = ({ icon, i18nPropertiesPrefix, title, records }: IProps) => {
+export const DetailsCard = ({ children, i18nPropertiesPrefix, title, records }: PropsWithChildren<IProps>) => {
     const { t } = useTranslation();
 
     return (
         <div className={`CustomizedTable ${styles.Card}`}>
             <div className="TableHeader">
                 <div className={`RowChunk ${styles.TableHeaderRowChunk}`}>
-                    {icon && <img src={icon} alt={`${title} icon`} className={styles.CardIcon} />}
+                    {children}
                     {t(title)}
                 </div>
             </div>

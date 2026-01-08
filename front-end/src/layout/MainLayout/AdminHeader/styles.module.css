@@ -10,7 +10,7 @@
     align-items: center;
     height: var(--axelix-header-height);
     border-bottom: 1px solid var(--axelix-medium-grey);
-    box-shadow: 0 4px 20px rgb(0 0 0 / 5%);
+    box-shadow: var(--axelix-box-shadow-light);
     padding: 0 50px;
 }
 

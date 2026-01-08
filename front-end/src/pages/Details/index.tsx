@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import BuildIcon from "assets/icons/build.svg?react";
+import GitIcon from "assets/icons/git.svg?react";
+import SpringIcon from "assets/icons/spring.svg?react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -21,15 +24,11 @@ import { fetchData, isCopyableField, resolveLangIcon, resolveOsIcon } from "help
 import { type IDetailsCardRecord, type IDetailsResponseBody, StatefulRequest } from "models";
 import type { DetailsBuildValuesData } from "models/types/details";
 import { getDetailsData } from "services";
-import { DETAILS_I18N_PREFIX, VALUE_TRANSFORMERS } from "utils";
+import { VALUE_TRANSFORMERS } from "utils";
 
 import { DetailsCard } from "./DetailsCard";
 import { DetailsHeader } from "./DetailsFirstSection";
 import styles from "./styles.module.css";
-
-import BuildIcon from "assets/icons/build.svg";
-import GitIcon from "assets/icons/git.svg";
-import SpringIcon from "assets/icons/spring.svg";
 
 const Details = () => {
     const { instanceId } = useParams();
@@ -66,44 +65,32 @@ const Details = () => {
 
     const { serviceName, git, build, spring, runtime, os } = dataState.response!;
 
+    const LangIcon = resolveLangIcon(runtime);
+    const OsIcon = resolveOsIcon(os.name);
+
     return (
         <>
             <DetailsHeader instanceName={serviceName} />
 
             <div className={styles.InnerWrapper}>
                 <div className={styles.ColumnWrapper}>
-                    <DetailsCard
-                        icon={GitIcon}
-                        i18nPropertiesPrefix={`${DETAILS_I18N_PREFIX}.git`}
-                        title="git"
-                        records={buildValues(git)}
-                    />
-                    <DetailsCard
-                        icon={BuildIcon}
-                        i18nPropertiesPrefix={`${DETAILS_I18N_PREFIX}.build`}
-                        title="build"
-                        records={buildValues(build)}
-                    />
+                    <DetailsCard i18nPropertiesPrefix="Details.git" title="git" records={buildValues(git)}>
+                        <GitIcon className={styles.CardIcon} />
+                    </DetailsCard>
+                    <DetailsCard i18nPropertiesPrefix="Details.build" title="build" records={buildValues(build)}>
+                        <BuildIcon className={styles.CardIcon} />
+                    </DetailsCard>
                 </div>
                 <div className={styles.ColumnWrapper}>
-                    <DetailsCard
-                        icon={SpringIcon}
-                        i18nPropertiesPrefix={`${DETAILS_I18N_PREFIX}.spring`}
-                        title="spring"
-                        records={buildValues(spring)}
-                    />
-                    <DetailsCard
-                        icon={resolveLangIcon(runtime)}
-                        i18nPropertiesPrefix={`${DETAILS_I18N_PREFIX}.runtime`}
-                        title="runtime"
-                        records={buildValues(runtime)}
-                    />
-                    <DetailsCard
-                        icon={resolveOsIcon(os.name)}
-                        i18nPropertiesPrefix={`${DETAILS_I18N_PREFIX}.os`}
-                        title="os"
-                        records={buildValues(os)}
-                    />
+                    <DetailsCard i18nPropertiesPrefix="Details.spring" title="spring" records={buildValues(spring)}>
+                        <SpringIcon className={styles.CardIcon} color="#00ab55" />
+                    </DetailsCard>
+                    <DetailsCard i18nPropertiesPrefix="Details.runtime" title="runtime" records={buildValues(runtime)}>
+                        <LangIcon className={styles.CardIcon} />
+                    </DetailsCard>
+                    <DetailsCard i18nPropertiesPrefix="Details.os" title="os" records={buildValues(os)}>
+                        <OsIcon className={styles.CardIcon} />
+                    </DetailsCard>
                 </div>
             </div>
         </>

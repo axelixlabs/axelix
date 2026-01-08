@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Switch, message } from "antd";
+import { App, Switch } from "antd";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -33,7 +33,8 @@ interface IProps {
 export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message } = App.useApp();
+
     const [mutationRequest, setMutationRequest] = useState(StatelessRequest.inactive());
 
     const switchTaskStatus = () => {
@@ -46,7 +47,7 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
             targetScheduledTask: runnable.runnable.target,
         })
             .then(() => {
-                messageApi.success(t(`${runnable.enabled ? "ScheduledTasks.disabled" : "ScheduledTasks.enabled"}`));
+                message.success(t(`${runnable.enabled ? "ScheduledTasks.disabled" : "ScheduledTasks.enabled"}`));
                 runnable.enabled = !runnable.enabled;
                 setMutationRequest(StatelessRequest.success());
             })
@@ -56,15 +57,12 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
     };
 
     return (
-        <>
-            {contextHolder}
-            <Switch
-                checkedChildren={t("on")}
-                unCheckedChildren={t("off")}
-                onChange={() => switchTaskStatus()}
-                loading={mutationRequest.loading}
-                checked={runnable.enabled}
-            />
-        </>
+        <Switch
+            checkedChildren={t("on")}
+            unCheckedChildren={t("off")}
+            onChange={() => switchTaskStatus()}
+            loading={mutationRequest.loading}
+            checked={runnable.enabled}
+        />
     );
 };

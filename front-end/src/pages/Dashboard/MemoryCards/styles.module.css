@@ -24,7 +24,7 @@
     border: 1px solid var(--axelix-light-grey);
     flex-basis: 33%;
     text-align: center;
-    box-shadow: 0 6px 18px rgb(15 23 42 / 20%);
+    box-shadow: var(--axelix-box-shadow-bold);
 }
 
 .CardTitle {
