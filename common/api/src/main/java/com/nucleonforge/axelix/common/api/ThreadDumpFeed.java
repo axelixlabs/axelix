@@ -124,7 +124,7 @@ public record ThreadDumpFeed(boolean threadContentionMonitoringEnabled, List<Thr
 
     @Nullable
     private static LockInfo toLockInfo(java.lang.management.ThreadInfo threadInfo) {
-        if (threadInfo != null) {
+        if (threadInfo.getLockInfo() != null) {
             return new LockInfo(
                     threadInfo.getLockInfo().getClassName(),
                     threadInfo.getLockInfo().getIdentityHashCode());
