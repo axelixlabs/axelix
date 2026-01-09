@@ -87,7 +87,7 @@ jobs:
           version: v3.14.0
 
       - name: Deploy master to K8S
-        working-directory: distributions
+        working-directory: distributions/chart
         run: |
           mkdir -p ~/.kube
           touch ~/.kube/config
