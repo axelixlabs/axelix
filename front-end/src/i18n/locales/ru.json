@@ -220,10 +220,10 @@
         "stacktrace": "Стек вызовов",
         "notAvailable" : "Не Доступно",
         "Settings": {
-            "title": "Настройки дампа потоков",
-            "contentionMonitoring": "Мониторинг конкуренции потоков",
-            "contentionMonitoringEnabled": "Мониторинг конкуренции потоков включен",
-            "contentionMonitoringDisabled": "Мониторинг конкуренции потоков выключен"
+            "title": "Настройки Дампа Потоков",
+            "contentionMonitoring": "Мониторинг Контешена",
+            "contentionMonitoringEnabled": "Мониторинг контешена включен",
+            "contentionMonitoringDisabled": "Мониторинг контешена выключен"
         }
     }
 }

@@ -62,6 +62,9 @@ const ThreadDump = () => {
             <ThreadDumpFirstSection
                 setSearch={setSearch}
                 addonAfter={addonAfter}
+                // TODO:
+                //  Now, the contention monitoring component property is drilled down really
+                //  hard. I think this is going to be a good case for using the state manager here later.
                 contentionMonitoring={contentionMonitoring}
             />
 

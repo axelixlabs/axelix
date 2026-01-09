@@ -221,10 +221,10 @@
         "stacktrace": "Stacktrace",
         "notAvailable" : "Not Available",
         "Settings": {
-            "title": "Thread dump settings",
-            "contentionMonitoring": "Thread contention monitoring",
-            "contentionMonitoringEnabled": "Thread dump contention monitoring is enabled",
-            "contentionMonitoringDisabled": "Thread dump contention monitoring is disabled"
+            "title": "Thread Dump Settings",
+            "contentionMonitoring": "Thread Contention Monitoring",
+            "contentionMonitoringEnabled": "Thread contention monitoring is enabled",
+            "contentionMonitoringDisabled": "Thread contention monitoring is disabled"
         }
     }
 }
