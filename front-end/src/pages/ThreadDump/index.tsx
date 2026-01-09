@@ -14,26 +14,22 @@
  * limitations under the License.
  */
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { Accordion, EmptyHandler, Loader } from "components";
-import { fetchData, getDisplayedThreadDump } from "helpers";
-import { type IThread, type IThreadDumpResponseBody, type IThreadGroup, StatefulRequest } from "models";
+import { EmptyHandler, Loader } from "components";
+import { fetchData, filterThreadDump, sortThreadDumpByPriority } from "helpers";
+import { type IThreadDumpResponseBody, StatefulRequest } from "models";
 import { getThreadDumpData } from "services";
 import { THREAD_DUMP_SHORT_POLLING_INTERVAL_MS } from "utils";
 
-import { GlobalSlidingTimeLine } from "./GlobalSlidingTimeLine";
-import { ThreadDumpAccordionBody } from "./ThreadDumpAccordionBody";
-import { SingleThreadAccordionHeader } from "./ThreadDumpAccordionHeader";
-import styles from "./styles.module.css";
+import { ThreadDumpFirstSection } from "./ThreadDumpFirstSection";
+import { ThreadDumpMainContent } from "./ThreadDumpMainContent";
 
 const ThreadDump = () => {
-    const { t } = useTranslation();
     const { instanceId } = useParams();
 
     const [threadDumpData, setThreadDumpData] = useState(StatefulRequest.loading<IThreadDumpResponseBody>());
-    const [selectedGroups, setSelectedGroups] = useState<Record<string, IThreadGroup>>({});
+    const [search, setSearch] = useState<string>("");
 
     useEffect(() => {
         const doFetch = () => {
@@ -55,45 +51,24 @@ const ThreadDump = () => {
         return <EmptyHandler isEmpty />;
     }
 
+    const contentionMonitoring = threadDumpData.response!.threadContentionMonitoringEnabled;
     const threadDumpFeed = threadDumpData.response!.threads;
-    const sortedThreadDump = threadDumpFeed.toSorted(
-        (currentThread, nextThread) => nextThread.priority - currentThread.priority,
-    );
-
-    const onAccordionClose = (threadDump: IThread): void => {
-        setSelectedGroups((prev) => {
-            const prevGroups = { ...prev };
-            delete prevGroups[threadDump.threadId];
-            return prevGroups;
-        });
-    };
+    const effectiveThreadDump = search ? filterThreadDump(threadDumpFeed, search) : threadDumpFeed;
+    const sortedThreadDump = sortThreadDumpByPriority(effectiveThreadDump);
+    const addonAfter = `${effectiveThreadDump.length} / ${threadDumpFeed.length}`;
 
     return (
         <>
-            {/* Empty attribute required for the correct styling to be applied, see MainLayout component styling */}
-            <div data-thread-layout className={styles.TitleAndTimelineWrapper}>
-                <div className={`TextMedium ${styles.MainTitle}`}>{t("ThreadDump.title")}</div>
-                <GlobalSlidingTimeLine />
-            </div>
+            <ThreadDumpFirstSection
+                setSearch={setSearch}
+                addonAfter={addonAfter}
+                // TODO:
+                //  Now, the contention monitoring component property is drilled down really
+                //  hard. I think this is going to be a good case for using the state manager here later.
+                contentionMonitoring={contentionMonitoring}
+            />
 
-            <div className={`AccordionsWrapper ${styles.AccordionsWrapper}`}>
-                {sortedThreadDump.map((threadDump) => (
-                    <Accordion
-                        header={
-                            <SingleThreadAccordionHeader
-                                currentThreadSnapshot={threadDump}
-                                selectedGroup={selectedGroups[threadDump.threadId]}
-                                setSelectedGroups={setSelectedGroups}
-                            />
-                        }
-                        key={threadDump.threadId}
-                        onClose={() => onAccordionClose(threadDump)}
-                        hideArrowIcon
-                    >
-                        <ThreadDumpAccordionBody thread={getDisplayedThreadDump(threadDump, selectedGroups)} />
-                    </Accordion>
-                ))}
-            </div>
+            <ThreadDumpMainContent sortedThreadDump={sortedThreadDump} />
         </>
     );
 };

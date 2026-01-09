@@ -202,7 +202,6 @@
         "blog": "Блог"
     },
     "ThreadDump": {
-        "title": "Дамп Потоков",
         "id": "Id потока",
         "name": "Имя потока",
         "state": "Состояние потока",
@@ -219,6 +218,12 @@
         "lockInfo": "Заблокирован на",
         "lock": "Блокировка",
         "stacktrace": "Стек вызовов",
-        "notAvailable" : "Не Доступно"
+        "notAvailable" : "Не Доступно",
+        "Settings": {
+            "title": "Настройки Дампа Потоков",
+            "contentionMonitoring": "Мониторинг Контешена",
+            "contentionMonitoringEnabled": "Мониторинг контешена включен",
+            "contentionMonitoringDisabled": "Мониторинг контешена выключен"
+        }
     }
 }

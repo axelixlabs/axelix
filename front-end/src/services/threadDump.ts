@@ -16,5 +16,13 @@
 import apiFetch from "api/apiFetch";
 
 export const getThreadDumpData = (instanceId: string) => {
-    return apiFetch.get(`/thread-dump/${instanceId}`);
+    return apiFetch.get(`thread-dump/${instanceId}`);
+};
+
+export const enableContentionMonitoring = (instanceId: string) => {
+    return apiFetch.post(`thread-dump/${instanceId}/thread-contention-monitoring/enable`);
+};
+
+export const disableContentionMonitoring = (instanceId: string) => {
+    return apiFetch.post(`thread-dump/${instanceId}/thread-contention-monitoring/disable`);
 };

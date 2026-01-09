@@ -202,7 +202,6 @@
         "blog": "Blog"
     },
     "ThreadDump": {
-        "title": "Thread Dump",
         "id": "Thread id",
         "name": "Thread name",
         "state": "Thread state",
@@ -220,6 +219,12 @@
         "lockInfo": "Locked by",
         "lock": "Lock",
         "stacktrace": "Stacktrace",
-        "notAvailable" : "Not Available"
+        "notAvailable" : "Not Available",
+        "Settings": {
+            "title": "Thread Dump Settings",
+            "contentionMonitoring": "Thread Contention Monitoring",
+            "contentionMonitoringEnabled": "Thread contention monitoring is enabled",
+            "contentionMonitoringDisabled": "Thread contention monitoring is disabled"
+        }
     }
 }
