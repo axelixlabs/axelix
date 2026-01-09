@@ -1,0 +1,34 @@
+---
+{{- with $.Values.backend }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "master.backend.name" . }}
+  labels:
+    {{- include "master.backend.labels" . | nindent 4 }}
+spec:
+  type: {{ .service.type }}
+  ports:
+    - port: {{ .service.port }}
+      targetPort: {{ .service.port }}
+      name: http
+  selector:
+    {{- include "master.backend.selectorLabels" . | nindent 4 }}
+{{- end }}
+---
+{{- with $.Values.frontend }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "master.frontend.name" . }}
+  labels:
+    {{- include "master.frontend.labels" . | nindent 4 }}
+spec:
+  type: {{ .service.type }}
+  ports:
+    - port: {{ .service.port }}
+      targetPort: {{ .service.port }}
+      name: http
+  selector:
+    {{- include "master.frontend.selectorLabels" . | nindent 4 }}
+{{- end }}

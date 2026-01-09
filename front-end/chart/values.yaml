@@ -1,3 +1,0 @@
-# Expected to be passed during the build. Fully qualified reference to the docker image.
-image:
-  ref: ""

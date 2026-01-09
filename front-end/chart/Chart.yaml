@@ -1,6 +1,0 @@
-apiVersion: v2
-name: front-end
-description: A Front-end helm chart for Kubernetes
-type: application
-version: 0.1.0
-appVersion: "1.0.0-SNAPSHOT"

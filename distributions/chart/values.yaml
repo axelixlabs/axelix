@@ -1,0 +1,247 @@
+# Configuration for ingress resource to be created.
+ingress:
+
+  # Whether to create a dedicated ingress K8S resource for external access to the axelix master ui. Default is true.
+  # Switch to 'false' if you already have an ingress to add rules into. In case enabled is left as 'true', then please
+  # ensure the correct ingress controller is installed in the cluster. The default expected ingress controller is nginx.
+  enabled: true
+
+  # Name of the created ingress. Default is the name of the chart.
+  name: ""
+
+  # Namespace where the ingress is supposed to be created.
+  default: "default"
+
+  # Class name of the ingress. Default is 'nginx'.
+  className: "nginx"
+
+  # Additional annotations for ingress, if any.
+  annotations: {}
+
+  # Host of the ingress. By default, the host is empty.
+  host: ""
+
+  # TLS settings for the provided host.
+  tls:
+    # Whether tls is enabled for the host. Default is false.
+    enabled: true
+
+    # The name of the secret that stores the certificate and private key for it.
+    secretName: ""
+
+rbac:
+
+  # The namespace where monitored pods reside. Inside this namespace will also role and role-binding
+  # will be created if 'autoCreateRole = true'. The default is 'default'.
+  targetNamespace: "default"
+
+  # Whether to create the Role and Role-Binding for backend service account. Default is 'true'. If overridden
+  # to false, then the end-user MUST ensure that backend service account has required privileges to access the
+  # K8S KubeApi server.
+  autoCreateRole: true
+
+# Array of secret names to be used when pulling the Axelix images
+imagePullSecrets: []
+
+# Configurations for the Axelix backend
+backend:
+
+  # The name to be given to deployment and container inside pods
+  name: "axelix-backend"
+
+  # Configuration for the service account to be attached to Axelix Master backend pods.
+  serviceAccount:
+
+    # name of the service account to create (if 'create = true') or reference to an existing service account.
+    # Default: the same name as the backend deployment.
+    name: ""
+
+    # Namespace of the service account, where if not creating, existing service account resides. If new
+    # service account required, the namespace where a new service account will be created.
+    namespace: default
+
+    # whether to create service account for the backend pods or rely on an existing one. Default - false
+    create: "false"
+
+    # Annotations for the backend service account. By default, there are no annotations.
+    annotations: {}
+
+    # Whether to automount the service account into pod or not. Default is true.
+    automount: "true"
+
+  # Security context of the axelix master backend pods.
+  podSecurityContext: {}
+
+  # Custom pod labels.
+  podLabels: {}
+
+  # Pod annotations, if any. By default, pod has no annotations.
+  podAnnotations: {}
+
+  # Custom labels and annotations for the K8S deployment
+  custom:
+    labels: ""
+    annotations: ""
+
+  # Configuration of HPA for Master pods. Disabled by default.
+  autoscaling:
+    # Whether the HPA is enabled for backend. Disabled by default
+    enabled: "false"
+    # Configuration of HPA for backend
+    hpa:
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPU: 80
+      targetMemory: ""
+
+  # amount of backend replicas to be deployed
+  replicaCount: 1
+
+  image:
+    # Reference to the axelix master backend image (without repository) to be used
+    tag: ""
+    # Repository that holds the provided image
+    repository: ""
+
+    # Image pull policy
+    pullPolicy: "IfNotPresent"
+
+  # Liveness probes configuration
+  liveness:
+    delay: 15
+    failureThreshold: 10
+    timeoutSeconds: 10
+    period: 5
+  # Readiness probes configuration
+  readiness:
+    delay: 15
+    failureThreshold: 10
+    timeoutSeconds: 10
+    period: 5
+  # Resources (limits and requests of memory and cpu) to be used by axelix backend.
+  resources: {}
+
+  # Additional volume mounts to be used (expecting a corresponding "volume" definition)
+  volumeMounts: []
+
+  # Additional volumes to be attached to the axelix master backend pods
+  volumes: []
+
+  # The node selector for the Axelix Master backend pods. By default, any node is capable to run the pod.
+  nodeSelector: {}
+
+  # Custom affinity rules for the Axelix Master backend pods. By default, there are no rules.
+  affinity: {}
+
+  # Array of tolerations for the Axelix Master backend. By default, frontend pods dp not define any tolerations.
+  tolerations: []
+
+  # Configuration of the K8S service for the backend.
+  service:
+
+    # Port (both target and source) of the K8S service allocated for the backend. 8080 by default.
+    port: 8080
+
+    # Type of the K8S service allocated for the backend. ClusterIP by default.
+    type: ClusterIP
+
+# Configurations for the Axelix front-end
+frontend:
+  # The name to be given to deployment and container inside pods
+  name: "axelix-ui"
+
+  # Configuration for the service account to be attached to Axelix Master frontend pods.
+  serviceAccount:
+
+    # name of the service account to create (if 'create = true') or reference to an existing service account.
+    # Default: the same name as the frontend deployment.
+    name: ""
+
+    # Namespace of the service account, where if not creating, existing service account resides. If new
+    # service account required, the namespace where a new service account will be created.
+    namespace: default
+
+    # whether to create service account for the frontend pods or rely on an existing one. Default - false
+    create: "false"
+
+    # Annotations for the frontend service account. By default, there are no annotations.
+    annotations: {}
+
+    # Whether to automount the service account into pod or not. Default is true.
+    automount: "true"
+
+  # Security context of the axelix master frontend pods.
+  podSecurityContext: {}
+
+  # Custom frontend pod labels.
+  podLabels: {}
+
+  # Frontend pod annotations, if any. By default, pod has no annotations.
+  podAnnotations: {}
+
+  # Custom labels and annotations for the frontend K8S deployment.
+  custom:
+    labels: ""
+    annotations: ""
+
+  # Configuration of HPA for Master frontend pods. Disabled by default.
+  autoscaling:
+    # Whether the HPA is enabled for frontend. Disabled by default.
+    enabled: "false"
+    # Configuration of HPA for frontend.
+    hpa:
+      minReplicas: 1
+      maxReplicas: 2
+      targetCPU: 80
+      targetMemory: ""
+
+  # amount of backend replicas to be deployed. Must be specified if autoscaling is disabled
+  replicaCount: 1
+
+  image:
+    # Reference to the axelix master frontend image (without repository) to be used
+    tag: ""
+    # Repository that holds the provided image
+    repository: ""
+
+    # Image pull policy
+    pullPolicy: "IfNotPresent"
+
+  # Liveness probes configuration
+  liveness:
+    delay: 15
+    failureThreshold: 10
+    timeoutSeconds: 10
+    period: 5
+  # Readiness probes configuration
+  readiness:
+    delay: 15
+    failureThreshold: 10
+    timeoutSeconds: 10
+    period: 5
+  # Resources (limits and requests of memory and cpu) to be used by axelix frontend.
+  resources: {}
+
+  # Additional volume mounts to be used (expecting a corresponding "volume" definition)
+  volumeMounts: []
+
+  # Additional volumes to be attached to the axelix master frontend pods
+  volumes: []
+
+  # The node selector for the Axelix Master frontend pods. By default, any node is capable to run the pod.
+  nodeSelector: {}
+
+  # Custom affinity rules for the Axelix Master frontend pods. By default, there are no rules.
+  affinity: {}
+
+  # Array of tolerations for the Axelix Master frontend pods. By default, frontend pods do not define any tolerations.
+  tolerations: []
+
+  # Configuration of the K8S service for the backend.
+  service:
+
+    # Port (both target and source) of the K8S service allocated for the backend. 8080 by default.
+    port: 80
+
+    # Type of the K8S service allocated for the backend. ClusterIP by default.
+    type: ClusterIP
