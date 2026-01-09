@@ -2,7 +2,7 @@
 The name of the Axelix Master backend deployment.
 */}}
 {{- define "master.backend.name" -}}
-{{- default .Chart.Name $.Values.backend.name | trunc 63 | trimSuffix "-" }}
+{{- default $.Chart.Name $.Values.backend.name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
