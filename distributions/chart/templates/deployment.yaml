@@ -1,5 +1,5 @@
 ---
-{{- with .Values.backend }}
+{{- with $.Values.backend }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -91,7 +91,7 @@ spec:
       {{- end }}
 {{- end }}
 ---
-{{- with .Values.frontend }}
+{{- with $.Values.frontend }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

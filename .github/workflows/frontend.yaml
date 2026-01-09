@@ -6,6 +6,7 @@ on:
     branches: [ master ]
     paths:
       - 'front-end/**'
+      - 'distributions/**'
       - '.github/workflows/frontend.yaml'
   pull_request:
     branches: [ master ]
@@ -26,7 +27,7 @@ jobs:
         uses: nearform-actions/github-action-check-linked-issues@v1
         with:
           exclude-labels: "refactoring"
-  lint:
+  lint-and-test:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -43,23 +44,11 @@ jobs:
 
       - name: CSS lint application
         run: npm run lint-css
-  test:
-    needs: lint
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: front-end
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Run tests
         run: npm test
   deploy:
-    needs: test
+    needs: lint-and-test
     env:
       DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
       CR_URL: ${{ vars.CR_URL }}
@@ -98,7 +87,7 @@ jobs:
           version: v3.14.0
 
       - name: Deploy master to K8S
-        working-directory: front-end/chart
+        working-directory: distributions
         run: |
           mkdir -p ~/.kube
           touch ~/.kube/config
