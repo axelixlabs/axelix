@@ -1,8 +1,4 @@
-.AccordionsWrapper {
-    width: max-content;
-}
-
-.TitleAndTimelineWrapper {
+.FirstSectionWrapper {
     height: 58px;
     position: sticky;
     top: var(--axelix-header-height);
@@ -14,8 +10,10 @@
     z-index: 9;
 }
 
-.MainTitle {
-    flex-shrink: 0;
+.SearchAndSettingsWrapper {
+    display: flex;
+    column-gap: 8px;
+    align-self: flex-end;
 
     /* This size is measured from the start of the accordion to the end of the thread name */
     width: 488px;

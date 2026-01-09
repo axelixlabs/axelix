@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 import { getThreadStateColor } from "helpers";
 import type { IThread, IThreadGroup } from "models";
-import { THREAD_DUMP_SLIDING_WINDOW_MS, threadDumpStateLetters } from "utils";
+import { threadDumpStateLetters } from "utils";
 
 import { ThreadTimeLine } from "../ThreadTimeLine";
 
@@ -38,24 +38,19 @@ interface IProps {
      * Setter to update the selected thread groups
      */
     setSelectedGroups: Dispatch<SetStateAction<Record<string, IThreadGroup>>>;
+
+    /**
+     * The list of thread dump history
+     */
+    history: IThread[];
 }
 
-export const SingleThreadAccordionHeader = ({ currentThreadSnapshot, selectedGroup, setSelectedGroups }: IProps) => {
-    const [history, setHistory] = useState<IThread[]>([]);
-
-    useEffect(() => {
-        const id = setInterval(() => {
-            setHistory([]);
-            setSelectedGroups({});
-        }, THREAD_DUMP_SLIDING_WINDOW_MS);
-
-        return () => clearInterval(id);
-    }, []);
-
-    useEffect(() => {
-        setHistory((prev) => [...prev, currentThreadSnapshot]);
-    }, [currentThreadSnapshot]);
-
+export const SingleThreadAccordionHeader = ({
+    currentThreadSnapshot,
+    selectedGroup,
+    setSelectedGroups,
+    history,
+}: IProps) => {
     const { colorPrimary } = getThreadStateColor(currentThreadSnapshot);
 
     return (

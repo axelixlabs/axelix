@@ -173,6 +173,11 @@ export interface IThread {
 
 export interface IThreadDumpResponseBody {
     /**
+     * Whether thread contention monitoring is enabled
+     */
+    threadContentionMonitoringEnabled: boolean;
+
+    /**
      * Array of threads in the dump
      */
     threads: IThread[];

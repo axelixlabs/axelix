@@ -121,3 +121,30 @@ export const stopPropagationOnAccordionExpand = (e: MouseEvent<HTMLDivElement>):
         e.stopPropagation();
     }
 };
+
+export const filterThreadDump = (threadDump: IThread[], search: string): IThread[] => {
+    const formattedSearch = search.toLowerCase().trim();
+
+    return threadDump.filter(({ threadName }) => {
+        const lowerThreadName = threadName.toLowerCase();
+        return lowerThreadName.includes(formattedSearch);
+    });
+};
+
+export const sortThreadDumpByPriority = (effectiveThreadDump: IThread[]): IThread[] => {
+    return effectiveThreadDump.toSorted((currentThread, nextThread) => nextThread.priority - currentThread.priority);
+};
+
+export const getThreadHistoryNextState = (
+    previouseState: Record<string, IThread[]>,
+    sortedThreadDump: IThread[],
+): Record<string, IThread[]> => {
+    const nextState = { ...previouseState };
+    sortedThreadDump.forEach((thread) => {
+        const { threadId } = thread;
+
+        nextState[threadId] = (nextState[threadId] || []).concat(thread);
+    });
+
+    return nextState;
+};

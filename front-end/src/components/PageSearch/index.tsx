@@ -31,7 +31,7 @@ interface IProps {
     removeBottomGutter?: boolean;
 
     /**
-     * Optional text to display after the search field
+     * Тext to display after the search field
      */
     addonAfter?: string;
 
