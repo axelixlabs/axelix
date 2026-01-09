@@ -135,16 +135,17 @@ export const sortThreadDumpByPriority = (effectiveThreadDump: IThread[]): IThrea
     return effectiveThreadDump.toSorted((currentThread, nextThread) => nextThread.priority - currentThread.priority);
 };
 
-export const getThreadHistoryNextState = (
-    previouseState: Record<string, IThread[]>,
+export const appendToThreadDumpHistory = (
+    previousState: Record<string, IThread[]>,
     sortedThreadDump: IThread[],
 ): Record<string, IThread[]> => {
-    const nextState = { ...previouseState };
+    const actualState = { ...previousState };
+
     sortedThreadDump.forEach((thread) => {
         const { threadId } = thread;
 
-        nextState[threadId] = (nextState[threadId] || []).concat(thread);
+        actualState[threadId] = (actualState[threadId] || []).concat(thread);
     });
 
-    return nextState;
+    return actualState;
 };

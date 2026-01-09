@@ -16,7 +16,7 @@
 import { useEffect, useState } from "react";
 
 import { Accordion } from "components";
-import { getDisplayedThreadDump, getThreadHistoryNextState } from "helpers";
+import { appendToThreadDumpHistory, getDisplayedThreadDump } from "helpers";
 import type { IThread, IThreadGroup } from "models";
 import { THREAD_DUMP_SLIDING_WINDOW_MS } from "utils";
 
@@ -46,7 +46,7 @@ export const ThreadDumpMainContent = ({ sortedThreadDump }: IProps) => {
     }, []);
 
     useEffect(() => {
-        setThreadsHistory((prev) => getThreadHistoryNextState(prev, sortedThreadDump));
+        setThreadsHistory((prev) => appendToThreadDumpHistory(prev, sortedThreadDump));
     }, [sortedThreadDump]);
 
     const onAccordionClose = (threadDump: IThread): void => {
