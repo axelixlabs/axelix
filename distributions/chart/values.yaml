@@ -60,8 +60,8 @@ backend:
     # service account required, the namespace where a new service account will be created.
     namespace: default
 
-    # whether to create service account for the backend pods or rely on an existing one. Default - false
-    create: "false"
+    # whether to create service account for the backend pods or rely on an existing one. Default - true
+    create: "true"
 
     # Annotations for the backend service account. By default, there are no annotations.
     annotations: {}
@@ -98,10 +98,12 @@ backend:
   replicaCount: 1
 
   image:
+
     # Reference to the axelix master backend image (without repository) to be used
     tag: ""
-    # Repository that holds the provided image
-    repository: ""
+
+    # Repository that holds the provided image along with the actual image name, like repository/image
+    name: ""
 
     # Image pull policy
     pullPolicy: "IfNotPresent"
@@ -161,8 +163,8 @@ frontend:
     # service account required, the namespace where a new service account will be created.
     namespace: default
 
-    # whether to create service account for the frontend pods or rely on an existing one. Default - false
-    create: "false"
+    # whether to create service account for the frontend pods or rely on an existing one. Default - true
+    create: "true"
 
     # Annotations for the frontend service account. By default, there are no annotations.
     annotations: {}
@@ -199,10 +201,12 @@ frontend:
   replicaCount: 1
 
   image:
+
     # Reference to the axelix master frontend image (without repository) to be used
     tag: ""
-    # Repository that holds the provided image
-    repository: ""
+
+    # Repository that holds the provided image along with the actual image name, like repository/image
+    name: ""
 
     # Image pull policy
     pullPolicy: "IfNotPresent"
