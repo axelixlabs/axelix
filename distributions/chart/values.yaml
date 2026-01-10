@@ -24,7 +24,7 @@ ingress:
   # TLS settings for the provided host.
   tls:
     # Whether tls is enabled for the host. Default is false.
-    enabled: true
+    enabled: false
 
     # The name of the secret that stores the certificate and private key for it.
     secretName: ""
@@ -148,7 +148,7 @@ backend:
 # Configurations for the Axelix front-end
 frontend:
   # The name to be given to deployment and container inside pods
-  name: "axelix-ui"
+  name: "axelix-frontend"
 
   # Configuration for the service account to be attached to Axelix Master frontend pods.
   serviceAccount:

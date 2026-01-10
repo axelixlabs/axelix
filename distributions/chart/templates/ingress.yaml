@@ -2,10 +2,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{- default $.Chart.Name $.Values.ingress.name }}
-  namespace: {{- $.Values.ingress.default }}
+  name: {{ default $.Chart.Name $.Values.ingress.name }}
+  namespace: {{ $.Values.ingress.default }}
   labels:
-    {{- include "master.backend.labels" . | nindent 4 }}
+    {{- include "master.backend.labels" $ | nindent 4 }}
   {{- with $.Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -25,14 +25,14 @@ spec:
         paths:
           - backend:
               service:
-                name: {{ include "master.backend.name" . }}
+                name: {{ include "master.backend.name" $ }}
                 port:
                   number: 8080
             path: /api
             pathType: Prefix
           - backend:
               service:
-                name: {{ include "master.frontend.name" . }}
+                name: {{ include "master.frontend.name" $ }}
                 port:
                   number: 80
             path: /
