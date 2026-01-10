@@ -1,0 +1,95 @@
+= Axelix contribution guidelines
+
+First off, thank you for taking the time to contribute!
+👍 🎉
+[[code-of-conduct]]
+== Code of Conduct
+
+This project adheres to the Contributor Covenant link:https://www.contributor-covenant.org/[code of conduct].
+By participating, you are expected to uphold this code.
+
+[[using-github-issues]]
+== Using GitHub Issues
+We use GitHub issues to track bugs and enhancements.
+If you have a general usage question please https://github.com/Nucleon-Forge/axelix/issues[submit a Question ticket] to our Issue Tracker (GitHub).
+
+If you are reporting a bug, please help to speed up problem diagnosis by providing as much information as possible.
+Ideally, that would include a small sample project that reproduces the problem (Minimal Reproducible Example).
+
+== Reporting Security Vulnerabilities
+If you think you have found a security vulnerability in Axelix please *DO NOT* disclose it publicly until we've had a chance to fix it.
+Please don't report security vulnerabilities using GitHub issues, instead head over to *#TODO* and learn how to disclose them responsibly.
+
+[[how-to-contribute]]
+== How to Contribute
+
+[[discuss]]
+=== Discuss
+
+If you have a question, check existing GitHub issues with the `question` label. You can express your thoughts within an existing discussion, or start a new one if necessary.
+
+If you believe there is an issue, search through existing issues trying a few different ways to find discussions, past or current, that are related to the issue.
+Reading those discussions helps you to learn about the issue, and helps us to make a decision.
+
+[[quickstart]]
+=== Quickstart
+
+For the impatient, if you want to submit a quick pull request (polishing, trivial fix, documentation fix):
+
+1. API changes require discussion, use cases, etc.
+Code comes later.
+Create an issue in the GitHub issue tracker and stop here.
+In every other case continue with step 2.
+2. Make sure the submitted code follows the project's code style. Our code style check is configured as a part of our CI process, so, to fix the code style violations you can just run
+- `gradle spotlessApply` for the java backend related changes
+- `npm run lint:fix` and `npm run lint-css:fix` for the React front-end related part.
+3. Make sure you submit test cases (unit or integration tests) that back your changes.
+4. Ideally, please, in the Javadoc for the newly added test cases refer to the issue the changes apply to like this
++
+[source,java]
+----
+@Test // GH-???
+void yourTestMethod() { … }
+----
++
+5. In case you're editing the java files, make sure to add yourself as author in the headers of the classes you touched (javadoc's `@author` tag).
+ Amend the date range in the Apache license header if needed. The license header will be automatically added to new source code files, see the second bullet above.
+6. Make sure you follow the <<commit-messages>> guidelines.
+7. All external contributors must sign a CLA (Contributor License Agreement) before their changes can be accepted into the Axelix Project.
+
+[[participate-in-reviews]]
+=== Participate in Reviews
+
+Helping to review pull requests is another great way to contribute.
+Your feedback can help to shape the implementation of new features.
+When reviewing pull requests, however, please refrain from approving or rejecting a PR unless you are a core committer for Axelix.
+
+[[reference-documentation]]
+=== Reference Documentation
+
+The reference documentation is expressed in MarkDown and lives within the https://github.com/Nucleon-Forge/axelix-docs[Axelix Docs GitHub repository].
+
+[[commit-messages]]
+=== Commit messages
+
+The commit message should follow the following style:
+
+* First line contains the summary starting with a capital letter.
+* Finish summary with a dot.
+* In the description, don't use single line breaks.
+No manual wrapping.
+Separate paragraphs by a blank line.
+* During merges, add a reference to the original pull request.
+* To close a GitHub issue, use https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword[GitHub syntax to reference issues].
+* Add related references at the very bottom (also see the section on pull requests below).
+
+[source]
+----
+Summary of the commit (try to stay under 80 characters).
+
+Additional explanations if necessary.
+
+Original pull request #?? (can be omitted when there's no ticket using Closes #?? syntax)
+Closes #?? (optionally close tickets)
+Related tickets #??? (optionally refer to related tickets)
+----
