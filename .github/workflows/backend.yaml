@@ -90,19 +90,20 @@ jobs:
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
         uses: docker/setup-docker-action@v4
 
-      - name: Read Gradle Properties
-        uses: guillermocalvo/gradle-properties@v3
+      - name: Read Gradle Properties file
+        uses: madhead/read-java-properties@latest
+        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         id: gradleProperties
         with:
-          # Use this to only export specific properties
-          export: axelixVersion
+          file: gradle.properties
+          property: axelixVersion
 
       - name: Build Docker Image
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
         # TODO:
         #  We need to take the repository part inside the image name from the terraform output
         run: |
-          docker build --tag $CR_URL/$CR_MASTER_REPOSITORY/master:${{ steps.gradleProperties.outputs.axelixVersion }} --file master/docker/Dockerfile .
+          docker build --tag $CR_URL/$CR_MASTER_REPOSITORY/master:${{ steps.gradleProperties.outputs.value }} --file master/docker/Dockerfile .
 
       - name: Docker login to Yandex Cloud CR
         if: ${{ env.SHOULD_DEPLOY == 'true' }}

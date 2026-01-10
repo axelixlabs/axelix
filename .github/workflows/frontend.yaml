@@ -64,19 +64,26 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-docker-action@v4
 
+      - name: Read Gradle Properties file
+        uses: madhead/read-java-properties@latest
+        id: gradleProperties
+        with:
+          file: gradle.properties
+          property: axelixVersion
+
       - name: Build Docker Image
         # TODO:
         #  For now the version of package is hardcoded both in package.json and in here. We later would need to
         #  find a way to manage it correctly.
         run: |
-          docker build --tag $CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:1.0.0-SNAPSHOT --file front-end/Dockerfile .
+          docker build --tag $CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:${{ steps.gradleProperties.outputs.value }} --file front-end/Dockerfile .
 
       - name: Docker login to Yandex Cloud CR
         # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is my token
         run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
       - name: Docker push to Yandex Cloud CR
-        run: docker push $CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:1.0.0-SNAPSHOT
+        run: docker push $CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:${{ steps.gradleProperties.outputs.axelixVersion }}
 
       - name: Docker logout
         run: docker logout
@@ -93,4 +100,4 @@ jobs:
           touch ~/.kube/config
           echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
           chmod 600 ~/.kube/config
-          helm upgrade --install front-end . --set image.ref=$CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:1.0.0-SNAPSHOT -f values.yaml
+          helm upgrade --install front-end . --set image.ref=$CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:${{ steps.gradleProperties.outputs.axelixVersion }} -f values.yaml
