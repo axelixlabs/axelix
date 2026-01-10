@@ -190,6 +190,29 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/{instanceId}";
     }
 
+    public static final class GcLogFileApi {
+
+        /**
+         * Base path for gc-logfile API.
+         */
+        public static final String MAIN = "/gc-logfile";
+
+        /**
+         * GcLogfile endpoint with instance ID.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+
+        /**
+         * GcLogfile endpoint with instance ID.
+         */
+        public static final String ENABLE_GC_LOGGING = "/{instanceId}/enable";
+
+        /**
+         * GcLogfile endpoint with instance ID.
+         */
+        public static final String DISABLE_GC_LOGGING = "/{instanceId}/disable";
+    }
+
     public static final class HeapDumpApi {
 
         /**

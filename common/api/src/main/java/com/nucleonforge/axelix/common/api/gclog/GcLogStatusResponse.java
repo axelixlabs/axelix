@@ -13,27 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.export;
+package com.nucleonforge.axelix.common.api.gclog;
 
-public enum StateComponent {
-    HEAP_DUMP("hprof"),
-    THREAD_DUMP("json"),
-    BEANS("json"),
-    CACHES("json"),
-    CONDITIONS("json"),
-    CONFIG_PROPS("json"),
-    ENV("json"),
-    LOG_FILE("log"),
-    GC_LOG_FILE("log"),
-    SCHEDULED_TASKS("json");
+import org.jspecify.annotations.Nullable;
 
-    private final String fileExtension;
-
-    StateComponent(String fileExtension) {
-        this.fileExtension = fileExtension;
-    }
-
-    public String getFilename() {
-        return name().toLowerCase() + "." + fileExtension;
-    }
-}
+/**
+ * Response DTO representing the current status of garbage collection logging.
+ *
+ * @param enabled indicates whether GC logging is currently enabled (true) or disabled (false).
+ * @param level The verbosity level of GC logging (e.g., "info", "debug", "trace").
+ *              May be null if logging is disabled.
+ *
+ * @since 10.01.2026
+ * @author Nikita Kirillov
+ */
+public record GcLogStatusResponse(boolean enabled, @Nullable String level) {}

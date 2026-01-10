@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.export;
+package com.nucleonforge.axelix.sbs.spring.gclog;
 
-public enum StateComponent {
-    HEAP_DUMP("hprof"),
-    THREAD_DUMP("json"),
-    BEANS("json"),
-    CACHES("json"),
-    CONDITIONS("json"),
-    CONFIG_PROPS("json"),
-    ENV("json"),
-    LOG_FILE("log"),
-    GC_LOG_FILE("log"),
-    SCHEDULED_TASKS("json");
+/**
+ * Exception thrown when errors occur during GC log operations.
+ *
+ * @since 29.12.2025
+ * @author Nikita Kirillov
+ */
+public class GcLogException extends RuntimeException {
 
-    private final String fileExtension;
-
-    StateComponent(String fileExtension) {
-        this.fileExtension = fileExtension;
+    public GcLogException(String message) {
+        super(message);
     }
 
-    public String getFilename() {
-        return name().toLowerCase() + "." + fileExtension;
+    public GcLogException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

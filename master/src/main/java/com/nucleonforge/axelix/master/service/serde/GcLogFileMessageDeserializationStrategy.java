@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.export;
+package com.nucleonforge.axelix.master.service.serde;
 
-public enum StateComponent {
-    HEAP_DUMP("hprof"),
-    THREAD_DUMP("json"),
-    BEANS("json"),
-    CACHES("json"),
-    CONDITIONS("json"),
-    CONFIG_PROPS("json"),
-    ENV("json"),
-    LOG_FILE("log"),
-    GC_LOG_FILE("log"),
-    SCHEDULED_TASKS("json");
+import org.springframework.stereotype.Component;
 
-    private final String fileExtension;
+/**
+ * {@link BinaryResourceMessageDeserializationStrategy} for gc-logfile.
+ *
+ * @since 10.01.2026
+ * @author Nikita Kirillov
+ */
+@Component
+public class GcLogFileMessageDeserializationStrategy extends BinaryResourceMessageDeserializationStrategy {
 
-    StateComponent(String fileExtension) {
-        this.fileExtension = fileExtension;
-    }
-
-    public String getFilename() {
-        return name().toLowerCase() + "." + fileExtension;
+    @Override
+    protected String filename() {
+        return "gclog.log";
     }
 }

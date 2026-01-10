@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.export;
+package com.nucleonforge.axelix.sbs.spring.gclog;
 
-public enum StateComponent {
-    HEAP_DUMP("hprof"),
-    THREAD_DUMP("json"),
-    BEANS("json"),
-    CACHES("json"),
-    CONDITIONS("json"),
-    CONFIG_PROPS("json"),
-    ENV("json"),
-    LOG_FILE("log"),
-    GC_LOG_FILE("log"),
-    SCHEDULED_TASKS("json");
+/**
+ * Represents the result of an external process execution.
+ *
+ * @since 29.12.2025
+ * @author Nikita Kirillov
+ */
+public class ProcessResult {
+    private final boolean success;
+    private final String output;
 
-    private final String fileExtension;
-
-    StateComponent(String fileExtension) {
-        this.fileExtension = fileExtension;
+    public ProcessResult(int exitCode, String output) {
+        this.success = exitCode == 0;
+        this.output = output;
     }
 
-    public String getFilename() {
-        return name().toLowerCase() + "." + fileExtension;
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getOutput() {
+        return output;
     }
 }

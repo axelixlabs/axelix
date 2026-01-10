@@ -89,7 +89,7 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ValueInjectionTrackerBeanPostProcessor trackingAutowiredAnnotationBeanPostProcessor(
+    public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor(
             PropertyNameNormalizer propertyNameNormalizer) {
         return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
     }

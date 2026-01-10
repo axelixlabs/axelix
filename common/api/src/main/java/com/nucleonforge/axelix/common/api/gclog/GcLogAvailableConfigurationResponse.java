@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.export;
+package com.nucleonforge.axelix.common.api.gclog;
 
-public enum StateComponent {
-    HEAP_DUMP("hprof"),
-    THREAD_DUMP("json"),
-    BEANS("json"),
-    CACHES("json"),
-    CONDITIONS("json"),
-    CONFIG_PROPS("json"),
-    ENV("json"),
-    LOG_FILE("log"),
-    GC_LOG_FILE("log"),
-    SCHEDULED_TASKS("json");
+import java.util.List;
 
-    private final String fileExtension;
-
-    StateComponent(String fileExtension) {
-        this.fileExtension = fileExtension;
-    }
-
-    public String getFilename() {
-        return name().toLowerCase() + "." + fileExtension;
-    }
-}
+/**
+ * Represents available GC logging configuration options provided by the JVM.
+ *
+ * @param availableLevels list of available GC log levels supported by the JVM
+ *
+ * @since 30.12.2025
+ * @author Nikita Kirillov
+ */
+public record GcLogAvailableConfigurationResponse(List<String> availableLevels) {}

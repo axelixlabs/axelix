@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.export;
+package com.nucleonforge.axelix.master.service.export.settings;
 
-public enum StateComponent {
-    HEAP_DUMP("hprof"),
-    THREAD_DUMP("json"),
-    BEANS("json"),
-    CACHES("json"),
-    CONDITIONS("json"),
-    CONFIG_PROPS("json"),
-    ENV("json"),
-    LOG_FILE("log"),
-    GC_LOG_FILE("log"),
-    SCHEDULED_TASKS("json");
+import com.nucleonforge.axelix.master.service.export.StateComponent;
+import com.nucleonforge.axelix.master.service.export.StateComponentSettings;
 
-    private final String fileExtension;
+/**
+ * {@link StateComponentSettings} for gc-logfile.
+ *
+ * @author Nikita Kirillov
+ * @since 10.01.2025
+ */
+public class GcLogFileStateComponentSettings implements StateComponentSettings {
 
-    StateComponent(String fileExtension) {
-        this.fileExtension = fileExtension;
-    }
-
-    public String getFilename() {
-        return name().toLowerCase() + "." + fileExtension;
+    @Override
+    public StateComponent component() {
+        return StateComponent.GC_LOG_FILE;
     }
 }
