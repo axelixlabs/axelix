@@ -9,7 +9,7 @@ The name of the Axelix Master backend deployment.
 Common labels for Axelix Master baceknd
 */}}
 {{- define "master.backend.labels" -}}
-helm.sh/hook-time: {{ now | quote }}
+helm.sh/hook-time: {{ now | date "2006-01-02T15:04:05" | quote }}
 helm.sh/chart: {{ include "master.chart" . }}
 app.kubernetes.io/version: {{ $.Chart.AppVersion | quote }}
 {{ include "master.backend.selectorLabels" $ }}

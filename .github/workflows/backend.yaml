@@ -95,7 +95,12 @@ jobs:
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
         id: gradleProperties
         env:
-          JAVA_HOME: ""  # Clear the leaked variable
+          # We have to clear the JAVA_HOME here, since because the read-java-properties
+          # is a docker-based action, it assumes to have its own JAVA_HOME, different from
+          # the one that we set up above. Be invoking read-java-properties the JAVA_HOME from
+          # the runner leaks into container, and overrides the correct JAVA_HOME for the container.
+          # So we must clean it up explicitly
+          JAVA_HOME: ""
         with:
           file: gradle.properties
           property: axelixVersion
