@@ -90,13 +90,19 @@ jobs:
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
         uses: docker/setup-docker-action@v4
 
+      - name: Read Gradle Properties
+        uses: guillermocalvo/gradle-properties@v3
+        id: gradleProperties
+        with:
+          # Use this to only export specific properties
+          export: axelixVersion
+
       - name: Build Docker Image
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
         # TODO:
-        #  1. extract version from gradle.properties file later on. For now hardcoded is fine
-        #  2. And also we need to take the repository part inside the image name from the terraform output
+        #  We need to take the repository part inside the image name from the terraform output
         run: |
-          docker build --tag $CR_URL/$CR_MASTER_REPOSITORY/master:1.0.0-SNAPSHOT --file master/docker/Dockerfile .
+          docker build --tag $CR_URL/$CR_MASTER_REPOSITORY/master:${{ steps.gradleProperties.outputs.axelixVersion }} --file master/docker/Dockerfile .
 
       - name: Docker login to Yandex Cloud CR
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
@@ -105,7 +111,7 @@ jobs:
 
       - name: Docker push to Yandex Cloud CR
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
-        run: docker push $CR_URL/$CR_MASTER_REPOSITORY/master:1.0.0-SNAPSHOT
+        run: docker push $CR_URL/$CR_MASTER_REPOSITORY/master:${{ steps.gradleProperties.outputs.axelixVersion }}
 
       - name: Docker logout
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
