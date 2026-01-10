@@ -21,7 +21,7 @@ plugins {
 
 allprojects {
     group = "com.nucleonforge.axelix"
-    version = "1.0.0-SNAPSHOT"
+    version = project.findProperty("axelix-version")!!
 
     repositories {
         mavenCentral()
