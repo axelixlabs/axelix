@@ -52,7 +52,7 @@ jobs:
     env:
       DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
       CR_URL: ${{ vars.CR_URL }}
-      IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_FRONTEND_REPOSITORY }}
+      IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
       IMAGE_NAME: master-fe
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
     name: Build nginx Docker container
