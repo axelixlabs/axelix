@@ -91,9 +91,11 @@ jobs:
         uses: docker/setup-docker-action@v4
 
       - name: Read Gradle Properties file
-        uses: madhead/read-java-properties@latest
+        uses: madhead/read-java-properties@4
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
         id: gradleProperties
+        env:
+          JAVA_HOME: ""  # Clear the leaked variable
         with:
           file: gradle.properties
           property: axelixVersion
