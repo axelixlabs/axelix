@@ -41,7 +41,7 @@ spec:
         {{- toYaml .podSecurityContext | nindent 8 }}
       containers:
         - name: {{ include "master.backend.name" $ }}
-          image: "{{ .image.repository }}:{{ .image.tag }}"
+          image: "{{ .image.name }}:{{ .image.tag }}"
           imagePullPolicy: {{ .image.pullPolicy }}
           ports:
             - name: http
@@ -133,7 +133,7 @@ spec:
         {{- toYaml .podSecurityContext | nindent 8 }}
       containers:
         - name: {{ include "master.frontend.name" $ }}
-          image: "{{ .image.repository }}:{{ .image.tag }}"
+          image: "{{ .image.name }}:{{ .image.tag }}"
           imagePullPolicy: {{ .image.pullPolicy }}
           ports:
             - name: http

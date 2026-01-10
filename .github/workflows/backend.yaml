@@ -39,7 +39,8 @@ jobs:
     env:
       DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
       CR_URL: ${{ vars.CR_URL }}
-      CR_MASTER_REPOSITORY: ${{ vars.CR_MASTER_REPOSITORY }}
+      IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
+      IMAGE_NAME: master
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
 
       # These are needed in order to publish the final build artifacts into Nexus package registry
@@ -110,7 +111,7 @@ jobs:
         # TODO:
         #  We need to take the repository part inside the image name from the terraform output
         run: |
-          docker build --tag $CR_URL/$CR_MASTER_REPOSITORY/master:${{ steps.gradleProperties.outputs.value }} --file master/docker/Dockerfile .
+          docker build --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file master/docker/Dockerfile .
 
       - name: Docker login to Yandex Cloud CR
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
@@ -119,7 +120,7 @@ jobs:
 
       - name: Docker push to Yandex Cloud CR
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
-        run: docker push $CR_URL/$CR_MASTER_REPOSITORY/master:${{ steps.gradleProperties.outputs.value }}
+        run: docker push $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }}
 
       - name: Docker logout
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
@@ -143,7 +144,13 @@ jobs:
           touch ~/.kube/config
           echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
           chmod 600 ~/.kube/config
-          helm upgrade --install master . -f values.yaml
+          helm upgrade \
+            --set frontend.image.name=$IMAGE_REPOSITORY/master-fe \
+            --set frontend.image.tag=${{ steps.gradleProperties.outputs.value }} \
+            --set backend.image.name=$IMAGE_REPOSITORY/$IMAGE_NAME \
+            --set backend.image.tag=${{ steps.gradleProperties.outputs.value }} \
+            --install master . \
+            -f values.yaml
 
   dispatch:
     needs: [build-deploy-source]
