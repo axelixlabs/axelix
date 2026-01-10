@@ -3,9 +3,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "master.backend.name" . }}
+  name: {{ include "master.backend.name" $ }}
   labels:
-    {{- include "master.backend.labels" . | nindent 4 }}
+    {{- include "master.backend.labels" $ | nindent 4 }}
     {{- with .custom.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -19,7 +19,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "master.backend.selectorLabels" . | nindent 6 }}
+      {{- include "master.backend.selectorLabels" $ | nindent 6 }}
   template:
     metadata:
       {{- with .podAnnotations }}
@@ -27,7 +27,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "master.backend.labels" . | nindent 8 }}
+        {{- include "master.backend.labels" $ | nindent 8 }}
         {{- with .podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -36,11 +36,11 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "master.backend.serviceAccountName" . }}
+      serviceAccountName: {{ include "master.backend.serviceAccountName" $ }}
       securityContext:
         {{- toYaml .podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ include "master.backend.name" . }}
+        - name: {{ include "master.backend.name" $ }}
           image: "{{ .image.repository }}:{{ .image.tag }}"
           imagePullPolicy: {{ .image.pullPolicy }}
           ports:
@@ -95,9 +95,9 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "master.frontend.name" . }}
+  name: {{ include "master.frontend.name" $ }}
   labels:
-    {{- include "master.frontend.labels" . | nindent 4 }}
+    {{- include "master.frontend.labels" $ | nindent 4 }}
     {{- with .custom.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -111,7 +111,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      {{- include "master.frontend.selectorLabels" . | nindent 6 }}
+      {{- include "master.frontend.selectorLabels" $ | nindent 6 }}
   template:
     metadata:
       {{- with .podAnnotations }}
@@ -119,7 +119,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "master.frontend.labels" . | nindent 8 }}
+        {{- include "master.frontend.labels" $ | nindent 8 }}
         {{- with .podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -128,11 +128,11 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "master.frontend.serviceAccountName" . }}
+      serviceAccountName: {{ include "master.frontend.serviceAccountName" $ }}
       securityContext:
         {{- toYaml .podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ include "master.frontend.name" . }}
+        - name: {{ include "master.frontend.name" $ }}
           image: "{{ .image.repository }}:{{ .image.tag }}"
           imagePullPolicy: {{ .image.pullPolicy }}
           ports:

@@ -12,7 +12,7 @@ Common labels for Axelix Master frontend
 helm.sh/hook-time: {{ now | quote }}
 helm.sh/chart: {{ include "master.chart" . }}
 app.kubernetes.io/version: {{ $.Chart.AppVersion | quote }}
-{{ include "master.frontend.selectorLabels" . }}
+{{ include "master.frontend.selectorLabels" $ }}
 {{- end }}
 
 {{/*
@@ -20,7 +20,7 @@ Frontend pods selector labels
 */}}
 {{- define "master.frontend.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "master.frontend.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ $.Release.Name }}
 {{- end }}
 
 {{/*
@@ -28,7 +28,7 @@ Create the name of the service account to use for frontend pods.
 */}}
 {{- define "master.frontend.serviceAccountName" -}}
 {{- if $.Values.frontend.serviceAccount.create }}
-{{- default (include "master.frontend.name" .) $.Values.frontend.serviceAccount.name }}
+{{- default (include "master.frontend.name" $) $.Values.frontend.serviceAccount.name }}
 {{- else }}
 {{- default "default" $.Values.frontend.serviceAccount.name }}
 {{- end }}
