@@ -65,7 +65,7 @@ jobs:
         uses: docker/setup-docker-action@v4
 
       - name: Read Gradle Properties file
-        uses: madhead/read-java-properties@latest
+        uses: madhead/read-java-properties@4
         id: gradleProperties
         with:
           file: gradle.properties
