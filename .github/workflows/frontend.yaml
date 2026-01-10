@@ -83,7 +83,7 @@ jobs:
         run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
       - name: Docker push to Yandex Cloud CR
-        run: docker push $CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:${{ steps.gradleProperties.outputs.axelixVersion }}
+        run: docker push $CR_URL/$CR_FRONTEND_REPOSITORY/master-fe:${{ steps.gradleProperties.outputs.value }}
 
       - name: Docker logout
         run: docker logout

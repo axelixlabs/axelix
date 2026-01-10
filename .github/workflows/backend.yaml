@@ -112,7 +112,7 @@ jobs:
 
       - name: Docker push to Yandex Cloud CR
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
-        run: docker push $CR_URL/$CR_MASTER_REPOSITORY/master:${{ steps.gradleProperties.outputs.axelixVersion }}
+        run: docker push $CR_URL/$CR_MASTER_REPOSITORY/master:${{ steps.gradleProperties.outputs.value }}
 
       - name: Docker logout
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
