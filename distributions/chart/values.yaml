@@ -98,10 +98,12 @@ backend:
   replicaCount: 1
 
   image:
+
     # Reference to the axelix master backend image (without repository) to be used
     tag: ""
-    # Repository that holds the provided image
-    repository: ""
+
+    # Name of the image including repository prefix
+    name: ""
 
     # Image pull policy
     pullPolicy: "IfNotPresent"
@@ -199,10 +201,12 @@ frontend:
   replicaCount: 1
 
   image:
+
     # Reference to the axelix master frontend image (without repository) to be used
     tag: ""
-    # Repository that holds the provided image
-    repository: ""
+
+    # Name of the image including repository prefix
+    name: ""
 
     # Image pull policy
     pullPolicy: "IfNotPresent"
