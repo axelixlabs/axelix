@@ -119,12 +119,11 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint LOG_FILE = of("/logfile", HttpMethod.GET);
 
     // Gc Log File
-    public static final ActuatorEndpoint AVAILABLE_CONFIGURATION_GC_LOGGING =
-            of("/gclog/available-configuration", HttpMethod.GET);
-    public static final ActuatorEndpoint STATUS_GC_LOGGING = of("/gclog/status", HttpMethod.GET);
-    public static final ActuatorEndpoint GC_LOG_FILE = of("/gclog/gc-logfile", HttpMethod.GET);
-    public static final ActuatorEndpoint ENABLE_GC_LOGGING = of("/gclog/enable", HttpMethod.POST);
-    public static final ActuatorEndpoint DISABLE_GC_LOGGING = of("/gclog/disable", HttpMethod.POST);
+    public static final ActuatorEndpoint STATUS_GC_LOGGING = of("/axelix-gclog/status", HttpMethod.GET);
+    public static final ActuatorEndpoint GC_LOG_FILE = of("/axelix-gclog/gc-logfile", HttpMethod.GET);
+    public static final ActuatorEndpoint GC_TRIGGER = of("/axelix-gclog/trigger", HttpMethod.POST);
+    public static final ActuatorEndpoint ENABLE_GC_LOGGING = of("/axelix-gclog/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint DISABLE_GC_LOGGING = of("/axelix-gclog/disable", HttpMethod.POST);
 
     // Loggers
     public static final ActuatorEndpoint ALL_LOGGERS = of("/loggers", HttpMethod.GET);

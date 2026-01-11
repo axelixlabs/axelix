@@ -17,7 +17,6 @@ package com.nucleonforge.axelix.sbs.spring.gclog;
 
 import java.io.File;
 
-import com.nucleonforge.axelix.common.api.gclog.GcLogAvailableConfigurationResponse;
 import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
 
 /**
@@ -29,21 +28,22 @@ import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
 public interface GcLogService {
 
     /**
-     * Returns available GC logging configuration supported by the JVM.
-     *
-     * @return available GC log levels
-     */
-    GcLogAvailableConfigurationResponse getAvailableConfiguration();
-
-    /**
      * Returns the current GC logging status.
+     *
+     * @return current GC logging status
+     * @throws GcLogException if the GC logging status cannot be reliably determined
      */
-    GcLogStatusResponse getStatus();
+    GcLogStatusResponse getStatus() throws GcLogException;
 
     /**
-     * Returns the GC log file.
+     * Returns a {@link File} pointing to the JVM GC log.
+     *
+     * <p>The file may not exist yet. Throws {@link GcLogException} if the file path cannot be resolved.
+     *
+     * @return GC log file reference
+     * @throws GcLogException if the GC log file path cannot be determined
      */
-    File getGcLogFile();
+    File getGcLogFile() throws GcLogException;
 
     /**
      * Enables GC logging with the given log level.

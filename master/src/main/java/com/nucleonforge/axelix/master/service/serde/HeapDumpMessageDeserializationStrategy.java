@@ -18,13 +18,13 @@ package com.nucleonforge.axelix.master.service.serde;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link BinaryResourceMessageDeserializationStrategy} for heapdump.
+ * {@link ResourceMessageDeserializationStrategy} for heapdump.
  *
  * @since 12.11.2025
  * @author Nikita Kirillov
  */
 @Component
-public class HeapDumpMessageDeserializationStrategy extends BinaryResourceMessageDeserializationStrategy {
+public class HeapDumpMessageDeserializationStrategy extends ResourceMessageDeserializationStrategy {
 
     /**
      * This filename extension is valid only for HotSpot heapdump format.

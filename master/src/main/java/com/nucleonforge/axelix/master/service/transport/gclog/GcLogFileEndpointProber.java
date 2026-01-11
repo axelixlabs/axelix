@@ -27,7 +27,7 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.AbstractEndpointProber;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#GC_LOG_FILE /gclog/gc-logfile} endpoint.
+ * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#GC_LOG_FILE /axelix-gclog/gc-logfile} endpoint.
  *
  * @since 10.01.2026
  * @author Nikita Kirillov

@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.transport.gclog;
+package com.nucleonforge.axelix.master.api.request.state;
 
-import org.springframework.stereotype.Service;
-
-import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
-import com.nucleonforge.axelix.master.service.transport.AbstractEndpointProber;
+import com.fasterxml.jackson.annotation.JsonGetter;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#AVAILABLE_CONFIGURATION_GC_LOGGING /gclog/available-configuration} endpoint.
+ * {@link StateComponentSettings} for gc-logfile.
  *
- * @since 10.01.2026
+ * @since 11.01.2025
  * @author Nikita Kirillov
  */
-@Service
-public class GcLogAvailableConfigurationEndpointProber {}
+public class GcLogFileStateComponentSettings implements StateComponentSettings {
+
+    @JsonGetter(COMPONENT)
+    @Override
+    public StateExportComponent getComponent() {
+        return StateExportComponent.GC_LOG_FILE;
+    }
+}

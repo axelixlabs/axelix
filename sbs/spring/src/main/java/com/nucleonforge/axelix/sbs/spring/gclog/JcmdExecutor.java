@@ -41,6 +41,7 @@ public class JcmdExecutor {
                 output = reader.lines().collect(Collectors.joining("\n"));
             }
 
+            // TODO: Perhaps it's worth adding a timeout. Consider using process.waitFor(long, TimeUnit).
             int exitCode = process.waitFor();
 
             return new ProcessResult(exitCode, output);

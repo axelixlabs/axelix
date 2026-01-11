@@ -15,19 +15,29 @@
  */
 package com.nucleonforge.axelix.master.service.serde;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.NonNull;
+
 import org.springframework.stereotype.Component;
 
+import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
+
 /**
- * {@link ResourceMessageDeserializationStrategy} for logfile.
+ * {@link JacksonMessageDeserializationStrategy} for {@link GcLogStatusResponse}.
  *
- * @since 12.11.2025
+ * @since 11.01.2026
  * @author Nikita Kirillov
  */
 @Component
-public class LogFileMessageDeserializationStrategy extends ResourceMessageDeserializationStrategy {
+public class GcLogStatusMessageDeserializationStrategy
+        extends JacksonMessageDeserializationStrategy<GcLogStatusResponse> {
+
+    public GcLogStatusMessageDeserializationStrategy(ObjectMapper objectMapper) {
+        super(objectMapper);
+    }
 
     @Override
-    protected String filename() {
-        return "application.log";
+    public @NonNull Class<GcLogStatusResponse> supported() {
+        return GcLogStatusResponse.class;
     }
 }

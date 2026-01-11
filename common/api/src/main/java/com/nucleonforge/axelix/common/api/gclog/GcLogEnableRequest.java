@@ -16,7 +16,7 @@
 package com.nucleonforge.axelix.common.api.gclog;
 
 /**
- * Request object used to enable GC logging.
+ * Request DTO used to enable GC logging.
  *
  * @param level GC log level to apply (e.g. info, debug, trace)
  *

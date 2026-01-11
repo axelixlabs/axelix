@@ -22,11 +22,10 @@ import org.springframework.stereotype.Service;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
-import com.nucleonforge.axelix.master.service.transport.AbstractEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#ENABLE_GC_LOGGING /gclog/enable} endpoint.
+ * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#ENABLE_GC_LOGGING /axelix-gclog/enable} endpoint.
  *
  * @since 10.01.2026
  * @author Nikita Kirillov

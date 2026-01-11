@@ -27,17 +27,17 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.nucleonforge.axelix.common.api.gclog.GcLogEnableRequest;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
@@ -47,25 +47,42 @@ import com.nucleonforge.axelix.master.service.transport.EndpointInvocationExcept
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link LogFileApi}.
+ * Integration tests for {@link GcLogFileApi}.
  *
- * @since 12.11.2025
+ * @since 11.01.2026
  * @author Nikita Kirillov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class LogFileApiTest {
+class GcLogFileApiTest {
 
-    private static final String logContent =
+    private static final String GC_LOG_STATUS_RESPONSE =
+            // language=json
             """
-            2025-11-12T14:05:13.795+05:00  INFO 1868 --- [main] o.s.s.petclinic.PetClinicApplication: Starting PetClinicApplication using Java 17.0.16 with PID 1868 (C:\\Project\\spring-petclinic\\target\\classes started in C:\\Project\\spring-petclinic)
-            2025-11-12T14:05:13.795+05:00  INFO 1868 --- [main] o.s.s.petclinic.PetClinicApplication     : No active profile set, falling back to 1 default profile: "default"
-            2025-11-12T14:05:14.382+05:00  INFO 1868 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-            2025-11-12T14:05:14.429+05:00  INFO 1868 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 30 ms. Found 3 JPA repository interfaces.
-            2025-11-12T14:05:14.531+05:00  INFO 1868 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=4c03ca02-57eb-3d79-a155-785dae504167
-            """;
+        {
+            "enabled": true,
+            "level": "info",
+            "availableLevels": [
+                "trace",
+                "debug",
+                "info",
+                "warning",
+                "error"
+            ]
+        }
+        """;
+
+    private static final String GC_LOG_FILE_CONTENT =
+            """
+            [2026-01-11T23:20:50.868+0500][info][gc] GC(348) Concurrent Mark Cycle
+            [2026-01-11T23:20:50.878+0500][info][gc] GC(350) Pause Young (Normal) (G1 Evacuation Pause) 32M->31M(42M) 0.532ms
+            [2026-01-11T23:20:50.883+0500][info][gc] GC(348) Pause Remark 33M->33M(42M) 2.256ms
+            [2026-01-11T23:20:50.884+0500][info][gc] GC(351) Pause Young (Normal) (G1 Evacuation Pause) 33M->31M(42M) 0.380ms
+            [2026-01-11T23:20:50.888+0500][info][gc] GC(352) Pause Young (Normal) (G1 Evacuation Pause) 33M->31M(42M) 0.342ms
+        """;
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
@@ -96,21 +113,20 @@ class LogFileApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/logfile")) {
-                    String rangeHeader = request.getHeader("Range");
-
-                    if (rangeHeader != null && rangeHeader.startsWith("bytes=0-151")) {
-                        String partialContent = logContent.substring(0, 152);
-                        return new MockResponse()
-                                .setBody(partialContent)
-                                .addHeader("Content-Type", "text/plain;charset=UTF-8")
-                                .setResponseCode(206)
-                                .addHeader("Content-Range", "bytes 0-151/" + logContent.length());
-                    } else {
-                        return new MockResponse()
-                                .setBody(logContent)
-                                .addHeader("Content-Type", "text/plain;charset=UTF-8");
-                    }
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/status")) {
+                    return new MockResponse()
+                            .setBody(GC_LOG_STATUS_RESPONSE)
+                            .addHeader("Content-Type", "application/json");
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/gc-logfile")) {
+                    return new MockResponse()
+                            .setBody(GC_LOG_FILE_CONTENT)
+                            .addHeader("Content-Type", "text/plain;charset=UTF-8");
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/trigger")) {
+                    return new MockResponse();
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/enable")) {
+                    return new MockResponse();
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/disable")) {
+                    return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
@@ -127,42 +143,67 @@ class LogFileApiTest {
     }
 
     @Test
-    void shouldReturnLogFileAsPlainText() {
+    void shouldReturnGcLogFileAsPlainText() {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/logfile/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/api/axelix/gc-logfile/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
-        assertThat(response.getBody()).contains(logContent);
+        assertThat(response.getBody()).contains(GC_LOG_FILE_CONTENT);
     }
 
     @Test
-    void shouldReturnLogFileSupportRangeHeader() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Range", "bytes=0-151");
-
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+    void shouldReturnStatusGcLogging() {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .exchange("/api/axelix/logfile/{instanceId}", HttpMethod.GET, entity, String.class, activeInstanceId);
+                .getForEntity("/api/axelix/gc-logfile/{instanceId}/status", String.class, activeInstanceId);
 
-        String expectedPartialContent = logContent.substring(0, 152);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
-        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
-        assertThat(response.getBody()).contains(expectedPartialContent);
-        assertThat(response.getBody()).doesNotContain(logContent);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).isEqualTo(GC_LOG_STATUS_RESPONSE);
     }
 
     @Test
-    void shouldReturnInternalServerErrorForInvalidInstance() {
+    void shouldTriggerGc() {
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/gc-logfile/{instanceId}/trigger", HttpEntity.EMPTY, Void.class, activeInstanceId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void shouldEnableGcLogging() {
+        GcLogEnableRequest requestBody = new GcLogEnableRequest("info");
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity("/api/axelix/gc-logfile/{instanceId}/enable", requestBody, Void.class, activeInstanceId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void shouldDisableGcLogging() {
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/gc-logfile/{instanceId}/disable", HttpEntity.EMPTY, Void.class, activeInstanceId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    @DisplayName("Should return 500 on EndpointInvocationError")
+    void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
+
         registry.register(createInstance(instanceId));
 
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/logfile/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/axelix/gc-logfile/{instanceId}", EndpointInvocationException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -173,7 +214,7 @@ class LogFileApiTest {
 
         ResponseEntity<InstanceNotFoundException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/logfile/{instanceId}", InstanceNotFoundException.class, instanceId);
+                .getForEntity("/api/axelix/gc-logfile/{instanceId}", InstanceNotFoundException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

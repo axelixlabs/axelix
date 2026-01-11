@@ -42,7 +42,7 @@ public class HeapDumpContributorBinaryInstance
     }
 
     @Override
-    protected Resource collectBinaryResource(String instanceId, HeapDumpStateComponentSettings settings)
+    protected Resource collectResource(String instanceId, HeapDumpStateComponentSettings settings)
             throws StateExportException {
         ResponseEntity<Resource> heapDump = heapDumpApi.getHeapDump(instanceId, settings.sanitized());
         if (heapDump.getBody() == null) {

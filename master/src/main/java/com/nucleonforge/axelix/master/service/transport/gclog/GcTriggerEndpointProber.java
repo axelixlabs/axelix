@@ -25,20 +25,20 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
 
 /**
- * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#DISABLE_GC_LOGGING /axelix-gclog/disable} endpoint.
+ * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#GC_TRIGGER /axelix-gclog/trigger} endpoint.
  *
- * @since 10.01.2026
+ * @since 11.01.2026
  * @author Nikita Kirillov
  */
 @Service
-public class DisableGcLoggingEndpointProber extends DiscardingAbstractEndpointProber {
+public class GcTriggerEndpointProber extends DiscardingAbstractEndpointProber {
 
-    public DisableGcLoggingEndpointProber(InstanceRegistry instanceRegistry) {
+    public GcTriggerEndpointProber(InstanceRegistry instanceRegistry) {
         super(instanceRegistry);
     }
 
     @Override
     public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.DISABLE_GC_LOGGING;
+        return ActuatorEndpoints.GC_TRIGGER;
     }
 }

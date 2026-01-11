@@ -15,8 +15,6 @@
  */
 package com.nucleonforge.axelix.sbs.spring.gclog;
 
-import java.io.File;
-
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.nucleonforge.axelix.common.api.gclog.GcLogAvailableConfigurationResponse;
 import com.nucleonforge.axelix.common.api.gclog.GcLogEnableRequest;
 import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
 
@@ -35,18 +32,13 @@ import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
  * @since 28.12.2025
  * @author Nikita Kirillov
  */
-@RestControllerEndpoint(id = "gclog")
+@RestControllerEndpoint(id = "axelix-gclog")
 public class GcLogEndpoint {
 
-    private final DefaultGcLogService gcLogService;
+    private final GcLogService gcLogService;
 
-    public GcLogEndpoint(DefaultGcLogService gcLogService) {
+    public GcLogEndpoint(GcLogService gcLogService) {
         this.gcLogService = gcLogService;
-    }
-
-    @GetMapping("/available-configuration")
-    public GcLogAvailableConfigurationResponse getAvailableConfiguration() {
-        return gcLogService.getAvailableConfiguration();
     }
 
     @GetMapping("/status")
@@ -55,28 +47,22 @@ public class GcLogEndpoint {
     }
 
     @GetMapping(value = "/gc-logfile", produces = MediaType.TEXT_PLAIN_VALUE)
-    public Resource gcLogfile() throws GcLogException {
-        File file = gcLogService.getGcLogFile();
+    public Resource gcLogfile() {
+        return new FileSystemResource(gcLogService.getGcLogFile());
+    }
 
-        if (!file.exists() || !file.isFile()) {
-            throw new GcLogException("GC log file not found");
-        }
-
-        return new FileSystemResource(file);
+    @PostMapping("/trigger")
+    public void triggerGc() {
+        System.gc();
     }
 
     @PostMapping("/enable")
-    public void changeLevel(@RequestBody GcLogEnableRequest request) {
+    public void enable(@RequestBody GcLogEnableRequest request) {
         gcLogService.enable(request.level());
     }
 
     @PostMapping("/disable")
     public void disable() {
         gcLogService.disable();
-    }
-
-    @GetMapping("/system")
-    public void execute() {
-        System.gc();
     }
 }

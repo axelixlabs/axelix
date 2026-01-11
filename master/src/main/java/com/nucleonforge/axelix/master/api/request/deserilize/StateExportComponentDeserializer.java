@@ -32,6 +32,7 @@ import com.nucleonforge.axelix.master.api.request.state.CachesStateComponentSett
 import com.nucleonforge.axelix.master.api.request.state.ConditionsStateComponentSettings;
 import com.nucleonforge.axelix.master.api.request.state.ConfigPropsStateComponentSettings;
 import com.nucleonforge.axelix.master.api.request.state.EnvStateComponentSettings;
+import com.nucleonforge.axelix.master.api.request.state.GcLogFileStateComponentSettings;
 import com.nucleonforge.axelix.master.api.request.state.HeapDumpStateComponentSettings;
 import com.nucleonforge.axelix.master.api.request.state.LogFileStateComponentSettings;
 import com.nucleonforge.axelix.master.api.request.state.ScheduledTasksStateComponentSettings;
@@ -90,6 +91,7 @@ public class StateExportComponentDeserializer extends JsonDeserializer<List<Stat
                 case CONFIG_PROPS -> results.add(new ConfigPropsStateComponentSettings());
                 case ENV -> results.add(new EnvStateComponentSettings());
                 case LOG_FILE -> results.add(new LogFileStateComponentSettings());
+                case GC_LOG_FILE -> results.add(new GcLogFileStateComponentSettings());
                 case SCHEDULED_TASKS -> results.add(new ScheduledTasksStateComponentSettings());
             }
         }

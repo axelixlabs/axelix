@@ -46,7 +46,7 @@ public class LogFileContributorBinaryInstance
     }
 
     @Override
-    protected Resource collectBinaryResource(String instanceId, LogFileStateComponentSettings settings)
+    protected Resource collectResource(String instanceId, LogFileStateComponentSettings settings)
             throws StateExportException {
         return logFileApi.getLogFile(instanceId, null);
     }

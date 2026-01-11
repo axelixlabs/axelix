@@ -19,11 +19,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.common.api.gclog.GcLogEnableRequest;
+import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
@@ -31,9 +33,11 @@ import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationS
 import com.nucleonforge.axelix.master.service.transport.gclog.DisableGcLoggingEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.gclog.EnableGcLoggingEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.gclog.GcLogFileEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.gclog.GcLogStatusEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.gclog.GcTriggerEndpointProber;
 
 /**
- * The API for GC logfile.
+ * The API for gc-logfile.
  *
  * @since 10.01.2026
  * @author Nikita Kirillov
@@ -43,36 +47,53 @@ import com.nucleonforge.axelix.master.service.transport.gclog.GcLogFileEndpointP
 public class GcLogFileApi {
 
     private final GcLogFileEndpointProber gcLogFileEndpointProber;
+    private final GcTriggerEndpointProber gcTriggerEndpointProber;
+    private final GcLogStatusEndpointProber gcLogStatusEndpointProber;
     private final EnableGcLoggingEndpointProber enableGcLoggingEndpointProber;
     private final DisableGcLoggingEndpointProber disableGcLoggingEndpointProber;
     private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     public GcLogFileApi(
             GcLogFileEndpointProber gcLogFileEndpointProber,
+            GcTriggerEndpointProber gcTriggerEndpointProber,
+            GcLogStatusEndpointProber gcLogStatusEndpointProber,
             EnableGcLoggingEndpointProber enableGcLoggingEndpointProber,
             DisableGcLoggingEndpointProber disableGcLoggingEndpointProber,
             JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
         this.gcLogFileEndpointProber = gcLogFileEndpointProber;
+        this.gcTriggerEndpointProber = gcTriggerEndpointProber;
+        this.gcLogStatusEndpointProber = gcLogStatusEndpointProber;
         this.enableGcLoggingEndpointProber = enableGcLoggingEndpointProber;
         this.disableGcLoggingEndpointProber = disableGcLoggingEndpointProber;
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
 
-    @GetMapping(path = ApiPaths.GcLogFileApi.INSTANCE_ID, produces = MediaType.TEXT_PLAIN_VALUE)
+    @GetMapping(
+            path = ApiPaths.GcLogFileApi.INSTANCE_ID,
+            produces = {MediaType.TEXT_PLAIN_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public Resource getGcLogFile(@PathVariable("instanceId") String instanceId) {
         return gcLogFileEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
     }
 
-    @GetMapping(path = ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING)
-    public void enableGcLogging(
-            @PathVariable("instanceId") String instanceId, @RequestBody GcLogEnableRequest request) {
-
-        HttpPayload httpPayload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
-        enableGcLoggingEndpointProber.invoke(InstanceId.of(instanceId), httpPayload);
+    @GetMapping(path = ApiPaths.GcLogFileApi.STATUS_GC_LOGGING)
+    public GcLogStatusResponse getStatus(@PathVariable("instanceId") String instanceId) {
+        return gcLogStatusEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
     }
 
-    @GetMapping(path = ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING)
+    @PostMapping(path = ApiPaths.GcLogFileApi.TRIGGER_GC)
+    public void triggerGc(@PathVariable("instanceId") String instanceId) {
+        gcTriggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+    }
+
+    @PostMapping(path = ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING)
+    public void enableGcLogging(
+            @PathVariable("instanceId") String instanceId, @RequestBody GcLogEnableRequest request) {
+        HttpPayload httpPayload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
+        enableGcLoggingEndpointProber.invokeNoValue(InstanceId.of(instanceId), httpPayload);
+    }
+
+    @PostMapping(path = ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING)
     public void disableGcLogging(@PathVariable("instanceId") String instanceId) {
-        disableGcLoggingEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        disableGcLoggingEndpointProber.invokeNoValue(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
     }
 }

@@ -19,7 +19,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axelix.master.api.GcLogFileApi;
-import com.nucleonforge.axelix.master.api.LogFileApi;
 import com.nucleonforge.axelix.master.exception.StateExportException;
 import com.nucleonforge.axelix.master.service.export.StateComponent;
 import com.nucleonforge.axelix.master.service.export.settings.GcLogFileStateComponentSettings;
@@ -27,7 +26,7 @@ import com.nucleonforge.axelix.master.service.export.settings.GcLogFileStateComp
 /**
  * Collect gc-logfile for application state export.
  *
- * @see LogFileApi
+ * @see GcLogFileApi
  * @since 10.01.2026
  * @author Nikita Kirillov
  */
@@ -47,7 +46,7 @@ public class GcLogFileContributorBinaryInstance
     }
 
     @Override
-    protected Resource collectBinaryResource(String instanceId, GcLogFileStateComponentSettings settings)
+    protected Resource collectResource(String instanceId, GcLogFileStateComponentSettings settings)
             throws StateExportException {
         return gcLogFileApi.getGcLogFile(instanceId);
     }

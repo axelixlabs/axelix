@@ -15,16 +15,34 @@
  */
 package com.nucleonforge.axelix.master.service.transport.gclog;
 
+import org.jspecify.annotations.NonNull;
+
 import org.springframework.stereotype.Service;
 
+import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
+import com.nucleonforge.axelix.master.service.serde.MessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.AbstractEndpointProber;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#STATUS_GC_LOGGING /gclog/status} endpoint.
+ * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#STATUS_GC_LOGGING /axelix-gclog/status} endpoint.
  *
  * @since 10.01.2026
  * @author Nikita Kirillov
  */
 @Service
-public class GcLogStatusEndpointProber {}
+public class GcLogStatusEndpointProber extends AbstractEndpointProber<GcLogStatusResponse> {
+
+    public GcLogStatusEndpointProber(
+            InstanceRegistry instanceRegistry,
+            MessageDeserializationStrategy<GcLogStatusResponse> messageDeserializationStrategy) {
+        super(instanceRegistry, messageDeserializationStrategy);
+    }
+
+    @Override
+    public @NonNull ActuatorEndpoint supports() {
+        return ActuatorEndpoints.STATUS_GC_LOGGING;
+    }
+}

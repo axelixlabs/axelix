@@ -193,7 +193,7 @@ public final class ApiPaths {
     public static final class GcLogFileApi {
 
         /**
-         * Base path for gc-logfile API.
+         * Base path for GcLogFileApi.
          */
         public static final String MAIN = "/gc-logfile";
 
@@ -203,12 +203,22 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/{instanceId}";
 
         /**
-         * GcLogfile endpoint with instance ID.
+         * GC logging status endpoint with instance ID.
+         */
+        public static final String STATUS_GC_LOGGING = "/{instanceId}/status";
+
+        /**
+         * Manual GC trigger endpoint with instance ID.
+         */
+        public static final String TRIGGER_GC = "/{instanceId}/trigger";
+
+        /**
+         * Enable GC logging endpoint with instance ID.
          */
         public static final String ENABLE_GC_LOGGING = "/{instanceId}/enable";
 
         /**
-         * GcLogfile endpoint with instance ID.
+         * Disable GC logging endpoint with instance ID.
          */
         public static final String DISABLE_GC_LOGGING = "/{instanceId}/disable";
     }

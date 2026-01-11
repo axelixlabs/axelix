@@ -39,6 +39,7 @@ management:
           - configprops
           - env
           - axelix-thread-dump
+          - axelix-gclog
 
 logging:
   level:

@@ -18,13 +18,13 @@ package com.nucleonforge.axelix.master.service.serde;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link BinaryResourceMessageDeserializationStrategy} for gc-logfile.
+ * {@link ResourceMessageDeserializationStrategy} for gc-logfile.
  *
  * @since 10.01.2026
  * @author Nikita Kirillov
  */
 @Component
-public class GcLogFileMessageDeserializationStrategy extends BinaryResourceMessageDeserializationStrategy {
+public class GcLogFileMessageDeserializationStrategy extends ResourceMessageDeserializationStrategy {
 
     @Override
     protected String filename() {
