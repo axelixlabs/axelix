@@ -15,15 +15,23 @@
  */
 package com.nucleonforge.axelix.sbs.spring.configprops;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
+import com.nucleonforge.axelix.common.api.KeyValue;
+import com.nucleonforge.axelix.sbs.spring.env.DefaultPropertyNameNormalizer;
+import com.nucleonforge.axelix.sbs.spring.env.PropertyNameNormalizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,8 +40,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@EnableConfigurationProperties(ConfigPropsConfigurationProperties.class)
 public class ConfigurationPropertiesCacheTest {
 
     @Autowired
@@ -41,7 +51,22 @@ public class ConfigurationPropertiesCacheTest {
 
     @Test
     void shouldReturnConfigurationProperties() {
-        assertThat(configurationPropertiesCache.getConfigProps()).isNotNull().isInstanceOf(ConfigPropsFeed.class);
+        // when.
+        ConfigPropsFeed configProps = configurationPropertiesCache.getConfigProps();
+
+        // then.
+        Set<@Nullable String> values = configProps.contexts().values().stream()
+                .flatMap(it -> it.beans().values().stream())
+                .flatMap(bean -> bean.properties().stream())
+                .map(KeyValue::value)
+                .collect(Collectors.toSet());
+
+        // TODO: Well, the "null" sanitization policy is not something that we currently have control over.
+        // It is also not clear if we want to sanitize "null" values in general. I think
+        // that it makes sense to sanitize them as well, but currently it is not possible due
+        // to internal implementation of the Spring Boot Actuator native config props endpoint.
+        assertThat(values).containsOnly(null, "******");
+        assertThat(configProps).isNotNull().isInstanceOf(ConfigPropsFeed.class);
     }
 
     @TestConfiguration
@@ -49,15 +74,26 @@ public class ConfigurationPropertiesCacheTest {
 
         @Bean
         public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-            return new DefaultConfigurationPropertiesConverter();
+            return new FlatteningConfigurationPropertiesConverter();
+        }
+
+        @Bean
+        public PropertyNameNormalizer propertyNameNormalizer() {
+            return new DefaultPropertyNameNormalizer();
+        }
+
+        @Bean
+        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
+            return new SmartSanitizingFunction(ConfigPropsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
         }
 
         @Bean
         public ConfigurationPropertiesCache configurationPropertiesCache(
-                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
+                SmartSanitizingFunction smartSanitizingFunction,
+                ApplicationContext applicationContext,
                 ConfigurationPropertiesConverter configurationPropertiesConverter) {
             return new ConfigurationPropertiesCache(
-                    configurationPropertiesReportEndpoint, configurationPropertiesConverter);
+                    smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
         }
     }
 }

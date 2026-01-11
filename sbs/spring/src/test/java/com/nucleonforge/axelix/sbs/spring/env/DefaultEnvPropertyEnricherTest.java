@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.StandardEnvironment;
@@ -28,6 +29,7 @@ import org.springframework.core.env.StandardEnvironment;
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.Property;
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.PropertySource;
+import com.nucleonforge.axelix.sbs.spring.configprops.ConfigPropsConfigurationProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest(args = "--fooBar=fromArgs")
+@EnableConfigurationProperties(ConfigPropsConfigurationProperties.class)
 @Import(EnvironmentTestConfig.class)
 class DefaultEnvPropertyEnricherTest {
 

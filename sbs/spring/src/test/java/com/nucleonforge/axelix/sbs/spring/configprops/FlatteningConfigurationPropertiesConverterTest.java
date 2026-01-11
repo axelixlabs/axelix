@@ -36,7 +36,7 @@ import com.nucleonforge.axelix.common.api.KeyValue;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link DefaultConfigurationPropertiesConverter}.
+ * Integration tests for {@link FlatteningConfigurationPropertiesConverter}.
  *
  * @author Sergey Cherkasov
  */
@@ -55,8 +55,8 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
             "axelix.prop.test.http-client.requests[0].methods[1].type=POST"
         })
-@EnableConfigurationProperties(DefaultConfigurationPropertiesConverterTest.AxelixConfigurationProperties.class)
-public class DefaultConfigurationPropertiesConverterTest {
+@EnableConfigurationProperties(FlatteningConfigurationPropertiesConverterTest.AxelixConfigurationProperties.class)
+public class FlatteningConfigurationPropertiesConverterTest {
 
     @Autowired
     private ConfigurationPropertiesReportEndpoint endpoint;
@@ -145,7 +145,7 @@ public class DefaultConfigurationPropertiesConverterTest {
 
         @Bean
         public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-            return new DefaultConfigurationPropertiesConverter();
+            return new FlatteningConfigurationPropertiesConverter();
         }
     }
 }

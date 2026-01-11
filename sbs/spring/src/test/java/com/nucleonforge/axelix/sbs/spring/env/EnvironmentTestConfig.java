@@ -15,16 +15,19 @@
  */
 package com.nucleonforge.axelix.sbs.spring.env;
 
+import java.util.List;
+
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesConverter;
-import com.nucleonforge.axelix.sbs.spring.configprops.DefaultConfigurationPropertiesConverter;
+import com.nucleonforge.axelix.sbs.spring.configprops.FlatteningConfigurationPropertiesConverter;
+import com.nucleonforge.axelix.sbs.spring.configprops.SmartSanitizingFunction;
 
 /**
  * Environment test configuration.
@@ -37,15 +40,21 @@ public class EnvironmentTestConfig {
 
     @Bean
     public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-        return new DefaultConfigurationPropertiesConverter();
+        return new FlatteningConfigurationPropertiesConverter();
+    }
+
+    @Bean
+    public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
+        return new SmartSanitizingFunction(List.of(), propertyNameNormalizer);
     }
 
     @Bean
     public ConfigurationPropertiesCache configurationPropertiesCache(
-            ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
+            SmartSanitizingFunction smartSanitizingFunction,
+            ApplicationContext applicationContext,
             ConfigurationPropertiesConverter configurationPropertiesConverter) {
         return new ConfigurationPropertiesCache(
-                configurationPropertiesReportEndpoint, configurationPropertiesConverter);
+                smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
     }
 
     @Bean

@@ -15,17 +15,20 @@
  */
 package com.nucleonforge.axelix.sbs.autoconfiguration.spring;
 
-import org.springframework.boot.actuate.autoconfigure.context.properties.ConfigurationPropertiesReportEndpointAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axelix.sbs.spring.configprops.AxelixConfigurationPropertiesEndpoint;
+import com.nucleonforge.axelix.sbs.spring.configprops.ConfigPropsConfigurationProperties;
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesConverter;
-import com.nucleonforge.axelix.sbs.spring.configprops.DefaultConfigurationPropertiesConverter;
+import com.nucleonforge.axelix.sbs.spring.configprops.FlatteningConfigurationPropertiesConverter;
+import com.nucleonforge.axelix.sbs.spring.configprops.SmartSanitizingFunction;
+import com.nucleonforge.axelix.sbs.spring.env.DefaultPropertyNameNormalizer;
+import com.nucleonforge.axelix.sbs.spring.env.PropertyNameNormalizer;
 
 /**
  * Auto-configuration for the {@link AxelixConfigurationPropertiesEndpoint}.
@@ -33,23 +36,39 @@ import com.nucleonforge.axelix.sbs.spring.configprops.DefaultConfigurationProper
  * @since 13.11.2025
  * @author Sergey Cherkasov
  */
-@AutoConfiguration(after = ConfigurationPropertiesReportEndpointAutoConfiguration.class)
-@ConditionalOnAvailableEndpoint(endpoint = ConfigurationPropertiesReportEndpoint.class)
+@AutoConfiguration
+@EnableConfigurationProperties(ConfigPropsConfigurationProperties.class)
 public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
     public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-        return new DefaultConfigurationPropertiesConverter();
+        return new FlatteningConfigurationPropertiesConverter();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PropertyNameNormalizer propertyNameNormalizer() {
+        return new DefaultPropertyNameNormalizer();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SmartSanitizingFunction smartSanitizingFunction(
+            ConfigPropsConfigurationProperties configPropsConfigurationProperties,
+            PropertyNameNormalizer propertyNameNormalizer) {
+        return new SmartSanitizingFunction(
+                configPropsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public ConfigurationPropertiesCache configurationPropertiesCaches(
-            ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
+            SmartSanitizingFunction smartSanitizingFunction,
+            ApplicationContext applicationContext,
             ConfigurationPropertiesConverter configurationPropertiesConverter) {
         return new ConfigurationPropertiesCache(
-                configurationPropertiesReportEndpoint, configurationPropertiesConverter);
+                smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
     }
 
     @Bean

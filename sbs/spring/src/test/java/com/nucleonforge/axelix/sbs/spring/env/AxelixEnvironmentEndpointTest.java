@@ -43,6 +43,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.sbs.spring.configprops.ConfigPropsConfigurationProperties;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,7 +83,10 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
-@EnableConfigurationProperties(AxelixEnvironmentEndpointTest.AxelixPropTest.class)
+@EnableConfigurationProperties({
+    AxelixEnvironmentEndpointTest.AxelixPropTest.class,
+    ConfigPropsConfigurationProperties.class
+})
 @Import({EnvironmentTestConfig.class})
 class AxelixEnvironmentEndpointTest {
 

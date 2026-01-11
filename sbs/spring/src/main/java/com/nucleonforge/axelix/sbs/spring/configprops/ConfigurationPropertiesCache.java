@@ -15,9 +15,13 @@
  */
 package com.nucleonforge.axelix.sbs.spring.configprops;
 
+import java.util.List;
+
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
+import org.springframework.boot.actuate.endpoint.Show;
+import org.springframework.context.ApplicationContext;
 
 import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 
@@ -32,16 +36,18 @@ import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 public class ConfigurationPropertiesCache {
 
     private final ConfigurationPropertiesReportEndpoint delegate;
-
     private final ConfigurationPropertiesConverter configurationPropertiesConverter;
 
     @Nullable
     private volatile ConfigPropsFeed cachedResult;
 
     public ConfigurationPropertiesCache(
-            ConfigurationPropertiesReportEndpoint delegate,
+            SmartSanitizingFunction smartSanitizingFunction,
+            ApplicationContext applicationContext,
             ConfigurationPropertiesConverter configurationPropertiesConverter) {
-        this.delegate = delegate;
+        // ALWAYS is required here in order for Spring Boot to invoke our custom sanitization function
+        this.delegate = new ConfigurationPropertiesReportEndpoint(List.of(smartSanitizingFunction), Show.ALWAYS);
+        this.delegate.setApplicationContext(applicationContext);
         this.configurationPropertiesConverter = configurationPropertiesConverter;
     }
 

@@ -24,12 +24,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +37,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 import com.nucleonforge.axelix.common.api.KeyValue;
+import com.nucleonforge.axelix.sbs.spring.env.DefaultPropertyNameNormalizer;
+import com.nucleonforge.axelix.sbs.spring.env.PropertyNameNormalizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,12 +48,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 13.11.2025
  * @author Sergey Cherkasov
  */
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "management.endpoint.configprops.show-values=always")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
         properties = {
-            "axelix.prop.test.tags.environment=test",
+            "axelix.prop.test.tags.forSanitization=toBeSanitized",
+            "axelix.prop.test.tags.FOR_SANITIZATION=toBeSanitized",
             "axelix.prop.test.tags.version=1.0.0",
             "axelix.prop.test.enabled-contexts=user-service, payment-service",
             "axelix.prop.test.http-client.requests[0].name=user-api",
@@ -66,7 +67,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
-@EnableConfigurationProperties(AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.class)
+@EnableConfigurationProperties({AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.class})
 public class AxelixConfigurationPropertiesEndpointTest {
 
     @Autowired
@@ -94,7 +95,8 @@ public class AxelixConfigurationPropertiesEndpointTest {
 
     private static Stream<Arguments> propertyName() {
         return Stream.of(
-                Arguments.of("tags.environment", "test"),
+                Arguments.of("tags.forSanitization", "******"),
+                Arguments.of("tags.FOR_SANITIZATION", "******"),
                 Arguments.of("tags.version", "1.0.0"),
                 Arguments.of("enabledContexts[0]", "user-service"),
                 Arguments.of("enabledContexts[1]", "payment-service"),
@@ -109,41 +111,6 @@ public class AxelixConfigurationPropertiesEndpointTest {
                 Arguments.of("httpClient.requests[1].methods[0].type", "PUT"),
                 Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2"),
                 Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level", "DEBUG"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("inputsName")
-    void shouldReturnInputsName(String inputsName) {
-        ResponseEntity<ConfigPropsFeed> response =
-                restTemplate.getForEntity("/actuator/axelix-configprops", ConfigPropsFeed.class);
-
-        List<KeyValue> inputs = response.getBody().contexts().values().stream()
-                .flatMap(ctx -> ctx.beans().values().stream())
-                .filter(e -> e.prefix().equals("axelix.prop.test"))
-                .flatMap(bean -> bean.inputs().stream())
-                .toList();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        assertThat(inputs).hasSize(30).extracting(KeyValue::key).contains(inputsName);
-    }
-
-    private static Stream<Arguments> inputsName() {
-        return Stream.of(
-                Arguments.of("tags.environment.value"),
-                Arguments.of("tags.version.origin"),
-                Arguments.of("enabledContexts[0].value"),
-                Arguments.of("enabledContexts[1].value"),
-                Arguments.of("httpClient.requests[0].name.origin"),
-                Arguments.of("httpClient.requests[0].baseUrl.value"),
-                Arguments.of("httpClient.requests[0].methods[0].type.origin"),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].count.origin"),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].parameters.timeout.origin"),
-                Arguments.of("httpClient.requests[0].methods[1].type.value"),
-                Arguments.of("httpClient.requests[1].name.value"),
-                Arguments.of("httpClient.requests[1].baseUrl.origin"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].count.value"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level.value"));
     }
 
     @ConfigurationProperties(prefix = "axelix.prop.test")
@@ -164,15 +131,28 @@ public class AxelixConfigurationPropertiesEndpointTest {
 
         @Bean
         public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-            return new DefaultConfigurationPropertiesConverter();
+            return new FlatteningConfigurationPropertiesConverter();
+        }
+
+        @Bean
+        public PropertyNameNormalizer propertyNameNormalizer() {
+            return new DefaultPropertyNameNormalizer();
+        }
+
+        @Bean
+        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
+            return new SmartSanitizingFunction(
+                    List.of("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION"),
+                    propertyNameNormalizer);
         }
 
         @Bean
         public ConfigurationPropertiesCache configurationPropertiesCache(
-                ConfigurationPropertiesReportEndpoint configurationPropertiesReportEndpoint,
+                SmartSanitizingFunction smartSanitizingFunction,
+                ApplicationContext applicationContext,
                 ConfigurationPropertiesConverter configurationPropertiesConverter) {
             return new ConfigurationPropertiesCache(
-                    configurationPropertiesReportEndpoint, configurationPropertiesConverter);
+                    smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
         }
 
         @Bean

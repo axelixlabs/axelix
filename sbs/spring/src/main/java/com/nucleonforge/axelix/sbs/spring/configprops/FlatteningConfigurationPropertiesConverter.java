@@ -29,11 +29,12 @@ import com.nucleonforge.axelix.common.api.KeyValue;
 import com.nucleonforge.axelix.common.utils.BeanNameUtils;
 
 /**
- * Default implementation {@link ConfigurationPropertiesConverter}
+ * {@link ConfigurationPropertiesConverter} that flattens out the configuration properties feed as it is returned from the
+ * Spring Boot native actuator endpoint.
  *
  * @author Sergey Cherkasov
  */
-public class DefaultConfigurationPropertiesConverter implements ConfigurationPropertiesConverter {
+public class FlatteningConfigurationPropertiesConverter implements ConfigurationPropertiesConverter {
 
     @Override
     public ConfigPropsFeed convert(ConfigurationPropertiesDescriptor originalDescriptor) {
