@@ -21,15 +21,13 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.autoconfigure.scheduling.ScheduledTasksEndpointAutoConfiguration;
-import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
+import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpoint;
 import com.nucleonforge.axelix.sbs.spring.scheduled.IntervalBasedTaskRescheduler;
@@ -46,8 +44,7 @@ import com.nucleonforge.axelix.sbs.spring.scheduled.TriggerBasedTaskRescheduler;
  * @author Mikhail Polivakha
  * @since 14.10.2025
  */
-@AutoConfiguration(after = ScheduledTasksEndpointAutoConfiguration.class)
-@ConditionalOnAvailableEndpoint(endpoint = ScheduledTasksEndpoint.class)
+@AutoConfiguration
 @ConditionalOnBean(ScheduledAnnotationBeanPostProcessor.class)
 public class ScheduledTaskManagementAutoConfiguration {
 
@@ -81,8 +78,8 @@ public class ScheduledTaskManagementAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
-            ScheduledTasksEndpoint delegate, ScheduledTasksRegistry scheduledTasksRegistry) {
-        return new AxelixScheduledTasksEndpoint(delegate, scheduledTasksRegistry);
+            ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTasksRegistry scheduledTasksRegistry) {
+        return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), scheduledTasksRegistry);
     }
 
     @Bean

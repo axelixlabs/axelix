@@ -22,8 +22,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -42,6 +42,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.test.context.TestPropertySource;
 
@@ -54,13 +55,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class)
 @TestPropertySource(
-        properties = {
-            "management.endpoints.web.exposure.include=axelix-scheduledtasks, scheduledtasks, scheduled-tasks-management"
-        })
+        properties = {"management.endpoints.web.exposure.include=axelix-scheduledtasks, scheduled-tasks-management"})
 class ScheduledTaskManagementEndpointTest {
 
     private static final String CRON_TASK_ID =
@@ -319,8 +319,8 @@ class ScheduledTaskManagementEndpointTest {
 
         @Bean
         public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
-                ScheduledTasksEndpoint delegate, ScheduledTasksRegistry registry) {
-            return new AxelixScheduledTasksEndpoint(delegate, registry);
+                ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTasksRegistry registry) {
+            return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), registry);
         }
 
         @Bean

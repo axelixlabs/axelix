@@ -21,6 +21,7 @@ import java.util.concurrent.ScheduledFuture;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -36,8 +37,8 @@ public class AxelixScheduledTasksEndpoint {
     private final ScheduledTasksEndpoint delegate;
     private final ScheduledTasksRegistry registry;
 
-    public AxelixScheduledTasksEndpoint(ScheduledTasksEndpoint delegate, ScheduledTasksRegistry registry) {
-        this.delegate = delegate;
+    public AxelixScheduledTasksEndpoint(List<ScheduledTaskHolder> taskHolders, ScheduledTasksRegistry registry) {
+        this.delegate = new ScheduledTasksEndpoint(taskHolders);
         this.registry = registry;
     }
 
