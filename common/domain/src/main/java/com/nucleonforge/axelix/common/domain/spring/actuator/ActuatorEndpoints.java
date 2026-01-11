@@ -157,11 +157,10 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint SINGLE_SBOM = of("/sbom/{sbom-id}", HttpMethod.GET);
 
     // @Scheduled tasks
-    public static final ActuatorEndpoint SCHEDULED_TASKS = of("/axelix-scheduledtasks", HttpMethod.GET);
-    public static final ActuatorEndpoint ENABLE_SCHEDULED_TASK =
-            of("/scheduled-tasks-management/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint SCHEDULED_TASKS = of("/axelix-scheduled-tasks", HttpMethod.GET);
+    public static final ActuatorEndpoint ENABLE_SCHEDULED_TASK = of("/axelix-scheduled-tasks/enable", HttpMethod.POST);
     public static final ActuatorEndpoint DISABLE_SCHEDULED_TASK =
-            of("/scheduled-tasks-management/disable", HttpMethod.POST);
+            of("/axelix-scheduled-tasks/disable", HttpMethod.POST);
 
     // Sessions
     public static final ActuatorEndpoint SESSION = of("/sessions", HttpMethod.GET);

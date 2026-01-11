@@ -23,6 +23,7 @@ package com.nucleonforge.axelix.common.auth.core;
  * @see Authority
  * @since 28.07.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 // TODO:
 //  Well, conceptually, it becomes more and more clear that the authorities on the master
@@ -114,14 +115,9 @@ public enum DefaultAuthority implements Authority {
     LOGGERS,
 
     /**
-     * Grants authority to view scheduledtasks endpoint.
+     * Grants authority to view scheduled-tasks endpoint.
      */
     SCHEDULED_TASKS,
-
-    /**
-     * Grants authority to view custom scheduled-tasks-management endpoint.
-     */
-    SCHEDULED_TASKS_MANAGEMENT,
 
     /**
      * Grants authority to view controller and endpoint mappings.

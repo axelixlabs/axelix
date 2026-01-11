@@ -285,13 +285,13 @@ public class ScheduledTasksApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduledtasks")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/scheduled-tasks-management/enable")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks/enable")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/actuator/scheduled-tasks-management/disable")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks/disable")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -375,7 +375,7 @@ public class ScheduledTasksApiTest {
 
     @Test
     void shouldReturnBadRequestForUnregisteredInstanceOnGetAllScheduledTasks() {
-        String instanceId = "unregistered-scheduled-tasks-management-instance";
+        String instanceId = "unregistered-axelix-scheduled-tasks-instance";
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
@@ -411,7 +411,7 @@ public class ScheduledTasksApiTest {
 
     @Test
     void shouldReturnBadRequestForUnregisteredInstanceOnEnableSingleScheduledTask() {
-        String instanceId = "unregistered-scheduled-tasks-management-enable--instance";
+        String instanceId = "unregistered-axelix-scheduled-tasks-enable-instance";
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
@@ -452,7 +452,7 @@ public class ScheduledTasksApiTest {
 
     @Test
     void shouldReturnBadRequestForUnregisteredInstanceOnDisableSingleScheduledTask() {
-        String instanceId = "unregistered-scheduled-tasks-management-enable--instance";
+        String instanceId = "unregistered-axelix-scheduled-tasks-enable-instance";
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 

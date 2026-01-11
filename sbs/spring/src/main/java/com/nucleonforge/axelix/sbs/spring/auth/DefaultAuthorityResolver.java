@@ -50,8 +50,7 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
             Map.entry("/actuator/axelix-metrics/**", DefaultAuthority.METRICS),
             Map.entry("/actuator/loggers/**", DefaultAuthority.LOGGERS),
             Map.entry("/actuator/mappings", DefaultAuthority.MAPPINGS),
-            Map.entry("/actuator/axelix-scheduledtasks/**", DefaultAuthority.SCHEDULED_TASKS),
-            Map.entry("/actuator/scheduled-tasks-management/**", DefaultAuthority.SCHEDULED_TASKS_MANAGEMENT));
+            Map.entry("/actuator/axelix-scheduled-tasks/**", DefaultAuthority.SCHEDULED_TASKS));
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 

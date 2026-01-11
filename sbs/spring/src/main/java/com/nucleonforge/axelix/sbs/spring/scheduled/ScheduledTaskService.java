@@ -16,6 +16,7 @@
 package com.nucleonforge.axelix.sbs.spring.scheduled;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 
 import org.slf4j.Logger;
@@ -59,6 +60,15 @@ public final class ScheduledTaskService {
             log.info("Failed to enable task: {}", taskId, e);
             throw e;
         }
+    }
+
+    /**
+     * Find the task by the provided id.
+     *
+     * @param taskId the id of the task to find.
+     */
+    public Optional<ManagedScheduledTask> find(String taskId) {
+        return registry.find(taskId);
     }
 
     /**

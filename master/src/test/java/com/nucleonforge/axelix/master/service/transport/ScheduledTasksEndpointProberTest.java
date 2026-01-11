@@ -172,13 +172,13 @@ public class ScheduledTasksEndpointProberTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/axelix-scheduledtasks")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-scheduled-tasks")) {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/scheduled-tasks-management/enable")) {
+                } else if (path.equals("/" + activeInstanceId + "/axelix-scheduled-tasks/enable")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/scheduled-tasks-management/disable")) {
+                } else if (path.equals("/" + activeInstanceId + "/axelix-scheduled-tasks/disable")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -271,7 +271,7 @@ public class ScheduledTasksEndpointProberTest {
         // then
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/scheduled-tasks-management/enable");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/axelix-scheduled-tasks/enable");
         assertThatJson(recordedRequest.getBody().readUtf8()).isEqualTo(jsonRequest);
     }
 
@@ -295,7 +295,7 @@ public class ScheduledTasksEndpointProberTest {
         // then
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/scheduled-tasks-management/disable");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/axelix-scheduled-tasks/disable");
         assertThatJson(recordedRequest.getBody().readUtf8()).isEqualTo(jsonRequest);
     }
 }

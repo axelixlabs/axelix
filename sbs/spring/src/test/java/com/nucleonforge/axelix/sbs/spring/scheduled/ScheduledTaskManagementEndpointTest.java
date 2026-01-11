@@ -51,16 +51,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 // TODO: Revisit this test design.
 /**
- * Integration tests for {@link ScheduledTaskManagementEndpoint}
+ * Integration tests for enable/disable capabilities of {@link AxelixScheduledTasksEndpoint}.
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
+// TODO: This test should be merged into AxelixScheduledTasksEndpointTest
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class)
-@TestPropertySource(
-        properties = {"management.endpoints.web.exposure.include=axelix-scheduledtasks, scheduled-tasks-management"})
+@TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-scheduled-tasks"})
 class ScheduledTaskManagementEndpointTest {
 
     private static final String CRON_TASK_ID =
@@ -258,7 +258,7 @@ class ScheduledTaskManagementEndpointTest {
         ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(target);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/scheduled-tasks-management/enable", defaultEntity(request), Void.class);
+                "/actuator/axelix-scheduled-tasks/enable", defaultEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
@@ -267,13 +267,13 @@ class ScheduledTaskManagementEndpointTest {
         ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(targetScheduledTask);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/scheduled-tasks-management/disable?force=true", defaultEntity(request), Void.class);
+                "/actuator/axelix-scheduled-tasks/disable?force=true", defaultEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
 
     private String getScheduledTasks() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-scheduledtasks", String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-scheduled-tasks", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -319,13 +319,8 @@ class ScheduledTaskManagementEndpointTest {
 
         @Bean
         public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
-                ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTasksRegistry registry) {
-            return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), registry);
-        }
-
-        @Bean
-        public ScheduledTaskManagementEndpoint scheduledTaskManagementEndpoint(ScheduledTaskService service) {
-            return new ScheduledTaskManagementEndpoint(service);
+                ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTaskService service) {
+            return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), service);
         }
 
         @Scheduled(cron = "*/1 * * * * *")

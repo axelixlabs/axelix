@@ -20,9 +20,13 @@ import java.util.concurrent.ScheduledFuture;
 
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Custom actuator endpoint that provides information about {@link Scheduled @Scheduled} tasks.
@@ -31,15 +35,15 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@RestControllerEndpoint(id = "axelix-scheduledtasks")
+@RestControllerEndpoint(id = "axelix-scheduled-tasks")
 public class AxelixScheduledTasksEndpoint {
 
+    private final ScheduledTaskService taskService;
     private final ScheduledTasksEndpoint delegate;
-    private final ScheduledTasksRegistry registry;
 
-    public AxelixScheduledTasksEndpoint(List<ScheduledTaskHolder> taskHolders, ScheduledTasksRegistry registry) {
+    public AxelixScheduledTasksEndpoint(List<ScheduledTaskHolder> taskHolders, ScheduledTaskService taskService) {
+        this.taskService = taskService;
         this.delegate = new ScheduledTasksEndpoint(taskHolders);
-        this.registry = registry;
     }
 
     @GetMapping
@@ -54,6 +58,21 @@ public class AxelixScheduledTasksEndpoint {
         return new ExtendedScheduledTasksDescriptor(cronTasks, fixedDelayTasks, fixedRateTasks, customTasks);
     }
 
+    @PostMapping("/enable")
+    public ResponseEntity<Void> enableTask(@RequestBody ScheduledTaskToggleRequest request) {
+        taskService.enableTask(request.targetScheduledTask());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/disable")
+    public ResponseEntity<Void> disableTask(
+            @RequestBody ScheduledTaskToggleRequest request,
+            @RequestParam(value = "force", defaultValue = "false") boolean force) {
+
+        taskService.disableTask(request.targetScheduledTask(), force);
+        return ResponseEntity.noContent().build();
+    }
+
     private List<ExtendedTaskDescriptor> enrich(List<? extends ScheduledTasksEndpoint.TaskDescriptor> tasks) {
         return tasks.stream()
                 .map(td -> new ExtendedTaskDescriptor(td, resolveTaskEnabledStatus(td)))
@@ -66,7 +85,8 @@ public class AxelixScheduledTasksEndpoint {
         // TODO:
         //  1. how is that possible that future will be null?
         //  2. is that correct that we're returning tru in case the task is not found? I guess no.
-        return registry.find(target)
+        return taskService
+                .find(target)
                 .map(task -> {
                     ScheduledFuture<?> future = task.getFuture();
                     return future == null || !future.isCancelled();

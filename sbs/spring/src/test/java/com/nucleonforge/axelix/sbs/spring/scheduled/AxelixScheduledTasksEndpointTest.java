@@ -58,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(AxelixScheduledTasksEndpointTest.ScheduledTasksEndpointExtensionTestConfiguration.class)
-@TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-scheduledtasks"})
+@TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-scheduled-tasks"})
 class AxelixScheduledTasksEndpointTest {
 
     private static final String EXPECTED_JSON =
@@ -119,7 +119,7 @@ class AxelixScheduledTasksEndpointTest {
 
     @Test
     void shouldReturnExpectedJson() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-scheduledtasks", String.class);
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-scheduled-tasks", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -160,8 +160,8 @@ class AxelixScheduledTasksEndpointTest {
 
         @Bean
         public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
-                ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTasksRegistry registry) {
-            return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), registry);
+                ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTaskService service) {
+            return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), service);
         }
 
         @Scheduled(cron = "*/1 * * * * *")

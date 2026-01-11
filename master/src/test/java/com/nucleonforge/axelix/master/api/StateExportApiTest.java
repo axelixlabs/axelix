@@ -357,7 +357,7 @@ class StateExportApiTest {
                     return new MockResponse()
                             .setBody(jsonConfigpropsResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduledtasks")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks")) {
                     return new MockResponse()
                             .setBody(jsonSchedulesTasksResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

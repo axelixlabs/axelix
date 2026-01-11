@@ -31,7 +31,6 @@ import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpoint;
 import com.nucleonforge.axelix.sbs.spring.scheduled.IntervalBasedTaskRescheduler;
-import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTaskManagementEndpoint;
 import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTaskService;
 import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksRegistry;
 import com.nucleonforge.axelix.sbs.spring.scheduled.TaskRescheduler;
@@ -78,14 +77,8 @@ public class ScheduledTaskManagementAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
-            ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTasksRegistry scheduledTasksRegistry) {
-        return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), scheduledTasksRegistry);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ScheduledTaskManagementEndpoint scheduledTaskManagementEndpoint(ScheduledTaskService scheduledTaskService) {
-        return new ScheduledTaskManagementEndpoint(scheduledTaskService);
+            ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTaskService service) {
+        return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), service);
     }
 
     @NonNull
