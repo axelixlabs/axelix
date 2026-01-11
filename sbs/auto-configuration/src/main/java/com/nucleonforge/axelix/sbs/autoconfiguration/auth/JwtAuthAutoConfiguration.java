@@ -47,18 +47,19 @@ import com.nucleonforge.axelix.sbs.spring.auth.JwtAuthorizationFilter;
  * </ul>
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  * @since 22.07.2025
  */
 @AutoConfiguration
-@ConditionalOnProperty(name = "axelix.master.auth.jwt")
+@ConditionalOnProperty(name = "axelix.sbs.auth.jwt")
 @ConditionalOnClass({JwtDecoderService.class, JwtParser.class})
 public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
     public JwtDecoderService jwtDecoderService(
-            final @Value("${axelix.master.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-            final @Value("${axelix.master.auth.jwt.signing-key}") String signingKey) {
+            final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
+            final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
         return new DefaultJwtDecoderService(algorithm, signingKey);
     }
 
