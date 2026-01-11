@@ -16,16 +16,15 @@
 package com.nucleonforge.axelix.sbs.autoconfiguration.spring;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.autoconfigure.env.EnvironmentEndpointAutoConfiguration;
-import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
+import com.nucleonforge.axelix.sbs.spring.config.EndpointsConfigurationProperties;
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesCache;
+import com.nucleonforge.axelix.sbs.spring.configprops.SmartSanitizingFunction;
 import com.nucleonforge.axelix.sbs.spring.env.AxelixEnvironmentEndpoint;
 import com.nucleonforge.axelix.sbs.spring.env.DefaultEnvPropertyEnricher;
 import com.nucleonforge.axelix.sbs.spring.env.DefaultPropertyMetadataExtractor;
@@ -40,13 +39,9 @@ import com.nucleonforge.axelix.sbs.spring.env.ValueInjectionTrackerBeanPostProce
  *
  * @since 21.10.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-@AutoConfiguration(
-        after = {
-            EnvironmentEndpointAutoConfiguration.class,
-            AxelixConfigurationsPropertiesEndpointAutoConfiguration.class
-        })
-@ConditionalOnAvailableEndpoint(endpoint = EnvironmentEndpoint.class)
+@AutoConfiguration(after = {AxelixConfigurationsPropertiesEndpointAutoConfiguration.class})
 public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean
@@ -64,6 +59,15 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public SmartSanitizingFunction smartSanitizingFunction(
+            EndpointsConfigurationProperties endpointsConfigurationProperties,
+            PropertyNameNormalizer propertyNameNormalizer) {
+        return new SmartSanitizingFunction(
+                endpointsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public EnvPropertyEnricher envPropertyEnricher(
             Environment environment,
             PropertyNameNormalizer propertyNameNormalizer,
@@ -77,8 +81,10 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-            EnvironmentEndpoint environmentEndpoint, EnvPropertyEnricher envPropertyEnricher) {
-        return new AxelixEnvironmentEndpoint(environmentEndpoint, envPropertyEnricher);
+            Environment environment,
+            SmartSanitizingFunction smartSanitizingFunction,
+            EnvPropertyEnricher envPropertyEnricher) {
+        return new AxelixEnvironmentEndpoint(environment, smartSanitizingFunction, envPropertyEnricher);
     }
 
     @Bean

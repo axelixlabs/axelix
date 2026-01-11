@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.spring.configprops;
+package com.nucleonforge.axelix.sbs.spring.config;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Configuration properties that for the {@link AxelixConfigurationPropertiesEndpoint}.
+ * Configuration properties that apply across different endpoints.
  *
  * @author Mikhail Polivakha
  */
-@ConfigurationProperties(prefix = "axelix.sbs.endpoints.config-props")
-public class ConfigPropsConfigurationProperties {
+@ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+public class EndpointsConfigurationProperties {
 
     public static final List<String> SANITIZE_ALL = List.of("*");
 
@@ -40,7 +39,7 @@ public class ConfigPropsConfigurationProperties {
         return sanitizedProperties;
     }
 
-    public ConfigPropsConfigurationProperties setSanitizedProperties(List<String> sanitizedProperties) {
+    public EndpointsConfigurationProperties setSanitizedProperties(List<String> sanitizedProperties) {
         this.sanitizedProperties = sanitizedProperties;
         return this;
     }
