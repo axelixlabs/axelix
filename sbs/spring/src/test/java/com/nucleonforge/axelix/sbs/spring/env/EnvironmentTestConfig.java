@@ -15,8 +15,6 @@
  */
 package com.nucleonforge.axelix.sbs.spring.env;
 
-import java.util.List;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
@@ -41,11 +39,6 @@ public class EnvironmentTestConfig {
     @Bean
     public ConfigurationPropertiesConverter configurationPropertiesConverter() {
         return new FlatteningConfigurationPropertiesConverter();
-    }
-
-    @Bean
-    public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-        return new SmartSanitizingFunction(List.of(), propertyNameNormalizer);
     }
 
     @Bean

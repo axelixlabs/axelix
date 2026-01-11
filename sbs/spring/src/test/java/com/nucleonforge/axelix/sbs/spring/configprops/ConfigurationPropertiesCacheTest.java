@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 import com.nucleonforge.axelix.common.api.KeyValue;
+import com.nucleonforge.axelix.sbs.spring.config.EndpointsConfigurationProperties;
 import com.nucleonforge.axelix.sbs.spring.env.DefaultPropertyNameNormalizer;
 import com.nucleonforge.axelix.sbs.spring.env.PropertyNameNormalizer;
 
@@ -43,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableConfigurationProperties(ConfigPropsConfigurationProperties.class)
+@EnableConfigurationProperties(EndpointsConfigurationProperties.class)
 public class ConfigurationPropertiesCacheTest {
 
     @Autowired
@@ -84,7 +85,7 @@ public class ConfigurationPropertiesCacheTest {
 
         @Bean
         public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(ConfigPropsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
+            return new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
         }
 
         @Bean

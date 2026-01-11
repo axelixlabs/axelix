@@ -26,7 +26,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +34,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +43,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
-import com.nucleonforge.axelix.sbs.spring.configprops.ConfigPropsConfigurationProperties;
+import com.nucleonforge.axelix.sbs.spring.config.EndpointsConfigurationProperties;
+import com.nucleonforge.axelix.sbs.spring.configprops.SmartSanitizingFunction;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,6 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 21.10.2025
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -66,6 +68,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         properties = {
             // properties -> shouldSelectPrimaryPropertyFromHighestPrecedenceSource
             "axelix.env.test.prop1=fromTestSource",
+            "axelix.env.test.toBeSanitized=shouldBeSanitized",
 
             // properties -> shouldReturnTheBeanNameThatMatchesTheConfigProps
             "axelix.prop.test.tags.environment=test",
@@ -85,7 +88,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         })
 @EnableConfigurationProperties({
     AxelixEnvironmentEndpointTest.AxelixPropTest.class,
-    ConfigPropsConfigurationProperties.class
+    EndpointsConfigurationProperties.class
 })
 @Import({EnvironmentTestConfig.class})
 class AxelixEnvironmentEndpointTest {
@@ -101,6 +104,7 @@ class AxelixEnvironmentEndpointTest {
         environment.getSystemProperties().put("axelix.env.test.prop1", "systemValue");
         environment.getSystemProperties().put("axelix.env.test.prop2", "systemValue");
         environment.getSystemProperties().put("axelix.env.test.prop3", "systemValue");
+        environment.getSystemProperties().put("AXELIX_FOR_SANITIZATION", "shouldBeSanitized");
     }
 
     @DynamicPropertySource
@@ -114,11 +118,7 @@ class AxelixEnvironmentEndpointTest {
         ResponseEntity<EnvironmentFeed> response =
                 restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
-        var propertyAppearances = response.getBody().propertySources().stream()
-                .flatMap(src -> src.properties().stream()
-                        .filter(p -> p.propertyName().equals(propertyName))
-                        .map(p -> Map.entry(src.sourceName(), p)))
-                .toList();
+        var propertyAppearances = findPropertyAppearances(propertyName, response);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(propertyAppearances)
@@ -135,6 +135,22 @@ class AxelixEnvironmentEndpointTest {
                 Arguments.of("axelix.env.test.prop1", "fromTestSource"),
                 Arguments.of("axelix.env.test.prop2", "dynamicValue"),
                 Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
+    }
+
+    @ParameterizedTest(name = "Property ''{0}'' should have sanitized value")
+    @MethodSource("sanitizationArgsSource")
+    void shouldSanitizeAllAppearancesOfTheGivenProperty(String propertyName) {
+        ResponseEntity<EnvironmentFeed> response =
+                restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+
+        var propertyAppearances = findPropertyAppearances(propertyName, response);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(propertyAppearances).extracting(it -> it.getValue().value()).containsOnly("******");
+    }
+
+    public static Stream<Arguments> sanitizationArgsSource() {
+        return Stream.of(Arguments.of("axelix.env.test.toBeSanitized"), Arguments.of("AXELIX_FOR_SANITIZATION"));
     }
 
     @Test
@@ -186,11 +202,7 @@ class AxelixEnvironmentEndpointTest {
         ResponseEntity<EnvironmentFeed> response =
                 restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
-        var propertyAppearances = response.getBody().propertySources().stream()
-                .flatMap(src -> src.properties().stream()
-                        .filter(p -> p.propertyName().equals(propertyName))
-                        .map(p -> Map.entry(src.sourceName(), p)))
-                .toList();
+        var propertyAppearances = findPropertyAppearances(propertyName, response);
 
         assertThat(propertyAppearances)
                 .extracting(e -> e.getValue().configPropsBeanName())
@@ -237,6 +249,16 @@ class AxelixEnvironmentEndpointTest {
                         "Contains the 'server.port' property from 'application.*', which defines the web server port (8080 by default)."));
     }
 
+    private static List<Map.Entry<String, EnvironmentFeed.Property>> findPropertyAppearances(
+            String propertyName, ResponseEntity<EnvironmentFeed> response) {
+
+        return response.getBody().propertySources().stream()
+                .flatMap(src -> src.properties().stream()
+                        .filter(p -> p.propertyName().equals(propertyName))
+                        .map(p -> Map.entry(src.sourceName(), p)))
+                .toList();
+    }
+
     @ConfigurationProperties(prefix = "axelix.prop.test")
     public record AxelixPropTest(Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
 
@@ -254,8 +276,16 @@ class AxelixEnvironmentEndpointTest {
 
         @Bean
         public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-                EnvironmentEndpoint delegate, EnvPropertyEnricher envPropertyEnricher) {
-            return new AxelixEnvironmentEndpoint(delegate, envPropertyEnricher);
+                Environment environment,
+                SmartSanitizingFunction smartSanitizingFunction,
+                EnvPropertyEnricher envPropertyEnricher) {
+            return new AxelixEnvironmentEndpoint(environment, smartSanitizingFunction, envPropertyEnricher);
+        }
+
+        @Bean
+        public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
+            return new SmartSanitizingFunction(
+                    List.of("axelix.env.test.toBeSanitized", "AXELIX_FOR_SANITIZATION"), propertyNameNormalizer);
         }
     }
 }

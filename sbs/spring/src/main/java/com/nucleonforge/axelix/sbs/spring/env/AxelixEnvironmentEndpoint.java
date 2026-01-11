@@ -15,30 +15,38 @@
  */
 package com.nucleonforge.axelix.sbs.spring.env;
 
+import java.util.List;
+
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.boot.actuate.endpoint.Show;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.sbs.spring.configprops.SmartSanitizingFunction;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.
  *
  * @since 21.10.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @RestControllerEndpoint(id = "axelix-env")
 public class AxelixEnvironmentEndpoint {
 
     private final EnvironmentEndpoint delegate;
-
     private final EnvPropertyEnricher envPropertyEnricher;
 
-    public AxelixEnvironmentEndpoint(EnvironmentEndpoint delegate, EnvPropertyEnricher envPropertyEnricher) {
-        this.delegate = delegate;
+    public AxelixEnvironmentEndpoint(
+            Environment environment,
+            SmartSanitizingFunction smartSanitizingFunction,
+            EnvPropertyEnricher envPropertyEnricher) {
+        this.delegate = new EnvironmentEndpoint(environment, List.of(smartSanitizingFunction), Show.ALWAYS);
         this.envPropertyEnricher = envPropertyEnricher;
     }
 

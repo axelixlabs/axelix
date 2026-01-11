@@ -27,6 +27,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.actuate.endpoint.SanitizableData;
 import org.springframework.core.env.MapPropertySource;
 
+import com.nucleonforge.axelix.sbs.spring.config.EndpointsConfigurationProperties;
 import com.nucleonforge.axelix.sbs.spring.env.DefaultPropertyNameNormalizer;
 import com.nucleonforge.axelix.sbs.spring.env.PropertyNameNormalizer;
 
@@ -73,7 +74,7 @@ class SmartSanitizingFunctionTest {
     @MethodSource(value = "sanitizeAllArgs")
     void shouldSanitizeValue_SanitizeAll(SanitizableData input) {
         // given.
-        subject = new SmartSanitizingFunction(ConfigPropsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
+        subject = new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
         Object beforeSanitization = input.getValue();
 
         // when.

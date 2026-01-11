@@ -21,8 +21,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
+import com.nucleonforge.axelix.sbs.spring.config.EndpointsConfigurationProperties;
 import com.nucleonforge.axelix.sbs.spring.configprops.AxelixConfigurationPropertiesEndpoint;
-import com.nucleonforge.axelix.sbs.spring.configprops.ConfigPropsConfigurationProperties;
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesCache;
 import com.nucleonforge.axelix.sbs.spring.configprops.ConfigurationPropertiesConverter;
 import com.nucleonforge.axelix.sbs.spring.configprops.FlatteningConfigurationPropertiesConverter;
@@ -37,7 +37,7 @@ import com.nucleonforge.axelix.sbs.spring.env.PropertyNameNormalizer;
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
-@EnableConfigurationProperties(ConfigPropsConfigurationProperties.class)
+@EnableConfigurationProperties(EndpointsConfigurationProperties.class)
 public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
@@ -55,10 +55,10 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SmartSanitizingFunction smartSanitizingFunction(
-            ConfigPropsConfigurationProperties configPropsConfigurationProperties,
+            EndpointsConfigurationProperties endpointsConfigurationProperties,
             PropertyNameNormalizer propertyNameNormalizer) {
         return new SmartSanitizingFunction(
-                configPropsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);
+                endpointsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);
     }
 
     @Bean

@@ -15,6 +15,8 @@
  */
 package com.nucleonforge.axelix.sbs.spring.env;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -23,13 +25,16 @@ import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.StandardEnvironment;
 
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.Property;
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed.PropertySource;
-import com.nucleonforge.axelix.sbs.spring.configprops.ConfigPropsConfigurationProperties;
+import com.nucleonforge.axelix.sbs.spring.config.EndpointsConfigurationProperties;
+import com.nucleonforge.axelix.sbs.spring.configprops.SmartSanitizingFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,10 +43,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 21.10.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(args = "--fooBar=fromArgs")
-@EnableConfigurationProperties(ConfigPropsConfigurationProperties.class)
-@Import(EnvironmentTestConfig.class)
+@EnableConfigurationProperties(EndpointsConfigurationProperties.class)
+@Import({EnvironmentTestConfig.class, DefaultEnvPropertyEnricherTest.CurrentTestConfig.class})
 class DefaultEnvPropertyEnricherTest {
 
     @Autowired
@@ -49,6 +55,15 @@ class DefaultEnvPropertyEnricherTest {
 
     @Autowired
     private EnvPropertyEnricher enricher;
+
+    @TestConfiguration
+    static class CurrentTestConfig {
+
+        @Bean
+        SmartSanitizingFunction smartSanitizingFunction() {
+            return new SmartSanitizingFunction(List.of(), new DefaultPropertyNameNormalizer());
+        }
+    }
 
     @BeforeAll
     static void beforeAll() {
