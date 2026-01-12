@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
 import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.utils.ProxyUtils;
 import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
 
 import static com.nucleonforge.axelix.common.api.BeansFeed.BeanMethod;
@@ -78,7 +79,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
         Object bean = beanFactory.getBean(beanName);
         Set<String> positiveConditionsKeys = conditionsKeys();
-        ProxyType beanProxyingType = analyzeProxyType(bean.getClass());
+        ProxyType beanProxyingType = ProxyUtils.analyzeProxyType(bean.getClass());
         BeanSource beanSource = analyzeBeanSource(beanDefinition, beanName);
 
         return new BeanMetaInfo(
@@ -88,15 +89,6 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
                 beanDefinition.isPrimary(),
                 qualifiersRegistry.getQualifiers(beanName),
                 beanSource);
-    }
-
-    private ProxyType analyzeProxyType(Class<?> beanType) {
-        if (Proxy.isProxyClass(beanType)) {
-            return ProxyType.JDK_PROXY;
-        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR) && !beanType.isHidden()) {
-            return ProxyType.CGLIB;
-        }
-        return ProxyType.NO_PROXYING;
     }
 
     private BeanSource analyzeBeanSource(BeanDefinition beanDefinition, String beanName) {
