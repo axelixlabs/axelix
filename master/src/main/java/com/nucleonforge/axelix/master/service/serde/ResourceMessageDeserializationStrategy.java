@@ -27,7 +27,7 @@ import org.springframework.core.io.Resource;
  * @since 12.11.2025
  * @author Nikita Kirillov
  */
-public abstract class BinaryResourceMessageDeserializationStrategy implements MessageDeserializationStrategy<Resource> {
+public abstract class ResourceMessageDeserializationStrategy implements MessageDeserializationStrategy<Resource> {
 
     @Override
     public @NonNull Resource deserialize(byte @NonNull [] binary) throws DeserializationException {

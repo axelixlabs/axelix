@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.serde;
+package com.nucleonforge.axelix.master.service.export.settings;
 
-import org.springframework.stereotype.Component;
+import com.nucleonforge.axelix.master.service.export.StateComponent;
+import com.nucleonforge.axelix.master.service.export.StateComponentSettings;
 
 /**
- * {@link ResourceMessageDeserializationStrategy} for logfile.
+ * {@link StateComponentSettings} for gc-logfile.
  *
- * @since 12.11.2025
  * @author Nikita Kirillov
+ * @since 10.01.2025
  */
-@Component
-public class LogFileMessageDeserializationStrategy extends ResourceMessageDeserializationStrategy {
+public class GcLogFileStateComponentSettings implements StateComponentSettings {
 
     @Override
-    protected String filename() {
-        return "application.log";
+    public StateComponent component() {
+        return StateComponent.GC_LOG_FILE;
     }
 }

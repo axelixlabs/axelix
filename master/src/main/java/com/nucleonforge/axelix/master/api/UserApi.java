@@ -135,7 +135,7 @@ public class UserApi {
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
     @PostMapping(path = ApiPaths.UsersApi.LOGOUT)
-    public ResponseEntity<?> login() {
+    public ResponseEntity<?> logout() {
         ResponseCookie cookie = cookieService.buildExpiredAuthCookie();
 
         return ResponseEntity.status(HttpStatus.OK)

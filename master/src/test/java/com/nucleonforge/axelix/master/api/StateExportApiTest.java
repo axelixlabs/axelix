@@ -107,6 +107,12 @@ class StateExportApiTest {
                         "component" : "THREAD_DUMP"
                     },
                     {
+                        "component" : "LOG_FILE"
+                    },
+                    {
+                      "component" : "GC_LOG_FILE"
+                    },
+                    {
                         "component" : "HEAP_DUMP",
                         "sanitized" : true
                     }
@@ -331,6 +337,15 @@ class StateExportApiTest {
              2025-11-12T14:05:14.531+05:00  INFO 1868 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=4c03ca02-57eb-3d79-a155-785dae504167
              """;
 
+        String mockGcLogFileResponse =
+                """
+         [2026-01-11T23:20:50.868+0500][info][gc] GC(348) Concurrent Mark Cycle
+         [2026-01-11T23:20:50.878+0500][info][gc] GC(350) Pause Young (Normal) (G1 Evacuation Pause) 32M->31M(42M) 0.532ms
+         [2026-01-11T23:20:50.883+0500][info][gc] GC(348) Pause Remark 33M->33M(42M) 2.256ms
+         [2026-01-11T23:20:50.884+0500][info][gc] GC(351) Pause Young (Normal) (G1 Evacuation Pause) 33M->31M(42M) 0.380ms
+         [2026-01-11T23:20:50.888+0500][info][gc] GC(352) Pause Young (Normal) (G1 Evacuation Pause) 33M->31M(42M) 0.342ms
+         """;
+
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
@@ -372,6 +387,10 @@ class StateExportApiTest {
                 } else if (path.equals("/" + activeInstanceId + "/actuator/logfile")) {
                     return new MockResponse()
                             .setBody(mockLogFileResponse)
+                            .addHeader("Content-Type", "text/plain;charset=UTF-8");
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/gc-logfile")) {
+                    return new MockResponse()
+                            .setBody(mockGcLogFileResponse)
                             .addHeader("Content-Type", "text/plain;charset=UTF-8");
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -475,7 +494,9 @@ class StateExportApiTest {
                             "env.json",
                             "scheduled_tasks.json",
                             "thread_dump.json",
-                            "heap_dump.hprof");
+                            "heap_dump.hprof",
+                            "log_file.log",
+                            "gc_log_file.log");
         }
     }
 }

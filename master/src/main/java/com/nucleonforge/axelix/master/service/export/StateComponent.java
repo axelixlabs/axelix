@@ -24,6 +24,7 @@ public enum StateComponent {
     CONFIG_PROPS("json"),
     ENV("json"),
     LOG_FILE("log"),
+    GC_LOG_FILE("log"),
     SCHEDULED_TASKS("json");
 
     private final String fileExtension;

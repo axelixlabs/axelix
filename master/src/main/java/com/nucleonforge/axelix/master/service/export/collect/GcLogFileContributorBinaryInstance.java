@@ -18,36 +18,36 @@ package com.nucleonforge.axelix.master.service.export.collect;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import com.nucleonforge.axelix.master.api.LogFileApi;
+import com.nucleonforge.axelix.master.api.GcLogFileApi;
 import com.nucleonforge.axelix.master.exception.StateExportException;
 import com.nucleonforge.axelix.master.service.export.StateComponent;
-import com.nucleonforge.axelix.master.service.export.settings.LogFileStateComponentSettings;
+import com.nucleonforge.axelix.master.service.export.settings.GcLogFileStateComponentSettings;
 
 /**
- * Collect log-file for application state export.
+ * Collect gc-logfile for application state export.
  *
- * @see LogFileApi
- * @since 20.11.2025
+ * @see GcLogFileApi
+ * @since 10.01.2026
  * @author Nikita Kirillov
  */
 @Component
-public class LogFileContributorBinaryInstance
-        extends AbstractBinaryInstanceStateCollector<LogFileStateComponentSettings> {
+public class GcLogFileContributorBinaryInstance
+        extends AbstractBinaryInstanceStateCollector<GcLogFileStateComponentSettings> {
 
-    private final LogFileApi logFileApi;
+    private final GcLogFileApi gcLogFileApi;
 
-    public LogFileContributorBinaryInstance(LogFileApi logFileApi) {
-        this.logFileApi = logFileApi;
+    public GcLogFileContributorBinaryInstance(GcLogFileApi gcLogFileApi) {
+        this.gcLogFileApi = gcLogFileApi;
     }
 
     @Override
     public StateComponent responsibleFor() {
-        return StateComponent.LOG_FILE;
+        return StateComponent.GC_LOG_FILE;
     }
 
     @Override
-    protected Resource collectResource(String instanceId, LogFileStateComponentSettings settings)
+    protected Resource collectResource(String instanceId, GcLogFileStateComponentSettings settings)
             throws StateExportException {
-        return logFileApi.getLogFile(instanceId, null);
+        return gcLogFileApi.getGcLogFile(instanceId);
     }
 }

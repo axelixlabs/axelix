@@ -28,6 +28,7 @@ import com.nucleonforge.axelix.master.service.export.settings.CachesStateCompone
 import com.nucleonforge.axelix.master.service.export.settings.ConditionsStateComponentSettings;
 import com.nucleonforge.axelix.master.service.export.settings.ConfigPropsStateComponentSettings;
 import com.nucleonforge.axelix.master.service.export.settings.EnvStateComponentSettings;
+import com.nucleonforge.axelix.master.service.export.settings.GcLogFileStateComponentSettings;
 import com.nucleonforge.axelix.master.service.export.settings.HeapDumpStateComponentSettings;
 import com.nucleonforge.axelix.master.service.export.settings.LogFileStateComponentSettings;
 import com.nucleonforge.axelix.master.service.export.settings.ScheduledTasksStateComponentSettings;
@@ -61,6 +62,7 @@ public class StateExportRequestConverter implements Converter<StateExportRequest
             case CONFIG_PROPS -> new ConfigPropsStateComponentSettings();
             case ENV -> new EnvStateComponentSettings();
             case LOG_FILE -> new LogFileStateComponentSettings();
+            case GC_LOG_FILE -> new GcLogFileStateComponentSettings();
             case SCHEDULED_TASKS -> new ScheduledTasksStateComponentSettings();
         };
     }

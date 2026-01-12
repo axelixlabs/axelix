@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.serde;
-
-import org.springframework.stereotype.Component;
+package com.nucleonforge.axelix.sbs.spring.gclog;
 
 /**
- * {@link ResourceMessageDeserializationStrategy} for logfile.
+ * Exception thrown when errors occur during GC log operations.
  *
- * @since 12.11.2025
+ * @since 29.12.2025
  * @author Nikita Kirillov
  */
-@Component
-public class LogFileMessageDeserializationStrategy extends ResourceMessageDeserializationStrategy {
+public class GcLogException extends RuntimeException {
 
-    @Override
-    protected String filename() {
-        return "application.log";
+    public GcLogException(String message) {
+        super(message);
+    }
+
+    public GcLogException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

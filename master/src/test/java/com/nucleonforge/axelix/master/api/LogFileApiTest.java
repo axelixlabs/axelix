@@ -173,7 +173,7 @@ class LogFileApiTest {
 
         ResponseEntity<InstanceNotFoundException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/env/feed/{instanceId}", InstanceNotFoundException.class, instanceId);
+                .getForEntity("/api/axelix/logfile/{instanceId}", InstanceNotFoundException.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
