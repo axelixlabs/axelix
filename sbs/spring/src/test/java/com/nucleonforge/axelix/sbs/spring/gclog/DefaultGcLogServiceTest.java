@@ -55,18 +55,6 @@ class DefaultGcLogServiceTest {
         Files.deleteIfExists(Path.of("gc.log.0"));
     }
 
-    /**
-     * <b>Important:</b> The {@code "off"} log level is intentionally excluded from the available levels.
-     *
-     * <p>Disabling GC logging must be done via {@link GcLogService#disable()} instead of
-     * switching the log level to {@code "off"}.
-     *
-     * <p>At the moment we assume that this guarantees that existing GC log files are preserved after logging is disabled,
-     * which would not be the case if {@code "off"} were applied as a log level.
-     *
-     * <p><b>Note:</b> This behavior has been verified for Corretto and Liberica JDK distributions.
-     * Other distributions or future JDK versions may behave differently.
-     */
     @Test
     void shouldReturnOnlyEnableableGcLogLevels() {
         var levels = subject.getStatus().availableLevels();
