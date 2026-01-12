@@ -100,9 +100,7 @@ public class LogFileApi {
                 in = ParameterIn.HEADER,
                 schema = @Schema(type = "string"))
     })
-    @GetMapping(
-            path = ApiPaths.LogFileApi.INSTANCE_ID,
-            produces = {MediaType.TEXT_PLAIN_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(path = ApiPaths.LogFileApi.INSTANCE_ID, produces = MediaType.TEXT_PLAIN_VALUE)
     public Resource getLogFile(
             @PathVariable("instanceId") String instanceId,
             @RequestHeader(value = "Range", required = false) @Nullable String rangeHeader) {

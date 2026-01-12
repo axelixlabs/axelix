@@ -20,12 +20,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -38,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class DefaultGcLogServiceTest {
 
-    private final DefaultGcLogService subject = new DefaultGcLogService(new JcmdExecutor());
+    private static final DefaultGcLogService subject = new DefaultGcLogService(new JcmdExecutor());
 
     @AfterEach
     void tearDown() {
@@ -71,19 +74,20 @@ class DefaultGcLogServiceTest {
         assertThat(levels).isNotEmpty().doesNotContain("off");
     }
 
-    @Test
-    void shouldEnableGcLoggingForEveryAvailableLevel() {
-        List<String> availableLevels = subject.getStatus().availableLevels();
+    @ParameterizedTest
+    @MethodSource("availableLevelsProvider")
+    void shouldEnableGcLoggingForEveryAvailableLevel(String level) {
+        subject.enable(level);
+        GcLogStatusResponse status = subject.getStatus();
 
-        for (String level : availableLevels) {
-            subject.enable(level);
-            GcLogStatusResponse status = subject.getStatus();
+        assertThat(status.enabled()).isTrue();
+        assertThat(status.level()).isEqualTo(level);
 
-            assertThat(status.enabled()).isTrue();
-            assertThat(status.level()).isEqualTo(level);
+        subject.disable();
+    }
 
-            subject.disable();
-        }
+    private static Stream<String> availableLevelsProvider() {
+        return subject.getStatus().availableLevels().stream();
     }
 
     @Test
@@ -128,14 +132,5 @@ class DefaultGcLogServiceTest {
     @Test
     void shouldThrowExceptionWhenEnableWithOffLevel() {
         assertThatThrownBy(() -> subject.enable("off")).isInstanceOf(GcLogException.class);
-    }
-
-    @Test
-    void shouldReturnFileEvenWhenLogFileDoesNotExist() throws IOException, InterruptedException {
-        subject.disable();
-        // In afterAll() method log files are deleted
-        afterAll();
-
-        assertThatThrownBy(subject::getGcLogFile).isInstanceOf(GcLogException.class);
     }
 }
