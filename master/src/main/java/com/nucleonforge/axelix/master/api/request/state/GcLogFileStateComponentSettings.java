@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.serde;
+package com.nucleonforge.axelix.master.api.request.state;
 
-import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.annotation.JsonGetter;
 
 /**
- * {@link ResourceMessageDeserializationStrategy} for logfile.
+ * {@link StateComponentSettings} for gc-logfile.
  *
- * @since 12.11.2025
+ * @since 11.01.2025
  * @author Nikita Kirillov
  */
-@Component
-public class LogFileMessageDeserializationStrategy extends ResourceMessageDeserializationStrategy {
+public class GcLogFileStateComponentSettings implements StateComponentSettings {
 
+    @JsonGetter(COMPONENT)
     @Override
-    protected String filename() {
-        return "application.log";
+    public StateExportComponent getComponent() {
+        return StateExportComponent.GC_LOG_FILE;
     }
 }

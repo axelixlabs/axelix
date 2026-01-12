@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.serde;
+package com.nucleonforge.axelix.common.api.gclog;
 
-import org.springframework.stereotype.Component;
+import java.util.List;
+
+import org.jspecify.annotations.Nullable;
 
 /**
- * {@link ResourceMessageDeserializationStrategy} for logfile.
+ * Response DTO representing the current status of garbage collection logging.
  *
- * @since 12.11.2025
+ * @param enabled indicates whether GC logging is currently enabled (true) or disabled (false).
+ * @param level The verbosity level of GC logging (e.g., "info", "debug", "trace").
+ *              May be null if logging is disabled.
+ * @param availableLevels list of available GC log levels supported by the JVM
+ *
+ * @since 10.01.2026
  * @author Nikita Kirillov
  */
-@Component
-public class LogFileMessageDeserializationStrategy extends ResourceMessageDeserializationStrategy {
-
-    @Override
-    protected String filename() {
-        return "application.log";
-    }
-}
+public record GcLogStatusResponse(boolean enabled, @Nullable String level, List<String> availableLevels) {}

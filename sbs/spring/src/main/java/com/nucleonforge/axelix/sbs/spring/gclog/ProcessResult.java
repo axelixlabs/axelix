@@ -13,21 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.serde;
-
-import org.springframework.stereotype.Component;
+package com.nucleonforge.axelix.sbs.spring.gclog;
 
 /**
- * {@link ResourceMessageDeserializationStrategy} for logfile.
+ * Represents the result of an external process execution.
  *
- * @since 12.11.2025
+ * @since 29.12.2025
  * @author Nikita Kirillov
  */
-@Component
-public class LogFileMessageDeserializationStrategy extends ResourceMessageDeserializationStrategy {
+public class ProcessResult {
+    private final boolean success;
+    private final String output;
 
-    @Override
-    protected String filename() {
-        return "application.log";
+    public ProcessResult(int exitCode, String output) {
+        this.success = exitCode == 0;
+        this.output = output;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getOutput() {
+        return output;
     }
 }

@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.service.serde;
-
-import org.springframework.stereotype.Component;
+package com.nucleonforge.axelix.common.api.gclog;
 
 /**
- * {@link ResourceMessageDeserializationStrategy} for logfile.
+ * Request DTO used to enable GC logging.
  *
- * @since 12.11.2025
+ * @param level GC log level to apply (e.g. info, debug, trace)
+ *
+ * @since 28.12.2025
  * @author Nikita Kirillov
  */
-@Component
-public class LogFileMessageDeserializationStrategy extends ResourceMessageDeserializationStrategy {
-
-    @Override
-    protected String filename() {
-        return "application.log";
-    }
-}
+public record GcLogEnableRequest(String level) {}

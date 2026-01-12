@@ -34,12 +34,12 @@ public abstract class AbstractBinaryInstanceStateCollector<T extends StateCompon
     @Override
     public byte[] collect(String instanceId, T settings) throws StateExportException {
         try {
-            Resource resource = collectBinaryResource(instanceId, settings);
+            Resource resource = collectResource(instanceId, settings);
             return resource.getContentAsByteArray();
         } catch (IOException e) {
             throw new StateExportException(instanceId, e);
         }
     }
 
-    protected abstract Resource collectBinaryResource(String instanceId, T settings) throws StateExportException;
+    protected abstract Resource collectResource(String instanceId, T settings) throws StateExportException;
 }
