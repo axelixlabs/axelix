@@ -128,19 +128,19 @@ public class GcLoggingEndpointProbersTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/status")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-gc/log/status")) {
                     return new MockResponse()
                             .setBody(STATUS_RESPONSE)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/gc-logfile")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gc/log/file")) {
                     return new MockResponse()
                             .setBody(GC_LOG_CONTENT)
                             .addHeader("Content-Type", "text/plain;charset=UTF-8");
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/trigger")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gc/trigger")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/enable")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gc/log/enable")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/disable")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gc/log/disable")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);

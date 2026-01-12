@@ -388,7 +388,7 @@ class StateExportApiTest {
                     return new MockResponse()
                             .setBody(mockLogFileResponse)
                             .addHeader("Content-Type", "text/plain;charset=UTF-8");
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gclog/gc-logfile")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-gc/log/file")) {
                     return new MockResponse()
                             .setBody(mockGcLogFileResponse)
                             .addHeader("Content-Type", "text/plain;charset=UTF-8");
