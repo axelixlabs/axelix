@@ -15,6 +15,14 @@
  */
 package com.nucleonforge.axelix.master.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +36,7 @@ import com.nucleonforge.axelix.common.api.gclog.GcLogEnableRequest;
 import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axelix.master.service.transport.gclog.DisableGcLoggingEndpointProber;
@@ -42,6 +51,7 @@ import com.nucleonforge.axelix.master.service.transport.gclog.GcTriggerEndpointP
  * @since 10.01.2026
  * @author Nikita Kirillov
  */
+@Tag(name = "GC Log File API", description = "API for managing GC logging and retrieving GC logs")
 @RestController
 @RequestMapping(path = ApiPaths.GcLogFileApi.MAIN)
 public class GcLogFileApi {
@@ -68,23 +78,124 @@ public class GcLogFileApi {
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
 
-    @GetMapping(
-            path = ApiPaths.GcLogFileApi.INSTANCE_ID,
-            produces = {MediaType.TEXT_PLAIN_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @Operation(
+            summary = "Get GC log file for the given instance",
+            description = "Returns GC log file as plain text",
+            responses = {
+                @ApiResponse(
+                        description = "GC log file content",
+                        responseCode = "200",
+                        content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))),
+                @ApiResponse(
+                        description = "Bad Request - instance not found",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "GC logging not enabled",
+                        responseCode = "404",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
+            })
+    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
+    @GetMapping(path = ApiPaths.GcLogFileApi.INSTANCE_ID, produces = MediaType.TEXT_PLAIN_VALUE)
     public Resource getGcLogFile(@PathVariable("instanceId") String instanceId) {
         return gcLogFileEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
     }
 
+    @Operation(
+            summary = "Get GC logging status",
+            description = "Returns current GC logging status for the instance",
+            responses = {
+                @ApiResponse(
+                        description = "GC logging status",
+                        responseCode = "200",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = GcLogStatusResponse.class))),
+                @ApiResponse(
+                        description = "Bad Request - instance not found",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
+            })
+    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.GcLogFileApi.STATUS_GC_LOGGING)
     public GcLogStatusResponse getStatus(@PathVariable("instanceId") String instanceId) {
         return gcLogStatusEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
     }
 
+    @Operation(
+            summary = "Trigger garbage collection",
+            description = "Manually triggers garbage collection on the target instance",
+            responses = {
+                @ApiResponse(description = "GC triggered successfully", responseCode = "200"),
+                @ApiResponse(
+                        description = "Bad Request - instance not found",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
+            })
+    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @PostMapping(path = ApiPaths.GcLogFileApi.TRIGGER_GC)
     public void triggerGc(@PathVariable("instanceId") String instanceId) {
         gcTriggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
     }
 
+    @Operation(
+            summary = "Enable GC logging",
+            description = "Enables GC logging with specified log level",
+            responses = {
+                @ApiResponse(description = "GC logging enabled successfully", responseCode = "200"),
+                @ApiResponse(
+                        description = "Bad Request - instance not found or invalid log level",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
+            })
+    @Parameters({
+        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
+        @Parameter(name = "request", description = "GC logging configuration", required = true)
+    })
     @PostMapping(path = ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING)
     public void enableGcLogging(
             @PathVariable("instanceId") String instanceId, @RequestBody GcLogEnableRequest request) {
@@ -92,6 +203,27 @@ public class GcLogFileApi {
         enableGcLoggingEndpointProber.invokeNoValue(InstanceId.of(instanceId), httpPayload);
     }
 
+    @Operation(
+            summary = "Disable GC logging",
+            description = "Disables GC logging for the instance",
+            responses = {
+                @ApiResponse(description = "GC logging disabled successfully", responseCode = "200"),
+                @ApiResponse(
+                        description = "Bad Request - instance not found",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
+            })
+    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @PostMapping(path = ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING)
     public void disableGcLogging(@PathVariable("instanceId") String instanceId) {
         disableGcLoggingEndpointProber.invokeNoValue(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);

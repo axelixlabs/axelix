@@ -65,7 +65,7 @@ class GcLogEndpointTest {
     @Test
     void status_shouldReturnCurrentStatus() {
         ResponseEntity<GcLogStatusResponse> response =
-                restTemplate.getForEntity("/actuator/axelix-gclog/status", GcLogStatusResponse.class);
+                restTemplate.getForEntity("/actuator/axelix-gc/log/status", GcLogStatusResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
@@ -83,7 +83,7 @@ class GcLogEndpointTest {
         GcLogEnableRequest request = new GcLogEnableRequest(availableLevels.get(0));
 
         ResponseEntity<Void> response =
-                restTemplate.postForEntity("/actuator/axelix-gclog/enable", request, Void.class);
+                restTemplate.postForEntity("/actuator/axelix-gc/log/enable", request, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -98,12 +98,12 @@ class GcLogEndpointTest {
         GcLogEnableRequest enableRequest = new GcLogEnableRequest(availableLevels.get(0));
 
         ResponseEntity<Void> enableResponse =
-                restTemplate.postForEntity("/actuator/axelix-gclog/enable", enableRequest, Void.class);
+                restTemplate.postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
 
         assertThat(enableResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         ResponseEntity<Void> disableResponse =
-                restTemplate.postForEntity("/actuator/axelix-gclog/disable", null, Void.class);
+                restTemplate.postForEntity("/actuator/axelix-gc/log/disable", null, Void.class);
 
         assertThat(disableResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -113,19 +113,19 @@ class GcLogEndpointTest {
     }
 
     @Test
-    void gcLogfile_shouldReturnFileWhenLoggingEnabled() throws IOException, InterruptedException {
+    void gcLogfile_shouldReturnFileWhenLoggingEnabled() throws InterruptedException {
         List<String> availableLevels = getStatus().availableLevels();
         GcLogEnableRequest enableRequest = new GcLogEnableRequest(availableLevels.get(0));
 
         ResponseEntity<Void> enableResponse =
-                restTemplate.postForEntity("/actuator/axelix-gclog/enable", enableRequest, Void.class);
+                restTemplate.postForEntity("/actuator/axelix-gc/log/enable", enableRequest, Void.class);
 
         assertThat(enableResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         System.gc();
         Thread.sleep(500);
 
-        ResponseEntity<byte[]> response = restTemplate.getForEntity("/actuator/axelix-gclog/gc-logfile", byte[].class);
+        ResponseEntity<byte[]> response = restTemplate.getForEntity("/actuator/axelix-gc/log/file", byte[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
@@ -133,19 +133,9 @@ class GcLogEndpointTest {
     }
 
     @Test
-    void gcLogfile_shouldReturnErrorWhenFileNotFound() throws IOException, InterruptedException {
-        // In afterAll() method log files are deleted
-        afterAll();
-
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-gclog/gc-logfile", String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Test
     void triggerGc_shouldTriggerGarbageCollection() {
         ResponseEntity<Void> response =
-                restTemplate.postForEntity("/actuator/axelix-gclog/trigger", HttpEntity.EMPTY, Void.class);
+                restTemplate.postForEntity("/actuator/axelix-gc/trigger", HttpEntity.EMPTY, Void.class);
 
         // Cannot assert GC happened, but endpoint should respond
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -156,14 +146,14 @@ class GcLogEndpointTest {
         GcLogEnableRequest request = new GcLogEnableRequest("invalid-level");
 
         ResponseEntity<String> response =
-                restTemplate.postForEntity("/actuator/axelix-gclog/enable", request, String.class);
+                restTemplate.postForEntity("/actuator/axelix-gc/log/enable", request, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private GcLogStatusResponse getStatus() {
         ResponseEntity<GcLogStatusResponse> response =
-                restTemplate.getForEntity("/actuator/axelix-gclog/status", GcLogStatusResponse.class);
+                restTemplate.getForEntity("/actuator/axelix-gc/log/status", GcLogStatusResponse.class);
 
         return response.getBody();
     }
