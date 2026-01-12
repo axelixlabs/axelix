@@ -146,7 +146,7 @@ class GcLogFileApiTest {
     void shouldReturnGcLogFileAsPlainText() {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/gc-logfile/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/api/axelix/garbage-collector/logs/{instanceId}/file", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
@@ -157,7 +157,7 @@ class GcLogFileApiTest {
     void shouldReturnStatusGcLogging() {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/gc-logfile/{instanceId}/status", String.class, activeInstanceId);
+                .getForEntity("/api/axelix/garbage-collector/logs/{instanceId}/status", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -169,7 +169,10 @@ class GcLogFileApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/gc-logfile/{instanceId}/trigger", HttpEntity.EMPTY, Void.class, activeInstanceId);
+                        "/api/axelix/garbage-collector/{instanceId}/trigger",
+                        HttpEntity.EMPTY,
+                        Void.class,
+                        activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -179,7 +182,11 @@ class GcLogFileApiTest {
         GcLogEnableRequest requestBody = new GcLogEnableRequest("info");
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
-                .postForEntity("/api/axelix/gc-logfile/{instanceId}/enable", requestBody, Void.class, activeInstanceId);
+                .postForEntity(
+                        "/api/axelix/garbage-collector/logs/{instanceId}/enable",
+                        requestBody,
+                        Void.class,
+                        activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -189,7 +196,10 @@ class GcLogFileApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/gc-logfile/{instanceId}/disable", HttpEntity.EMPTY, Void.class, activeInstanceId);
+                        "/api/axelix/garbage-collector/logs/{instanceId}/disable",
+                        HttpEntity.EMPTY,
+                        Void.class,
+                        activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -203,7 +213,10 @@ class GcLogFileApiTest {
 
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/gc-logfile/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity(
+                        "/api/axelix/garbage-collector/logs/{instanceId}/file",
+                        EndpointInvocationException.class,
+                        instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -214,7 +227,10 @@ class GcLogFileApiTest {
 
         ResponseEntity<InstanceNotFoundException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/gc-logfile/{instanceId}", InstanceNotFoundException.class, instanceId);
+                .getForEntity(
+                        "/api/axelix/garbage-collector/logs/{instanceId}/file",
+                        InstanceNotFoundException.class,
+                        instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }

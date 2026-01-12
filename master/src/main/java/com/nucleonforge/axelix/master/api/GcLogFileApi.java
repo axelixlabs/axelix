@@ -37,7 +37,7 @@ import com.nucleonforge.axelix.master.service.transport.gclog.GcLogStatusEndpoin
 import com.nucleonforge.axelix.master.service.transport.gclog.GcTriggerEndpointProber;
 
 /**
- * The API for gc-logfile.
+ * The API for garbage-collector.
  *
  * @since 10.01.2026
  * @author Nikita Kirillov

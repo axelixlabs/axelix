@@ -195,17 +195,17 @@ public final class ApiPaths {
         /**
          * Base path for GcLogFileApi.
          */
-        public static final String MAIN = "/gc-logfile";
+        public static final String MAIN = "/garbage-collector";
 
         /**
          * GcLogfile endpoint with instance ID.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/logs/{instanceId}/file";
 
         /**
          * GC logging status endpoint with instance ID.
          */
-        public static final String STATUS_GC_LOGGING = "/{instanceId}/status";
+        public static final String STATUS_GC_LOGGING = "/logs/{instanceId}/status";
 
         /**
          * Manual GC trigger endpoint with instance ID.
@@ -215,12 +215,12 @@ public final class ApiPaths {
         /**
          * Enable GC logging endpoint with instance ID.
          */
-        public static final String ENABLE_GC_LOGGING = "/{instanceId}/enable";
+        public static final String ENABLE_GC_LOGGING = "/logs/{instanceId}/enable";
 
         /**
          * Disable GC logging endpoint with instance ID.
          */
-        public static final String DISABLE_GC_LOGGING = "/{instanceId}/disable";
+        public static final String DISABLE_GC_LOGGING = "/logs/{instanceId}/disable";
     }
 
     public static final class HeapDumpApi {
