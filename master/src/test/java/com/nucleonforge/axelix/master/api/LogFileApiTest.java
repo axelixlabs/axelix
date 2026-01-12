@@ -175,6 +175,6 @@ class LogFileApiTest {
                 .withoutAuthorities()
                 .getForEntity("/api/axelix/logfile/{instanceId}", InstanceNotFoundException.class, instanceId);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

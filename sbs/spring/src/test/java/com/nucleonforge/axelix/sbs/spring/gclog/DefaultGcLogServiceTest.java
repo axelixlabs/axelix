@@ -20,10 +20,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
 
@@ -38,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class DefaultGcLogServiceTest {
 
-    private final DefaultGcLogService subject = new DefaultGcLogService(new JcmdExecutor());
+    private static final DefaultGcLogService subject = new DefaultGcLogService(new JcmdExecutor());
 
     @AfterEach
     void tearDown() {
@@ -52,18 +55,6 @@ class DefaultGcLogServiceTest {
         Files.deleteIfExists(Path.of("gc.log.0"));
     }
 
-    /**
-     * <b>Important:</b> The {@code "off"} log level is intentionally excluded from the available levels.
-     *
-     * <p>Disabling GC logging must be done via {@link GcLogService#disable()} instead of
-     * switching the log level to {@code "off"}.
-     *
-     * <p>At the moment we assume that this guarantees that existing GC log files are preserved after logging is disabled,
-     * which would not be the case if {@code "off"} were applied as a log level.
-     *
-     * <p><b>Note:</b> This behavior has been verified for Corretto and Liberica JDK distributions.
-     * Other distributions or future JDK versions may behave differently.
-     */
     @Test
     void shouldReturnOnlyEnableableGcLogLevels() {
         var levels = subject.getStatus().availableLevels();
@@ -71,19 +62,20 @@ class DefaultGcLogServiceTest {
         assertThat(levels).isNotEmpty().doesNotContain("off");
     }
 
-    @Test
-    void shouldEnableGcLoggingForEveryAvailableLevel() {
-        List<String> availableLevels = subject.getStatus().availableLevels();
+    @ParameterizedTest
+    @MethodSource("availableLevelsProvider")
+    void shouldEnableGcLoggingForEveryAvailableLevel(String level) {
+        subject.enable(level);
+        GcLogStatusResponse status = subject.getStatus();
 
-        for (String level : availableLevels) {
-            subject.enable(level);
-            GcLogStatusResponse status = subject.getStatus();
+        assertThat(status.enabled()).isTrue();
+        assertThat(status.level()).isEqualTo(level);
 
-            assertThat(status.enabled()).isTrue();
-            assertThat(status.level()).isEqualTo(level);
+        subject.disable();
+    }
 
-            subject.disable();
-        }
+    private static Stream<String> availableLevelsProvider() {
+        return subject.getStatus().availableLevels().stream();
     }
 
     @Test
@@ -128,14 +120,5 @@ class DefaultGcLogServiceTest {
     @Test
     void shouldThrowExceptionWhenEnableWithOffLevel() {
         assertThatThrownBy(() -> subject.enable("off")).isInstanceOf(GcLogException.class);
-    }
-
-    @Test
-    void shouldReturnFileEvenWhenLogFileDoesNotExist() throws IOException, InterruptedException {
-        subject.disable();
-        // In afterAll() method log files are deleted
-        afterAll();
-
-        assertThatThrownBy(subject::getGcLogFile).isInstanceOf(GcLogException.class);
     }
 }

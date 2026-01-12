@@ -32,7 +32,7 @@ import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
  * @since 28.12.2025
  * @author Nikita Kirillov
  */
-@RestControllerEndpoint(id = "axelix-gclog")
+@RestControllerEndpoint(id = "axelix-gc")
 public class GcLogEndpoint {
 
     private final GcLogService gcLogService;
@@ -41,12 +41,12 @@ public class GcLogEndpoint {
         this.gcLogService = gcLogService;
     }
 
-    @GetMapping("/status")
+    @GetMapping("/log/status")
     public GcLogStatusResponse status() {
         return gcLogService.getStatus();
     }
 
-    @GetMapping(value = "/gc-logfile", produces = MediaType.TEXT_PLAIN_VALUE)
+    @GetMapping(value = "log/file", produces = MediaType.TEXT_PLAIN_VALUE)
     public Resource gcLogfile() {
         return new FileSystemResource(gcLogService.getGcLogFile());
     }
@@ -56,12 +56,12 @@ public class GcLogEndpoint {
         System.gc();
     }
 
-    @PostMapping("/enable")
+    @PostMapping("/log/enable")
     public void enable(@RequestBody GcLogEnableRequest request) {
         gcLogService.enable(request.level());
     }
 
-    @PostMapping("/disable")
+    @PostMapping("/log/disable")
     public void disable() {
         gcLogService.disable();
     }
