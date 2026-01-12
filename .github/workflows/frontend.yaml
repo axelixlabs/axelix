@@ -102,6 +102,8 @@ jobs:
           echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
           chmod 600 ~/.kube/config
           helm upgrade \
+            --set frontend.image.pullPolicy=Always \
+            --set backend.image.pullPolicy=Always \
             --set frontend.image.name=$IMAGE_REPOSITORY/$IMAGE_NAME \
             --set frontend.image.tag=${{ steps.gradleProperties.outputs.value }} \
             --set backend.image.name=$IMAGE_REPOSITORY/master \
