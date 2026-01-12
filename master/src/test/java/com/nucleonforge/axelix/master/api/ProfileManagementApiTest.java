@@ -27,10 +27,13 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,6 +51,7 @@ import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -60,6 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 28.08.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProfileManagementApiTest {
@@ -120,6 +125,16 @@ class ProfileManagementApiTest {
                 }
             }
         });
+
+        registry.register(TestObjectFactory.createInstance(
+                activeInstanceId,
+                mockWebServer.url(activeInstanceId + "/actuator").toString(),
+                Instance.InstanceStatus.UP));
+    }
+
+    @AfterEach
+    void cleanup() {
+        registry.deRegister(InstanceId.of(activeInstanceId));
     }
 
     @Test
@@ -127,11 +142,7 @@ class ProfileManagementApiTest {
         List<String> profiles = List.of("postgres");
         ProfileUpdatedRequest request = new ProfileUpdatedRequest(profiles);
 
-        registry.register(TestObjectFactory.createInstance(
-                activeInstanceId,
-                mockWebServer.url(activeInstanceId + "/actuator").toString(),
-                Instance.InstanceStatus.UP));
-
+        // when.
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
@@ -140,6 +151,7 @@ class ProfileManagementApiTest {
                         String.class,
                         activeInstanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
 
@@ -147,18 +159,17 @@ class ProfileManagementApiTest {
                 registry.get(InstanceId.of(activeInstanceId)).orElseThrow(InstanceNotFoundException::new);
         assertThat(instanceModify.status()).isEqualTo(Instance.InstanceStatus.RELOAD);
 
-        String body = response.getBody();
-        assertThatJson(body).isEqualTo(EXPECTED_JSON);
+        assertThatJson(response.getBody()).isEqualTo(EXPECTED_JSON);
     }
 
     @Test
     @DisplayName("Should return 500 on EndpointInvocationError when replacing profiles")
-    void shouldReturnInternalServerErrorOnProfileManagement() {
+    void shouldReturnInternalServerError_OnProfileManagement() {
         String instanceId = UUID.randomUUID().toString();
         ProfileUpdatedRequest request = new ProfileUpdatedRequest(List.of("test-profile"));
-
         registry.register(createInstance(instanceId));
 
+        // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
@@ -167,6 +178,7 @@ class ProfileManagementApiTest {
                         EndpointInvocationException.class,
                         instanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -175,6 +187,7 @@ class ProfileManagementApiTest {
         String instanceId = UUID.randomUUID().toString();
         ProfileUpdatedRequest request = new ProfileUpdatedRequest(List.of("test-profile"));
 
+        // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
@@ -183,7 +196,26 @@ class ProfileManagementApiTest {
                         EndpointInvocationException.class,
                         instanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
+        ProfileUpdatedRequest request = new ProfileUpdatedRequest(List.of("test-profile"));
+
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .postForEntity(
+                        "/api/axelix/profile-management/{instanceId}",
+                        defaultEntity(request),
+                        Void.class,
+                        activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     private HttpEntity<ProfileUpdatedRequest> defaultEntity(ProfileUpdatedRequest request) {

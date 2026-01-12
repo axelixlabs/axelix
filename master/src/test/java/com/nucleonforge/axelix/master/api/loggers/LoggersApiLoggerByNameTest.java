@@ -31,6 +31,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,6 +46,7 @@ import com.nucleonforge.axelix.master.api.LoggersApi;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -180,9 +183,7 @@ public class LoggersApiLoggerByNameTest {
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-
-        String body = response.getBody();
-        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedJson);
+        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedJson);
     }
 
     @Test
@@ -219,5 +220,23 @@ public class LoggersApiLoggerByNameTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
+        String loggerName = "org.springframework.web";
+
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .getForEntity(
+                        "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
+                        Void.class,
+                        activeInstanceId,
+                        loggerName);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 }

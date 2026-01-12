@@ -19,6 +19,7 @@ package com.nucleonforge.axelix.master.api;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -31,6 +32,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,6 +52,7 @@ import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -317,7 +323,6 @@ public class ScheduledTasksApiTest {
     @Test
     void shouldReturnJSONScheduledTasksResponse() {
         // when.
-
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity("/api/axelix/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
@@ -325,13 +330,12 @@ public class ScheduledTasksApiTest {
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-
-        String body = response.getBody();
-        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_MASTER_RESPONSE);
+        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_MASTER_RESPONSE);
     }
 
-    @Test
-    void shouldEnableSingleScheduledTask() {
+    @ParameterizedTest
+    @MethodSource("managementScheduledTask")
+    void shouldEnableOrDisableSingleScheduledTask(String scheduledTaskStatus) {
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
@@ -339,22 +343,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<String> body = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/enable", requestBody, String.class, activeInstanceId);
-
-        // then
-        assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
-    void shouldDisableSingleScheduledTask() {
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
-
-        // when.
-        ResponseEntity<String> body = restTemplate
-                .withoutAuthorities()
-                .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/disable",
+                        "/api/axelix/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
                         String.class,
                         activeInstanceId);
@@ -421,9 +410,9 @@ public class ScheduledTasksApiTest {
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerErrorOnGetAllScheduledTasks() {
         String instanceId = UUID.randomUUID().toString();
+        registry.register(createInstance(instanceId));
 
         // when.
-        registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
@@ -447,9 +436,10 @@ public class ScheduledTasksApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("managementScheduledTask")
     @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerErrorOnEnableSingleScheduledTask() {
+    void shouldReturnInternalServerError_OnEnableOrDisableSingleScheduledTask(String scheduledTaskStatus) {
         String instanceId = UUID.randomUUID().toString();
 
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
@@ -460,7 +450,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/enable",
+                        "/api/axelix/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
                         EndpointInvocationException.class,
                         instanceId);
@@ -469,50 +459,11 @@ public class ScheduledTasksApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @Test
-    void shouldReturnBadRequestForUnregisteredInstanceOnEnableSingleScheduledTask() {
-        String instanceId = "unregistered-axelix-scheduled-tasks-enable-instance";
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
-
-        // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
-                .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/enable",
-                        requestBody,
-                        EndpointInvocationException.class,
-                        instanceId);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerErrorOnDisableSingleScheduledTask() {
+    @ParameterizedTest
+    @MethodSource("managementScheduledTask")
+    void shouldReturnBadRequestForUnregisteredInstance_OnEnableOrDisableSingleScheduledTask(
+            String scheduledTaskStatus) {
         String instanceId = UUID.randomUUID().toString();
-
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
-
-        // when.
-        registry.register(createInstance(instanceId));
-        ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
-                .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/disable",
-                        requestBody,
-                        EndpointInvocationException.class,
-                        instanceId);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Test
-    void shouldReturnBadRequestForUnregisteredInstanceOnDisableSingleScheduledTask() {
-        String instanceId = "unregistered-axelix-scheduled-tasks-enable-instance";
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
@@ -520,7 +471,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/disable",
+                        "/api/axelix/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
                         EndpointInvocationException.class,
                         instanceId);
@@ -650,5 +601,53 @@ public class ScheduledTasksApiTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized_OnGetAllScheduledTasks(InvalidAuthScenario scenario) {
+        // when.
+        ResponseEntity<?> response = scenario.modifier
+                .apply(restTemplate)
+                .getForEntity("/api/axelix/scheduled-tasks/{instanceId}", Void.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized_OnEnableSingleScheduledTask(InvalidAuthScenario scenario) {
+        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .postForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}/enable", requestBody, Void.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized_OnDisableSingleScheduledTask(InvalidAuthScenario scenario) {
+        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
+
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .postForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}/disable", requestBody, Void.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    private static Stream<Arguments> managementScheduledTask() {
+        return Stream.of(Arguments.of("/enable"), Arguments.of("/disable"));
     }
 }

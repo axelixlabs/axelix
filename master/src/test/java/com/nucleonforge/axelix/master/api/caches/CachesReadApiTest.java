@@ -26,9 +26,13 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,8 +42,11 @@ import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
+import com.nucleonforge.axelix.master.api.response.caches.CachesResponse;
+import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -55,6 +62,51 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CachesReadApiTest {
+    private static final String activeInstanceId = UUID.randomUUID().toString();
+    private static final String activeInstanceIdEmptyCaches = UUID.randomUUID().toString();
+
+    // language=json
+    String EXPECTED_ALL_CACHES_JSON =
+            """
+    {
+      "cacheManagers": [
+        {
+          "name": "anotherCacheManager",
+          "caches": [
+            {
+              "name": "countries",
+              "target": "java.util.concurrent.ConcurrentHashMap",
+              "hitsCount" : 15,
+              "missesCount" : 2,
+              "estimatedEntrySize": 10,
+              "enabled" : true
+            }
+          ]
+        },
+        {
+          "name": "cacheManager",
+          "caches": [
+            {
+              "name": "cities",
+              "target": "java.util.concurrent.ConcurrentHashMap",
+              "hitsCount" : 25,
+              "missesCount" : 5,
+              "estimatedEntrySize": 6,
+              "enabled" : false
+            },
+            {
+              "name": "countries",
+              "target": "java.util.concurrent.ConcurrentHashMap",
+              "hitsCount" : 35,
+              "missesCount" : 5,
+              "estimatedEntrySize": 10,
+              "enabled" : true
+            }
+          ]
+        }
+      ]
+    }
+    """;
 
     private static MockWebServer mockWebServer;
 
@@ -75,12 +127,10 @@ public class CachesReadApiTest {
         mockWebServer.shutdown();
     }
 
-    @Test
-    void shouldReturnJSONCachesResponse() {
-        String activeInstanceId = UUID.randomUUID().toString();
-
-        String responseFromManagedService =
-                // language=json
+    @BeforeEach
+    void prepare() {
+        // language=json
+        String jsonResponseAllCaches =
                 """
         {
           "cacheManagers" : [
@@ -122,15 +172,41 @@ public class CachesReadApiTest {
         }
         """;
 
+        // language=json
+        String jsonResponseFromStarter =
+                """
+        {
+          "target" : "java.util.concurrent.ConcurrentHashMap",
+          "name" : "cities",
+          "cacheManager" : "cacheManager"
+        }
+        """;
+
+        // language=json
+        String jsonResponseEmptyCaches = """
+        {
+          "cacheManagers" : []
+        }
+        """;
+
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/actuator/axelix-caches")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches")) {
                     return new MockResponse()
-                            .setBody(responseFromManagedService)
+                            .setBody(jsonResponseAllCaches)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                }
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/cacheManager/cities")) {
+                    return new MockResponse()
+                            .setBody(jsonResponseFromStarter)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceIdEmptyCaches + "/actuator/axelix-caches")) {
+                    return new MockResponse()
+                            .setBody(jsonResponseEmptyCaches)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -138,69 +214,86 @@ public class CachesReadApiTest {
             }
         });
 
+        registry.register(
+                TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
         registry.register(TestObjectFactory.createInstance(
-                activeInstanceId, mockWebServer.url("/actuator").toString()));
+                activeInstanceIdEmptyCaches, mockWebServer.url(activeInstanceIdEmptyCaches) + "/actuator"));
+    }
 
-        // language=json
-        String expectedAllCachesJSON =
-                """
-        {
-          "cacheManagers": [
-            {
-              "name": "anotherCacheManager",
-              "caches": [
-                {
-                  "name": "countries",
-                  "target": "java.util.concurrent.ConcurrentHashMap",
-                  "hitsCount" : 15,
-                  "missesCount" : 2,
-                  "estimatedEntrySize": 10,
-                  "enabled" : true
-                }
-              ]
-            },
-            {
-              "name": "cacheManager",
-              "caches": [
-                {
-                  "name": "cities",
-                  "target": "java.util.concurrent.ConcurrentHashMap",
-                  "hitsCount" : 25,
-                  "missesCount" : 5,
-                  "estimatedEntrySize": 6,
-                  "enabled" : false
-                },
-                {
-                  "name": "countries",
-                  "target": "java.util.concurrent.ConcurrentHashMap",
-                  "hitsCount" : 35,
-                  "missesCount" : 5,
-                  "estimatedEntrySize": 10,
-                  "enabled" : true
-                }
-              ]
-            }
-          ]
-        }
-        """;
+    @AfterEach
+    void cleanup() {
+        registry.deRegister(InstanceId.of(activeInstanceId));
+        registry.deRegister(InstanceId.of(activeInstanceIdEmptyCaches));
+    }
+
+    @Test
+    void shouldReturnJSONAllCachesResponse() {
         // when
-        ResponseEntity<String> response = restTemplate
+        ResponseEntity<CachesResponse> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/caches/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/api/axelix/caches/{instanceId}", CachesResponse.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_ALL_CACHES_JSON);
+    }
 
-        String body = response.getBody();
-        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedAllCachesJSON);
+    @Test
+    void shouldReturnJSONCacheProfileResponse() {
+        String requestedCacheName = "cities";
+        String requestedCacheManagerName = "cacheManager";
+
+        // language=json
+        String expectedResponseFromMaster =
+                """
+        {
+          "name": "%s",
+          "target": "java.util.concurrent.ConcurrentHashMap",
+          "cacheManager": "%s"
+        }
+        """
+                        .formatted(requestedCacheName, requestedCacheManagerName);
+
+        // when.
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity(
+                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=" + requestedCacheManagerName,
+                        String.class,
+                        activeInstanceId,
+                        requestedCacheName);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedResponseFromMaster);
+    }
+
+    @Test
+    void shouldHandleEmptyCacheManagersResponse() {
+        // language=json
+        String expectedEmptyCaches = """
+            {
+              "cacheManagers": []
+            }
+            """;
+
+        // when
+        ResponseEntity<String> response = restTemplate
+                .withoutAuthorities()
+                .getForEntity("/api/axelix/caches/{instanceId}", String.class, activeInstanceIdEmptyCaches);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedEmptyCaches);
     }
 
     @Test
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerErrorCachesResponse() {
         String instanceId = UUID.randomUUID().toString();
-
         registry.register(createInstance(instanceId));
 
         // when.
@@ -223,73 +316,6 @@ public class CachesReadApiTest {
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    void shouldReturnJSONCacheProfileResponse() {
-        String activeInstanceId = UUID.randomUUID().toString();
-        String requestedCacheName = "cities";
-        String requestedCacheManagerName = "cacheManager";
-
-        // language=json
-        String responseFromStarter =
-                """
-        {
-          "target" : "java.util.concurrent.ConcurrentHashMap",
-          "name" : "%s",
-          "cacheManager" : "%s"
-        }
-        """
-                        .formatted(requestedCacheName, requestedCacheManagerName);
-
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
-                String path = request.getPath();
-                assert path != null;
-
-                boolean expectedPath = path.equals(
-                        "/actuator/axelix-caches/%s/%s".formatted(requestedCacheManagerName, requestedCacheName));
-
-                if (expectedPath) {
-                    return new MockResponse()
-                            .setBody(responseFromStarter)
-                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else {
-                    return new MockResponse().setResponseCode(404);
-                }
-            }
-        });
-
-        registry.register(TestObjectFactory.createInstance(
-                activeInstanceId, mockWebServer.url("/actuator").toString()));
-
-        // language=json
-        String expectedResponseFromMaster =
-                """
-            {
-              "name": "%s",
-              "target": "java.util.concurrent.ConcurrentHashMap",
-              "cacheManager": "%s"
-            }
-            """
-                        .formatted(requestedCacheName, requestedCacheManagerName);
-
-        // when.
-        ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
-                .getForEntity(
-                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=" + requestedCacheManagerName,
-                        String.class,
-                        activeInstanceId,
-                        requestedCacheName);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-
-        String body = response.getBody();
-        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedResponseFromMaster);
     }
 
     @Test
@@ -328,5 +354,32 @@ public class CachesReadApiTest {
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized_OnCachesResponse(InvalidAuthScenario scenario) {
+
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .getForEntity("/api/axelix/caches/{instanceId}", Void.class, activeInstanceId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized_OnCacheProfileResponse(InvalidAuthScenario scenario) {
+        String cacheName = "cities";
+
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .getForEntity(
+                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
+                        Void.class,
+                        activeInstanceId,
+                        cacheName);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 }

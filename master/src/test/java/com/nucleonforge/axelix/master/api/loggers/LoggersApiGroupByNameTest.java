@@ -31,6 +31,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,6 +46,7 @@ import com.nucleonforge.axelix.master.api.LoggersApi;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -59,7 +62,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LoggersApiGroupByNameTest {
-
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
@@ -84,7 +86,7 @@ public class LoggersApiGroupByNameTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonGroupTestResponse =
+        String jsonLoggerGroupsWithConfiguredLevelResponse =
                 """
             {
                 "configuredLevel" : "INFO",
@@ -93,7 +95,7 @@ public class LoggersApiGroupByNameTest {
             """;
 
         // language=json
-        String jsonGroupWebResponse =
+        String jsonLoggerGroupsResponse =
                 """
             {
                 "members" : [ "web.member1"]
@@ -108,11 +110,11 @@ public class LoggersApiGroupByNameTest {
 
                 if (path.equals("/" + activeInstanceId + "/loggers/test")) {
                     return new MockResponse()
-                            .setBody(jsonGroupTestResponse)
+                            .setBody(jsonLoggerGroupsWithConfiguredLevelResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
                 } else if (path.equals("/" + activeInstanceId + "/loggers/web")) {
                     return new MockResponse()
-                            .setBody(jsonGroupWebResponse)
+                            .setBody(jsonLoggerGroupsResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -130,7 +132,7 @@ public class LoggersApiGroupByNameTest {
     }
 
     @Test
-    void shouldReturnJSONGroupNameTest() {
+    void shouldReturnJSONLoggerGroupsWithConfiguredLevel() {
         // language=json
         String expectedJson =
                 """
@@ -159,7 +161,7 @@ public class LoggersApiGroupByNameTest {
     }
 
     @Test
-    void shouldReturnJSONGroupNameWeb() {
+    void shouldReturnJSONLoggerGroups() {
         // language=json
         String expectedJson =
                 """
@@ -181,9 +183,7 @@ public class LoggersApiGroupByNameTest {
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-
-        String body = response.getBody();
-        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedJson);
+        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(expectedJson);
     }
 
     @Test
@@ -205,7 +205,7 @@ public class LoggersApiGroupByNameTest {
 
     @Test
     void shouldReturnBadRequestForUnregisteredInstance() {
-        String instanceId = "unregistered-loggers-group-instance";
+        String instanceId = UUID.randomUUID().toString();
         String groupName = "test";
 
         // when.
@@ -219,5 +219,20 @@ public class LoggersApiGroupByNameTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
+        String groupName = "test";
+
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .getForEntity(
+                        "/api/axelix/loggers/{instanceId}/group/{groupName}", Void.class, activeInstanceId, groupName);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 }

@@ -18,7 +18,9 @@
 package com.nucleonforge.axelix.master.api;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -31,6 +33,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,6 +49,7 @@ import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
@@ -280,69 +287,141 @@ class ThreadDumpApiTest {
                 .withoutAuthorities()
                 .getForEntity("/api/axelix/thread-dump/{instanceId}", String.class, activeInstanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-
-        String body = response.getBody();
-
-        assertThatJson(body).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_THREAD_DUMP_JSON);
+        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_THREAD_DUMP_JSON);
     }
 
     @Test
     @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerError() {
         String instanceId = UUID.randomUUID().toString();
-
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<?> response = restTemplate
+        // when.
+        ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/thread-dump/{instanceId}", Void.class, instanceId);
+                .getForEntity("/api/axelix/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = UUID.randomUUID().toString();
-
+        // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity("/api/axelix/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @Test
-    void shouldEnableContentionMonitoring() throws InterruptedException {
+    @ParameterizedTest
+    @MethodSource("managementCachesContentionMonitoring")
+    void shouldEnableOrDisableContentionMonitoring(String contentionMonitoringStatus) throws InterruptedException {
         // when.
-        restTemplate
+        ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
-                .postForObject(
+                .postForEntity(
+                        "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring"
+                                + contentionMonitoringStatus,
+                        null,
+                        Void.class,
+                        Map.of("instanceId", activeInstanceId));
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @ParameterizedTest
+    @MethodSource("managementCachesContentionMonitoring")
+    @DisplayName("Should return 500 on EndpointInvocationError")
+    void shouldReturnInternalServerError_OnEnableOrDisableContentionMonitoring(String contentionMonitoringStatus) {
+        String instanceId = UUID.randomUUID().toString();
+        registry.register(createInstance(instanceId));
+        // when.
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring"
+                                + contentionMonitoringStatus,
+                        null,
+                        EndpointInvocationException.class,
+                        Map.of("instanceId", instanceId));
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ParameterizedTest
+    @MethodSource("managementCachesContentionMonitoring")
+    void shouldReturnBadRequestForUnregisteredInstance_OnEnableOrDisableContentionMonitoring(
+            String contentionMonitoringStatus) {
+        String instanceId = UUID.randomUUID().toString();
+
+        // when.
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring"
+                                + contentionMonitoringStatus,
+                        null,
+                        EndpointInvocationException.class,
+                        Map.of("instanceId", instanceId));
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .getForEntity("/api/axelix/thread-dump/{instanceId}", Void.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized_OnEnableContentionMonitoring(InvalidAuthScenario scenario) {
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .postForEntity(
                         "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring/enable",
                         null,
                         Void.class,
-                        activeInstanceId);
+                        Map.of("instanceId", activeInstanceId));
 
         // then.
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/actuator/axelix-thread-dump/enable");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
-    @Test
-    void shouldDisableContentionMonitoring() throws InterruptedException {
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized_OnDisableContentionMonitoring(InvalidAuthScenario scenario) {
         // when.
-        restTemplate
-                .withoutAuthorities()
-                .postForObject(
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .postForEntity(
                         "/api/axelix/thread-dump/{instanceId}/thread-contention-monitoring/disable",
                         null,
                         Void.class,
-                        activeInstanceId);
+                        Map.of("instanceId", activeInstanceId));
 
         // then.
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertThat(recordedRequest.getPath())
-                .isEqualTo("/" + activeInstanceId + "/actuator/axelix-thread-dump/disable");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    private static Stream<Arguments> managementCachesContentionMonitoring() {
+        return Stream.of(Arguments.of("/enable"), Arguments.of("/disable"));
     }
 }

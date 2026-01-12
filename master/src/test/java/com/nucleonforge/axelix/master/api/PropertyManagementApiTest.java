@@ -26,10 +26,13 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,6 +50,7 @@ import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
@@ -58,6 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 28.08.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PropertyManagementApiTest {
@@ -100,17 +105,23 @@ class PropertyManagementApiTest {
                 }
             }
         });
+
+        registry.register(TestObjectFactory.createInstance(
+                activeInstanceId,
+                mockWebServer.url(activeInstanceId + "/actuator").toString(),
+                Instance.InstanceStatus.UP));
+    }
+
+    @AfterEach
+    void cleanup() {
+        registry.deRegister(InstanceId.of(activeInstanceId));
     }
 
     @Test
     void shouldReturnOkOnPropertyUpdate() {
         PropertyUpdatedRequest request = new PropertyUpdatedRequest("property.enabled", "false");
 
-        registry.register(TestObjectFactory.createInstance(
-                activeInstanceId,
-                mockWebServer.url(activeInstanceId + "/actuator").toString(),
-                Instance.InstanceStatus.UP));
-
+        // when.
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
@@ -119,6 +130,7 @@ class PropertyManagementApiTest {
                         Void.class,
                         activeInstanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         Instance instanceModify =
@@ -131,9 +143,9 @@ class PropertyManagementApiTest {
     void shouldReturnInternalServerErrorOnPropertyManagement() {
         String instanceId = UUID.randomUUID().toString();
         PropertyUpdatedRequest request = new PropertyUpdatedRequest("property.enabled", "value");
-
         registry.register(createInstance(instanceId));
 
+        // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
@@ -142,6 +154,7 @@ class PropertyManagementApiTest {
                         EndpointInvocationException.class,
                         instanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -150,6 +163,7 @@ class PropertyManagementApiTest {
         String instanceId = UUID.randomUUID().toString();
         PropertyUpdatedRequest request = new PropertyUpdatedRequest("property.enabled", "false");
 
+        // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
@@ -158,7 +172,26 @@ class PropertyManagementApiTest {
                         EndpointInvocationException.class,
                         instanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
+        PropertyUpdatedRequest request = new PropertyUpdatedRequest("property.enabled", "false");
+
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .postForEntity(
+                        "/api/axelix/property-management/{instanceId}",
+                        defaultEntity(request),
+                        Void.class,
+                        activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     private HttpEntity<PropertyUpdatedRequest> defaultEntity(PropertyUpdatedRequest request) {

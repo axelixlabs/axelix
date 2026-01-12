@@ -27,9 +27,13 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,9 +48,11 @@ import org.springframework.http.ResponseEntity;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
+import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.export.HeapDumpAnonymizer;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
@@ -59,6 +65,7 @@ import static org.mockito.Mockito.when;
  *
  * @since 12.11.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class HeapDumpApiTest {
@@ -122,17 +129,24 @@ class HeapDumpApiTest {
                 }
             };
         });
+
+        registry.register(
+                TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+    }
+
+    @AfterEach
+    void cleanup() {
+        registry.deRegister(InstanceId.of(activeInstanceId));
     }
 
     @Test
     void shouldReturnHeapDumpAsAttachment() {
-        registry.register(
-                TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
-
+        // when.
         ResponseEntity<byte[]> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity("/api/axelix/heapdump/{instanceId}", byte[].class, activeInstanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
 
@@ -140,20 +154,22 @@ class HeapDumpApiTest {
         assertThat(contentDisposition).isNotNull();
         assertThat(contentDisposition).contains("attachment");
         assertThat(contentDisposition).contains("filename=\"heapdump.hprof\"");
-
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).contains(mockHeapDump);
     }
 
     @Test
+    @DisplayName("Should return 500 on EndpointInvocationError")
     void shouldReturnInternalServerErrorWhenHeapDumpFails() {
         String instanceId = UUID.randomUUID().toString();
         registry.register(createInstance(instanceId));
 
+        // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity("/api/axelix/heapdump/{instanceId}", EndpointInvocationException.class, instanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -161,10 +177,24 @@ class HeapDumpApiTest {
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = UUID.randomUUID().toString();
 
+        // when.
         ResponseEntity<InstanceNotFoundException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity("/api/axelix/heapdump/{instanceId}", InstanceNotFoundException.class, instanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
+                .getForEntity("/api/axelix/heapdump/{instanceId}", Void.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 }

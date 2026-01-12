@@ -20,6 +20,7 @@ package com.nucleonforge.axelix.master.api.caches;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -30,7 +31,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,6 +46,8 @@ import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 26.11.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CachesManagementApiTest {
@@ -107,10 +115,92 @@ class CachesManagementApiTest {
         registry.deRegister(InstanceId.of(activeInstanceId));
     }
 
-    @Test
-    void shouldEnableSpecificCache() {
+    @ParameterizedTest
+    @MethodSource("managementCaches")
+    void shouldEnableOrDisableSpecificCache(String cacheStatus) {
+        // when.
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}" + cacheStatus,
+                        null,
+                        Void.class,
+                        Map.of(
+                                "instanceId",
+                                activeInstanceId,
+                                "cacheManagerName",
+                                "cacheManager",
+                                "cacheName",
+                                "vets"));
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @ParameterizedTest
+    @MethodSource("managementCaches")
+    void shouldEnableOrDisableCacheManager(String cacheStatus) {
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}" + cacheStatus,
+                        null,
+                        Void.class,
+                        Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @ParameterizedTest
+    @MethodSource("managementCaches")
+    @DisplayName("Should return 500 on EndpointInvocationError")
+    void shouldReturnInternalServerError_OnEnableOrDisableCacheName(String cacheStatus) {
+        String instanceId = UUID.randomUUID().toString();
+        registry.register(createInstance(instanceId));
+
+        // when.
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}" + cacheStatus,
+                        null,
+                        EndpointInvocationException.class,
+                        Map.of("instanceId", instanceId, "cacheManagerName", "unknown", "cacheName", "unknown"));
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ParameterizedTest
+    @MethodSource("managementCaches")
+    void shouldReturnBadRequestForUnregisteredInstance_OnEnableOrDisableCacheName(String cacheStatus) {
+        // when.
+        ResponseEntity<EndpointInvocationException> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}" + cacheStatus,
+                        null,
+                        EndpointInvocationException.class,
+                        Map.of(
+                                "instanceId",
+                                UUID.randomUUID().toString(),
+                                "cacheManagerName",
+                                "cacheManager",
+                                "cacheName",
+                                "vets"));
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized_OnEnableCacheName(InvalidAuthScenario scenario) {
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
                 .postForEntity(
                         "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
                         null,
@@ -123,13 +213,16 @@ class CachesManagementApiTest {
                                 "cacheName",
                                 "vets"));
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
-    @Test
-    void shouldDisableSpecificCache() {
-        ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized_OnDisableCacheName(InvalidAuthScenario scenario) {
+        // when.
+        ResponseEntity<Void> response = scenario.modifier
+                .apply(restTemplate)
                 .postForEntity(
                         "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/disable",
                         null,
@@ -142,64 +235,11 @@ class CachesManagementApiTest {
                                 "cacheName",
                                 "vets"));
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
-    @Test
-    void shouldEnableCacheManager() {
-        ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
-                .postForEntity(
-                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/enable",
-                        null,
-                        Void.class,
-                        Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
-    void shouldDisableCacheManager() {
-        ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
-                .postForEntity(
-                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/disable",
-                        null,
-                        Void.class,
-                        Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
-    void shouldReturnInternalServerErrorWhenInstanceReturns404() {
-        ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
-                .postForEntity(
-                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
-                        null,
-                        Void.class,
-                        Map.of("instanceId", activeInstanceId, "cacheManagerName", "unknown", "cacheName", "unknown"));
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Test
-    void shouldReturnBadRequestForUnregisteredInstance() {
-        ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
-                .postForEntity(
-                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable",
-                        null,
-                        Void.class,
-                        Map.of(
-                                "instanceId",
-                                UUID.randomUUID().toString(),
-                                "cacheManagerName",
-                                "cacheManager",
-                                "cacheName",
-                                "vets"));
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    private static Stream<Arguments> managementCaches() {
+        return Stream.of(Arguments.of("/enable"), Arguments.of("/disable"));
     }
 }
