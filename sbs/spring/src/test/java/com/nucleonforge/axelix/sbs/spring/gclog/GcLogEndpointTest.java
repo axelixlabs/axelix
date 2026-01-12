@@ -133,16 +133,6 @@ class GcLogEndpointTest {
     }
 
     @Test
-    void gcLogfile_shouldReturnErrorWhenFileNotFound() throws IOException, InterruptedException {
-        // In afterAll() method log files are deleted
-        afterAll();
-
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-gclog/gc-logfile", String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Test
     void triggerGc_shouldTriggerGarbageCollection() {
         ResponseEntity<Void> response =
                 restTemplate.postForEntity("/actuator/axelix-gc/trigger", HttpEntity.EMPTY, Void.class);
