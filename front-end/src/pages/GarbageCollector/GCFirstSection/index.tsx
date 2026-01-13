@@ -21,14 +21,21 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { downloadFile, extractErrorCode, fetchData } from "helpers";
-import { type IErrorResponse, StatefulRequest, StatelessRequest } from "models";
+import { downloadFile, extractErrorCode } from "helpers";
+import { type IErrorResponse, StatelessRequest } from "models";
 import { disableGCLogging, getGCLogFile, triggerGC } from "services";
 
 import styles from "./styles.module.css";
 
 export interface IProps {
+    /**
+     * Loads the GC logging status
+     */
     loadGCStatus: () => void;
+
+    /**
+     * Indicates whether GC logging is enabled
+     */
     isLoggingStatusEnabled: boolean;
 }
 
@@ -40,9 +47,8 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
     const [disableGCData, setDisableGCData] = useState(StatelessRequest.inactive());
     const [triggerGBData, setTriggerGBData] = useState(StatelessRequest.inactive());
     const [downloadFileLoading, setDownloadFileLoading] = useState<boolean>(false);
-    console.log(downloadFileLoading)
 
-    const disableGChandler = (): void => {
+    const disableGCHandler = (): void => {
         setDisableGCData(StatelessRequest.loading());
 
         disableGCLogging(instanceId!)
@@ -55,7 +61,7 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
             });
     };
 
-    const triggerGBhandler = (): void => {
+    const triggerGBHandler = (): void => {
         setTriggerGBData(StatelessRequest.loading());
 
         triggerGC(instanceId!)
@@ -69,18 +75,17 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
     };
 
     const downloadFileHandler = (): void => {
-        setDownloadFileLoading(true)
+        setDownloadFileLoading(true);
 
         getGCLogFile(instanceId!)
             .then((responseBody) => {
-                const file = responseBody.data
-                downloadFile(file)
-                // setTriggerGBData(StatelessRequest.success());
-                // message.success(t("GC.triggered"));
+                const file = responseBody.data;
+                downloadFile(file);
             })
             .catch((error: AxiosError<IErrorResponse>) => {
                 setTriggerGBData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
-            }).finally(() => {
+            })
+            .finally(() => {
                 setDownloadFileLoading(false);
             });
     };
@@ -91,26 +96,26 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
             <div className={styles.ActionButtonsWrapper}>
                 {isLoggingStatusEnabled && (
                     <>
-                        <Button icon={<DownloadIcon />} type="primary" loading={downloadFileLoading} onClick={downloadFileHandler}>
+                        <Button
+                            icon={<DownloadIcon />}
+                            type="primary"
+                            loading={downloadFileLoading}
+                            onClick={downloadFileHandler}
+                        >
                             {t("GC.download")}
                         </Button>
                         <Button
                             icon={<OnOffIcon />}
                             type="primary"
                             loading={disableGCData.loading}
-                            onClick={disableGChandler}
+                            onClick={disableGCHandler}
                             danger
                         >
                             {t("GC.disable")}
                         </Button>
                     </>
                 )}
-                <Button
-                    icon={<OnOffIcon />}
-                    type="primary"
-                    loading={triggerGBData.loading}
-                    onClick={triggerGBhandler}
-                >
+                <Button icon={<OnOffIcon />} type="primary" loading={triggerGBData.loading} onClick={triggerGBHandler}>
                     {t("GC.triggerButtonText")}
                 </Button>
             </div>

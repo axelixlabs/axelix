@@ -14,12 +14,30 @@
  * limitations under the License.
  */
 export interface IGCLoggingStatusResponseBody {
+    /**
+     * Indicates whether logging is enabled
+     */
     enabled: boolean;
+
+    /**
+     * Current logging level
+     */
     level: string;
+
+    /**
+     * List of supported logging levels
+     */
     availableLevels: string[];
 }
 
 export interface IEnableGCLoggingData {
+    /**
+     * Instance id of service
+     */
     instanceId: string;
-    level: string
+
+    /**
+     * Selected logging level
+     */
+    level: string;
 }

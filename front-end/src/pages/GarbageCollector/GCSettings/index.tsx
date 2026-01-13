@@ -27,17 +27,32 @@ import { getLevelsSelectData } from "utils";
 import styles from "./styles.module.css";
 
 interface IProps {
+    /**
+     * Whether the modal is currently open
+     */
     isModalOpen: boolean;
+
+    /**
+     * Setter for updating the modal open state
+     */
     setIsModalOpen: Dispatch<SetStateAction<boolean>>;
-    logginStatusData: StatefulRequest<IGCLoggingStatusResponseBody>;
+
+    /**
+     * State of GC logging status
+     */
+    loggingStatusData: StatefulRequest<IGCLoggingStatusResponseBody>;
+
+    /**
+     * Loads the GC logging status
+     */
     loadGCStatus: () => void;
 }
 
-export const GCSettings = ({ isModalOpen, setIsModalOpen, logginStatusData, loadGCStatus }: IProps) => {
+export const GCSettings = ({ isModalOpen, setIsModalOpen, loggingStatusData, loadGCStatus }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
-    const { level, availableLevels } = logginStatusData.response!
+    const { level, availableLevels } = loggingStatusData.response!;
 
     const [selectedLevel, setSelectedLevel] = useState<string>(level);
     const [enableGCLoggingData, setEnableGCLoggingData] = useState(StatelessRequest.inactive());

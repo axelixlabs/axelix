@@ -18,7 +18,13 @@ import type { AxiosResponse } from "axios";
 import { t } from "i18next";
 import type { Dispatch, SetStateAction } from "react";
 
-import { EMimeTypes, type IConfigPropsBean, type IEnvironmentPropertySource, type MenuItem, StatefulRequest } from "models";
+import {
+    EMimeTypes,
+    type IConfigPropsBean,
+    type IEnvironmentPropertySource,
+    type MenuItem,
+    StatefulRequest,
+} from "models";
 import { UNKNOWN_ERROR } from "utils";
 
 export const findOpenKeys = (items: MenuItem[]): string[] => {
@@ -87,9 +93,7 @@ export const commonNormalize = (string: string): string => {
 };
 
 export const downloadFile = (data: Blob | string): void => {
-    const mimeType = typeof data === 'string'
-        ? EMimeTypes.TEXT_PLAIN
-        : EMimeTypes.ZIP;
+    const mimeType = typeof data === "string" ? EMimeTypes.TEXT_PLAIN : EMimeTypes.ZIP;
 
     const blob = new Blob([data], { type: mimeType });
 

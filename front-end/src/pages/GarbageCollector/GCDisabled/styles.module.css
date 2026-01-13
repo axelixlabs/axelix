@@ -20,7 +20,6 @@
 
 .InfoIcon {
     height: 80px;
-    /* aspect-ratio: 1; */
     width: 80px;
 }
 
@@ -29,6 +28,5 @@
 }
 
 .SubTitle {
-    text-align: center;
     color: var(--axelix-bold-grey);
 }

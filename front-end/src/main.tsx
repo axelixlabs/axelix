@@ -21,4 +21,8 @@ import { App } from "./App";
 import "./index.css";
 import "./customizedTable.css";
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+        <App />
+    </StrictMode>,
+);

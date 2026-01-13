@@ -16,17 +16,25 @@
 import { Button } from "antd";
 import InfoIcon from "assets/icons/info.svg?react";
 import OnOffIcon from "assets/icons/onOf.svg?react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import styles from "./styles.module.css";
-import { useState } from "react";
-import { GCSettings } from "../GCSettings";
 import type { IGCLoggingStatusResponseBody, StatefulRequest } from "models";
 
+import { GCSettings } from "../GCSettings";
+
+import styles from "./styles.module.css";
 
 interface IProps {
+    /**
+     * State of GC logging status
+     */
     loggingStatusData: StatefulRequest<IGCLoggingStatusResponseBody>;
-    loadGCStatus: () => void
+
+    /**
+     * Loads the GC logging status
+     */
+    loadGCStatus: () => void;
 }
 
 export const GCDisabled = ({ loggingStatusData, loadGCStatus }: IProps) => {
@@ -51,12 +59,14 @@ export const GCDisabled = ({ loggingStatusData, loadGCStatus }: IProps) => {
                     {t("GC.enableButtonText")}
                 </Button>
             </div>
-            {isModalOpen && <GCSettings
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
-                logginStatusData={loggingStatusData}
-                loadGCStatus={loadGCStatus}
-            />}
+            {isModalOpen && (
+                <GCSettings
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    loggingStatusData={loggingStatusData}
+                    loadGCStatus={loadGCStatus}
+                />
+            )}
         </div>
     );
 };
