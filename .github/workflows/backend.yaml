@@ -156,6 +156,7 @@ jobs:
             -f values.yaml
 
   dispatch:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
     needs: [build-deploy-source]
     strategy:
       matrix:
@@ -167,7 +168,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Repository Dispatch
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.WORKFLOW_DISPATCH_TOKEN }}
