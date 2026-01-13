@@ -2,9 +2,11 @@ name: Release Pipeline
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
+    inputs:
+      git_tag:
+        description: 'Git release tag (e.g., v1.0.1)'
+        required: true
+        type: string
 
 env:
   REGISTRY: ghcr.io
@@ -16,6 +18,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.git_tag }}
+          fetch-depth: 0
 
       # TODO: Change to java 25 later on
       - name: Set up JDK 17

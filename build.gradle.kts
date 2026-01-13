@@ -107,8 +107,6 @@ subprojects {
             // Publish to Nexus
             register<MavenPublication>("nexus") {
                 from(components["java"])
-                artifact(tasks.named("javadocJar"))
-                artifact(tasks.named("sourcesJar"))
             }
 
             // Publish to GitHub Package Registry
@@ -156,7 +154,7 @@ subprojects {
 
     configure<SigningExtension> {
         val signingKey = findProperty("signing.key") as String? ?: System.getenv("PGP_SIGNING_KEY")
-        val signingPassword = findProperty("signing.password") as String? ?: System.getenv("PGP_SIGNING_PASSPHRASE")
+        val signingPassword = findProperty("signing.password") as String? ?: System.getenv("SIGNING_KEY_PASSPHRASE")
 
         if (signingKey != null && signingPassword != null) {
             useInMemoryPgpKeys(signingKey, signingPassword)
