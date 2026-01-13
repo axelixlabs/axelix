@@ -35,11 +35,11 @@ public final class HttpUrl {
 
     /**
      * Example of usage:
-     * <pre class="code">
+     * <pre>{@code
      * Example:
      * Input: /cache/{cache}/{some.other.value}
      * Output: ["cache", "some.other.value"]
-     * <pre/>
+     * }</pre>
      *
      * @param url <strong>templated</strong> url to be parsed, see in the example
      */
