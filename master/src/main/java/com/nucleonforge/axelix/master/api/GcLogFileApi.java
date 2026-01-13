@@ -17,7 +17,6 @@ package com.nucleonforge.axelix.master.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -192,10 +191,7 @@ public class GcLogFileApi {
                                         mediaType = "application/json",
                                         schema = @Schema(implementation = SimpleApiError.class)))
             })
-    @Parameters({
-        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "request", description = "GC logging configuration", required = true)
-    })
+    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @PostMapping(path = ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING)
     public void enableGcLogging(
             @PathVariable("instanceId") String instanceId, @RequestBody GcLogEnableRequest request) {
