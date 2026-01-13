@@ -30,15 +30,6 @@ jobs:
       - name: Build and generate all JARs
         run: ./gradlew build -x test javadocJar sourcesJar
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: java-artifacts
-          path: |
-            **/build/libs/*.jar
-            **/build/libs/*-sources.jar
-            **/build/libs/*-javadoc.jar
-
       - name: Publish to GitHub Packages (Maven)
         run: ./gradlew publishGprPublicationToGitHubPackagesRepository
         env:
