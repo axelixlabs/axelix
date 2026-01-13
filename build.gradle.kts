@@ -3,7 +3,6 @@ import net.ltgt.gradle.errorprone.errorprone
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-import kotlin.io.path.readBytes
 import kotlin.io.path.readText
 
 plugins {
@@ -35,6 +34,12 @@ subprojects {
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "pmd")
     apply(plugin = "net.ltgt.errorprone")
+    apply(plugin = "signing")
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
 
     dependencies {
         errorprone("com.google.errorprone:error_prone_core:2.41.0")
@@ -86,6 +91,15 @@ subprojects {
                     password = project.findProperty("nexus.password") as String? ?: System.getenv("NEXUS_PASSWORD")
                 }
             }
+
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/Nucleon-Forge/axelix")
+                credentials {
+                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+                }
+            }
         }
 
         publications {
@@ -93,6 +107,15 @@ subprojects {
             // Publish to Nexus
             register<MavenPublication>("nexus") {
                 from(components["java"])
+                artifact(tasks.named("javadocJar"))
+                artifact(tasks.named("sourcesJar"))
+            }
+
+            // Publish to GitHub Package Registry
+            register<MavenPublication>("gpr") {
+                from(components["java"])
+                artifact(tasks.named("javadocJar"))
+                artifact(tasks.named("sourcesJar"))
             }
         }
     }
@@ -129,6 +152,24 @@ subprojects {
         options.errorprone {
             disableAllChecks = true
         }
+    }
+
+    configure<SigningExtension> {
+        val signingKey = findProperty("signing.key") as String? ?: System.getenv("PGP_SIGNING_KEY")
+        val signingPassword = findProperty("signing.password") as String? ?: System.getenv("PGP_SIGNING_PASSPHRASE")
+
+        if (signingKey != null && signingPassword != null) {
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            sign(publishing.publications)
+        }
+    }
+
+    tasks.withType<Javadoc> {
+        val options = options as StandardJavadocDocletOptions
+        options.tags(
+            "apiNote:a:API Note:",
+            "implNote:a:Implementation Note:"
+        )
     }
 }
 

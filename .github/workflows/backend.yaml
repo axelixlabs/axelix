@@ -20,6 +20,7 @@ on:
     paths-ignore:
       - 'front-end/**'
       - '.github/workflows/frontend.yaml'
+      - '.github/workflows/release.yaml'
 
 env:
   SHOULD_DEPLOY: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
@@ -85,7 +86,7 @@ jobs:
 
       - name: Publish Libraries to Nexus
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
-        run: ./gradlew publish
+        run: ./gradlew publishNexusPublicationToAxelixRepository
 
       - name: Set up Docker
         if: ${{ env.SHOULD_DEPLOY == 'true' }}

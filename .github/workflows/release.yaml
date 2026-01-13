@@ -1,0 +1,47 @@
+name: Release Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # TODO: Change to java 25 later on
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'liberica'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build and generate all JARs
+        run: ./gradlew build -x test javadocJar sourcesJar
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-artifacts
+          path: |
+            **/build/libs/*.jar
+            **/build/libs/*-sources.jar
+            **/build/libs/*-javadoc.jar
+
+      - name: Publish to GitHub Packages (Maven)
+        run: ./gradlew publishGprPublicationToGitHubPackagesRepository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_PACKAGES_TOKEN }}
+          PGP_SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY }}
+          PGP_SIGNING_PASSPHRASE: ${{ secrets.PGP_SIGNING_PASSPHRASE }}

@@ -31,8 +31,8 @@ import com.nucleonforge.axelix.sbs.spring.env.PropertyNameNormalizer;
 
 /**
  * {@link SanitizingFunction} that is capable to make sanitization decisions on a per-property basis.
- * <p/>
- * Typically, only the specific specified properties are sanitized, see {@link #toBeSanitized}. However,
+ *
+ * <p>Typically, only the specific specified properties are sanitized, see {@link #toBeSanitized}. However,
  * there is a universal placeholder {@link EndpointsConfigurationProperties#SANITIZE_ALL} which implies that
  * all properties values must be sanitized.
  *
