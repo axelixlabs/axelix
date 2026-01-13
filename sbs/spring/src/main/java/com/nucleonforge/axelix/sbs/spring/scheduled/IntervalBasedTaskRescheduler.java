@@ -28,6 +28,7 @@ import org.springframework.scheduling.config.Task;
  * {@link FixedRateTask} tasks.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Chaerkasov
  */
 public final class IntervalBasedTaskRescheduler implements TaskRescheduler {
 
@@ -70,4 +71,7 @@ public final class IntervalBasedTaskRescheduler implements TaskRescheduler {
 
         return actualTask instanceof FixedRateTask || actualTask instanceof FixedDelayTask;
     }
+
+    @Override
+    public void mutate(ManagedScheduledTask task, String newExpression) {}
 }

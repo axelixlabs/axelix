@@ -43,115 +43,80 @@ public record ServiceScheduledTasks(
         @JsonProperty("custom") List<CustomTask> custom) {
 
     /**
-     * DTO representing information about a scheduled cron task.
+     * DTO representing a scheduled cron task with precise execution configuration.
      *
-     * @param delegate  The cron task with precise execution configuration.
+     * @param runnable         The target that will be executed.
+     * @param expression       The cron expression (e.g., "0 1 1 5 7 3" or "0 0/15 9-17 ? * MON,WED,FRI" (seconds minutes hours day_of_month month day_of_week))
+     * @param nextExecution    The time of the next scheduled execution of this task, if known.
+     * @param lastExecution    The last execution of this task, if any.
      * @param enabled   The indicator showing whether the cron task is enabled {@code true} or disabled {@code false}.
      *
      * @author Sergey Cherkasov
      */
-    public record CronTask(@JsonProperty("delegate") Cron delegate, @JsonProperty("enabled") boolean enabled) {
-
-        /**
-         * DTO representing a scheduled task with precise execution configuration.
-         *
-         * @param runnable         The target that will be executed.
-         * @param expression       The cron expression (e.g., "0 1 1 5 7 3" or "0 0/15 9-17 ? * MON,WED,FRI" (seconds minutes hours day_of_month month day_of_week))
-         * @param nextExecution    The time of the next scheduled execution of this task, if known.
-         * @param lastExecution    The last execution of this task, if any.
-         *
-         * @author Sergey Cherkasov
-         */
-        public record Cron(
-                @JsonProperty("runnable") Runnable runnable,
-                @JsonProperty("expression") String expression,
-                @JsonProperty("nextExecution") @Nullable NextExecution nextExecution,
-                @JsonProperty("lastExecution") @Nullable LastExecution lastExecution) {}
-    }
+    public record CronTask(
+            @JsonProperty("runnable") Runnable runnable,
+            @JsonProperty("expression") @Nullable String expression,
+            @JsonProperty("nextExecution") @Nullable NextExecution nextExecution,
+            @JsonProperty("lastExecution") @Nullable LastExecution lastExecution,
+            @JsonProperty("enabled") boolean enabled) {}
 
     /**
-     * DTO representing information about a scheduled fixedDelay task.
+     * DTO representing the interval between task executions, counted from the end of the previous task execution.
      *
-     * @param delegate  The fixedDelay task defines the interval between task executions, counted from the end of the previous task execution.
-     * @param enabled   The indicator showing whether the fixedDelay task is enabled {@code true} or disabled {@code false}.
+     * @param runnable         The target that will be executed.
+     * @param interval         The interval, in milliseconds, between the start of each execution.
+     * @param initialDelay     The delay, in milliseconds, before first execution.
+     * @param nextExecution    The time of the next scheduled execution of this task, if known.
+     * @param lastExecution    The last execution of this task, if any.
+     * @param enabled   The indicator showing whether the cron task is enabled {@code true} or disabled {@code false}.
      *
      * @author Sergey Cherkasov
      */
     public record FixedDelayTask(
-            @JsonProperty("delegate") FixedDelay delegate, @JsonProperty("enabled") boolean enabled) {
-
-        /**
-         * DTO representing the interval between task executions, counted from the end of the previous task execution.
-         *
-         * @param runnable         The target that will be executed.
-         * @param interval         The interval, in milliseconds, between the start of each execution.
-         * @param initialDelay     The delay, in milliseconds, before first execution.
-         * @param nextExecution    The time of the next scheduled execution of this task, if known.
-         * @param lastExecution    The last execution of this task, if any.
-         *
-         * @author Sergey Cherkasov
-         */
-        public record FixedDelay(
-                @JsonProperty("runnable") Runnable runnable,
-                @JsonProperty("interval") Number interval,
-                @JsonProperty("initialDelay") Number initialDelay,
-                @JsonProperty("nextExecution") @Nullable NextExecution nextExecution,
-                @JsonProperty("lastExecution") @Nullable LastExecution lastExecution) {}
-    }
+            @JsonProperty("runnable") Runnable runnable,
+            @JsonProperty("interval") Number interval,
+            @JsonProperty("initialDelay") Number initialDelay,
+            @JsonProperty("nextExecution") @Nullable NextExecution nextExecution,
+            @JsonProperty("lastExecution") @Nullable LastExecution lastExecution,
+            @JsonProperty("enabled") boolean enabled) {}
 
     /**
-     * DTO representing information about a scheduled fixedRate task.
+     * DTO representing the interval between task executions, measured from the start of the previous task execution.
      *
-     * @param delegate  The fixedRate task defines the interval between task executions, measured from the start of the previous task execution.
-     * @param enabled   The indicator showing whether the fixedRate task is enabled {@code true} or disabled {@code false}.
+     * @param runnable         The target that will be executed.
+     * @param interval         The interval, in milliseconds, between the start of each execution.
+     * @param initialDelay     The delay, in milliseconds, before first execution.
+     * @param nextExecution    The time of the next scheduled execution of this task, if known.
+     * @param lastExecution    The last execution of this task, if any.
+     * @param enabled   The indicator showing whether the cron task is enabled {@code true} or disabled {@code false}.
      *
      * @author Sergey Cherkasov
      */
     public record FixedRateTask(
-            @JsonProperty("delegate") FixedRate delegate, @JsonProperty("enabled") boolean enabled) {
-
-        /**
-         * DTO representing the interval between task executions, measured from the start of the previous task execution.
-         *
-         * @param runnable         The target that will be executed.
-         * @param interval         The interval, in milliseconds, between the start of each execution.
-         * @param initialDelay     The delay, in milliseconds, before first execution.
-         * @param nextExecution    The time of the next scheduled execution of this task, if known.
-         * @param lastExecution    The last execution of this task, if any.
-         *
-         * @author Sergey Cherkasov
-         */
-        public record FixedRate(
-                @JsonProperty("runnable") Runnable runnable,
-                @JsonProperty("interval") Number interval,
-                @JsonProperty("initialDelay") Number initialDelay,
-                @JsonProperty("nextExecution") @Nullable NextExecution nextExecution,
-                @JsonProperty("lastExecution") @Nullable LastExecution lastExecution) {}
-    }
+            @JsonProperty("runnable") Runnable runnable,
+            @JsonProperty("interval") Number interval,
+            @JsonProperty("initialDelay") Number initialDelay,
+            @JsonProperty("nextExecution") @Nullable NextExecution nextExecution,
+            @JsonProperty("lastExecution") @Nullable LastExecution lastExecution,
+            @JsonProperty("enabled") boolean enabled) {}
 
     /**
-     * DTO representing information about a scheduled custom task.
+     * DTO representing a task with a configured user trigger.
      *
-     * @param delegate  The custom task with a configured user trigger.
-     * @param enabled   The indicator showing whether the custom task is enabled {@code true} or disabled {@code false}.
+     * @param runnable        The target that will be executed.
+     * @param trigger         The trigger used to execute this task.
+     * @param nextExecution    The time of the next scheduled execution of this task, if known.
+     * @param lastExecution   The last execution of this task, if any.
+     * @param enabled   The indicator showing whether the cron task is enabled {@code true} or disabled {@code false}.
      *
      * @author Sergey Cherkasov
      */
-    public record CustomTask(@JsonProperty("delegate") Custom delegate, @JsonProperty("enabled") boolean enabled) {
-        /**
-         * DTO representing a task with a configured user trigger.
-         *
-         * @param runnable        The target that will be executed.
-         * @param trigger         The trigger used to execute this task.
-         * @param lastExecution   The last execution of this task, if any.
-         *
-         * @author Sergey Cherkasov
-         */
-        public record Custom(
-                @JsonProperty("runnable") Runnable runnable,
-                @JsonProperty("trigger") String trigger,
-                @JsonProperty("lastExecution") @Nullable LastExecution lastExecution) {}
-    }
+    public record CustomTask(
+            @JsonProperty("runnable") Runnable runnable,
+            @JsonProperty("trigger") String trigger,
+            @JsonProperty("nextExecution") @Nullable NextExecution nextExecution,
+            @JsonProperty("lastExecution") @Nullable LastExecution lastExecution,
+            @JsonProperty("enabled") boolean enabled) {}
 
     /**
      * DTO representing the last execution of a task.

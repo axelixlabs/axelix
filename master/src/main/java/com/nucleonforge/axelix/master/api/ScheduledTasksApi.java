@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,7 +37,8 @@ import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
-import com.nucleonforge.axelix.master.api.request.ScheduledTaskToggleRequest;
+import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskMutationRequest;
+import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.api.response.ScheduledTasksResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
@@ -44,6 +46,7 @@ import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationS
 import com.nucleonforge.axelix.master.service.transport.scheduled.DisableSingleScheduledTaskEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.scheduled.EnableSingleScheduledTaskEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.scheduled.GetAllScheduledTasksEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.scheduled.MutateScheduledTaskEndpointProber;
 
 /**
  * The API for managing scheduled-tasks (i.e. those that are represented by {@link Scheduled @Scheduled} methods).
@@ -61,6 +64,7 @@ public class ScheduledTasksApi {
     private final GetAllScheduledTasksEndpointProber getAllScheduledTasksEndpointProber;
     private final EnableSingleScheduledTaskEndpointProber enableSingleScheduledTaskEndpointProber;
     private final DisableSingleScheduledTaskEndpointProber disableSingleScheduledTaskEndpointProber;
+    private final MutateScheduledTaskEndpointProber mutateScheduledTaskEndpointProber;
     private final Converter<ServiceScheduledTasks, ScheduledTasksResponse> converter;
     private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
@@ -68,11 +72,13 @@ public class ScheduledTasksApi {
             GetAllScheduledTasksEndpointProber getAllScheduledTasksEndpointProber,
             EnableSingleScheduledTaskEndpointProber enableSingleScheduledTaskEndpointProber,
             DisableSingleScheduledTaskEndpointProber disableSingleScheduledTaskEndpointProber,
+            MutateScheduledTaskEndpointProber mutateScheduledTaskEndpointProber,
             Converter<ServiceScheduledTasks, ScheduledTasksResponse> converter,
             JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
         this.getAllScheduledTasksEndpointProber = getAllScheduledTasksEndpointProber;
         this.enableSingleScheduledTaskEndpointProber = enableSingleScheduledTaskEndpointProber;
         this.disableSingleScheduledTaskEndpointProber = disableSingleScheduledTaskEndpointProber;
+        this.mutateScheduledTaskEndpointProber = mutateScheduledTaskEndpointProber;
         this.converter = converter;
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
@@ -163,5 +169,34 @@ public class ScheduledTasksApi {
             @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskToggleRequest request) {
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
         disableSingleScheduledTaskEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
+    }
+
+    @Operation(
+            summary = "Allows disabling a scheduled task.",
+            responses = {
+                @ApiResponse(description = "No Content", responseCode = "204"),
+                @ApiResponse(
+                        description = "Bad Request",
+                        responseCode = "400",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class))),
+                @ApiResponse(
+                        description = "Internal Server Error",
+                        responseCode = "500",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SimpleApiError.class)))
+            })
+    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
+    @PostMapping(path = ApiPaths.ScheduledTasksApi.INSTANCE_ID)
+    public ResponseEntity<Void> mutateCronExpression(
+            @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskMutationRequest request) {
+
+        HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
+        mutateScheduledTaskEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
+        return ResponseEntity.noContent().build();
     }
 }

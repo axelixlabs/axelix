@@ -15,18 +15,15 @@
  */
 package com.nucleonforge.axelix.sbs.spring.scheduled;
 
-import java.util.List;
-import java.util.concurrent.ScheduledFuture;
-
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
-import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 
 /**
  * Custom actuator endpoint that provides information about {@link Scheduled @Scheduled} tasks.
@@ -34,28 +31,23 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @RestControllerEndpoint(id = "axelix-scheduled-tasks")
 public class AxelixScheduledTasksEndpoint {
 
     private final ScheduledTaskService taskService;
-    private final ScheduledTasksEndpoint delegate;
+    private final ServiceScheduledTasksAssembler serviceScheduledTasksAssembler;
 
-    public AxelixScheduledTasksEndpoint(List<ScheduledTaskHolder> taskHolders, ScheduledTaskService taskService) {
+    public AxelixScheduledTasksEndpoint(
+            ScheduledTaskService taskService, ServiceScheduledTasksAssembler serviceScheduledTasksAssembler) {
         this.taskService = taskService;
-        this.delegate = new ScheduledTasksEndpoint(taskHolders);
+        this.serviceScheduledTasksAssembler = serviceScheduledTasksAssembler;
     }
 
     @GetMapping
-    public ExtendedScheduledTasksDescriptor scheduledTasks() {
-        ScheduledTasksEndpoint.ScheduledTasksDescriptor scheduledTasksDescriptor = delegate.scheduledTasks();
-
-        List<ExtendedTaskDescriptor> cronTasks = enrich(scheduledTasksDescriptor.getCron());
-        List<ExtendedTaskDescriptor> fixedDelayTasks = enrich(scheduledTasksDescriptor.getFixedDelay());
-        List<ExtendedTaskDescriptor> fixedRateTasks = enrich(scheduledTasksDescriptor.getFixedRate());
-        List<ExtendedTaskDescriptor> customTasks = enrich(scheduledTasksDescriptor.getCustom());
-
-        return new ExtendedScheduledTasksDescriptor(cronTasks, fixedDelayTasks, fixedRateTasks, customTasks);
+    public ServiceScheduledTasks test() {
+        return serviceScheduledTasksAssembler.assemble();
     }
 
     @PostMapping("/enable")
@@ -73,32 +65,9 @@ public class AxelixScheduledTasksEndpoint {
         return ResponseEntity.noContent().build();
     }
 
-    private List<ExtendedTaskDescriptor> enrich(List<? extends ScheduledTasksEndpoint.TaskDescriptor> tasks) {
-        return tasks.stream()
-                .map(td -> new ExtendedTaskDescriptor(td, resolveTaskEnabledStatus(td)))
-                .toList();
+    @PostMapping
+    public ResponseEntity<Void> mutateCronExpression(@RequestBody ScheduledTaskMutationRequest request) {
+        taskService.mutate(request.targetScheduledTask(), request.newValue());
+        return ResponseEntity.noContent().build();
     }
-
-    private boolean resolveTaskEnabledStatus(ScheduledTasksEndpoint.TaskDescriptor taskDescriptor) {
-        String target = taskDescriptor.getRunnable().getTarget();
-
-        // TODO:
-        //  1. how is that possible that future will be null?
-        //  2. is that correct that we're returning tru in case the task is not found? I guess no.
-        return taskService
-                .find(target)
-                .map(task -> {
-                    ScheduledFuture<?> future = task.getFuture();
-                    return future == null || !future.isCancelled();
-                })
-                .orElse(true);
-    }
-
-    public record ExtendedScheduledTasksDescriptor(
-            List<ExtendedTaskDescriptor> cron,
-            List<ExtendedTaskDescriptor> fixedDelay,
-            List<ExtendedTaskDescriptor> fixedRate,
-            List<ExtendedTaskDescriptor> custom) {}
-
-    public record ExtendedTaskDescriptor(ScheduledTasksEndpoint.TaskDescriptor delegate, boolean enabled) {}
 }

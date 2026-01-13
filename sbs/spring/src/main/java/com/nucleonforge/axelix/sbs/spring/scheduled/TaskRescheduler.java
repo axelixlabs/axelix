@@ -39,6 +39,7 @@ import org.springframework.scheduling.config.ScheduledTask;
  *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public interface TaskRescheduler {
 
@@ -49,9 +50,17 @@ public interface TaskRescheduler {
     void reschedule(ManagedScheduledTask task);
 
     /**
-     * Re-schedule the provided task.
-     * @param task task to re-schedule.
+     * Checks whether the given scheduled task is compatible with this handler.
+     * @param task task for evaluation.
      * @return {@code true} if the current {@link TaskRescheduler} supports the provided task.
      */
     boolean supports(ManagedScheduledTask task);
+
+    /**
+     * Mutate the configuration of the given scheduled task.
+     *
+     * @param task task to re-schedule.
+     * @param newValue the new value to apply to the task's configuration.
+     */
+    void mutate(ManagedScheduledTask task, String newValue);
 }

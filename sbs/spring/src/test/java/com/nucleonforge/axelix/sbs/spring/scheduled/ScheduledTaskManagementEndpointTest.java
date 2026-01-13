@@ -56,6 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 // TODO: This test should be merged into AxelixScheduledTasksEndpointTest
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -66,6 +67,9 @@ class ScheduledTaskManagementEndpointTest {
     private static final String CRON_TASK_ID =
             ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class.getName()
                     + ".testCronTask";
+    private static final String CRON_TASK_ID_FOR_MUTATION =
+            ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class.getName()
+                    + ".testCronTaskForMutation";
     private static final String FIXED_DELAY_TASK_ID =
             ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class.getName()
                     + ".testFixedDelayTask";
@@ -100,7 +104,7 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(cronFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
     }
@@ -116,7 +120,7 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(cronFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
@@ -125,7 +129,7 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(cronFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(true);
         });
     }
@@ -141,7 +145,7 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(fixedDelayFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
     }
@@ -157,7 +161,7 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(fixedDelayFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
@@ -166,7 +170,7 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(fixedDelayFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(true);
         });
     }
@@ -182,7 +186,7 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(fixedRateFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
     }
@@ -198,7 +202,7 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(fixedRateFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
@@ -207,7 +211,7 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(fixedRateFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(true);
         });
     }
@@ -223,8 +227,8 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(customTaskFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
-            assertThatJson(task).node("delegate.trigger").isEqualTo(CUSTOM_TRIGGER);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("trigger").isEqualTo(CUSTOM_TRIGGER);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
     }
@@ -240,7 +244,7 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(customTaskFlag).isFalse();
 
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
 
@@ -249,8 +253,24 @@ class ScheduledTaskManagementEndpointTest {
         assertThat(customTaskFlag).isTrue();
 
         assertThatJson(getScheduledTasks()).node("custom").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("delegate.runnable.target").isEqualTo(taskId);
+            assertThatJson(task).node("runnable.target").isEqualTo(taskId);
             assertThatJson(task).node("enabled").isEqualTo(true);
+        });
+    }
+
+    @Test
+    void shouldMutateCronExpression_testCronTask() throws InterruptedException {
+        String newCronExpression = "*/5 * * * * *";
+        ScheduledTaskMutationRequest request =
+                new ScheduledTaskMutationRequest(CRON_TASK_ID_FOR_MUTATION, newCronExpression);
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(
+                "/actuator/axelix-scheduled-tasks", defaultEntityForMutation(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
+        assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
+            assertThatJson(task).node("runnable.target").isEqualTo(CRON_TASK_ID_FOR_MUTATION);
+            assertThatJson(task).node("expression").isEqualTo(newCronExpression);
         });
     }
 
@@ -287,6 +307,12 @@ class ScheduledTaskManagementEndpointTest {
         return new HttpEntity<>(request, headers);
     }
 
+    private HttpEntity<ScheduledTaskMutationRequest> defaultEntityForMutation(ScheduledTaskMutationRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(request, headers);
+    }
+
     @TestConfiguration
     @EnableScheduling
     static class ScheduledTaskManagementEndpointTestConfiguration implements SchedulingConfigurer {
@@ -318,15 +344,25 @@ class ScheduledTaskManagementEndpointTest {
         }
 
         @Bean
-        public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
+        public ServiceScheduledTasksAssembler serviceScheduledTasksAssembler(
                 ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTaskService service) {
-            return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), service);
+            return new DefaultServiceScheduledTasksAssembler(
+                    taskHolders.orderedStream().toList(), service);
+        }
+
+        @Bean
+        public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
+                ScheduledTaskService service, ServiceScheduledTasksAssembler serviceScheduledTasksAssembler) {
+            return new AxelixScheduledTasksEndpoint(service, serviceScheduledTasksAssembler);
         }
 
         @Scheduled(cron = "*/1 * * * * *")
         public void testCronTask() {
             cronFlag = true;
         }
+
+        @Scheduled(cron = "*/1 * * * * *")
+        public void testCronTaskForMutation() {}
 
         @Scheduled(fixedDelay = 100)
         public void testFixedDelayTask() {

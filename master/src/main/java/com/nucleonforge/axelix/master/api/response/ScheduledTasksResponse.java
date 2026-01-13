@@ -48,7 +48,7 @@ public record ScheduledTasksResponse(
     public record Cron(
             boolean enabled,
             Runnable runnable,
-            String expression,
+            @Nullable String expression,
             @Nullable NextExecution nextExecution,
             @Nullable LastExecution lastExecution) {}
 
@@ -100,12 +100,18 @@ public record ScheduledTasksResponse(
      * @param enabled         The indicator showing whether the task is enabled {@code true} or disabled {@code false}.
      * @param runnable        The target that will be executed.
      * @param trigger         The trigger used to execute this task.
+     * @param nextExecution    The time of the next scheduled execution of this task, if known.
      * @param lastExecution   The last execution of this task, if any.
      *
      * @author Sergey Cherkasov
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record Custom(boolean enabled, Runnable runnable, String trigger, @Nullable LastExecution lastExecution) {}
+    public record Custom(
+            boolean enabled,
+            Runnable runnable,
+            String trigger,
+            @Nullable NextExecution nextExecution,
+            @Nullable LastExecution lastExecution) {}
 
     /**
      * The profile representing the last execution of the task.

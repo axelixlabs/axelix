@@ -44,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest
 @Import(ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class)
@@ -51,6 +52,8 @@ class ScheduledTaskServiceTest {
 
     private static final String CRON_TASK_ID =
             ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName() + ".testCronTask";
+    private static final String CRON_TASK_ID_FOR_MUTATION =
+            ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName() + ".testCronTaskForMutation";
     private static final String FIXED_DELAY_TASK_ID =
             ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName() + ".testFixedDelayTask";
     private static final String FIXED_RATE_TASK_ID =
@@ -197,6 +200,16 @@ class ScheduledTaskServiceTest {
         assertThat(task.getFuture().isCancelled()).isFalse();
     }
 
+    @Test
+    void shouldMutateCronExpression_testCronTask() throws InterruptedException {
+        String newCronExpression = "*/5 * * * * *";
+
+        taskService.mutate(CRON_TASK_ID_FOR_MUTATION, newCronExpression);
+
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MUTATION).orElseThrow();
+        assertThat(task.getCronTrigger().getExpression()).isEqualTo(newCronExpression);
+    }
+
     @TestConfiguration
     @EnableScheduling
     static class ScheduledTaskServiceTestConfiguration implements SchedulingConfigurer {
@@ -231,6 +244,9 @@ class ScheduledTaskServiceTest {
         public void testCronTask() {
             cronFlag = true;
         }
+
+        @Scheduled(cron = "*/1 * * * * *")
+        public void testCronTaskForMutation() {}
 
         @Scheduled(fixedDelay = 100)
         public void testFixedDelayTask() {

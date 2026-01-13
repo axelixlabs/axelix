@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Chaerkasov
  */
 public final class ScheduledTaskService {
 
@@ -86,6 +87,27 @@ public final class ScheduledTaskService {
             log.info("Disabled scheduled task: {}(force: {})", taskId, force);
         } catch (ScheduledTaskNotFoundException e) {
             log.info("Failed to disable task: {}", taskId, e);
+            throw e;
+        }
+    }
+
+    /**
+     * Mutate the configuration for the given id.
+     *
+     * @param taskId         the id of the task to re-schedule.
+     * @param newValue       the new value to apply to the task's configuration.
+     */
+    public void mutate(String taskId, String newValue) {
+        try {
+            ManagedScheduledTask task = registry.findRequired(taskId);
+
+            for (TaskRescheduler taskRescheduler : taskReschedulers) {
+                if (taskRescheduler.supports(task)) {
+                    taskRescheduler.mutate(task, newValue);
+                }
+            }
+        } catch (ScheduledTaskNotFoundException e) {
+            log.info("Failed to enable task: {}", taskId, e);
             throw e;
         }
     }

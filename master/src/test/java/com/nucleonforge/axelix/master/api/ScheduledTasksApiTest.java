@@ -38,7 +38,8 @@ import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
-import com.nucleonforge.axelix.master.api.request.ScheduledTaskToggleRequest;
+import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskMutationRequest;
+import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
@@ -137,6 +138,9 @@ public class ScheduledTasksApiTest {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634"
               },
               "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$CustomTrigger@4323cbe0",
+              "nextExecution": {
+                "time": "2025-10-14T06:33:50.086630700Z"
+              },
               "lastExecution": {
                 "status": "ERROR",
                 "time": "2025-09-18T15:03:34.132500256Z",
@@ -151,6 +155,7 @@ public class ScheduledTasksApiTest {
         """;
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
+    private static final String activeInstanceIdMutateTask = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
 
@@ -179,7 +184,6 @@ public class ScheduledTasksApiTest {
             {
               "cron": [
                 {
-                  "delegate": {
                     "runnable": {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
                     },
@@ -191,24 +195,20 @@ public class ScheduledTasksApiTest {
                       "exception": null,
                       "time": "2025-10-14T06:33:48.014578100Z",
                       "status": "STARTED"
-                    }
-                  },
-                  "enabled": true
+                    },
+                    "enabled": true
                 },
                 {
-                  "delegate": {
                     "runnable": {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
                     },
                     "expression": "*/5 * * * * *",
                     "nextExecution": {
                       "time": "2025-10-14T06:33:49.999631800Z"
-                    }
-                  },
-                  "enabled": true
+                    },
+                    "enabled": true
                 },
                 {
-                  "delegate": {
                     "runnable": {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
                     },
@@ -217,14 +217,12 @@ public class ScheduledTasksApiTest {
                       "exception": null,
                       "time": "2025-10-14T06:33:48.014578100Z",
                       "status": "SUCCESS"
-                    }
-                  },
-                  "enabled": true
+                    },
+                    "enabled": true
                 }
               ],
               "fixedDelay": [
                 {
-                  "delegate": {
                     "runnable": {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask"
                     },
@@ -237,14 +235,12 @@ public class ScheduledTasksApiTest {
                       "exception": null,
                       "time": "2025-10-14T06:33:47.001570800Z",
                       "status": "SUCCESS"
-                    }
-                  },
-                  "enabled": true
+                    },
+                    "enabled": true
                 }
               ],
               "fixedRate": [
                 {
-                  "delegate": {
                     "runnable": {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
                     },
@@ -252,18 +248,19 @@ public class ScheduledTasksApiTest {
                     "interval": 2000,
                     "nextExecution": {
                       "time": "2025-10-14T06:33:50.086630700Z"
-                    }
-                  },
-                  "enabled": false
+                    },
+                    "enabled": false
                 }
               ],
               "custom": [
                 {
-                  "delegate": {
                     "runnable": {
                       "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634"
                     },
                     "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$CustomTrigger@4323cbe0",
+                    "nextExecution": {
+                       "time": "2025-10-14T06:33:50.086630700Z"
+                    },
                     "lastExecution": {
                       "exception": {
                         "message": "Failed while running custom task",
@@ -271,9 +268,8 @@ public class ScheduledTasksApiTest {
                       },
                       "status": "ERROR",
                       "time": "2025-09-18T15:03:34.132500256Z"
-                    }
-                  },
-                  "enabled": false
+                    },
+                    "enabled": false
                 }
               ]
             }
@@ -289,6 +285,8 @@ public class ScheduledTasksApiTest {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/" + activeInstanceIdMutateTask + "/actuator/axelix-scheduled-tasks")) {
+                    return new MockResponse();
                 } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks/enable")) {
                     return new MockResponse();
                 } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks/disable")) {
@@ -355,6 +353,28 @@ public class ScheduledTasksApiTest {
 
         // then
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void shouldModifyConfigurationScheduledTask() {
+
+        ScheduledTaskMutationRequest requestBody = new ScheduledTaskMutationRequest(
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 0 0/3 1/1 * ?");
+
+        registry.register(TestObjectFactory.createInstance(
+                activeInstanceIdMutateTask, mockWebServer.url(activeInstanceIdMutateTask) + "/actuator"));
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/axelix/scheduled-tasks/{instanceId}",
+                        requestBody,
+                        Void.class,
+                        activeInstanceIdMutateTask);
+
+        // then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -464,6 +484,39 @@ public class ScheduledTasksApiTest {
                         requestBody,
                         EndpointInvocationException.class,
                         instanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    @DisplayName("Should return 500 on EndpointInvocationError")
+    void shouldReturnInternalServerError_OnModifyConfigurationScheduledTask() {
+        String instanceId = UUID.randomUUID().toString();
+
+        ScheduledTaskMutationRequest requestBody = new ScheduledTaskMutationRequest(
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 0 0/3 1/1 * ?");
+
+        // when.
+        registry.register(createInstance(instanceId));
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity("/api/axelix/scheduled-tasks/{instanceId}", requestBody, Void.class, instanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void shouldReturnBadRequestForUnregisteredInstance_OnModifyConfigurationScheduledTask() {
+        String instanceId = "unregistered-axelix-scheduled-tasks-enable-instance";
+        ScheduledTaskMutationRequest requestBody = new ScheduledTaskMutationRequest(
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 0 0/3 1/1 * ?");
+
+        // when.
+        ResponseEntity<Void> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity("/api/axelix/scheduled-tasks/{instanceId}", requestBody, Void.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

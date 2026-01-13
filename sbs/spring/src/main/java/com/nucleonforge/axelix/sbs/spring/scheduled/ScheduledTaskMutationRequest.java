@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.master.api.request;
+package com.nucleonforge.axelix.sbs.spring.scheduled;
 
 /**
- * Request to enable execution of a scheduled task.
+ * Represents a request to modify a scheduled task configuration.
  *
- * @param targetScheduledTask The target scheduled task to be enabled.
+ * @param targetScheduledTask the identifier of the scheduled task to toggle. Must not be {@code null}.
+ * @param newValue            the new value to be assigned.
  *
  * @author Sergey Cherkasov
- * @author Mikhail Polivakha
  */
-public record ScheduledTaskToggleRequest(String targetScheduledTask) {}
+public record ScheduledTaskMutationRequest(String targetScheduledTask, String newValue) {}

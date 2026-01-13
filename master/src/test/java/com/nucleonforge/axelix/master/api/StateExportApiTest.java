@@ -265,19 +265,17 @@ class StateExportApiTest {
         {
           "cron": [
             {
-              "delegate": {
-                "runnable": {
-                  "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
-                },
-                "expression": "*/2 * * * * *",
-                "nextExecution": {
-                  "time": "2025-10-14T06:33:49.999631800Z"
-                },
-                "lastExecution": {
-                  "exception": null,
-                  "time": "2025-10-14T06:33:48.014578100Z",
-                  "status": "STARTED"
-                }
+              "runnable": {
+                "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
+              },
+              "expression": "*/2 * * * * *",
+              "nextExecution": {
+                "time": "2025-10-14T06:33:49.999631800Z"
+              },
+              "lastExecution": {
+                "exception": null,
+                "time": "2025-10-14T06:33:48.014578100Z",
+                "status": "STARTED"
               },
               "enabled": true
             }

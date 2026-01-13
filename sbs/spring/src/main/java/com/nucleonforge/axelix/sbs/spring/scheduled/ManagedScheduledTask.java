@@ -21,8 +21,10 @@ import java.util.concurrent.ScheduledFuture;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.TriggerTask;
+import org.springframework.scheduling.support.CronTrigger;
 
 /**
  * Decorates the standard {@link ScheduledTask}, and provides additional information
@@ -31,6 +33,7 @@ import org.springframework.scheduling.config.TriggerTask;
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Chaerkasov
  */
 public class ManagedScheduledTask {
 
@@ -49,6 +52,12 @@ public class ManagedScheduledTask {
      */
     private final ScheduledTask scheduledTask;
 
+    /**
+     * The original CronTrigger, or {@code null} if absent.
+     */
+    @Nullable
+    private CronTrigger cronTrigger;
+
     static {
         try {
             SCHEDULED_TASK_FUTURE_FIELD = ScheduledTask.class.getDeclaredField("future");
@@ -61,6 +70,12 @@ public class ManagedScheduledTask {
     public ManagedScheduledTask(String id, ScheduledTask scheduledTask) {
         this.id = id;
         this.scheduledTask = scheduledTask;
+
+        if (scheduledTask.getTask() instanceof CronTask cronTask) {
+            this.cronTrigger = (CronTrigger) cronTask.getTrigger();
+        } else {
+            this.cronTrigger = null;
+        }
     }
 
     public String getId() {
@@ -101,5 +116,13 @@ public class ManagedScheduledTask {
         } catch (IllegalAccessException e) {
             throw new IllegalStateException("Failed to set 'future' in ScheduledTask", e);
         }
+    }
+
+    public @Nullable CronTrigger getCronTrigger() {
+        return cronTrigger;
+    }
+
+    public void setCronTrigger(CronTrigger cronTrigger) {
+        this.cronTrigger = cronTrigger;
     }
 }

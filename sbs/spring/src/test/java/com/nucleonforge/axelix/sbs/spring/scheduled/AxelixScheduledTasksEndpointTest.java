@@ -55,6 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(AxelixScheduledTasksEndpointTest.ScheduledTasksEndpointExtensionTestConfiguration.class)
@@ -67,47 +68,39 @@ class AxelixScheduledTasksEndpointTest {
       {
         "cron": [
          {
-             "delegate": {
-                  "runnable": {
-                     "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testCronTask"
-                 },
-                  "expression": "*/1 * * * * *"
+              "runnable": {
+               "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testCronTask"
               },
+              "expression": "*/1 * * * * *",
               "enabled": true
           }
         ],
        "fixedDelay": [
           {
-              "delegate": {
-                  "runnable": {
-                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedDelayTask"
-                  },
-                  "initialDelay": 0,
-                  "interval": 1000
+              "runnable": {
+               "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedDelayTask"
               },
+              "initialDelay": 0,
+              "interval": 1000,
               "enabled": true
          }
        ],
         "fixedRate": [
           {
-              "delegate": {
-                  "runnable": {
-                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedRateTask"
-                  },
-                 "initialDelay": 100,
-                  "interval": 1000
-              },
+             "runnable": {
+               "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedRateTask"
+             },
+             "initialDelay": 100,
+             "interval": 1000,
              "enabled": true
           }
        ],
         "custom": [
           {
-              "delegate": {
-                  "runnable": {
-                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration$CustomTestTask"
-                  },
-                  "trigger": "CustomTestTrigger"
-              },
+             "runnable": {
+               "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration$CustomTestTask"
+             },
+             "trigger": "CustomTestTrigger",
              "enabled": true
           }
         ]
@@ -159,9 +152,16 @@ class AxelixScheduledTasksEndpointTest {
         }
 
         @Bean
-        public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
+        public ServiceScheduledTasksAssembler serviceScheduledTasksAssembler(
                 ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTaskService service) {
-            return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), service);
+            return new DefaultServiceScheduledTasksAssembler(
+                    taskHolders.orderedStream().toList(), service);
+        }
+
+        @Bean
+        public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
+                ScheduledTaskService service, ServiceScheduledTasksAssembler serviceScheduledTasksAssembler) {
+            return new AxelixScheduledTasksEndpoint(service, serviceScheduledTasksAssembler);
         }
 
         @Scheduled(cron = "*/1 * * * * *")

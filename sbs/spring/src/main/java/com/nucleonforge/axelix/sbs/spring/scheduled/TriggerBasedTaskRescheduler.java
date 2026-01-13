@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
  * The most prominent example is {@link CronTrigger}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Chaerkasov
  */
 public final class TriggerBasedTaskRescheduler implements TaskRescheduler {
 
@@ -54,5 +55,23 @@ public final class TriggerBasedTaskRescheduler implements TaskRescheduler {
     @Override
     public boolean supports(ManagedScheduledTask task) {
         return task.getTrigger() != null;
+    }
+
+    @Override
+    public void mutate(ManagedScheduledTask task, String newExpression) {
+        Trigger trigger = task.getTrigger();
+
+        Assert.notNull(trigger, "Trigger cannot be null at this point");
+
+        CronTrigger newTrigger = new CronTrigger(newExpression);
+
+        ScheduledFuture<?> rescheduledFuture = taskScheduler.schedule(task.getRunnable(), newTrigger);
+
+        // rescheduledFuture may be null in case the supplied Trigger won't fire anymore,
+        // therefore, there is nothing to schedule.
+        if (rescheduledFuture != null) {
+            task.replaceScheduledFuture(rescheduledFuture);
+            task.setCronTrigger(newTrigger);
+        }
     }
 }
