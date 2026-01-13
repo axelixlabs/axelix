@@ -1,0 +1,10 @@
+.FirstSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ActionButtonsWrapper {
+    display: flex;
+    column-gap: 20px;
+}

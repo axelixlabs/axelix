@@ -17,9 +17,9 @@ export * from "./interfaces/scheduledTasks";
 export * from "./interfaces/environment";
 export * from "./interfaces/configProps";
 export * from "./interfaces/conditions";
+export * from "./interfaces/threadDump";
 export * from "./interfaces/wallboard";
 export * from "./interfaces/dashboard";
-export * from "./interfaces/threadDump";
 export * from "./interfaces/metrics";
 export * from "./interfaces/details";
 export * from "./interfaces/globals";
@@ -27,6 +27,7 @@ export * from "./interfaces/loggers";
 export * from "./interfaces/caches";
 export * from "./interfaces/beans";
 export * from "./interfaces/auth";
+export * from "./interfaces/gc";
 
 export * from "./types/conditions";
 export * from "./types/antd";

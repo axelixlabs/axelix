@@ -50,13 +50,3 @@ export function isCopyableField(field: string): boolean {
 export function resolveLangIcon(runtime: IDetailsRuntime): FC<SVGProps<SVGSVGElement>> {
     return runtime.kotlinVersion ? KotlinIcon : JavaIcon;
 }
-
-export const downloadFile = (file: Blob) => {
-    const blob = new Blob([file], { type: "application/zip" });
-
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.click();
-    window.URL.revokeObjectURL(url);
-};

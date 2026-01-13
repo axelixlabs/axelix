@@ -1,0 +1,14 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 40px;
+    height: 100%;
+}
+
+.ContentWrapper {
+    padding: 24px;
+    height: calc(100%);
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    overflow-y: auto;
+}

@@ -226,5 +226,16 @@
             "contentionMonitoringEnabled": "Thread contention monitoring is enabled",
             "contentionMonitoringDisabled": "Thread contention monitoring is disabled"
         }
+    },
+    "GC": {
+        "disableTitle": "Garbage collector is disabled",
+        "disableSubtitle": "Enable it to display logs",
+        "enableButtonText": "Enable Garbage Collector",
+        "selectLogginglevel": "Select logging level",
+        "download": "Download",
+        "disable": "Disable",
+        "logList": "Garbage Collector Log",
+        "triggerButtonText": "Trigger GC",
+        "triggered": "The garbage collector was triggered"
     }
 }

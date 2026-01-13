@@ -225,5 +225,16 @@
             "contentionMonitoringEnabled": "Мониторинг контешена включен",
             "contentionMonitoringDisabled": "Мониторинг контешена выключен"
         }
+    },
+    "GC": {
+        "disableTitle": "Сборщик мусора отключён",
+        "disableSubtitle": "Включите его, чтобы отображать логи",
+        "enableButtonText": "Включить сборщик мусора",
+        "selectLogginglevel": "Выберите уровень логирования",
+        "download": "Скачать",
+        "disable": "Отключить",
+        "logList": "Журнал сборщика мусора",
+        "triggerButtonText": "Запустить GC",
+        "triggered": "Сборщик мусора был вызван"
     }
 }

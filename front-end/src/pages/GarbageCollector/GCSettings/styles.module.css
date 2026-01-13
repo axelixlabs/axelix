@@ -1,0 +1,12 @@
+.ContentWrapper {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-content: space-between;
+    /* TODO: TODO: Remove this margin-block after creating a universal modal component */
+    margin-block: 30px;
+    font-weight: 500;
+}
+
+.LoggingLevelSelect{
+    width: 120px;
+}

@@ -19,6 +19,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Loadable from "components";
 import { MainLayout } from "layout";
 
+const GarbageCollector = Loadable(lazy(() => import("pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("pages/ScheduledTasks")));
 const Environment = Loadable(lazy(() => import("pages/Environment")));
 const ConfigProps = Loadable(lazy(() => import("pages/ConfigProps")));
@@ -53,6 +54,7 @@ export const MainRoutes = () => {
                 <Route path="/instance/:instanceId/scheduled-tasks" element={<ScheduledTasks />} />
                 <Route path="/instance/:instanceId/conditions" element={<Conditions />} />
                 <Route path="/instance/:instanceId/thread-dump" element={<ThreadDump />} />
+                <Route path="/instance/:instanceId/garbage-collector" element={<GarbageCollector />} />
             </Route>
         </Routes>
     );

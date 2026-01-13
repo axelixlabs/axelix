@@ -18,7 +18,7 @@ import type { AxiosResponse } from "axios";
 import { t } from "i18next";
 import type { Dispatch, SetStateAction } from "react";
 
-import { type IConfigPropsBean, type IEnvironmentPropertySource, type MenuItem, StatefulRequest } from "models";
+import { EMimeTypes, type IConfigPropsBean, type IEnvironmentPropertySource, type MenuItem, StatefulRequest } from "models";
 import { UNKNOWN_ERROR } from "utils";
 
 export const findOpenKeys = (items: MenuItem[]): string[] => {
@@ -84,4 +84,23 @@ export function showErrorNotification(errorCode: string): void {
 
 export const commonNormalize = (string: string): string => {
     return canonicalize(string);
+};
+
+export const downloadFile = (data: Blob | string): void => {
+    const mimeType = typeof data === 'string'
+        ? EMimeTypes.TEXT_PLAIN
+        : EMimeTypes.ZIP;
+
+    const blob = new Blob([data], { type: mimeType });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+
+    link.setAttribute("download", "");
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
 };

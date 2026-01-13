@@ -88,7 +88,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
             <div className={styles.MainTitle}>{instanceName}</div>
             <Button
                 type="primary"
-                icon={<img src={DownloadIcon} alt="Download icon" className={styles.DownloadIcon} />}
+                icon={<img src={DownloadIcon} alt="Download icon" />}
                 onClick={() => setIsModalOpen(true)}
                 className={styles.Download}
             >

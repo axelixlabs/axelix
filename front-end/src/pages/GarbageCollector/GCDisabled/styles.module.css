@@ -1,0 +1,34 @@
+.MainWrapper {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+}
+
+.ContentWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 20px;
+    width: min(550px, 100%);
+    border-radius: var(--axelix-border-radius-small);
+    background-color: #fff;
+    box-shadow: 0 0 14px rgb(15 23 42 / 25%);
+    padding: 24px;
+    margin-inline: 20px;
+}
+
+.InfoIcon {
+    height: 80px;
+    /* aspect-ratio: 1; */
+    width: 80px;
+}
+
+.Title {
+    font-weight: 500;
+}
+
+.SubTitle {
+    text-align: center;
+    color: var(--axelix-bold-grey);
+}
