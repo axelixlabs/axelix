@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Tree, type TreeDataNode } from "antd";
+import LinkIcon from "assets/icons/link.svg?react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
@@ -22,8 +23,6 @@ import { EBeanOrigin, ESearchSubject, type IBean } from "models";
 import { scrollToAccordionById } from "utils";
 
 import styles from "./styles.module.css";
-
-import LinkIcon from "assets/icons/link.svg";
 
 interface IProps {
     /**
@@ -90,7 +89,7 @@ export const BeanSourceTree = ({ bean }: IProps) => {
                                                   to={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}
                                                   onClick={(e) => e.stopPropagation()}
                                               >
-                                                  <img src={LinkIcon} alt="Link icon" />
+                                                  <LinkIcon />
                                               </Link>
                                           </div>
                                       ),

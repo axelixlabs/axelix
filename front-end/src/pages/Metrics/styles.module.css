@@ -3,6 +3,6 @@
     padding: 16px;
 }
 
-.AccordionsWrapper {
+.AccordionsWrapper:not(:last-child) {
     margin-bottom: 40px;
 }

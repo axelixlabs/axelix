@@ -28,7 +28,7 @@
     border: none;
     border-bottom: 1px solid #0505050f;
     border-radius: 0;
-    background-color: #fff;
+    background-color: var(--axelix-primary-white);
 }
 
 .Collapse :global(.ant-collapse-header):hover {

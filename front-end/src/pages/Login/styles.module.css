@@ -2,7 +2,7 @@
     max-width: 400px;
     width: 100%;
     padding: 32px;
-    background-color: #fff;
+    background-color: var(--axelix-primary-white);
     border-radius: 16px;
     box-shadow: var(--axelix-box-shadow-bold);
 }

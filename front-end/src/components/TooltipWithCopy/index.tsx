@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Tooltip } from "antd";
+import { useEffect, useRef, useState } from "react";
 
 import { Copy } from "../Copy";
 
@@ -24,18 +25,24 @@ interface IProps {
      * Tooltip text
      */
     text: string;
-    /**
-     * Different onclick handlers on tooltip text
-     */
-    onClick?: () => void;
 }
 
-export const TooltipWithCopy = ({ text, onClick }: IProps) => {
+export const TooltipWithCopy = ({ text }: IProps) => {
+    const textRef = useRef<HTMLDivElement>(null);
+    const [isEllipsis, setIsEllipsis] = useState<boolean>(false);
+
+    useEffect(() => {
+        const text = textRef.current;
+        if (text) {
+            setIsEllipsis(text.scrollWidth > text.clientWidth);
+        }
+    }, [text]);
+
     return (
         <>
-            <Tooltip title={text}>
+            <Tooltip title={isEllipsis ? text : undefined}>
                 <div className={styles.TextWrapper}>
-                    <div className={styles.Text} onClick={onClick}>
+                    <div className={styles.Text} ref={textRef}>
                         {text}
                     </div>
                     <Copy text={text} />

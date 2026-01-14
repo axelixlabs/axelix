@@ -1,5 +1,5 @@
 .MainWrapper {
-    background-color: #fff;
+    background-color: var(--axelix-primary-white);
     border: 1px solid var(--axelix-light-grey);
     box-shadow: 0 6px 18px rgb(15 23 42 / 20%);
     border-radius: var(--axelix-border-radius-large);

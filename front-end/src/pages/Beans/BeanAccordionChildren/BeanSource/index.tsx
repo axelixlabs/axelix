@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BeanSourceTree } from "./BeanSourceTree/BeanSourceTree";
+import LinkIcon from "assets/icons/link.svg?react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
@@ -22,9 +22,8 @@ import { EBeanOrigin, type IBean } from "models";
 
 import sharedStyles from "../styles.module.css";
 
+import { BeanSourceTree } from "./BeanSourceTree";
 import styles from "./styles.module.css";
-
-import LinkIcon from "assets/icons/link.svg";
 
 interface IProps {
     /**
@@ -52,7 +51,7 @@ export const BeanSource = ({ bean }: IProps) => {
             <div className={styles.LinkedTitleWrapper}>
                 <div>{t("Beans.beanSource.AUTO_CONFIGURATION_CLASS")}</div>
                 <Link to={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}>
-                    <img src={LinkIcon} alt="Link icon" />
+                    <LinkIcon />
                 </Link>
             </div>
         );

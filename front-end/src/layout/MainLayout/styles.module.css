@@ -6,13 +6,17 @@
     position: fixed;
     top: var(--axelix-header-height);
     height: 100vh;
-    background-color: #fff;
+    background-color: var(--axelix-primary-white);
     z-index: 10;
+}
+
+.HideSider {
+    display: none;
 }
 
 .Content {
     padding: 24px;
-    background: #fff;
+    background-color: var(--axelix-primary-white);
 }
 
 .Content.WithSider {

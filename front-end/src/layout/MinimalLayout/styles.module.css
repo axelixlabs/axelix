@@ -10,7 +10,7 @@
     z-index: 1000;
     width: 100%;
     height: var(--axelix-header-height);
-    background-color: #fff;
+    background-color: var(--axelix-primary-white);
     display: flex;
     justify-content: center;
     align-items: center;

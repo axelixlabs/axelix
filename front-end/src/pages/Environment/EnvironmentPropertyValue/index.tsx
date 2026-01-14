@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Tooltip } from "antd";
+import CrownIcon from "assets/icons/crown.svg?react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
@@ -23,8 +24,6 @@ import type { IEnvProperty } from "models";
 import { updatePropertyThunk } from "store/thunks";
 
 import styles from "./styles.module.css";
-
-import CrownIcon from "assets/icons/crown.svg";
 
 interface IProps {
     /**
@@ -59,7 +58,7 @@ export const EnvironmentPropertyValue = ({ property }: IProps) => {
                 onNewValue={(newValue) => updatePropertyClickHandler(newValue)}
             />
             <Tooltip title={t("Environments.primaryProperty")}>
-                <img src={CrownIcon} alt="Crown icon" className={!isPrimary ? styles.IconPlaceholder : ""} />
+                <CrownIcon className={!isPrimary ? styles.IconPlaceholder : ""} />
             </Tooltip>
         </div>
     );

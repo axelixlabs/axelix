@@ -15,6 +15,8 @@
     --axelix-bold-grey: #838383;
     --axelix-primary-red: #ff000a;
     --axelix-primary-light-red: #ff000a1a;
+    --axelix-primary-white: #fff;
+    --axelix-primary-black: #000;
     --axelix-border-radius-large: 8px;
     --axelix-border-radius-small: 4px;
     --axelix-scroll-margin-top: 150px;
@@ -49,7 +51,7 @@ a {
 }
 
 .MainContainer {
-    background-color: #fff;
+    background-color: var(--axelix-primary-white);
     max-width: 1450px;
     padding: 0 40px;
     width: 100%;

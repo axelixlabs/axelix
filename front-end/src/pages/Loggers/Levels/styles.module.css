@@ -23,8 +23,7 @@
     cursor: pointer;
     user-select: none;
     border: 1px solid var(--axelix-medium-grey);
-    background-color: #fff;
-    color: #000;
+    background-color: var(--axelix-primary-white);
     transition: all 0.3s;
 }
 
@@ -36,7 +35,7 @@
 .RadioButton.Selected:active {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
-    color: #fff;
+    color: var(--axelix-primary-white);
 }
 
 .RadioButton.Selected:active {
@@ -52,12 +51,10 @@
 .RadioButton:active:not(.Selected) {
     background-color: var(--color-primary-active);
     border-color: var(--color-primary-active);
-    color: #fff;
+    color: var(--axelix-primary-white);
 }
 
 .TargetIcon {
-    height: 16px;
-    width: 16px;
     position: absolute;
     top: -7px;
     right: -7px;
@@ -65,7 +62,7 @@
 }
 
 .Reset {
-    color: #ff000a;
+    color: var(--axelix-primary-red);
     border: none;
     background-color: transparent;
     cursor: pointer;
