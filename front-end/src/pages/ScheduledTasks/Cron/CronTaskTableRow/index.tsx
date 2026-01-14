@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { App } from "antd";
+import { App, Button } from "antd";
+import RunIcon from "assets/icons/run.svg?react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
@@ -59,8 +60,11 @@ export const CronTaskTableRow = ({ task }: IProps) => {
                     }}
                 />
             </div>
-            <div className={`RowChunk ${styles.RowChunk}`}>
+            <div className={`RowChunk ${styles.CenteredRowChunk}`}>
                 <ScheduledTasksStatusSwitch runnable={task} />
+            </div>
+            <div className={`RowChunk ${styles.CenteredRowChunk}`}>
+                <Button icon={<RunIcon />} type="primary" />
             </div>
         </div>
     );

@@ -1,11 +1,11 @@
 .CronTaskTableRow {
-    grid-template-columns: 1fr 230px 110px;
+    grid-template-columns: 1fr 230px 110px 110px;
 }
 
 .TooltipWrapperChunk {
     min-width: 0;
 }
 
-.RowChunk {
+.CenteredRowChunk {
     justify-content: center;
 }

@@ -43,7 +43,7 @@ export const FixedTasks = ({ taskTitle, fixedTasks }: IProps) => {
                 <FixedTaskTableHeader />
 
                 <EmptyHandler isEmpty={fixedTasks.length === 0}>
-                    {fixedTasks.map((task: IFixedTasks, index: number) => (
+                    {fixedTasks.map((task, index) => (
                         <FixedTaskTableRow task={task} key={index} />
                     ))}
                 </EmptyHandler>
