@@ -47,7 +47,7 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
             targetScheduledTask: runnable.runnable.target,
         })
             .then(() => {
-                message.success(t(`${runnable.enabled ? "ScheduledTasks.disabled" : "ScheduledTasks.enabled"}`));
+                message.success(runnable.enabled ? t("ScheduledTasks.disabled") : t("ScheduledTasks.enabled"));
                 runnable.enabled = !runnable.enabled;
                 setMutationRequest(StatelessRequest.success());
             })

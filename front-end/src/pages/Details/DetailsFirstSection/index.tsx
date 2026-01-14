@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Button, Checkbox, Collapse, List, Modal, Switch } from "antd";
+import DownloadIcon from "assets/icons/download.svg?react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -24,8 +25,6 @@ import { EExportableComponent } from "models";
 import { exportStateData } from "services";
 
 import styles from "./styles.module.css";
-
-import DownloadIcon from "assets/icons/download.svg";
 
 interface IProps {
     /**
@@ -88,7 +87,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
             <div className={styles.MainTitle}>{instanceName}</div>
             <Button
                 type="primary"
-                icon={<img src={DownloadIcon} alt="Download icon" />}
+                icon={<DownloadIcon />}
                 onClick={() => setIsModalOpen(true)}
                 className={styles.Download}
             >

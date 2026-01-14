@@ -53,7 +53,7 @@ export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
 
         (cache.enabled ? disableCache(requestBody) : enableCache(requestBody))
             .then(() => {
-                message.success(t(`${cache.enabled ? "Caches.disabled" : "Caches.enabled"}`));
+                message.success(cache.enabled ? t("Caches.disabled") : t("Caches.enabled"));
                 cache.enabled = !cache.enabled;
                 setMutationRequest(StatelessRequest.success());
             })

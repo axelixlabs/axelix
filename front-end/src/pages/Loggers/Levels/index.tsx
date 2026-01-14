@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 import { Tooltip } from "antd";
+import TargetIcon from "assets/icons/target.svg?react";
 import { useTranslation } from "react-i18next";
 
 import { loggersColors } from "utils";
 
 import styles from "./styles.module.css";
-
-import TargetIcon from "assets/icons/target.svg";
 
 interface IProps {
     /**
@@ -75,7 +74,7 @@ export const Levels = ({ levels, checkedLevel, configuredLevel, handleChange }: 
                             </label>
                             {configuredLevel === level && (
                                 <Tooltip title={t("Loggers.configuredExplicitly")} className={styles.Tooltip}>
-                                    <img src={TargetIcon} alt="Target icon" className={styles.TargetIcon} />
+                                    <TargetIcon className={styles.TargetIcon} />
                                 </Tooltip>
                             )}
                         </div>

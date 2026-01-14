@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import CheckmarkIcon from "assets/icons/checkmark.svg?react";
+import CloseIcon from "assets/icons/close.svg?react";
+
 import { Accordion } from "components";
 import { EConditionStatus, type ICondition } from "models";
 
 import styles from "./styles.module.css";
-
-import CheckmarkIcon from "assets/icons/checkmark.svg";
-import CloseIcon from "assets/icons/close.svg";
 
 interface IStatusAwareCondition extends ICondition {
     status: EConditionStatus;
@@ -32,10 +32,10 @@ interface IProps {
 export const ConditionsAccordionEntry = ({ items }: IProps) => {
     const findNeededIcon = (status: EConditionStatus) => {
         if (status === EConditionStatus.NOT_MATCHED) {
-            return <img src={CloseIcon} alt="Close icon" />;
+            return <CloseIcon />;
         }
 
-        return <img src={CheckmarkIcon} alt="Checkmark icon" />;
+        return <CheckmarkIcon />;
     };
 
     return (

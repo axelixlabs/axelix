@@ -34,18 +34,14 @@ export const MainLayout = ({ hideSider }: IProps) => {
         <Layout className={styles.MainWrapper}>
             <AdminHeader />
 
-            <Layout>
-                {hideSider || (
-                    <Sider width={270} className={styles.Sider}>
-                        <SiderMenu />
-                    </Sider>
-                )}
+            <Sider width={270} className={`${styles.Sider} ${hideSider ? styles.HideSider : ""}`}>
+                <SiderMenu />
+            </Sider>
 
-                <Layout className={styles.ContentLayout}>
-                    <Content className={`${styles.Content} ${!hideSider ? styles.WithSider : ""}`}>
-                        <Outlet />
-                    </Content>
-                </Layout>
+            <Layout className={styles.ContentLayout}>
+                <Content className={`${styles.Content} ${!hideSider ? styles.WithSider : ""}`}>
+                    <Outlet />
+                </Content>
             </Layout>
         </Layout>
     );

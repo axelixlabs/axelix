@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 import { App } from "antd";
+import CopyIcon from "assets/icons/copy.svg?react";
 import { type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
-
-import CopyIcon from "assets/icons/copy.svg";
 
 interface IProps {
     /**
@@ -32,7 +31,7 @@ export const Copy = ({ text }: IProps) => {
     const { t } = useTranslation();
     const { message } = App.useApp();
 
-    const handleCopy = async (e: MouseEvent<HTMLImageElement>): Promise<void> => {
+    const handleCopy = async (e: MouseEvent<SVGSVGElement>): Promise<void> => {
         e.stopPropagation();
 
         try {
@@ -43,5 +42,5 @@ export const Copy = ({ text }: IProps) => {
         }
     };
 
-    return <img src={CopyIcon} alt="Copy icon" onClick={handleCopy} className={styles.CopyIcon} />;
+    return <CopyIcon onClick={handleCopy} className={styles.CopyIcon} />;
 };

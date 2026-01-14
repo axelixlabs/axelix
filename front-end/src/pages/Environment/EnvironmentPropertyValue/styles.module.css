@@ -1,8 +1,8 @@
 .MainWrapper {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
     column-gap: 20px;
-    width: 100%;
 }
 
 .PropertyValueWrapper {
