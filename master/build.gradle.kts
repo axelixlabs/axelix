@@ -51,10 +51,19 @@ tasks.bootJar {
     archiveFileName = "master.jar"
 }
 
+val isReleasePipeline = System.getenv("CI") != null && System.getenv("RELEASE_TAG") != null
+
 publishing {
     publications {
         named<MavenPublication>("nexus") {
             artifact(tasks.bootJar.get())
+        }
+    }
+    if (isReleasePipeline) {
+        publications {
+            named<MavenPublication>("gpr") {
+                artifact(tasks.bootJar.get())
+            }
         }
     }
 }

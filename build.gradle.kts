@@ -36,11 +36,6 @@ subprojects {
     apply(plugin = "net.ltgt.errorprone")
     apply(plugin = "signing")
 
-    java {
-        withJavadocJar()
-        withSourcesJar()
-    }
-
     dependencies {
         errorprone("com.google.errorprone:error_prone_core:2.41.0")
         errorprone("com.uber.nullaway:nullaway:0.12.9")
@@ -81,10 +76,19 @@ subprojects {
         }
     }
 
+    val isReleasePipeline = System.getenv("CI") != null && System.getenv("RELEASE_TAG") != null
+
+    if (isReleasePipeline) {
+        java {
+            withJavadocJar()
+            withSourcesJar()
+        }
+    }
+
     configure<PublishingExtension> {
         repositories {
             maven {
-                name = "Axelix"
+                name = "NexusAxelix"
                 url = uri("https://158.160.69.73:8443/repository/axile-monorepo/")
                 credentials {
                     username = project.findProperty("nexus.user") as String? ?: System.getenv("NEXUS_USER")
@@ -92,12 +96,14 @@ subprojects {
                 }
             }
 
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/Nucleon-Forge/axelix")
-                credentials {
-                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                    password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+            if (isReleasePipeline) {
+                maven {
+                    name = "GitHubPackages"
+                    url = uri("https://maven.pkg.github.com/Nucleon-Forge/axelix")
+                    credentials {
+                        username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                        password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+                    }
                 }
             }
         }
@@ -110,10 +116,64 @@ subprojects {
             }
 
             // Publish to GitHub Package Registry
-            register<MavenPublication>("gpr") {
-                from(components["java"])
-                artifact(tasks.named("javadocJar"))
-                artifact(tasks.named("sourcesJar"))
+            if (isReleasePipeline) {
+                register<MavenPublication>("gpr") {
+                    from(components["java"])
+
+                    // Configure the POM file details
+                    // TODO: Remove all TODOs below after configuring for Maven Central publication
+                    // TODO: Requirements: https://maven.apache.org/repository/guide-central-repository-upload.html
+                    pom {
+                        name.set(project.name)
+                        description = "description" //TODO add description
+                        url = "https://www.example.com" //TODO: add valid url
+                        packaging = "jar"
+
+                        organization {
+                            name.set("Nucleon-Forge")
+                            url.set("https://github.com/Nucleon-Forge") //TODO
+                        }
+
+                        licenses {
+                            license {
+                                name.set("Apache License, Version 2.0")
+                                url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                                distribution.set("repo")
+                            }
+                        }
+
+                        scm {
+                            url.set("https://github.com/Nucleon-Forge/axelix")
+                        }
+
+                        developers {
+                            developer {
+                                name.set("Mikhail Polivakha")
+                                email.set("axelix@gmail.com") //TODO
+                                organization.set("Nucleon-Forge")
+                                organizationUrl.set("https://github.com/Nucleon-Forge")
+                            }
+                            developer {
+                                name.set("Nikita Kirillov")
+                                email.set("kirilloffnikita1@gmail.com")
+                                organization.set("Nucleon-Forge")
+                                organizationUrl.set("https://github.com/Nucleon-Forge")
+                            }
+                            developer {
+                                name.set("Ashot Sargsyan")
+                                email.set("axelix@gmail.com") //TODO
+                                organization.set("Nucleon-Forge")
+                                organizationUrl.set("https://github.com/Nucleon-Forge")
+                            }
+                            developer {
+                                name.set("Sergey Cherkasov")
+                                email.set("axelix@gmail.com") //TODO
+                                organization.set("Nucleon-Forge")
+                                organizationUrl.set("https://github.com/Nucleon-Forge")
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -132,7 +192,7 @@ subprojects {
 //    }
 
     tasks.named("check") {
-        dependsOn("pmdMain","pmdTest")
+        dependsOn("pmdMain", "pmdTest")
     }
 
     tasks.named<JavaCompile>("compileJava") {
@@ -152,16 +212,27 @@ subprojects {
         }
     }
 
-    configure<SigningExtension> {
-        val signingKey = findProperty("signing.key") as String? ?: System.getenv("PGP_SIGNING_KEY")
-        val signingPassword = findProperty("signing.password") as String? ?: System.getenv("SIGNING_KEY_PASSPHRASE")
+    if (isReleasePipeline) {
+        configure<SigningExtension> {
+            val signingKey = System.getenv("PGP_SIGNING_KEY")
+            val signingPassword = System.getenv("PGP_SIGNING_KEY_PASSPHRASE")
 
-        if (signingKey != null && signingPassword != null) {
-            useInMemoryPgpKeys(signingKey, signingPassword)
-            sign(publishing.publications)
+            if (signingKey != null && signingPassword != null) {
+                useInMemoryPgpKeys(signingKey, signingPassword)
+                sign(publishing.publications["gpr"])
+            } else {
+                throw GradleException(
+                    """
+                Signing requires:
+                1. signing.key property OR PGP_SIGNING_KEY env var.
+                2. signing.password property OR SIGNING_KEY_PASSPHRASE env var.
+                """
+                )
+            }
         }
     }
 
+    // Enable custom Javadoc tags
     tasks.withType<Javadoc> {
         val options = options as StandardJavadocDocletOptions
         options.tags(
