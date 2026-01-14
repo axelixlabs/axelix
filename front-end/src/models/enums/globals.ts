@@ -33,3 +33,8 @@ export enum EInstanceStatus {
      */
     UNKNOWN = "UNKNOWN",
 }
+
+export enum EMimeTypes {
+    TEXT_PLAIN = "text/plain",
+    ZIP = "application/zip",
+}

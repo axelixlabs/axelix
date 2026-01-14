@@ -19,11 +19,6 @@
     justify-self: end;
 }
 
-.DownloadIcon {
-    height: 16px;
-    width: 16px;
-}
-
 .List {
     margin-block: 30px;
     overflow: hidden;

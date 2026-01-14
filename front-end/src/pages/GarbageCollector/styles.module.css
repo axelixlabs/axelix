@@ -1,0 +1,20 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 40px;
+}
+
+.ContentWrapper {
+    padding: 24px;
+
+    /*
+        240px represents the total height of all elements located above this block
+        on the page.
+        Without this constraint, the container grows with its content,
+        so overflow-y would not work.
+    */
+    height: calc(100vh - 240px);
+    border: 1px solid var(--axelix-medium-grey);
+    border-radius: var(--axelix-border-radius-large);
+    overflow-y: auto;
+}

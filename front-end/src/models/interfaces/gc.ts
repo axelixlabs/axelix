@@ -13,13 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./scheduledTasks";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./dashboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./beans";
-export * from "./gc";
+export interface IGCLoggingStatusResponseBody {
+    /**
+     * Indicates whether logging is enabled
+     */
+    enabled: boolean;
+
+    /**
+     * Current logging level
+     */
+    level: string;
+
+    /**
+     * List of supported logging levels
+     */
+    availableLevels: string[];
+}
+
+export interface IEnableGCLoggingRequestData {
+    /**
+     * Instance id of service
+     */
+    instanceId: string;
+
+    /**
+     * Selected logging level
+     */
+    level: string;
+}

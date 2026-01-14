@@ -225,5 +225,20 @@
             "contentionMonitoringEnabled": "Мониторинг контешена включен",
             "contentionMonitoringDisabled": "Мониторинг контешена выключен"
         }
+    },
+    "GC": {
+        "disableTitle": "Лог Сборщика Мусора Отключён",
+        "disableSubtitle": "Нажмите на кнопку ниже, чтобы включить логгировние",
+        "enableButtonText": "Включить Лог Сборщика Мусора",
+        "modalWindow" : {
+            "title" : "Enable Garbage Collector Logs",
+            "selectLoggingLevel": "Выберите уровень логирования",
+            "submit" : "Ок"
+        },
+        "download": "Скачать Лог",
+        "disable": "Отключить",
+        "mainTitle": "Лог Сборщика Мусора",
+        "triggerButtonText": "Запустить GC",
+        "triggered": "Сборщик мусора был вызван"
     }
 }

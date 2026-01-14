@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export * from "./scheduledTasks";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./dashboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./beans";
-export * from "./gc";
+import type { DefaultOptionType } from "antd/es/select";
+
+export const getLevelsSelectData = (loggingLevels: string[]): DefaultOptionType[] => {
+    return loggingLevels.map((level) => ({
+        value: level,
+        label: level.toUpperCase(),
+    }));
+};
