@@ -10,7 +10,7 @@
     line-height: 1.2;
     text-align: center;
     margin: 0 auto 40px;
-    word-break: break-all;
+    word-break: normal;
     transform: translateX(50%);
 }
 

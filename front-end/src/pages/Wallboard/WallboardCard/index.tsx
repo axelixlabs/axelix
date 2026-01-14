@@ -35,7 +35,7 @@ export const WallboardCard = ({ data }: IProps) => {
                 <div>Spring Boot: {data.springBootVersion}</div>
                 <div>Java: {data.javaVersion}</div>
                 <div className={styles.HashAndTimeWrapper}>
-                    <span>{data.commitShaShort}</span>
+                    <span>Commit: {data.commitShaShort}</span>
                     <span>{data.deployedFor}</span>
                 </div>
             </div>
