@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nucleonforge.axelix.sbs.autoconfiguration.spring;
+package com.nucleonforge.axelix.sbs.autoconfiguration;
 
 import feign.Feign;
 
