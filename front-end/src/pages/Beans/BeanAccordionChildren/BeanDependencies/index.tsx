@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import LinkIcon from "assets/icons/link.svg?react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -22,8 +23,6 @@ import { ESearchSubject, type IDependency } from "models";
 import { scrollToAccordionById } from "utils";
 
 import styles from "./styles.module.css";
-
-import LinkIcon from "assets/icons/link.svg";
 
 interface IProps {
     /**
@@ -55,7 +54,7 @@ export const BeanDependencies = ({ dependencies, instanceId }: IProps) => {
                             </div>
                             {isConfigPropsDependency && (
                                 <Link to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(name)}`}>
-                                    <img src={LinkIcon} alt="Link icon" />
+                                    <LinkIcon />
                                 </Link>
                             )}
                         </div>

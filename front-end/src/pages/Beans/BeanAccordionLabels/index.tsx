@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Tag } from "antd";
+import LinkIcon from "assets/icons/link.svg?react";
 import { Link, useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
@@ -21,8 +22,6 @@ import { defineBeanScopeColor, normalizeHtmlElementId } from "helpers";
 import type { IBean } from "models";
 
 import styles from "./styles.module.css";
-
-import LinkIcon from "assets/icons/link.svg";
 
 interface IProps {
     /**
@@ -52,7 +51,7 @@ export const BeanAccordionLabels = ({ bean }: IProps) => {
                             to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(beanName)}`}
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <img src={LinkIcon} alt="Link icon" />
+                            <LinkIcon />
                         </Link>
                     )}
                 </div>

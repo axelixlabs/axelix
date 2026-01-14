@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import LinkIcon from "assets/icons/link.svg?react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
@@ -20,8 +21,6 @@ import { normalizeHtmlElementId, uniqueInjectionPointsBeanNames } from "helpers"
 import type { IEnvProperty } from "models";
 
 import styles from "./styles.module.css";
-
-import LinkIcon from "assets/icons/link.svg";
 
 interface IProps {
     /**
@@ -61,7 +60,7 @@ export const EnvironmentAccordionBody = ({ property }: IProps) => {
                             to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
                             className={styles.LinkIcon}
                         >
-                            <img src={LinkIcon} alt="Link icon" />
+                            <LinkIcon />
                         </Link>
                     </div>
                 </>
@@ -78,7 +77,7 @@ export const EnvironmentAccordionBody = ({ property }: IProps) => {
                                     to={`/instance/${instanceId}/beans#${normalizeHtmlElementId(beanName)}`}
                                     className={styles.LinkIcon}
                                 >
-                                    <img src={LinkIcon} alt="Link icon" />
+                                    <LinkIcon />
                                 </Link>
                             </div>
                         ))}

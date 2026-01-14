@@ -2,7 +2,7 @@
     height: 58px;
     position: sticky;
     top: var(--axelix-header-height);
-    background-color: #fff;
+    background-color: var(--axelix-primary-white);
     display: flex;
     align-items: center;
     column-gap: 20px;

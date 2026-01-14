@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import ArrowIcon from "assets/icons/arrow.svg?react";
 import { type PropsWithChildren, type ReactNode, useState } from "react";
 
 import styles from "./styles.module.css";
-
-import ArrowIcon from "assets/icons/arrow.svg";
 
 interface IProps {
     /**
@@ -73,12 +72,14 @@ export const Accordion = ({
     return (
         <div className={`${styles.MainWrapper} ${open ? styles.Open : ""}`}>
             <div className={`${styles.HeaderWrapper} ${headerStyles}`} onClick={handlerClick}>
-                {!hideArrowIcon && <img src={ArrowIcon} alt="Arrow icon" className={styles.Icon} />}
+                {!hideArrowIcon && <ArrowIcon className={styles.Icon} />}
                 <div className={styles.Header}>{header}</div>
             </div>
-            <div className={styles.ContentWrapper}>
-                <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
-            </div>
+            {open && (
+                <div className={styles.ContentWrapper}>
+                    <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
+                </div>
+            )}
         </div>
     );
 };
