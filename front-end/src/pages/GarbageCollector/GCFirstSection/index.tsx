@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { App, Button } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
+
+import { App, Button, Tooltip } from "antd";
 import DownloadIcon from "assets/icons/download.svg?react";
 import OnOffIcon from "assets/icons/onOf.svg?react";
 import type { AxiosError } from "axios";
@@ -96,28 +98,36 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
             <div className={styles.ActionButtonsWrapper}>
                 {isLoggingStatusEnabled && (
                     <>
-                        <Button
-                            icon={<DownloadIcon />}
-                            type="primary"
-                            loading={downloadFileLoading}
-                            onClick={downloadFileHandler}
-                        >
-                            {t("GC.download")}
-                        </Button>
-                        <Button
-                            icon={<OnOffIcon />}
-                            type="primary"
-                            loading={disableGCData.loading}
-                            onClick={disableGCHandler}
-                            danger
-                        >
-                            {t("GC.disable")}
-                        </Button>
+                        <Tooltip title={t("GC.download")}>
+                            <Button
+                                icon={<DownloadIcon />}
+                                type="primary"
+                                loading={downloadFileLoading}
+                                onClick={downloadFileHandler}
+                                className={styles.ActionButton}
+                            />
+                        </Tooltip>
+                        <Tooltip title={t("GC.disable")}>
+                            <Button
+                                icon={<OnOffIcon />}
+                                type="primary"
+                                loading={disableGCData.loading}
+                                onClick={disableGCHandler}
+                                danger
+                                className={styles.ActionButton}
+                            />
+                        </Tooltip>
                     </>
                 )}
-                <Button icon={<OnOffIcon />} type="primary" loading={triggerGBData.loading} onClick={triggerGBHandler}>
-                    {t("GC.triggerButtonText")}
-                </Button>
+                <Tooltip title={t("GC.triggerButtonText")}>
+                    <Button
+                        icon={<ReloadOutlined />}
+                        type="primary"
+                        loading={triggerGBData.loading}
+                        onClick={triggerGBHandler}
+                        className={styles.ActionButton}
+                    />
+                </Tooltip>
             </div>
         </div>
     );
