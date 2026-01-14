@@ -1,11 +1,7 @@
 .CronTableHeader {
-    grid-template-columns: 1fr 230px 110px;
+    grid-template-columns: 1fr 230px 110px 110px;
 }
 
-.Status {
-    text-align: center;
-}
-
-.RowChunk {
+.CenteredRowChunk {
     justify-content: center;
 }

@@ -24,8 +24,9 @@ export const CronTableHeader = () => {
         <>
             <div className={`TableHeader ${styles.CronTableHeader}`}>
                 <div className="RowChunk">{t("ScheduledTasks.runnable")}</div>
-                <div className={`RowChunk ${styles.RowChunk}`}>{t("ScheduledTasks.expression")}</div>
-                <div className={`RowChunk ${styles.Status} ${styles.RowChunk}`}>{t("status")}</div>
+                <div className={`RowChunk ${styles.CenteredRowChunk}`}>{t("ScheduledTasks.expression")}</div>
+                <div className={`RowChunk ${styles.CenteredRowChunk}`}>{t("status")}</div>
+                <div className={`RowChunk ${styles.CenteredRowChunk}`}>{t("ScheduledTasks.run")}</div>
             </div>
         </>
     );

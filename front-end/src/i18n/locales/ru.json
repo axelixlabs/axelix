@@ -160,7 +160,8 @@
         "fixedDelay": "Fixed delay",
         "fixedRate": "Fixed rate",
         "enabled": "Задача включена",
-        "disabled": "Задача выключена"
+        "disabled": "Задача выключена",
+        "run": "Запуск"
     },
     "Error": {
         "title": "Ошибка",

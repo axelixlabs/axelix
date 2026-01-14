@@ -15,8 +15,10 @@
 }
 
 .DefaultPropertyValueWrapper {
+    padding-right: 30px;
     width: 100%;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: flex-end;
     align-items: center;
+    column-gap: 20px;
 }

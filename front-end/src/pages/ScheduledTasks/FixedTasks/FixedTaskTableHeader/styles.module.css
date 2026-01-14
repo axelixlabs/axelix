@@ -1,9 +1,10 @@
 .TableHeader {
-    grid-template-columns: 1fr 170px 170px 110px;
+    grid-template-columns: 1fr 170px 230px 110px 110px;
+    text-align: center;
 }
 
-.Status {
-    text-align: center;
+.CenteredRowChunk {
+    justify-content: center;
 }
 
 .InitialDelayRowChunk {
