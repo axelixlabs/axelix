@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { extractErrorCode } from "helpers";
-import { type IErrorResponse, type IGCLoggingStatusResponseBody, StatefulRequest, StatelessRequest } from "models";
+import { type IErrorResponse, type IGCLoggingStatusResponseBody, StatelessRequest } from "models";
 import { enableGCLogging } from "services";
 import { getLevelsSelectData } from "utils";
 
@@ -40,7 +40,7 @@ interface IProps {
     /**
      * State of GC logging status
      */
-    loggingStatusData: StatefulRequest<IGCLoggingStatusResponseBody>;
+    logginsStatus: IGCLoggingStatusResponseBody;
 
     /**
      * Loads the GC logging status
@@ -48,11 +48,11 @@ interface IProps {
     loadGCStatus: () => void;
 }
 
-export const GCSettings = ({ isModalOpen, setIsModalOpen, loggingStatusData, loadGCStatus }: IProps) => {
+export const GCLogEnableSettings = ({ isModalOpen, setIsModalOpen, logginsStatus, loadGCStatus }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
 
-    const { level, availableLevels } = loggingStatusData.response!;
+    const { level, availableLevels } = logginsStatus!;
 
     const [selectedLevel, setSelectedLevel] = useState<string>(level);
     const [enableGCLoggingData, setEnableGCLoggingData] = useState(StatelessRequest.inactive());
@@ -80,11 +80,11 @@ export const GCSettings = ({ isModalOpen, setIsModalOpen, loggingStatusData, loa
 
     return (
         <Modal
-            title="Enable garbage collector"
+            title={t("GC.modalWindow.title")}
             open={isModalOpen}
             onOk={onOk}
             onCancel={onClose}
-            okText="Save"
+            okText={t("GC.modalWindow.submit")}
             centered
             width={550}
             loading={enableGCLoggingData.loading}
@@ -93,7 +93,7 @@ export const GCSettings = ({ isModalOpen, setIsModalOpen, loggingStatusData, loa
             }}
         >
             <div className={styles.ContentWrapper}>
-                <div>{t("GC.selectLogginglevel")}:</div>
+                <div>{t("GC.modalWindow.selectLoggingLevel")}:</div>
                 <Select
                     placeholder="Level"
                     defaultValue={selectedLevel}

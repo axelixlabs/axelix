@@ -92,7 +92,7 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
 
     return (
         <div className={styles.FirstSection}>
-            <div className="TextMedium">{t("GC.logList")}</div>
+            <div className="TextMedium">{t("GC.mainTitle")}</div>
             <div className={styles.ActionButtonsWrapper}>
                 {isLoggingStatusEnabled && (
                     <>

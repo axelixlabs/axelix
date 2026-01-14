@@ -30,7 +30,7 @@ export interface IGCLoggingStatusResponseBody {
     availableLevels: string[];
 }
 
-export interface IEnableGCLoggingData {
+export interface IEnableGCLoggingRequestData {
     /**
      * Instance id of service
      */

@@ -228,13 +228,17 @@
         }
     },
     "GC": {
-        "disableTitle": "Garbage collector is disabled",
-        "disableSubtitle": "Enable it to display logs",
-        "enableButtonText": "Enable Garbage Collector",
-        "selectLogginglevel": "Select logging level",
+        "disableTitle": "Garbage Collector Logging is Disabled",
+        "disableSubtitle": "Click below to see GC logs feed",
+        "enableButtonText": "Enable GC Logging",
+        "modalWindow" : {
+            "title" : "Enable Garbage Collector Logs",
+            "selectLoggingLevel": "Select Logging Level",
+            "submit" : "Save"
+        },
         "download": "Download",
         "disable": "Disable",
-        "logList": "Garbage Collector Log",
+        "mainTitle": "Garbage Collector Log",
         "triggerButtonText": "Trigger GC",
         "triggered": "The garbage collector was triggered"
     }

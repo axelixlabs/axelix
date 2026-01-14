@@ -227,13 +227,17 @@
         }
     },
     "GC": {
-        "disableTitle": "Сборщик мусора отключён",
-        "disableSubtitle": "Включите его, чтобы отображать логи",
-        "enableButtonText": "Включить сборщик мусора",
-        "selectLogginglevel": "Выберите уровень логирования",
-        "download": "Скачать",
+        "disableTitle": "Лог Сборщика Мусора Отключён",
+        "disableSubtitle": "Нажмите на кнопку ниже, чтобы включить логгировние",
+        "enableButtonText": "Включить Лог Сборщика Мусора",
+        "modalWindow" : {
+            "title" : "Enable Garbage Collector Logs",
+            "selectLoggingLevel": "Выберите уровень логирования",
+            "submit" : "Ок"
+        },
+        "download": "Скачать Лог",
         "disable": "Отключить",
-        "logList": "Журнал сборщика мусора",
+        "mainTitle": "Лог Сборщика Мусора",
         "triggerButtonText": "Запустить GC",
         "triggered": "Сборщик мусора был вызван"
     }

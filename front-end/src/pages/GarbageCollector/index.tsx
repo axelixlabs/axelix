@@ -21,9 +21,9 @@ import { fetchData } from "helpers";
 import { type IGCLoggingStatusResponseBody, StatefulRequest } from "models";
 import { getGCLoggingStatus } from "services";
 
-import { GCDisabled } from "./GCDisabled";
+import { GCDisabledMessage } from "./GCDisabled";
 import { GCFirstSection } from "./GCFirstSection";
-import { GCLogList } from "./GCLogList";
+import { GCLogFeed } from "./GCLogFeed";
 import styles from "./styles.module.css";
 
 const GarbageCollector = () => {
@@ -47,7 +47,8 @@ const GarbageCollector = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const isLoggingStatusEnabled = loggingStatusData.response!.enabled;
+    const gcStatus = loggingStatusData.response!;
+    const isLoggingStatusEnabled = gcStatus.enabled;
 
     return (
         <div className={styles.MainWrapper}>
@@ -55,9 +56,9 @@ const GarbageCollector = () => {
 
             <div className={styles.ContentWrapper}>
                 {isLoggingStatusEnabled ? (
-                    <GCLogList />
+                    <GCLogFeed />
                 ) : (
-                    <GCDisabled loggingStatusData={loggingStatusData} loadGCStatus={loadGCStatus} />
+                    <GCDisabledMessage loggingStatusData={gcStatus} loadGCStatus={loadGCStatus} />
                 )}
             </div>
         </div>

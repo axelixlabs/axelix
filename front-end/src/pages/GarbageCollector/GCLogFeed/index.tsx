@@ -20,7 +20,7 @@ import { fetchData } from "helpers";
 import { StatefulRequest } from "models";
 import { getGCLogFile } from "services";
 
-export const GCLogList = () => {
+export const GCLogFeed = () => {
     const { instanceId } = useParams();
 
     const [logsData, setLogsData] = useState(StatefulRequest.loading<string>());

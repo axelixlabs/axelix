@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 import apiFetch from "api/apiFetch";
-import type { IEnableGCLoggingData } from "models";
+import type { IEnableGCLoggingRequestData } from "models";
 
 export const getGCLoggingStatus = (instanceId: string) => {
     return apiFetch.get(`garbage-collector/logs/${instanceId}/status`);
 };
 
-export const enableGCLogging = (data: IEnableGCLoggingData) => {
+export const enableGCLogging = (data: IEnableGCLoggingRequestData) => {
     const { instanceId, level } = data;
 
     return apiFetch.post(`garbage-collector/logs/${instanceId}/enable`, {

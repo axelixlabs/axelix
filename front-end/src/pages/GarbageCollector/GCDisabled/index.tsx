@@ -19,9 +19,9 @@ import OnOffIcon from "assets/icons/onOf.svg?react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { IGCLoggingStatusResponseBody, StatefulRequest } from "models";
+import type { IGCLoggingStatusResponseBody } from "models";
 
-import { GCSettings } from "../GCSettings";
+import { GCLogEnableSettings } from "../GCLogEnableSettings";
 
 import styles from "./styles.module.css";
 
@@ -29,7 +29,7 @@ interface IProps {
     /**
      * State of GC logging status
      */
-    loggingStatusData: StatefulRequest<IGCLoggingStatusResponseBody>;
+    loggingStatusData: IGCLoggingStatusResponseBody;
 
     /**
      * Loads the GC logging status
@@ -37,7 +37,7 @@ interface IProps {
     loadGCStatus: () => void;
 }
 
-export const GCDisabled = ({ loggingStatusData, loadGCStatus }: IProps) => {
+export const GCDisabledMessage = ({ loggingStatusData, loadGCStatus }: IProps) => {
     const { t } = useTranslation();
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -50,20 +50,15 @@ export const GCDisabled = ({ loggingStatusData, loadGCStatus }: IProps) => {
                 </div>
                 <div className={`TextMedium ${styles.Title}`}>{t("GC.disableTitle")}</div>
                 <div className={styles.SubTitle}>{t("GC.disableSubtitle")}</div>
-                <Button
-                    icon={<OnOffIcon />}
-                    type="primary"
-                    className={styles.CloseButton}
-                    onClick={() => setIsModalOpen(true)}
-                >
+                <Button icon={<OnOffIcon />} type="primary" onClick={() => setIsModalOpen(true)}>
                     {t("GC.enableButtonText")}
                 </Button>
             </div>
             {isModalOpen && (
-                <GCSettings
+                <GCLogEnableSettings
                     isModalOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
-                    loggingStatusData={loggingStatusData}
+                    logginsStatus={loggingStatusData}
                     loadGCStatus={loadGCStatus}
                 />
             )}
