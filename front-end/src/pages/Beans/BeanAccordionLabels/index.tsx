@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 import { Tag } from "antd";
-import LinkIcon from "assets/icons/link.svg?react";
-import { Link, useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
-import { defineBeanScopeColor, normalizeHtmlElementId } from "helpers";
+import { defineBeanScopeColor } from "helpers";
 import type { IBean } from "models";
 
 import styles from "./styles.module.css";
@@ -31,8 +29,7 @@ interface IProps {
 }
 
 export const BeanAccordionLabels = ({ bean }: IProps) => {
-    const { beanName, className, scope, aliases, isConfigPropsBean } = bean;
-    const { instanceId } = useParams();
+    const { beanName, className, scope, aliases } = bean;
 
     return (
         <div
@@ -46,14 +43,6 @@ export const BeanAccordionLabels = ({ bean }: IProps) => {
             <div className={styles.AccordionHeaderContent}>
                 <div className={styles.BeanNameWrapper}>
                     <TooltipWithCopy text={beanName} />
-                    {isConfigPropsBean && (
-                        <Link
-                            to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(beanName)}`}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <LinkIcon />
-                        </Link>
-                    )}
                 </div>
                 <div className={styles.ClassName}>
                     <TooltipWithCopy text={className} />
