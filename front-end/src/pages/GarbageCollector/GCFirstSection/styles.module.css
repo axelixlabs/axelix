@@ -8,3 +8,7 @@
     display: flex;
     column-gap: 20px;
 }
+
+.ActionButton {
+    padding-inline: 25px !important;
+}
