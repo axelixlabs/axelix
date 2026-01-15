@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import LinkIcon from "assets/icons/link.svg?react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
+import { StyledLink } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import { EBeanOrigin, type IBean } from "models";
 
 import sharedStyles from "../styles.module.css";
 
 import { BeanSourceTree } from "./BeanSourceTree";
-import styles from "./styles.module.css";
 
 interface IProps {
     /**
@@ -36,7 +35,7 @@ export const BeanSource = ({ bean }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
-    const { beanSource, autoConfigurationRef } = bean;
+    const { beanName, beanSource, autoConfigurationRef, isConfigPropsBean } = bean;
     const { origin } = beanSource;
 
     const statelessBeanSource =
@@ -48,15 +47,16 @@ export const BeanSource = ({ bean }: IProps) => {
 
     if (origin === EBeanOrigin.COMPONENT_ANNOTATION && autoConfigurationRef) {
         beanSourceTitle = (
-            <div className={styles.LinkedTitleWrapper}>
-                <div>{t("Beans.beanSource.AUTO_CONFIGURATION_CLASS")}</div>
-                <Link to={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}>
-                    <LinkIcon />
-                </Link>
-            </div>
+            <StyledLink href={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}>
+                {t("Beans.beanSource.AUTO_CONFIGURATION_CLASS")}
+            </StyledLink>
         );
-    } else if (origin == EBeanOrigin.UNKNOWN && bean.isConfigPropsBean) {
-        beanSourceTitle = t(`Beans.beanSource.CONFIG_PROPS_BEAN`);
+    } else if (origin == EBeanOrigin.UNKNOWN && isConfigPropsBean) {
+        beanSourceTitle = (
+            <StyledLink href={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(beanName)}`}>
+                {t(`Beans.beanSource.CONFIG_PROPS_BEAN`)}
+            </StyledLink>
+        );
     } else {
         beanSourceTitle = t(`Beans.beanSource.${origin}`);
     }

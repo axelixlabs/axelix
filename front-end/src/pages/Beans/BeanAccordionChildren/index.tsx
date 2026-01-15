@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useParams } from "react-router-dom";
-
 import { type IBean } from "models";
 
 import { BeanBooleanFlag } from "./BeanBooleanFlag";
@@ -32,20 +30,16 @@ interface IProps {
 }
 
 export const BeanAccordionChildren = ({ bean }: IProps) => {
-    const { instanceId } = useParams();
+    const { dependencies, aliases, qualifiers, isLazyInit, isPrimary } = bean;
 
     return (
         <div className={styles.AccordionBody}>
-            {bean.dependencies.length > 0 && (
-                <BeanDependencies instanceId={instanceId!} dependencies={bean.dependencies}></BeanDependencies>
-            )}
-            {bean.aliases.length > 0 && <BeanSimpleList valuesTag="aliases" values={bean.aliases}></BeanSimpleList>}
-            {bean.qualifiers.length > 0 && (
-                <BeanSimpleList valuesTag="qualifiers" values={bean.qualifiers}></BeanSimpleList>
-            )}
+            {dependencies.length > 0 && <BeanDependencies dependencies={dependencies} />}
+            {aliases.length > 0 && <BeanSimpleList valuesTag="aliases" values={aliases} />}
+            {qualifiers.length > 0 && <BeanSimpleList valuesTag="qualifiers" values={qualifiers} />}
             <BeanProxyType proxyType={bean.proxyType} />
-            <BeanBooleanFlag valueTag={"isLazyInitBean"} value={bean.isLazyInit} />
-            <BeanBooleanFlag valueTag={"isPrimaryBean"} value={bean.isPrimary} />
+            <BeanBooleanFlag valueTag={"isLazyInitBean"} value={isLazyInit} />
+            <BeanBooleanFlag valueTag={"isPrimaryBean"} value={isPrimary} />
             <BeanSource bean={bean} />
         </div>
     );

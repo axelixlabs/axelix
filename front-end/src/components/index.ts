@@ -22,6 +22,7 @@ export { EmptyHandler } from "./EmptyHandler";
 export { InfoTooltip } from "./InfoTooltip";
 export { PageSearch } from "./PageSearch";
 export { AboutModal } from "./AboutModal";
+export { StyledLink } from "./StyledLink";
 export { Accordion } from "./Accordion";
 export { default } from "./Loadable";
 export { Loader } from "./Loader";

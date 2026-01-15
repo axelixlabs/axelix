@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import { Tree, type TreeDataNode } from "antd";
-import LinkIcon from "assets/icons/link.svg?react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
+import { StyledLink } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import { EBeanOrigin, ESearchSubject, type IBean } from "models";
 import { scrollToAccordionById } from "utils";
@@ -34,7 +34,7 @@ interface IProps {
 export const BeanSourceTree = ({ bean }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
-    const { beanSource, autoConfigurationRef } = bean;
+    const { beanName, beanSource, autoConfigurationRef, isConfigPropsBean } = bean;
 
     const resolveTreeChildren = (): TreeDataNode[] | undefined => {
         if (beanSource.origin === EBeanOrigin.BEAN_METHOD) {
@@ -77,23 +77,33 @@ export const BeanSourceTree = ({ bean }: IProps) => {
                             ),
                             key: beanSource.enclosingClassName!,
                         },
+
+                        // TODO: Maybe we can refactor this in the future
                         ...(autoConfigurationRef
                             ? [
                                   {
                                       title: (
-                                          <div className={styles.BeanTreeItem}>
-                                              <div className={styles.BeanTreeLabel}>
-                                                  {t("Beans.beanSource.tree.conditionsPageRef")}
-                                              </div>
-                                              <Link
-                                                  to={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}
-                                                  onClick={(e) => e.stopPropagation()}
-                                              >
-                                                  <LinkIcon />
-                                              </Link>
-                                          </div>
+                                          <StyledLink
+                                              href={`/instance/${instanceId}/conditions#${normalizeHtmlElementId(autoConfigurationRef)}`}
+                                          >
+                                              {t("Beans.beanSource.tree.conditionsPageRef")}
+                                          </StyledLink>
                                       ),
                                       key: autoConfigurationRef,
+                                  },
+                              ]
+                            : []),
+                        ...(isConfigPropsBean
+                            ? [
+                                  {
+                                      title: (
+                                          <StyledLink
+                                              href={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(beanName)}`}
+                                          >
+                                              {t("Beans.beanSource.tree.configPropsBean")}
+                                          </StyledLink>
+                                      ),
+                                      key: "isConfigPropsBean",
                                   },
                               ]
                             : []),

@@ -138,7 +138,8 @@
                 "enclosingClass": "Declaring class",
                 "factoryBeanClassName": "Factory Bean",
                 "autoConfigurationEnclosingClass" : "Declaring AutoConfiguration class",
-                "conditionsPageRef" : "Who defines this bean?"
+                "conditionsPageRef" : "Who defines this bean?",
+                "configPropsBean": "@ConfigurationProperties bean"
             },
             "AUTO_CONFIGURATION_BEAN_METHOD" : "AutoConfiguration @Bean method",
             "AUTO_CONFIGURATION_CLASS" : "@AutoConfiguration class",
