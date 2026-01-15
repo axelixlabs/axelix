@@ -64,38 +64,38 @@ export const EditableValue = ({
                 />
             </div>
         );
-    } else {
-        return (
-            <div className={editClassName}>
-                <Input
-                    value={actualValue}
-                    onChange={(e) => setActualValue(e.target.value)}
-                    className={styles.EditPropertyField}
-                />
-
-                <Button
-                    icon={<CloseOutlined />}
-                    type="primary"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingValue(false);
-                        setActualValue(initialValue);
-                    }}
-                    className={styles.CloseButton}
-                />
-
-                <Button
-                    icon={<CheckOutlined />}
-                    type="primary"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingValue(false);
-                        setActualValue(actualValue);
-                        onNewValue(actualValue);
-                    }}
-                    className={styles.UpdateButton}
-                />
-            </div>
-        );
     }
+
+    return (
+        <div className={editClassName}>
+            <Input
+                value={actualValue}
+                onChange={(e) => setActualValue(e.target.value)}
+                className={styles.EditPropertyField}
+            />
+
+            <Button
+                icon={<CloseOutlined />}
+                type="primary"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingValue(false);
+                    setActualValue(initialValue);
+                }}
+                className={styles.CloseButton}
+            />
+
+            <Button
+                icon={<CheckOutlined />}
+                type="primary"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingValue(false);
+                    setActualValue(actualValue);
+                    onNewValue(actualValue);
+                }}
+                className={styles.UpdateButton}
+            />
+        </div>
+    );
 };

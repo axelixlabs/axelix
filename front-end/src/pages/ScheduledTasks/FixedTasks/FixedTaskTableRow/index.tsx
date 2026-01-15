@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TooltipWithCopy } from "components";
+import { Button } from "antd";
+import RunIcon from "assets/icons/run.svg?react";
+
+import { EditableValue, TooltipWithCopy } from "components";
 import type { IFixedTasks } from "models";
 
 import { ScheduledTasksStatusSwitch } from "../../ScheduledTasksStatusSwitch";
@@ -33,10 +36,15 @@ export const FixedTaskTableRow = ({ task }: IProps) => {
             <div className={`RowChunk ${styles.TooltipWrapperChunk}`}>
                 <TooltipWithCopy text={task.runnable.target} />
             </div>
-            <div className="RowChunk">{task.initialDelay}</div>
-            <div className="RowChunk">{task.interval}</div>
+            <div className={`RowChunk ${styles.CenteredRowChunk}`}>{task.initialDelay}</div>
             <div className="RowChunk">
+                <EditableValue initialValue={String(task.interval)} onNewValue={() => {}} />
+            </div>
+            <div className={`RowChunk ${styles.CenteredRowChunk}`}>
                 <ScheduledTasksStatusSwitch runnable={task} />
+            </div>
+            <div className={`RowChunk ${styles.CenteredRowChunk}`}>
+                <Button icon={<RunIcon />} type="primary" />
             </div>
         </div>
     );

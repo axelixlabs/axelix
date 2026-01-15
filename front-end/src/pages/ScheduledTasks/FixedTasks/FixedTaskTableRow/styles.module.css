@@ -1,7 +1,11 @@
 .FixedTaskTableRow {
-    grid-template-columns: 1fr 170px 170px 110px;
+    grid-template-columns: 1fr 170px 230px 110px 110px;
 }
 
 .TooltipWrapperChunk {
     min-width: 0;
+}
+
+.CenteredRowChunk {
+    justify-content: center;
 }
