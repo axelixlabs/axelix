@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ReloadOutlined } from "@ant-design/icons";
-
 import { App, Button, Tooltip } from "antd";
 import DownloadIcon from "assets/icons/download.svg?react";
 import OnOffIcon from "assets/icons/onOf.svg?react";
+import RunIcon from "assets/icons/run.svg?react";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -121,7 +120,7 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
                 )}
                 <Tooltip title={t("GC.triggerButtonText")}>
                     <Button
-                        icon={<ReloadOutlined />}
+                        icon={<RunIcon />}
                         type="primary"
                         loading={triggerGBData.loading}
                         onClick={triggerGBHandler}
