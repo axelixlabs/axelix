@@ -139,7 +139,7 @@
                 "factoryBeanClassName": "Factory Bean",
                 "autoConfigurationEnclosingClass" : "Класс Авто-Конфигурации",
                 "conditionsPageRef" : "Происхождение бина",
-                "configPropsBean": "Бин свойств конфигурации"
+                "configPropsBean": "@ConfigurationProperties bean"
             },
             "AUTO_CONFIGURATION_BEAN_METHOD" : "@Bean метод в классе авто-конфигурации",
             "AUTO_CONFIGURATION_CLASS" : "Класс Авто-Конфигурации",
