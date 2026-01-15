@@ -233,12 +233,12 @@
         "disableSubtitle": "Нажмите на кнопку ниже, чтобы включить логгировние",
         "enableButtonText": "Включить Лог Сборщика Мусора",
         "modalWindow" : {
-            "title" : "Enable Garbage Collector Logs",
+            "title" : "Включить Лог Сборщика Мусора",
             "selectLoggingLevel": "Выберите уровень логирования",
             "submit" : "Ок"
         },
-        "download": "Скачать Лог",
-        "disable": "Отключить",
+        "download": "Скачать Лог GC",
+        "disable": "Отключить Лог GC",
         "mainTitle": "Лог Сборщика Мусора",
         "triggerButtonText": "Запустить GC",
         "triggered": "Сборщик мусора был вызван"

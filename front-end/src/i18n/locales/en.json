@@ -236,10 +236,10 @@
         "modalWindow" : {
             "title" : "Enable Garbage Collector Logs",
             "selectLoggingLevel": "Select Logging Level",
-            "submit" : "Save"
+            "submit" : "Enable"
         },
-        "download": "Download",
-        "disable": "Disable",
+        "download": "Download GC Log",
+        "disable": "Disable GC Logging",
         "mainTitle": "Garbage Collector Log",
         "triggerButtonText": "Trigger GC",
         "triggered": "The garbage collector was triggered"
