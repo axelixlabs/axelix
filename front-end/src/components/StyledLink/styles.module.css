@@ -1,0 +1,16 @@
+.MainWrapper {
+    max-width: max-content;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    word-break: break-all;
+    transition-duration: 0.3s;
+}
+
+.MainWrapper:hover {
+    border-bottom: 1px solid var(--axelix-primary-blue);
+    color: var(--axelix-primary-blue);
+}
+
+.LinkIcon {
+    margin-left: 8px;
+}

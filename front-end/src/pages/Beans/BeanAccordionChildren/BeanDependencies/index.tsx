@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import LinkIcon from "assets/icons/link.svg?react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
-import { normalizeHtmlElementId } from "helpers";
 import { ESearchSubject, type IDependency } from "models";
 import { scrollToAccordionById } from "utils";
 
@@ -26,24 +23,19 @@ import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * the id of the current application instance
-     */
-    instanceId: string;
-
-    /**
      * List of dependencies
      */
     dependencies: IDependency[];
 }
 
-export const BeanDependencies = ({ dependencies, instanceId }: IProps) => {
+export const BeanDependencies = ({ dependencies }: IProps) => {
     const { t } = useTranslation();
 
     return (
         <>
             <div className={styles.AccordionBodyChunkTitle}>{t("Beans.dependencies")}:</div>
             <div>
-                {dependencies.map(({ name, isConfigPropsDependency }) => (
+                {dependencies.map(({ name }) => (
                     <div key={name} className={styles.AccordionBodyChunkList}>
                         <div className={styles.DependencyWrapper}>
                             <div
@@ -52,11 +44,6 @@ export const BeanDependencies = ({ dependencies, instanceId }: IProps) => {
                             >
                                 <TooltipWithCopy text={name} />
                             </div>
-                            {isConfigPropsDependency && (
-                                <Link to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(name)}`}>
-                                    <LinkIcon />
-                                </Link>
-                            )}
                         </div>
                     </div>
                 ))}

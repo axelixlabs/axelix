@@ -17,6 +17,7 @@ import LinkIcon from "assets/icons/link.svg?react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
+import { StyledLink } from "components";
 import { normalizeHtmlElementId, uniqueInjectionPointsBeanNames } from "helpers";
 import type { IEnvProperty } from "models";
 
@@ -54,15 +55,11 @@ export const EnvironmentAccordionBody = ({ property }: IProps) => {
             {configPropsBeanName && (
                 <>
                     <div>{t(`Environments.configProps`)}:</div>
-                    <div className={styles.Value}>
+                    <StyledLink
+                        href={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
+                    >
                         {configPropsBeanName}
-                        <Link
-                            to={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
-                            className={styles.LinkIcon}
-                        >
-                            <LinkIcon />
-                        </Link>
-                    </div>
+                    </StyledLink>
                 </>
             )}
 
