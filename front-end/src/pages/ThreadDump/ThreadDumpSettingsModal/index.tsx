@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Modal } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
+
+import { UniversalModal } from "components";
 
 import { ContentionMonitoringStatusSwitch } from "./ContentionMonitoringStatusSwitch";
 import styles from "./styles.module.css";
@@ -47,25 +48,13 @@ export const ThreadDumpSettingsModal = ({ isModalopen, setIsModalOpen, contentio
     };
 
     return (
-        // TODO: In our project, <Modal> component from аntd is used in several places.
-        // In the future, we may consider creating a universal component for it.
-        <Modal
-            title={t("ThreadDump.Settings.title")}
-            open={isModalopen}
-            onOk={onClose}
-            onCancel={onClose}
-            centered
-            width={550}
-            cancelButtonProps={{
-                style: { display: "none" },
-            }}
-        >
+        <UniversalModal title={t("ThreadDump.Settings.title")} open={isModalopen} onOk={onClose} onCancel={onClose}>
             <div className={styles.ModalContentWrapper}>
                 <div className={styles.SettingsItemWrapper}>
                     <div>{t("ThreadDump.Settings.contentionMonitoring")}</div>
                     <ContentionMonitoringStatusSwitch contentionMonitoring={contentionMonitoring} />
                 </div>
             </div>
-        </Modal>
+        </UniversalModal>
     );
 };

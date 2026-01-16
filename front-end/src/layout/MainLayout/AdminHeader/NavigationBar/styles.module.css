@@ -1,5 +1,5 @@
 .Link {
-    transition: all 0.3s;
+    transition-duration: 0.3s;
     align-self: center;
     padding: 8px 12px;
     border-radius: var(--axelix-border-radius-small);

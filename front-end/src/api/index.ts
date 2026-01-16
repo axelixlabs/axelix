@@ -24,7 +24,7 @@ import { IS_AUTH } from "utils";
 /**
  * Browser will route such requests (with no host:port) to the same origin as the current
  */
-const apiFetch = axios.create({
+export const apiFetch = axios.create({
     baseURL: `/api/axelix`,
     withCredentials: true,
     headers: {
@@ -53,5 +53,3 @@ apiFetch.interceptors.response.use(
         return Promise.reject(error);
     },
 );
-
-export default apiFetch;

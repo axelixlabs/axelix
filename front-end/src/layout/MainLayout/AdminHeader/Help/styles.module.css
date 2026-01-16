@@ -11,7 +11,7 @@
 }
 
 .ArrowIcon {
-    transition: transform 0.3s ease;
+    transition: transform 0.3s;
     transform: rotate(180deg);
     margin-top: 4px;
 }
