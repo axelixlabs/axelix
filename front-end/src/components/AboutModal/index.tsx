@@ -17,9 +17,11 @@
  */
 import { FileTextOutlined, GithubOutlined, ReadOutlined } from "@ant-design/icons";
 
-import { Button, Modal } from "antd";
+import { Button } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { Trans, useTranslation } from "react-i18next";
+
+import { UniversalModal } from "components";
 
 import styles from "./styles.module.css";
 
@@ -49,16 +51,7 @@ export function AboutModal({ open, setOpen }: IProps) {
     };
 
     return (
-        <Modal
-            open={open}
-            onOk={onClose}
-            onCancel={onClose}
-            centered
-            width={550}
-            cancelButtonProps={{
-                style: { display: "none" },
-            }}
-        >
+        <UniversalModal open={open} onOk={onClose} onCancel={onClose}>
             <div className={styles.HeaderWrapper}>
                 <p className="TextMedium">{t("About.title")}</p>
                 <p className={styles.Version}>
@@ -114,6 +107,6 @@ export function AboutModal({ open, setOpen }: IProps) {
                     {t("About.blog")}
                 </Button>
             </div>
-        </Modal>
+        </UniversalModal>
     );
 }

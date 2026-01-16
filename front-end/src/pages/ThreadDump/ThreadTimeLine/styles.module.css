@@ -11,7 +11,7 @@
 .ThreadGroup {
     width: 5px;
     height: 30px;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s;
     background-color: var(--color-primary);
 }
 

@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { resolveProxying } from "helpers/beans";
+import { resolveProxying } from "helpers";
 import { EProxyType } from "models";
 
 import styles from "../styles.module.css";

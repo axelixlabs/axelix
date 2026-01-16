@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import apiFetch from "api/apiFetch";
+import { apiFetch } from "api";
 import type { IUpdatePropertyRequestData } from "models";
 
 export const updateProperty = (data: IUpdatePropertyRequestData) => {
     const { instanceId, propertyName, newValue } = data;
 
-    return apiFetch.post(`/property-management/${instanceId}`, {
+    return apiFetch.post(`property-management/${instanceId}`, {
         propertyName,
         newValue,
     });
