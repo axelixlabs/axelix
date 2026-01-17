@@ -9,17 +9,27 @@ on:
         type: string
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  USERNAME: ${{ github.actor }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_CONTAINER_REGISTRY: ghcr.io
+  RELEASE_TAG: ${{ github.event.inputs.git_tag }}
+  PGP_KEY_ID: ${{ secrets.PGP_KEY_ID }}
+  PGP_SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY }}
+  PGP_SIGNING_KEY_PASSPHRASE: ${{ secrets.PGP_SIGNING_KEY_PASSPHRASE }}
 
 jobs:
   release:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.inputs.git_tag }}
+          ref: ${{ env.RELEASE_TAG }}
           fetch-depth: 0
 
       # TODO: Change to java 25 later on
@@ -29,15 +39,29 @@ jobs:
           distribution: 'liberica'
           java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      # Intentionally leaving the setup-gradle action for release pipeline to not introduce any cached behavior
+      # and to create the release build from scratch.
+      - name: Build
+        run: ./gradlew clean build sourcesJar javadocJar
 
-      - name: Build and generate all JARs
-        run: ./gradlew build -x test javadocJar sourcesJar
-
-      - name: Publish to GitHub Packages (Maven)
+      - name: Publish to GitHub Packages
         run: ./gradlew publishGprPublicationToGitHubPackagesRepository
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_PACKAGES_TOKEN }}
-          PGP_SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY }}
-          PGP_SIGNING_PASSPHRASE: ${{ secrets.PGP_SIGNING_PASSPHRASE }}
+
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.GH_CONTAINER_REGISTRY }}
+          username: ${{ env.USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: master/docker/Dockerfile
+          push: true
+          tags: |
+            ${{ env.GH_CONTAINER_REGISTRY }}/${{ github.repository_owner }}:${{ env.RELEASE_TAG }}

@@ -57,6 +57,11 @@ publishing {
             artifact(tasks.bootJar.get())
         }
     }
+    publications {
+        named<MavenPublication>("gpr") {
+            artifact(tasks.bootJar.get())
+        }
+    }
 }
 
 axelix {
