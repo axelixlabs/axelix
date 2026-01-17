@@ -34,7 +34,7 @@ import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskMutationRequest;
+import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskCronExpressionMutationRequest;
 import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationStrategy;
@@ -312,7 +312,7 @@ public class ScheduledTasksEndpointProberTest {
            "newValue" : "*/5 0 0/3 1/1 * ?"
         }
         """;
-        ScheduledTaskMutationRequest requestBody = new ScheduledTaskMutationRequest(
+        ScheduledTaskCronExpressionMutationRequest requestBody = new ScheduledTaskCronExpressionMutationRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive", "*/5 0 0/3 1/1 * ?");
 
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(requestBody));

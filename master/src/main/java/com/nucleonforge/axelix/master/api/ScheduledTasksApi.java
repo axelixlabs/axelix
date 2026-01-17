@@ -37,7 +37,7 @@ import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskMutationRequest;
+import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskCronExpressionMutationRequest;
 import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.api.response.ScheduledTasksResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
@@ -172,7 +172,7 @@ public class ScheduledTasksApi {
     }
 
     @Operation(
-            summary = "Allows disabling a scheduled task.",
+            summary = "Allows modifying the cron expression",
             responses = {
                 @ApiResponse(description = "No Content", responseCode = "204"),
                 @ApiResponse(
@@ -193,7 +193,7 @@ public class ScheduledTasksApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @PostMapping(path = ApiPaths.ScheduledTasksApi.INSTANCE_ID)
     public ResponseEntity<Void> mutateCronExpression(
-            @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskMutationRequest request) {
+            @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskCronExpressionMutationRequest request) {
 
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
         mutateScheduledTaskEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);

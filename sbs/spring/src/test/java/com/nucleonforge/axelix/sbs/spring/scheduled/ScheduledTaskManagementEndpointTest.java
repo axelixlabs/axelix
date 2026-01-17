@@ -257,13 +257,14 @@ class ScheduledTaskManagementEndpointTest {
     }
 
     @Test
-    void shouldMutateCronExpression_testCronTask() throws InterruptedException {
+    void shouldMutateCronExpression_testCronTask() {
         String newCronExpression = "*/5 * * * * *";
+
         ScheduledTaskMutationRequest request =
                 new ScheduledTaskMutationRequest(CRON_TASK_ID_FOR_MUTATION, newCronExpression);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks", defaultEntityForMutation(request), Void.class);
+                "/actuator/axelix-scheduled-tasks/modify/cron-expression", defaultEntityForMutation(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
