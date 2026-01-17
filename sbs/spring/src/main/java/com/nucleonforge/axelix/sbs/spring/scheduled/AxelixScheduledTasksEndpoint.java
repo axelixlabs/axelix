@@ -65,7 +65,7 @@ public class AxelixScheduledTasksEndpoint {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping
+    @PostMapping("/modify/cron-expression")
     public ResponseEntity<Void> modifyCronExpression(@RequestBody ScheduledTaskMutationRequest request) {
         taskService.modifyCronExpression(request.targetScheduledTask(), request.newValue());
         return ResponseEntity.noContent().build();

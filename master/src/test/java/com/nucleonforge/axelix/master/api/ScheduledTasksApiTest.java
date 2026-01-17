@@ -38,7 +38,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskMutationRequest;
+import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskCronExpressionMutationRequest;
 import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -358,7 +358,7 @@ public class ScheduledTasksApiTest {
     @Test
     void shouldModifyConfigurationScheduledTask() {
 
-        ScheduledTaskMutationRequest requestBody = new ScheduledTaskMutationRequest(
+        ScheduledTaskCronExpressionMutationRequest requestBody = new ScheduledTaskCronExpressionMutationRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 0 0/3 1/1 * ?");
 
         registry.register(TestObjectFactory.createInstance(
@@ -494,7 +494,7 @@ public class ScheduledTasksApiTest {
     void shouldReturnInternalServerError_OnModifyConfigurationScheduledTask() {
         String instanceId = UUID.randomUUID().toString();
 
-        ScheduledTaskMutationRequest requestBody = new ScheduledTaskMutationRequest(
+        ScheduledTaskCronExpressionMutationRequest requestBody = new ScheduledTaskCronExpressionMutationRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 0 0/3 1/1 * ?");
 
         // when.
@@ -510,7 +510,7 @@ public class ScheduledTasksApiTest {
     @Test
     void shouldReturnBadRequestForUnregisteredInstance_OnModifyConfigurationScheduledTask() {
         String instanceId = "unregistered-axelix-scheduled-tasks-enable-instance";
-        ScheduledTaskMutationRequest requestBody = new ScheduledTaskMutationRequest(
+        ScheduledTaskCronExpressionMutationRequest requestBody = new ScheduledTaskCronExpressionMutationRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 0 0/3 1/1 * ?");
 
         // when.

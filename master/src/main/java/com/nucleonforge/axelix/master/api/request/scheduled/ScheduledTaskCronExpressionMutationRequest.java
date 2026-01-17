@@ -18,9 +18,9 @@ package com.nucleonforge.axelix.master.api.request.scheduled;
 /**
  * Represents a request to modify a scheduled task configuration.
  *
- * @param targetScheduledTask the identifier of the scheduled task to toggle. Must not be {@code null}.
- * @param newValue            the new value to be assigned. Must not be {@code null}.
+ * @param taskId         the identifier of the scheduled task to toggle. Must not be {@code null}.
+ * @param cronExpression the new value to be assigned. Must not be {@code null}.
  *
  * @author Sergey Cherkasov
  */
-public record ScheduledTaskMutationRequest(String targetScheduledTask, String newValue) {}
+public record ScheduledTaskCronExpressionMutationRequest(String taskId, String cronExpression) {}
