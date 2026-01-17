@@ -193,7 +193,8 @@ public class ScheduledTasksApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @PostMapping(path = ApiPaths.ScheduledTasksApi.INSTANCE_ID)
     public ResponseEntity<Void> mutateCronExpression(
-            @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskCronExpressionMutationRequest request) {
+            @PathVariable("instanceId") String instanceId,
+            @RequestBody ScheduledTaskCronExpressionMutationRequest request) {
 
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
         mutateScheduledTaskEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
