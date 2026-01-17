@@ -51,6 +51,7 @@ jobs:
     needs: lint-and-test
     env:
       DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
+      # TODO: Rename the CR variable. We're likely going to use multiple CRs
       CR_URL: ${{ vars.CR_URL }}
       IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
       IMAGE_NAME: master-fe
@@ -80,7 +81,7 @@ jobs:
           docker build --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file front-end/Dockerfile .
 
       - name: Docker login to Yandex Cloud CR
-        # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is my token
+        # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is a maintainer's PAT
         run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
       - name: Docker push to Yandex Cloud CR

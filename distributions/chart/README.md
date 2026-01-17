@@ -1,6 +1,6 @@
-# Axelix Master Helm Chart
+# Axelix Helm Chart
 
-* Installs [Axelix Master](https://github.com/axelix/axelix) to Kubernetes, deploying both backend and frontend components.
+* Installs [Axelix](https://github.com/axelixlabs/axelix) to Kubernetes, deploying both backend and frontend components.
 
 ## Get Repo Info
 
@@ -16,7 +16,7 @@ _See [helm repo](https://helm.sh/docs/helm/helm_repo/) for command documentation
 To install the chart with the release name `my-release`:
 
 ```console
-helm install my-release axelix/axelix-master
+helm install my-release axelixlabs/axelix
 ```
 
 The command deploys Axelix Master on the Kubernetes cluster with the default configuration. The [Configuration](#configuration) section lists the parameters that can be configured during installation.
@@ -126,18 +126,18 @@ The following table lists the configurable parameters of the Axelix Master chart
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
 ```console
-helm install my-release axelix/axelix-master \
+helm install my-release axelixlabs/axelix \
   --set backend.replicaCount=2 \
-  --set backend.image.name=myregistry/axelix-backend \
+  --set backend.image.name=myregistry/axelix \
   --set backend.image.tag=v1.0.0 \
-  --set frontend.image.name=myregistry/axelix-frontend \
+  --set frontend.image.name=myregistry/axelix-ui \
   --set frontend.image.tag=v1.0.0
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
 
 ```console
-helm install my-release axelix/axelix-master -f values.yaml
+helm install my-release axelixlabs/axelix -f values.yaml
 ```
 
 ## Backend Configuration

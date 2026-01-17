@@ -11,20 +11,20 @@ on:
 env:
   USERNAME: ${{ github.actor }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GH_CONTAINER_REGISTRY: ghcr.io
+  GITHUB_CONTAINER_REGISTRY: ghcr.io
   RELEASE_TAG: ${{ github.event.inputs.git_tag }}
   PGP_KEY_ID: ${{ secrets.PGP_KEY_ID }}
   PGP_SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY }}
   PGP_SIGNING_KEY_PASSPHRASE: ${{ secrets.PGP_SIGNING_KEY_PASSPHRASE }}
 
 jobs:
-  release:
+  release-backend-artifacts:
     runs-on: ubuntu-latest
-
+    env:
+      FULL_IMAGE_NAME: ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }}
     permissions:
       contents: read
       packages: write
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -53,15 +53,114 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.GH_CONTAINER_REGISTRY }}
+          registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
           username: ${{ env.USERNAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+      - name: Build Docker Image
+        run: docker build --tag ${{ env.FULL_IMAGE_NAME }} --file master/docker/Dockerfile .
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
         with:
-          context: .
-          file: master/docker/Dockerfile
-          push: true
-          tags: |
-            ${{ env.GH_CONTAINER_REGISTRY }}/${{ github.repository_owner }}:${{ env.RELEASE_TAG }}
+          registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
+          username: ${{ env.USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker push to GitHub Container registry
+        run: docker push ${{ env.FULL_IMAGE_NAME }}
+
+      - name: Docker logout from GitHub Container Registry
+        run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
+
+  release-frontend-artifacts:
+    runs-on: ubuntu-latest
+    env:
+      # Vite Config
+      VITE_APP_SOURCE_CODE_LINK: https://github.com/axelixlabs/axelix
+      VITE_APP_ISSUE_TRACKER_LINK: https://github.com/axelixlabs/axelix/issues
+      VITE_APP_LICENSE_LINK: https://www.gnu.org/licenses/lgpl-3.0.en.html
+      VITE_APP_REFERENCE_GUIDE_LINK: #TODO
+      VITE_APP_BLOG_LINK: #TODO
+
+      FULL_IMAGE_NAME: ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix-ui:${{ env.RELEASE_TAG }}
+    defaults:
+      run:
+        working-directory: front-end
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.inputs.git_tag }}
+          fetch-depth: 0
+
+      - name: Installing dependencies
+        run: npm ci
+
+      - name: Linting source files
+        run: npm run lint
+
+      - name: Linting CSS files
+        run: npm run lint-css
+
+      - name: Running tests
+        run: npm run test
+
+      - name: Running tests
+        run: |
+          echo "VITE_APP_VERSION=${{ github.event.inputs.git_tag }}" >> .env
+          echo "VITE_APP_SOURCE_CODE_LINK=${{ env.VITE_APP_SOURCE_CODE_LINK }}" >> .env
+          echo "VITE_APP_ISSUE_TRACKER_LINK=${{ env.VITE_APP_ISSUE_TRACKER_LINK }}" >> .env
+          echo "VITE_APP_LICENSE_LINK=${{ env.VITE_APP_LICENSE_LINK }}" >> .env.production
+          echo "VITE_APP_REFERENCE_GUIDE_LINK=${{ env.VITE_APP_REFERENCE_GUIDE_LINK }}" >> .env
+          echo "VITE_APP_BLOG_LINK=${{ env.VITE_APP_BLOG_LINK }}" >> .env
+
+      - name: Running tests
+        run: npm run build
+
+      - name: Clean-up
+        run: rm .env
+
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+
+      - name: Build Docker Image
+        run: docker build --tag ${{ env.FULL_IMAGE_NAME }} --file Dockerfile .
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
+          username: ${{ env.USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker push to GitHub Container registry
+        run: docker push ${{ env.FULL_IMAGE_NAME }}
+
+      - name: Docker logout from GitHub Container Registry
+        run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
+
+  release-helm-chart:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: distributions/chart
+    steps:
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4.3.0
+        with:
+          version: v3.14.0
+
+      - name: Add helm plugin for values.schema.json generation
+        run: |
+          helm plugin install https://github.com/losisin/helm-values-schema-json.git
+
+      - name: Generate values.schema.json
+        run: |
+          helm schema -f values.yaml
+
+      - name: Create Helm Chart Artifact
+        # TODO: Sign the chart before publication
+        run: |
+          helm package --app-version ${{ github.event.inputs.git_tag }} 
