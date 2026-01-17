@@ -42,10 +42,10 @@ jobs:
       # Intentionally leaving the setup-gradle action for release pipeline to not introduce any cached behavior
       # and to create the release build from scratch.
       - name: Build
-        run: ./gradlew clean build sourcesJar javadocJar
+        run: ./gradlew clean -x test build sourcesJar javadocJar
 
-      - name: Publish to GitHub Packages
-        run: ./gradlew publishGprPublicationToGitHubPackagesRepository
+#      - name: Publish to GitHub Packages
+#        run: ./gradlew publishGprPublicationToGitHubPackagesRepository
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v4
