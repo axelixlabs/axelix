@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "tsc -b && vite build --mode cloud",
+        "build": "tsc -b && vite build",
         "lint": "eslint .",
         "lint-css": "stylelint \"src/**/*.css\"",
         "lint:fix": "eslint . --fix",
