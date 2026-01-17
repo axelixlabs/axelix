@@ -22,7 +22,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -42,7 +41,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.test.context.TestPropertySource;
 
@@ -324,7 +322,7 @@ class ScheduledTaskManagementEndpointTest {
 
         @Bean
         public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-            return new ScheduledTasksRegistry(processor);
+            return new ScheduledTasksRegistry(List.of(processor));
         }
 
         @Bean
@@ -344,16 +342,14 @@ class ScheduledTaskManagementEndpointTest {
         }
 
         @Bean
-        public ServiceScheduledTasksAssembler serviceScheduledTasksAssembler(
-                ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTaskService service) {
-            return new DefaultServiceScheduledTasksAssembler(
-                    taskHolders.orderedStream().toList(), service);
+        public ScheduledTasksAssembler serviceScheduledTasksAssembler(ScheduledTasksRegistry scheduledTasksRegistry) {
+            return new DefaultScheduledTasksAssembler(scheduledTasksRegistry);
         }
 
         @Bean
         public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
-                ScheduledTaskService service, ServiceScheduledTasksAssembler serviceScheduledTasksAssembler) {
-            return new AxelixScheduledTasksEndpoint(service, serviceScheduledTasksAssembler);
+                ScheduledTaskService service, ScheduledTasksAssembler scheduledTasksAssembler) {
+            return new AxelixScheduledTasksEndpoint(service, scheduledTasksAssembler);
         }
 
         @Scheduled(cron = "*/1 * * * * *")

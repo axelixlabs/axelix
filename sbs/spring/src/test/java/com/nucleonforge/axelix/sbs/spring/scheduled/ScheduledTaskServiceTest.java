@@ -36,6 +36,7 @@ import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProc
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.scheduling.support.CronTrigger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -201,13 +202,13 @@ class ScheduledTaskServiceTest {
     }
 
     @Test
-    void shouldMutateCronExpression_testCronTask() throws InterruptedException {
+    void shouldModifyCronExpressionCronExpression_testCronTask() {
         String newCronExpression = "*/5 * * * * *";
 
-        taskService.mutate(CRON_TASK_ID_FOR_MUTATION, newCronExpression);
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MUTATION, newCronExpression);
 
         ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MUTATION).orElseThrow();
-        assertThat(task.getCronTrigger().getExpression()).isEqualTo(newCronExpression);
+        assertThat(((CronTrigger) task.getTrigger()).getExpression()).isEqualTo(newCronExpression);
     }
 
     @TestConfiguration
@@ -221,7 +222,7 @@ class ScheduledTaskServiceTest {
 
         @Bean
         public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-            return new ScheduledTasksRegistry(processor);
+            return new ScheduledTasksRegistry(List.of(processor));
         }
 
         @Bean

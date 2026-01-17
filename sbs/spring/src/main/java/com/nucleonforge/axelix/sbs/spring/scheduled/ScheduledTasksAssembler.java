@@ -22,7 +22,7 @@ import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
  *
  * @author Sergey Cherkasov
  */
-public interface ServiceScheduledTasksAssembler {
+public interface ScheduledTasksAssembler {
 
     /**
      * @return assembled {@link ServiceScheduledTasks}.
