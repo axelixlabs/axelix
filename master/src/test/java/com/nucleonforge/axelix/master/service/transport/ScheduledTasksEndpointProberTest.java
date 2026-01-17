@@ -177,7 +177,8 @@ public class ScheduledTasksEndpointProberTest {
                     return new MockResponse()
                             .setBody(response)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceIdMutateTask + "/axelix-scheduled-tasks")) {
+                } else if (path.equals(
+                        "/" + activeInstanceIdMutateTask + "/axelix-scheduled-tasks/modify/cron-expression")) {
                     return new MockResponse();
                 } else if (path.equals("/" + activeInstanceId + "/axelix-scheduled-tasks/enable")) {
                     return new MockResponse();
@@ -308,8 +309,8 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
         {
-           "targetScheduledTask": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive",
-           "newValue" : "*/5 0 0/3 1/1 * ?"
+           "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive",
+           "cronExpression" : "*/5 0 0/3 1/1 * ?"
         }
         """;
         ScheduledTaskCronExpressionMutationRequest requestBody = new ScheduledTaskCronExpressionMutationRequest(
@@ -327,7 +328,8 @@ public class ScheduledTasksEndpointProberTest {
         // then
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceIdMutateTask + "/axelix-scheduled-tasks");
+        assertThat(recordedRequest.getPath())
+                .isEqualTo("/" + activeInstanceIdMutateTask + "/axelix-scheduled-tasks/modify/cron-expression");
         assertThatJson(recordedRequest.getBody().readUtf8()).isEqualTo(jsonRequest);
     }
 }

@@ -285,7 +285,8 @@ public class ScheduledTasksApiTest {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceIdMutateTask + "/actuator/axelix-scheduled-tasks")) {
+                } else if (path.equals(
+                        "/" + activeInstanceIdMutateTask + "/actuator/axelix-scheduled-tasks/modify/cron-expression")) {
                     return new MockResponse();
                 } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks/enable")) {
                     return new MockResponse();
