@@ -122,7 +122,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build \ 
+          docker build \
             --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix-ui:${{ env.RELEASE_TAG }} \
             --file Dockerfile .
 
@@ -168,4 +168,4 @@ jobs:
       - name: Create Helm Chart Artifact
         # TODO: Sign the chart before publication
         run: |
-          helm package --app-version ${{ github.event.inputs.git_tag }} 
+          helm package . --app-version ${{ github.event.inputs.git_tag }}
