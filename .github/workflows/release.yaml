@@ -20,8 +20,6 @@ env:
 jobs:
   release-backend-artifacts:
     runs-on: ubuntu-latest
-    env:
-      FULL_IMAGE_NAME: ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }}
     permissions:
       contents: read
       packages: write
@@ -58,7 +56,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker Image
-        run: docker build --tag ${{ env.FULL_IMAGE_NAME }} --file master/docker/Dockerfile .
+        run: docker build --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} --file master/docker/Dockerfile .
 
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@v3
@@ -68,7 +66,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Docker push to GitHub Container registry
-        run: docker push ${{ env.FULL_IMAGE_NAME }}
+        run: docker push ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }}
 
       - name: Docker logout from GitHub Container Registry
         run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
@@ -82,8 +80,6 @@ jobs:
       VITE_APP_LICENSE_LINK: https://www.gnu.org/licenses/lgpl-3.0.en.html
       VITE_APP_REFERENCE_GUIDE_LINK: #TODO
       VITE_APP_BLOG_LINK: #TODO
-
-      FULL_IMAGE_NAME: ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix-ui:${{ env.RELEASE_TAG }}
     defaults:
       run:
         working-directory: front-end
@@ -125,7 +121,9 @@ jobs:
         uses: docker/setup-docker-action@v4
 
       - name: Build Docker Image
-        run: docker build --tag ${{ env.FULL_IMAGE_NAME }} --file Dockerfile .
+        run: docker build \ 
+          --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix-ui:${{ env.RELEASE_TAG }} \
+          --file Dockerfile .
 
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@v3
@@ -135,7 +133,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Docker push to GitHub Container registry
-        run: docker push ${{ env.FULL_IMAGE_NAME }}
+        run: |
+          docker push ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix-ui:${{ env.RELEASE_TAG }}
 
       - name: Docker logout from GitHub Container Registry
         run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
