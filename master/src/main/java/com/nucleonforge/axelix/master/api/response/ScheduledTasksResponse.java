@@ -48,7 +48,7 @@ public record ScheduledTasksResponse(
     public record Cron(
             boolean enabled,
             Runnable runnable,
-            @Nullable String expression,
+            String expression,
             @Nullable NextExecution nextExecution,
             @Nullable LastExecution lastExecution) {}
 

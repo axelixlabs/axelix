@@ -53,7 +53,7 @@ public record ServiceScheduledTasks(
      */
     public record CronTask(
             @JsonProperty("runnable") Runnable runnable,
-            @JsonProperty("expression") @Nullable String expression,
+            @JsonProperty("expression") String expression,
             @JsonProperty("nextExecution") @Nullable NextExecution nextExecution,
             @JsonProperty("lastExecution") @Nullable LastExecution lastExecution,
             @JsonProperty("enabled") boolean enabled) {}
