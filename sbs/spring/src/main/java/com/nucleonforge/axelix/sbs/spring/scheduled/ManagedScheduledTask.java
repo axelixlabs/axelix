@@ -15,16 +15,18 @@
  */
 package com.nucleonforge.axelix.sbs.spring.scheduled;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ScheduledFuture;
 
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTask;
+import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
-import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * Decorates the standard {@link ScheduledTask}, and provides additional information
@@ -50,13 +52,7 @@ public class ManagedScheduledTask {
     /**
      * The original Spring scheduled task being managed.
      */
-    private final ScheduledTask scheduledTask;
-
-    /**
-     * The original CronTrigger, or {@code null} if absent.
-     */
-    @Nullable
-    private CronTrigger cronTrigger;
+    private ScheduledTask scheduledTask;
 
     static {
         try {
@@ -70,12 +66,6 @@ public class ManagedScheduledTask {
     public ManagedScheduledTask(String id, ScheduledTask scheduledTask) {
         this.id = id;
         this.scheduledTask = scheduledTask;
-
-        if (scheduledTask.getTask() instanceof CronTask cronTask) {
-            this.cronTrigger = (CronTrigger) cronTask.getTrigger();
-        } else {
-            this.cronTrigger = null;
-        }
     }
 
     public String getId() {
@@ -88,6 +78,10 @@ public class ManagedScheduledTask {
 
     public Runnable getRunnable() {
         return scheduledTask.getTask().getRunnable();
+    }
+
+    public Task getTask() {
+        return scheduledTask.getTask();
     }
 
     /**
@@ -109,20 +103,32 @@ public class ManagedScheduledTask {
         }
     }
 
-    public void replaceScheduledFuture(ScheduledFuture<?> actual) {
+    public boolean isEnabled() {
+        return !getFuture().isCancelled();
+    }
+
+    /**
+     * Replace the internal {@link ManagedScheduledTask} with the new one, created from passed parameters.
+     *
+     * @param newExecutionSchedule execution schedule handle. May be null, which typically (in Spring Framework) means
+     *                             that the trigger won't fire anymore.
+     * @param newTask the new {@link Task}.
+     */
+    public void replaceScheduledState(@Nullable ScheduledFuture<?> newExecutionSchedule, Task newTask) {
         try {
-            this.scheduledTask.cancel();
-            SCHEDULED_TASK_FUTURE_FIELD.set(this.scheduledTask, actual);
-        } catch (IllegalAccessException e) {
+            // Cancel the old Spring ScheduledTask
+            this.scheduledTask.cancel(false);
+
+            // Construct a new Spring ScheduledTask
+            Constructor<ScheduledTask> constructor = ScheduledTask.class.getDeclaredConstructor(Task.class);
+            ReflectionUtils.makeAccessible(constructor);
+            this.scheduledTask = constructor.newInstance(newTask);
+            SCHEDULED_TASK_FUTURE_FIELD.set(this.scheduledTask, newExecutionSchedule);
+
+        } catch (IllegalAccessException | NoSuchMethodException e) {
             throw new IllegalStateException("Failed to set 'future' in ScheduledTask", e);
+        } catch (InvocationTargetException | InstantiationException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    public @Nullable CronTrigger getCronTrigger() {
-        return cronTrigger;
-    }
-
-    public void setCronTrigger(CronTrigger cronTrigger) {
-        this.cronTrigger = cronTrigger;
     }
 }

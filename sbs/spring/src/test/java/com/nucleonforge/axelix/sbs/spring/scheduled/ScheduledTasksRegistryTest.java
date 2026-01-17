@@ -112,7 +112,7 @@ class ScheduledTasksRegistryTest {
 
         @Bean
         public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-            return new ScheduledTasksRegistry(processor);
+            return new ScheduledTasksRegistry(List.of(processor));
         }
 
         @Scheduled(cron = "*/2 * * * * *")

@@ -16,37 +16,28 @@
 package com.nucleonforge.axelix.sbs.spring.scheduled;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ScheduledFuture;
-
-import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.FixedDelayTask;
 import org.springframework.scheduling.config.FixedRateTask;
-import org.springframework.scheduling.config.ScheduledTask;
-import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
-import org.springframework.scheduling.support.CronTrigger;
 
 import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 
 /**
- * Default implementation of {@link ServiceScheduledTasksAssembler}.
+ * Default implementation of {@link ScheduledTasksAssembler}.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
-public class DefaultServiceScheduledTasksAssembler implements ServiceScheduledTasksAssembler {
+public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler {
 
-    private final Collection<ScheduledTaskHolder> scheduledTaskHolders;
-    private final ScheduledTaskService taskService;
+    private final ScheduledTasksRegistry registry;
 
-    public DefaultServiceScheduledTasksAssembler(
-            Collection<ScheduledTaskHolder> scheduledTaskHolders, ScheduledTaskService taskService) {
-        this.scheduledTaskHolders = scheduledTaskHolders;
-        this.taskService = taskService;
+    public DefaultScheduledTasksAssembler(ScheduledTasksRegistry registry) {
+        this.registry = registry;
     }
 
     @Override
@@ -56,43 +47,44 @@ public class DefaultServiceScheduledTasksAssembler implements ServiceScheduledTa
         List<ServiceScheduledTasks.FixedRateTask> fixedRate = new ArrayList<>();
         List<ServiceScheduledTasks.CustomTask> custom = new ArrayList<>();
 
-        scheduledTaskHolders.stream()
-                .flatMap(h -> h.getScheduledTasks().stream())
-                .map(ScheduledTask::getTask)
-                .forEach(task -> assembleScheduledTasks(task, cron, fixedDelay, fixedRate, custom));
+        registry.getAll().forEach(task -> assembleScheduledTasks(task, cron, fixedDelay, fixedRate, custom));
 
         return new ServiceScheduledTasks(cron, fixedDelay, fixedRate, custom);
     }
 
     private void assembleScheduledTasks(
-            Task task,
+            ManagedScheduledTask managedScheduledTask,
             List<ServiceScheduledTasks.CronTask> cron,
             List<ServiceScheduledTasks.FixedDelayTask> fixedDelay,
             List<ServiceScheduledTasks.FixedRateTask> fixedRate,
             List<ServiceScheduledTasks.CustomTask> custom) {
+
+        Task task = managedScheduledTask.getScheduledTask().getTask();
+
         if (task instanceof CronTask cronTask) {
-            cron.add(assembleCronTask(cronTask));
+            cron.add(assembleCronTask(cronTask, managedScheduledTask));
         } else if (task instanceof FixedRateTask fixedRateTask) {
-            fixedRate.add(assembleFixedRateTask(fixedRateTask));
+            fixedRate.add(assembleFixedRateTask(fixedRateTask, managedScheduledTask));
         } else if (task instanceof FixedDelayTask fixedDelayTask) {
-            fixedDelay.add(assembleFixedDelayMap(fixedDelayTask));
+            fixedDelay.add(assembleFixedDelayMap(fixedDelayTask, managedScheduledTask));
         } else if (task instanceof TriggerTask customTriggerTask) {
-            custom.add(assembleCustomMap(customTriggerTask));
+            custom.add(assembleCustomMap(customTriggerTask, managedScheduledTask));
         }
     }
 
-    private ServiceScheduledTasks.CronTask assembleCronTask(CronTask task) {
-        String target = task.getRunnable().toString();
+    private ServiceScheduledTasks.CronTask assembleCronTask(CronTask task, ManagedScheduledTask managedScheduledTask) {
+        String target = managedScheduledTask.getRunnable().toString();
 
         return new ServiceScheduledTasks.CronTask(
                 new ServiceScheduledTasks.Runnable(target),
-                extractCronExpression(target),
+                task.getExpression(),
                 null,
                 null,
-                extractTaskEnabledStatus(target));
+                managedScheduledTask.isEnabled());
     }
 
-    private ServiceScheduledTasks.FixedRateTask assembleFixedRateTask(FixedRateTask task) {
+    private ServiceScheduledTasks.FixedRateTask assembleFixedRateTask(
+            FixedRateTask task, ManagedScheduledTask managedScheduledTask) {
         String target = task.getRunnable().toString();
 
         return new ServiceScheduledTasks.FixedRateTask(
@@ -101,10 +93,11 @@ public class DefaultServiceScheduledTasksAssembler implements ServiceScheduledTa
                 task.getInitialDelayDuration().toMillis(),
                 null,
                 null,
-                extractTaskEnabledStatus(target));
+                managedScheduledTask.isEnabled());
     }
 
-    private ServiceScheduledTasks.FixedDelayTask assembleFixedDelayMap(FixedDelayTask task) {
+    private ServiceScheduledTasks.FixedDelayTask assembleFixedDelayMap(
+            FixedDelayTask task, ManagedScheduledTask managedScheduledTask) {
         String target = task.getRunnable().toString();
 
         return new ServiceScheduledTasks.FixedDelayTask(
@@ -113,10 +106,11 @@ public class DefaultServiceScheduledTasksAssembler implements ServiceScheduledTa
                 task.getInitialDelayDuration().toMillis(),
                 null,
                 null,
-                extractTaskEnabledStatus(target));
+                managedScheduledTask.isEnabled());
     }
 
-    private ServiceScheduledTasks.CustomTask assembleCustomMap(TriggerTask task) {
+    private ServiceScheduledTasks.CustomTask assembleCustomMap(
+            TriggerTask task, ManagedScheduledTask managedScheduledTask) {
         String target = task.getRunnable().toString();
 
         return new ServiceScheduledTasks.CustomTask(
@@ -124,29 +118,6 @@ public class DefaultServiceScheduledTasksAssembler implements ServiceScheduledTa
                 task.getTrigger().toString(),
                 null,
                 null,
-                extractTaskEnabledStatus(target));
-    }
-
-    private boolean extractTaskEnabledStatus(String target) {
-        // TODO:
-        //  1. how is that possible that future will be null?
-        //  2. is that correct that we're returning tru in case the task is not found? I guess no.
-        return taskService
-                .find(target)
-                .map(task -> {
-                    ScheduledFuture<?> future = task.getFuture();
-                    return future == null || !future.isCancelled();
-                })
-                .orElse(true);
-    }
-
-    private @Nullable String extractCronExpression(String target) {
-        return taskService
-                .find(target)
-                .map(task -> {
-                    CronTrigger trigger = task.getCronTrigger();
-                    return trigger != null ? trigger.getExpression() : null;
-                })
-                .orElse(null);
+                managedScheduledTask.isEnabled());
     }
 }

@@ -37,17 +37,17 @@ import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 public class AxelixScheduledTasksEndpoint {
 
     private final ScheduledTaskService taskService;
-    private final ServiceScheduledTasksAssembler serviceScheduledTasksAssembler;
+    private final ScheduledTasksAssembler scheduledTasksAssembler;
 
     public AxelixScheduledTasksEndpoint(
-            ScheduledTaskService taskService, ServiceScheduledTasksAssembler serviceScheduledTasksAssembler) {
+            ScheduledTaskService taskService, ScheduledTasksAssembler scheduledTasksAssembler) {
         this.taskService = taskService;
-        this.serviceScheduledTasksAssembler = serviceScheduledTasksAssembler;
+        this.scheduledTasksAssembler = scheduledTasksAssembler;
     }
 
     @GetMapping
-    public ServiceScheduledTasks test() {
-        return serviceScheduledTasksAssembler.assemble();
+    public ServiceScheduledTasks getScheduledTasks() {
+        return scheduledTasksAssembler.assemble();
     }
 
     @PostMapping("/enable")
@@ -66,8 +66,8 @@ public class AxelixScheduledTasksEndpoint {
     }
 
     @PostMapping
-    public ResponseEntity<Void> mutateCronExpression(@RequestBody ScheduledTaskMutationRequest request) {
-        taskService.mutate(request.targetScheduledTask(), request.newValue());
+    public ResponseEntity<Void> modifyCronExpression(@RequestBody ScheduledTaskMutationRequest request) {
+        taskService.modifyCronExpression(request.targetScheduledTask(), request.newValue());
         return ResponseEntity.noContent().build();
     }
 }

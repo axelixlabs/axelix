@@ -15,12 +15,16 @@
  */
 package com.nucleonforge.axelix.sbs.spring.scheduled;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.scheduling.config.CronTask;
+import org.springframework.scheduling.support.CronTrigger;
 
 /**
  * Service for managing scheduled tasks with enable/disable functionality.
@@ -94,16 +98,19 @@ public final class ScheduledTaskService {
     /**
      * Mutate the configuration for the given id.
      *
-     * @param taskId         the id of the task to re-schedule.
-     * @param newValue       the new value to apply to the task's configuration.
+     * @param taskId            the id of the task to re-schedule.
+     * @param newCronExpression the new value to apply to the task's configuration.
      */
-    public void mutate(String taskId, String newValue) {
+    public void modifyCronExpression(String taskId, String newCronExpression) {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
 
+            CronTask cronTask =
+                    new CronTask(task.getRunnable(), new CronTrigger(newCronExpression, ZoneId.systemDefault()));
+
             for (TaskRescheduler taskRescheduler : taskReschedulers) {
                 if (taskRescheduler.supports(task)) {
-                    taskRescheduler.mutate(task, newValue);
+                    taskRescheduler.reschedule(task, cronTask);
                 }
             }
         } catch (ScheduledTaskNotFoundException e) {
