@@ -18,6 +18,7 @@ package com.nucleonforge.axelix.sbs.spring.scheduled;
 import java.util.concurrent.ScheduledFuture;
 
 import org.springframework.scheduling.config.ScheduledTask;
+import org.springframework.scheduling.config.Task;
 
 /**
  * Interface that is capable to "re-schedule" the {@link ManagedScheduledTask}. Understanding the
@@ -39,18 +40,31 @@ import org.springframework.scheduling.config.ScheduledTask;
  *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public interface TaskRescheduler {
 
     /**
-     * Re-schedule the provided task.
-     * @param task task to re-schedule.
+     * Re-schedules the provided Axelix's {@link ManagedScheduledTask}, in accordance to the rules provided by the new provided
+     * Spring's {@link Task}.
+     *
+     * @param task    task to re-schedule.
+     * @param newTask new task schedule to be applied
      */
-    void reschedule(ManagedScheduledTask task);
+    void reschedule(ManagedScheduledTask task, Task newTask);
 
     /**
-     * Re-schedule the provided task.
+     * Re-schedules the {@link ManagedScheduledTask} without any changes in its schedule.
+     *
      * @param task task to re-schedule.
+     */
+    default void reschedule(ManagedScheduledTask task) {
+        this.reschedule(task, task.getTask());
+    }
+
+    /**
+     * Checks whether the given scheduled task is compatible with this handler.
+     * @param task task for evaluation.
      * @return {@code true} if the current {@link TaskRescheduler} supports the provided task.
      */
     boolean supports(ManagedScheduledTask task);

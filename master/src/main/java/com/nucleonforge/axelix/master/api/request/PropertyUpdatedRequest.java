@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * Represents a request to update a specific configuration property in a given application instance.
  *
  * @param propertyName the name of the property to update. Must not be {@code null}.
- * @param newValue newValue the new value to assign to the property. May be {@code null} or empty.
+ * @param newValue cronExpression the new value to assign to the property. May be {@code null} or empty.
  *
  * @since 25.09.2025
  * @author Nikita Kirillov

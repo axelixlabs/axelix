@@ -86,6 +86,7 @@ public class ServiceScheduledTasksConverterTest {
         assertThat(custom.enabled()).isFalse();
         assertThat(custom.runnable().target()).isEqualTo("com.example.Processor.processOrders");
         assertThat(custom.trigger()).isEqualTo("com.example.Processor$CustomTrigger@56567e9b");
+        assertThat(custom.nextExecution().time()).isEqualTo("2025-09-18T17:59:59.999098218Z");
         assertThat(custom.lastExecution().status()).isEqualTo("ERROR");
         assertThat(custom.lastExecution().time()).isEqualTo("2025-09-18T15:03:34.132500256Z");
         assertThat(custom.lastExecution().exception()).isNull();
@@ -113,33 +114,24 @@ public class ServiceScheduledTasksConverterTest {
                 new ServiceScheduledTasks.LastExecution("ERROR", "2025-09-18T15:03:34.132500256Z", null);
 
         // Cron
-        ServiceScheduledTasks.CronTask.Cron cron =
-                new ServiceScheduledTasks.CronTask.Cron(runnable, "0 0 0/3 1/1 * ?", nextExecution, lastExecution);
-
-        // CronTask
-        ServiceScheduledTasks.CronTask cronTask = new ServiceScheduledTasks.CronTask(cron, true);
+        ServiceScheduledTasks.CronTask cronTask =
+                new ServiceScheduledTasks.CronTask(runnable, "0 0 0/3 1/1 * ?", nextExecution, lastExecution, true);
 
         // FixedRate
-        ServiceScheduledTasks.FixedRateTask.FixedRate fixedRate =
-                new ServiceScheduledTasks.FixedRateTask.FixedRate(runnable, 3000, 10000, nextExecution, lastExecution);
-
-        // FixedRateTask
-        ServiceScheduledTasks.FixedRateTask fixedRateTask = new ServiceScheduledTasks.FixedRateTask(fixedRate, true);
+        ServiceScheduledTasks.FixedRateTask fixedRateTask =
+                new ServiceScheduledTasks.FixedRateTask(runnable, 3000, 10000, nextExecution, lastExecution, true);
 
         // FixedDelay
-        ServiceScheduledTasks.FixedDelayTask.FixedDelay fixedDelay =
-                new ServiceScheduledTasks.FixedDelayTask.FixedDelay(runnable, null, null, null, null);
-
-        // FixedDelayTask
         ServiceScheduledTasks.FixedDelayTask fixedDelayTask =
-                new ServiceScheduledTasks.FixedDelayTask(fixedDelay, false);
+                new ServiceScheduledTasks.FixedDelayTask(runnable, null, null, null, null, false);
 
         // Custom
-        ServiceScheduledTasks.CustomTask.Custom custom = new ServiceScheduledTasks.CustomTask.Custom(
-                runnable, "com.example.Processor$CustomTrigger@56567e9b", lastExecutionEmptyException);
-
-        // CustomTask
-        ServiceScheduledTasks.CustomTask customTask = new ServiceScheduledTasks.CustomTask(custom, false);
+        ServiceScheduledTasks.CustomTask customTask = new ServiceScheduledTasks.CustomTask(
+                runnable,
+                "com.example.Processor$CustomTrigger@56567e9b",
+                nextExecution,
+                lastExecutionEmptyException,
+                false);
 
         // ServiceScheduledTasks -> return
         return new ServiceScheduledTasks(
