@@ -51,38 +51,39 @@ public class ServiceScheduledTasksConverter implements Converter<ServiceSchedule
     private ScheduledTasksResponse.Cron convertCronTask(ServiceScheduledTasks.CronTask cron) {
         return new ScheduledTasksResponse.Cron(
                 cron.enabled(),
-                convertRunnable(cron.delegate().runnable()),
-                cron.delegate().expression(),
-                convertNextExecution(cron.delegate().nextExecution()),
-                convertLastExecution(cron.delegate().lastExecution()));
+                convertRunnable(cron.runnable()),
+                cron.expression(),
+                convertNextExecution(cron.nextExecution()),
+                convertLastExecution(cron.lastExecution()));
     }
 
     private ScheduledTasksResponse.FixedRate convertFixedRateTask(ServiceScheduledTasks.FixedRateTask fixedRate) {
         return new ScheduledTasksResponse.FixedRate(
                 fixedRate.enabled(),
-                convertRunnable(fixedRate.delegate().runnable()),
-                fixedRate.delegate().interval(),
-                fixedRate.delegate().initialDelay(),
-                convertNextExecution(fixedRate.delegate().nextExecution()),
-                convertLastExecution(fixedRate.delegate().lastExecution()));
+                convertRunnable(fixedRate.runnable()),
+                fixedRate.interval(),
+                fixedRate.initialDelay(),
+                convertNextExecution(fixedRate.nextExecution()),
+                convertLastExecution(fixedRate.lastExecution()));
     }
 
     private ScheduledTasksResponse.FixedDelay convertFixedDelayTask(ServiceScheduledTasks.FixedDelayTask fixedDelay) {
         return new ScheduledTasksResponse.FixedDelay(
                 fixedDelay.enabled(),
-                convertRunnable(fixedDelay.delegate().runnable()),
-                fixedDelay.delegate().interval(),
-                fixedDelay.delegate().initialDelay(),
-                convertNextExecution(fixedDelay.delegate().nextExecution()),
-                convertLastExecution(fixedDelay.delegate().lastExecution()));
+                convertRunnable(fixedDelay.runnable()),
+                fixedDelay.interval(),
+                fixedDelay.initialDelay(),
+                convertNextExecution(fixedDelay.nextExecution()),
+                convertLastExecution(fixedDelay.lastExecution()));
     }
 
     private ScheduledTasksResponse.Custom convertCustomTask(ServiceScheduledTasks.CustomTask custom) {
         return new ScheduledTasksResponse.Custom(
                 custom.enabled(),
-                convertRunnable(custom.delegate().runnable()),
-                custom.delegate().trigger(),
-                convertLastExecution(custom.delegate().lastExecution()));
+                convertRunnable(custom.runnable()),
+                custom.trigger(),
+                convertNextExecution(custom.nextExecution()),
+                convertLastExecution(custom.lastExecution()));
     }
 
     private ScheduledTasksResponse.Runnable convertRunnable(ServiceScheduledTasks.Runnable runnable) {

@@ -22,7 +22,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -40,7 +39,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.test.context.TestPropertySource;
 
@@ -55,6 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(AxelixScheduledTasksEndpointTest.ScheduledTasksEndpointExtensionTestConfiguration.class)
@@ -67,47 +66,39 @@ class AxelixScheduledTasksEndpointTest {
       {
         "cron": [
          {
-             "delegate": {
-                  "runnable": {
-                     "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testCronTask"
-                 },
-                  "expression": "*/1 * * * * *"
+              "runnable": {
+               "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testCronTask"
               },
+              "expression": "*/1 * * * * *",
               "enabled": true
           }
         ],
        "fixedDelay": [
           {
-              "delegate": {
-                  "runnable": {
-                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedDelayTask"
-                  },
-                  "initialDelay": 0,
-                  "interval": 1000
+              "runnable": {
+               "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedDelayTask"
               },
+              "initialDelay": 0,
+              "interval": 1000,
               "enabled": true
          }
        ],
         "fixedRate": [
           {
-              "delegate": {
-                  "runnable": {
-                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedRateTask"
-                  },
-                 "initialDelay": 100,
-                  "interval": 1000
-              },
+             "runnable": {
+               "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration.testFixedRateTask"
+             },
+             "initialDelay": 100,
+             "interval": 1000,
              "enabled": true
           }
        ],
         "custom": [
           {
-              "delegate": {
-                  "runnable": {
-                      "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration$CustomTestTask"
-                  },
-                  "trigger": "CustomTestTrigger"
-              },
+             "runnable": {
+               "target": "com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpointTest$ScheduledTasksEndpointExtensionTestConfiguration$CustomTestTask"
+             },
+             "trigger": "CustomTestTrigger",
              "enabled": true
           }
         ]
@@ -139,7 +130,7 @@ class AxelixScheduledTasksEndpointTest {
 
         @Bean
         public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-            return new ScheduledTasksRegistry(processor);
+            return new ScheduledTasksRegistry(List.of(processor));
         }
 
         @Bean
@@ -159,9 +150,14 @@ class AxelixScheduledTasksEndpointTest {
         }
 
         @Bean
+        public ScheduledTasksAssembler serviceScheduledTasksAssembler(ScheduledTasksRegistry scheduledTasksRegistry) {
+            return new DefaultScheduledTasksAssembler(scheduledTasksRegistry);
+        }
+
+        @Bean
         public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
-                ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTaskService service) {
-            return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), service);
+                ScheduledTaskService service, ScheduledTasksAssembler scheduledTasksAssembler) {
+            return new AxelixScheduledTasksEndpoint(service, scheduledTasksAssembler);
         }
 
         @Scheduled(cron = "*/1 * * * * *")

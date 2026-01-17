@@ -19,6 +19,8 @@ import java.util.concurrent.ScheduledFuture;
 
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.config.Task;
+import org.springframework.scheduling.config.TriggerTask;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.util.Assert;
 
@@ -27,6 +29,7 @@ import org.springframework.util.Assert;
  * The most prominent example is {@link CronTrigger}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Chaerkasov
  */
 public final class TriggerBasedTaskRescheduler implements TaskRescheduler {
 
@@ -37,18 +40,17 @@ public final class TriggerBasedTaskRescheduler implements TaskRescheduler {
     }
 
     @Override
-    public void reschedule(ManagedScheduledTask task) {
-        Trigger trigger = task.getTrigger();
+    public void reschedule(ManagedScheduledTask task, Task newTask) {
+        Assert.state(
+                newTask instanceof TriggerTask,
+                "Expected a new task schedule to be an instance of the TriggerTask, but was %s"
+                        .formatted(newTask.getClass()));
 
-        Assert.notNull(trigger, "Trigger cannot be null at this point");
+        // returned rescheduledFuture may be null in case the supplied Trigger won't fire anymore
+        ScheduledFuture<?> rescheduledFuture =
+                taskScheduler.schedule(newTask.getRunnable(), ((TriggerTask) newTask).getTrigger());
 
-        ScheduledFuture<?> rescheduledFuture = taskScheduler.schedule(task.getRunnable(), trigger);
-
-        // rescheduledFuture may be null in case the supplied Trigger won't fire anymore,
-        // therefore, there is nothing to schedule.
-        if (rescheduledFuture != null) {
-            task.replaceScheduledFuture(rescheduledFuture);
-        }
+        task.replaceScheduledState(rescheduledFuture, newTask);
     }
 
     @Override

@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.config.ScheduledTask;
+import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.scheduling.config.Task;
 
 /**
@@ -45,17 +45,19 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
 
     private final Map<String, ManagedScheduledTask> tasks = new ConcurrentHashMap<>();
 
-    private final ScheduledAnnotationBeanPostProcessor postProcessor;
+    private final Collection<ScheduledTaskHolder> scheduledTaskHolders;
 
-    public ScheduledTasksRegistry(ScheduledAnnotationBeanPostProcessor postProcessor) {
-        this.postProcessor = postProcessor;
+    public ScheduledTasksRegistry(Collection<ScheduledTaskHolder> scheduledTaskHolders) {
+        this.scheduledTaskHolders = scheduledTaskHolders;
     }
 
     @Override
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
-        Set<ScheduledTask> allTasks = postProcessor.getScheduledTasks();
-        for (ScheduledTask task : allTasks) {
-            tasks.computeIfAbsent(resolveId(task), taskId -> new ManagedScheduledTask(taskId, task));
+        for (ScheduledTaskHolder scheduledTaskHolder : scheduledTaskHolders) {
+            Set<ScheduledTask> allTasks = scheduledTaskHolder.getScheduledTasks();
+            for (ScheduledTask task : allTasks) {
+                tasks.computeIfAbsent(resolveId(task), taskId -> new ManagedScheduledTask(taskId, task));
+            }
         }
         log.info("Registered {} managed scheduled tasks", tasks.size());
     }

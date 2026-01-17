@@ -28,6 +28,7 @@ import org.springframework.scheduling.config.Task;
  * {@link FixedRateTask} tasks.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Chaerkasov
  */
 public final class IntervalBasedTaskRescheduler implements TaskRescheduler {
 
@@ -38,25 +39,23 @@ public final class IntervalBasedTaskRescheduler implements TaskRescheduler {
     }
 
     @Override
-    public void reschedule(ManagedScheduledTask task) {
-        Task currentTask = task.getScheduledTask().getTask();
-
-        if (currentTask instanceof FixedDelayTask fixedDelayTask) {
+    public void reschedule(ManagedScheduledTask task, Task newTask) {
+        if (newTask instanceof FixedDelayTask fixedDelayTask) {
             ScheduledFuture<?> scheduledFuture = taskScheduler.scheduleWithFixedDelay(
-                    task.getRunnable(),
+                    newTask.getRunnable(),
                     Instant.now().plus(fixedDelayTask.getInitialDelayDuration()),
                     fixedDelayTask.getIntervalDuration());
 
-            task.replaceScheduledFuture(scheduledFuture);
+            task.replaceScheduledState(scheduledFuture, newTask);
         }
 
-        if (currentTask instanceof FixedRateTask fixedRateTask) {
+        if (newTask instanceof FixedRateTask fixedRateTask) {
             ScheduledFuture<?> scheduledFuture = taskScheduler.scheduleAtFixedRate(
-                    task.getRunnable(),
+                    newTask.getRunnable(),
                     Instant.now().plus(fixedRateTask.getInitialDelayDuration()),
                     fixedRateTask.getIntervalDuration());
 
-            task.replaceScheduledFuture(scheduledFuture);
+            task.replaceScheduledState(scheduledFuture, newTask);
         }
     }
 

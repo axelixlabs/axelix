@@ -30,8 +30,10 @@ import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProc
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpoint;
+import com.nucleonforge.axelix.sbs.spring.scheduled.DefaultScheduledTasksAssembler;
 import com.nucleonforge.axelix.sbs.spring.scheduled.IntervalBasedTaskRescheduler;
 import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTaskService;
+import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksAssembler;
 import com.nucleonforge.axelix.sbs.spring.scheduled.ScheduledTasksRegistry;
 import com.nucleonforge.axelix.sbs.spring.scheduled.TaskRescheduler;
 import com.nucleonforge.axelix.sbs.spring.scheduled.TriggerBasedTaskRescheduler;
@@ -49,8 +51,8 @@ public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ScheduledTasksRegistry scheduledTasksRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-        return new ScheduledTasksRegistry(processor);
+    public ScheduledTasksRegistry scheduledTasksRegistry(ObjectProvider<ScheduledTaskHolder> taskHolders) {
+        return new ScheduledTasksRegistry(taskHolders.orderedStream().toList());
     }
 
     @Bean
@@ -77,8 +79,14 @@ public class ScheduledTaskManagementAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
-            ObjectProvider<ScheduledTaskHolder> taskHolders, ScheduledTaskService service) {
-        return new AxelixScheduledTasksEndpoint(taskHolders.orderedStream().toList(), service);
+            ScheduledTaskService service, ScheduledTasksAssembler scheduledTasksAssembler) {
+        return new AxelixScheduledTasksEndpoint(service, scheduledTasksAssembler);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ScheduledTasksAssembler serviceScheduledTasksAssembler(ScheduledTasksRegistry scheduledTasksRegistry) {
+        return new DefaultScheduledTasksAssembler(scheduledTasksRegistry);
     }
 
     @NonNull
