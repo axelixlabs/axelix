@@ -24,8 +24,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      attestations: write
-      id-token: write
 
     steps:
       - name: Checkout repository
@@ -41,8 +39,10 @@ jobs:
           distribution: 'liberica'
           java-version: '17'
 
+      # Intentionally leaving the setup-gradle action for release pipeline to not introduce any cached behavior
+      # and to create the release build from scratch.
       - name: Build
-        run: ./gradlew build
+        run: ./gradlew clean build sourcesJar javadocJar
 
       - name: Publish to GitHub Packages
         run: ./gradlew publishGprPublicationToGitHubPackagesRepository
@@ -57,14 +57,6 @@ jobs:
           username: ${{ env.USERNAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Convert to lowercase per Docker/OCI image naming specification
-      # GitHub Container Registry requires lowercase image names
-      # See: https://github.com/orgs/community/discussions/10553
-      - name: Convert repository name to lowercase
-        id: repo-name
-        run: |  
-            echo "repository-lower-case=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
@@ -72,4 +64,4 @@ jobs:
           file: master/docker/Dockerfile
           push: true
           tags: |
-            ${{ env.GH_CONTAINER_REGISTRY }}/${{ steps.repo-name.outputs.repository-lower-case }}:${{ env.RELEASE_TAG }}
+            ${{ env.GH_CONTAINER_REGISTRY }}/${{ github.repository_owner }}:${{ env.RELEASE_TAG }}
