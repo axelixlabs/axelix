@@ -18,6 +18,9 @@ on:
       - reopened
       - synchronize
 
+env:
+  MASTER_PUSH_OR_MANUAL: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'workflow_dispatch' }}
+
 jobs:
   check-linked-issues:
     if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch') }}
@@ -27,8 +30,23 @@ jobs:
         uses: nearform-actions/github-action-check-linked-issues@v1
         with:
           exclude-labels: "refactoring"
-  lint-and-test:
+
+  build-deploy-source:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
+      # TODO: Rename the CR variable. We're likely going to use multiple CRs
+      CR_URL: ${{ vars.CR_URL }}
+      IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
+      IMAGE_NAME: master-fe
+      KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
+
+      # Vite Config
+      VITE_APP_SOURCE_CODE_LINK: https://github.com/axelixlabs/axelix
+      VITE_APP_ISSUE_TRACKER_LINK: https://github.com/axelixlabs/axelix/issues
+      VITE_APP_LICENSE_LINK: https://www.gnu.org/licenses/lgpl-3.0.en.html
+      VITE_APP_REFERENCE_GUIDE_LINK: #TODO
+      VITE_APP_BLOG_LINK: #TODO
     defaults:
       run:
         working-directory: front-end
@@ -47,55 +65,70 @@ jobs:
 
       - name: Run tests
         run: npm test
-  deploy:
-    needs: lint-and-test
-    env:
-      DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
-      # TODO: Rename the CR variable. We're likely going to use multiple CRs
-      CR_URL: ${{ vars.CR_URL }}
-      IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
-      IMAGE_NAME: master-fe
-      KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
-    name: Build nginx Docker container
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Set up Docker
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
         uses: docker/setup-docker-action@v4
 
       - name: Read Gradle Properties file
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
         uses: madhead/read-java-properties@4
         id: gradleProperties
         with:
           file: gradle.properties
           property: axelixVersion
 
+      - name: Actualize NPM Version
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        run: npm version ${{ steps.gradleProperties.outputs.value }}
+
+      - name: Create Vite Configuration
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        run: |
+          echo "VITE_APP_VERSION=${{ steps.gradleProperties.outputs.value }}" >> .env
+          echo "VITE_APP_SOURCE_CODE_LINK=${{ env.VITE_APP_SOURCE_CODE_LINK }}" >> .env
+          echo "VITE_APP_ISSUE_TRACKER_LINK=${{ env.VITE_APP_ISSUE_TRACKER_LINK }}" >> .env
+          echo "VITE_APP_LICENSE_LINK=${{ env.VITE_APP_LICENSE_LINK }}" >> .env
+          echo "VITE_APP_REFERENCE_GUIDE_LINK=${{ env.VITE_APP_REFERENCE_GUIDE_LINK }}" >> .env
+          echo "VITE_APP_BLOG_LINK=${{ env.VITE_APP_BLOG_LINK }}" >> .env
+
+      - name: Building JS Bundles
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        run: npm run build
+
+      - name: Clean-up
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        run: rm .env
+
       - name: Build Docker Image
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
         # TODO:
         #  For now the version of package is hardcoded both in package.json and in here. We later would need to
         #  find a way to manage it correctly.
         run: |
-          docker build --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file front-end/Dockerfile .
+          docker build --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file Dockerfile .
 
-      - name: Docker login to Yandex Cloud CR
+      - name: Docker login to Cloud Container Registry
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
         # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is a maintainer's PAT
         run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
-      - name: Docker push to Yandex Cloud CR
+      - name: Docker push to Cloud Container Registry
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
         run: docker push $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }}
 
       - name: Docker logout
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
         run: docker logout
 
       - name: Setup Helm
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
         uses: azure/setup-helm@v4.3.0
         with:
           version: v3.14.0
 
       - name: Deploy master to K8S
+        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
         working-directory: distributions/chart
         run: |
           mkdir -p ~/.kube
