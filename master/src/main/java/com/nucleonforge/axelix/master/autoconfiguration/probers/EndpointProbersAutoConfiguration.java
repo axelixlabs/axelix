@@ -53,6 +53,16 @@ public class EndpointProbersAutoConfiguration {
     }
 
     @Bean
+    public DiscardingAbstractEndpointProber clearLevelForLoggerEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.CLEAR_FOR_LOGGER);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber setLevelForLoggerGroupEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.SET_FOR_LOGGER_GROUP);
+    }
+
+    @Bean
     public DiscardingAbstractEndpointProber clearAllCachesEndpointProber() {
         return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.CLEAR_ALL_CACHES);
     }

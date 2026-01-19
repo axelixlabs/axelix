@@ -54,10 +54,8 @@ import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 import com.nucleonforge.axelix.master.service.transport.loggers.AllLoggersEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.loggers.ClearForLoggerEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.loggers.GroupLoggersEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.loggers.OneLoggerEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.loggers.SetForLoggerGroupEndpointProber;
 
 /**
  * The API for managing loggers.
@@ -78,8 +76,6 @@ public class LoggersApi {
     private final AllLoggersEndpointProber allLoggersEndpointProber;
     private final GroupLoggersEndpointProber groupLoggersEndpointProber;
     private final OneLoggerEndpointProber oneLoggerEndpointProber;
-    private final SetForLoggerGroupEndpointProber setForLoggerGroupEndpointProber;
-    private final ClearForLoggerEndpointProber clearForLoggerEndpointProber;
     private final Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter;
     private final Converter<LoggerGroup, GroupProfileResponse> groupProfileConverter;
     private final Converter<LoggerLevels, LoggerProfileResponse> loggerProfileConverter;
@@ -90,8 +86,6 @@ public class LoggersApi {
             GroupLoggersEndpointProber groupLoggersEndpointProber,
             EndpointInvoker endpointInvoker,
             OneLoggerEndpointProber oneLoggerEndpointProber,
-            SetForLoggerGroupEndpointProber setForLoggerGroupEndpointProber,
-            ClearForLoggerEndpointProber clearForLoggerEndpointProber,
             Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter,
             Converter<LoggerGroup, GroupProfileResponse> groupProfileConverter,
             Converter<LoggerLevels, LoggerProfileResponse> loggerProfileConverter,
@@ -100,8 +94,6 @@ public class LoggersApi {
         this.groupLoggersEndpointProber = groupLoggersEndpointProber;
         this.endpointInvoker = endpointInvoker;
         this.oneLoggerEndpointProber = oneLoggerEndpointProber;
-        this.setForLoggerGroupEndpointProber = setForLoggerGroupEndpointProber;
-        this.clearForLoggerEndpointProber = clearForLoggerEndpointProber;
         this.loggersResponseConverter = loggersResponseConverter;
         this.groupProfileConverter = groupProfileConverter;
         this.loggerProfileConverter = loggerProfileConverter;
@@ -315,7 +307,7 @@ public class LoggersApi {
 
         HttpPayload payload = HttpPayload.json(
                 Map.of("group.name", groupName), jacksonMessageSerializationStrategy.serialize(request));
-        setForLoggerGroupEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
+        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
     }
 
     @Operation(
@@ -351,9 +343,10 @@ public class LoggersApi {
     @PostMapping(path = ApiPaths.LoggersApi.CLEAR_FOR_LOGGER)
     public void clearLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
+
         HttpPayload payload = HttpPayload.json(
                 Map.of("logger.name", loggerName),
                 jacksonMessageSerializationStrategy.serialize(Collections.emptyMap()));
-        clearForLoggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
+        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.CLEAR_FOR_LOGGER, payload);
     }
 }
