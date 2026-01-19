@@ -17,11 +17,8 @@
  */
 package com.nucleonforge.axelix.master.service.transport.gclog;
 
-import org.jspecify.annotations.NonNull;
-
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
@@ -36,11 +33,6 @@ import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpoi
 public class DisableGcLoggingEndpointProber extends DiscardingAbstractEndpointProber {
 
     public DisableGcLoggingEndpointProber(InstanceRegistry instanceRegistry) {
-        super(instanceRegistry);
-    }
-
-    @Override
-    public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.DISABLE_GC_LOGGING;
+        super(instanceRegistry, ActuatorEndpoints.DISABLE_GC_LOGGING);
     }
 }

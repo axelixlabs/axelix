@@ -17,11 +17,8 @@
  */
 package com.nucleonforge.axelix.master.service.transport.threaddump;
 
-import org.jspecify.annotations.NonNull;
-
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
@@ -34,12 +31,8 @@ import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpoi
  */
 @Service
 public class ThreadDumpDisableContentionMonitoringProber extends DiscardingAbstractEndpointProber {
-    public ThreadDumpDisableContentionMonitoringProber(InstanceRegistry instanceRegistry) {
-        super(instanceRegistry);
-    }
 
-    @Override
-    public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.THREAD_DUMP_DISABLE_CONTENTION_MONITORING;
+    public ThreadDumpDisableContentionMonitoringProber(InstanceRegistry instanceRegistry) {
+        super(instanceRegistry, ActuatorEndpoints.THREAD_DUMP_DISABLE_CONTENTION_MONITORING);
     }
 }

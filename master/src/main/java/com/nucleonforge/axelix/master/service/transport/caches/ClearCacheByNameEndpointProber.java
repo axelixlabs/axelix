@@ -17,11 +17,8 @@
  */
 package com.nucleonforge.axelix.master.service.transport.caches;
 
-import org.jspecify.annotations.NonNull;
-
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
@@ -35,11 +32,6 @@ import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpoi
 public class ClearCacheByNameEndpointProber extends DiscardingAbstractEndpointProber {
 
     public ClearCacheByNameEndpointProber(InstanceRegistry instanceRegistry) {
-        super(instanceRegistry);
-    }
-
-    @Override
-    public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.CLEAR_SINGLE_CACHE;
+        super(instanceRegistry, ActuatorEndpoints.CLEAR_SINGLE_CACHE);
     }
 }

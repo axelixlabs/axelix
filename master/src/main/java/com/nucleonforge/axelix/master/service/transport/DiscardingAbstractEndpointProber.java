@@ -20,6 +20,7 @@ package com.nucleonforge.axelix.master.service.transport;
 import org.jspecify.annotations.NonNull;
 
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.serde.NoOpMessageDeserializationStrategy;
@@ -30,10 +31,13 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
  *
  * @author Mikhail Polivakha
  */
-public abstract class DiscardingAbstractEndpointProber extends AbstractEndpointProber<byte[]> {
+public class DiscardingAbstractEndpointProber extends AbstractEndpointProber<byte[]> {
 
-    protected DiscardingAbstractEndpointProber(InstanceRegistry instanceRegistry) {
+    private final ActuatorEndpoint actuatorEndpoint;
+
+    public DiscardingAbstractEndpointProber(InstanceRegistry instanceRegistry, ActuatorEndpoint actuatorEndpoint) {
         super(instanceRegistry, NoOpMessageDeserializationStrategy.INSTANCE);
+        this.actuatorEndpoint = actuatorEndpoint;
     }
 
     @Override
@@ -45,5 +49,10 @@ public abstract class DiscardingAbstractEndpointProber extends AbstractEndpointP
     public void invokeNoValue(@NonNull InstanceId instanceId, HttpPayload httpPayload)
             throws EndpointInvocationException, InstanceNotFoundException {
         super.invoke(instanceId, httpPayload);
+    }
+
+    @Override
+    public @NonNull ActuatorEndpoint supports() {
+        return this.actuatorEndpoint;
     }
 }

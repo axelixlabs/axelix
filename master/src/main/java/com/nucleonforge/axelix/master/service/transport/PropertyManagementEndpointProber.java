@@ -17,11 +17,8 @@
  */
 package com.nucleonforge.axelix.master.service.transport;
 
-import org.jspecify.annotations.NonNull;
-
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
@@ -35,11 +32,6 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 public class PropertyManagementEndpointProber extends DiscardingAbstractEndpointProber {
 
     public PropertyManagementEndpointProber(InstanceRegistry instanceRegistry) {
-        super(instanceRegistry);
-    }
-
-    @Override
-    public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.PROPERTY_MANAGEMENT;
+        super(instanceRegistry, ActuatorEndpoints.PROPERTY_MANAGEMENT);
     }
 }

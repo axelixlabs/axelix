@@ -17,11 +17,8 @@
  */
 package com.nucleonforge.axelix.master.service.transport.scheduled;
 
-import org.jspecify.annotations.NonNull;
-
 import org.springframework.stereotype.Service;
 
-import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
@@ -33,12 +30,8 @@ import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpoi
  */
 @Service
 public class EnableSingleScheduledTaskEndpointProber extends DiscardingAbstractEndpointProber {
-    public EnableSingleScheduledTaskEndpointProber(InstanceRegistry instanceRegistry) {
-        super(instanceRegistry);
-    }
 
-    @Override
-    public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.ENABLE_SCHEDULED_TASK;
+    public EnableSingleScheduledTaskEndpointProber(InstanceRegistry instanceRegistry) {
+        super(instanceRegistry, ActuatorEndpoints.ENABLE_SCHEDULED_TASK);
     }
 }
