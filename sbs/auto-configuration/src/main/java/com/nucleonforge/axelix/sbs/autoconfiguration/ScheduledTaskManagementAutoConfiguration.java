@@ -64,8 +64,11 @@ public class ScheduledTaskManagementAutoConfiguration {
     public ScheduledTaskService scheduledTaskService(
             ScheduledTasksRegistry scheduledTasksRegistry,
             List<TaskRescheduler> taskReschedulers,
-            ThreadPoolTaskExecutor taskExecutor) {
-        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, taskExecutor);
+            ObjectProvider<ThreadPoolTaskExecutor> taskExecutor) {
+        return new ScheduledTaskService(
+                scheduledTasksRegistry,
+                taskReschedulers,
+                taskExecutor.getIfAvailable() != null ? taskExecutor.getIfAvailable() : createThreadPoolExecutor());
     }
 
     @Bean
@@ -106,5 +109,14 @@ public class ScheduledTaskManagementAutoConfiguration {
         }
 
         return taskScheduler;
+    }
+
+    private static ThreadPoolTaskExecutor createThreadPoolExecutor() {
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        threadPoolTaskExecutor.setCorePoolSize(1);
+        threadPoolTaskExecutor.setMaxPoolSize(3);
+        threadPoolTaskExecutor.setAllowCoreThreadTimeOut(false);
+        threadPoolTaskExecutor.setPrestartAllCoreThreads(true);
+        return threadPoolTaskExecutor;
     }
 }

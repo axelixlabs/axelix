@@ -20,9 +20,9 @@ package com.nucleonforge.axelix.master.api.request.scheduled;
 /**
  * Represents a request to modify the cron expression of a scheduled task.
  *
- * @param targetScheduledTask the identifier of the scheduled task to modify. Must not be {@code null}.
- * @param cronExpression      the new cron expression to be assigned.
+ * @param taskId         the identifier of the scheduled task to modify. Must not be {@code null}.
+ * @param cronExpression the new cron expression to be assigned.
  *
  * @author Sergey Cherkasov
  */
-public record ScheduledTaskCronExpressionModifyRequest(String targetScheduledTask, String cronExpression) {}
+public record ScheduledTaskCronExpressionModifyRequest(String taskId, String cronExpression) {}

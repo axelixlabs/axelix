@@ -138,12 +138,11 @@ public final class ScheduledTaskService {
      * @param taskId            the id of the task to re-schedule.
      * @param newInterval       the new interval to apply.
      */
-    public void modifyInterval(String taskId, String newInterval) {
+    public void modifyInterval(String taskId, Duration newInterval) {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
-            Duration interval = Duration.ofMillis(Long.parseLong(newInterval));
 
-            IntervalTask updatedTask = recreateIntervalTask(task.getTask(), interval);
+            IntervalTask updatedTask = recreateIntervalTask(task.getTask(), newInterval);
 
             for (TaskRescheduler taskRescheduler : taskReschedulers) {
                 if (taskRescheduler.supports(task)) {
@@ -161,7 +160,7 @@ public final class ScheduledTaskService {
      *
      * @param taskId  the id of the task to run forcibly.
      */
-    public void runNowTask(String taskId) {
+    public void executeScheduledTask(String taskId) {
         try {
             ManagedScheduledTask task = registry.findRequired(taskId);
 

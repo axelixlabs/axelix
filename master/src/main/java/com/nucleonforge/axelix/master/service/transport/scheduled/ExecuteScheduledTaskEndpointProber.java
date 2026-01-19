@@ -27,18 +27,18 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
 
 /**
- * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#RUN_NOW_SCHEDULED_TASK} endpoint.
+ * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#EXECUTE_SCHEDULED_TASK} endpoint.
  *
  * @author Sergey Cherkasov
  */
 @Service
-public class RunNowScheduledTaskEndpointProber extends DiscardingAbstractEndpointProber {
-    public RunNowScheduledTaskEndpointProber(InstanceRegistry instanceRegistry) {
+public class ExecuteScheduledTaskEndpointProber extends DiscardingAbstractEndpointProber {
+    public ExecuteScheduledTaskEndpointProber(InstanceRegistry instanceRegistry) {
         super(instanceRegistry);
     }
 
     @Override
     public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.RUN_NOW_SCHEDULED_TASK;
+        return ActuatorEndpoints.EXECUTE_SCHEDULED_TASK;
     }
 }

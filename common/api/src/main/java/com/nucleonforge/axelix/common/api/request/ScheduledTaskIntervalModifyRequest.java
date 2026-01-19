@@ -25,4 +25,4 @@ package com.nucleonforge.axelix.common.api.request;
  *
  * @author Sergey Cherkasov
  */
-public record ScheduledTaskIntervalModifyRequest(String targetScheduledTask, String interval) {}
+public record ScheduledTaskIntervalModifyRequest(String targetScheduledTask, Long interval) {}

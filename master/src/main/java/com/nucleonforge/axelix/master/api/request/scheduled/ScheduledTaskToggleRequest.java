@@ -20,9 +20,9 @@ package com.nucleonforge.axelix.master.api.request.scheduled;
 /**
  * Request to enable execution of a scheduled task.
  *
- * @param targetScheduledTask The target scheduled task to be enabled.
+ * @param taskId The target scheduled task to be enabled.
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-public record ScheduledTaskToggleRequest(String targetScheduledTask) {}
+public record ScheduledTaskToggleRequest(String taskId) {}

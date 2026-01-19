@@ -24,4 +24,4 @@ package com.nucleonforge.axelix.common.api.request;
  *
  * @author Sergey Cherkasov
  */
-public record ScheduledTaskRunNowRequest(String targetScheduledTask) {}
+public record ScheduledTaskExecuteRequest(String targetScheduledTask) {}

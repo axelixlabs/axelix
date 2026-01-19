@@ -17,6 +17,8 @@
  */
 package com.nucleonforge.axelix.sbs.spring.scheduled;
 
+import java.time.Duration;
+
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,8 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 import com.nucleonforge.axelix.common.api.request.ScheduledTaskCronExpressionModifyRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskExecuteRequest;
 import com.nucleonforge.axelix.common.api.request.ScheduledTaskIntervalModifyRequest;
-import com.nucleonforge.axelix.common.api.request.ScheduledTaskRunNowRequest;
 import com.nucleonforge.axelix.common.api.request.ScheduledTaskToggleRequest;
 
 /**
@@ -79,13 +81,13 @@ public class AxelixScheduledTasksEndpoint {
 
     @PostMapping("/modify/interval")
     public ResponseEntity<Void> modifyInterval(@RequestBody ScheduledTaskIntervalModifyRequest request) {
-        taskService.modifyInterval(request.targetScheduledTask(), request.interval());
+        taskService.modifyInterval(request.targetScheduledTask(), Duration.ofMillis(request.interval()));
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/run-now")
-    public ResponseEntity<Void> runNowTusk(@RequestBody ScheduledTaskRunNowRequest request) {
-        taskService.runNowTask(request.targetScheduledTask());
+    @PostMapping("/execute")
+    public ResponseEntity<Void> executeScheduledTask(@RequestBody ScheduledTaskExecuteRequest request) {
+        taskService.executeScheduledTask(request.targetScheduledTask());
         return ResponseEntity.noContent().build();
     }
 }

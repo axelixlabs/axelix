@@ -48,8 +48,8 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.test.context.TestPropertySource;
 
 import com.nucleonforge.axelix.common.api.request.ScheduledTaskCronExpressionModifyRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskExecuteRequest;
 import com.nucleonforge.axelix.common.api.request.ScheduledTaskIntervalModifyRequest;
-import com.nucleonforge.axelix.common.api.request.ScheduledTaskRunNowRequest;
 import com.nucleonforge.axelix.common.api.request.ScheduledTaskToggleRequest;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -85,9 +85,9 @@ class ScheduledTaskManagementEndpointTest {
     private static final String FIXED_DELAY_TASK_ID_FOR_MODIFY =
             ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class.getName()
                     + ".testFixedDelayTaskForModify";
-    private static final String FIXED_DELAY_TASK_ID_FOR_RUN_NOW =
+    private static final String FIXED_DELAY_TASK_ID_FOR_EXECUTE =
             ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class.getName()
-                    + ".testFixedDelayTaskForRunNow";
+                    + ".testFixedDelayTaskForExecute";
 
     // FixedRate
     private static final String FIXED_RATE_TASK_ID =
@@ -96,9 +96,9 @@ class ScheduledTaskManagementEndpointTest {
     private static final String FIXED_RATE_TASK_ID_FOR_MODIFY =
             ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class.getName()
                     + ".testFixedRateTaskForModify";
-    private static final String FIXED_RATE_TASK_ID_FOR_RUN_NOW =
+    private static final String FIXED_RATE_TASK_ID_FOR_EXECUTE =
             ScheduledTaskManagementEndpointTest.ScheduledTaskManagementEndpointTestConfiguration.class.getName()
-                    + ".testFixedRateTaskForRunNow";
+                    + ".testFixedRateTaskForExecute";
 
     // Custom
     private static final String CUSTOM_TASK_ID =
@@ -291,9 +291,7 @@ class ScheduledTaskManagementEndpointTest {
                 new ScheduledTaskCronExpressionModifyRequest(CRON_TASK_ID_FOR_MODIFY, newCronExpression);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/modify/cron-expression",
-                defaultEntityForModifyCronExpression(request),
-                Void.class);
+                "/actuator/axelix-scheduled-tasks/modify/cron-expression", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
@@ -304,15 +302,13 @@ class ScheduledTaskManagementEndpointTest {
 
     @Test
     void shouldModifyInterval_testFixedDelay() {
-        String newInterval = "555555";
+        Long newInterval = 555555L;
 
         ScheduledTaskIntervalModifyRequest request =
                 new ScheduledTaskIntervalModifyRequest(FIXED_DELAY_TASK_ID_FOR_MODIFY, newInterval);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/modify/interval",
-                defaultEntityForModifyInterval(request),
-                Void.class);
+                "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
@@ -323,15 +319,13 @@ class ScheduledTaskManagementEndpointTest {
 
     @Test
     void shouldModifyInterval_testFixedRate() {
-        String newInterval = "777777";
+        Long newInterval = 777777L;
 
         ScheduledTaskIntervalModifyRequest request =
                 new ScheduledTaskIntervalModifyRequest(FIXED_RATE_TASK_ID_FOR_MODIFY, newInterval);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/modify/interval",
-                defaultEntityForModifyInterval(request),
-                Void.class);
+                "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
@@ -341,16 +335,16 @@ class ScheduledTaskManagementEndpointTest {
     }
 
     @Test
-    void shouldRunNowWitheDisableTask_testFixedDelay() {
-        forceDisableTask(FIXED_DELAY_TASK_ID_FOR_RUN_NOW);
-        ScheduledTaskRunNowRequest request = new ScheduledTaskRunNowRequest(FIXED_DELAY_TASK_ID_FOR_RUN_NOW);
+    void shouldExecuteWithDisableTask_testFixedDelay() {
+        forceDisableTask(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
+        ScheduledTaskExecuteRequest request = new ScheduledTaskExecuteRequest(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/run-now", defaultEntityRunNow(request), Void.class);
+                "/actuator/axelix-scheduled-tasks/run-now", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("runnable.target").isEqualTo(FIXED_DELAY_TASK_ID_FOR_RUN_NOW);
+            assertThatJson(task).node("runnable.target").isEqualTo(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
             assertThatJson(task).node("interval").isEqualTo(2000000000);
             assertThatJson(task).node("enabled").isEqualTo(false);
         });
@@ -358,15 +352,15 @@ class ScheduledTaskManagementEndpointTest {
     }
 
     @Test
-    void shouldRunNowTask_testFixedRate() {
-        ScheduledTaskRunNowRequest request = new ScheduledTaskRunNowRequest(FIXED_RATE_TASK_ID_FOR_RUN_NOW);
+    void shouldExecuteTask_testFixedRate() {
+        ScheduledTaskExecuteRequest request = new ScheduledTaskExecuteRequest(FIXED_RATE_TASK_ID_FOR_EXECUTE);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/run-now", defaultEntityRunNow(request), Void.class);
+                "/actuator/axelix-scheduled-tasks/run-now", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
-            assertThatJson(task).node("runnable.target").isEqualTo(FIXED_RATE_TASK_ID_FOR_RUN_NOW);
+            assertThatJson(task).node("runnable.target").isEqualTo(FIXED_RATE_TASK_ID_FOR_EXECUTE);
             assertThatJson(task).node("interval").isEqualTo(2000000000);
             assertThatJson(task).node("enabled").isEqualTo(true);
         });
@@ -377,7 +371,7 @@ class ScheduledTaskManagementEndpointTest {
         ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(target);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/enable", defaultEntity(request), Void.class);
+                "/actuator/axelix-scheduled-tasks/enable", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
@@ -386,7 +380,7 @@ class ScheduledTaskManagementEndpointTest {
         ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(targetScheduledTask);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/disable?force=true", defaultEntity(request), Void.class);
+                "/actuator/axelix-scheduled-tasks/disable?force=true", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
@@ -400,27 +394,7 @@ class ScheduledTaskManagementEndpointTest {
         return response.getBody();
     }
 
-    private HttpEntity<ScheduledTaskToggleRequest> defaultEntity(ScheduledTaskToggleRequest request) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return new HttpEntity<>(request, headers);
-    }
-
-    private HttpEntity<ScheduledTaskRunNowRequest> defaultEntityRunNow(ScheduledTaskRunNowRequest request) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return new HttpEntity<>(request, headers);
-    }
-
-    private HttpEntity<ScheduledTaskCronExpressionModifyRequest> defaultEntityForModifyCronExpression(
-            ScheduledTaskCronExpressionModifyRequest request) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return new HttpEntity<>(request, headers);
-    }
-
-    private HttpEntity<ScheduledTaskIntervalModifyRequest> defaultEntityForModifyInterval(
-            ScheduledTaskIntervalModifyRequest request) {
+    private <T> HttpEntity<T> defaultJsonEntity(T request) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<>(request, headers);
@@ -488,7 +462,7 @@ class ScheduledTaskManagementEndpointTest {
         public void testFixedDelayTaskForModify() {}
 
         @Scheduled(fixedRate = 2000000000)
-        public void testFixedDelayTaskForRunNow() {
+        public void testFixedDelayTaskForExecute() {
             fixedDelayFlag = true;
         }
 
@@ -502,7 +476,7 @@ class ScheduledTaskManagementEndpointTest {
         public void testFixedRateTaskForModify() {}
 
         @Scheduled(fixedRate = 2000000000)
-        public void testFixedRateTaskForRunNow() {
+        public void testFixedRateTaskForExecute() {
             fixedRateFlag = true;
         }
 

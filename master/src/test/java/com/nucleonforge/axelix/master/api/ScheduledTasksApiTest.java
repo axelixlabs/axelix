@@ -41,8 +41,8 @@ import org.springframework.http.ResponseEntity;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskCronExpressionModifyRequest;
+import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskExecuteRequest;
 import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskIntervalModifyRequest;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskRunNowRequest;
 import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -297,7 +297,7 @@ public class ScheduledTasksApiTest {
                     return new MockResponse();
                 } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks/disable")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks/run-now")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-scheduled-tasks/execute")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -386,7 +386,7 @@ public class ScheduledTasksApiTest {
     void shouldModifyIntervalScheduledTask() {
 
         ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", "555555");
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -402,16 +402,16 @@ public class ScheduledTasksApiTest {
     }
 
     @Test
-    void shouldRunNowScheduledTask() {
+    void shouldExecuteScheduledTask() {
 
-        ScheduledTaskRunNowRequest requestBody = new ScheduledTaskRunNowRequest(
+        ScheduledTaskExecuteRequest requestBody = new ScheduledTaskExecuteRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/run-now", requestBody, Void.class, activeInstanceId);
+                        "/api/axelix/scheduled-tasks/{instanceId}/execute", requestBody, Void.class, activeInstanceId);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -576,7 +576,7 @@ public class ScheduledTasksApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", "555555");
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
 
         // when.
         registry.register(createInstance(instanceId));
@@ -596,7 +596,7 @@ public class ScheduledTasksApiTest {
     void shouldReturnBadRequestForUnregisteredInstance_OnModifyInterval() {
         String instanceId = UUID.randomUUID().toString();
         ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", "555555");
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask", 555555L);
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -613,10 +613,10 @@ public class ScheduledTasksApiTest {
 
     @Test
     @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerError_OnRunNowTask() {
+    void shouldReturnInternalServerError_OnTaskExecute() {
         String instanceId = UUID.randomUUID().toString();
 
-        ScheduledTaskRunNowRequest requestBody = new ScheduledTaskRunNowRequest(
+        ScheduledTaskExecuteRequest requestBody = new ScheduledTaskExecuteRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
@@ -634,9 +634,9 @@ public class ScheduledTasksApiTest {
     }
 
     @Test
-    void shouldReturnBadRequestForUnregisteredInstance_OnRunNowTask() {
+    void shouldReturnBadRequestForUnregisteredInstance_OnExecuteTask() {
         String instanceId = UUID.randomUUID().toString();
-        ScheduledTaskRunNowRequest requestBody = new ScheduledTaskRunNowRequest(
+        ScheduledTaskExecuteRequest requestBody = new ScheduledTaskExecuteRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.

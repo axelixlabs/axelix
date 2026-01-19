@@ -17,6 +17,7 @@
  */
 package com.nucleonforge.axelix.sbs.spring.scheduled;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -74,9 +75,9 @@ class ScheduledTaskServiceTest {
     private static final String FIXED_RATE_TASK_ID_FOR_MODIFY =
             ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName()
                     + ".testFixedRateTaskForModify";
-    private static final String FIXED_RATE_TASK_ID_FOR_RUN_NOW =
+    private static final String FIXED_RATE_TASK_ID_FOR_EXECUTE =
             ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName()
-                    + ".testFixedRateTaskForRunNow";
+                    + ".testFixedDelayTaskForExecute";
 
     // Custom
     private static final String CUSTOM_TASK_ID =
@@ -94,7 +95,7 @@ class ScheduledTaskServiceTest {
 
     private static volatile boolean fixedRateFlag = false;
 
-    private static volatile boolean fixedRateFlagForRunNow = false;
+    private static volatile boolean fixedRateFlagForExecute = false;
 
     private static volatile boolean customTaskFlag = false;
 
@@ -235,33 +236,34 @@ class ScheduledTaskServiceTest {
 
     @Test
     void shouldModifyInterval_testFixedDelay() {
-        String newInterval = "555555";
+        Duration newInterval = Duration.ofMillis(555555L);
 
         taskService.modifyInterval(FIXED_DELAY_TASK_ID_FOR_MODIFY, newInterval);
 
         ManagedScheduledTask task =
                 taskRegistry.find(FIXED_DELAY_TASK_ID_FOR_MODIFY).orElseThrow();
-        assertThat(((IntervalTask) task.getTask()).getInterval()).isEqualTo(Long.parseLong(newInterval));
+        assertThat(((IntervalTask) task.getTask()).getIntervalDuration()).isEqualTo(newInterval);
     }
 
     @Test
     void shouldModifyInterval_testFixedRate() {
-        String newInterval = "777777";
+        Duration newInterval = Duration.ofMillis(777777L);
 
         taskService.modifyInterval(FIXED_RATE_TASK_ID_FOR_MODIFY, newInterval);
 
         ManagedScheduledTask task =
                 taskRegistry.find(FIXED_RATE_TASK_ID_FOR_MODIFY).orElseThrow();
-        assertThat(((IntervalTask) task.getTask()).getInterval()).isEqualTo(Long.parseLong(newInterval));
+        assertThat(((IntervalTask) task.getTask()).getIntervalDuration()).isEqualTo(newInterval);
     }
 
     @Test
-    void shouldRunNowTask_testFixedRate() {
-        taskService.runNowTask(FIXED_RATE_TASK_ID_FOR_RUN_NOW);
+    void shouldExecuteScheduledTask_testFixedRate() {
+        // when.
+        taskService.executeScheduledTask(FIXED_RATE_TASK_ID_FOR_EXECUTE);
 
-        ManagedScheduledTask task =
-                taskRegistry.find(FIXED_RATE_TASK_ID_FOR_RUN_NOW).orElseThrow();
-        assertThat(fixedRateFlagForRunNow).isTrue();
+        // then task exists and was executed
+        taskRegistry.find(FIXED_RATE_TASK_ID_FOR_EXECUTE).orElseThrow();
+        assertThat(fixedRateFlagForExecute).isTrue();
     }
 
     @TestConfiguration
@@ -324,8 +326,8 @@ class ScheduledTaskServiceTest {
         public void testFixedRateTaskForModify() {}
 
         @Scheduled(fixedRate = 2000000000)
-        public void testFixedRateTaskForRunNow() {
-            fixedRateFlagForRunNow = true;
+        public void testFixedDelayTaskForExecute() {
+            fixedRateFlagForExecute = true;
         }
 
         // Custom

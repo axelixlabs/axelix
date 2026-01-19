@@ -37,18 +37,18 @@ import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskCronExpressionModifyRequest;
+import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskExecuteRequest;
 import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskIntervalModifyRequest;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskRunNowRequest;
 import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.scheduled.DisableSingleScheduledTaskEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.scheduled.EnableSingleScheduledTaskEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.scheduled.ExecuteScheduledTaskEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.scheduled.GetAllScheduledTasksEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.scheduled.ModifyCronExpressionScheduledTaskEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.scheduled.ModifyIntervalScheduledTaskEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.scheduled.RunNowScheduledTaskEndpointProber;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
@@ -85,7 +85,7 @@ public class ScheduledTasksEndpointProberTest {
     private ModifyIntervalScheduledTaskEndpointProber modifyIntervalScheduledTaskEndpointProber;
 
     @Autowired
-    private RunNowScheduledTaskEndpointProber runNowScheduledTaskEndpointProber;
+    private ExecuteScheduledTaskEndpointProber executeScheduledTaskEndpointProber;
 
     @Autowired
     private JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
@@ -196,7 +196,7 @@ public class ScheduledTasksEndpointProberTest {
                     return new MockResponse();
                 } else if (path.equals("/" + activeInstanceId + "/axelix-scheduled-tasks/disable")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/axelix-scheduled-tasks/run-now")) {
+                } else if (path.equals("/" + activeInstanceId + "/axelix-scheduled-tasks/execute")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -275,7 +275,7 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
           {
-             "targetScheduledTask": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
+             "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
           }
           """;
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
@@ -299,7 +299,7 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
             {
-               "targetScheduledTask": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
+               "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
             }
             """;
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
@@ -323,7 +323,7 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
         {
-           "targetScheduledTask": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive",
+           "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive",
            "cronExpression" : "*/5 0 0/3 1/1 * ?"
         }
         """;
@@ -349,13 +349,13 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
         {
-           "targetScheduledTask": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask",
-           "interval" : "22222"
+           "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask",
+           "interval" : 22222
         }
         """;
 
         ScheduledTaskIntervalModifyRequest requestBody = new ScheduledTaskIntervalModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask", "22222");
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask", 22222L);
 
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(requestBody));
 
@@ -371,27 +371,27 @@ public class ScheduledTasksEndpointProberTest {
     }
 
     @Test
-    void shouldRunNowScheduledTask() throws InterruptedException {
+    void shouldExecuteScheduledTask() throws InterruptedException {
         // language=json
         String jsonRequest =
                 """
             {
-               "targetScheduledTask": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask"
+               "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask"
             }
             """;
 
-        ScheduledTaskRunNowRequest requestBody = new ScheduledTaskRunNowRequest(
+        ScheduledTaskExecuteRequest requestBody = new ScheduledTaskExecuteRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask");
 
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(requestBody));
 
         // when.
-        runNowScheduledTaskEndpointProber.invokeNoValue(InstanceId.of(activeInstanceId), payload);
+        executeScheduledTaskEndpointProber.invokeNoValue(InstanceId.of(activeInstanceId), payload);
 
         // then
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/axelix-scheduled-tasks/run-now");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/axelix-scheduled-tasks/execute");
         assertThatJson(recordedRequest.getBody().readUtf8()).isEqualTo(jsonRequest);
     }
 }
