@@ -15,14 +15,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.master.api.request.scheduled;
+package com.nucleonforge.axelix.common.api.request;
 
 /**
- * Request to enable execution of a scheduled task.
+ * Represents a request to toggle (enable/disable) a scheduled task.
  *
- * @param taskId The target scheduled task to be enabled.
+ * @param targetScheduledTask the identifier of the scheduled task to toggle. Must not be {@code null}.
  *
- * @author Sergey Cherkasov
+ * @since 14.10.2025
+ * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public record ScheduledTaskToggleRequest(String taskId) {}
+public record ScheduledTaskToggleRequest(String targetScheduledTask) {}

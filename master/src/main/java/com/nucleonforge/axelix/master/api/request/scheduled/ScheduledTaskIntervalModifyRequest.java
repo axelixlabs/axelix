@@ -18,11 +18,12 @@
 package com.nucleonforge.axelix.master.api.request.scheduled;
 
 /**
- * Request to enable execution of a scheduled task.
+ * Represents a request to modify the interval of a scheduled task.
  *
- * @param taskId The target scheduled task to be enabled.
+ * @param taskId   the identifier of the scheduled task to modify. Must not be {@code null}.
+ * @param interval the new interval to be assigned (in milliseconds).
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-public record ScheduledTaskToggleRequest(String taskId) {}
+public record ScheduledTaskIntervalModifyRequest(String taskId, Long interval) {}

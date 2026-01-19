@@ -32,8 +32,8 @@ import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpoi
  * @author Sergey Cherkasov
  */
 @Service
-public class MutateScheduledTaskEndpointProber extends DiscardingAbstractEndpointProber {
-    public MutateScheduledTaskEndpointProber(InstanceRegistry instanceRegistry) {
+public class ModifyCronExpressionScheduledTaskEndpointProber extends DiscardingAbstractEndpointProber {
+    public ModifyCronExpressionScheduledTaskEndpointProber(InstanceRegistry instanceRegistry) {
         super(instanceRegistry);
     }
 

@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.master.api.request.scheduled;
+package com.nucleonforge.axelix.common.api.request;
 
 /**
- * Represents a request to modify a scheduled task configuration.
+ * Represents a request to modify the interval of a scheduled task.
  *
- * @param taskId         the identifier of the scheduled task to toggle. Must not be {@code null}.
- * @param cronExpression the new value to be assigned. Must not be {@code null}.
+ * @param targetScheduledTask the identifier of the scheduled task to modify. Must not be {@code null}.
+ * @param interval            the new interval to be assigned.
  *
  * @author Sergey Cherkasov
  */
-public record ScheduledTaskCronExpressionMutationRequest(String taskId, String cronExpression) {}
+public record ScheduledTaskIntervalModifyRequest(String targetScheduledTask, Long interval) {}

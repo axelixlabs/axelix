@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.sbs.spring.scheduled;
+package com.nucleonforge.axelix.master.api.request.scheduled;
 
 /**
- * Represents a request to modify a scheduled task configuration.
+ * Represents a request to modify the cron expression of a scheduled task.
  *
- * @param targetScheduledTask the identifier of the scheduled task to toggle. Must not be {@code null}.
- * @param newValue            the new value to be assigned.
+ * @param taskId         the identifier of the scheduled task to modify. Must not be {@code null}.
+ * @param cronExpression the new cron expression to be assigned.
  *
  * @author Sergey Cherkasov
  */
-public record ScheduledTaskMutationRequest(String targetScheduledTask, String newValue) {}
+public record ScheduledTaskCronExpressionModifyRequest(String taskId, String cronExpression) {}
