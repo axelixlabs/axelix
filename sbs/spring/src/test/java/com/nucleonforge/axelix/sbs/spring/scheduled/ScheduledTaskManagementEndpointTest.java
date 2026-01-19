@@ -340,7 +340,7 @@ class ScheduledTaskManagementEndpointTest {
         ScheduledTaskExecuteRequest request = new ScheduledTaskExecuteRequest(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/run-now", defaultJsonEntity(request), Void.class);
+                "/actuator/axelix-scheduled-tasks/execute", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
@@ -356,7 +356,7 @@ class ScheduledTaskManagementEndpointTest {
         ScheduledTaskExecuteRequest request = new ScheduledTaskExecuteRequest(FIXED_RATE_TASK_ID_FOR_EXECUTE);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/run-now", defaultJsonEntity(request), Void.class);
+                "/actuator/axelix-scheduled-tasks/execute", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
