@@ -42,4 +42,14 @@ public class EndpointProbersAutoConfiguration {
     public DiscardingAbstractEndpointProber setOneLoggerEndpointProber() {
         return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.SET_ONE_LOGGER);
     }
+
+    @Bean
+    public DiscardingAbstractEndpointProber clearAllCachesEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.CLEAR_ALL_CACHES);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber clearSingleCacheEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.CLEAR_SINGLE_CACHE);
+    }
 }

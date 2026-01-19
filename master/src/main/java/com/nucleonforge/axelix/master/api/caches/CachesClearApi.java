@@ -37,30 +37,27 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.ApiPaths;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
-import com.nucleonforge.axelix.master.service.transport.caches.ClearAllCachesEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.caches.ClearCacheByNameEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing caches. Endpoints for clearing the application caches.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @Tag(name = "Caches API", description = "The caches endpoint provides access to the application’s caches.")
 @RestController
 @RequestMapping(path = ApiPaths.CachesApi.MAIN)
 public class CachesClearApi {
 
-    private final ClearAllCachesEndpointProber clearAllCachesEndpointProber;
-    private final ClearCacheByNameEndpointProber clearCacheByNameEndpointProber;
+    private final EndpointInvoker endpointInvoker;
 
-    public CachesClearApi(
-            ClearAllCachesEndpointProber clearAllCachesEndpointProber,
-            ClearCacheByNameEndpointProber clearCacheByNameEndpointProber) {
-        this.clearAllCachesEndpointProber = clearAllCachesEndpointProber;
-        this.clearCacheByNameEndpointProber = clearCacheByNameEndpointProber;
+    public CachesClearApi(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Operation(
@@ -92,7 +89,8 @@ public class CachesClearApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @DeleteMapping(path = ApiPaths.CachesApi.INSTANCE_ID)
     public void clearAllCaches(@PathVariable("instanceId") String instanceId) {
-        clearAllCachesEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        endpointInvoker.invokeNoValue(
+                InstanceId.of(instanceId), ActuatorEndpoints.CLEAR_ALL_CACHES, NoHttpPayload.INSTANCE);
     }
 
     @Operation(
@@ -135,6 +133,6 @@ public class CachesClearApi {
             @PathVariable("cacheName") String cacheName,
             @RequestParam("cacheManager") String cacheManager) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("cacheName", cacheName, "cacheManagerName", cacheManager));
-        clearCacheByNameEndpointProber.invoke(InstanceId.of(instanceId), payload);
+        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.CLEAR_SINGLE_CACHE, payload);
     }
 }
