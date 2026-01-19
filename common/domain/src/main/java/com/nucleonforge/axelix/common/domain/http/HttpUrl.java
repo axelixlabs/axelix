@@ -117,4 +117,9 @@ public final class HttpUrl {
 
         return pathVariables;
     }
+
+    @Override
+    public String toString() {
+        return "HttpUrl{" + "originalUrl='" + originalUrl + '\'' + '}';
+    }
 }

@@ -1,4 +1,5 @@
 com.nucleonforge.axelix.master.autoconfiguration.discovery.DiscoveryAutoConfiguration
+com.nucleonforge.axelix.master.autoconfiguration.probers.EndpointProbersAutoConfiguration
 com.nucleonforge.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration
 com.nucleonforge.axelix.master.autoconfiguration.MemoryTransformerAutoConfiguration
 com.nucleonforge.axelix.master.autoconfiguration.AxelixAutoConfiguration
