@@ -161,9 +161,9 @@ jobs:
     strategy:
       matrix:
         playground_repo: [
-          'Nucleon-Forge/notification-service',
-          'Nucleon-Forge/feature-service',
-          'Nucleon-Forge/spring-petclinic'
+          'axelixlabs/notification-service',
+          'axelixlabs/feature-service',
+          'axelixlabs/spring-petclinic'
         ]
     runs-on: ubuntu-latest
     steps:
