@@ -21,8 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import com.nucleonforge.axelix.common.api.caches.CachesFeed;
+import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
+import com.nucleonforge.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.caches.SingleCacheJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
+import com.nucleonforge.axelix.master.service.transport.DefaultEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.EndpointProber;
 
@@ -32,6 +37,10 @@ import com.nucleonforge.axelix.master.service.transport.EndpointProber;
  *
  * @author Mikhail Polivakha
  */
+// TODO: We should dynamically register instances of EndpointProbers.
+//  We can do that, but that requires a significant ActuatorEndpoint revisiting.
+//  In particular, ActuatorEndpoint should now not only the request Http Path and Http Method,
+//  but it should also know the shape of the returned object, along with it's format.
 @AutoConfiguration
 public class EndpointProbersAutoConfiguration {
 
@@ -51,5 +60,38 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public DiscardingAbstractEndpointProber clearSingleCacheEndpointProber() {
         return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.CLEAR_SINGLE_CACHE);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber enableCacheEndpointProver() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.ENABLE_CACHE);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber disableCacheEndpointProver() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.DISABLE_CACHE);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber disableCacheManagerEndpointProver() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.DISABLE_CACHES_MANAGER);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber enableCacheManagerEndpointProver() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.ENABLE_CACHE_MANAGER);
+    }
+
+    @Bean
+    public DefaultEndpointProber<SingleCache> getSingleCacheEndpointProver(
+            SingleCacheJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_CACHE);
+    }
+
+    @Bean
+    public DefaultEndpointProber<CachesFeed> getAllCachesEndpointProver(
+            ServiceCachesJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_ALL_CACHES);
     }
 }

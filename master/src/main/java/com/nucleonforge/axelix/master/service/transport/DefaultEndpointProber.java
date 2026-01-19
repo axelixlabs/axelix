@@ -15,34 +15,33 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.master.service.transport.caches;
+package com.nucleonforge.axelix.master.service.transport;
 
 import org.jspecify.annotations.NonNull;
 
-import org.springframework.stereotype.Service;
-
-import com.nucleonforge.axelix.common.api.caches.CachesFeed;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
-import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
-import com.nucleonforge.axelix.master.service.transport.AbstractEndpointProber;
 
 /**
- * {@link AbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#GET_ALL_CACHES /caches} endpoint.
+ * Default implementation of the {@link AbstractEndpointProber}.
  *
- * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
-@Service
-public class GetAllCachesEndpointProber extends AbstractEndpointProber<CachesFeed> {
-    public GetAllCachesEndpointProber(
+public class DefaultEndpointProber<O> extends AbstractEndpointProber<O> {
+
+    private final ActuatorEndpoint actuatorEndpoint;
+
+    public DefaultEndpointProber(
             InstanceRegistry instanceRegistry,
-            MessageDeserializationStrategy<CachesFeed> messageDeserializationStrategy) {
+            MessageDeserializationStrategy<O> messageDeserializationStrategy,
+            ActuatorEndpoint actuatorEndpoint) {
         super(instanceRegistry, messageDeserializationStrategy);
+        this.actuatorEndpoint = actuatorEndpoint;
     }
 
     @Override
     public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.GET_ALL_CACHES;
+        return this.actuatorEndpoint;
     }
 }

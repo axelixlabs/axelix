@@ -62,11 +62,11 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint BEANS = of("/axelix-beans", HttpMethod.GET);
 
     // Caches
-    public static final ActuatorEndpoint GET_ALL_CACHES = of("/axelix-caches", HttpMethod.GET);
-    public static final ActuatorEndpoint CLEAR_ALL_CACHES = of("/axelix-caches", HttpMethod.DELETE);
-
     public static final ActuatorEndpoint CLEAR_SINGLE_CACHE =
             of("/axelix-caches/{cacheManagerName}/{cacheName}", HttpMethod.DELETE);
+    public static final ActuatorEndpoint CLEAR_ALL_CACHES = of("/axelix-caches", HttpMethod.DELETE);
+
+    public static final ActuatorEndpoint GET_ALL_CACHES = of("/axelix-caches", HttpMethod.GET);
     public static final ActuatorEndpoint GET_SINGLE_CACHE =
             of("/axelix-caches/{cacheManagerName}/{cacheName}", HttpMethod.GET);
     public static final ActuatorEndpoint ENABLE_CACHE =
@@ -195,9 +195,15 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint THREAD_DUMP_DISABLE_CONTENTION_MONITORING =
             of("/axelix-thread-dump/disable", HttpMethod.POST);
 
+    private static final ActuatorEndpoints INSTANCE = new ActuatorEndpoints();
+
+    public static ActuatorEndpoints getInstance() {
+        return INSTANCE;
+    }
+
     // spotless:on
 
-    public ActuatorEndpoints() {
+    private ActuatorEndpoints() {
         this.endpoints = new HashSet<>(List.of(
                 BEANS,
                 GET_ALL_CACHES,

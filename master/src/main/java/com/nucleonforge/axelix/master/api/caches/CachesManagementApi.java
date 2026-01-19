@@ -34,13 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.ApiPaths;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
-import com.nucleonforge.axelix.master.service.transport.caches.DisableCacheEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.caches.DisableCacheManagerEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.caches.EnableCacheEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.caches.EnableCacheManagerEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing cache operations - enabling/disabling caches and cache managers.
@@ -55,20 +53,10 @@ import com.nucleonforge.axelix.master.service.transport.caches.EnableCacheManage
 @RequestMapping(path = ApiPaths.CachesApi.MAIN)
 public class CachesManagementApi {
 
-    private final EnableCacheEndpointProber enableCacheEndpointProber;
-    private final DisableCacheEndpointProber disableCacheEndpointProber;
-    private final EnableCacheManagerEndpointProber enableCacheManagerEndpointProber;
-    private final DisableCacheManagerEndpointProber disableCacheManagerEndpointProber;
+    private final EndpointInvoker endpointInvoker;
 
-    public CachesManagementApi(
-            EnableCacheEndpointProber enableCacheEndpointProber,
-            DisableCacheEndpointProber disableCacheEndpointProber,
-            EnableCacheManagerEndpointProber enableCacheManagerEndpointProber,
-            DisableCacheManagerEndpointProber disableCacheManagerEndpointProber) {
-        this.enableCacheEndpointProber = enableCacheEndpointProber;
-        this.disableCacheEndpointProber = disableCacheEndpointProber;
-        this.enableCacheManagerEndpointProber = enableCacheManagerEndpointProber;
-        this.disableCacheManagerEndpointProber = disableCacheManagerEndpointProber;
+    public CachesManagementApi(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Operation(
@@ -102,7 +90,11 @@ public class CachesManagementApi {
             @PathVariable("instanceId") String instanceId,
             @PathVariable("cacheManagerName") String cacheManagerName,
             @PathVariable("cacheName") String cacheName) {
-        enableCacheEndpointProber.invoke(InstanceId.of(instanceId), createCachePayload(cacheManagerName, cacheName));
+
+        endpointInvoker.invokeNoValue(
+                InstanceId.of(instanceId),
+                ActuatorEndpoints.ENABLE_CACHE,
+                createCachePayload(cacheManagerName, cacheName));
     }
 
     @Operation(
@@ -136,7 +128,11 @@ public class CachesManagementApi {
             @PathVariable("instanceId") String instanceId,
             @PathVariable("cacheManagerName") String cacheManagerName,
             @PathVariable("cacheName") String cacheName) {
-        disableCacheEndpointProber.invoke(InstanceId.of(instanceId), createCachePayload(cacheManagerName, cacheName));
+
+        endpointInvoker.invokeNoValue(
+                InstanceId.of(instanceId),
+                ActuatorEndpoints.DISABLE_CACHE,
+                createCachePayload(cacheManagerName, cacheName));
     }
 
     @Operation(
@@ -166,7 +162,11 @@ public class CachesManagementApi {
     @PostMapping(ApiPaths.CachesApi.ENABLE_CACHE_MANAGER)
     public void enableCacheManager(
             @PathVariable("instanceId") String instanceId, @PathVariable("cacheManagerName") String cacheManagerName) {
-        enableCacheManagerEndpointProber.invoke(InstanceId.of(instanceId), createCacheManagerPayload(cacheManagerName));
+
+        endpointInvoker.invokeNoValue(
+                InstanceId.of(instanceId),
+                ActuatorEndpoints.ENABLE_CACHE_MANAGER,
+                createCacheManagerPayload(cacheManagerName));
     }
 
     @Operation(
@@ -196,8 +196,11 @@ public class CachesManagementApi {
     @PostMapping(ApiPaths.CachesApi.DISABLE_CACHE_MANAGER)
     public void disableCacheManager(
             @PathVariable("instanceId") String instanceId, @PathVariable("cacheManagerName") String cacheManagerName) {
-        disableCacheManagerEndpointProber.invoke(
-                InstanceId.of(instanceId), createCacheManagerPayload(cacheManagerName));
+
+        endpointInvoker.invokeNoValue(
+                InstanceId.of(instanceId),
+                ActuatorEndpoints.DISABLE_CACHES_MANAGER,
+                createCacheManagerPayload(cacheManagerName));
     }
 
     private HttpPayload createCachePayload(String cacheManagerName, String cacheName) {

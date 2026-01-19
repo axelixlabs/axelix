@@ -40,14 +40,14 @@ import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.ApiPaths;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.caches.CacheProfileResponse;
 import com.nucleonforge.axelix.master.api.response.caches.CachesResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axelix.master.service.transport.caches.GetAllCachesEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.caches.GetCacheByNameEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing caches. Endpoints for retrieving information about the application caches.
@@ -59,18 +59,15 @@ import com.nucleonforge.axelix.master.service.transport.caches.GetCacheByNameEnd
 @RequestMapping(path = ApiPaths.CachesApi.MAIN)
 public class CachesReadApi {
 
-    private final GetAllCachesEndpointProber getAllCachesEndpointProber;
-    private final GetCacheByNameEndpointProber getCacheByNameEndpointProber;
+    private final EndpointInvoker endpointInvoker;
     private final Converter<CachesFeed, CachesResponse> cachesFeedConverter;
     private final Converter<SingleCache, CacheProfileResponse> singleCacheConverter;
 
     public CachesReadApi(
-            GetAllCachesEndpointProber getAllCachesEndpointProber,
-            GetCacheByNameEndpointProber getCacheByNameEndpointProber,
+            EndpointInvoker endpointInvoker,
             Converter<CachesFeed, CachesResponse> cachesFeedConverter,
             Converter<SingleCache, CacheProfileResponse> singleCacheConverter) {
-        this.getAllCachesEndpointProber = getAllCachesEndpointProber;
-        this.getCacheByNameEndpointProber = getCacheByNameEndpointProber;
+        this.endpointInvoker = endpointInvoker;
         this.cachesFeedConverter = cachesFeedConverter;
         this.singleCacheConverter = singleCacheConverter;
     }
@@ -108,8 +105,10 @@ public class CachesReadApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.CachesApi.INSTANCE_ID)
     public CachesResponse getAllCaches(@PathVariable("instanceId") String instanceId) {
-        CachesFeed response = getAllCachesEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(cachesFeedConverter.convert(response));
+        CachesFeed feed = endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_CACHES, NoHttpPayload.INSTANCE);
+
+        return Objects.requireNonNull(cachesFeedConverter.convert(feed));
     }
 
     @Operation(
@@ -157,7 +156,8 @@ public class CachesReadApi {
             @RequestParam("cacheManager") String cacheManager) {
 
         HttpPayload payload = new DefaultHttpPayload(Map.of("cacheManagerName", cacheManager, "cacheName", cacheName));
-        SingleCache response = getCacheByNameEndpointProber.invoke(InstanceId.of(instanceId), payload);
+        SingleCache response =
+                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_SINGLE_CACHE, payload);
         return Objects.requireNonNull(singleCacheConverter.convert(response));
     }
 }
