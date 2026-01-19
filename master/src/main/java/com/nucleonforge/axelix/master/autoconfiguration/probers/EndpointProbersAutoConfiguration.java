@@ -15,23 +15,31 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.master.service.transport.loggers;
+package com.nucleonforge.axelix.master.autoconfiguration.probers;
 
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointProber;
 
 /**
- * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#SET_ONE_LOGGER /loggers/{logger.name}} endpoint.
+ * Configuration that creates necessary {@link EndpointProber} instances to
+ * access the API on the managed service side.
  *
- * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
-@Service
-public class SetOneLoggerEndpointProber extends DiscardingAbstractEndpointProber {
+@AutoConfiguration
+public class EndpointProbersAutoConfiguration {
 
-    public SetOneLoggerEndpointProber(InstanceRegistry instanceRegistry) {
-        super(instanceRegistry, ActuatorEndpoints.SET_ONE_LOGGER);
+    @Autowired
+    private InstanceRegistry instanceRegistry;
+
+    @Bean
+    public DiscardingAbstractEndpointProber setOneLoggerEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.SET_ONE_LOGGER);
     }
 }

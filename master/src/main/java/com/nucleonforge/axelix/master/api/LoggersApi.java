@@ -43,6 +43,7 @@ import com.nucleonforge.axelix.common.api.loggers.ServiceLoggers;
 import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.request.LogLevelChangeRequest;
 import com.nucleonforge.axelix.master.api.response.loggers.GroupProfileResponse;
@@ -51,12 +52,12 @@ import com.nucleonforge.axelix.master.api.response.loggers.LoggersResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationStrategy;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 import com.nucleonforge.axelix.master.service.transport.loggers.AllLoggersEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.loggers.ClearForLoggerEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.loggers.GroupLoggersEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.loggers.OneLoggerEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.loggers.SetForLoggerGroupEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.loggers.SetOneLoggerEndpointProber;
 
 /**
  * The API for managing loggers.
@@ -72,10 +73,11 @@ import com.nucleonforge.axelix.master.service.transport.loggers.SetOneLoggerEndp
 @RequestMapping(path = ApiPaths.LoggersApi.MAIN)
 public class LoggersApi {
 
+    private final EndpointInvoker endpointInvoker;
+
     private final AllLoggersEndpointProber allLoggersEndpointProber;
     private final GroupLoggersEndpointProber groupLoggersEndpointProber;
     private final OneLoggerEndpointProber oneLoggerEndpointProber;
-    private final SetOneLoggerEndpointProber setOneLoggerEndpointProber;
     private final SetForLoggerGroupEndpointProber setForLoggerGroupEndpointProber;
     private final ClearForLoggerEndpointProber clearForLoggerEndpointProber;
     private final Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter;
@@ -86,8 +88,8 @@ public class LoggersApi {
     public LoggersApi(
             AllLoggersEndpointProber allLoggersEndpointProber,
             GroupLoggersEndpointProber groupLoggersEndpointProber,
+            EndpointInvoker endpointInvoker,
             OneLoggerEndpointProber oneLoggerEndpointProber,
-            SetOneLoggerEndpointProber setOneLoggerEndpointProber,
             SetForLoggerGroupEndpointProber setForLoggerGroupEndpointProber,
             ClearForLoggerEndpointProber clearForLoggerEndpointProber,
             Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter,
@@ -96,8 +98,8 @@ public class LoggersApi {
             JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
         this.allLoggersEndpointProber = allLoggersEndpointProber;
         this.groupLoggersEndpointProber = groupLoggersEndpointProber;
+        this.endpointInvoker = endpointInvoker;
         this.oneLoggerEndpointProber = oneLoggerEndpointProber;
-        this.setOneLoggerEndpointProber = setOneLoggerEndpointProber;
         this.setForLoggerGroupEndpointProber = setForLoggerGroupEndpointProber;
         this.clearForLoggerEndpointProber = clearForLoggerEndpointProber;
         this.loggersResponseConverter = loggersResponseConverter;
@@ -270,7 +272,7 @@ public class LoggersApi {
 
         HttpPayload payload = HttpPayload.json(
                 Map.of("logger.name", loggerName), jacksonMessageSerializationStrategy.serialize(request));
-        setOneLoggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
+        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_ONE_LOGGER, payload);
     }
 
     @Operation(
