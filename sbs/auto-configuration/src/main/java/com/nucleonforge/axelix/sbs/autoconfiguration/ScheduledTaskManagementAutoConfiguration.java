@@ -29,6 +29,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 
 import com.nucleonforge.axelix.sbs.spring.scheduled.AxelixScheduledTasksEndpoint;
@@ -45,6 +46,7 @@ import com.nucleonforge.axelix.sbs.spring.scheduled.TriggerBasedTaskRescheduler;
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  * @since 14.10.2025
  */
 @AutoConfiguration
@@ -60,8 +62,10 @@ public class ScheduledTaskManagementAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ScheduledTaskService scheduledTaskService(
-            ScheduledTasksRegistry scheduledTasksRegistry, List<TaskRescheduler> taskReschedulers) {
-        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers);
+            ScheduledTasksRegistry scheduledTasksRegistry,
+            List<TaskRescheduler> taskReschedulers,
+            ThreadPoolTaskExecutor taskExecutor) {
+        return new ScheduledTaskService(scheduledTasksRegistry, taskReschedulers, taskExecutor);
     }
 
     @Bean

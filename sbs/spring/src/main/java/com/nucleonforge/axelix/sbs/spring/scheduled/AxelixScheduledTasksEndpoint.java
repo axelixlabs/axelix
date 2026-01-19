@@ -26,6 +26,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskCronExpressionModifyRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskIntervalModifyRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskRunNowRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskToggleRequest;
 
 /**
  * Custom actuator endpoint that provides information about {@link Scheduled @Scheduled} tasks.
@@ -68,8 +72,20 @@ public class AxelixScheduledTasksEndpoint {
     }
 
     @PostMapping("/modify/cron-expression")
-    public ResponseEntity<Void> modifyCronExpression(@RequestBody ScheduledTaskMutationRequest request) {
-        taskService.modifyCronExpression(request.targetScheduledTask(), request.newValue());
+    public ResponseEntity<Void> modifyCronExpression(@RequestBody ScheduledTaskCronExpressionModifyRequest request) {
+        taskService.modifyCronExpression(request.targetScheduledTask(), request.cronExpression());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/modify/interval")
+    public ResponseEntity<Void> modifyInterval(@RequestBody ScheduledTaskIntervalModifyRequest request) {
+        taskService.modifyInterval(request.targetScheduledTask(), request.interval());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/run-now")
+    public ResponseEntity<Void> runNowTusk(@RequestBody ScheduledTaskRunNowRequest request) {
+        taskService.runNowTask(request.targetScheduledTask());
         return ResponseEntity.noContent().build();
     }
 }

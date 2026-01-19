@@ -169,9 +169,13 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint SCHEDULED_TASKS = of("/axelix-scheduled-tasks", HttpMethod.GET);
     public static final ActuatorEndpoint MODIFY_CRON_EXPRESSION_SCHEDULED_TASK =
             of("/axelix-scheduled-tasks/modify/cron-expression", HttpMethod.POST);
+    public static final ActuatorEndpoint MODIFY_INTERVAL_SCHEDULED_TASK =
+            of("/axelix-scheduled-tasks/modify/interval", HttpMethod.POST);
     public static final ActuatorEndpoint ENABLE_SCHEDULED_TASK = of("/axelix-scheduled-tasks/enable", HttpMethod.POST);
     public static final ActuatorEndpoint DISABLE_SCHEDULED_TASK =
             of("/axelix-scheduled-tasks/disable", HttpMethod.POST);
+    public static final ActuatorEndpoint RUN_NOW_SCHEDULED_TASK =
+            of("/axelix-scheduled-tasks/run-now", HttpMethod.POST);
 
     // Sessions
     public static final ActuatorEndpoint SESSION = of("/sessions", HttpMethod.GET);
@@ -243,8 +247,10 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 SINGLE_SBOM,
                 SCHEDULED_TASKS,
                 MODIFY_CRON_EXPRESSION_SCHEDULED_TASK,
+                MODIFY_INTERVAL_SCHEDULED_TASK,
                 ENABLE_SCHEDULED_TASK,
                 DISABLE_SCHEDULED_TASK,
+                RUN_NOW_SCHEDULED_TASK,
                 SESSION,
                 SINGLE_SESSION,
                 DELETE_SESSION,

@@ -15,15 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.sbs.spring.scheduled;
+package com.nucleonforge.axelix.common.api.request;
 
 /**
- * Represents a request to toggle (enable/disable) a scheduled task.
+ * Represents a request to modify the interval of a scheduled task.
  *
- * @param targetScheduledTask the identifier of the scheduled task to toggle. Must not be {@code null}.
+ * @param targetScheduledTask the identifier of the scheduled task to modify. Must not be {@code null}.
+ * @param interval            the new interval to be assigned.
  *
- * @since 14.10.2025
- * @author Nikita Kirillov
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public record ScheduledTaskToggleRequest(String targetScheduledTask) {}
+public record ScheduledTaskIntervalModifyRequest(String targetScheduledTask, String interval) {}

@@ -41,6 +41,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.test.context.TestPropertySource;
 
@@ -147,8 +148,10 @@ class AxelixScheduledTasksEndpointTest {
 
         @Bean
         public ScheduledTaskService scheduledTaskService(
-                ScheduledTasksRegistry registry, List<TaskRescheduler> taskReschedulers) {
-            return new ScheduledTaskService(registry, taskReschedulers);
+                ScheduledTasksRegistry registry,
+                List<TaskRescheduler> taskReschedulers,
+                ThreadPoolTaskExecutor taskExecutor) {
+            return new ScheduledTaskService(registry, taskReschedulers, taskExecutor);
         }
 
         @Bean

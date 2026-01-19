@@ -337,6 +337,18 @@ public final class ApiPaths {
          * Endpoint allows disabling a scheduled task.
          */
         public static final String DISABLE_TASK = "/{instanceId}/disable";
+        /**
+         * Endpoint allows modification of the cron expression for a scheduled task.
+         */
+        public static final String MODIFY_CRON_EXPRESSION = "/{instanceId}/modify/cron-expression";
+        /**
+         * Endpoint allows modification of the interval for a scheduled task.
+         */
+        public static final String MODIFY_INTERVAL = "/{instanceId}/modify/interval";
+        /**
+         * Endpoint allows forcing a scheduled task to run now.
+         */
+        public static final String RUN_NOW = "/{instanceId}/run-now";
     }
 
     public static final class DetailsApi {

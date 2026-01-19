@@ -27,18 +27,18 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
 
 /**
- * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#MODIFY_CRON_EXPRESSION_SCHEDULED_TASK} endpoint.
+ * {@link DiscardingAbstractEndpointProber} that specifically works with {@link ActuatorEndpoints#RUN_NOW_SCHEDULED_TASK} endpoint.
  *
  * @author Sergey Cherkasov
  */
 @Service
-public class MutateScheduledTaskEndpointProber extends DiscardingAbstractEndpointProber {
-    public MutateScheduledTaskEndpointProber(InstanceRegistry instanceRegistry) {
+public class RunNowScheduledTaskEndpointProber extends DiscardingAbstractEndpointProber {
+    public RunNowScheduledTaskEndpointProber(InstanceRegistry instanceRegistry) {
         super(instanceRegistry);
     }
 
     @Override
     public @NonNull ActuatorEndpoint supports() {
-        return ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK;
+        return ActuatorEndpoints.RUN_NOW_SCHEDULED_TASK;
     }
 }

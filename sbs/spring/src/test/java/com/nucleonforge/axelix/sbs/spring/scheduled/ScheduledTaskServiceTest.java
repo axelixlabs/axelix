@@ -37,6 +37,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 
@@ -53,14 +55,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class)
 class ScheduledTaskServiceTest {
 
+    // Cron
     private static final String CRON_TASK_ID =
             ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName() + ".testCronTask";
-    private static final String CRON_TASK_ID_FOR_MUTATION =
-            ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName() + ".testCronTaskForMutation";
+    private static final String CRON_TASK_ID_FOR_MODIFY =
+            ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName() + ".testCronTaskForModify";
+
+    // FixedDelay
     private static final String FIXED_DELAY_TASK_ID =
             ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName() + ".testFixedDelayTask";
+    private static final String FIXED_DELAY_TASK_ID_FOR_MODIFY =
+            ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName()
+                    + ".testFixedDelayTaskForModify";
+
+    // FixedRate
     private static final String FIXED_RATE_TASK_ID =
             ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName() + ".testFixedRateTask";
+    private static final String FIXED_RATE_TASK_ID_FOR_MODIFY =
+            ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName()
+                    + ".testFixedRateTaskForModify";
+    private static final String FIXED_RATE_TASK_ID_FOR_RUN_NOW =
+            ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName()
+                    + ".testFixedRateTaskForRunNow";
+
+    // Custom
     private static final String CUSTOM_TASK_ID =
             ScheduledTaskServiceTest.ScheduledTaskServiceTestConfiguration.class.getName() + ".testCustomTask";
 
@@ -75,6 +93,8 @@ class ScheduledTaskServiceTest {
     private static volatile boolean fixedDelayFlag = false;
 
     private static volatile boolean fixedRateFlag = false;
+
+    private static volatile boolean fixedRateFlagForRunNow = false;
 
     private static volatile boolean customTaskFlag = false;
 
@@ -204,13 +224,44 @@ class ScheduledTaskServiceTest {
     }
 
     @Test
-    void shouldModifyCronExpressionCronExpression_testCronTask() {
+    void shouldModifyCronExpression_testCronTask() {
         String newCronExpression = "*/5 * * * * *";
 
-        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MUTATION, newCronExpression);
+        taskService.modifyCronExpression(CRON_TASK_ID_FOR_MODIFY, newCronExpression);
 
-        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MUTATION).orElseThrow();
+        ManagedScheduledTask task = taskRegistry.find(CRON_TASK_ID_FOR_MODIFY).orElseThrow();
         assertThat(((CronTrigger) task.getTrigger()).getExpression()).isEqualTo(newCronExpression);
+    }
+
+    @Test
+    void shouldModifyInterval_testFixedDelay() {
+        String newInterval = "555555";
+
+        taskService.modifyInterval(FIXED_DELAY_TASK_ID_FOR_MODIFY, newInterval);
+
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_DELAY_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(((IntervalTask) task.getTask()).getInterval()).isEqualTo(Long.parseLong(newInterval));
+    }
+
+    @Test
+    void shouldModifyInterval_testFixedRate() {
+        String newInterval = "777777";
+
+        taskService.modifyInterval(FIXED_RATE_TASK_ID_FOR_MODIFY, newInterval);
+
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_RATE_TASK_ID_FOR_MODIFY).orElseThrow();
+        assertThat(((IntervalTask) task.getTask()).getInterval()).isEqualTo(Long.parseLong(newInterval));
+    }
+
+    @Test
+    void shouldRunNowTask_testFixedRate() {
+        taskService.runNowTask(FIXED_RATE_TASK_ID_FOR_RUN_NOW);
+
+        ManagedScheduledTask task =
+                taskRegistry.find(FIXED_RATE_TASK_ID_FOR_RUN_NOW).orElseThrow();
+        assertThat(fixedRateFlagForRunNow).isTrue();
     }
 
     @TestConfiguration
@@ -239,28 +290,45 @@ class ScheduledTaskServiceTest {
 
         @Bean
         public ScheduledTaskService scheduledTaskService(
-                ScheduledTasksRegistry registry, List<TaskRescheduler> taskReschedulers) {
-            return new ScheduledTaskService(registry, taskReschedulers);
+                ScheduledTasksRegistry registry,
+                List<TaskRescheduler> taskReschedulers,
+                ThreadPoolTaskExecutor taskExecutor) {
+            return new ScheduledTaskService(registry, taskReschedulers, taskExecutor);
         }
 
+        // Cron
         @Scheduled(cron = "*/1 * * * * *")
         public void testCronTask() {
             cronFlag = true;
         }
 
-        @Scheduled(cron = "*/1 * * * * *")
-        public void testCronTaskForMutation() {}
+        @Scheduled(cron = "*/2 * * * * *")
+        public void testCronTaskForModify() {}
 
+        // FixedDelay
         @Scheduled(fixedDelay = 100)
         public void testFixedDelayTask() {
             fixedDelayFlag = true;
         }
 
+        @Scheduled(fixedDelay = 200)
+        public void testFixedDelayTaskForModify() {}
+
+        // FixedRate
         @Scheduled(fixedRate = 100, initialDelay = 50)
         public void testFixedRateTask() {
             fixedRateFlag = true;
         }
 
+        @Scheduled(fixedRate = 200)
+        public void testFixedRateTaskForModify() {}
+
+        @Scheduled(fixedRate = 2000000000)
+        public void testFixedRateTaskForRunNow() {
+            fixedRateFlagForRunNow = true;
+        }
+
+        // Custom
         @Override
         public void configureTasks(ScheduledTaskRegistrar registrar) {
             registrar.addTriggerTask(new CustomTestTask(), new CustomTestTrigger());
