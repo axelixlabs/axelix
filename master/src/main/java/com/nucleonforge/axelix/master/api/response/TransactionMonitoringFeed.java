@@ -23,4 +23,7 @@ import java.util.List;
  * @since 20.01.2026
  * @author Nikita Kirillov
  */
-public record TransactionMonitoringFeed(String className, String methodName, List<Long> durationsMs) {}
+public record TransactionMonitoringFeed(String className, String methodName, List<TransactionExecution> executions) {
+
+    public record TransactionExecution(long durationsMs, String timestamp) {}
+}

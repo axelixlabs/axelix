@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.master.api.response.TransactionMonitoringFeed;
+import com.nucleonforge.axelix.master.api.response.TransactionMonitoringFeed.TransactionExecution;
 
 /**
  * The API for Transaction Monitoring.
@@ -42,14 +43,49 @@ public class TransactionMonitoringApi {
                 new TransactionMonitoringFeed(
                         "PropagationTestHelper",
                         "testNestedRequiresNew",
-                        List.of(125L, 110L, 98L, 135L, 115L, 125L, 110L, 98L, 135L, 115L, 125L, 110L, 98L, 135L, 115L)),
+                        List.of(
+                                new TransactionExecution(125L, "1737374615"),
+                                new TransactionExecution(110L, "1737374625"),
+                                new TransactionExecution(98L, "1737374635"),
+                                new TransactionExecution(135L, "1737374645"),
+                                new TransactionExecution(115L, "1737374655"),
+                                new TransactionExecution(125L, "1737374665"),
+                                new TransactionExecution(110L, "1737374675"),
+                                new TransactionExecution(98L, "1737374685"),
+                                new TransactionExecution(135L, "1737374695"),
+                                new TransactionExecution(115L, "1737374705"),
+                                new TransactionExecution(125L, "1737374715"),
+                                new TransactionExecution(110L, "1737374725"),
+                                new TransactionExecution(98L, "1737374735"),
+                                new TransactionExecution(135L, "1737374745"),
+                                new TransactionExecution(115L, "1737374755"))),
                 new TransactionMonitoringFeed(
                         "PropagationTestService",
                         "testRequired",
-                        List.of(25L, 11L, 288L, 13L, 15L, 25L, 11L, 288L, 13L, 15L)),
+                        List.of(
+                                new TransactionExecution(25L, "1737374765"),
+                                new TransactionExecution(11L, "1737374775"),
+                                new TransactionExecution(288L, "1737374785"),
+                                new TransactionExecution(13L, "1737374795"),
+                                new TransactionExecution(15L, "1737374805"),
+                                new TransactionExecution(25L, "1737374815"),
+                                new TransactionExecution(11L, "1737374825"),
+                                new TransactionExecution(288L, "1737374835"),
+                                new TransactionExecution(13L, "1737374845"),
+                                new TransactionExecution(15L, "1737374855"))),
                 new TransactionMonitoringFeed(
                         "PropagationTestService",
                         "testSupports",
-                        List.of(225L, 280L, 198L, 235L, 275L, 225L, 280L, 198L, 235L, 275L)));
+                        List.of(
+                                new TransactionExecution(225L, "1737374865"),
+                                new TransactionExecution(280L, "1737374875"),
+                                new TransactionExecution(198L, "1737374885"),
+                                new TransactionExecution(235L, "1737374895"),
+                                new TransactionExecution(275L, "1737374905"),
+                                new TransactionExecution(225L, "1737374915"),
+                                new TransactionExecution(280L, "1737374925"),
+                                new TransactionExecution(198L, "1737374935"),
+                                new TransactionExecution(235L, "1737374945"),
+                                new TransactionExecution(275L, "1737374955"))));
     }
 }
