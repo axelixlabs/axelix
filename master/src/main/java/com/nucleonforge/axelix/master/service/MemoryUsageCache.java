@@ -60,4 +60,9 @@ public interface MemoryUsageCache {
      *         {@link MemoryUsageCache} does not have any heap usages recorded yet.
      */
     double getTotalHeapSize();
+
+    /**
+     * Clears all cached heap usage data. The cache will be empty after this call returns.
+     */
+    void clear();
 }

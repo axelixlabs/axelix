@@ -71,6 +71,8 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
 
     @Override
     public @NonNull Set<@NonNull Instance> discover() {
+        memoryUsageCache.clear();
+
         List<String> serviceIds = discoveryClient.getServices();
 
         if (CollectionUtils.isEmpty(serviceIds)) {
