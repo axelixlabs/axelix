@@ -21,7 +21,7 @@ import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader } from "components";
 import { buildSelectedTagParams, createMeasurementsWithTimestamp, fetchData } from "helpers";
-import { type IMetric, type ISingleMetricResponseBody, StatefulRequest } from "models";
+import { type IMeasurementsWithTimestamp, type IMetric, type ISingleMetricResponseBody, StatefulRequest } from "models";
 import { getSingleMetricData } from "services";
 import { METRIC_SHORT_POLLING_INTERVAL_MS, METRIC_SLIDING_WINDOW_MS } from "utils";
 
@@ -41,18 +41,18 @@ export const MetricBody = ({ metric }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
-    const [singleMetricData, setSingleMetricData] = useState(StatefulRequest.loading<ISingleMetricResponseBody>());
+    const [latestMetricData, setLatestMetricData] = useState(StatefulRequest.loading<ISingleMetricResponseBody>());
     const [selectedTags, setSelectedTags] = useState<Record<string, string>>({});
-    const [measurementsHistory, setMeasurementsHistory] = useState<ISingleMetricResponseBody["measurements"]>([]);
+    const [measurementsHistory, setMeasurementsHistory] = useState<IMeasurementsWithTimestamp[]>([]);
     const [startTime, setStartTime] = useState<number>(Date.now());
 
     useEffect(() => {
         setMeasurementsHistory([]);
         setStartTime(Date.now());
-        setSingleMetricData(StatefulRequest.loading<ISingleMetricResponseBody>());
+        setLatestMetricData(StatefulRequest.loading<ISingleMetricResponseBody>());
 
         const fetchMetricData = () => {
-            fetchData(setSingleMetricData, () =>
+            fetchData(setLatestMetricData, () =>
                 getSingleMetricData({
                     instanceId: instanceId!,
                     metric: metric.metricName,
@@ -77,32 +77,32 @@ export const MetricBody = ({ metric }: IProps) => {
     }, [selectedTags]);
 
     useEffect(() => {
-        if (!singleMetricData.response) {
+        if (!latestMetricData.response) {
             return;
         }
 
-        const measurements = singleMetricData.response.measurements;
+        const measurements = latestMetricData.response.measurements;
         const measurementsWithTime = createMeasurementsWithTimestamp(measurements);
 
         setMeasurementsHistory((prev) => prev.concat(measurementsWithTime));
-    }, [singleMetricData.response]);
+    }, [latestMetricData.response]);
 
-    if (singleMetricData.loading) {
+    if (latestMetricData.loading) {
         return <Loader />;
     }
 
-    if (singleMetricData.error) {
+    if (latestMetricData.error) {
         return <EmptyHandler isEmpty />;
     }
 
-    const singleMetricFeed = singleMetricData.response!;
-    const measurementsLastValue = measurementsHistory.at(-1)?.value;
+    const singleMetricFeed = latestMetricData.response!;
+    const measurementLastValue = measurementsHistory.at(-1)?.value;
 
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.MetricDataWrapper}>
                 <div>{t("Metrics.value")}:</div>
-                <div>{measurementsLastValue}</div>
+                <div>{measurementLastValue}</div>
 
                 {singleMetricFeed.baseUnit && (
                     <>
@@ -113,7 +113,7 @@ export const MetricBody = ({ metric }: IProps) => {
 
                 <ValidTagCombinations
                     selectedTags={selectedTags}
-                    singleMetricFeed={singleMetricFeed}
+                    validTagCombinations={singleMetricFeed.validTagCombinations}
                     setSelectedTags={setSelectedTags}
                 />
             </div>
@@ -122,5 +122,3 @@ export const MetricBody = ({ metric }: IProps) => {
         </div>
     );
 };
-
-export default MetricBody;

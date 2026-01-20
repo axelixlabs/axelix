@@ -23,7 +23,7 @@ import type {
     ITagValueOptionValue,
     IValidTagCombination,
 } from "models";
-import { METRIC_SLIDING_WINDOW_MS, SHOW_RAW_THRESHOLD } from "utils";
+import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
 
@@ -180,17 +180,14 @@ export const buildSelectedTagParams = (selectedTags: Record<string, string>): st
     return Object.entries(selectedTags).map(([key, value]) => `${key}:${value}`);
 };
 
-export const createMetricTagSelectOptions = (values: ITagValueOptionValue[]) => {
-    return values.map(({ value, invalid }) => ({
-        value: value,
-        disabled: invalid,
-    }));
-};
+/**
+ * @param timestamp the unix timestamp (time im millisecond from epoch)
+ */
+export const formatXAxis = (timestamp: number): string => {
+    const date = new Date(timestamp);
 
-export const formatXAxis = (tickItem: number): string => {
-    const date = new Date(tickItem);
-
-    return date.toLocaleTimeString("ru-RU", {
+    // use default locale by passing undefied
+    return date.toLocaleTimeString(undefined, {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
@@ -198,17 +195,17 @@ export const formatXAxis = (tickItem: number): string => {
 };
 
 export const getMetricsChartTicks = (startTime: number, endTime: number): number[] => {
+    const window = endTime - startTime;
+
+    /* eslint-disable */
     return [
         startTime,
-        startTime + METRIC_SLIDING_WINDOW_MS * 0.25,
-        startTime + METRIC_SLIDING_WINDOW_MS * 0.5,
-        startTime + METRIC_SLIDING_WINDOW_MS * 0.75,
+        startTime + window * 0.25,
+        startTime + window * 0.5,
+        startTime + window * 0.75,
         endTime,
     ];
-};
-
-export const metricChartTooltipLabelFormatter = (label: number): string => {
-    return new Date(label).toLocaleTimeString("ru-RU");
+    /* eslint-enable */
 };
 
 export const createMeasurementsWithTimestamp = (measurements: IMeasurement[]): IMeasurementsWithTimestamp[] => {
