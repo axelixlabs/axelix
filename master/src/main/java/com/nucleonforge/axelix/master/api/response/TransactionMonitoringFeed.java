@@ -20,10 +20,7 @@ package com.nucleonforge.axelix.master.api.response;
 import java.util.List;
 
 /**
- * @param methodSignature
- * @param durationsMs
- *
  * @since 20.01.2026
  * @author Nikita Kirillov
  */
-public record TransactionMonitoringFeed(String methodSignature, List<Long> durationsMs) {}
+public record TransactionMonitoringFeed(String className, String methodName, List<Long> durationsMs) {}
