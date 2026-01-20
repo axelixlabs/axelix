@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "axelix.sbs.auth.jwt.algorithm",
+      "type": "com.nucleonforge.axelix.common.auth.core.JwtAlgorithm",
+      "description": "HMAC-SHA algorithm for token decoding and verification."
+    },
+    {
+      "name": "axelix.sbs.auth.jwt.signing-key",
+      "type": "java.lang.String",
+      "description": "The key used for signing the token."
+    }
+  ]
+}
