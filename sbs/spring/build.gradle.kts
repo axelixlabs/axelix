@@ -1,9 +1,6 @@
-
-
 plugins {
     id("sbs")
 }
-
 
 dependencies {
     // Self
