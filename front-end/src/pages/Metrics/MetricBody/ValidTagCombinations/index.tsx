@@ -22,7 +22,7 @@ import { useTranslation } from "react-i18next";
 
 import { InfoTooltip } from "components";
 import { getMetricTagValuesWithStatus } from "helpers";
-import type { ISingleMetricResponseBody, ITagValueOptionValue, IValidTagCombination } from "models";
+import type { ITagValueOptionValue, IValidTagCombination } from "models";
 
 import styles from "./styles.module.css";
 
@@ -30,10 +30,10 @@ interface IProps {
     /**
      * Single metric data
      */
-    singleMetricFeed: ISingleMetricResponseBody;
+    validTagCombinations: IValidTagCombination[];
 
     /**
-     * Currently selected tags
+     * Currently selected tags. Property key - selected tag name, property value - selected value.
      */
     selectedTags: Record<string, string>;
 
@@ -43,10 +43,9 @@ interface IProps {
     setSelectedTags: Dispatch<SetStateAction<Record<string, string>>>;
 }
 
-export const ValidTagCombinations = ({ singleMetricFeed, selectedTags, setSelectedTags }: IProps) => {
+export const ValidTagCombinations = ({ validTagCombinations, selectedTags, setSelectedTags }: IProps) => {
     const { t } = useTranslation();
 
-    const validTagCombinations: IValidTagCombination[] = singleMetricFeed.validTagCombinations;
     const tagValuesWithStatus = getMetricTagValuesWithStatus(validTagCombinations, selectedTags);
 
     const handleSelectChange = (tagName: string, selectedValue?: string): void => {

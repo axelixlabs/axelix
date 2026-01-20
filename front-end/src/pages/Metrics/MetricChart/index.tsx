@@ -17,8 +17,8 @@
  */
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { formatXAxis, getMetricsChartTicks, metricChartTooltipLabelFormatter, reduceDisplayedNumber } from "helpers";
-import type { IMeasurement } from "models";
+import { formatXAxis, getMetricsChartTicks, reduceDisplayedNumber } from "helpers";
+import type { IMeasurementsWithTimestamp } from "models";
 import { METRIC_SLIDING_WINDOW_MS } from "utils";
 
 import styles from "./styles.module.css";
@@ -27,10 +27,10 @@ interface IProps {
     /**
      * Measurements for the metric
      */
-    measurements: IMeasurement[];
+    measurements: IMeasurementsWithTimestamp[];
 
     /**
-     * Start of the chart time window
+     * Start of the chart time window (in milliseconds from epoch)
      */
     startTime: number;
 }
@@ -51,7 +51,7 @@ export const MetricChart = ({ measurements, startTime }: IProps) => {
                     ticks={getMetricsChartTicks(startTime, endTime)}
                 />
                 <YAxis tickFormatter={reduceDisplayedNumber} type="number" domain={["auto", "auto"]} />
-                <Tooltip labelFormatter={metricChartTooltipLabelFormatter} />
+                <Tooltip labelFormatter={(value) => new Date(value).toLocaleTimeString()} />
                 <Line
                     type="monotone"
                     dataKey="value"
