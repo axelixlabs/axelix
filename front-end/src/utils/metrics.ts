@@ -16,3 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 export const SHOW_RAW_THRESHOLD = 100_000;
+
+export const METRIC_SLIDING_WINDOW_MS = 3 * 60 * 1000; // 3 min
+
+export const METRIC_SHORT_POLLING_INTERVAL_MS = 1000;

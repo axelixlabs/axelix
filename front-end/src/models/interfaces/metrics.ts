@@ -131,3 +131,7 @@ export interface ITagValueOption {
      */
     values: ITagValueOptionValue[];
 }
+
+export interface IMeasurementsWithTimestamp extends IMeasurement {
+    timestamp: number;
+}
