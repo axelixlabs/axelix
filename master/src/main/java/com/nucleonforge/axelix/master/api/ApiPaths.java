@@ -351,6 +351,13 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/{instanceId}";
     }
 
+    public static final class TransactionMonitoringApi {
+
+        public static final String MAIN = "/transaction-monitoring";
+
+        public static final String INSTANCE_ID = "/mock-data";
+    }
+
     public static final class ThreadDumpApi {
 
         /**
