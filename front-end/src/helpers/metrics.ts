@@ -15,8 +15,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IMetricsGroup, ITagValueOption, ITagValueOptionValue, IValidTagCombination } from "models";
-import { SHOW_RAW_THRESHOLD } from "utils";
+import type {
+    IMeasurement,
+    IMeasurementsWithTimestamp,
+    IMetricsGroup,
+    ITagValueOption,
+    ITagValueOptionValue,
+    IValidTagCombination,
+} from "models";
+import { METRIC_SLIDING_WINDOW_MS, SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
 
@@ -177,5 +184,36 @@ export const createMetricTagSelectOptions = (values: ITagValueOptionValue[]) => 
     return values.map(({ value, invalid }) => ({
         value: value,
         disabled: invalid,
+    }));
+};
+
+export const formatXAxis = (tickItem: number): string => {
+    const date = new Date(tickItem);
+
+    return date.toLocaleTimeString("ru-RU", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
+};
+
+export const getMetricsChartTicks = (startTime: number, endTime: number): number[] => {
+    return [
+        startTime,
+        startTime + METRIC_SLIDING_WINDOW_MS * 0.25,
+        startTime + METRIC_SLIDING_WINDOW_MS * 0.5,
+        startTime + METRIC_SLIDING_WINDOW_MS * 0.75,
+        endTime,
+    ];
+};
+
+export const metricChartTooltipLabelFormatter = (label: number): string => {
+    return new Date(label).toLocaleTimeString("ru-RU");
+};
+
+export const createMeasurementsWithTimestamp = (measurements: IMeasurement[]): IMeasurementsWithTimestamp[] => {
+    return measurements.map(({ value }) => ({
+        value: value,
+        timestamp: Date.now(),
     }));
 };
