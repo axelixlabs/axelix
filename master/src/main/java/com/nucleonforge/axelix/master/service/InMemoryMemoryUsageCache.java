@@ -54,6 +54,11 @@ public class InMemoryMemoryUsageCache implements MemoryUsageCache {
     }
 
     @Override
+    public void clear(InstanceId instanceId) {
+        this.cache.remove(instanceId);
+    }
+
+    @Override
     public void clear() {
         cache.clear();
     }

@@ -29,6 +29,7 @@ import com.nucleonforge.axelix.master.exception.InstanceAlreadyRegisteredExcepti
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
+import com.nucleonforge.axelix.master.service.MemoryUsageCache;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -43,11 +44,15 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
     private final InstancesDiscoverer instancesDiscoverer;
     private final InstanceRegistry instanceRegistry;
+    private final MemoryUsageCache memoryUsageCache;
 
     public ShortPollingInstanceDiscoveryScheduler(
-            InstancesDiscoverer instancesDiscoverer, InstanceRegistry instanceRegistry) {
+            InstancesDiscoverer instancesDiscoverer,
+            InstanceRegistry instanceRegistry,
+            MemoryUsageCache memoryUsageCache) {
         this.instancesDiscoverer = instancesDiscoverer;
         this.instanceRegistry = instanceRegistry;
+        this.memoryUsageCache = memoryUsageCache;
     }
 
     @Scheduled(
@@ -85,9 +90,12 @@ public class ShortPollingInstanceDiscoveryScheduler {
                     instanceRegistry.register(instance);
                     logger.debug("Registered new instance: {}", instance.id());
                 } catch (InstanceAlreadyRegisteredException e) {
-                    logger.debug("Instance already registered: {}", instance.id());
+                    logger.warn(
+                            "The Instance '{}' expected to be new, but found in registry. That is not expected and should be reported to maintainers",
+                            instance.id());
                 }
             }
+            memoryUsageCache.putHeapSize(instance.id(), instance.memoryUsage().heap());
         }
     }
 
@@ -96,6 +104,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
             if (!discoveredIds.contains(existingId)) {
                 try {
                     instanceRegistry.deRegister(existingId);
+                    memoryUsageCache.clear(existingId);
                     logger.debug("Deregistered instance: {}", existingId);
                 } catch (InstanceNotFoundException e) {
                     logger.debug("Instance not found during deregistration: {}", existingId);

@@ -36,7 +36,6 @@ import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.model.instance.Instance;
-import com.nucleonforge.axelix.master.service.MemoryUsageCache;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
@@ -54,25 +53,20 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     private final DiscoveryClient discoveryClient;
     private final ManagedServiceMetadataEndpointProber managedServiceProber;
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
-    private final MemoryUsageCache memoryUsageCache;
 
     public AbstractInstancesDiscoverer(
             Logger logger,
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
-            AxelixVersionDiscoverer axelixVersionDiscoverer,
-            MemoryUsageCache memoryUsageCache) {
+            AxelixVersionDiscoverer axelixVersionDiscoverer) {
         this.discoveryClient = discoveryClient;
         this.managedServiceProber = managedServiceMetadataEndpointProber;
         this.logger = logger;
-        this.memoryUsageCache = memoryUsageCache;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
     }
 
     @Override
     public @NonNull Set<@NonNull Instance> discover() {
-        memoryUsageCache.clear();
-
         List<String> serviceIds = discoveryClient.getServices();
 
         if (CollectionUtils.isEmpty(serviceIds)) {
@@ -136,9 +130,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
 
     private @Nullable Instance toDomainInstanceSafe(InstanceIntermediateProfile intermediateProfile) {
         try {
-            Instance domainInstance = toDomainInstance(intermediateProfile);
-            recordMemoryUsage(intermediateProfile, domainInstance);
-            return domainInstance;
+            return toDomainInstance(intermediateProfile);
         } catch (IllegalArgumentException e) {
             logger.warn(
                     "Unable to convert the discovered service : {} to its internal representation to make it manageable. Skipping registration",
@@ -146,11 +138,6 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
                     e);
             return null;
         }
-    }
-
-    private void recordMemoryUsage(InstanceIntermediateProfile intermediateProfile, Instance domainInstance) {
-        long heapSize = intermediateProfile.metadata.memoryDetails().heap();
-        memoryUsageCache.putHeapSize(domainInstance.id(), heapSize);
     }
 
     /**
