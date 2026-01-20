@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { reduceDisplayedNumber } from "helpers";
-import type { IMeasurement } from "models";
+import { formatXAxis, getMetricsChartTicks, reduceDisplayedNumber } from "helpers";
+import type { IMeasurementsWithTimestamp } from "models";
+import { METRIC_SLIDING_WINDOW_MS } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -26,27 +27,40 @@ interface IProps {
     /**
      * Measurements for the metric
      */
-    measurements: IMeasurement[];
+    measurements: IMeasurementsWithTimestamp[];
+
+    /**
+     * Start of the chart time window (in milliseconds from epoch)
+     */
+    startTime: number;
 }
 
-export default function MetricChart({ measurements }: IProps) {
-    const data = measurements.map((measurement) => ({
-        statistic: "value",
-        value: measurement.value,
-    }));
+export const MetricChart = ({ measurements, startTime }: IProps) => {
+    const endTime = startTime + METRIC_SLIDING_WINDOW_MS;
 
     return (
-        <div className={styles.MainWrapper}>
-            <ResponsiveContainer>
-                <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="statistic" />
-                    <YAxis tickFormatter={reduceDisplayedNumber} />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="value" stroke="#00ab55" dot />
-                </LineChart>
-            </ResponsiveContainer>
-        </div>
+        <ResponsiveContainer className={styles.MainWrapper}>
+            <LineChart data={measurements} margin={{ top: 10, right: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                    dataKey="timestamp"
+                    type="number"
+                    scale="time"
+                    domain={[startTime, endTime]}
+                    tickFormatter={formatXAxis}
+                    ticks={getMetricsChartTicks(startTime, endTime)}
+                />
+                <YAxis tickFormatter={reduceDisplayedNumber} type="number" domain={["auto", "auto"]} />
+                <Tooltip labelFormatter={(value) => new Date(value).toLocaleTimeString()} />
+                <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#00ab55"
+                    strokeWidth={3}
+                    activeDot={{ r: 5 }}
+                    isAnimationActive={false}
+                />
+            </LineChart>
+        </ResponsiveContainer>
     );
-}
+};

@@ -15,25 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Select } from "antd";
-import type { DefaultOptionType } from "antd/es/select";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { EmptyHandler, InfoTooltip, Loader } from "components";
-import { buildSelectedTagParams, fetchData, getMetricTagValuesWithStatus } from "helpers";
-import {
-    type IMetric,
-    type ISingleMetricResponseBody,
-    type ITagValueOptionValue,
-    type IValidTagCombination,
-    StatefulRequest,
-} from "models";
+import { EmptyHandler, Loader } from "components";
+import { buildSelectedTagParams, createMeasurementsWithTimestamp, fetchData } from "helpers";
+import { type IMeasurementsWithTimestamp, type IMetric, type ISingleMetricResponseBody, StatefulRequest } from "models";
 import { getSingleMetricData } from "services";
+import { METRIC_SHORT_POLLING_INTERVAL_MS, METRIC_SLIDING_WINDOW_MS } from "utils";
 
-import MetricChart from "../MetricChart";
+import { MetricChart } from "../MetricChart";
 
+import { ValidTagCombinations } from "./ValidTagCombinations";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -47,68 +41,68 @@ export const MetricBody = ({ metric }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 
-    const [singleMetricData, setSingleMetricData] = useState(StatefulRequest.loading<ISingleMetricResponseBody>());
+    const [latestMetricData, setLatestMetricData] = useState(StatefulRequest.loading<ISingleMetricResponseBody>());
     const [selectedTags, setSelectedTags] = useState<Record<string, string>>({});
+    const [measurementsHistory, setMeasurementsHistory] = useState<IMeasurementsWithTimestamp[]>([]);
+    const [startTime, setStartTime] = useState<number>(Date.now());
 
     useEffect(() => {
-        setSingleMetricData(StatefulRequest.loading<ISingleMetricResponseBody>());
+        setMeasurementsHistory([]);
+        setStartTime(Date.now());
+        setLatestMetricData(StatefulRequest.loading<ISingleMetricResponseBody>());
 
-        fetchData(setSingleMetricData, () =>
-            getSingleMetricData({
-                instanceId: instanceId!,
-                metric: metric.metricName,
-                tags: buildSelectedTagParams(selectedTags),
-            }),
-        );
+        const fetchMetricData = () => {
+            fetchData(setLatestMetricData, () =>
+                getSingleMetricData({
+                    instanceId: instanceId!,
+                    metric: metric.metricName,
+                    tags: buildSelectedTagParams(selectedTags),
+                }),
+            );
+        };
+
+        fetchMetricData();
+
+        const id = setInterval(() => {
+            setMeasurementsHistory([]);
+            setStartTime(Date.now());
+        }, METRIC_SLIDING_WINDOW_MS);
+
+        const intervalId = setInterval(fetchMetricData, METRIC_SHORT_POLLING_INTERVAL_MS);
+
+        return () => {
+            clearInterval(id);
+            clearInterval(intervalId);
+        };
     }, [selectedTags]);
 
-    if (singleMetricData.loading) {
+    useEffect(() => {
+        if (!latestMetricData.response) {
+            return;
+        }
+
+        const measurements = latestMetricData.response.measurements;
+        const measurementsWithTime = createMeasurementsWithTimestamp(measurements);
+
+        setMeasurementsHistory((prev) => prev.concat(measurementsWithTime));
+    }, [latestMetricData.response]);
+
+    if (latestMetricData.loading) {
         return <Loader />;
     }
 
-    if (singleMetricData.error) {
+    if (latestMetricData.error) {
         return <EmptyHandler isEmpty />;
     }
 
-    const singleMetricFeed = singleMetricData.response!;
-    const singleMetricFeedMeasurements = singleMetricFeed.measurements;
-    const validTagCombinations: IValidTagCombination[] = singleMetricFeed.validTagCombinations;
-
-    const tagValuesWithStatus = getMetricTagValuesWithStatus(validTagCombinations, selectedTags);
-
-    const handleSelectChange = (tagName: string, selectedValue?: string) => {
-        setSelectedTags((prev) => {
-            const updatedTags: Record<string, string> = { ...prev };
-
-            if (selectedValue) {
-                updatedTags[tagName] = selectedValue;
-            } else {
-                delete updatedTags[tagName];
-            }
-
-            return updatedTags;
-        });
-    };
-
-    const createMetricTagSelectOptions = (values: ITagValueOptionValue[]): DefaultOptionType[] => {
-        return values.map(({ value, invalid }) => ({
-            label: invalid ? (
-                <InfoTooltip text={t("Metrics.disabledTag")}>
-                    <div>{value}</div>
-                </InfoTooltip>
-            ) : (
-                value
-            ),
-            value: value,
-            disabled: invalid,
-        }));
-    };
+    const singleMetricFeed = latestMetricData.response!;
+    const measurementLastValue = measurementsHistory.at(-1)?.value;
 
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.MetricDataWrapper}>
                 <div>{t("Metrics.value")}:</div>
-                <div>{singleMetricFeedMeasurements.at(-1)?.value}</div>
+                <div>{measurementLastValue}</div>
 
                 {singleMetricFeed.baseUnit && (
                     <>
@@ -117,36 +111,14 @@ export const MetricBody = ({ metric }: IProps) => {
                     </>
                 )}
 
-                {validTagCombinations.length > 0 && (
-                    <>
-                        <div>{t("Metrics.tags")}:</div>
-                        <div className={styles.TagsWrapper}>
-                            {tagValuesWithStatus.map(({ tag, values }) => (
-                                <Fragment key={tag}>
-                                    <div>{tag}:</div>
-                                    <Select
-                                        value={selectedTags[tag] || undefined}
-                                        onChange={(it) => handleSelectChange(tag, it)}
-                                        placeholder={t("Metrics.selectValue")}
-                                        options={createMetricTagSelectOptions(values)}
-                                        allowClear
-                                        className={styles.TagSelect}
-                                        classNames={{
-                                            popup: {
-                                                root: styles.SelectPopupRoot,
-                                            },
-                                        }}
-                                    />
-                                </Fragment>
-                            ))}
-                        </div>
-                    </>
-                )}
+                <ValidTagCombinations
+                    selectedTags={selectedTags}
+                    validTagCombinations={singleMetricFeed.validTagCombinations}
+                    setSelectedTags={setSelectedTags}
+                />
             </div>
 
-            <MetricChart measurements={singleMetricFeedMeasurements} />
+            <MetricChart measurements={measurementsHistory} startTime={startTime} />
         </div>
     );
 };
-
-export default MetricBody;

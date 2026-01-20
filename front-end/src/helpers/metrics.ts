@@ -15,7 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IMetricsGroup, ITagValueOption, ITagValueOptionValue, IValidTagCombination } from "models";
+import type {
+    IMeasurement,
+    IMeasurementsWithTimestamp,
+    IMetricsGroup,
+    ITagValueOption,
+    ITagValueOptionValue,
+    IValidTagCombination,
+} from "models";
 import { SHOW_RAW_THRESHOLD } from "utils";
 
 import { commonNormalize } from "./globals";
@@ -173,9 +180,37 @@ export const buildSelectedTagParams = (selectedTags: Record<string, string>): st
     return Object.entries(selectedTags).map(([key, value]) => `${key}:${value}`);
 };
 
-export const createMetricTagSelectOptions = (values: ITagValueOptionValue[]) => {
-    return values.map(({ value, invalid }) => ({
+/**
+ * @param timestamp the unix timestamp (time im millisecond from epoch)
+ */
+export const formatXAxis = (timestamp: number): string => {
+    const date = new Date(timestamp);
+
+    // use default locale by passing undefied
+    return date.toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
+};
+
+export const getMetricsChartTicks = (startTime: number, endTime: number): number[] => {
+    const window = endTime - startTime;
+
+    /* eslint-disable */
+    return [
+        startTime,
+        startTime + window * 0.25,
+        startTime + window * 0.5,
+        startTime + window * 0.75,
+        endTime,
+    ];
+    /* eslint-enable */
+};
+
+export const createMeasurementsWithTimestamp = (measurements: IMeasurement[]): IMeasurementsWithTimestamp[] => {
+    return measurements.map(({ value }) => ({
         value: value,
-        disabled: invalid,
+        timestamp: Date.now(),
     }));
 };
