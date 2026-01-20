@@ -10,9 +10,6 @@ dependencies {
 //    api(project(":sbs:postgres"))
     api(project(":sbs:spring"))
 
-    // processor
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${Dependencies.springBootVersion}")
-
     // Compile
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")
     compileOnly("org.springframework.boot:spring-boot-starter-web")
@@ -23,8 +20,4 @@ dependencies {
 
 axelix {
     properties.put("version", rootProject.version.toString())
-}
-
-tasks.named("compileJava") {
-    inputs.files(tasks.named("processResources"))
 }
