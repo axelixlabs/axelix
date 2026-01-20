@@ -40,13 +40,16 @@ public class TransactionMonitoringApi {
     public List<TransactionMonitoringFeed> getTransactionFeed() {
         return Arrays.asList(
                 new TransactionMonitoringFeed(
-                        "propagationTestHelper.PropagationTestHelper.testNestedRequiresNew",
+                        "PropagationTestHelper",
+                        "testNestedRequiresNew",
                         List.of(125L, 110L, 98L, 135L, 115L, 125L, 110L, 98L, 135L, 115L, 125L, 110L, 98L, 135L, 115L)),
                 new TransactionMonitoringFeed(
-                        "propagationTestService.PropagationTestService.testRequired",
+                        "PropagationTestService",
+                        "testRequired",
                         List.of(25L, 11L, 288L, 13L, 15L, 25L, 11L, 288L, 13L, 15L)),
                 new TransactionMonitoringFeed(
-                        "propagationTestService.PropagationTestService.testSupports",
+                        "PropagationTestService",
+                        "testSupports",
                         List.of(225L, 280L, 198L, 235L, 275L, 225L, 280L, 198L, 235L, 275L)));
     }
 }
