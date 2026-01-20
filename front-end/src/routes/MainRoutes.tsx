@@ -57,6 +57,7 @@ export const MainRoutes = () => {
                 <Route path="/instance/:instanceId/conditions" element={<Conditions />} />
                 <Route path="/instance/:instanceId/thread-dump" element={<ThreadDump />} />
                 <Route path="/instance/:instanceId/garbage-collector" element={<GarbageCollector />} />
+                <Route path="/instance/:instanceId/transactional" element={<>Transactional placeholder</>} />
             </Route>
         </Routes>
     );

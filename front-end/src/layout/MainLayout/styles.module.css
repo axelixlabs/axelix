@@ -5,9 +5,11 @@
 .Sider {
     position: fixed;
     top: var(--axelix-header-height);
-    height: 100vh;
+    height: calc(100vh - var(--axelix-header-height));
     background-color: var(--axelix-primary-white);
     z-index: 10;
+    overflow-y: auto;
+    scrollbar-width: thin;
 }
 
 .HideSider {

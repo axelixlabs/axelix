@@ -29,6 +29,7 @@ import MetricsIcon from "assets/icons/metrics.svg?react";
 import ScheduledTasksIcon from "assets/icons/scheduledTasks.svg?react";
 import SpringIcon from "assets/icons/spring.svg?react";
 import ThreadDumpIcon from "assets/icons/threadDump.svg?react";
+import TransactionIcon from "assets/icons/transaction.svg?react";
 import type { TFunction } from "i18next";
 
 import type { MenuItem } from "models";
@@ -68,9 +69,9 @@ export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
                 },
                 { key: `/instance/${instanceId}/conditions`, icon: <ConditionsIcon />, label: t("Sider.conditions") },
                 { key: `/instance/${instanceId}/caches`, icon: <CachesIcon />, label: t("Sider.caches") },
+                { key: `/instance/${instanceId}/transactional`, icon: <TransactionIcon />, label: "@Transactional" },
             ],
         },
-
         {
             key: "JVM",
             icon: <JvmIcon />,
