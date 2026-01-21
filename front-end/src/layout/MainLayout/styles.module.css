@@ -12,7 +12,7 @@
 
 .SiderScrollContainer {
     height: calc(100% + 20px); 
-    margin-top: -10px; 
+    margin-top: -10px;
     overflow-y: auto;
     scrollbar-width: thin;
     padding-block: 10px; 

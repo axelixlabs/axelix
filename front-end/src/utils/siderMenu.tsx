@@ -69,7 +69,11 @@ export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
                 },
                 { key: `/instance/${instanceId}/conditions`, icon: <ConditionsIcon />, label: t("Sider.conditions") },
                 { key: `/instance/${instanceId}/caches`, icon: <CachesIcon />, label: t("Sider.caches") },
-                { key: `/instance/${instanceId}/transactional`, icon: <TransactionIcon />, label: "@Transactional" },
+                {
+                    key: `/instance/${instanceId}/transactional`,
+                    icon: <TransactionIcon />,
+                    label: t("Sider.transactionControl"),
+                },
             ],
         },
         {
