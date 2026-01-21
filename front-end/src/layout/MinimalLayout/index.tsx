@@ -16,9 +16,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Outlet } from "react-router-dom";
+import LogoIcon from "src/assets/icons/logo.svg?react";
 
 import { LanguageSwitcher } from "components";
-import LogoIcon from "src/assets/icons/logo.png";
 
 import styles from "./styles.module.css";
 
@@ -28,7 +28,7 @@ export const MinimalLayout = () => {
             <div className={styles.Header}>
                 <div className="MainContainer">
                     <div className={styles.LanguageSwitcherWrapper}>
-                        <img src={LogoIcon} alt="Axelix logo" className={styles.Logo} />
+                        <LogoIcon className={styles.Logo} />
                         <LanguageSwitcher />
                     </div>
                 </div>

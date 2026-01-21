@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import LogoIcon from "assets/icons/logo.svg?react";
 import { useNavigate } from "react-router-dom";
 
 import { LanguageSwitcher } from "components";
@@ -24,14 +25,12 @@ import { NavigationBar } from "./NavigationBar";
 import { ProfileMenu } from "./ProfileMenu";
 import styles from "./styles.module.css";
 
-import LogoIcon from "assets/icons/logo.png";
-
 export const AdminHeader = () => {
     const navigate = useNavigate();
 
     return (
         <div className={styles.Header}>
-            <img src={LogoIcon} alt="Axelix logo" onClick={() => navigate("/wallboard")} className={styles.Logo} />
+            <LogoIcon onClick={() => navigate("/wallboard")} className={styles.Logo} />
             <div className={styles.LinksAndAvatarWrapper}>
                 <NavigationBar />
                 <Help />
