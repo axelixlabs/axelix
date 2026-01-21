@@ -37,7 +37,9 @@ export const MainLayout = ({ hideSider }: IProps) => {
             <AdminHeader />
 
             <Sider width={270} className={`${styles.Sider} ${hideSider ? styles.HideSider : ""}`}>
-                <SiderMenu />
+                <div className={styles.SiderScrollContainer}>
+                    <SiderMenu />
+                </div>
             </Sider>
 
             <Layout className={styles.ContentLayout}>
