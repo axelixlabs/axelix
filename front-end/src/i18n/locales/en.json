@@ -92,6 +92,7 @@
         "loggers": "Loggers",
         "mappings": "Mappings",
         "caches": "Caches",
+        "transactionControl" : "Transaction Control",
         "threadDump": "Thread Dump",
         "garbageCollector": "Garbage Collector"
     },
