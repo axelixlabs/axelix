@@ -1,0 +1,24 @@
+.MainWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 20px;
+}
+
+.LabelWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    font-weight: 300;
+    margin-bottom: 8px;
+    word-break: break-all;
+}
+
+.Label {
+    flex-shrink: 0;
+}
+
+.TagsWrapper {
+    display: flex;
+    column-gap: 8px;
+}

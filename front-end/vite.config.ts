@@ -54,6 +54,18 @@ export default defineConfig({
                     brotliSize: true,
                 }),
             ],
+            output: {
+                /* TODO: Vite/Rollup detected a circular dependency inside Recharts (modules re-exporting each other)
+                   If Recharts modules end up in different chunks, the build can brea
+                   So we forced all Recharts code into one chunk
+                   This is a temporary fix 
+                */
+                manualChunks(id) {
+                    if (id.includes("node_modules/recharts")) {
+                        return "recharts";
+                    }
+                },
+            },
         },
     },
     resolve: {

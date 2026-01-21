@@ -9,9 +9,3 @@
     column-gap: 8px;
     margin-top: 8px;
 }
-
-.NativeTag {
-    border: 1px solid var(--axelix-primary-green);
-    background-color: var(--axelix-primary-light-green);
-    color: var(--axelix-primary-green);
-}

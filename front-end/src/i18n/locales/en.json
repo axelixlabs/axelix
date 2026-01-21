@@ -248,14 +248,19 @@
         "triggered": "The garbage collector was triggered"
     },
     "Wallboard": {
-        "filter": {
-            "save": "Save",
-            "addFilter": "Add filter",
-            "field": "Field",
-            "comparison": "Comparison",
-            "equal": "Equal",
-            "lessThanOrEqual": "Less than or equal",
-            "greaterThanOrEqual": "Greater than or equal"
-        }
+      "filter": {
+        "save": "Save",
+        "addFilter": "Add filter",
+        "field": "Field",
+        "comparison": "Comparison",
+        "equal": "Equal",
+        "lessThanOrEqual": "Less than or equal",
+        "greaterThanOrEqual": "Greater than or equal"
+      }
+    },
+    "Transactional": {
+        "maxTime": "Max time",
+        "averageTime": "Average time",
+        "medianTime": "Median time"
     }
 }

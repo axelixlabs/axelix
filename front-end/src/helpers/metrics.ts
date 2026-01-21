@@ -186,6 +186,7 @@ export const buildSelectedTagParams = (selectedTags: Record<string, string>): st
 export const formatXAxis = (timestamp: number): string => {
     const date = new Date(timestamp);
 
+    // TODO: Consider the option of correct time display
     // use default locale by passing undefied
     return date.toLocaleTimeString(undefined, {
         hour: "2-digit",

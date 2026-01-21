@@ -15,18 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./scheduledTasks";
-export * from "./transactional";
-export * from "./configProps";
-export * from "./environment";
-export * from "./conditions";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./wallboard";
-export * from "./dashboard";
-export * from "./metrics";
-export * from "./globals";
-export * from "./details";
-export * from "./loggers";
-export * from "./caches";
-export * from "./beans";
+import apiFetch from "api/apiFetch";
+
+export const getTransactionalData = () => {
+    // TODO: Replace this with the real path
+    return apiFetch.get(`transaction-monitoring/mock-data`);
+};

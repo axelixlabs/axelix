@@ -39,6 +39,7 @@ export const GlobalSlidingTimeLine = () => {
         <div className={styles.MainWrapper}>
             {timeSlots.map((timeSlot, index) => (
                 <div className={styles.TimeSlot} key={index}>
+                    {/* TODO: Consider the option of correct time display */}
                     {timeSlot.toLocaleTimeString([], { hour12: false })}
                 </div>
             ))}

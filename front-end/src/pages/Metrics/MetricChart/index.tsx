@@ -51,6 +51,8 @@ export const MetricChart = ({ measurements, startTime }: IProps) => {
                     ticks={getMetricsChartTicks(startTime, endTime)}
                 />
                 <YAxis tickFormatter={reduceDisplayedNumber} type="number" domain={["auto", "auto"]} />
+
+                {/* TODO: Consider the option of correct time display */}
                 <Tooltip labelFormatter={(value) => new Date(value).toLocaleTimeString()} />
                 <Line
                     type="monotone"

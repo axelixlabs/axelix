@@ -15,18 +15,31 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./scheduledTasks";
-export * from "./transactional";
-export * from "./configProps";
-export * from "./environment";
-export * from "./conditions";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./wallboard";
-export * from "./dashboard";
-export * from "./metrics";
-export * from "./globals";
-export * from "./details";
-export * from "./loggers";
-export * from "./caches";
-export * from "./beans";
+interface ITransactionalExecution {
+    /**
+     * Execution duration in miliseconds
+     */
+    durationsMs: number;
+
+    /**
+     * Execution timestamp
+     */
+    timestamp: string;
+}
+
+export interface ITransactionalResponseData {
+    /**
+     * Transactional class name
+     */
+    className: string;
+
+    /**
+     * Transactional method name
+     */
+    methodName: string;
+
+    /**
+     * Transactional executions list
+     */
+    executions: ITransactionalExecution[];
+}

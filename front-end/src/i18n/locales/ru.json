@@ -93,7 +93,7 @@
         "mappings": "Сопоставления",
         "caches": "Кэши",
         "threadDump": "Дамп потоков",
-        "transactionControl" : "Transaction Control",
+        "transactionControl" : "Мониторинг транзакций",
         "garbageCollector": "Сборщик Мусора"
     },
     "Caches": {
@@ -247,14 +247,19 @@
         "triggered": "Сборщик мусора был вызван"
     },
     "Wallboard": {
-        "filter": {
-            "save": "Сохранить",
-            "addFilter": "Добавить фильтр",
-            "field": "Поле",
-            "comparison": "Сравнение",
-            "equal": "Равно",
-            "lessThanOrEqual": "Меньше или равно",
-            "greaterThanOrEqual": "Больше или равно"
-        }
+      "filter": {
+        "save": "Сохранить",
+        "addFilter": "Добавить фильтр",
+        "field": "Поле",
+        "comparison": "Сравнение",
+        "equal": "Равно",
+        "lessThanOrEqual": "Меньше или равно",
+        "greaterThanOrEqual": "Больше или равно"
+      }
+    },
+    "Transactional": {
+        "maxTime": "Макс. время",
+        "averageTime": "Среднее время",
+        "medianTime": "Медианное время"
     }
 }

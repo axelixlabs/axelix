@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 export * from "./scheduledTasks";
+export * from "./transactional";
 export * from "./environment";
 export * from "./configProps";
 export * from "./threadDump";
