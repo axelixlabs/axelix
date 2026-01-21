@@ -27,7 +27,7 @@ import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for the {@link ActuatorEndpoints#SINGLE_METRIC} API.
+ * {@link JacksonMessageDeserializationStrategy} for the {@link ActuatorEndpoints#GET_SINGLE_METRIC} API.
  *
  * @author Mikhail Polivakha
  */

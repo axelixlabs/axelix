@@ -23,7 +23,7 @@ import com.nucleonforge.axelix.common.api.transform.BaseUnitValueTransformer;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 
 /**
- * The base unit that is reported by {@link ActuatorEndpoints#SINGLE_METRIC} which we
+ * The base unit that is reported by {@link ActuatorEndpoints#GET_SINGLE_METRIC} which we
  * know and care about. By "care" I mean that we can apply certain transformations for the
  * values that are reported by this base unit.
  * <p>
