@@ -34,7 +34,6 @@ import org.springframework.context.annotation.Bean;
 import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import com.nucleonforge.axelix.master.service.MemoryUsageCache;
 import com.nucleonforge.axelix.master.service.discovery.InstancesDiscoverer;
-import com.nucleonforge.axelix.master.service.discovery.InstancesRegistrar;
 import com.nucleonforge.axelix.master.service.discovery.KubernetesDiscoveryClient;
 import com.nucleonforge.axelix.master.service.discovery.KubernetesInstanceDiscoverer;
 import com.nucleonforge.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
@@ -49,12 +48,6 @@ import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEn
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "auto", havingValue = "true")
 public class DiscoveryAutoConfiguration {
-
-    @Bean
-    public InstancesRegistrar instancesRegistrar(
-            InstancesDiscoverer instancesDiscoverer, InstanceRegistry instanceRegistry) {
-        return new InstancesRegistrar(instancesDiscoverer, instanceRegistry);
-    }
 
     @Bean
     public ShortPollingInstanceDiscoveryScheduler shortPollingInstanceDiscoveryScheduler(

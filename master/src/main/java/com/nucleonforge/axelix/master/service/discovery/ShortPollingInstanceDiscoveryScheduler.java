@@ -37,6 +37,8 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
  *
  * @since 29.10.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public class ShortPollingInstanceDiscoveryScheduler {
 
@@ -55,22 +57,27 @@ public class ShortPollingInstanceDiscoveryScheduler {
         this.memoryUsageCache = memoryUsageCache;
     }
 
-    @Scheduled(
-            fixedDelayString = "${axelix.master.discovery.polling.fixed-delay:60000}",
-            initialDelayString = "${axelix.master.discovery.polling.initial-delay:30000}")
+    @Scheduled(fixedDelayString = "${axelix.master.discovery.polling.fixed-delay:60000}")
     public void performDiscovery() {
-        logger.debug("Starting instance discovery refresh cycle");
 
-        Set<Instance> discoveredInstances = instancesDiscoverer.discover();
+        Set<Instance> discoveredInstances = instancesDiscoverer.discoverSafely();
+
+        if (discoveredInstances.isEmpty()) {
+            logger.error(
+                    """
+                Despite the auto-discovery was enabled, the {} did not found any result.
+                That is almost certainly not the intended behavior. Please, revisit your configuration.
+                """,
+                    this.getClass().getSimpleName());
+        }
+
         Set<InstanceId> currentlyRegisteredIds = getCurrentlyRegisteredIds();
         Set<InstanceId> discoveredIds = getDiscoveredIds(discoveredInstances);
 
         registerNewInstances(discoveredInstances, currentlyRegisteredIds);
         deregisterMissingInstances(currentlyRegisteredIds, discoveredIds);
 
-        logger.debug(
-                "Instance discovery refresh completed. Registered instances: {}",
-                instanceRegistry.getAll().size());
+        logger.debug("Registered instances: {}", instanceRegistry.getAll().size());
     }
 
     private Set<InstanceId> getCurrentlyRegisteredIds() {
@@ -91,7 +98,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
                     logger.debug("Registered new instance: {}", instance.id());
                 } catch (InstanceAlreadyRegisteredException e) {
                     logger.warn(
-                            "The Instance '{}' expected to be new, but found in registry. That is not expected and should be reported to maintainers",
+                            "The Instance '{}' expected to be new, but found in registry. That is not expected and should be reported to maintainers.",
                             instance.id());
                 }
             }
