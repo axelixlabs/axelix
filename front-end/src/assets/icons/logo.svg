@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 28.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 204.06 49" style="enable-background:new 0 0 204.06 49;" xml:space="preserve">
+	 viewBox="0 0 184.92 49" style="enable-background:new 0 0 184.92 49;" xml:space="preserve">
 <style type="text/css">
 	.st0{fill:#06AB54;}
 	.st1{font-family:'GolosText-Medium';}
-	.st2{font-size:36px;}
-	.st3{fill:#838383;}
-	.st4{font-size:10px;}
-	.st5{fill:#06AB54;stroke:#FFFFFF;stroke-miterlimit:10;}
-	.st6{fill:none;stroke:#FFFFFF;stroke-width:1.4;stroke-miterlimit:10;}
-	.st7{fill:#0AAB52;stroke:#FFFFFF;stroke-miterlimit:10;}
+	.st2{font-size:42px;}
+	.st3{fill:#06AB54;stroke:#FFFFFF;stroke-miterlimit:10;}
+	.st4{fill:none;stroke:#FFFFFF;stroke-width:1.4;stroke-miterlimit:10;}
+	.st5{fill:#0AAB52;stroke:#FFFFFF;stroke-miterlimit:10;}
 </style>
 <g id="Layer_1">
 </g>
 <g id="Layer_2">
-	<text transform="matrix(0.9966 0 0 1 56.3689 33.1066)"><tspan x="0" y="0" class="st0 st1 st2">A</tspan><tspan x="24.48" y="0" class="st1 st2">xelix</tspan></text>
-	<text transform="matrix(0.9966 0 0 1 56.0702 43.638)" class="st3 st1 st4">Empowering Spring Ecosystem</text>
-	<ellipse class="st5" cx="24.42" cy="24.5" rx="23.92" ry="24"/>
-	<path class="st6" d="M12.73,3.56c7.91,3.17,21.03,10.25,29.48,26.07c1.19,2.23,2.2,4.46,3.05,6.65"/>
-	<path class="st6" d="M40.95,41.84c-9.16-2.78-24.32-8.97-34.1-22.82c-1.38-1.95-2.54-3.9-3.53-5.82"/>
-	<path class="st6" d="M42.03,8.26c-2.82,8.31-9.37,22.19-25.15,31.75c-2.22,1.35-4.46,2.5-6.66,3.5"/>
-	<path class="st6" d="M5.82,39.59c2.39-8.54,8.13-22.84,22.78-32.98c2.06-1.43,4.14-2.66,6.2-3.73"/>
-	<ellipse class="st7" cx="24.42" cy="10.16" rx="1.99" ry="2"/>
-	<ellipse class="st7" cx="12.2" cy="24.71" rx="1.99" ry="2"/>
-	<ellipse class="st7" cx="24.42" cy="34.29" rx="1.99" ry="2"/>
+	<text transform="matrix(0.9966 0 0 1 60.3983 38.7292)"><tspan x="0" y="0" class="st0 st1 st2">A</tspan><tspan x="28.56" y="0" class="st1 st2">xelix</tspan></text>
+	<ellipse class="st3" cx="24.42" cy="24.5" rx="23.92" ry="24"/>
+	<path class="st4" d="M12.73,3.56c7.91,3.17,21.03,10.25,29.48,26.07c1.19,2.23,2.2,4.46,3.05,6.65"/>
+	<path class="st4" d="M40.95,41.84c-9.16-2.78-24.32-8.97-34.1-22.82c-1.38-1.95-2.54-3.9-3.53-5.82"/>
+	<path class="st4" d="M42.03,8.26c-2.82,8.31-9.37,22.19-25.15,31.75c-2.22,1.35-4.46,2.5-6.66,3.5"/>
+	<path class="st4" d="M5.82,39.59c2.39-8.54,8.13-22.84,22.78-32.98c2.06-1.43,4.14-2.66,6.2-3.73"/>
+	<ellipse class="st5" cx="24.42" cy="10.16" rx="1.99" ry="2"/>
+	<ellipse class="st5" cx="12.2" cy="24.71" rx="1.99" ry="2"/>
+	<ellipse class="st5" cx="24.42" cy="34.29" rx="1.99" ry="2"/>
 </g>
 </svg>
