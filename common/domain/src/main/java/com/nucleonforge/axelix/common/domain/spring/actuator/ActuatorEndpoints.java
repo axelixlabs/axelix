@@ -59,7 +59,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // spotless:off
 
     // Beans
-    public static final ActuatorEndpoint BEANS = of("/axelix-beans", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_BEANS = of("/axelix-beans", HttpMethod.GET);
 
     // Caches
     public static final ActuatorEndpoint CLEAR_SINGLE_CACHE =
@@ -108,7 +108,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint INFO = of("/info", HttpMethod.GET);
 
     // Details
-    public static final ActuatorEndpoint DETAILS = of("/axelix-details", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_DETAILS = of("/axelix-details", HttpMethod.GET);
 
     // Integration Graph (Spring Integrations project)
     public static final ActuatorEndpoint INTEGRATIONS_GRAPH = of("/integrationgraph", HttpMethod.GET);
@@ -205,7 +205,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     private ActuatorEndpoints() {
         this.endpoints = new HashSet<>(List.of(
-                BEANS,
+                GET_BEANS,
                 GET_ALL_CACHES,
                 GET_SINGLE_CACHE,
                 CLEAR_ALL_CACHES,
@@ -226,7 +226,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 HEAP_DUMP,
                 HTTP_EXCHANGES,
                 INFO,
-                DETAILS,
+                GET_DETAILS,
                 INTEGRATIONS_GRAPH,
                 REBUILD_INTEGRATIONS_GRAPH,
                 LIQUIBASE,

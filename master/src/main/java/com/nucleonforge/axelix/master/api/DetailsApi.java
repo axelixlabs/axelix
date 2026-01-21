@@ -33,13 +33,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.common.api.InstanceDetails;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.InstanceDetailsResponse;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.convert.response.details.DetailsConversionRequest;
-import com.nucleonforge.axelix.master.service.transport.DetailsEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing details.
@@ -53,13 +54,12 @@ import com.nucleonforge.axelix.master.service.transport.DetailsEndpointProber;
 @RequestMapping(path = ApiPaths.DetailsApi.MAIN)
 public class DetailsApi {
 
-    private final DetailsEndpointProber detailsEndpointProber;
+    private final EndpointInvoker endpointInvoker;
     private final Converter<DetailsConversionRequest, InstanceDetailsResponse> converter;
 
     public DetailsApi(
-            DetailsEndpointProber detailsEndpointProber,
-            Converter<DetailsConversionRequest, InstanceDetailsResponse> converter) {
-        this.detailsEndpointProber = detailsEndpointProber;
+            EndpointInvoker endpointInvoker, Converter<DetailsConversionRequest, InstanceDetailsResponse> converter) {
+        this.endpointInvoker = endpointInvoker;
         this.converter = converter;
     }
 
@@ -94,7 +94,8 @@ public class DetailsApi {
             throws InstanceNotFoundException {
 
         InstanceId id = InstanceId.of(instanceId);
-        InstanceDetails instanceDetails = detailsEndpointProber.invoke(id, NoHttpPayload.INSTANCE);
+        InstanceDetails instanceDetails =
+                endpointInvoker.invoke(id, ActuatorEndpoints.GET_DETAILS, NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(converter.convert(new DetailsConversionRequest(instanceDetails, id)));
     }
 }

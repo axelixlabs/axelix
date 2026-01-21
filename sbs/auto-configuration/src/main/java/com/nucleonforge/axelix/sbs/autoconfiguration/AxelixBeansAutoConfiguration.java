@@ -35,7 +35,7 @@ import com.nucleonforge.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
 import com.nucleonforge.axelix.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
 
 /**
- * Auto-configuration class for {@link ActuatorEndpoints#BEANS} endpoint.
+ * Auto-configuration class for {@link ActuatorEndpoints#GET_BEANS} endpoint.
  *
  * @since 07.07.2025
  * @author Nikita Kirillov
