@@ -29,6 +29,8 @@ import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axelix.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axelix.common.api.loggers.ServiceLoggers;
+import com.nucleonforge.axelix.common.api.metrics.MetricProfile;
+import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.serde.BeansJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
@@ -38,6 +40,8 @@ import com.nucleonforge.axelix.master.service.serde.caches.SingleCacheJacksonMes
 import com.nucleonforge.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.loggers.LoggerLevelsJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.loggers.ServiceLoggersJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.metrics.MetricsGroupsJacksonDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.metrics.SingleMetricJacksonDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DefaultEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
@@ -171,6 +175,21 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public DiscardingAbstractEndpointProber disableThreadDumpEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.THREAD_DUMP_DISABLE_CONTENTION_MONITORING);
+            instanceRegistry, ActuatorEndpoints.THREAD_DUMP_DISABLE_CONTENTION_MONITORING);
+    }
+
+    // Metrics
+    @Bean
+    public DefaultEndpointProber<MetricsGroupsFeed> getMetricGroupsEndpointProver(
+            MetricsGroupsJacksonDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_METRIC_GROUPS);
+    }
+
+    @Bean
+    public DefaultEndpointProber<MetricProfile> getSingleMetricEndpointProver(
+            SingleMetricJacksonDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_METRIC);
     }
 }
