@@ -19,22 +19,22 @@ package com.nucleonforge.axelix.sbs.autoconfiguration;
 
 import io.jsonwebtoken.JwtParser;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axelix.common.auth.DefaultJwtDecoderService;
 import com.nucleonforge.axelix.common.auth.JwtDecoderService;
-import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
 import com.nucleonforge.axelix.sbs.spring.auth.AuthorityResolver;
 import com.nucleonforge.axelix.sbs.spring.auth.Authorizer;
 import com.nucleonforge.axelix.sbs.spring.auth.DefaultAuthorityResolver;
 import com.nucleonforge.axelix.sbs.spring.auth.DefaultAuthorizer;
 import com.nucleonforge.axelix.sbs.spring.auth.JwtAuthorizationFilter;
+import com.nucleonforge.axelix.sbs.spring.config.AuthConfigurationProperties;
 
 /**
  * {@link AutoConfiguration} for JWT-based authentication support.
@@ -55,14 +55,15 @@ import com.nucleonforge.axelix.sbs.spring.auth.JwtAuthorizationFilter;
 @AutoConfiguration
 @ConditionalOnProperty(name = "axelix.sbs.auth.jwt")
 @ConditionalOnClass({JwtDecoderService.class, JwtParser.class})
+@EnableConfigurationProperties(AuthConfigurationProperties.class)
 public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public JwtDecoderService jwtDecoderService(
-            final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-            final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
-        return new DefaultJwtDecoderService(algorithm, signingKey);
+    public JwtDecoderService jwtDecoderService(AuthConfigurationProperties configurationProperties) {
+        return new DefaultJwtDecoderService(
+                configurationProperties.getJwt().getAlgorithm(),
+                configurationProperties.getJwt().getSigningKey());
     }
 
     @Bean

@@ -18,6 +18,8 @@ dependencies {
     compileOnly("org.springframework.kafka:spring-kafka")
     compileOnly("com.github.ben-manes.caffeine:caffeine")
 
+    // processor
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${Dependencies.springBootVersion}")
 
     // Test
     testImplementation("org.junit.jupiter:junit-jupiter")
