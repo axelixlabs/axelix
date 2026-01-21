@@ -93,6 +93,7 @@
         "mappings": "Сопоставления",
         "caches": "Кэши",
         "threadDump": "Дамп потоков",
+        "transactionControl" : "Transaction Control",
         "garbageCollector": "Сборщик Мусора"
     },
     "Caches": {

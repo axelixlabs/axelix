@@ -30,7 +30,7 @@ import {
 import { UNKNOWN_ERROR } from "utils";
 
 export const findOpenKeys = (items: MenuItem[]): string[] => {
-    const parent = items.filter((item) => item && "children" in item);
+    const parent = items.filter((item) => item && "children" in item).filter((value) => value?.key !== "JVM");
     return parent ? [...parent.map((it) => it!.key as string)] : [];
 };
 
