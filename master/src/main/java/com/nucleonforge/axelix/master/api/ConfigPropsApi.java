@@ -34,11 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.ConfigPropsFeedResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axelix.master.service.transport.ConfigPropsEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing configprops.
@@ -54,13 +55,13 @@ import com.nucleonforge.axelix.master.service.transport.ConfigPropsEndpointProbe
 @RequestMapping(path = ApiPaths.ConfigPropsApi.MAIN)
 public class ConfigPropsApi {
 
-    private final ConfigPropsEndpointProber configpropsEndpointProber;
+    private final EndpointInvoker endpointInvoker;
     private final Converter<ConfigPropsFeed, ConfigPropsFeedResponse> configpropsFeedConverter;
 
     public ConfigPropsApi(
-            ConfigPropsEndpointProber configpropsEndpointProber,
+            EndpointInvoker endpointInvoker,
             Converter<ConfigPropsFeed, ConfigPropsFeedResponse> configpropsFeedConverter) {
-        this.configpropsEndpointProber = configpropsEndpointProber;
+        this.endpointInvoker = endpointInvoker;
         this.configpropsFeedConverter = configpropsFeedConverter;
     }
 
@@ -98,7 +99,8 @@ public class ConfigPropsApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.ConfigPropsApi.FEED)
     public ConfigPropsFeedResponse getConfigpropsFeed(@PathVariable("instanceId") String instanceId) {
-        ConfigPropsFeed result = configpropsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        ConfigPropsFeed result = endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(configpropsFeedConverter.convert(result));
     }
 }

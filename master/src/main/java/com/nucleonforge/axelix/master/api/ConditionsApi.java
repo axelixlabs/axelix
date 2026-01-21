@@ -34,11 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.common.api.ConditionsFeed;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.ConditionsFeedResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axelix.master.service.transport.ConditionsEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing conditions.
@@ -54,13 +55,11 @@ import com.nucleonforge.axelix.master.service.transport.ConditionsEndpointProber
 @RequestMapping(path = ApiPaths.ConditionsApi.MAIN)
 public class ConditionsApi {
 
-    private final ConditionsEndpointProber conditionsEndpointProber;
+    private final EndpointInvoker endpointInvoker;
     private final Converter<ConditionsFeed, ConditionsFeedResponse> converter;
 
-    public ConditionsApi(
-            ConditionsEndpointProber conditionsEndpointProber,
-            Converter<ConditionsFeed, ConditionsFeedResponse> converter) {
-        this.conditionsEndpointProber = conditionsEndpointProber;
+    public ConditionsApi(EndpointInvoker endpointInvoker, Converter<ConditionsFeed, ConditionsFeedResponse> converter) {
+        this.endpointInvoker = endpointInvoker;
         this.converter = converter;
     }
 
@@ -98,7 +97,8 @@ public class ConditionsApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.ConditionsApi.FEED)
     public ConditionsFeedResponse getConditionsFeed(@PathVariable("instanceId") String instanceId) {
-        ConditionsFeed result = conditionsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        ConditionsFeed result = endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_CONDITIONS, NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(converter.convert(result));
     }
 }
