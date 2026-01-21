@@ -125,7 +125,7 @@ class KubernetesInstanceDiscovererTest {
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
 
         subject = new KubernetesInstanceDiscoverer(
-                discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer, memoryUsageCache);
+                discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
     }
 
     @AfterEach

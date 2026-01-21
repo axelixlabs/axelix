@@ -54,6 +54,11 @@ public class InMemoryMemoryUsageCache implements MemoryUsageCache {
     }
 
     @Override
+    public void clear(InstanceId instanceId) {
+        this.cache.remove(instanceId);
+    }
+
+    @Override
     public double getAverageHeapSize() {
         return cache.values().stream()
                 .mapToDouble(Double::doubleValue)

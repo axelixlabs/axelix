@@ -30,6 +30,7 @@ import com.nucleonforge.axelix.common.domain.ClassPath;
 import com.nucleonforge.axelix.common.domain.ClassPathEntry;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
+import com.nucleonforge.axelix.master.model.instance.MemoryUsage;
 
 /**
  * Utility factory for creating test objects used in unit and integration tests.
@@ -93,6 +94,7 @@ public final class TestObjectFactory {
                 "df027cf",
                 Instant.now(),
                 status,
+                new MemoryUsage(1000L),
                 url);
     }
 

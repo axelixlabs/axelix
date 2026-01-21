@@ -33,7 +33,7 @@ import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
-import com.nucleonforge.axelix.master.service.MemoryUsageCache;
+import com.nucleonforge.axelix.master.model.instance.MemoryUsage;
 import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
 /**
@@ -55,9 +55,8 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     public KubernetesInstanceDiscoverer(
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
-            AxelixVersionDiscoverer axelixVersionDiscoverer,
-            MemoryUsageCache memoryUsageCache) {
-        super(log, discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer, memoryUsageCache);
+            AxelixVersionDiscoverer axelixVersionDiscoverer) {
+        super(log, discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
     }
 
     @Override
@@ -80,6 +79,7 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
                     profile.metadata().commitShortSha(),
                     deployedAt,
                     mapStatus(profile),
+                    new MemoryUsage(profile.metadata().memoryDetails().heap()),
                     serviceInstance.getUri().toString() + "/actuator");
         } else {
             throw new IllegalArgumentException(buildErrorMessage(serviceInstance));

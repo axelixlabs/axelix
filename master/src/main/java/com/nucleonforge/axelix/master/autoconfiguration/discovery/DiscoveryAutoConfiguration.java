@@ -34,7 +34,6 @@ import org.springframework.context.annotation.Bean;
 import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import com.nucleonforge.axelix.master.service.MemoryUsageCache;
 import com.nucleonforge.axelix.master.service.discovery.InstancesDiscoverer;
-import com.nucleonforge.axelix.master.service.discovery.InstancesRegistrar;
 import com.nucleonforge.axelix.master.service.discovery.KubernetesDiscoveryClient;
 import com.nucleonforge.axelix.master.service.discovery.KubernetesInstanceDiscoverer;
 import com.nucleonforge.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
@@ -51,15 +50,11 @@ import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEn
 public class DiscoveryAutoConfiguration {
 
     @Bean
-    public InstancesRegistrar instancesRegistrar(
-            InstancesDiscoverer instancesDiscoverer, InstanceRegistry instanceRegistry) {
-        return new InstancesRegistrar(instancesDiscoverer, instanceRegistry);
-    }
-
-    @Bean
     public ShortPollingInstanceDiscoveryScheduler shortPollingInstanceDiscoveryScheduler(
-            InstancesDiscoverer instancesDiscoverer, InstanceRegistry instanceRegistry) {
-        return new ShortPollingInstanceDiscoveryScheduler(instancesDiscoverer, instanceRegistry);
+            InstancesDiscoverer instancesDiscoverer,
+            InstanceRegistry instanceRegistry,
+            MemoryUsageCache memoryUsageCache) {
+        return new ShortPollingInstanceDiscoveryScheduler(instancesDiscoverer, instanceRegistry, memoryUsageCache);
     }
 
     @AutoConfiguration
@@ -95,10 +90,9 @@ public class DiscoveryAutoConfiguration {
         public KubernetesInstanceDiscoverer kubernetesInstanceDiscoverer(
                 DiscoveryClient discoveryClient,
                 ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
-                AxelixVersionDiscoverer axelixVersionDiscoverer,
-                MemoryUsageCache memoryUsageCache) {
+                AxelixVersionDiscoverer axelixVersionDiscoverer) {
             return new KubernetesInstanceDiscoverer(
-                    discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer, memoryUsageCache);
+                    discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
         }
     }
 }

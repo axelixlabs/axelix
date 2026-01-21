@@ -50,6 +50,13 @@ public interface MemoryUsageCache {
     void putHeapSize(InstanceId instanceId, double heap);
 
     /**
+     * Clear recording for of heap usage for the {@link Instance} with the given {@link InstanceId}.
+     *
+     * @param instanceId the id of the {@link Instance} for which heap usage is recorded.
+     */
+    void clear(InstanceId instanceId);
+
+    /**
      * @return the estimate of an average heap in bytes among all the recorded services,
      *         or -1 if this {@link MemoryUsageCache} does not have any heap usages recorded yet.
      */

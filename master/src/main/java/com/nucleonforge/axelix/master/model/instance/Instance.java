@@ -49,6 +49,7 @@ public record Instance(
         String commitShaShort,
         @Nullable Instant deployedAt,
         InstanceStatus status,
+        MemoryUsage memoryUsage,
         @NonNull String actuatorUrl) {
 
     public Instance copy(InstanceStatus instanceStatus) {
@@ -64,6 +65,7 @@ public record Instance(
                 this.commitShaShort,
                 this.deployedAt,
                 instanceStatus,
+                this.memoryUsage,
                 this.actuatorUrl);
     }
 
