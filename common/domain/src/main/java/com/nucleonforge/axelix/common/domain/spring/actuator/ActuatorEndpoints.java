@@ -79,11 +79,12 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
             of("/axelix-caches/{cacheManagerName}/disable", HttpMethod.POST);
 
     // Conditions
-    public static final ActuatorEndpoint CONDITIONS = of("/axelix-conditions", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_CONDITIONS = of("/axelix-conditions", HttpMethod.GET);
 
     // @ConfigurationProperties beans
-    public static final ActuatorEndpoint CONFIG_PROPS = of("/axelix-configprops", HttpMethod.GET);
-    public static final ActuatorEndpoint CONFIG_PROPS_BY_PREFIX = of("/axelix-configprops/{prefix}", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_CONFIG_PROPS = of("/axelix-configprops", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_CONFIG_PROPS_BY_PREFIX =
+            of("/axelix-configprops/{prefix}", HttpMethod.GET);
 
     // Environment
     public static final ActuatorEndpoint GET_ALL_ENV_PROPERTIES = of("/axelix-env", HttpMethod.GET);
@@ -194,11 +195,11 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 DISABLE_CACHE,
                 ENABLE_CACHE_MANAGER,
                 DISABLE_CACHES_MANAGER,
-                CONDITIONS,
-                CONFIG_PROPS,
-                CONFIG_PROPS_BY_PREFIX,
                 GET_ALL_ENV_PROPERTIES,
                 GET_SINGLE_ENV_PROPERTY,
+                GET_CONDITIONS,
+                GET_CONFIG_PROPS,
+                GET_CONFIG_PROPS_BY_PREFIX,
                 HEALTH,
                 HEALTH_COMPONENT,
                 HEALTH_SUB_COMPONENT,
