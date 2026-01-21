@@ -23,9 +23,15 @@ import org.springframework.context.annotation.Bean;
 
 import com.nucleonforge.axelix.common.api.caches.CachesFeed;
 import com.nucleonforge.axelix.common.api.caches.SingleCache;
+import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
+import com.nucleonforge.axelix.common.api.loggers.LoggerLevels;
+import com.nucleonforge.axelix.common.api.loggers.ServiceLoggers;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.SingleCacheJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.loggers.LoggerLevelsJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.loggers.ServiceLoggersJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DefaultEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
@@ -36,6 +42,7 @@ import com.nucleonforge.axelix.master.service.transport.EndpointProber;
  * access the API on the managed service side.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 // TODO: We should dynamically register instances of EndpointProbers.
 //  We can do that, but that requires a significant ActuatorEndpoint revisiting.
@@ -47,6 +54,7 @@ public class EndpointProbersAutoConfiguration {
     @Autowired
     private InstanceRegistry instanceRegistry;
 
+    // Loggers
     @Bean
     public DiscardingAbstractEndpointProber setOneLoggerEndpointProber() {
         return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.SET_ONE_LOGGER);
@@ -62,6 +70,27 @@ public class EndpointProbersAutoConfiguration {
         return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.SET_FOR_LOGGER_GROUP);
     }
 
+    @Bean
+    public DefaultEndpointProber<ServiceLoggers> getAllLoggersEndpointProber(
+            ServiceLoggersJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_ALL_LOGGERS);
+    }
+
+    @Bean
+    public DefaultEndpointProber<LoggerLevels> getOneLoggerEndpointProber(
+            LoggerLevelsJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_ONE_LOGGER);
+    }
+
+    @Bean
+    public DefaultEndpointProber<LoggerGroup> getLoggerGroupEndpointProber(
+            LoggerGroupJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_LOGGER_GROUP);
+    }
+
+    // Caches
     @Bean
     public DiscardingAbstractEndpointProber clearAllCachesEndpointProber() {
         return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.CLEAR_ALL_CACHES);

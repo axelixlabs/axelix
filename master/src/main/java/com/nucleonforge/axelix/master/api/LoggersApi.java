@@ -53,9 +53,6 @@ import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
-import com.nucleonforge.axelix.master.service.transport.loggers.AllLoggersEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.loggers.GroupLoggersEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.loggers.OneLoggerEndpointProber;
 
 /**
  * The API for managing loggers.
@@ -72,28 +69,18 @@ import com.nucleonforge.axelix.master.service.transport.loggers.OneLoggerEndpoin
 public class LoggersApi {
 
     private final EndpointInvoker endpointInvoker;
-
-    private final AllLoggersEndpointProber allLoggersEndpointProber;
-    private final GroupLoggersEndpointProber groupLoggersEndpointProber;
-    private final OneLoggerEndpointProber oneLoggerEndpointProber;
     private final Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter;
     private final Converter<LoggerGroup, GroupProfileResponse> groupProfileConverter;
     private final Converter<LoggerLevels, LoggerProfileResponse> loggerProfileConverter;
     private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     public LoggersApi(
-            AllLoggersEndpointProber allLoggersEndpointProber,
-            GroupLoggersEndpointProber groupLoggersEndpointProber,
             EndpointInvoker endpointInvoker,
-            OneLoggerEndpointProber oneLoggerEndpointProber,
             Converter<ServiceLoggers, LoggersResponse> loggersResponseConverter,
             Converter<LoggerGroup, GroupProfileResponse> groupProfileConverter,
             Converter<LoggerLevels, LoggerProfileResponse> loggerProfileConverter,
             JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
-        this.allLoggersEndpointProber = allLoggersEndpointProber;
-        this.groupLoggersEndpointProber = groupLoggersEndpointProber;
         this.endpointInvoker = endpointInvoker;
-        this.oneLoggerEndpointProber = oneLoggerEndpointProber;
         this.loggersResponseConverter = loggersResponseConverter;
         this.groupProfileConverter = groupProfileConverter;
         this.loggerProfileConverter = loggerProfileConverter;
@@ -133,7 +120,8 @@ public class LoggersApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.LoggersApi.INSTANCE_ID)
     public LoggersResponse getAllLoggers(@PathVariable("instanceId") String instanceId) {
-        ServiceLoggers loggers = allLoggersEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        ServiceLoggers loggers = endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_LOGGERS, NoHttpPayload.INSTANCE);
 
         return Objects.requireNonNull(loggersResponseConverter.convert(loggers));
     }
@@ -176,7 +164,8 @@ public class LoggersApi {
     public GroupProfileResponse getGroupByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("groupName") String groupName) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("group.name", groupName));
-        LoggerGroup group = groupLoggersEndpointProber.invoke(InstanceId.of(instanceId), payload);
+        LoggerGroup group =
+                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_LOGGER_GROUP, payload);
 
         return Objects.requireNonNull(groupProfileConverter.convert(group));
     }
@@ -219,7 +208,8 @@ public class LoggersApi {
     public LoggerProfileResponse getLoggerByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("logger.name", loggerName));
-        LoggerLevels logger = oneLoggerEndpointProber.invoke(InstanceId.of(instanceId), payload);
+        LoggerLevels logger =
+                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_ONE_LOGGER, payload);
 
         return Objects.requireNonNull(loggerProfileConverter.convert(logger));
     }
