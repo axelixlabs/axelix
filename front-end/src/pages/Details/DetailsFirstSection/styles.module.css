@@ -24,34 +24,6 @@
     overflow: hidden;
 }
 
-.Collapse {
-    border: none;
-    border-bottom: 1px solid #0505050f;
-    border-radius: 0;
-    background-color: var(--axelix-primary-white);
-}
-
-.Collapse :global(.ant-collapse-header):hover {
-    cursor: default;
-}
-
-.HeapDumpAccordionHeader {
-    display: flex;
-    justify-content: space-between;
-    padding-inline: 8px 16px;
-}
-
-.Component {
-    cursor: text;
-}
-
-.HeapDumpAccordionBody {
-    display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
-    gap: 20px;
-    padding-inline: 28px 16px;
-}
-
 .LoaderWrapper {
     margin-block: 40px;
 }
