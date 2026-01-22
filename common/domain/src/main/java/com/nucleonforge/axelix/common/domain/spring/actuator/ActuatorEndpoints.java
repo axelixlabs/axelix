@@ -121,8 +121,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint GET_LOG_FILE = of("/logfile", HttpMethod.GET);
 
     // Gc Log File
-    public static final ActuatorEndpoint STATUS_GC_LOGGING = of("/axelix-gc/log/status", HttpMethod.GET);
-    public static final ActuatorEndpoint GC_LOG_FILE = of("/axelix-gc/log/file", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_STATUS_GC_LOGGING = of("/axelix-gc/log/status", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_GC_LOG_FILE = of("/axelix-gc/log/file", HttpMethod.GET);
     public static final ActuatorEndpoint GC_TRIGGER = of("/axelix-gc/trigger", HttpMethod.POST);
     public static final ActuatorEndpoint ENABLE_GC_LOGGING = of("/axelix-gc/log/enable", HttpMethod.POST);
     public static final ActuatorEndpoint DISABLE_GC_LOGGING = of("/axelix-gc/log/disable", HttpMethod.POST);
@@ -231,7 +231,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 REBUILD_INTEGRATIONS_GRAPH,
                 LIQUIBASE,
                 GET_LOG_FILE,
-                GC_LOG_FILE,
+                GET_GC_LOG_FILE,
                 GET_ALL_LOGGERS,
                 GET_ONE_LOGGER,
                 GET_LOGGER_GROUP,
