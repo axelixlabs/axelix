@@ -25,6 +25,7 @@ import org.springframework.core.io.Resource;
 import com.nucleonforge.axelix.common.api.BeansFeed;
 import com.nucleonforge.axelix.common.api.InstanceDetails;
 import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
+import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 import com.nucleonforge.axelix.common.api.caches.CachesFeed;
 import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
@@ -45,6 +46,7 @@ import com.nucleonforge.axelix.master.service.serde.GcLogStatusMessageDeserializ
 import com.nucleonforge.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.LogFileMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.ThreadDumpJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.ScheduledTasksJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.SingleCacheJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
@@ -260,5 +262,39 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public DiscardingAbstractEndpointProber disableGcLoggingEndpointProber() {
         return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.DISABLE_GC_LOGGING);
+    }
+
+    // Scheduled tasks
+    @Bean
+    public DefaultEndpointProber<ServiceScheduledTasks> getScheduledTasksEndpointProber(
+            ScheduledTasksJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SCHEDULED_TASKS);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber executeScheduledTasksEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.EXECUTE_SCHEDULED_TASK);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber enableScheduledTasksEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.ENABLE_SCHEDULED_TASK);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber disableScheduledTasksEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.DISABLE_SCHEDULED_TASK);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber modifyCronExpressionScheduledTasksEndpointProber() {
+        return new DiscardingAbstractEndpointProber(
+                instanceRegistry, ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber modifyIntervalScheduledTasksEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.MODIFY_INTERVAL_SCHEDULED_TASK);
     }
 }
