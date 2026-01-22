@@ -17,15 +17,15 @@
  */
 package com.nucleonforge.axelix.sbs.autoconfiguration;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-
 import com.nucleonforge.axelix.sbs.spring.transactions.TransactionMonitoringBeanPostProcessor;
 import com.nucleonforge.axelix.sbs.spring.transactions.TransactionMonitoringEndpoint;
 import com.nucleonforge.axelix.sbs.spring.transactions.TransactionMonitoringService;
 import com.nucleonforge.axelix.sbs.spring.transactions.TransactionStatsCollector;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 
 /**
  *
@@ -39,7 +39,7 @@ public class TransactionMonitoringAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public TransactionStatsCollector transactionStatsCollector(
-            final @Value("${transaction.monitoring.max-transactions-per-method:30}") Integer maxTransactionsPerMethod) {
+        final @Value("${transaction.monitoring.max-transactions-per-method:30}") Integer maxTransactionsPerMethod) {
         return new TransactionStatsCollector(maxTransactionsPerMethod);
     }
 

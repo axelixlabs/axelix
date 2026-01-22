@@ -73,22 +73,12 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
         if (propagation == null) {
             return false;
         }
-        return shouldUseTransaction(propagation) && shouldUseNewTransaction(propagation);
-    }
 
-    private boolean shouldUseTransaction(Propagation propagation) {
-        boolean hasActiveTransaction = hasActiveTransaction();
-        return switch (propagation) {
-            case REQUIRES_NEW, NESTED, REQUIRED -> true;
-
-            case MANDATORY, SUPPORTS -> hasActiveTransaction;
-
-            case NOT_SUPPORTED, NEVER -> false;
-        };
+        return shouldUseNewTransaction(propagation);
     }
 
     private boolean shouldUseNewTransaction(Propagation propagation) {
-        boolean hasActiveTransaction = hasActiveTransaction();
+        boolean hasActiveTransaction = TransactionSynchronizationManager.isActualTransactionActive();
 
         return switch (propagation) {
             case REQUIRES_NEW -> true;

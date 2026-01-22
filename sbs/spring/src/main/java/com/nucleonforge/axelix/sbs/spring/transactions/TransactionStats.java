@@ -18,8 +18,11 @@
 package com.nucleonforge.axelix.sbs.spring.transactions;
 
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -28,26 +31,39 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * @author Nikita Kirillov
  */
 public class TransactionStats {
+
     private final int maxTransactionsPerMethod;
     private final ConcurrentLinkedDeque<TransactionRecord> recordedTransactions;
+    private final AtomicInteger dequeSize;
 
     public TransactionStats(Integer maxTransactionsPerMethod) {
         this.maxTransactionsPerMethod = maxTransactionsPerMethod;
+        this.dequeSize = new AtomicInteger(0);
         this.recordedTransactions = new ConcurrentLinkedDeque<>();
     }
 
     public void addTransactionRecord(TransactionRecord transactionRecord) {
-        synchronized (recordedTransactions) {
-            recordedTransactions.addLast(transactionRecord);
-            while (recordedTransactions.size() > maxTransactionsPerMethod) {
-                recordedTransactions.removeFirst();
-            }
-        }
+        recordedTransactions.addLast(transactionRecord);
+        dequeSize.incrementAndGet();
     }
 
+    // maxTransactionsPerMethod
     public List<TransactionRecord> getRecordedTransactions() {
-        synchronized (recordedTransactions) {
-            return new ArrayList<>(recordedTransactions);
+        var copy = new LinkedList<>(recordedTransactions);
+        clear(copy.size(), copy);
+        return copy;
+    }
+
+    public void clear() {
+        this.clear(dequeSize.get(), this.recordedTransactions);
+    }
+
+    public void clear(int dequeSize, Deque<TransactionRecord> recordedTransactions) {
+        int toShrink = dequeSize - maxTransactionsPerMethod;
+
+        while (toShrink > 0) {
+            recordedTransactions.removeFirst();
+            toShrink--;
         }
     }
 }

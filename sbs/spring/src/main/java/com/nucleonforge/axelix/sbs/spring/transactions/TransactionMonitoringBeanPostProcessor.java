@@ -38,6 +38,7 @@ import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.annotation.RepeatableContainers;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -63,27 +64,18 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
         Class<?> targetClass = AopUtils.getTargetClass(bean);
 
-        if (!hasMethodsThatCreateTransactions(targetClass)) {
+        if (preloadMethodPropagationCacheForClass(targetClass)) {
+            return createTransactionalProxy(bean, targetClass);
+        } else {
             return bean;
         }
-
-        preloadMethodPropagationCacheForClass(targetClass);
-        return createTransactionalProxy(bean, targetClass);
     }
 
-    private boolean hasMethodsThatCreateTransactions(Class<?> clazz) {
-        Propagation classPropagation = findPropagation(clazz);
-        if (classPropagation != null && canCreateTransaction(classPropagation)) {
-            return true;
-        }
+    private boolean preloadMethodPropagationCacheForClass(Class<?> targetClass) {
 
-        return Arrays.stream(clazz.getDeclaredMethods()).anyMatch(method -> {
-            Propagation methodPropagation = findPropagation(method);
-            return methodPropagation != null && canCreateTransaction(methodPropagation);
-        });
-    }
+        boolean canCreateTransaciton = false;
 
-    private void preloadMethodPropagationCacheForClass(Class<?> targetClass) {
+        // TODO: why getMethods here and not getDeclaredMethods?
         for (Method method : targetClass.getMethods()) {
             if (ReflectionUtils.isObjectMethod(method)) {
                 continue;
@@ -95,10 +87,13 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
             if (propagation != null) {
                 propagationCache.put(key, propagation);
 
-                boolean canCreate = canCreateTransaction(propagation);
-                canCreateTransactionCache.put(key, canCreate);
+                boolean thisMethod = canCreateTransaction(propagation);
+                canCreateTransaciton |= thisMethod;
+                canCreateTransactionCache.put(key, thisMethod);
             }
         }
+
+        return canCreateTransaciton;
     }
 
     private Object createTransactionalProxy(Object bean, Class<?> targetClass) {
@@ -109,6 +104,11 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         TransactionMonitoringInterceptor interceptor =
                 new TransactionMonitoringInterceptor(targetClass, propagationCache, statsCollector);
 
+        // TODO:
+        //  For me at least it does not seem to be the case that we need this.
+        //  TransactionMonitoringInterceptor should already intercept all method invocations
+        //  and TransactionMonitoringInterceptor makes the decision internally whether
+        //  the given method needs to be intercepted or not.
         DefaultPointcutAdvisor advisor =
                 new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(targetClass), interceptor);
 
@@ -132,6 +132,7 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
                 }
 
                 Propagation propagation = resolveTransactionPropagation(method, targetClass);
+
                 if (propagation == null) {
                     canCreateTransactionCache.put(key, false);
                     return false;
