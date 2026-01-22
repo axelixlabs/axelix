@@ -23,8 +23,7 @@
             "CONFIG_PROPS": "Configuration Properties",
             "ENV": "Environment",
             "SCHEDULED_TASKS": "Scheduled Tasks",
-            "LOG_FILE": "Log File",
-            "Sanitize": "Sanitize Before Export"
+            "LOG_FILE": "Log File"
         },
         "spring": {
             "springBootVersion": "Spring Boot",
