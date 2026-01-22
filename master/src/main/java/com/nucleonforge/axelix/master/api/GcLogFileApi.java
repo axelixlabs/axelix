@@ -37,14 +37,11 @@ import com.nucleonforge.axelix.common.api.gclog.GcLogEnableRequest;
 import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationStrategy;
-import com.nucleonforge.axelix.master.service.transport.gclog.DisableGcLoggingEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.gclog.EnableGcLoggingEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.gclog.GcLogFileEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.gclog.GcLogStatusEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.gclog.GcTriggerEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for garbage-collector.
@@ -57,25 +54,12 @@ import com.nucleonforge.axelix.master.service.transport.gclog.GcTriggerEndpointP
 @RequestMapping(path = ApiPaths.GcLogFileApi.MAIN)
 public class GcLogFileApi {
 
-    private final GcLogFileEndpointProber gcLogFileEndpointProber;
-    private final GcTriggerEndpointProber gcTriggerEndpointProber;
-    private final GcLogStatusEndpointProber gcLogStatusEndpointProber;
-    private final EnableGcLoggingEndpointProber enableGcLoggingEndpointProber;
-    private final DisableGcLoggingEndpointProber disableGcLoggingEndpointProber;
+    private final EndpointInvoker endpointInvoker;
     private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     public GcLogFileApi(
-            GcLogFileEndpointProber gcLogFileEndpointProber,
-            GcTriggerEndpointProber gcTriggerEndpointProber,
-            GcLogStatusEndpointProber gcLogStatusEndpointProber,
-            EnableGcLoggingEndpointProber enableGcLoggingEndpointProber,
-            DisableGcLoggingEndpointProber disableGcLoggingEndpointProber,
-            JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
-        this.gcLogFileEndpointProber = gcLogFileEndpointProber;
-        this.gcTriggerEndpointProber = gcTriggerEndpointProber;
-        this.gcLogStatusEndpointProber = gcLogStatusEndpointProber;
-        this.enableGcLoggingEndpointProber = enableGcLoggingEndpointProber;
-        this.disableGcLoggingEndpointProber = disableGcLoggingEndpointProber;
+            EndpointInvoker endpointInvoker, JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
+        this.endpointInvoker = endpointInvoker;
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
 
@@ -112,7 +96,8 @@ public class GcLogFileApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.GcLogFileApi.INSTANCE_ID, produces = MediaType.TEXT_PLAIN_VALUE)
     public Resource getGcLogFile(@PathVariable("instanceId") String instanceId) {
-        return gcLogFileEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        return endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_GC_LOG_FILE, NoHttpPayload.INSTANCE);
     }
 
     @Operation(
@@ -144,7 +129,8 @@ public class GcLogFileApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.GcLogFileApi.STATUS_GC_LOGGING)
     public GcLogStatusResponse getStatus(@PathVariable("instanceId") String instanceId) {
-        return gcLogStatusEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        return endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_STATUS_GC_LOGGING, NoHttpPayload.INSTANCE);
     }
 
     @Operation(
@@ -170,7 +156,7 @@ public class GcLogFileApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @PostMapping(path = ApiPaths.GcLogFileApi.TRIGGER_GC)
     public void triggerGc(@PathVariable("instanceId") String instanceId) {
-        gcTriggerEndpointProber.invokeNoValue(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.GC_TRIGGER, NoHttpPayload.INSTANCE);
     }
 
     @Operation(
@@ -198,7 +184,7 @@ public class GcLogFileApi {
     public void enableGcLogging(
             @PathVariable("instanceId") String instanceId, @RequestBody GcLogEnableRequest request) {
         HttpPayload httpPayload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
-        enableGcLoggingEndpointProber.invokeNoValue(InstanceId.of(instanceId), httpPayload);
+        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.ENABLE_GC_LOGGING, httpPayload);
     }
 
     @Operation(
@@ -224,6 +210,7 @@ public class GcLogFileApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @PostMapping(path = ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING)
     public void disableGcLogging(@PathVariable("instanceId") String instanceId) {
-        disableGcLoggingEndpointProber.invokeNoValue(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        endpointInvoker.invokeNoValue(
+                InstanceId.of(instanceId), ActuatorEndpoints.DISABLE_GC_LOGGING, NoHttpPayload.INSTANCE);
     }
 }

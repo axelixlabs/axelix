@@ -29,6 +29,7 @@ import com.nucleonforge.axelix.common.api.caches.CachesFeed;
 import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
 import com.nucleonforge.axelix.common.api.env.EnvironmentProperty;
+import com.nucleonforge.axelix.common.api.gclog.GcLogStatusResponse;
 import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axelix.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axelix.common.api.loggers.ServiceLoggers;
@@ -37,11 +38,13 @@ import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.serde.BeansJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
-import com.nucleonforge.axelix.master.service.serde.ThreadDumpJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.EnvironmentJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.EnvironmentPropertyJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.GcLogStatusMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.LogFileMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.ThreadDumpJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.SingleCacheJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
@@ -182,7 +185,7 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public DiscardingAbstractEndpointProber disableThreadDumpEndpointProber() {
         return new DiscardingAbstractEndpointProber(
-            instanceRegistry, ActuatorEndpoints.THREAD_DUMP_DISABLE_CONTENTION_MONITORING);
+                instanceRegistry, ActuatorEndpoints.THREAD_DUMP_DISABLE_CONTENTION_MONITORING);
     }
 
     // Metrics
@@ -197,7 +200,7 @@ public class EndpointProbersAutoConfiguration {
     public DefaultEndpointProber<MetricProfile> getSingleMetricEndpointProver(
             SingleMetricJacksonDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(
-            instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_METRIC);
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_METRIC);
     }
 
     // Environment Property
@@ -212,7 +215,7 @@ public class EndpointProbersAutoConfiguration {
     public DefaultEndpointProber<EnvironmentProperty> getSingleEnvironmentEndpointProver(
             EnvironmentPropertyJacksonMessageDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(
-            instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_ENV_PROPERTY);
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_ENV_PROPERTY);
     }
 
     // HeapDump
@@ -227,5 +230,35 @@ public class EndpointProbersAutoConfiguration {
     public DefaultEndpointProber<Resource> getLogFileEndpointProver(
             LogFileMessageDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_LOG_FILE);
+    }
+
+    // Garbage Collector Log
+    @Bean
+    public DefaultEndpointProber<Resource> getGcLogFileEndpointProber(
+            GcLogFileMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_GC_LOG_FILE);
+    }
+
+    @Bean
+    public DefaultEndpointProber<GcLogStatusResponse> getGcLogStatusEndpointProber(
+            GcLogStatusMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_STATUS_GC_LOGGING);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber gcTriggerEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.GC_TRIGGER);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber enableGcLoggingEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.ENABLE_GC_LOGGING);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber disableGcLoggingEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.DISABLE_GC_LOGGING);
     }
 }
