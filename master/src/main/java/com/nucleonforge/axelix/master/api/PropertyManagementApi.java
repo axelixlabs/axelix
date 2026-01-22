@@ -33,13 +33,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.request.PropertyUpdatedRequest;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.serde.MessageSerializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceStatusModifier;
-import com.nucleonforge.axelix.master.service.transport.PropertyManagementEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing properties.
@@ -54,15 +55,15 @@ import com.nucleonforge.axelix.master.service.transport.PropertyManagementEndpoi
 @RequestMapping(path = ApiPaths.PropertyManagementApi.MAIN)
 public class PropertyManagementApi {
 
-    private final PropertyManagementEndpointProber propertyManagementEndpointProber;
+    private final EndpointInvoker endpointInvoker;
     private final MessageSerializationStrategy messageSerializationStrategy;
     private final InstanceStatusModifier instanceStatusModifier;
 
     public PropertyManagementApi(
-            PropertyManagementEndpointProber profileManagementEndpointProber,
+            EndpointInvoker endpointInvoker,
             MessageSerializationStrategy messageSerializationStrategy,
             InstanceStatusModifier instanceStatusModifier) {
-        this.propertyManagementEndpointProber = profileManagementEndpointProber;
+        this.endpointInvoker = endpointInvoker;
         this.messageSerializationStrategy = messageSerializationStrategy;
         this.instanceStatusModifier = instanceStatusModifier;
     }
@@ -92,7 +93,7 @@ public class PropertyManagementApi {
             @PathVariable("instanceId") String instanceId, @RequestBody PropertyUpdatedRequest request) {
 
         HttpPayload payload = HttpPayload.json(messageSerializationStrategy.serialize(request));
-        propertyManagementEndpointProber.invokeNoValue(InstanceId.of(instanceId), payload);
+        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.PROPERTY_MANAGEMENT, payload);
         instanceStatusModifier.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);
         return ResponseEntity.noContent().build();
     }

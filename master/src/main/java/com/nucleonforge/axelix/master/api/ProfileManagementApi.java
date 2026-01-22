@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.common.api.ProfileMutationResult;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.request.ProfileUpdatedRequest;
 import com.nucleonforge.axelix.master.api.response.ProfileUpdateResponse;
@@ -43,7 +44,7 @@ import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
 import com.nucleonforge.axelix.master.service.serde.MessageSerializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceStatusModifier;
-import com.nucleonforge.axelix.master.service.transport.ProfileManagementEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing profiles.
@@ -58,17 +59,17 @@ import com.nucleonforge.axelix.master.service.transport.ProfileManagementEndpoin
 @RequestMapping(path = ApiPaths.ProfileManagementApi.MAIN)
 public class ProfileManagementApi {
 
-    private final ProfileManagementEndpointProber profileManagementEndpointProber;
+    private final EndpointInvoker endpointInvoker;
     private final Converter<ProfileMutationResult, ProfileUpdateResponse> converter;
     private final MessageSerializationStrategy messageSerializationStrategy;
     private final InstanceStatusModifier instanceStatusModifier;
 
     public ProfileManagementApi(
-            ProfileManagementEndpointProber profileManagementEndpointProber,
+            EndpointInvoker endpointInvoker,
             Converter<ProfileMutationResult, ProfileUpdateResponse> converter,
             MessageSerializationStrategy messageSerializationStrategy,
             InstanceStatusModifier instanceStatusModifier) {
-        this.profileManagementEndpointProber = profileManagementEndpointProber;
+        this.endpointInvoker = endpointInvoker;
         this.converter = converter;
         this.messageSerializationStrategy = messageSerializationStrategy;
         this.instanceStatusModifier = instanceStatusModifier;
@@ -105,7 +106,8 @@ public class ProfileManagementApi {
             @PathVariable("instanceId") String instanceId, @RequestBody ProfileUpdatedRequest request) {
 
         HttpPayload payload = HttpPayload.json(messageSerializationStrategy.serialize(request));
-        ProfileMutationResult result = profileManagementEndpointProber.invoke(InstanceId.of(instanceId), payload);
+        ProfileMutationResult result =
+                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.PROFILE_MANAGEMENT, payload);
         instanceStatusModifier.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);
         return Objects.requireNonNull(converter.convert(result));
     }
