@@ -1,0 +1,105 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.nucleonforge.axelix.sbs.spring.transactions;
+
+import java.util.List;
+import java.util.Map;
+
+import com.nucleonforge.axelix.common.api.TransactionMonitoringFeed;
+import com.nucleonforge.axelix.common.api.TransactionMonitoringFeed.ExecutionStats;
+import com.nucleonforge.axelix.common.api.TransactionMonitoringFeed.MethodStats;
+import com.nucleonforge.axelix.common.api.TransactionMonitoringFeed.TransactionExecution;
+
+/**
+ *
+ *
+ * @author Nikita Kirillov
+ */
+public class TransactionMonitoringService {
+
+    private final TransactionStatsCollector transactionStatsCollector;
+
+    public TransactionMonitoringService(TransactionStatsCollector transactionStatsCollector) {
+        this.transactionStatsCollector = transactionStatsCollector;
+    }
+
+    public TransactionMonitoringFeed getMonitoringFeed() {
+        Map<MethodClassKey, TransactionStats> statsMap = transactionStatsCollector.getAllStats();
+
+        List<MethodStats> methodStats = statsMap.entrySet().stream()
+                .map(entry -> createMethodStats(
+                        entry.getKey().targetClass().getName(),
+                        entry.getKey().method().getName(),
+                        entry.getValue().getRecordedTransactions()))
+                .toList();
+
+        return new TransactionMonitoringFeed(methodStats);
+    }
+
+    public void clearAllStats() {
+        transactionStatsCollector.clearAllStats();
+    }
+
+    private MethodStats createMethodStats(String className, String methodName, List<TransactionRecord> transactions) {
+
+        if (transactions.isEmpty()) {
+            return new MethodStats(className, methodName, List.of(), new ExecutionStats(0, 0, 0));
+        }
+
+        long averageDuration = calculateAverageDuration(transactions);
+        long maxDuration = calculateMaxDuration(transactions);
+        long medianDuration = calculateMedianDuration(transactions);
+
+        List<TransactionExecution> executions =
+                transactions.stream().map(this::convertToTransactionExecution).toList();
+
+        return new MethodStats(
+                className, methodName, executions, new ExecutionStats(averageDuration, maxDuration, medianDuration));
+    }
+
+    private long calculateAverageDuration(List<TransactionRecord> transactions) {
+        long total =
+                transactions.stream().mapToLong(TransactionRecord::durationMs).sum();
+        return total / transactions.size();
+    }
+
+    private long calculateMaxDuration(List<TransactionRecord> transactions) {
+        return transactions.stream()
+                .mapToLong(TransactionRecord::durationMs)
+                .max()
+                .orElse(0);
+    }
+
+    private long calculateMedianDuration(List<TransactionRecord> transactions) {
+        List<Long> durations = transactions.stream()
+                .map(TransactionRecord::durationMs)
+                .sorted()
+                .toList();
+
+        int size = durations.size();
+        if (size % 2 == 0) {
+            return (durations.get(size / 2 - 1) + durations.get(size / 2)) / 2;
+        } else {
+            return durations.get(size / 2);
+        }
+    }
+
+    private TransactionExecution convertToTransactionExecution(TransactionRecord record) {
+        return new TransactionExecution(record.durationMs(), record.startTimestamp());
+    }
+}
