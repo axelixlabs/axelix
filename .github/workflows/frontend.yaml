@@ -67,11 +67,11 @@ jobs:
         run: npm test
 
       - name: Set up Docker
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         uses: docker/setup-docker-action@v4
 
       - name: Read Gradle Properties file
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         uses: madhead/read-java-properties@4
         id: gradleProperties
         with:
@@ -79,11 +79,11 @@ jobs:
           property: axelixVersion
 
       - name: Actualize NPM Version
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         run: npm version ${{ steps.gradleProperties.outputs.value }}
 
       - name: Create Vite Configuration
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         run: |
           echo "VITE_APP_VERSION=${{ steps.gradleProperties.outputs.value }}" >> .env
           echo "VITE_APP_SOURCE_CODE_LINK=${{ env.VITE_APP_SOURCE_CODE_LINK }}" >> .env
@@ -93,15 +93,15 @@ jobs:
           echo "VITE_APP_BLOG_LINK=${{ env.VITE_APP_BLOG_LINK }}" >> .env
 
       - name: Building JS Bundles
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         run: npm run build
 
       - name: Clean-up
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         run: rm .env
 
       - name: Build Docker Image
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         # TODO:
         #  For now the version of package is hardcoded both in package.json and in here. We later would need to
         #  find a way to manage it correctly.
@@ -109,26 +109,26 @@ jobs:
           docker build --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file Dockerfile .
 
       - name: Docker login to Cloud Container Registry
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is a maintainer's PAT
         run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
       - name: Docker push to Cloud Container Registry
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         run: docker push $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }}
 
       - name: Docker logout
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL  == 'true'}}
         run: docker logout
 
       - name: Setup Helm
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         uses: azure/setup-helm@v4.3.0
         with:
           version: v3.14.0
 
       - name: Deploy master to K8S
-        if: ${{ env.MASTER_PUSH_OR_MANUAL }}
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         working-directory: distributions/chart
         run: |
           mkdir -p ~/.kube
