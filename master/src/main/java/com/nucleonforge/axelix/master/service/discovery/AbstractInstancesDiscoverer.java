@@ -37,11 +37,11 @@ import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
-import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Abstract implementation of {@link InstancesDiscoverer} that performs common tasks like checking
- * the {{@link ActuatorEndpoints#METADATA} metadata endpoint} for compatibility etc.
+ * the {{@link ActuatorEndpoints#GET_METADATA} metadata endpoint} for compatibility etc.
  *
  * @author Mikhail Polivakha
  */
@@ -51,16 +51,16 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
 
     private final Logger logger;
     private final DiscoveryClient discoveryClient;
-    private final ManagedServiceMetadataEndpointProber managedServiceProber;
+    private final EndpointInvoker endpointInvoker;
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
 
     public AbstractInstancesDiscoverer(
             Logger logger,
             DiscoveryClient discoveryClient,
-            ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
+            EndpointInvoker endpointInvoker,
             AxelixVersionDiscoverer axelixVersionDiscoverer) {
         this.discoveryClient = discoveryClient;
-        this.managedServiceProber = managedServiceMetadataEndpointProber;
+        this.endpointInvoker = endpointInvoker;
         this.logger = logger;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
     }
@@ -97,7 +97,8 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
         String actuatorUrl = serviceInstance.getUri().toString() + ACTUATOR_ENDPOINT_POSTFIX;
 
         try {
-            ServiceMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
+            ServiceMetadata metadata =
+                    endpointInvoker.invoke(actuatorUrl, ActuatorEndpoints.GET_METADATA, NoHttpPayload.INSTANCE);
 
             return new InstanceIntermediateProfile(serviceInstance, metadata);
         } catch (EndpointInvocationException error) {

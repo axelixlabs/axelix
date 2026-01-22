@@ -139,7 +139,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint MAPPINGS = of("/mappings", HttpMethod.GET);
 
     // Metadata
-    public static final ActuatorEndpoint METADATA = of("/axelix-metadata", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_METADATA = of("/axelix-metadata", HttpMethod.GET);
 
     // Metric
     public static final ActuatorEndpoint METRICS_GROUP = of("/axelix-metrics", HttpMethod.GET);
@@ -239,7 +239,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 SET_FOR_LOGGER_GROUP,
                 CLEAR_FOR_LOGGER,
                 MAPPINGS,
-                METADATA,
+                GET_METADATA,
                 METRICS_GROUP,
                 SINGLE_METRIC,
                 PROFILE_MANAGEMENT,

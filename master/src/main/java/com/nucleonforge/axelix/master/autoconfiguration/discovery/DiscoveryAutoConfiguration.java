@@ -38,7 +38,7 @@ import com.nucleonforge.axelix.master.service.discovery.KubernetesDiscoveryClien
 import com.nucleonforge.axelix.master.service.discovery.KubernetesInstanceDiscoverer;
 import com.nucleonforge.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
-import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Auto-configuration for K8S related components.
@@ -89,10 +89,9 @@ public class DiscoveryAutoConfiguration {
         @Bean
         public KubernetesInstanceDiscoverer kubernetesInstanceDiscoverer(
                 DiscoveryClient discoveryClient,
-                ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
+                EndpointInvoker endpointInvoker,
                 AxelixVersionDiscoverer axelixVersionDiscoverer) {
-            return new KubernetesInstanceDiscoverer(
-                    discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
+            return new KubernetesInstanceDiscoverer(discoveryClient, endpointInvoker, axelixVersionDiscoverer);
         }
     }
 }

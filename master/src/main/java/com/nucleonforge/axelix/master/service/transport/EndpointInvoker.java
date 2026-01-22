@@ -49,6 +49,17 @@ public interface EndpointInvoker {
             throws EndpointInvocationException, InstanceNotFoundException, ClassCastException;
 
     /**
+     * Invoke endpoint on base url with the given payload.
+     *
+     * @param baseUrl the base url of the request
+     * @param endpoint the endpoint that should be invoked.
+     * @param httpPayload the abstraction that encapsulates the http payload of the request
+     * @return the result of the invocation. Guaranteed to be not null.
+     * @throws EndpointInvocationException in case the invocation to managed service did not result in successful response.
+     */
+    <O> O invoke(String baseUrl, ActuatorEndpoint endpoint, HttpPayload httpPayload) throws EndpointInvocationException;
+
+    /**
      * Invoke endpoint on instance with the given payload. Similar to {@link #invoke(InstanceId, ActuatorEndpoint, HttpPayload)},
      * but this invocation is not expected to result in any value.
      *

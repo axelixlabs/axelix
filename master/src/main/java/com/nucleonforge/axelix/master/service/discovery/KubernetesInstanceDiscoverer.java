@@ -34,7 +34,7 @@ import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
 import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.model.instance.MemoryUsage;
-import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Kubernetes implementation of {@link InstancesDiscoverer}.
@@ -54,9 +54,9 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
 
     public KubernetesInstanceDiscoverer(
             DiscoveryClient discoveryClient,
-            ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
+            EndpointInvoker endpointInvoker,
             AxelixVersionDiscoverer axelixVersionDiscoverer) {
-        super(log, discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
+        super(log, discoveryClient, endpointInvoker, axelixVersionDiscoverer);
     }
 
     @Override
