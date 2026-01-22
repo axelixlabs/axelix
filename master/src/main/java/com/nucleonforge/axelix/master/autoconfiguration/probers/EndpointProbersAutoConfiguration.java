@@ -26,6 +26,8 @@ import com.nucleonforge.axelix.common.api.InstanceDetails;
 import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
 import com.nucleonforge.axelix.common.api.caches.CachesFeed;
 import com.nucleonforge.axelix.common.api.caches.SingleCache;
+import com.nucleonforge.axelix.common.api.env.EnvironmentFeed;
+import com.nucleonforge.axelix.common.api.env.EnvironmentProperty;
 import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axelix.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axelix.common.api.loggers.ServiceLoggers;
@@ -35,6 +37,8 @@ import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.serde.BeansJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.ThreadDumpJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.EnvironmentJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.EnvironmentPropertyJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.SingleCacheJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
@@ -190,6 +194,21 @@ public class EndpointProbersAutoConfiguration {
     public DefaultEndpointProber<MetricProfile> getSingleMetricEndpointProver(
             SingleMetricJacksonDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_METRIC);
+            instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_METRIC);
+    }
+
+    // Environment Property
+    @Bean
+    public DefaultEndpointProber<EnvironmentFeed> getAllEnvironmentEndpointProver(
+            EnvironmentJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES);
+    }
+
+    @Bean
+    public DefaultEndpointProber<EnvironmentProperty> getSingleEnvironmentEndpointProver(
+            EnvironmentPropertyJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_ENV_PROPERTY);
     }
 }
