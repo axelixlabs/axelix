@@ -41,9 +41,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.HttpHeader;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
-import com.nucleonforge.axelix.master.service.transport.LogFileEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for logfile.
@@ -55,10 +56,10 @@ import com.nucleonforge.axelix.master.service.transport.LogFileEndpointProber;
 @RequestMapping(path = ApiPaths.LogFileApi.MAIN)
 public class LogFileApi {
 
-    private final LogFileEndpointProber logFileEndpointProber;
+    private final EndpointInvoker endpointInvoker;
 
-    public LogFileApi(LogFileEndpointProber logFileEndpointProber) {
-        this.logFileEndpointProber = logFileEndpointProber;
+    public LogFileApi(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Operation(
@@ -114,6 +115,6 @@ public class LogFileApi {
         }
 
         HttpPayload payload = new DefaultHttpPayload(headers);
-        return logFileEndpointProber.invoke(InstanceId.of(instanceId), payload);
+        return endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_LOG_FILE, payload);
     }
 }

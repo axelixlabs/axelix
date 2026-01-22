@@ -99,7 +99,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
             of("/health/{component}/{sub-component}", HttpMethod.GET);
 
     // Heap Dump
-    public static final ActuatorEndpoint HEAP_DUMP = of("/heapdump", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_HEAP_DUMP = of("/heapdump", HttpMethod.GET);
 
     // Http Exchanges
     public static final ActuatorEndpoint HTTP_EXCHANGES = of("/httpexchanges", HttpMethod.GET);
@@ -118,7 +118,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint LIQUIBASE = of("/liquibase", HttpMethod.GET);
 
     // Log File
-    public static final ActuatorEndpoint LOG_FILE = of("/logfile", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_LOG_FILE = of("/logfile", HttpMethod.GET);
 
     // Gc Log File
     public static final ActuatorEndpoint STATUS_GC_LOGGING = of("/axelix-gc/log/status", HttpMethod.GET);
@@ -223,14 +223,14 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 HEALTH,
                 HEALTH_COMPONENT,
                 HEALTH_SUB_COMPONENT,
-                HEAP_DUMP,
+                GET_HEAP_DUMP,
                 HTTP_EXCHANGES,
                 INFO,
                 GET_DETAILS,
                 INTEGRATIONS_GRAPH,
                 REBUILD_INTEGRATIONS_GRAPH,
                 LIQUIBASE,
-                LOG_FILE,
+                GET_LOG_FILE,
                 GC_LOG_FILE,
                 GET_ALL_LOGGERS,
                 GET_ONE_LOGGER,
