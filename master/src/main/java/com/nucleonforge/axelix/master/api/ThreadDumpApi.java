@@ -35,13 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.ThreadDumpFeedResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axelix.master.service.transport.threaddump.ThreadDumpDisableContentionMonitoringProber;
-import com.nucleonforge.axelix.master.service.transport.threaddump.ThreadDumpEnableContentionMonitoringProber;
-import com.nucleonforge.axelix.master.service.transport.threaddump.ThreadDumpEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for thread dump.
@@ -57,19 +56,11 @@ import com.nucleonforge.axelix.master.service.transport.threaddump.ThreadDumpEnd
 @RequestMapping(path = ApiPaths.ThreadDumpApi.MAIN)
 public class ThreadDumpApi {
 
-    private final ThreadDumpEndpointProber threadDumpEndpointProber;
-    private final ThreadDumpEnableContentionMonitoringProber enableContentionMonitoringProber;
-    private final ThreadDumpDisableContentionMonitoringProber disableContentionMonitoringProber;
+    private final EndpointInvoker endpointInvoker;
     private final Converter<ThreadDumpFeed, ThreadDumpFeedResponse> converter;
 
-    public ThreadDumpApi(
-            ThreadDumpEndpointProber threadDumpEndpointProber,
-            ThreadDumpEnableContentionMonitoringProber enableContentionMonitoringProber,
-            ThreadDumpDisableContentionMonitoringProber disableContentionMonitoringProber,
-            Converter<ThreadDumpFeed, ThreadDumpFeedResponse> converter) {
-        this.threadDumpEndpointProber = threadDumpEndpointProber;
-        this.enableContentionMonitoringProber = enableContentionMonitoringProber;
-        this.disableContentionMonitoringProber = disableContentionMonitoringProber;
+    public ThreadDumpApi(EndpointInvoker endpointInvoker, Converter<ThreadDumpFeed, ThreadDumpFeedResponse> converter) {
+        this.endpointInvoker = endpointInvoker;
         this.converter = converter;
     }
 
@@ -107,7 +98,8 @@ public class ThreadDumpApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(ApiPaths.ThreadDumpApi.INSTANCE_ID)
     public ThreadDumpFeedResponse getThreadDump(@PathVariable("instanceId") String instanceId) {
-        ThreadDumpFeed result = threadDumpEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        ThreadDumpFeed result = endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_THREAD_DUMP, NoHttpPayload.INSTANCE);
 
         return Objects.requireNonNull(converter.convert(result));
     }
@@ -134,7 +126,10 @@ public class ThreadDumpApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @PostMapping(ApiPaths.ThreadDumpApi.ENABLE_CONTENTION_MONITORING)
     public void enableContentionMonitoring(@PathVariable("instanceId") String instanceId) {
-        enableContentionMonitoringProber.invokeNoValue(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        endpointInvoker.invokeNoValue(
+                InstanceId.of(instanceId),
+                ActuatorEndpoints.THREAD_DUMP_ENABLE_CONTENTION_MONITORING,
+                NoHttpPayload.INSTANCE);
     }
 
     @Operation(
@@ -159,6 +154,9 @@ public class ThreadDumpApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @PostMapping(ApiPaths.ThreadDumpApi.DISABLE_CONTENTION_MONITORING)
     public void disableContentionMonitoring(@PathVariable("instanceId") String instanceId) {
-        disableContentionMonitoringProber.invokeNoValue(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        endpointInvoker.invokeNoValue(
+                InstanceId.of(instanceId),
+                ActuatorEndpoints.THREAD_DUMP_DISABLE_CONTENTION_MONITORING,
+                NoHttpPayload.INSTANCE);
     }
 }
