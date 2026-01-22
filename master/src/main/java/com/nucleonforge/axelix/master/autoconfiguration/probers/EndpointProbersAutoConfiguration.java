@@ -26,7 +26,9 @@ import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axelix.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axelix.common.api.loggers.ServiceLoggers;
+import com.nucleonforge.axelix.common.api.registration.ServiceMetadata;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
+import com.nucleonforge.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.SingleCacheJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
@@ -132,5 +134,12 @@ public class EndpointProbersAutoConfiguration {
     public DefaultEndpointProber<CachesFeed> getAllCachesEndpointProver(
             ServiceCachesJacksonMessageDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_ALL_CACHES);
+    }
+
+    // Metadata
+    @Bean
+    public DefaultEndpointProber<ServiceMetadata> getMetadataEndpointProver(
+            MetadataJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_METADATA);
     }
 }

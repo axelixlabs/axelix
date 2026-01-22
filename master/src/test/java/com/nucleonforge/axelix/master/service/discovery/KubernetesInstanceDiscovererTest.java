@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -38,22 +37,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.nucleonforge.axelix.common.domain.AxelixVersionDiscoverer;
+import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.model.instance.Instance;
-import com.nucleonforge.axelix.master.service.InMemoryMemoryUsageCache;
 import com.nucleonforge.axelix.master.service.MemoryUsageCache;
-import com.nucleonforge.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
-import com.nucleonforge.axelix.master.service.state.InMemoryInstanceRegistry;
-import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
-import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,8 +59,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  * @since 21.09.2025
  */
+@SpringBootTest(classes = ApplicationEntrypoint.class)
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = KubernetesInstanceDiscovererTest.CurrentConfig.class)
 class KubernetesInstanceDiscovererTest {
 
     private static MockWebServer mockWebServer;
@@ -75,10 +69,10 @@ class KubernetesInstanceDiscovererTest {
     private DiscoveryClient discoveryClient;
 
     @Autowired
-    private ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber;
+    private MemoryUsageCache memoryUsageCache;
 
     @Autowired
-    private MemoryUsageCache memoryUsageCache;
+    private EndpointInvoker endpointInvoker;
 
     @Autowired
     private AxelixVersionDiscoverer axelixVersionDiscoverer;
@@ -87,45 +81,13 @@ class KubernetesInstanceDiscovererTest {
 
     private KubernetesInstanceDiscoverer subject;
 
-    @TestConfiguration
-    static class CurrentConfig {
-
-        @Bean
-        public ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber(
-                InstanceRegistry instanceRegistry,
-                MetadataJacksonMessageDeserializationStrategy deserializationStrategy) {
-            return new ManagedServiceMetadataEndpointProber(instanceRegistry, deserializationStrategy);
-        }
-
-        @Bean
-        public InstanceRegistry instanceRegistry() {
-            return new InMemoryInstanceRegistry();
-        }
-
-        @Bean
-        public MetadataJacksonMessageDeserializationStrategy deserializationStrategy() {
-            return new MetadataJacksonMessageDeserializationStrategy(new ObjectMapper());
-        }
-
-        @Bean
-        public MemoryUsageCache memoryUsageCache() {
-            return new InMemoryMemoryUsageCache();
-        }
-
-        @Bean
-        public AxelixVersionDiscoverer axelixVersionDiscoverer() {
-            return () -> "1.0.0-SNAPSHOT";
-        }
-    }
-
     @BeforeEach
     void startServer() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
 
-        subject = new KubernetesInstanceDiscoverer(
-                discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
+        subject = new KubernetesInstanceDiscoverer(discoveryClient, endpointInvoker, axelixVersionDiscoverer);
     }
 
     @AfterEach

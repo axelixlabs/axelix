@@ -66,6 +66,22 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public <O> O invoke(String baseUrl, ActuatorEndpoint endpoint, HttpPayload httpPayload)
+            throws EndpointInvocationException {
+        EndpointProber<?> prober = getEndpointProber(endpoint);
+
+        Object result = prober.invoke(baseUrl, httpPayload);
+
+        try {
+            return (O) result;
+        } catch (ClassCastException e) {
+            log.error("[BUG] Unable to cast {} to requested type. Please, report to maintainers", result);
+            throw e;
+        }
+    }
+
+    @Override
     public void invokeNoValue(InstanceId instanceId, ActuatorEndpoint endpoint, HttpPayload httpPayload)
             throws EndpointInvocationException, InstanceNotFoundException {
         getEndpointProber(endpoint).invoke(instanceId, httpPayload);
