@@ -20,8 +20,8 @@ package com.nucleonforge.axelix.common.api.request;
 /**
  * Represents a request to forcibly execute a scheduled task.
  *
- * @param targetScheduledTask the identifier of the scheduled task to run now. Must not be {@code null}.
+ * @param trigger the identifier of the scheduled task to run now. Must not be {@code null}.
  *
  * @author Sergey Cherkasov
  */
-public record ScheduledTaskExecuteRequest(String targetScheduledTask) {}
+public record ScheduledTaskExecuteRequest(String trigger) {}

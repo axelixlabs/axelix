@@ -33,13 +33,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskCronExpressionModifyRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskExecuteRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskIntervalModifyRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskCronExpressionModifyRequest;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskExecuteRequest;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskIntervalModifyRequest;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
@@ -275,7 +275,7 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
           {
-             "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
+             "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
           }
           """;
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
@@ -299,7 +299,7 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
             {
-               "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
+               "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
             }
             """;
         ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
@@ -323,7 +323,7 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
         {
-           "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive",
+           "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive",
            "cronExpression" : "*/5 0 0/3 1/1 * ?"
         }
         """;
@@ -349,7 +349,7 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
         {
-           "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask",
+           "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask",
            "interval" : 22222
         }
         """;
@@ -376,7 +376,7 @@ public class ScheduledTasksEndpointProberTest {
         String jsonRequest =
                 """
             {
-               "taskId": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask"
+               "trigger": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask"
             }
             """;
 

@@ -20,9 +20,9 @@ package com.nucleonforge.axelix.common.api.request;
 /**
  * Represents a request to modify the interval of a scheduled task.
  *
- * @param targetScheduledTask the identifier of the scheduled task to modify. Must not be {@code null}.
- * @param interval            the new interval to be assigned.
+ * @param trigger   the identifier of the scheduled task to modify. Must not be {@code null}.
+ * @param interval  the new interval to be assigned.
  *
  * @author Sergey Cherkasov
  */
-public record ScheduledTaskIntervalModifyRequest(String targetScheduledTask, Long interval) {}
+public record ScheduledTaskIntervalModifyRequest(String trigger, Long interval) {}
