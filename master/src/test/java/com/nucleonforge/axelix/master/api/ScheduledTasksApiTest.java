@@ -38,12 +38,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskCronExpressionModifyRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskExecuteRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskIntervalModifyRequest;
+import com.nucleonforge.axelix.common.api.request.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskCronExpressionModifyRequest;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskExecuteRequest;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskIntervalModifyRequest;
-import com.nucleonforge.axelix.master.api.request.scheduled.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
