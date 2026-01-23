@@ -60,7 +60,7 @@ public class AxelixScheduledTasksEndpoint {
 
     @PostMapping("/enable")
     public ResponseEntity<Void> enableTask(@RequestBody ScheduledTaskToggleRequest request) {
-        taskService.enableTask(request.targetScheduledTask());
+        taskService.enableTask(request.trigger());
         return ResponseEntity.noContent().build();
     }
 
@@ -69,25 +69,25 @@ public class AxelixScheduledTasksEndpoint {
             @RequestBody ScheduledTaskToggleRequest request,
             @RequestParam(value = "force", defaultValue = "false") boolean force) {
 
-        taskService.disableTask(request.targetScheduledTask(), force);
+        taskService.disableTask(request.trigger(), force);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/modify/cron-expression")
     public ResponseEntity<Void> modifyCronExpression(@RequestBody ScheduledTaskCronExpressionModifyRequest request) {
-        taskService.modifyCronExpression(request.targetScheduledTask(), request.cronExpression());
+        taskService.modifyCronExpression(request.trigger(), request.cronExpression());
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/modify/interval")
     public ResponseEntity<Void> modifyInterval(@RequestBody ScheduledTaskIntervalModifyRequest request) {
-        taskService.modifyInterval(request.targetScheduledTask(), Duration.ofMillis(request.interval()));
+        taskService.modifyInterval(request.trigger(), Duration.ofMillis(request.interval()));
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/execute")
     public ResponseEntity<Void> executeScheduledTask(@RequestBody ScheduledTaskExecuteRequest request) {
-        taskService.executeScheduledTask(request.targetScheduledTask());
+        taskService.executeScheduledTask(request.trigger());
         return ResponseEntity.noContent().build();
     }
 }

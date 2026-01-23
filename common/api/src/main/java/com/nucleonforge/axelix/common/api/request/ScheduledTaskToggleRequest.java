@@ -20,10 +20,10 @@ package com.nucleonforge.axelix.common.api.request;
 /**
  * Represents a request to toggle (enable/disable) a scheduled task.
  *
- * @param targetScheduledTask the identifier of the scheduled task to toggle. Must not be {@code null}.
+ * @param trigger the identifier of the scheduled task to toggle. Must not be {@code null}.
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public record ScheduledTaskToggleRequest(String targetScheduledTask) {}
+public record ScheduledTaskToggleRequest(String trigger) {}
