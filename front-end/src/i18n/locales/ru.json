@@ -23,8 +23,7 @@
             "CONFIG_PROPS": "Свойства Конфигурации",
             "ENV": "Окружение",
             "SCHEDULED_TASKS": "Запланированные Задачи",
-            "LOG_FILE": "Лог файл",
-            "Sanitize": "Обезличить Перед Экспортом"
+            "LOG_FILE": "Лог файл"
         },
         "spring": {
             "springBootVersion": "Spring Boot",
