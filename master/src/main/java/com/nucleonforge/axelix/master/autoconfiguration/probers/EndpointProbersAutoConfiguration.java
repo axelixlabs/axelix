@@ -24,6 +24,7 @@ import org.springframework.core.io.Resource;
 
 import com.nucleonforge.axelix.common.api.BeansFeed;
 import com.nucleonforge.axelix.common.api.InstanceDetails;
+import com.nucleonforge.axelix.common.api.ProfileMutationResult;
 import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
 import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
 import com.nucleonforge.axelix.common.api.caches.CachesFeed;
@@ -45,6 +46,7 @@ import com.nucleonforge.axelix.master.service.serde.GcLogFileMessageDeserializat
 import com.nucleonforge.axelix.master.service.serde.GcLogStatusMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.LogFileMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.ProfileMutationJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.ScheduledTasksJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.ThreadDumpJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
@@ -296,5 +298,19 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public DiscardingAbstractEndpointProber modifyIntervalScheduledTasksEndpointProber() {
         return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.MODIFY_INTERVAL_SCHEDULED_TASK);
+    }
+
+    // Property Management
+    @Bean
+    public DiscardingAbstractEndpointProber changePropertyValueEndpointProver() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.PROPERTY_MANAGEMENT);
+    }
+
+    // Profile Management
+    @Bean
+    public DefaultEndpointProber<ProfileMutationResult> replaceProfileEndpointProver(
+            ProfileMutationJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.PROFILE_MANAGEMENT);
     }
 }
