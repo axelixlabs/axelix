@@ -86,8 +86,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint CONFIG_PROPS_BY_PREFIX = of("/axelix-configprops/{prefix}", HttpMethod.GET);
 
     // Environment
-    public static final ActuatorEndpoint ENV = of("/axelix-env", HttpMethod.GET);
-    public static final ActuatorEndpoint ENV_PROPERTY = of("/env/{property.name}", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_ALL_ENV_PROPERTIES = of("/axelix-env", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_SINGLE_ENV_PROPERTY = of("/env/{property.name}", HttpMethod.GET);
 
     // Flyway
     public static final ActuatorEndpoint FLYWAY = of("/flyway", HttpMethod.GET);
@@ -217,8 +217,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 CONDITIONS,
                 CONFIG_PROPS,
                 CONFIG_PROPS_BY_PREFIX,
-                ENV,
-                ENV_PROPERTY,
+                GET_ALL_ENV_PROPERTIES,
+                GET_SINGLE_ENV_PROPERTY,
                 FLYWAY,
                 HEALTH,
                 HEALTH_COMPONENT,

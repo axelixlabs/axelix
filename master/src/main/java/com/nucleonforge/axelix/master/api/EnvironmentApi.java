@@ -39,13 +39,13 @@ import com.nucleonforge.axelix.common.api.env.EnvironmentProperty;
 import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.HttpPayload;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.EnvironmentFeedResponse;
 import com.nucleonforge.axelix.master.api.response.EnvironmentPropertyResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axelix.master.service.transport.EnvironmentEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.EnvironmentPropertyEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing environment.
@@ -61,18 +61,15 @@ import com.nucleonforge.axelix.master.service.transport.EnvironmentPropertyEndpo
 @RequestMapping(path = ApiPaths.EnvironmentApi.MAIN)
 public class EnvironmentApi {
 
-    private final EnvironmentEndpointProber environmentEndpointProber;
-    private final EnvironmentPropertyEndpointProber environmentPropertyEndpointProber;
+    private final EndpointInvoker endpointInvoker;
     private final Converter<EnvironmentFeed, EnvironmentFeedResponse> envConverter;
     private final Converter<EnvironmentProperty, EnvironmentPropertyResponse> envPropertyConverter;
 
     public EnvironmentApi(
-            EnvironmentEndpointProber environmentEndpointProber,
-            EnvironmentPropertyEndpointProber environmentPropertyEndpointProber,
+            EndpointInvoker endpointInvoker,
             Converter<EnvironmentFeed, EnvironmentFeedResponse> envConverter,
             Converter<EnvironmentProperty, EnvironmentPropertyResponse> envPropertyConverter) {
-        this.environmentEndpointProber = environmentEndpointProber;
-        this.environmentPropertyEndpointProber = environmentPropertyEndpointProber;
+        this.endpointInvoker = endpointInvoker;
         this.envConverter = envConverter;
         this.envPropertyConverter = envPropertyConverter;
     }
@@ -109,8 +106,9 @@ public class EnvironmentApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.EnvironmentApi.FEED)
-    public EnvironmentFeedResponse getEnvironment(@PathVariable("instanceId") String instanceId) {
-        EnvironmentFeed result = environmentEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+    public EnvironmentFeedResponse getAllEnvironmentProperties(@PathVariable("instanceId") String instanceId) {
+        EnvironmentFeed result = endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(envConverter.convert(result));
     }
 
@@ -149,11 +147,12 @@ public class EnvironmentApi {
         @Parameter(name = "propertyName", description = "Name of the environment property", required = true)
     })
     @GetMapping(path = ApiPaths.EnvironmentApi.PROPERTY)
-    public EnvironmentPropertyResponse getProperty(
+    public EnvironmentPropertyResponse getSingleEnvironmentProperty(
             @PathVariable("instanceId") String instanceId, @PathVariable("propertyName") String propertyName) {
         HttpPayload payload = new DefaultHttpPayload(Map.of("property.name", propertyName));
 
-        EnvironmentProperty result = environmentPropertyEndpointProber.invoke(InstanceId.of(instanceId), payload);
+        EnvironmentProperty result =
+                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_SINGLE_ENV_PROPERTY, payload);
         return Objects.requireNonNull(envPropertyConverter.convert(result));
     }
 }

@@ -46,6 +46,6 @@ public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStat
 
     @Override
     protected Object collectInternal(String instanceId, EnvStateComponentSettings settings) {
-        return environmentApi.getEnvironment(instanceId);
+        return environmentApi.getAllEnvironmentProperties(instanceId);
     }
 }
