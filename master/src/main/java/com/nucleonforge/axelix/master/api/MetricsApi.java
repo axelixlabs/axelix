@@ -43,13 +43,13 @@ import com.nucleonforge.axelix.common.domain.http.DefaultHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.MultiValueQueryParameter;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.common.domain.http.QueryParameter;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.metrics.MetricsGroupsFeedResponse;
 import com.nucleonforge.axelix.master.api.response.metrics.SingleMetricProfileResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axelix.master.service.transport.metrics.GetMetricsGroupsEndpointProber;
-import com.nucleonforge.axelix.master.service.transport.metrics.GetSingleMetricProfileEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing metrics.
@@ -62,18 +62,15 @@ import com.nucleonforge.axelix.master.service.transport.metrics.GetSingleMetricP
 @RequestMapping(path = ApiPaths.MetricsApi.MAIN)
 public class MetricsApi {
 
-    private final GetMetricsGroupsEndpointProber getMetricsGroupsEndpointProber;
-    private final GetSingleMetricProfileEndpointProber getSingleMetricProfileEndpointProber;
+    private final EndpointInvoker endpointInvoker;
     private final Converter<MetricsGroupsFeed, MetricsGroupsFeedResponse> metricsGroupsFeedConverter;
     private final Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter;
 
     public MetricsApi(
-            GetMetricsGroupsEndpointProber getMetricsGroupsEndpointProber,
-            GetSingleMetricProfileEndpointProber getSingleMetricProfileEndpointProber,
+            EndpointInvoker endpointInvoker,
             Converter<MetricsGroupsFeed, MetricsGroupsFeedResponse> metricsGroupsFeedConverter,
             Converter<MetricProfile, SingleMetricProfileResponse> singleMetricConverter) {
-        this.getMetricsGroupsEndpointProber = getMetricsGroupsEndpointProber;
-        this.getSingleMetricProfileEndpointProber = getSingleMetricProfileEndpointProber;
+        this.endpointInvoker = endpointInvoker;
         this.metricsGroupsFeedConverter = metricsGroupsFeedConverter;
         this.singleMetricConverter = singleMetricConverter;
     }
@@ -110,9 +107,9 @@ public class MetricsApi {
             })
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.MetricsApi.INSTANCE_ID)
-    public MetricsGroupsFeedResponse getMetricsGroups(@PathVariable("instanceId") String instanceId) {
-        MetricsGroupsFeed metricsList =
-                getMetricsGroupsEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+    public MetricsGroupsFeedResponse getMetricGroups(@PathVariable("instanceId") String instanceId) {
+        MetricsGroupsFeed metricsList = endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_METRIC_GROUPS, NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(metricsGroupsFeedConverter.convert(metricsList));
     }
 
@@ -163,8 +160,10 @@ public class MetricsApi {
             queryParameters.add(new MultiValueQueryParameter("tag", tags));
         }
 
-        MetricProfile result = getSingleMetricProfileEndpointProber.invoke(
-                InstanceId.of(instanceId), new DefaultHttpPayload(queryParameters, Map.of("metric.name", metric)));
+        MetricProfile result = endpointInvoker.invoke(
+                InstanceId.of(instanceId),
+                ActuatorEndpoints.GET_SINGLE_METRIC,
+                new DefaultHttpPayload(queryParameters, Map.of("metric.name", metric)));
 
         return Objects.requireNonNull(singleMetricConverter.convert(result));
     }
