@@ -20,6 +20,7 @@ package com.nucleonforge.axelix.master.autoconfiguration.probers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
 
 import com.nucleonforge.axelix.common.api.BeansFeed;
 import com.nucleonforge.axelix.common.api.InstanceDetails;
@@ -39,6 +40,8 @@ import com.nucleonforge.axelix.master.service.serde.DetailsJacksonMessageDeseria
 import com.nucleonforge.axelix.master.service.serde.ThreadDumpJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.EnvironmentJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.EnvironmentPropertyJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.LogFileMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.SingleCacheJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
@@ -209,6 +212,20 @@ public class EndpointProbersAutoConfiguration {
     public DefaultEndpointProber<EnvironmentProperty> getSingleEnvironmentEndpointProver(
             EnvironmentPropertyJacksonMessageDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_ENV_PROPERTY);
+            instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_ENV_PROPERTY);
+    }
+
+    // HeapDump
+    @Bean
+    public DefaultEndpointProber<Resource> getHeapDumpEndpointProver(
+            HeapDumpMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_HEAP_DUMP);
+    }
+
+    // LogFile
+    @Bean
+    public DefaultEndpointProber<Resource> getLogFileEndpointProver(
+            LogFileMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_LOG_FILE);
     }
 }

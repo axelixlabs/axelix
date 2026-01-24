@@ -36,10 +36,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.export.HeapDumpAnonymizer;
-import com.nucleonforge.axelix.master.service.transport.HeapDumpEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for Heap Dump.
@@ -51,12 +52,11 @@ import com.nucleonforge.axelix.master.service.transport.HeapDumpEndpointProber;
 @RequestMapping(path = ApiPaths.HeapDumpApi.MAIN)
 public class HeapDumpApi {
 
-    private final HeapDumpEndpointProber heapDumpEndpointProber;
-
+    private final EndpointInvoker endpointInvoker;
     private final HeapDumpAnonymizer heapDumpAnonymizer;
 
-    public HeapDumpApi(HeapDumpEndpointProber heapDumpEndpointProber, HeapDumpAnonymizer heapDumpAnonymizer) {
-        this.heapDumpEndpointProber = heapDumpEndpointProber;
+    public HeapDumpApi(EndpointInvoker endpointInvoker, HeapDumpAnonymizer heapDumpAnonymizer) {
+        this.endpointInvoker = endpointInvoker;
         this.heapDumpAnonymizer = heapDumpAnonymizer;
     }
 
@@ -98,7 +98,8 @@ public class HeapDumpApi {
             @PathVariable("instanceId") String instanceId,
             @RequestParam(defaultValue = "true", required = false) boolean sanitizeHeapDump) {
 
-        Resource resource = heapDumpEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        Resource resource = endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_HEAP_DUMP, NoHttpPayload.INSTANCE);
 
         if (sanitizeHeapDump) {
             resource = heapDumpAnonymizer.anonymize(resource);
