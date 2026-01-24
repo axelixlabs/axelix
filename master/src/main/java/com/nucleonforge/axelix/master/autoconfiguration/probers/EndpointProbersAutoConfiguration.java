@@ -21,24 +21,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
-<<<<<<< HEAD
 import com.nucleonforge.axelix.common.api.BeansFeed;
 import com.nucleonforge.axelix.common.api.InstanceDetails;
-=======
 import com.nucleonforge.axelix.common.api.ThreadDumpFeed;
->>>>>>> 9eb323c7 (GH-615: Migrated the Thread Dump APIs to EndpointInvoker)
 import com.nucleonforge.axelix.common.api.caches.CachesFeed;
 import com.nucleonforge.axelix.common.api.caches.SingleCache;
 import com.nucleonforge.axelix.common.api.loggers.LoggerGroup;
 import com.nucleonforge.axelix.common.api.loggers.LoggerLevels;
 import com.nucleonforge.axelix.common.api.loggers.ServiceLoggers;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
-<<<<<<< HEAD
 import com.nucleonforge.axelix.master.service.serde.BeansJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
-=======
 import com.nucleonforge.axelix.master.service.serde.ThreadDumpJacksonMessageDeserializationStrategy;
->>>>>>> 9eb323c7 (GH-615: Migrated the Thread Dump APIs to EndpointInvoker)
 import com.nucleonforge.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.caches.SingleCacheJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
@@ -146,7 +140,6 @@ public class EndpointProbersAutoConfiguration {
         return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_ALL_CACHES);
     }
 
-<<<<<<< HEAD
     // Details
     @Bean
     public DefaultEndpointProber<InstanceDetails> getDetailsEndpointProber(
