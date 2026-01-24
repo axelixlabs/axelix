@@ -34,11 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.common.api.BeansFeed;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.api.error.SimpleApiError;
 import com.nucleonforge.axelix.master.api.response.BeansFeedResponse;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.convert.response.Converter;
-import com.nucleonforge.axelix.master.service.transport.BeansEndpointProber;
+import com.nucleonforge.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * The API for managing beans.
@@ -50,11 +51,11 @@ import com.nucleonforge.axelix.master.service.transport.BeansEndpointProber;
 @RequestMapping(path = ApiPaths.BeansApi.MAIN)
 public class BeansApi {
 
-    private final BeansEndpointProber beansEndpointProber;
+    private final EndpointInvoker endpointInvoker;
     private final Converter<BeansFeed, BeansFeedResponse> converter;
 
-    public BeansApi(BeansEndpointProber beansEndpointProber, Converter<BeansFeed, BeansFeedResponse> converter) {
-        this.beansEndpointProber = beansEndpointProber;
+    public BeansApi(EndpointInvoker endpointInvoker, Converter<BeansFeed, BeansFeedResponse> converter) {
+        this.endpointInvoker = endpointInvoker;
         this.converter = converter;
     }
 
@@ -91,7 +92,8 @@ public class BeansApi {
     @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
     @GetMapping(path = ApiPaths.BeansApi.FEED)
     public BeansFeedResponse getBeansProfile(@PathVariable("instanceId") String instanceId) {
-        BeansFeed result = beansEndpointProber.invoke(InstanceId.of(instanceId), NoHttpPayload.INSTANCE);
+        BeansFeed result =
+                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(converter.convert(result));
     }
 }
