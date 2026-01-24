@@ -189,7 +189,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint STARTUP = of("/startup", HttpMethod.POST);
 
     // Thread Dump
-    public static final ActuatorEndpoint THREAD_DUMP = of("/axelix-thread-dump", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_THREAD_DUMP = of("/axelix-thread-dump", HttpMethod.GET);
     public static final ActuatorEndpoint THREAD_DUMP_ENABLE_CONTENTION_MONITORING =
             of("/axelix-thread-dump/enable", HttpMethod.POST);
     public static final ActuatorEndpoint THREAD_DUMP_DISABLE_CONTENTION_MONITORING =
@@ -262,7 +262,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 DELETE_SESSION,
                 SHUTDOWN,
                 STARTUP,
-                THREAD_DUMP,
+                GET_THREAD_DUMP,
                 THREAD_DUMP_ENABLE_CONTENTION_MONITORING,
                 THREAD_DUMP_DISABLE_CONTENTION_MONITORING));
     }
