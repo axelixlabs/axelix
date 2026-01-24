@@ -166,7 +166,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint SINGLE_SBOM = of("/sbom/{sbom-id}", HttpMethod.GET);
 
     // @Scheduled tasks
-    public static final ActuatorEndpoint SCHEDULED_TASKS = of("/axelix-scheduled-tasks", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_SCHEDULED_TASKS = of("/axelix-scheduled-tasks", HttpMethod.GET);
     public static final ActuatorEndpoint MODIFY_CRON_EXPRESSION_SCHEDULED_TASK =
             of("/axelix-scheduled-tasks/modify/cron-expression", HttpMethod.POST);
     public static final ActuatorEndpoint MODIFY_INTERVAL_SCHEDULED_TASK =
@@ -251,7 +251,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 QUARTZ_TRIGGERS,
                 ALL_SBOMS,
                 SINGLE_SBOM,
-                SCHEDULED_TASKS,
+                GET_SCHEDULED_TASKS,
                 MODIFY_CRON_EXPRESSION_SCHEDULED_TASK,
                 MODIFY_INTERVAL_SCHEDULED_TASK,
                 ENABLE_SCHEDULED_TASK,
