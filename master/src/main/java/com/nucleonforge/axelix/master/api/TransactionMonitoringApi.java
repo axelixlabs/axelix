@@ -17,7 +17,6 @@
  */
 package com.nucleonforge.axelix.master.api;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nucleonforge.axelix.master.api.response.TransactionMonitoringFeed;
 import com.nucleonforge.axelix.master.api.response.TransactionMonitoringFeed.TransactionExecution;
+import com.nucleonforge.axelix.master.api.response.TransactionMonitoringFeed.TransactionalEntrypoint;
 
 /**
  * The API for Transaction Monitoring.
@@ -38,54 +38,54 @@ import com.nucleonforge.axelix.master.api.response.TransactionMonitoringFeed.Tra
 public class TransactionMonitoringApi {
 
     @GetMapping(path = ApiPaths.TransactionMonitoringApi.INSTANCE_ID)
-    public List<TransactionMonitoringFeed> getTransactionFeed() {
-        return Arrays.asList(
-                new TransactionMonitoringFeed(
+    public TransactionMonitoringFeed getTransactionFeed() {
+        return new TransactionMonitoringFeed(List.of(
+                new TransactionalEntrypoint(
                         "PropagationTestHelper",
                         "testNestedRequiresNew",
                         List.of(
-                                new TransactionExecution(125L, "1737374615"),
-                                new TransactionExecution(110L, "1737374625"),
-                                new TransactionExecution(98L, "1737374635"),
-                                new TransactionExecution(135L, "1737374645"),
-                                new TransactionExecution(115L, "1737374655"),
-                                new TransactionExecution(125L, "1737374665"),
-                                new TransactionExecution(110L, "1737374675"),
-                                new TransactionExecution(98L, "1737374685"),
-                                new TransactionExecution(135L, "1737374695"),
-                                new TransactionExecution(115L, "1737374705"),
-                                new TransactionExecution(125L, "1737374715"),
-                                new TransactionExecution(110L, "1737374725"),
-                                new TransactionExecution(98L, "1737374735"),
-                                new TransactionExecution(135L, "1737374745"),
-                                new TransactionExecution(115L, "1737374755"))),
-                new TransactionMonitoringFeed(
+                                new TransactionExecution(125L, 1737374615L),
+                                new TransactionExecution(110L, 1737374625L),
+                                new TransactionExecution(98L, 1737374635L),
+                                new TransactionExecution(135L, 1737374645L),
+                                new TransactionExecution(115L, 1737374655L),
+                                new TransactionExecution(125L, 1737374665L),
+                                new TransactionExecution(110L, 1737374675L),
+                                new TransactionExecution(98L, 1737374685L),
+                                new TransactionExecution(135L, 1737374695L),
+                                new TransactionExecution(115L, 1737374705L),
+                                new TransactionExecution(125L, 1737374715L),
+                                new TransactionExecution(110L, 1737374725L),
+                                new TransactionExecution(98L, 1737374735L),
+                                new TransactionExecution(135L, 1737374745L),
+                                new TransactionExecution(115L, 1737374755L))),
+                new TransactionalEntrypoint(
                         "PropagationTestService",
                         "testRequired",
                         List.of(
-                                new TransactionExecution(25L, "1737374765"),
-                                new TransactionExecution(11L, "1737374775"),
-                                new TransactionExecution(288L, "1737374785"),
-                                new TransactionExecution(13L, "1737374795"),
-                                new TransactionExecution(15L, "1737374805"),
-                                new TransactionExecution(25L, "1737374815"),
-                                new TransactionExecution(11L, "1737374825"),
-                                new TransactionExecution(288L, "1737374835"),
-                                new TransactionExecution(13L, "1737374845"),
-                                new TransactionExecution(15L, "1737374855"))),
-                new TransactionMonitoringFeed(
+                                new TransactionExecution(25L, 1737374765L),
+                                new TransactionExecution(11L, 1737374775L),
+                                new TransactionExecution(288L, 1737374785L),
+                                new TransactionExecution(13L, 1737374795L),
+                                new TransactionExecution(15L, 1737374805L),
+                                new TransactionExecution(25L, 1737374815L),
+                                new TransactionExecution(11L, 1737374825L),
+                                new TransactionExecution(288L, 1737374835L),
+                                new TransactionExecution(13L, 1737374845L),
+                                new TransactionExecution(15L, 1737374855L))),
+                new TransactionalEntrypoint(
                         "PropagationTestService",
                         "testSupports",
                         List.of(
-                                new TransactionExecution(225L, "1737374865"),
-                                new TransactionExecution(280L, "1737374875"),
-                                new TransactionExecution(198L, "1737374885"),
-                                new TransactionExecution(235L, "1737374895"),
-                                new TransactionExecution(275L, "1737374905"),
-                                new TransactionExecution(225L, "1737374915"),
-                                new TransactionExecution(280L, "1737374925"),
-                                new TransactionExecution(198L, "1737374935"),
-                                new TransactionExecution(235L, "1737374945"),
-                                new TransactionExecution(275L, "1737374955"))));
+                                new TransactionExecution(225L, 1737374865L),
+                                new TransactionExecution(280L, 1737374875L),
+                                new TransactionExecution(198L, 1737374885L),
+                                new TransactionExecution(235L, 1737374895L),
+                                new TransactionExecution(275L, 1737374905L),
+                                new TransactionExecution(225L, 1737374915L),
+                                new TransactionExecution(280L, 1737374925L),
+                                new TransactionExecution(198L, 1737374935L),
+                                new TransactionExecution(235L, 1737374945L),
+                                new TransactionExecution(275L, 1737374955L)))));
     }
 }

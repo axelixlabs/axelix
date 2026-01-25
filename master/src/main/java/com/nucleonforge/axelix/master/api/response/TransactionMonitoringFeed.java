@@ -20,10 +20,27 @@ package com.nucleonforge.axelix.master.api.response;
 import java.util.List;
 
 /**
+ * The feed of transactions inside a given application.
+ *
  * @since 20.01.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public record TransactionMonitoringFeed(String className, String methodName, List<TransactionExecution> executions) {
+public record TransactionMonitoringFeed(List<TransactionalEntrypoint> entrypoints) {
 
-    public record TransactionExecution(long durationsMs, String timestamp) {}
+    /**
+     * The transactional entrypoint. In other words,
+     *
+     * @param className the short name of the class where transaction is initiated.
+     * @param methodName the name of the method where transaction is initiated.
+     * @param executions currently recorded executions of this transaction entrypoint.
+     */
+    public record TransactionalEntrypoint(String className, String methodName, List<TransactionExecution> executions) {}
+
+    /**
+     *
+     * @param durationsMs
+     * @param timestamp unix timestamp (milliseconds from epoch) when transaction started
+     */
+    public record TransactionExecution(long durationsMs, Long timestamp) {}
 }
