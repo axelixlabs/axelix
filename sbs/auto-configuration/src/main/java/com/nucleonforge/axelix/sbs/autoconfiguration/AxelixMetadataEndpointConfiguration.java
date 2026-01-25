@@ -33,8 +33,10 @@ import com.nucleonforge.axelix.sbs.spring.master.CommitIdPluginShortBuildInfoPro
 import com.nucleonforge.axelix.sbs.spring.master.DefaultServiceMetadataAssembler;
 import com.nucleonforge.axelix.sbs.spring.master.GitInformationProvider;
 import com.nucleonforge.axelix.sbs.spring.master.LibraryDiscoverer;
+import com.nucleonforge.axelix.sbs.spring.master.OptionsParsingVMFeaturesProvider;
 import com.nucleonforge.axelix.sbs.spring.master.ServiceMetadataAssembler;
 import com.nucleonforge.axelix.sbs.spring.master.ShortBuildInfoProvider;
+import com.nucleonforge.axelix.sbs.spring.master.VMFeaturesProvider;
 
 /**
  * Auto-configuration for the {@link AxelixMetadataEndpoint}.
@@ -58,18 +60,26 @@ public class AxelixMetadataEndpointConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    public VMFeaturesProvider vmFeaturesProvider() {
+        return new OptionsParsingVMFeaturesProvider();
+    }
+
+    @Bean
     ServiceMetadataAssembler serviceMetadataAssembler(
             HealthEndpoint healthEndpoint,
             LibraryDiscoverer libraryDiscoverer,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
-            List<ShortBuildInfoProvider> shortBuildInfoProviders) {
+            List<ShortBuildInfoProvider> shortBuildInfoProviders,
+            VMFeaturesProvider vmFeaturesProvider) {
         return new DefaultServiceMetadataAssembler(
                 healthEndpoint,
                 libraryDiscoverer,
                 axelixVersionDiscoverer,
                 gitInformationProviders,
-                shortBuildInfoProviders);
+                shortBuildInfoProviders,
+                vmFeaturesProvider);
     }
 
     @Bean

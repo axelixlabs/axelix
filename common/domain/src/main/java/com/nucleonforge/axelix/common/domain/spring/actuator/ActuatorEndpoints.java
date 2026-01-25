@@ -89,9 +89,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint GET_ALL_ENV_PROPERTIES = of("/axelix-env", HttpMethod.GET);
     public static final ActuatorEndpoint GET_SINGLE_ENV_PROPERTY = of("/env/{property.name}", HttpMethod.GET);
 
-    // Flyway
-    public static final ActuatorEndpoint FLYWAY = of("/flyway", HttpMethod.GET);
-
     // Health
     public static final ActuatorEndpoint HEALTH = of("/health", HttpMethod.GET);
     public static final ActuatorEndpoint HEALTH_COMPONENT = of("/health/{component}", HttpMethod.GET);
@@ -104,18 +101,12 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // Http Exchanges
     public static final ActuatorEndpoint HTTP_EXCHANGES = of("/httpexchanges", HttpMethod.GET);
 
-    // General Info
-    public static final ActuatorEndpoint INFO = of("/info", HttpMethod.GET);
-
     // Details
     public static final ActuatorEndpoint GET_DETAILS = of("/axelix-details", HttpMethod.GET);
 
     // Integration Graph (Spring Integrations project)
     public static final ActuatorEndpoint INTEGRATIONS_GRAPH = of("/integrationgraph", HttpMethod.GET);
     public static final ActuatorEndpoint REBUILD_INTEGRATIONS_GRAPH = of("/integrationgraph", HttpMethod.POST);
-
-    // Liquibase
-    public static final ActuatorEndpoint LIQUIBASE = of("/liquibase", HttpMethod.GET);
 
     // Log File
     public static final ActuatorEndpoint GET_LOG_FILE = of("/logfile", HttpMethod.GET);
@@ -135,9 +126,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint SET_FOR_LOGGER_GROUP = of("/loggers/{group.name}", HttpMethod.POST);
     public static final ActuatorEndpoint CLEAR_FOR_LOGGER = of("/loggers/{logger.name}", HttpMethod.POST);
 
-    // Mappings
-    public static final ActuatorEndpoint MAPPINGS = of("/mappings", HttpMethod.GET);
-
     // Metadata
     public static final ActuatorEndpoint METADATA = of("/axelix-metadata", HttpMethod.GET);
 
@@ -148,22 +136,20 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     // ProfileManagement
     public static final ActuatorEndpoint PROFILE_MANAGEMENT = of("/profile-management", HttpMethod.POST);
 
-    // Prometheus
-    public static final ActuatorEndpoint PROMETHEUS = of("/prometheus", HttpMethod.GET);
-
     // PropertyManagement
     public static final ActuatorEndpoint PROPERTY_MANAGEMENT = of("/property-management", HttpMethod.POST);
 
     // Quartz
-    // TODO: there are more of them
-    public static final ActuatorEndpoint QUARTZ = of("/quartz", HttpMethod.GET);
-    public static final ActuatorEndpoint QUARTZ_JOBS = of("/quartz/jobs", HttpMethod.GET);
-    public static final ActuatorEndpoint QUARTZ_SINGLE_JOB = of("/quartz/jobs/{job}", HttpMethod.GET);
-    public static final ActuatorEndpoint QUARTZ_TRIGGERS = of("/quartz/triggers", HttpMethod.GET);
+    // TODO: Quartz integration
+    //    public static final ActuatorEndpoint QUARTZ = of("/quartz", HttpMethod.GET);
+    //    public static final ActuatorEndpoint QUARTZ_JOBS = of("/quartz/jobs", HttpMethod.GET);
+    //    public static final ActuatorEndpoint QUARTZ_SINGLE_JOB = of("/quartz/jobs/{job}", HttpMethod.GET);
+    //    public static final ActuatorEndpoint QUARTZ_TRIGGERS = of("/quartz/triggers", HttpMethod.GET);
 
     // SBOM
-    public static final ActuatorEndpoint ALL_SBOMS = of("/sbom", HttpMethod.GET);
-    public static final ActuatorEndpoint SINGLE_SBOM = of("/sbom/{sbom-id}", HttpMethod.GET);
+    // TODO: Add SBOM integration
+    //    public static final ActuatorEndpoint ALL_SBOMS = of("/sbom", HttpMethod.GET);
+    //    public static final ActuatorEndpoint SINGLE_SBOM = of("/sbom/{sbom-id}", HttpMethod.GET);
 
     // @Scheduled tasks
     public static final ActuatorEndpoint GET_SCHEDULED_TASKS = of("/axelix-scheduled-tasks", HttpMethod.GET);
@@ -181,12 +167,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint SESSION = of("/sessions", HttpMethod.GET);
     public static final ActuatorEndpoint SINGLE_SESSION = of("/sessions/{id}", HttpMethod.GET);
     public static final ActuatorEndpoint DELETE_SESSION = of("/sessions/{id}", HttpMethod.DELETE);
-
-    // Shutdown
-    public static final ActuatorEndpoint SHUTDOWN = of("/shutdown", HttpMethod.POST);
-
-    // Startup
-    public static final ActuatorEndpoint STARTUP = of("/startup", HttpMethod.POST);
 
     // Thread Dump
     public static final ActuatorEndpoint GET_THREAD_DUMP = of("/axelix-thread-dump", HttpMethod.GET);
@@ -219,17 +199,14 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 CONFIG_PROPS_BY_PREFIX,
                 GET_ALL_ENV_PROPERTIES,
                 GET_SINGLE_ENV_PROPERTY,
-                FLYWAY,
                 HEALTH,
                 HEALTH_COMPONENT,
                 HEALTH_SUB_COMPONENT,
                 GET_HEAP_DUMP,
                 HTTP_EXCHANGES,
-                INFO,
                 GET_DETAILS,
                 INTEGRATIONS_GRAPH,
                 REBUILD_INTEGRATIONS_GRAPH,
-                LIQUIBASE,
                 GET_LOG_FILE,
                 GET_GC_LOG_FILE,
                 GET_ALL_LOGGERS,
@@ -238,19 +215,11 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 SET_ONE_LOGGER,
                 SET_FOR_LOGGER_GROUP,
                 CLEAR_FOR_LOGGER,
-                MAPPINGS,
                 METADATA,
                 GET_METRIC_GROUPS,
                 GET_SINGLE_METRIC,
                 PROFILE_MANAGEMENT,
-                PROMETHEUS,
                 PROPERTY_MANAGEMENT,
-                QUARTZ,
-                QUARTZ_JOBS,
-                QUARTZ_SINGLE_JOB,
-                QUARTZ_TRIGGERS,
-                ALL_SBOMS,
-                SINGLE_SBOM,
                 GET_SCHEDULED_TASKS,
                 MODIFY_CRON_EXPRESSION_SCHEDULED_TASK,
                 MODIFY_INTERVAL_SCHEDULED_TASK,
@@ -260,8 +229,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 SESSION,
                 SINGLE_SESSION,
                 DELETE_SESSION,
-                SHUTDOWN,
-                STARTUP,
                 GET_THREAD_DUMP,
                 THREAD_DUMP_ENABLE_CONTENTION_MONITORING,
                 THREAD_DUMP_DISABLE_CONTENTION_MONITORING));

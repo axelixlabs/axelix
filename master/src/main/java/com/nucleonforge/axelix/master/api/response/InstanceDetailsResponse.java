@@ -17,8 +17,12 @@
  */
 package com.nucleonforge.axelix.master.api.response;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
+
+import com.nucleonforge.axelix.master.model.instance.Instance.VMFeature;
 
 /**
  * The profile of a given details.
@@ -38,7 +42,8 @@ public record InstanceDetailsResponse(
         RuntimeProfile runtime,
         SpringProfile spring,
         @Nullable BuildProfile build,
-        OSProfile os) {
+        OSProfile os,
+        List<VMFeature> vmFeatures) {
 
     /**
      * The profile of a given build.

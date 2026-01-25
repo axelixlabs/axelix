@@ -19,6 +19,7 @@ package com.nucleonforge.axelix.master.utils;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.instancio.Instancio;
@@ -29,6 +30,7 @@ import com.nucleonforge.axelix.common.domain.BuildInfo;
 import com.nucleonforge.axelix.common.domain.ClassPath;
 import com.nucleonforge.axelix.common.domain.ClassPathEntry;
 import com.nucleonforge.axelix.master.model.instance.Instance;
+import com.nucleonforge.axelix.master.model.instance.Instance.VMFeature;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.model.instance.MemoryUsage;
 
@@ -66,11 +68,39 @@ public final class TestObjectFactory {
             String springFramework,
             String jdkVendor,
             @Nullable String kotlin) {
-        return createInstance(id, DEFAULT_URL, DEFAULT_STATUS, java, springBoot, springFramework, jdkVendor, kotlin);
+        return createInstance(
+                id, DEFAULT_URL, DEFAULT_STATUS, java, springBoot, springFramework, jdkVendor, kotlin, List.of());
     }
 
     public static Instance createInstance(String id, String url, Instance.InstanceStatus status) {
-        return createInstance(id, url, status, "25", "3.5.2", "6.0.2", "BellSoft", null);
+        return createInstance(id, url, status, "25", "3.5.2", "6.0.2", "BellSoft", null, List.of());
+    }
+
+    public static Instance createInstance(
+            String id, String url, Instance.InstanceStatus status, VMFeature... vmFeatures) {
+        return createInstance(
+                id,
+                url,
+                status,
+                "25",
+                "3.5.2",
+                "6.0.2",
+                "BellSoft",
+                null,
+                Arrays.stream(vmFeatures).toList());
+    }
+
+    public static Instance createInstance(String id, String url, VMFeature... vmFeatures) {
+        return createInstance(
+                id,
+                url,
+                DEFAULT_STATUS,
+                "25",
+                "3.5.2",
+                "6.0.2",
+                "BellSoft",
+                null,
+                Arrays.stream(vmFeatures).toList());
     }
 
     public static Instance createInstance(
@@ -81,7 +111,8 @@ public final class TestObjectFactory {
             String springBoot,
             String springFramework,
             String jdkVendor,
-            @Nullable String kotlin) {
+            @Nullable String kotlin,
+            List<VMFeature> vmFeatures) {
         return new Instance(
                 InstanceId.of(id),
                 "test-object-factory-instance",
@@ -95,7 +126,8 @@ public final class TestObjectFactory {
                 Instant.now(),
                 status,
                 new MemoryUsage(1000L),
-                url);
+                url,
+                vmFeatures);
     }
 
     public static BuildInfo createBuildInfo(ClassPathEntry... classPathEntries) {

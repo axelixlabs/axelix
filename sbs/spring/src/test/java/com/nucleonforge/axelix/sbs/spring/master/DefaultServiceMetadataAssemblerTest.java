@@ -64,6 +64,11 @@ class DefaultServiceMetadataAssemblerTest {
         }
 
         @Bean
+        VMFeaturesProvider vmFeaturesProvider() {
+            return new OptionsParsingVMFeaturesProvider();
+        }
+
+        @Bean
         AxelixVersionDiscoverer axelixVersionDiscoverer() {
             return () -> "1.1.3";
         }

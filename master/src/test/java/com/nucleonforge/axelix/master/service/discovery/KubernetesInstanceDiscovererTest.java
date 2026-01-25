@@ -154,7 +154,14 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memory" : {
                 "heap" : 12000
-              }
+              },
+              "vmFeatures": [
+                   {
+                     "name" : "AppCDS",
+                     "description" : "AppCDS Description",
+                     "enabled" : false
+                   }
+              ]
             }
             """;
 
@@ -196,6 +203,10 @@ class KubernetesInstanceDiscovererTest {
             assertThat(it.springFrameworkVersion()).isEqualTo("6.1.2");
             assertThat(it.kotlinVersion()).isNull();
             assertThat(it.status()).isEqualTo(Instance.InstanceStatus.UP);
+            assertThat(it.vmFeatures())
+                    .hasSize(1)
+                    .first()
+                    .isEqualTo(new Instance.VMFeature("AppCDS", "AppCDS Description", false));
             assertThat(it.actuatorUrl())
                     .isEqualTo(mockWebServer.url("/actuator").toString());
         });
@@ -226,7 +237,14 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memory" : {
                 "heap" : 12000
-              }
+              },
+              "vmFeatures": [
+                   {
+                     "name" : "AppCDS",
+                     "description" : "AppCDS Description",
+                     "enabled" : false
+                   }
+              ]
             }
             """;
         // language=json
@@ -246,7 +264,14 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memory" : {
                 "heap" : 12000
-              }
+              },
+              "vmFeatures": [
+                   {
+                     "name" : "AppCDS",
+                     "description" : "AppCDS Description",
+                     "enabled" : false
+                   }
+              ]
             }
             """;
 
@@ -345,7 +370,14 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memory" : {
                 "heap" : 12000
-              }
+              },
+              "vmFeatures": [
+                   {
+                     "name" : "AppCDS",
+                     "description" : "AppCDS Description",
+                     "enabled" : false
+                   }
+              ]
             }
         """;
 
@@ -424,7 +456,14 @@ class KubernetesInstanceDiscovererTest {
               "healthStatus" : "UP",
               "memory" : {
                 "heap" : 12000
-              }
+              },
+              "vmFeatures": [
+                   {
+                     "name" : "AppCDS",
+                     "description" : "AppCDS Description",
+                     "enabled" : false
+                   }
+              ]
             }
         """;
 

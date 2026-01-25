@@ -45,6 +45,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
     private final ShortBuildInfoProvider shortBuildInfoProvider;
     private final LibraryDiscoverer libraryDiscoverer;
+    private final VMFeaturesProvider vmFeaturesProvider;
 
     @SuppressWarnings("NullAway")
     public DefaultServiceMetadataAssembler(
@@ -52,13 +53,15 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
             LibraryDiscoverer libraryDiscoverer,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
-            List<ShortBuildInfoProvider> shortBuildInfoProviders) {
+            List<ShortBuildInfoProvider> shortBuildInfoProviders,
+            VMFeaturesProvider vmFeaturesProvider) {
 
         this.healthEndpoint = healthEndpoint;
         this.libraryDiscoverer = libraryDiscoverer;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
         this.gitInformationProvider = CollectionUtils.firstElement(gitInformationProviders);
         this.shortBuildInfoProvider = CollectionUtils.firstElement(shortBuildInfoProviders);
+        this.vmFeaturesProvider = vmFeaturesProvider;
 
         Assert.notNull(this.healthEndpoint, "The HealthEndpoint must not be null");
         Assert.notNull(this.gitInformationProvider, missingGitInfoProvider());
@@ -75,16 +78,21 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 shortBuildInfo.map(ShortBuildInfo::serviceVersion).orElse(""),
                 gitCommitInfo.map(GitInfo::commitShaShort).orElse(""),
                 System.getProperty("java.vendor"),
-                new ServiceMetadata.SoftwareVersions(
-                        System.getProperty("java.version"),
-                        libraryDiscoverer.getRequiredLibraryVersion("spring-boot", "org.springframework.boot"),
-                        libraryDiscoverer.getRequiredLibraryVersion("spring-core", "org.springframework"),
-                        libraryDiscoverer
-                                .getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin")
-                                .orElse(null)),
+                buildSoftwareVersionInUse(),
                 getCurrentHealth(),
                 new ServiceMetadata.MemoryDetails(
-                        memoryMXBean.getHeapMemoryUsage().getUsed()));
+                        memoryMXBean.getHeapMemoryUsage().getUsed()),
+                vmFeaturesProvider.discover());
+    }
+
+    private ServiceMetadata.SoftwareVersions buildSoftwareVersionInUse() {
+        return new ServiceMetadata.SoftwareVersions(
+                System.getProperty("java.version"),
+                libraryDiscoverer.getRequiredLibraryVersion("spring-boot", "org.springframework.boot"),
+                libraryDiscoverer.getRequiredLibraryVersion("spring-core", "org.springframework"),
+                libraryDiscoverer
+                        .getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin")
+                        .orElse(null));
     }
 
     private ServiceMetadata.HealthStatus getCurrentHealth() {

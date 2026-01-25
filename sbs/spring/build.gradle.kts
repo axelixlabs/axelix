@@ -39,21 +39,7 @@ tasks.withType<JavaCompile> {
 }
 
 tasks {
-    val nonStandardVmOptionsTest by registering(Test::class) {
-        useJUnitPlatform {
-            include("**/DefaultNonStandardVMOptionsDiscovererTest.class")
-        }
-        jvmArgs = listOf(
-            "-Xms256m",
-            "-Xmx512m",
-            "-XX:+UseG1GC"
-        )
-    }
-
     test {
-        useJUnitPlatform {
-            exclude("**/DefaultNonStandardVMOptionsDiscovererTest.class")
-        }
-        dependsOn(nonStandardVmOptionsTest)
+        useJUnitPlatform()
     }
 }

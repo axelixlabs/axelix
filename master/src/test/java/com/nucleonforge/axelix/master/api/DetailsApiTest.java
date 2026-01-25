@@ -41,6 +41,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
 import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
+import com.nucleonforge.axelix.master.model.instance.Instance;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
@@ -93,7 +94,19 @@ public class DetailsApiTest {
              "name": "Windows 10",
              "version": "10.0",
              "arch": "amd64"
-           }
+           },
+           "vmFeatures": [
+             {
+              "name" : "AppCDS",
+              "description" : "AppCDS Description",
+              "enabled" : false
+             },
+             {
+              "name" : "CompressedObjectHeaders",
+              "description" : "CompressedObjectHeaders Description",
+              "enabled" : true
+             }
+           ]
          }
         """;
 
@@ -108,7 +121,7 @@ public class DetailsApiTest {
              "authorName": "",
              "authorEmail": "",
              "commitTimestamp": ""
-           },
+       },
        "runtime": {
          "javaVersion": "17.0.16",
          "kotlinVersion": "1.9.0",
@@ -125,12 +138,19 @@ public class DetailsApiTest {
              "version": "",
              "group": "",
              "time": ""
-           },
+       },
        "os": {
          "name": "Windows 10",
          "version": "10.0",
          "arch": "amd64"
-       }
+       },
+       "vmFeatures": [
+           {
+             "name" : "AppCDS",
+             "description" : "AppCDS Description",
+             "enabled" : false
+           }
+       ]
      }
     """;
 
@@ -258,8 +278,11 @@ public class DetailsApiTest {
     @Test
     void shouldReturnJSONDetailsResponse() {
         // when.
-        registry.register(
-                TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.register(TestObjectFactory.createInstance(
+                activeInstanceId,
+                mockWebServer.url(activeInstanceId) + "/actuator",
+                new Instance.VMFeature("AppCDS", "AppCDS Description", false),
+                new Instance.VMFeature("CompressedObjectHeaders", "CompressedObjectHeaders Description", true)));
 
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
@@ -277,7 +300,9 @@ public class DetailsApiTest {
     void shouldReturnJSONDetailsResponseWithoutPlugin() {
         // when.
         registry.register(TestObjectFactory.createInstance(
-                instanceWithoutPluginId, mockWebServer.url(instanceWithoutPluginId) + "/actuator"));
+                instanceWithoutPluginId,
+                mockWebServer.url(instanceWithoutPluginId) + "/actuator",
+                new Instance.VMFeature("AppCDS", "AppCDS Description", false)));
 
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()

@@ -22,7 +22,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
 import okhttp3.mockwebserver.Dispatcher;
@@ -140,7 +139,14 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "UP",
               "memory" : {
                 "heap" : 12000
-              }
+              },
+              "vmFeatures": [
+                   {
+                     "name" : "AppCDS",
+                     "description" : "AppCDS Description",
+                     "enabled" : false
+                   }
+              ]
             }
         """;
 
@@ -174,11 +180,10 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         Set<Instance> registeredInstances = instanceRegistry.getAll();
         assertThat(registeredInstances).hasSize(2);
 
-        Set<String> registeredInstanceIds = registeredInstances.stream()
-                .map(instance -> instance.id().instanceId())
-                .collect(Collectors.toSet());
-
-        assertThat(registeredInstanceIds).containsOnly(instance1Id, instance2Id);
+        assertThat(registeredInstances).extracting(it -> it.id().instanceId()).containsOnly(instance1Id, instance2Id);
+        assertThat(registeredInstances)
+                .flatExtracting(Instance::vmFeatures)
+                .containsOnly(new Instance.VMFeature("AppCDS", "AppCDS Description", false));
     }
 
     @Test
@@ -203,7 +208,14 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "UP",
               "memory" : {
                 "heap" : 12000
-              }
+              },
+              "vmFeatures": [
+                   {
+                     "name" : "AppCDS",
+                     "description" : "AppCDS Description",
+                     "enabled" : false
+                   }
+              ]
             }
             """;
 
@@ -224,7 +236,14 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memory" : {
                 "heap" : 12000
-              }
+              },
+              "vmFeatures": [
+                   {
+                     "name" : "AppCDS",
+                     "description" : "AppCDS Description",
+                     "enabled" : false
+                   }
+              ]
             }
             """;
 
@@ -254,6 +273,9 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.DOWN);
             assertThat(instance.commitShaShort()).isEqualTo("910230");
             assertThat(instance.springBootVersion()).isEqualTo("3.5.2");
+            assertThat(instance.vmFeatures())
+                    .hasSize(1)
+                    .containsOnly(new Instance.VMFeature("AppCDS", "AppCDS Description", false));
         });
     }
 
@@ -279,7 +301,14 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "healthStatus" : "DOWN",
               "memory" : {
                 "heap" : 12000
-              }
+              },
+              "vmFeatures": [
+                   {
+                     "name" : "AppCDS",
+                     "description" : "AppCDS Description",
+                     "enabled" : false
+                   }
+              ]
             }
             """;
 

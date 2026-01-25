@@ -51,7 +51,8 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     //  So, the problem is that the /actuator path is not guaranteed to be
     //  the path under which the actuator endpoints are going to be exposed.
     //  It is possible to override it via specific properties, see the doc
-    //  https://docs.spring.io/spring-boot/docs/2.1.7.RELEASE/reference/html/production-ready-monitoring.html#production-ready-customizing-management-server-context-path
+    //
+    // https://docs.spring.io/spring-boot/docs/2.1.7.RELEASE/reference/html/production-ready-monitoring.html#production-ready-customizing-management-server-context-path
     //  So, we have to take this into account. It is however unclear how
     //  we can do that in case of automatic discovery.
     private static final String ACTUATOR_ENDPOINT_POSTFIX = "/actuator";

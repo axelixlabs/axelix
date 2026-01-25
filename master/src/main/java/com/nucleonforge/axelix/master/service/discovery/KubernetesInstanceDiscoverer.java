@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -80,10 +81,17 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
                     deployedAt,
                     mapStatus(profile),
                     new MemoryUsage(profile.metadata().memoryDetails().heap()),
-                    serviceInstance.getUri().toString() + "/actuator");
+                    serviceInstance.getUri().toString() + "/actuator",
+                    mapVMFeatures(profile));
         } else {
             throw new IllegalArgumentException(buildErrorMessage(serviceInstance));
         }
+    }
+
+    private static List<Instance.VMFeature> mapVMFeatures(InstanceIntermediateProfile profile) {
+        return profile.metadata().vmFeatures().stream()
+                .map(it -> new Instance.VMFeature(it.name(), it.description(), it.enabled()))
+                .toList();
     }
 
     private static Instance.InstanceStatus mapStatus(InstanceIntermediateProfile profile) {
