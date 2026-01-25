@@ -79,7 +79,6 @@ public class DefaultDashboardService implements DashboardService {
         var springFramework = new DistributionResponse(SoftwareDistributions.SPRING_FRAMEWORK);
         var java = new DistributionResponse(SoftwareDistributions.JAVA);
         var kotlin = new DistributionResponse(SoftwareDistributions.KOTLIN);
-        var jdkVendor = new DistributionResponse(SoftwareDistributions.JDK_VENDOR);
 
         for (Instance instance : instanceRegistry.getAll()) {
             switch (instance.status()) {
@@ -91,7 +90,6 @@ public class DefaultDashboardService implements DashboardService {
             java.addVersion(getMajorVersion(instance.javaVersion()));
             springBoot.addVersion(getMajorMinorVersion(instance.springBootVersion()));
             springFramework.addVersion(getMajorMinorVersion(instance.springFrameworkVersion()));
-            jdkVendor.addVersion(instance.jdkVendor());
 
             if (instance.kotlinVersion() != null) {
                 kotlin.addVersion(getMajorMinorVersion(instance.kotlinVersion()));
@@ -100,8 +98,7 @@ public class DefaultDashboardService implements DashboardService {
 
         var healthStatus = new HealthStatus(statuesMap);
         var memoryUsage = buildMemoryUsageMap();
-        return new DashboardResponse(
-                List.of(springBoot, springFramework, java, kotlin, jdkVendor), healthStatus, memoryUsage);
+        return new DashboardResponse(List.of(springBoot, springFramework, java, kotlin), healthStatus, memoryUsage);
     }
 
     private MemoryUsageMap buildMemoryUsageMap() {
