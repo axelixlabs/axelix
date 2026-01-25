@@ -15,31 +15,38 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+
+/**
+ * The actual transaction execution.
+ */
 interface ITransactionalExecution {
     /**
-     * Execution duration in miliseconds
+     * Execution duration in milliseconds.
      */
     durationsMs: number;
 
     /**
-     * Execution timestamp
+     * Execution timestamp (milliseconds from epoch).
      */
-    timestamp: string;
+    timestamp: number;
 }
 
+/**
+ * Response for transaction feed.
+ */
 export interface ITransactionalResponseData {
     /**
-     * Transactional class name
+     * Transactional class name.
      */
     className: string;
 
     /**
-     * Transactional method name
+     * Transactional method name.
      */
     methodName: string;
 
     /**
-     * Transactional executions list
+     * Transactions executions list.
      */
     executions: ITransactionalExecution[];
 }

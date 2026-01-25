@@ -49,11 +49,7 @@ export const ThreadDumpStackTrace = ({ threadDump }: IProps) => {
                     return (
                         <div key={`${traceLine}${index}`} className={styles.TraceLine}>
                             <p>{traceLine}</p>
-                            {trace.nativeMethod && (
-                                <Tag variant="outlined" color="success">
-                                    NATIVE
-                                </Tag>
-                            )}
+                            {trace.nativeMethod && <Tag className={styles.NativeTag}>NATIVE</Tag>}
                         </div>
                     );
                 })}

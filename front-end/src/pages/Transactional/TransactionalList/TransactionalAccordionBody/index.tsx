@@ -17,7 +17,7 @@
  */
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
 
-import { formatExecutionTimestamp } from "helpers";
+import { toFormattedTime } from "helpers";
 import type { ITransactionalResponseData } from "models";
 
 import styles from "./styles.module.css";
@@ -43,7 +43,7 @@ export const TransactionalAccordionBody = ({ transactional }: IProps) => {
             </defs>
 
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="timestamp" tickFormatter={formatExecutionTimestamp} />
+            <XAxis dataKey="timestamp" tickFormatter={toFormattedTime} />
             <YAxis width="auto" />
 
             {/* TODO: When we decide how to display the time, we will add it to the tooltip */}
