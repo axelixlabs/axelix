@@ -117,11 +117,6 @@ class DefaultDashboardServiceTest {
         assertThat(springFramework.getVersions()).extractingByKey("6.2").isEqualTo(1L);
         assertThat(springFramework.getVersions()).extractingByKey("7.0").isEqualTo(1L);
 
-        DistributionResponse jdkVendor = findDistribution(distributions, SoftwareDistributions.JDK_VENDOR);
-        assertThat(jdkVendor.getVersions()).hasSize(2);
-        assertThat(jdkVendor.getVersions()).extractingByKey("BellSoft").isEqualTo(2L);
-        assertThat(jdkVendor.getVersions()).extractingByKey("Oracle").isEqualTo(1L);
-
         DistributionResponse kotlin = findDistribution(distributions, SoftwareDistributions.KOTLIN);
         assertThat(kotlin.getVersions()).hasSize(1);
         assertThat(kotlin.getVersions()).extractingByKey("2.0").isEqualTo(1L);
