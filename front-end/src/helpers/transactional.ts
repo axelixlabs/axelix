@@ -35,12 +35,3 @@ export const filterTransactionalData = (
         }
     });
 };
-
-export const formatExecutionTimestamp = (value: string): string => {
-    // TODO: Consider the option of correct time display
-    return new Date(Number(value) * 1000).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
-};

@@ -180,21 +180,6 @@ export const buildSelectedTagParams = (selectedTags: Record<string, string>): st
     return Object.entries(selectedTags).map(([key, value]) => `${key}:${value}`);
 };
 
-/**
- * @param timestamp the unix timestamp (time im millisecond from epoch)
- */
-export const formatXAxis = (timestamp: number): string => {
-    const date = new Date(timestamp);
-
-    // TODO: Consider the option of correct time display
-    // use default locale by passing undefied
-    return date.toLocaleTimeString(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
-};
-
 export const getMetricsChartTicks = (startTime: number, endTime: number): number[] => {
     const window = endTime - startTime;
 

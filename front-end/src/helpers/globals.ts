@@ -102,3 +102,14 @@ export const downloadFile = (data: Blob | string): void => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
 };
+
+/**
+ * @param value milliseconds from epoch
+ */
+export const toFormattedTime = (value: number): string => {
+    return new Date(value).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
+};
