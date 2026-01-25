@@ -19,7 +19,7 @@ import { Tag } from "antd";
 import { useTranslation } from "react-i18next";
 
 import { Copy } from "components";
-import type { ITransactionalResponseData } from "models";
+import type { ITransactionalEntryPoint } from "models";
 
 import styles from "./styles.module.css";
 
@@ -27,7 +27,7 @@ interface IProps {
     /**
      * Single transactional data
      */
-    transactional: ITransactionalResponseData;
+    transactional: ITransactionalEntryPoint;
 }
 
 export const TransactionalAccordionHeader = ({ transactional }: IProps) => {

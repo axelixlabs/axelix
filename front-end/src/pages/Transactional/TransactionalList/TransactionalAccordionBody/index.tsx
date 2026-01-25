@@ -18,7 +18,7 @@
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
 
 import { toFormattedTime } from "helpers";
-import type { ITransactionalResponseData } from "models";
+import type { ITransactionalEntryPoint } from "models";
 
 import styles from "./styles.module.css";
 
@@ -26,7 +26,7 @@ interface IProps {
     /**
      * Single transactional data
      */
-    transactional: ITransactionalResponseData;
+    transactional: ITransactionalEntryPoint;
 }
 
 export const TransactionalAccordionBody = ({ transactional }: IProps) => {
