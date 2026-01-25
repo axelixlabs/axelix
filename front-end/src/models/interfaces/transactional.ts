@@ -36,6 +36,16 @@ interface ITransactionalExecution {
  */
 export interface ITransactionalResponseData {
     /**
+     * Transactions executions list.
+     */
+    entrypoints: ITransactionalEntryPoint[];
+}
+
+/**
+ * Response for transaction feed.
+ */
+export interface ITransactionalEntryPoint {
+    /**
      * Transactional class name.
      */
     className: string;

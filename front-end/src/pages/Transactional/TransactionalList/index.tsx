@@ -16,22 +16,22 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Accordion } from "components";
-import type { ITransactionalResponseData } from "models";
+import type { ITransactionalEntryPoint } from "models";
 
 import { TransactionalAccordionBody } from "./TransactionalAccordionBody";
 import { TransactionalAccordionHeader } from "./TransactionalAccordionHeader";
 
 export interface IProps {
     /**
-     * Effective transactional data
+     * Transaction entry points.
      */
-    effectiveTransactionalData: ITransactionalResponseData[];
+    transactionEntryPoints: ITransactionalEntryPoint[];
 }
 
-export const TransactionalList = ({ effectiveTransactionalData }: IProps) => {
+export const TransactionalList = ({ transactionEntryPoints }: IProps) => {
     return (
         <div className="AccordionsWrapper">
-            {effectiveTransactionalData.map((transactional) => (
+            {transactionEntryPoints.map((transactional) => (
                 <Accordion
                     header={<TransactionalAccordionHeader transactional={transactional} />}
                     children={<TransactionalAccordionBody transactional={transactional} />}

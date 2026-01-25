@@ -25,7 +25,7 @@ import { getTransactionalData } from "services";
 import { TransactionalList } from "./TransactionalList";
 
 const Transactional = () => {
-    const [transactionalData, setTransactionalData] = useState(StatefulRequest.loading<ITransactionalResponseData[]>());
+    const [transactionalData, setTransactionalData] = useState(StatefulRequest.loading<ITransactionalResponseData>());
     const [search, setSearch] = useState<string>("");
 
     useEffect(() => {
@@ -40,14 +40,14 @@ const Transactional = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const transactionalFeed = transactionalData.response!;
+    const transactionalFeed = transactionalData.response!.entrypoints!;
     const effectiveTransactionalData = search ? filterTransactionalData(transactionalFeed, search) : transactionalFeed;
     const addonAfter = `${effectiveTransactionalData.length} / ${transactionalFeed.length}`;
 
     return (
         <>
             <PageSearch setSearch={setSearch} addonAfter={addonAfter} />
-            <TransactionalList effectiveTransactionalData={effectiveTransactionalData} />
+            <TransactionalList transactionEntryPoints={effectiveTransactionalData} />
         </>
     );
 };

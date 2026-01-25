@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ITransactionalResponseData } from "models";
+import type { ITransactionalEntryPoint } from "models";
 
 export const filterTransactionalData = (
-    transactionalData: ITransactionalResponseData[],
+    transactionalData: ITransactionalEntryPoint[],
     search: string,
-): ITransactionalResponseData[] => {
+): ITransactionalEntryPoint[] => {
     const formattedSearch = search.toLowerCase().trim();
 
     return transactionalData.filter(({ className, methodName }) => {
