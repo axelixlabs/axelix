@@ -17,6 +17,8 @@
  */
 package com.nucleonforge.axelix.common.api.registration;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
@@ -38,6 +40,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SuppressWarnings(
         "NullAway") // TODO: we need to think about nullability here. It is not obvious what the correct setup is in
@@ -49,7 +52,13 @@ public record ServiceMetadata(
         @JsonProperty("jdkVendor") String jdkVendor,
         @JsonProperty("versions") SoftwareVersions versions,
         @JsonProperty("healthStatus") HealthStatus healthStatus,
-        @JsonProperty("memory") MemoryDetails memoryDetails) {
+        @JsonProperty("memory") MemoryDetails memoryDetails,
+        @JsonProperty("vmFeatures") List<VMFeature> vmFeatures) {
+
+    /**
+     * The specific feature of the current runtime.
+     */
+    public record VMFeature(String name, String description, boolean enabled) {}
 
     /**
      * The health status of the given instance during registration.

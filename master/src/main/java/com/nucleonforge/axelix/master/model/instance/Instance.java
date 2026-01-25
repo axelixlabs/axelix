@@ -18,6 +18,7 @@
 package com.nucleonforge.axelix.master.model.instance;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -50,7 +51,17 @@ public record Instance(
         @Nullable Instant deployedAt,
         InstanceStatus status,
         MemoryUsage memoryUsage,
-        @NonNull String actuatorUrl) {
+        @NonNull String actuatorUrl,
+        List<VMFeature> vmFeatures) {
+
+    /**
+     * Status of various useful JVM features for this service, like AOT Cache, AppCDS etc.
+     *
+     * @param name feature name
+     * @param description feature description
+     * @param enabled enabled or not
+     */
+    public record VMFeature(String name, String description, boolean enabled) {}
 
     public Instance copy(InstanceStatus instanceStatus) {
         return new Instance(
@@ -66,7 +77,8 @@ public record Instance(
                 this.deployedAt,
                 instanceStatus,
                 this.memoryUsage,
-                this.actuatorUrl);
+                this.actuatorUrl,
+                this.vmFeatures);
     }
 
     public enum InstanceStatus {

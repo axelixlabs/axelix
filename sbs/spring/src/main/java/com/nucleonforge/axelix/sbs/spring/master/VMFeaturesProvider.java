@@ -15,20 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.sbs.spring.build;
+package com.nucleonforge.axelix.sbs.spring.master;
 
-import com.nucleonforge.axelix.common.domain.JvmNonStandardOptions;
+import java.util.List;
+
+import com.nucleonforge.axelix.common.api.registration.ServiceMetadata.VMFeature;
 
 /**
- * Service that is capable to discover the {@link JvmNonStandardOptions non-standard VM options}
- * used by this instance.
+ * Provides the information about specific VM features that are either used, or can potentially
+ * be used for the benefit of the current application, for example AppCDS, AotCache, Compressed Object Headers etc.
  *
  * @author Mikhail Polivakha
  */
-public interface NonStandardVMOptionsDiscoverer {
+public interface VMFeaturesProvider {
 
     /**
-     * Perform actual discovery
+     * @return the actual list of VM features.
      */
-    JvmNonStandardOptions discover();
+    List<VMFeature> discover();
 }

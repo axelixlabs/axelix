@@ -67,6 +67,11 @@ class AxelixMetadataEndpointTest {
         }
 
         @Bean
+        VMFeaturesProvider vmFeaturesProvider() {
+            return new OptionsParsingVMFeaturesProvider();
+        }
+
+        @Bean
         AxelixVersionDiscoverer axelixVersionDiscoverer() {
             return () -> "1.1.3";
         }
@@ -102,7 +107,14 @@ class AxelixMetadataEndpointTest {
               "healthStatus" : "UP",
               "memory" : {
                 "heap" : "#{json-unit.ignore}"
-              }
+              },
+              "vmFeatures": [
+                 {
+                   "name" : "AppCDS",
+                   "description" : "#{json-unit.ignore}",
+                   "enabled" : "#{json-unit.ignore}"
+                 }
+              ]
             }
             """);
     }
