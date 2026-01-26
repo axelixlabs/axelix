@@ -301,6 +301,24 @@ class ScheduledTaskManagementEndpointTest {
     }
 
     @Test
+    void shouldReturnBadRequest_modifyCronExpressionForCronTask() {
+        // language=json
+        String request =
+                """
+        {
+          "trigger" : "%s",
+          "cronExpression": "invalid value"
+        }
+        """
+                        .formatted(CRON_TASK_ID_FOR_MODIFY);
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(
+                "/actuator/axelix-scheduled-tasks/modify/cron-expression", defaultJsonEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
+    @Test
     void shouldModifyInterval_testFixedDelay() {
         Long newInterval = 555555L;
 
@@ -318,6 +336,24 @@ class ScheduledTaskManagementEndpointTest {
     }
 
     @Test
+    void shouldReturnBadRequest_modifyIntervalForFixedDelay() {
+        // language=json
+        String request =
+                """
+            {
+              "trigger" : "%s",
+              "cronExpression": "invalid value"
+            }
+            """
+                        .formatted(FIXED_DELAY_TASK_ID_FOR_MODIFY);
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(
+                "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
+    @Test
     void shouldModifyInterval_testFixedRate() {
         Long newInterval = 777777L;
 
@@ -332,6 +368,24 @@ class ScheduledTaskManagementEndpointTest {
             assertThatJson(task).node("runnable.target").isEqualTo(FIXED_RATE_TASK_ID_FOR_MODIFY);
             assertThatJson(task).node("interval").isEqualTo(newInterval);
         });
+    }
+
+    @Test
+    void shouldReturnBadRequest_modifyIntervalForFixedRate() {
+        // language=json
+        String request =
+                """
+            {
+              "trigger" : "%s",
+              "cronExpression": "invalid value"
+            }
+            """
+                        .formatted(FIXED_RATE_TASK_ID_FOR_MODIFY);
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(
+                "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
     }
 
     @Test

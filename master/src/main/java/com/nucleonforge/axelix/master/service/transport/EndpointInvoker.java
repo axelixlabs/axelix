@@ -40,13 +40,14 @@ public interface EndpointInvoker {
      * @return the value returned by endpoint.
      *
      * @throws EndpointInvocationException in case the invocation to managed service did not result in successful response.
+     * @throws BadRequestException in case the managed service cannot process the request.
      * @throws InstanceNotFoundException in case the instance with the given ID is not known to this {@link EndpointInvoker}.
      * @throws ClassCastException in case the response from actuator endpoint cannot be cast to the requested type {@code <O>}.
      *
      * @param <O> the type of the returned value by the endpoint.
      */
     <O> O invoke(InstanceId instanceId, ActuatorEndpoint endpoint, HttpPayload httpPayload)
-            throws EndpointInvocationException, InstanceNotFoundException, ClassCastException;
+            throws EndpointInvocationException, BadRequestException, InstanceNotFoundException, ClassCastException;
 
     /**
      * Invoke endpoint on instance with the given payload. Similar to {@link #invoke(InstanceId, ActuatorEndpoint, HttpPayload)},
@@ -57,8 +58,9 @@ public interface EndpointInvoker {
      * @param httpPayload the HTTP payload (headers, body etc.) to be sent.
      *
      * @throws EndpointInvocationException in case the invocation to managed service did not result in successful response.
+     * @throws BadRequestException in case the managed service cannot process the request.
      * @throws InstanceNotFoundException in case the instance with the given ID is not known to this {@link EndpointInvoker}.
      */
     void invokeNoValue(InstanceId instanceId, ActuatorEndpoint endpoint, HttpPayload httpPayload)
-            throws EndpointInvocationException, InstanceNotFoundException;
+            throws EndpointInvocationException, BadRequestException, InstanceNotFoundException;
 }

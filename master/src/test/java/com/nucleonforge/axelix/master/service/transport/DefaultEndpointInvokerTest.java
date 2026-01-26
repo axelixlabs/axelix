@@ -72,7 +72,11 @@ public class DefaultEndpointInvokerTest {
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     public static final ActuatorEndpoint METHOD_INVOKE = of("/axelix-test/invoke", HttpMethod.GET);
+    public static final ActuatorEndpoint METHOD_INVOKE_BAD_REQUEST =
+            of("/axelix-test/invoke/bad-request", HttpMethod.GET);
     public static final ActuatorEndpoint METHOD_INVOKE_NO_VALUE = of("/axelix-test/invoke-no-value", HttpMethod.POST);
+    public static final ActuatorEndpoint METHOD_INVOKE_NO_VALUE_BAD_REQUEST =
+            of("/axelix-test/invoke-no-value/bad-request", HttpMethod.POST);
 
     private static MockWebServer mockWebServer;
 
@@ -127,8 +131,12 @@ public class DefaultEndpointInvokerTest {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                } else if (path.equals("/actuator/axelix-test/invoke/bad-request")) {
+                    return new MockResponse().setResponseCode(400);
                 } else if (path.equals("/actuator/axelix-test/invoke-no-value")) {
                     return new MockResponse();
+                } else if (path.equals("/actuator/axelix-test/invoke-no-value/bad-request")) {
+                    return new MockResponse().setResponseCode(400);
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
@@ -183,6 +191,13 @@ public class DefaultEndpointInvokerTest {
     }
 
     @Test
+    void invoke_shouldReturnBadRequestException_OnNotValidRequest() {
+        assertThatThrownBy(() -> endpointInvoker.invoke(
+                        InstanceId.of(activeInstanceId), METHOD_INVOKE_BAD_REQUEST, NoHttpPayload.INSTANCE))
+                .isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
     void invoke_shouldReturnClassCastException() {
         assertThrows(ClassCastException.class, () -> {
             String result =
@@ -216,6 +231,13 @@ public class DefaultEndpointInvokerTest {
                 .isInstanceOf(InstanceNotFoundException.class);
     }
 
+    @Test
+    void invokeNoValue_shouldReturnBadRequestException_OnNotValidRequest() {
+        assertThatThrownBy(() -> endpointInvoker.invokeNoValue(
+                        InstanceId.of(activeInstanceId), METHOD_INVOKE_NO_VALUE_BAD_REQUEST, NoHttpPayload.INSTANCE))
+                .isInstanceOf(BadRequestException.class);
+    }
+
     @TestConfiguration
     static class DefaultEndpointInvokerTestConfiguration {
 
@@ -225,9 +247,21 @@ public class DefaultEndpointInvokerTest {
         }
 
         @Bean
+        public DiscardingAbstractEndpointProber invokeNoValueMethodWithBadRequestEndpointProber(
+                InstanceRegistry instanceRegistry) {
+            return new DiscardingAbstractEndpointProber(instanceRegistry, METHOD_INVOKE_NO_VALUE_BAD_REQUEST);
+        }
+
+        @Bean
         public DefaultEndpointProber<JsonNode> invokeMethodEndpointProber(
                 InstanceRegistry instanceRegistry, TestJacksonMessageDeserializationStrategy deserializationStrategy) {
             return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, METHOD_INVOKE);
+        }
+
+        @Bean
+        public DefaultEndpointProber<JsonNode> invokeMethodWithBadRequestEndpointProber(
+                InstanceRegistry instanceRegistry, TestJacksonMessageDeserializationStrategy deserializationStrategy) {
+            return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, METHOD_INVOKE_BAD_REQUEST);
         }
 
         @Component
