@@ -78,6 +78,7 @@ public class AxelixScheduledTasksEndpoint {
         try {
             taskService.modifyCronExpression(request.trigger(), request.cronExpression());
             return ResponseEntity.noContent().build();
+            // TODO: We need to revisit exception handling here
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -88,6 +89,7 @@ public class AxelixScheduledTasksEndpoint {
         try {
             taskService.modifyInterval(request.trigger(), Duration.ofMillis(request.interval()));
             return ResponseEntity.noContent().build();
+            // TODO: We need to revisit exception handling here
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
