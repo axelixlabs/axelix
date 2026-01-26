@@ -17,15 +17,29 @@
  */
 package com.nucleonforge.axelix.master.service.transport;
 
+import org.jspecify.annotations.NonNull;
+
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
 /**
+ * Proxying implementation of {@link AbstractEndpointProber} that forwards requests to actuator endpoints
+ * without response transformation.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
-public abstract class ProxyingEndpointProper extends AbstractEndpointProber<byte[]> {
+public class ProxyingEndpointProper extends AbstractEndpointProber<byte[]> {
 
-    protected ProxyingEndpointProper(InstanceRegistry instanceRegistry) {
+    private final ActuatorEndpoint actuatorEndpoint;
+
+    public ProxyingEndpointProper(InstanceRegistry instanceRegistry, ActuatorEndpoint actuatorEndpoint) {
         super(instanceRegistry, binary -> binary);
+        this.actuatorEndpoint = actuatorEndpoint;
+    }
+
+    @Override
+    public @NonNull ActuatorEndpoint supports() {
+        return actuatorEndpoint;
     }
 }

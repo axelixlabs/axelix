@@ -17,4 +17,5 @@ com.nucleonforge.axelix.sbs.autoconfiguration.AxelixConfigurationsPropertiesEndp
 com.nucleonforge.axelix.sbs.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration
 com.nucleonforge.axelix.sbs.autoconfiguration.AxelixMetricsAutoConfiguration
 com.nucleonforge.axelix.sbs.autoconfiguration.GcLogEndpointAutoConfiguration
+com.nucleonforge.axelix.sbs.autoconfiguration.TransactionMonitoringAutoConfiguration
 com.nucleonforge.axelix.sbs.autoconfiguration.JwtAuthAutoConfiguration
