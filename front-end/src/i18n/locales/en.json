@@ -161,7 +161,10 @@
         "fixedRate": "Fixed rate",
         "enabled": "Task enabled",
         "disabled": "Task disabled",
-        "run": "Run"
+        "run": "Run",
+        "runSuccess": "Scheduled task was force-run",
+        "fixedTaskIntervalChangeSuccess": "The interval has been changed",
+        "cronExpressionChangeSuccess": "Cron expression has been changed"
     },
     "Error": {
         "title": "Error",

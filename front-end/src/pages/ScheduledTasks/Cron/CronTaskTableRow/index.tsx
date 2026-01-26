@@ -15,8 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App, Button } from "antd";
-import RunIcon from "assets/icons/run.svg?react";
+import { App } from "antd";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
@@ -24,6 +23,7 @@ import { EditableValue, TooltipWithCopy } from "components";
 import { type ICron } from "models";
 import { changeCronExpression } from "services";
 
+import { ForceRunTask } from "../../ForceRunTask";
 import { ScheduledTasksStatusSwitch } from "../../ScheduledTasksStatusSwitch";
 
 import styles from "./styles.module.css";
@@ -52,6 +52,7 @@ export const CronTaskTableRow = ({ task }: IProps) => {
                         changeCronExpression({
                             instanceId: instanceId!,
                             newCronExpression: newValue,
+                            trigger: task.runnable.target,
                         })
                             .then(() => {
                                 message.success(t("ScheduledTasks.cronExpressionChangeSuccess"));
@@ -66,7 +67,7 @@ export const CronTaskTableRow = ({ task }: IProps) => {
                 <ScheduledTasksStatusSwitch runnable={task} />
             </div>
             <div className={`RowChunk ${styles.CenteredRowChunk}`}>
-                <Button icon={<RunIcon />} type="primary" />
+                <ForceRunTask trigger={task.runnable.target} />
             </div>
         </div>
     );

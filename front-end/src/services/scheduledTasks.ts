@@ -16,25 +16,48 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import apiFetch from "api/apiFetch";
-import type { IUpdateScheduledTasksCronExpressionData, IUpdateScheduledTasksStatusRequestData } from "models";
+import type {
+    IChangeScheduledTaskIntervalRequestData,
+    IForceRunRequestData,
+    IUpdateCronExpressionDataRequestData,
+    IUpdateScheduledTasksStatusRequestData,
+} from "models";
 
 export const getScheduledTasksData = (instanceId: string) => {
-    return apiFetch.get(`/scheduled-tasks/${instanceId}`);
+    return apiFetch.get(`scheduled-tasks/${instanceId}`);
 };
 
 export const updateScheduledTasksStatus = (data: IUpdateScheduledTasksStatusRequestData) => {
     const { instanceId, statusType, targetScheduledTask, force } = data;
 
-    return apiFetch.post(`/scheduled-tasks/${instanceId}/${statusType}`, {
+    return apiFetch.post(`scheduled-tasks/${instanceId}/${statusType}`, {
         targetScheduledTask: targetScheduledTask,
         force: force,
     });
 };
 
-export const changeCronExpression = (data: IUpdateScheduledTasksCronExpressionData) => {
-    const { instanceId, newCronExpression } = data;
+export const changeCronExpression = (data: IUpdateCronExpressionDataRequestData) => {
+    const { instanceId, newCronExpression, trigger } = data;
 
-    return apiFetch.post(`/scheduled-tasks/${instanceId}/cron`, {
-        newCronExpression: newCronExpression,
+    return apiFetch.post(`scheduled-tasks/${instanceId}/modify/cron-expression`, {
+        cronExpression: newCronExpression,
+        trigger: trigger,
+    });
+};
+
+export const forceRunTask = (data: IForceRunRequestData) => {
+    const { instanceId, trigger } = data;
+
+    return apiFetch.post(`scheduled-tasks/${instanceId}/execute`, {
+        trigger: trigger,
+    });
+};
+
+export const changeScheduledTaskInterval = (data: IChangeScheduledTaskIntervalRequestData) => {
+    const { instanceId, interval, trigger } = data;
+
+    return apiFetch.post(`scheduled-tasks/${instanceId}/modify/interval`, {
+        interval: interval,
+        trigger: trigger,
     });
 };

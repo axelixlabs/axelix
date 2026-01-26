@@ -51,6 +51,7 @@ export const EditableValue = ({
     className = styles.DefaultPropertyValueWrapper,
     editClassName = styles.DefaultEditPropertyWrapper,
 }: IProps) => {
+    // TODO: In this component, we need to make some improvements
     const [editingValue, setEditingValue] = useState<boolean>(false);
     const [actualValue, setActualValue] = useState<string>(initialValue);
 

@@ -161,7 +161,10 @@
         "fixedRate": "Fixed rate",
         "enabled": "Задача включена",
         "disabled": "Задача выключена",
-        "run": "Запуск"
+        "run": "Запуск",
+        "runSuccess": "Запланированная задача была принудительно запущена",
+        "fixedTaskIntervalChangeSuccess": "Интервал был изменён",
+        "cronExpressionChangeSuccess": "Cron-выражение было изменено"
     },
     "Error": {
         "title": "Ошибка",
