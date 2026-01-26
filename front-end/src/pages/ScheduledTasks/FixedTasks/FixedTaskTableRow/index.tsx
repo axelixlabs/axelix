@@ -15,12 +15,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button } from "antd";
-import RunIcon from "assets/icons/run.svg?react";
+import { App } from "antd";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
 
 import { EditableValue, TooltipWithCopy } from "components";
 import type { IFixedTasks } from "models";
+import { changeScheduledTaskInterval } from "services";
 
+import { ForceRunTask } from "../../ForceRunTask";
 import { ScheduledTasksStatusSwitch } from "../../ScheduledTasksStatusSwitch";
 
 import styles from "./styles.module.css";
@@ -33,6 +36,10 @@ interface IProps {
 }
 
 export const FixedTaskTableRow = ({ task }: IProps) => {
+    const { instanceId } = useParams();
+    const { message } = App.useApp();
+    const { t } = useTranslation();
+
     return (
         <div className={`TableRow ${styles.FixedTaskTableRow}`}>
             <div className={`RowChunk ${styles.TooltipWrapperChunk}`}>
@@ -40,13 +47,28 @@ export const FixedTaskTableRow = ({ task }: IProps) => {
             </div>
             <div className={`RowChunk ${styles.CenteredRowChunk}`}>{task.initialDelay}</div>
             <div className="RowChunk">
-                <EditableValue initialValue={String(task.interval)} onNewValue={() => {}} />
+                <EditableValue
+                    initialValue={task.interval.toString()}
+                    onNewValue={(newValue) => {
+                        changeScheduledTaskInterval({
+                            instanceId: instanceId!,
+                            interval: +newValue,
+                            trigger: task.runnable.target,
+                        })
+                            .then(() => {
+                                message.success(t("ScheduledTasks.fixedTaskIntervalChangeSuccess"));
+                            })
+                            .catch(() => {
+                                message.error(t("ScheduledTasks.cronExpressionChangeError"));
+                            });
+                    }}
+                />
             </div>
             <div className={`RowChunk ${styles.CenteredRowChunk}`}>
                 <ScheduledTasksStatusSwitch runnable={task} />
             </div>
             <div className={`RowChunk ${styles.CenteredRowChunk}`}>
-                <Button icon={<RunIcon />} type="primary" />
+                <ForceRunTask trigger={task.runnable.target} />
             </div>
         </div>
     );

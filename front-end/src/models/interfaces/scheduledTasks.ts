@@ -66,7 +66,48 @@ export interface IUpdateScheduledTasksStatusRequestData {
     statusType: "enable" | "disable";
 }
 
-export interface IUpdateScheduledTasksCronExpressionData {
+export interface IUpdateCronExpressionDataRequestData {
+    /**
+     * Instance id of service
+     */
     instanceId: string;
+
+    /**
+     * The trigger whose expression we are changing
+     */
+    trigger: string;
+
+    /**
+     * New cron expression
+     */
     newCronExpression: string;
+}
+
+export interface IForceRunRequestData {
+    /**
+     * Instance id of service
+     */
+    instanceId: string;
+
+    /**
+     * The trigger that we force to run
+     */
+    trigger: string;
+}
+
+export interface IChangeScheduledTaskIntervalRequestData {
+    /**
+     * Instance id of service
+     */
+    instanceId: string;
+
+    /**
+     * The trigger whose interval we are changing
+     */
+    trigger: string;
+
+    /**
+     * The new interval
+     */
+    interval: number;
 }

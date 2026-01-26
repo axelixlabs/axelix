@@ -41,7 +41,7 @@ apiFetch.interceptors.response.use(
     (error: AxiosError<IErrorResponse>) => {
         const errorCode: string | undefined = extractErrorCode(error?.response?.data);
 
-        if (errorCode != "INVALID_JWT_EXCEPTION") {
+        if (errorCode !== "INVALID_JWT_EXCEPTION") {
             showErrorNotification(errorCode);
         }
 
