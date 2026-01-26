@@ -18,23 +18,15 @@
 import { notification } from "antd";
 import type { AxiosResponse } from "axios";
 import { t } from "i18next";
-import type { Dispatch, SetStateAction } from "react";
 
 import {
     EMimeTypes,
     type IConfigPropsBean,
     type IEnvironmentPropertySource,
-    type MenuItem,
+    type SetRequestState,
     StatefulRequest,
 } from "models";
 import { UNKNOWN_ERROR } from "utils";
-
-export const findOpenKeys = (items: MenuItem[]): string[] => {
-    const parent = items.filter((item) => item && "children" in item).filter((value) => value?.key !== "JVM");
-    return parent ? [...parent.map((it) => it!.key as string)] : [];
-};
-
-export type SetRequestState<S> = Dispatch<SetStateAction<StatefulRequest<S>>>;
 
 /**
  * A universal function that retrieves data from the backend.

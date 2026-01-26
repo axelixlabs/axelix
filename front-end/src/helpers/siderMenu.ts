@@ -15,30 +15,32 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Menu } from "antd";
-import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import type { MenuItem } from "models";
 
-import { findOpenKeys } from "helpers";
-import { getItems } from "utils";
+export const findOpenKeys = (items: MenuItem[], pathname: string): string[] => {
+    const openKeys: string[] = [];
+    let hasJvmChildMatch = false;
 
-import styles from "./styles.module.css";
+    for (const item of items) {
+        if (!item?.key) {
+            continue;
+        }
 
-export const SiderMenu = () => {
-    const { t } = useTranslation();
+        if (item.key !== "JVM") {
+            openKeys.push(String(item.key));
+            continue;
+        }
 
-    const navigate = useNavigate();
-    const { pathname } = useLocation();
-    const { instanceId } = useParams();
+        if (!("children" in item) || !Array.isArray(item.children)) {
+            continue;
+        }
 
-    return (
-        <Menu
-            mode="inline"
-            items={getItems(instanceId!, t)}
-            onClick={({ key }) => navigate(key)}
-            selectedKeys={[pathname]}
-            defaultOpenKeys={findOpenKeys(getItems(instanceId!, t), pathname)}
-            className={styles.Menu}
-        />
-    );
+        hasJvmChildMatch = item.children.some((child) => String(child?.key) === pathname);
+    }
+
+    if (hasJvmChildMatch) {
+        openKeys.push("JVM");
+    }
+
+    return openKeys;
 };
