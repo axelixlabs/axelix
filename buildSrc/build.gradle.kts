@@ -10,7 +10,7 @@ repositories {
 gradlePlugin {
     plugins {
         register("axelix-internal") {
-            id = "com.nucleonforge.axelix-internal"
+            id = "com.axelixlabs.axelix-internal"
             implementationClass = "binary.AxelixPropertiesPlugin"
         }
     }

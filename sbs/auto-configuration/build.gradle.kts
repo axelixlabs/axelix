@@ -1,6 +1,6 @@
 plugins {
     id("sbs")
-    id("com.nucleonforge.axelix-internal")
+    id("com.axelixlabs.axelix-internal")
 }
 
 dependencies {
