@@ -20,6 +20,7 @@ import type { ITransactionalEntryPoint } from "models";
 
 import { TransactionalAccordionBody } from "./TransactionalAccordionBody";
 import { TransactionalAccordionHeader } from "./TransactionalAccordionHeader";
+import styles from "./styles.module.css";
 
 export interface IProps {
     /**
@@ -36,6 +37,7 @@ export const TransactionalList = ({ transactionEntryPoints }: IProps) => {
                     header={<TransactionalAccordionHeader transactional={transactional} />}
                     children={<TransactionalAccordionBody transactional={transactional} />}
                     key={transactional.className + transactional.methodName}
+                    headerStyles={styles.HeaderStyles}
                 />
             ))}
         </div>

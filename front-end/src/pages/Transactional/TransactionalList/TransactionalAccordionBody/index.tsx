@@ -45,9 +45,7 @@ export const TransactionalAccordionBody = ({ transactional }: IProps) => {
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="timestamp" tickFormatter={toFormattedTime} />
             <YAxis width="auto" />
-
-            {/* TODO: When we decide how to display the time, we will add it to the tooltip */}
-            <Tooltip />
+            <Tooltip labelFormatter={toFormattedTime} itemStyle={{ color: "green" }} />
             <Bar dataKey="durationsMs" fill="url(#gradient)" />
         </BarChart>
     );
