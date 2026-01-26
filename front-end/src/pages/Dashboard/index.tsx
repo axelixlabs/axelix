@@ -35,7 +35,6 @@ const Dashboard = () => {
     }, []);
 
     if (dashboardData.loading) {
-        // TODO: Fix loader to be fullscreen in the future (same needed for the wallboard)
         return <Loader />;
     }
 
