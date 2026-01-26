@@ -26,6 +26,7 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.assertj.core.api.ThrowableAssert;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterAll;
@@ -42,6 +43,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 import com.nucleonforge.axelix.common.domain.http.HttpMethod;
+import com.nucleonforge.axelix.common.domain.http.HttpUrl;
 import com.nucleonforge.axelix.common.domain.http.NoHttpPayload;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
@@ -115,16 +117,17 @@ public class DefaultEndpointInvokerTest {
         }
         """;
         mockWebServer.setDispatcher(new Dispatcher() {
+
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axelix-test/invoke")) {
+                if (path.equals("/actuator/axelix-test/invoke")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-test/invoke-no-value")) {
+                } else if (path.equals("/actuator/axelix-test/invoke-no-value")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -132,8 +135,8 @@ public class DefaultEndpointInvokerTest {
             }
         });
 
-        registry.register(
-                TestObjectFactory.createInstance(activeInstanceId, mockWebServer.url(activeInstanceId) + "/actuator"));
+        registry.register(TestObjectFactory.createInstance(
+                activeInstanceId, mockWebServer.url("/actuator").toString()));
     }
 
     @AfterEach
@@ -151,13 +154,23 @@ public class DefaultEndpointInvokerTest {
     }
 
     @Test
-    void invoke_shouldReturnEndpointInvocationException() {
+    void invoke_shouldReturnEndpointInvocationException_OnUnavailableInstance() {
         String instanceId = UUID.randomUUID().toString();
         registry.register(createInstance(instanceId));
 
         assertThatThrownBy(
                         () -> endpointInvoker.invoke(InstanceId.of(instanceId), METHOD_INVOKE, NoHttpPayload.INSTANCE))
                 .isInstanceOf(EndpointInvocationException.class);
+    }
+
+    @Test
+    void invoke_shouldReturnEndpointInvocationException_OnUnknownActuatorEndpoint() {
+        ThrowableAssert.ThrowingCallable callable = () -> endpointInvoker.invoke(
+                InstanceId.of(activeInstanceId),
+                new ActuatorEndpoint(new HttpUrl("other"), HttpMethod.POST),
+                NoHttpPayload.INSTANCE);
+
+        assertThatThrownBy(callable).isInstanceOf(EndpointInvocationException.class);
     }
 
     @Test
@@ -205,6 +218,7 @@ public class DefaultEndpointInvokerTest {
 
     @TestConfiguration
     static class DefaultEndpointInvokerTestConfiguration {
+
         @Bean
         public DiscardingAbstractEndpointProber invokeNoValueMethodEndpointProber(InstanceRegistry instanceRegistry) {
             return new DiscardingAbstractEndpointProber(instanceRegistry, METHOD_INVOKE_NO_VALUE);
