@@ -15,30 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.master.api.error.handle;
+package com.nucleonforge.axelix.master.service.transport;
+
+import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
- * The error codes that are be returned from the HTTP API.
+ * The exception that is thrown when Axelix Master sends an invalid request to a managed service
+ * via an {@link ActuatorEndpoint}, or when the managed service fails to process the request
+ * and responds with HTTP status code 400.
  *
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public enum ApiErrorCodes {
-    INTERNAL_SERVER_ERROR_CODE("INTERNAL_SERVER_ERROR"),
-    INSTANCE_NOT_FOUND_CODE("INSTANCE_NOT_FOUND"),
-    INVALID_CREDENTIALS_CODE("INVALID_CREDENTIALS"),
-    INVALID_JWT_EXCEPTION_CODE("INVALID_JWT_EXCEPTION"),
-    BAD_REQUEST("BAD_REQUEST");
+public class BadRequestException extends RuntimeException {
 
-    /**
-     * actual code that is sent from the master backend.
-     */
-    private final String errorCode;
-
-    ApiErrorCodes(String errorCode) {
-        this.errorCode = errorCode;
-    }
-
-    public String getErrorCode() {
-        return errorCode;
+    public BadRequestException(String message) {
+        super(message);
     }
 }

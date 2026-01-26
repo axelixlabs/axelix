@@ -75,14 +75,22 @@ public class AxelixScheduledTasksEndpoint {
 
     @PostMapping("/modify/cron-expression")
     public ResponseEntity<Void> modifyCronExpression(@RequestBody ScheduledTaskCronExpressionModifyRequest request) {
-        taskService.modifyCronExpression(request.trigger(), request.cronExpression());
-        return ResponseEntity.noContent().build();
+        try {
+            taskService.modifyCronExpression(request.trigger(), request.cronExpression());
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/modify/interval")
     public ResponseEntity<Void> modifyInterval(@RequestBody ScheduledTaskIntervalModifyRequest request) {
-        taskService.modifyInterval(request.trigger(), Duration.ofMillis(request.interval()));
-        return ResponseEntity.noContent().build();
+        try {
+            taskService.modifyInterval(request.trigger(), Duration.ofMillis(request.interval()));
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/execute")

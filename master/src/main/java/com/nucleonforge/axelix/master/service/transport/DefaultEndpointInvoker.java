@@ -67,7 +67,7 @@ public class DefaultEndpointInvoker implements EndpointInvoker {
 
     @Override
     public void invokeNoValue(InstanceId instanceId, ActuatorEndpoint endpoint, HttpPayload httpPayload)
-            throws EndpointInvocationException, InstanceNotFoundException {
+            throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
         getEndpointProber(endpoint).invoke(instanceId, httpPayload);
     }
 
