@@ -43,7 +43,6 @@ export function AboutModal({ open, setOpen }: IProps) {
     const licenseLink = import.meta.env.VITE_APP_LICENSE_LINK;
     const referenceGuideLink = import.meta.env.VITE_APP_REFERENCE_GUIDE_LINK;
     const blogLink = import.meta.env.VITE_APP_BLOG_LINK;
-    const corporateSupportEmail = import.meta.env.VITE_CORPORATE_SUPPORT_EMAIL;
 
     const onClose = (): void => {
         setOpen(false);
@@ -88,10 +87,7 @@ export function AboutModal({ open, setOpen }: IProps) {
                     <Trans
                         t={t}
                         i18nKey={"About.contact"}
-                        components={[
-                            <a key="0" href={referenceGuideLink} target="_blank" rel="noopener noreferrer" />,
-                            <a key="1" href={corporateSupportEmail} />,
-                        ]}
+                        components={[<a key="0" href={referenceGuideLink} target="_blank" rel="noopener noreferrer" />]}
                     />
                 </p>
 
