@@ -162,7 +162,7 @@
         "enabled": "Task enabled",
         "disabled": "Task disabled",
         "run": "Run",
-        "runSuccess": "Scheduled task was force-run",
+        "runSuccess": "Scheduled task was forcefully executed",
         "fixedTaskIntervalChangeSuccess": "The interval has been changed",
         "cronExpressionChangeSuccess": "Cron expression has been changed"
     },
