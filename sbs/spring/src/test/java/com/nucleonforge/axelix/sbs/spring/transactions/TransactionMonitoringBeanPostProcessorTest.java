@@ -41,6 +41,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration test for {@link TransactionMonitoringBeanPostProcessor}.
  *
+ * TODO: Revisit design of this test.
+ *
  * @since 22.01.2026
  * @author Nikita Kirillov
  */

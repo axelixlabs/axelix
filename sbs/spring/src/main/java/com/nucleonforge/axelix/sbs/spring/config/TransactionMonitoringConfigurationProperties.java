@@ -24,17 +24,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * Configuration properties for transaction monitoring feature.
  *
- * @param maxTransactionsPerMethod maximum number of transaction records to keep per method (default: 30)
- * @param cleanupInterval          interval for clearing old transaction records (default: PT5S)
+ * @param maxTransactionsPerMethod maximum number of transaction records to keep per method.
+ * @param cleanupInterval          interval for clearing old transaction records.
  *
  * @since 26.01.2026
  * @author Nikita Kirillov
  */
 @ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
-public record TransactionMonitoringConfigurationProperties(int maxTransactionsPerMethod, Duration cleanupInterval) {
+public record TransactionMonitoringConfigurationProperties(Integer maxTransactionsPerMethod, Duration cleanupInterval) {
 
     public TransactionMonitoringConfigurationProperties {
-        if (maxTransactionsPerMethod == 0) {
+        if (maxTransactionsPerMethod == null) {
             maxTransactionsPerMethod = 30;
         }
 

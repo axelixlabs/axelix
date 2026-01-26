@@ -40,6 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration test for {@link TransactionMonitoringEndpoint}
  *
+ * TODO: Revisit design of this test.
+ *
  * @since 26.01.2026
  * @author Nikita Kirillov
  */

@@ -54,10 +54,13 @@ public class TransactionStats {
 
     public void clear() {
         int currentSize = recordedTransactions.size();
+
         if (currentSize <= maxTransactionsPerMethod) {
             return;
         }
 
+        // We're not draining the queue till the 'maxTransactionsPerMethod'
+        // size to avoid potential infinite loop
         int toRemove = currentSize - maxTransactionsPerMethod;
         for (int i = 0; i < toRemove; i++) {
             if (recordedTransactions.pollFirst() == null) {

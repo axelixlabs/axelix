@@ -36,6 +36,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Integration test for {@link DefaultTransactionMonitoringService}
  *
+ * TODO: Revisit design of this test.
+ *
  * @since 22.01.2026
  * @author Nikita Kirillov
  */
