@@ -17,89 +17,25 @@
  */
 package com.nucleonforge.axelix.sbs.spring.transactions;
 
-import java.util.List;
-import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nucleonforge.axelix.common.api.TransactionMonitoringFeed;
-import com.nucleonforge.axelix.common.api.TransactionMonitoringFeed.ExecutionStats;
-import com.nucleonforge.axelix.common.api.TransactionMonitoringFeed.MethodStats;
-import com.nucleonforge.axelix.common.api.TransactionMonitoringFeed.TransactionExecution;
 
 /**
- *
+ * This interface defines the contract for retrieving aggregated transaction execution metrics
+ * from monitored {@link Transactional} methods.
  *
  * @author Nikita Kirillov
  */
-public class TransactionMonitoringService {
+public interface TransactionMonitoringService {
 
-    private final TransactionStatsCollector transactionStatsCollector;
+    /**
+     * Returns a complete monitoring feed with transaction execution statistics.
+     */
+    TransactionMonitoringFeed getMonitoringFeed();
 
-    public TransactionMonitoringService(TransactionStatsCollector transactionStatsCollector) {
-        this.transactionStatsCollector = transactionStatsCollector;
-    }
-
-    public TransactionMonitoringFeed getMonitoringFeed() {
-        Map<MethodClassKey, TransactionStats> statsMap = transactionStatsCollector.getAllStats();
-
-        List<MethodStats> methodStats = statsMap.entrySet().stream()
-                .map(entry -> createMethodStats(
-                        entry.getKey().targetClass().getName(),
-                        entry.getKey().method().getName(),
-                        entry.getValue().getRecordedTransactions()))
-                .toList();
-
-        return new TransactionMonitoringFeed(methodStats);
-    }
-
-    public void clearAllStats() {
-        transactionStatsCollector.clearAllStats();
-    }
-
-    private MethodStats createMethodStats(String className, String methodName, List<TransactionRecord> transactions) {
-
-        if (transactions.isEmpty()) {
-            return new MethodStats(className, methodName, List.of(), new ExecutionStats(0, 0, 0));
-        }
-
-        long averageDuration = calculateAverageDuration(transactions);
-        long maxDuration = calculateMaxDuration(transactions);
-        long medianDuration = calculateMedianDuration(transactions);
-
-        List<TransactionExecution> executions =
-                transactions.stream().map(this::convertToTransactionExecution).toList();
-
-        return new MethodStats(
-                className, methodName, executions, new ExecutionStats(averageDuration, maxDuration, medianDuration));
-    }
-
-    private long calculateAverageDuration(List<TransactionRecord> transactions) {
-        long total =
-                transactions.stream().mapToLong(TransactionRecord::durationMs).sum();
-        return total / transactions.size();
-    }
-
-    private long calculateMaxDuration(List<TransactionRecord> transactions) {
-        return transactions.stream()
-                .mapToLong(TransactionRecord::durationMs)
-                .max()
-                .orElse(0);
-    }
-
-    private long calculateMedianDuration(List<TransactionRecord> transactions) {
-        List<Long> durations = transactions.stream()
-                .map(TransactionRecord::durationMs)
-                .sorted()
-                .toList();
-
-        int size = durations.size();
-        if (size % 2 == 0) {
-            return (durations.get(size / 2 - 1) + durations.get(size / 2)) / 2;
-        } else {
-            return durations.get(size / 2);
-        }
-    }
-
-    private TransactionExecution convertToTransactionExecution(TransactionRecord record) {
-        return new TransactionExecution(record.durationMs(), record.startTimestamp());
-    }
+    /**
+     * Clears all collected transaction statistics.
+     */
+    void clearAllStats();
 }

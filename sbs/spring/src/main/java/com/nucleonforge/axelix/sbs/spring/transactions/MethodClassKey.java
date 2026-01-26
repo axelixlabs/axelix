@@ -15,32 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.master.api.response;
+package com.nucleonforge.axelix.sbs.spring.transactions;
 
-import java.util.List;
+import java.lang.reflect.Method;
 
 /**
- * The feed of transactions inside a given application.
+ * Key for caching method-specific transaction metadata per target class.
+ * Similar to Spring's {@link org.springframework.core.MethodClassKey}.
  *
- * @since 20.01.2026
+ * @param method the method being analyzed
+ * @param targetClass the class where the method is invoked
+ *
+ * @since 22.01.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public record TransactionMonitoringFeed(List<TransactionalEntrypoint> entrypoints) {
-
-    /**
-     * The transactional entrypoint. In other words,
-     *
-     * @param className the short name of the class where transaction is initiated.
-     * @param methodName the name of the method where transaction is initiated.
-     * @param executions currently recorded executions of this transaction entrypoint.
-     */
-    public record TransactionalEntrypoint(String className, String methodName, List<TransactionExecution> executions) {}
-
-    /**
-     *
-     * @param durationsMs
-     * @param timestamp unix timestamp (milliseconds from epoch) when transaction started
-     */
-    public record TransactionExecution(long durationsMs, Long timestamp) {}
-}
+public record MethodClassKey(Method method, Class<?> targetClass) {}

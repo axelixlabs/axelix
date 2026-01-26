@@ -19,12 +19,42 @@ package com.nucleonforge.axelix.common.api;
 
 import java.util.List;
 
-public record TransactionMonitoringFeed(List<MethodStats> stats) {
+/**
+ * The feed of transactions inside a given application.
+ *
+ * @since 20.01.2026
+ * @author Nikita Kirillov
+ * @author Mikhail Polivakha
+ */
+public record TransactionMonitoringFeed(List<TransactionalEntrypoint> entrypoints) {
 
-    public record MethodStats(
-            String className, String methodName, List<TransactionExecution> executions, ExecutionStats stats) {}
+    /**
+     * The transactional entrypoint. In other words,
+     *
+     * @param className  the short name of the class where transaction is initiated.
+     * @param methodName the name of the method where transaction is initiated.
+     * @param executions currently recorded executions of this transaction entrypoint.
+     */
+    public record TransactionalEntrypoint(
+            String className,
+            String methodName,
+            List<TransactionExecution> executions,
+            ExecutionStats executionStats) {}
 
-    public record TransactionExecution(long durationMs, long timestamp) {}
+    /**
+     * A single transaction execution record with timing information.
+     *
+     * @param durationsMs transaction execution duration in milliseconds
+     * @param timestamp   unix timestamp (milliseconds from epoch) when transaction started
+     */
+    public record TransactionExecution(long durationsMs, long timestamp) {}
 
+    /**
+     * Aggregated execution statistics for a transactional entrypoint.
+     *
+     * @param averageDurationMs average execution duration in milliseconds
+     * @param maxDurationMs     maximum execution duration in milliseconds
+     * @param medianDurationMs  median execution duration in milliseconds
+     */
     public record ExecutionStats(long averageDurationMs, long maxDurationMs, long medianDurationMs) {}
 }

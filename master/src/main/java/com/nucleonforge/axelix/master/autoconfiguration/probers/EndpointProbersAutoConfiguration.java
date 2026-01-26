@@ -17,7 +17,6 @@
  */
 package com.nucleonforge.axelix.master.autoconfiguration.probers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
@@ -64,6 +63,7 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.DefaultEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.DiscardingAbstractEndpointProber;
 import com.nucleonforge.axelix.master.service.transport.EndpointProber;
+import com.nucleonforge.axelix.master.service.transport.ProxyingEndpointProper;
 
 /**
  * Configuration that creates necessary {@link EndpointProber} instances to
@@ -79,8 +79,11 @@ import com.nucleonforge.axelix.master.service.transport.EndpointProber;
 @AutoConfiguration
 public class EndpointProbersAutoConfiguration {
 
-    @Autowired
-    private InstanceRegistry instanceRegistry;
+    private final InstanceRegistry instanceRegistry;
+
+    public EndpointProbersAutoConfiguration(InstanceRegistry instanceRegistry) {
+        this.instanceRegistry = instanceRegistry;
+    }
 
     // Loggers
     @Bean
@@ -331,5 +334,16 @@ public class EndpointProbersAutoConfiguration {
             ConfigPropsJacksonMessageDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(
                 instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_CONFIG_PROPS);
+    }
+
+    // @Transaction monitoring
+    @Bean
+    public ProxyingEndpointProper transactionMonitoringProxyingEndpointProper() {
+        return new ProxyingEndpointProper(instanceRegistry, ActuatorEndpoints.TRANSACTION_STATS_GET);
+    }
+
+    @Bean
+    public DiscardingAbstractEndpointProber transactionMonitoringDiscardingEndpointProber() {
+        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.TRANSACTION_STATS_CLEAR);
     }
 }

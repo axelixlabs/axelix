@@ -22,6 +22,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Test helper for demonstrating transaction propagation scenarios and monitoring.
+ * Used in integration tests to verify transaction tracking behavior.
+ *
+ * @author Nikita Kirillov
+ */
 @Component
 public class PropagationTestHelper {
 

@@ -17,15 +17,13 @@
  */
 package com.nucleonforge.axelix.sbs.spring.transactions;
 
-import java.util.ArrayList;
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
+ * Stores transaction execution records for a specific method with size limits.
+ * Maintains a rolling window of recent transactions up to the configured maximum.
  *
  * @since 22.01.2026
  * @author Nikita Kirillov
@@ -34,36 +32,37 @@ public class TransactionStats {
 
     private final int maxTransactionsPerMethod;
     private final ConcurrentLinkedDeque<TransactionRecord> recordedTransactions;
-    private final AtomicInteger dequeSize;
 
     public TransactionStats(Integer maxTransactionsPerMethod) {
         this.maxTransactionsPerMethod = maxTransactionsPerMethod;
-        this.dequeSize = new AtomicInteger(0);
         this.recordedTransactions = new ConcurrentLinkedDeque<>();
     }
 
     public void addTransactionRecord(TransactionRecord transactionRecord) {
         recordedTransactions.addLast(transactionRecord);
-        dequeSize.incrementAndGet();
     }
 
-    // maxTransactionsPerMethod
     public List<TransactionRecord> getRecordedTransactions() {
         var copy = new LinkedList<>(recordedTransactions);
-        clear(copy.size(), copy);
+
+        if (copy.size() > maxTransactionsPerMethod) {
+            return copy.subList(copy.size() - maxTransactionsPerMethod, copy.size());
+        }
+
         return copy;
     }
 
     public void clear() {
-        this.clear(dequeSize.get(), this.recordedTransactions);
-    }
+        int currentSize = recordedTransactions.size();
+        if (currentSize <= maxTransactionsPerMethod) {
+            return;
+        }
 
-    public void clear(int dequeSize, Deque<TransactionRecord> recordedTransactions) {
-        int toShrink = dequeSize - maxTransactionsPerMethod;
-
-        while (toShrink > 0) {
-            recordedTransactions.removeFirst();
-            toShrink--;
+        int toRemove = currentSize - maxTransactionsPerMethod;
+        for (int i = 0; i < toRemove; i++) {
+            if (recordedTransactions.pollFirst() == null) {
+                break;
+            }
         }
     }
 }

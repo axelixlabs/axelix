@@ -34,13 +34,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Integration test for {@link TransactionMonitoringService}
+ * Integration test for {@link DefaultTransactionMonitoringService}
  *
  * @since 22.01.2026
  * @author Nikita Kirillov
  */
 @SpringBootTest
-@Import(TransactionMonitoringServiceTest.TransactionMonitoringIntegrationTestConfiguration.class)
 public class TransactionMonitoringServiceTest {
 
     @Autowired
@@ -56,7 +55,7 @@ public class TransactionMonitoringServiceTest {
     private TransactionMonitoringService transactionMonitoringService;
 
     @BeforeEach
-    void setUp() {
+    void cleanUp() {
         transactionMonitoringService.clearAllStats();
     }
 
@@ -68,27 +67,27 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        var testRequiredMethod = monitoringFeed.stats().stream()
+        var testRequiredMethod = monitoringFeed.entrypoints().stream()
                 .filter(method -> "com.nucleonforge.axelix.sbs.spring.transactions.PropagationTestService"
                                 .equals(method.className())
                         && "testRequired".equals(method.methodName()))
                 .findFirst();
 
         assertThat(testRequiredMethod).isPresent();
-        assertThat(testRequiredMethod.get().stats()).isNotNull();
+        assertThat(testRequiredMethod.get().executionStats()).isNotNull();
         assertThat(testRequiredMethod.get().executions().size()).isEqualTo(3);
 
-        var nestedRequiresNewMethod = monitoringFeed.stats().stream()
+        var nestedRequiresNewMethod = monitoringFeed.entrypoints().stream()
                 .filter(method -> "com.nucleonforge.axelix.sbs.spring.transactions.PropagationTestHelper"
                                 .equals(method.className())
                         && "testNestedRequiresNew".equals(method.methodName()))
                 .findFirst();
 
         assertThat(nestedRequiresNewMethod).isPresent();
-        assertThat(testRequiredMethod.get().stats()).isNotNull();
+        assertThat(testRequiredMethod.get().executionStats()).isNotNull();
         assertThat(testRequiredMethod.get().executions().size()).isEqualTo(3);
 
-        boolean hasRepositoryMethod = monitoringFeed.stats().stream()
+        boolean hasRepositoryMethod = monitoringFeed.entrypoints().stream()
                 .anyMatch(method -> method.methodName().contains("findByLastName"));
         assertThat(hasRepositoryMethod).isFalse();
     }
@@ -99,14 +98,14 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.stats()).hasSize(1);
+        assertThat(monitoringFeed.entrypoints()).hasSize(1);
 
-        var requiresNewMethod = monitoringFeed.stats().get(0);
+        var requiresNewMethod = monitoringFeed.entrypoints().get(0);
         assertThat(requiresNewMethod.className())
                 .isEqualTo("com.nucleonforge.axelix.sbs.spring.transactions.PropagationTestHelper");
         assertThat(requiresNewMethod.methodName()).isEqualTo("testRequiresNew");
 
-        boolean hasRepositoryMethod = monitoringFeed.stats().stream()
+        boolean hasRepositoryMethod = monitoringFeed.entrypoints().stream()
                 .anyMatch(method -> method.methodName().contains("findByLastName"));
         assertThat(hasRepositoryMethod).isFalse();
     }
@@ -118,24 +117,24 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        var rollbackMethod = monitoringFeed.stats().stream()
+        var rollbackMethod = monitoringFeed.entrypoints().stream()
                 .filter(method -> "com.nucleonforge.axelix.sbs.spring.transactions.PropagationTestService"
                                 .equals(method.className())
                         && "testRollbackScenario".equals(method.methodName()))
                 .findFirst();
 
         assertThat(rollbackMethod).isPresent();
-        assertThat(rollbackMethod.get().stats()).isNotNull();
+        assertThat(rollbackMethod.get().executionStats()).isNotNull();
         assertThat(rollbackMethod.get().executions().size()).isEqualTo(1);
 
-        var nestedMethod = monitoringFeed.stats().stream()
+        var nestedMethod = monitoringFeed.entrypoints().stream()
                 .filter(method -> "com.nucleonforge.axelix.sbs.spring.transactions.PropagationTestHelper"
                                 .equals(method.className())
                         && "testNestedRequiresNew".equals(method.methodName()))
                 .findFirst();
 
         assertThat(nestedMethod).isPresent();
-        assertThat(nestedMethod.get().stats()).isNotNull();
+        assertThat(nestedMethod.get().executionStats()).isNotNull();
         assertThat(nestedMethod.get().executions().size()).isEqualTo(1);
     }
 
@@ -145,17 +144,17 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        boolean hasTestNotSupported =
-                monitoringFeed.stats().stream().anyMatch(method -> "testNotSupported".equals(method.methodName()));
+        boolean hasTestNotSupported = monitoringFeed.entrypoints().stream()
+                .anyMatch(method -> "testNotSupported".equals(method.methodName()));
         assertThat(hasTestNotSupported)
                 .as("'testNotSupported()' should not be tracked")
                 .isFalse();
 
-        boolean hasFindByLastName = monitoringFeed.stats().stream()
+        boolean hasFindByLastName = monitoringFeed.entrypoints().stream()
                 .anyMatch(method -> method.methodName().contains("findByLastName"));
         assertThat(hasFindByLastName).as("'findByLastName()' should be tracked").isTrue();
 
-        assertThat(monitoringFeed.stats()).hasSize(1);
+        assertThat(monitoringFeed.entrypoints()).hasSize(1);
     }
 
     // testSupports() should NOT be tracked (reuses test's transaction)
@@ -166,7 +165,7 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.stats()).isEmpty();
+        assertThat(monitoringFeed.entrypoints()).isEmpty();
     }
 
     @Test
@@ -175,7 +174,7 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.stats()).hasSize(0);
+        assertThat(monitoringFeed.entrypoints()).hasSize(0);
     }
 
     // testMandatory() should NOT be tracked (reuses test's transaction)
@@ -186,7 +185,7 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.stats()).isEmpty();
+        assertThat(monitoringFeed.entrypoints()).isEmpty();
     }
 
     @Test
@@ -197,7 +196,7 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.stats()).isEmpty();
+        assertThat(monitoringFeed.entrypoints()).isEmpty();
     }
 
     // internalMethod() should NOT be tracked (bypasses proxy)
@@ -207,9 +206,9 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.stats()).hasSize(1);
+        assertThat(monitoringFeed.entrypoints()).hasSize(1);
 
-        boolean hasTestSelfInvocation = monitoringFeed.stats().stream()
+        boolean hasTestSelfInvocation = monitoringFeed.entrypoints().stream()
                 .anyMatch(method -> "com.nucleonforge.axelix.sbs.spring.transactions.PropagationTestHelper"
                                 .equals(method.className())
                         && "testSelfInvocation".equals(method.methodName()));
@@ -222,13 +221,13 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.stats()).hasSize(2);
+        assertThat(monitoringFeed.entrypoints()).hasSize(2);
 
-        boolean hasTestCorrectSelfInvocation = monitoringFeed.stats().stream()
+        boolean hasTestCorrectSelfInvocation = monitoringFeed.entrypoints().stream()
                 .anyMatch(method -> "com.nucleonforge.axelix.sbs.spring.transactions.PropagationTestHelper"
                                 .equals(method.className())
                         && "testCorrectSelfInvocation".equals(method.methodName()));
-        boolean hasRequiresNewViaProxy = monitoringFeed.stats().stream()
+        boolean hasRequiresNewViaProxy = monitoringFeed.entrypoints().stream()
                 .anyMatch(method -> "com.nucleonforge.axelix.sbs.spring.transactions.PropagationTestHelper"
                                 .equals(method.className())
                         && "requiresNewViaProxy".equals(method.methodName()));
@@ -247,9 +246,9 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.stats()).hasSize(1);
+        assertThat(monitoringFeed.entrypoints()).hasSize(1);
 
-        boolean hasTestNested = monitoringFeed.stats().stream()
+        boolean hasTestNested = monitoringFeed.entrypoints().stream()
                 .anyMatch(method -> "com.nucleonforge.axelix.sbs.spring.transactions.PropagationTestHelper"
                                 .equals(method.className())
                         && "testNested".equals(method.methodName()));
@@ -264,27 +263,17 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.stats()).isEmpty();
+        assertThat(monitoringFeed.entrypoints()).isEmpty();
     }
 
     @TestConfiguration
+    @Import(TransactionMonitoringBeanPostProcessorTest.TransactionMonitoringBeanPostProcessorTestConfiguration.class)
     static class TransactionMonitoringIntegrationTestConfiguration {
-
-        @Bean
-        public TransactionStatsCollector transactionStatsCollector() {
-            return new TransactionStatsCollector(30);
-        }
 
         @Bean
         public TransactionMonitoringService transactionMonitoringService(
                 TransactionStatsCollector transactionStatsCollector) {
-            return new TransactionMonitoringService(transactionStatsCollector);
-        }
-
-        @Bean
-        public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector) {
-            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector);
+            return new DefaultTransactionMonitoringService(transactionStatsCollector);
         }
     }
 }

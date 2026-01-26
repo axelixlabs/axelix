@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Propagation;
 
@@ -45,7 +44,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest
-@Import({TransactionMonitoringBeanPostProcessorTest.TransactionMonitoringBeanPostProcessorTestConfiguration.class})
 class TransactionMonitoringBeanPostProcessorTest {
 
     @Autowired
@@ -104,7 +102,7 @@ class TransactionMonitoringBeanPostProcessorTest {
         assertThat(propagationCache).isNotEmpty();
         assertThat(canCreateTransactionCache).isNotEmpty();
 
-        Method testRequired = PropagationTestService.class.getMethod("testRequired", String.class);
+        Method testRequired = PropagationTestService.class.getDeclaredMethod("testRequired", String.class);
         MethodClassKey key = new MethodClassKey(testRequired, PropagationTestService.class);
 
         assertThat(propagationCache).containsKey(key);
@@ -124,7 +122,7 @@ class TransactionMonitoringBeanPostProcessorTest {
 
         @Bean
         public TransactionStatsCollector transactionStatsCollector() {
-            return new TransactionStatsCollector(30);
+            return new DefaultTransactionStatsCollector(30, 10000);
         }
 
         @Bean

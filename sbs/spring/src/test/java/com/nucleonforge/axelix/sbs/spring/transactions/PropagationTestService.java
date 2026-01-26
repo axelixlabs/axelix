@@ -21,6 +21,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Test service for demonstrating transaction propagation scenarios and monitoring.
+ * Used in integration tests to verify transaction tracking behavior.
+ *
+ * @author Nikita Kirillov
+ */
 @Component
 public class PropagationTestService {
 
@@ -33,7 +39,7 @@ public class PropagationTestService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void testRequired(String lastName) {
+    void testRequired(String lastName) {
         ownerRepository.findByLastName(lastName);
         helperService.testNestedRequiresNew();
     }
@@ -43,7 +49,7 @@ public class PropagationTestService {
     }
 
     @Transactional
-    public void testRollbackScenario(String lastName) {
+    protected void testRollbackScenario(String lastName) {
         ownerRepository.findByLastName(lastName);
         helperService.testNestedRequiresNew();
         throw new RuntimeException("Test rollback");

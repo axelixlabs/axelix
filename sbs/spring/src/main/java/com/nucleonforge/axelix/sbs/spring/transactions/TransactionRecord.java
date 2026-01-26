@@ -18,9 +18,10 @@
 package com.nucleonforge.axelix.sbs.spring.transactions;
 
 /**
+ * Record of a single transaction execution for monitoring purposes.
  *
- * @param durationMs
- * @param startTimestamp
+ * @param durationMs transaction execution duration in milliseconds
+ * @param startTimestamp transaction start timestamp in milliseconds since epoch
  *
  * @author Nikita Kirillov
  */

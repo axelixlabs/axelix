@@ -28,21 +28,21 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
+ * {@link MethodInterceptor} that monitors transaction execution and collects performance statistics.
  *
+ * <p>This interceptor tracks execution of @Transactional methods and records metrics
+ * when new transactions are created.
  *
+ * @since 22.01.2026
  * @author Nikita Kirillov
  */
 public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
-    private final Class<?> targetClass;
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
 
     public TransactionMonitoringInterceptor(
-            Class<?> targetClass,
-            Map<MethodClassKey, Propagation> propagationCache,
-            TransactionStatsCollector statsCollector) {
-        this.targetClass = targetClass;
+            Map<MethodClassKey, Propagation> propagationCache, TransactionStatsCollector statsCollector) {
         this.propagationCache = propagationCache;
         this.statsCollector = statsCollector;
     }
@@ -51,30 +51,22 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
     @Nullable
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Method method = invocation.getMethod();
+        Class<?> declaringClass = method.getDeclaringClass();
 
-        MethodClassKey key = new MethodClassKey(method, targetClass);
+        MethodClassKey key = new MethodClassKey(method, declaringClass);
         Propagation propagation = propagationCache.get(key);
 
-        if (!shouldMonitorTransaction(propagation)) {
-            return invocation.proceed();
+        if (propagation != null && shouldUseNewTransaction(propagation)) {
+            long startTime = System.currentTimeMillis();
+            try {
+                return invocation.proceed();
+            } finally {
+                long duration = System.currentTimeMillis() - startTime;
+                statsCollector.recordTransaction(key, new TransactionRecord(duration, startTime));
+            }
         }
 
-        long startTime = System.currentTimeMillis();
-
-        try {
-            return invocation.proceed();
-        } finally {
-            long duration = System.currentTimeMillis() - startTime;
-            statsCollector.recordTransaction(key, new TransactionRecord(duration, startTime));
-        }
-    }
-
-    private boolean shouldMonitorTransaction(@Nullable Propagation propagation) {
-        if (propagation == null) {
-            return false;
-        }
-
-        return shouldUseNewTransaction(propagation);
+        return invocation.proceed();
     }
 
     private boolean shouldUseNewTransaction(Propagation propagation) {
@@ -87,9 +79,5 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
             case SUPPORTS, MANDATORY, NOT_SUPPORTED, NEVER -> false;
         };
-    }
-
-    private boolean hasActiveTransaction() {
-        return TransactionSynchronizationManager.isActualTransactionActive();
     }
 }

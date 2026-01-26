@@ -19,14 +19,19 @@ package com.nucleonforge.axelix.sbs.spring.transactions;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.aop.Pointcut;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -38,12 +43,17 @@ import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.annotation.RepeatableContainers;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.ReflectionUtils.MethodFilter;
 
 /**
+ * BeanPostProcessor that creates AOP proxies for beans with @Transactional methods
+ * to enable real-time transaction monitoring and statistics collection.
  *
+ * <p>This processor scans Spring beans during initialization, identifies methods
+ * annotated with @Transactional, and wraps eligible beans with monitoring proxies.
  *
+ * @since 22.01.2026
  * @author Nikita Kirillov
  */
 public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor {
@@ -62,9 +72,25 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
 
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
+        boolean hasTransactionalMethods = false;
+        Set<Class<?>> classesToCheck = new LinkedHashSet<>();
         Class<?> targetClass = AopUtils.getTargetClass(bean);
 
-        if (preloadMethodPropagationCacheForClass(targetClass)) {
+        classesToCheck.add(targetClass);
+
+        if (AopUtils.isAopProxy(bean)) {
+            try {
+                Class<?>[] classes = AopProxyUtils.proxiedUserInterfaces(bean);
+                classesToCheck.addAll(Arrays.stream(classes).toList());
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        for (Class<?> clazz : classesToCheck) {
+            hasTransactionalMethods |= preloadMethodPropagationCacheForClass(clazz);
+        }
+
+        if (hasTransactionalMethods) {
             return createTransactionalProxy(bean, targetClass);
         } else {
             return bean;
@@ -72,28 +98,35 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
     }
 
     private boolean preloadMethodPropagationCacheForClass(Class<?> targetClass) {
+        boolean canCreateTransaction = false;
 
-        boolean canCreateTransaciton = false;
+        MethodFilter proxyableMethodFilter = method -> !ReflectionUtils.isObjectMethod(method)
+                && !Modifier.isPrivate(method.getModifiers())
+                && !Modifier.isStatic(method.getModifiers());
 
-        // TODO: why getMethods here and not getDeclaredMethods?
-        for (Method method : targetClass.getMethods()) {
-            if (ReflectionUtils.isObjectMethod(method)) {
-                continue;
-            }
+        // Process all public/protected/package-private methods (including inherited and interface methods)
+        // Supported since Spring 6.0+
+        Method[] uniqueMethods = ReflectionUtils.getUniqueDeclaredMethods(targetClass, proxyableMethodFilter);
 
-            MethodClassKey key = new MethodClassKey(method, targetClass);
-            Propagation propagation = resolveTransactionPropagation(method, targetClass);
-
-            if (propagation != null) {
-                propagationCache.put(key, propagation);
-
-                boolean thisMethod = canCreateTransaction(propagation);
-                canCreateTransaciton |= thisMethod;
-                canCreateTransactionCache.put(key, thisMethod);
-            }
+        for (Method method : uniqueMethods) {
+            canCreateTransaction |= processMethod(method, targetClass);
         }
 
-        return canCreateTransaciton;
+        return canCreateTransaction;
+    }
+
+    private boolean processMethod(Method method, Class<?> targetClass) {
+        MethodClassKey key = new MethodClassKey(method, targetClass);
+        Propagation propagation = resolveTransactionPropagation(method, targetClass);
+
+        if (propagation != null) {
+            propagationCache.put(key, propagation);
+            boolean canCreate = canCreateTransaction(propagation);
+            canCreateTransactionCache.put(key, canCreate);
+            return canCreate;
+        }
+
+        return false;
     }
 
     private Object createTransactionalProxy(Object bean, Class<?> targetClass) {
@@ -102,47 +135,27 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         proxyFactory.setProxyTargetClass(true);
 
         TransactionMonitoringInterceptor interceptor =
-                new TransactionMonitoringInterceptor(targetClass, propagationCache, statsCollector);
+                new TransactionMonitoringInterceptor(propagationCache, statsCollector);
 
-        // TODO:
-        //  For me at least it does not seem to be the case that we need this.
-        //  TransactionMonitoringInterceptor should already intercept all method invocations
-        //  and TransactionMonitoringInterceptor makes the decision internally whether
-        //  the given method needs to be intercepted or not.
-        DefaultPointcutAdvisor advisor =
-                new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(targetClass), interceptor);
+        // Pointcut provides fast filtering at the proxy level and is necessary for performance
+        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(), interceptor);
 
         proxyFactory.addAdvisor(advisor);
         return proxyFactory.getProxy();
     }
 
-    private Pointcut createTransactionMonitoringPointcut(Class<?> targetClass) {
+    private Pointcut createTransactionMonitoringPointcut() {
         return new StaticMethodMatcherPointcut() {
             @Override
             public boolean matches(@NonNull Method method, @NonNull Class<?> clazz) {
-                if (method.getDeclaringClass() == Object.class) {
+                if (ReflectionUtils.isObjectMethod(method)) {
                     return false;
                 }
 
-                MethodClassKey key = new MethodClassKey(method, targetClass);
+                MethodClassKey key = new MethodClassKey(method, method.getDeclaringClass());
                 Boolean cachedResult = canCreateTransactionCache.get(key);
 
-                if (cachedResult != null) {
-                    return cachedResult;
-                }
-
-                Propagation propagation = resolveTransactionPropagation(method, targetClass);
-
-                if (propagation == null) {
-                    canCreateTransactionCache.put(key, false);
-                    return false;
-                }
-
-                boolean result = canCreateTransaction(propagation);
-                canCreateTransactionCache.put(key, result);
-                propagationCache.put(key, propagation);
-
-                return result;
+                return Objects.requireNonNullElse(cachedResult, false);
             }
         };
     }

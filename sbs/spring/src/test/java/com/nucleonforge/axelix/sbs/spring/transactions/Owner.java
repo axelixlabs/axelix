@@ -22,6 +22,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+/**
+ * Simple {@link Entity} for test.
+ *
+ * @since 26.01.2026
+ * @author Nikita Kirillov
+ */
 @Entity
 public class Owner {
 

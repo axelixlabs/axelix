@@ -23,6 +23,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Simple {@link JpaRepository} for test.
+ *
+ * @author Nikita Kirillov
+ */
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
 
     @Transactional

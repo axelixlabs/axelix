@@ -17,14 +17,16 @@
  */
 package com.nucleonforge.axelix.sbs.spring.transactions;
 
+import org.springframework.boot.actuate.endpoint.annotation.DeleteOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import com.nucleonforge.axelix.common.api.TransactionMonitoringFeed;
 
 /**
+ * Custom Spring Boot Actuator endpoint for transaction monitoring.
  *
+ * <p>Exposes real-time transaction execution statistics.
  *
  * @since 22.01.2026
  * @author Nikita Kirillov
@@ -43,8 +45,8 @@ public class TransactionMonitoringEndpoint {
         return transactionMonitoringService.getMonitoringFeed();
     }
 
-    @DeleteMapping
-    public void deleteTransactionStats() {
+    @DeleteOperation
+    public void clearTransactionStats() {
         transactionMonitoringService.clearAllStats();
     }
 }
