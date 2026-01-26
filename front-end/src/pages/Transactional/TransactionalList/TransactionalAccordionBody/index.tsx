@@ -17,7 +17,7 @@
  */
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
 
-import { toFormattedTime } from "helpers";
+import { formatTransactionalDuration, toFormattedTime } from "helpers";
 import type { ITransactionalEntryPoint } from "models";
 
 import styles from "./styles.module.css";
@@ -45,7 +45,19 @@ export const TransactionalAccordionBody = ({ transactional }: IProps) => {
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="timestamp" tickFormatter={toFormattedTime} />
             <YAxis width="auto" />
-            <Tooltip labelFormatter={toFormattedTime} itemStyle={{ color: "green" }} />
+            <Tooltip
+                labelFormatter={toFormattedTime}
+                itemStyle={{ color: "green" }}
+                formatter={(value) => {
+                    let formattedValue = value;
+
+                    if (typeof value === "number") {
+                        formattedValue = value < 1000 ? `${value} ms` : formatTransactionalDuration(value);
+                    }
+
+                    return [formattedValue, "Duration"];
+                }}
+            />
             <Bar dataKey="durationsMs" fill="url(#gradient)" />
         </BarChart>
     );

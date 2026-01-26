@@ -35,3 +35,10 @@ export const filterTransactionalData = (
         }
     });
 };
+
+export const formatTransactionalDuration = (value: number): string => {
+    const seconds = value / 1000;
+    const formatted = Number.isInteger(seconds) ? seconds.toString() : seconds.toFixed(1);
+
+    return `${formatted}s`;
+};
