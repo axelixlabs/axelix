@@ -23,6 +23,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 
 import com.nucleonforge.axelix.common.api.BeansFeed;
+import com.nucleonforge.axelix.common.api.ConditionsFeed;
+import com.nucleonforge.axelix.common.api.ConfigPropsFeed;
 import com.nucleonforge.axelix.common.api.InstanceDetails;
 import com.nucleonforge.axelix.common.api.ProfileMutationResult;
 import com.nucleonforge.axelix.common.api.ServiceScheduledTasks;
@@ -39,6 +41,8 @@ import com.nucleonforge.axelix.common.api.metrics.MetricProfile;
 import com.nucleonforge.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.nucleonforge.axelix.master.service.serde.BeansJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.ConditionsJacksonMessageDeserializationStrategy;
+import com.nucleonforge.axelix.master.service.serde.ConfigPropsJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.EnvironmentJacksonMessageDeserializationStrategy;
 import com.nucleonforge.axelix.master.service.serde.EnvironmentPropertyJacksonMessageDeserializationStrategy;
@@ -312,5 +316,20 @@ public class EndpointProbersAutoConfiguration {
             ProfileMutationJacksonMessageDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(
                 instanceRegistry, deserializationStrategy, ActuatorEndpoints.PROFILE_MANAGEMENT);
+    }
+
+    // Conditions
+    @Bean
+    public DefaultEndpointProber<ConditionsFeed> getConditionsProber(
+            ConditionsJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_CONDITIONS);
+    }
+
+    // ConfigurationProperties
+    @Bean
+    public DefaultEndpointProber<ConfigPropsFeed> getConfigPropsProber(
+            ConfigPropsJacksonMessageDeserializationStrategy deserializationStrategy) {
+        return new DefaultEndpointProber<>(
+                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_CONFIG_PROPS);
     }
 }
