@@ -27,8 +27,6 @@ import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
-import com.nucleonforge.axelix.master.service.discovery.docker.DockerDiscoveryClient;
-import com.nucleonforge.axelix.master.service.discovery.docker.DockerInstanceDiscoverer;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
@@ -46,6 +44,8 @@ import com.nucleonforge.axelix.master.service.discovery.InstancesDiscoverer;
 import com.nucleonforge.axelix.master.service.discovery.KubernetesDiscoveryClient;
 import com.nucleonforge.axelix.master.service.discovery.KubernetesInstanceDiscoverer;
 import com.nucleonforge.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
+import com.nucleonforge.axelix.master.service.discovery.docker.DockerDiscoveryClient;
+import com.nucleonforge.axelix.master.service.discovery.docker.DockerInstanceDiscoverer;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
@@ -107,10 +107,10 @@ public class DiscoveryAutoConfiguration {
     }
 
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = "axile.master.discovery", name = "platform", havingValue = "docker")
+    @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "platform", havingValue = "docker")
     static class DockerDiscoveryAutoConfiguration {
         @Bean
-        @ConfigurationProperties(prefix = "axile.master.discovery.docker")
+        @ConfigurationProperties(prefix = "axelix.master.discovery.docker")
         public DockerDiscoveryProperties dockerDiscoveryProperties() {
             return new DockerDiscoveryProperties();
         }
@@ -134,28 +134,30 @@ public class DiscoveryAutoConfiguration {
             DockerClientConfig config = builder.build();
 
             ApacheDockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
-                .dockerHost(config.getDockerHost())
-                .sslConfig(config.getSSLConfig())
-                .maxConnections(100)
-                .connectionTimeout(Duration.ofSeconds(30))
-                .responseTimeout(Duration.ofSeconds(45))
-                .maxConnections(200)
-                .build();
+                    .dockerHost(config.getDockerHost())
+                    .sslConfig(config.getSSLConfig())
+                    .maxConnections(100)
+                    .connectionTimeout(Duration.ofSeconds(30))
+                    .responseTimeout(Duration.ofSeconds(45))
+                    .maxConnections(200)
+                    .build();
 
             return DockerClientImpl.getInstance(config, httpClient);
         }
 
         @Bean
         public DiscoveryClient dockerDiscoveryClient(
-            DockerClient dockerClient, DockerDiscoveryProperties dockerDiscoveryProperties) {
+                DockerClient dockerClient, DockerDiscoveryProperties dockerDiscoveryProperties) {
             return new DockerDiscoveryClient(dockerClient, dockerDiscoveryProperties.getFilters());
         }
 
         @Bean
         public DockerInstanceDiscoverer dockerInstanceDiscoverer(
-            DiscoveryClient discoveryClient,
-            ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber) {
-            return new DockerInstanceDiscoverer(discoveryClient, managedServiceMetadataEndpointProber);
+                DiscoveryClient discoveryClient,
+                ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
+                AxelixVersionDiscoverer axelixVersionDiscoverer) {
+            return new DockerInstanceDiscoverer(
+                    discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
         }
     }
 }
