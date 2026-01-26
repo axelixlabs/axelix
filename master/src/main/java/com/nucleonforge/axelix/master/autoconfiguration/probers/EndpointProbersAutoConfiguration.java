@@ -71,6 +71,7 @@ import com.nucleonforge.axelix.master.service.transport.ProxyingEndpointProper;
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 // TODO: We should dynamically register instances of EndpointProbers.
 //  We can do that, but that requires a significant ActuatorEndpoint revisiting.

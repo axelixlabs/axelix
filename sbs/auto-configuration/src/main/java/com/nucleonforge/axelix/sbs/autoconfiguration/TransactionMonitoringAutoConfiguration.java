@@ -17,12 +17,13 @@
  */
 package com.nucleonforge.axelix.sbs.autoconfiguration;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 
+import com.nucleonforge.axelix.sbs.spring.config.TransactionMonitoringConfigurationProperties;
 import com.nucleonforge.axelix.sbs.spring.transactions.DefaultTransactionMonitoringService;
 import com.nucleonforge.axelix.sbs.spring.transactions.DefaultTransactionStatsCollector;
 import com.nucleonforge.axelix.sbs.spring.transactions.TransactionMonitoringBeanPostProcessor;
@@ -37,16 +38,17 @@ import com.nucleonforge.axelix.sbs.spring.transactions.TransactionStatsCollector
  * @author Nikita Kirillov
  */
 @AutoConfiguration
+@EnableConfigurationProperties(TransactionMonitoringConfigurationProperties.class)
 public class TransactionMonitoringAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
     public TransactionStatsCollector transactionStatsCollector(
-            final @Value("${transaction.monitoring.max-transactions-per-method:30}") int maxTransactionsPerMethod,
-            final @Value("${transaction.monitoring.cleanup-interval:5}") int cleanupInterval) {
-        Assert.isTrue(maxTransactionsPerMethod > 0, "maxTransactionsPerMethod must be positive");
-        Assert.isTrue(cleanupInterval > 0, "cleanupInterval must be non-negative");
-        return new DefaultTransactionStatsCollector(maxTransactionsPerMethod, cleanupInterval);
+            TransactionMonitoringConfigurationProperties properties) {
+        Assert.isTrue(properties.maxTransactionsPerMethod() > 0, "maxTransactionsPerMethod must be positive");
+        Assert.isTrue(properties.cleanupInterval().toSeconds() > 0L, "cleanupInterval must be non-negative");
+        return new DefaultTransactionStatsCollector(
+                properties.maxTransactionsPerMethod(), properties.cleanupInterval());
     }
 
     @Bean

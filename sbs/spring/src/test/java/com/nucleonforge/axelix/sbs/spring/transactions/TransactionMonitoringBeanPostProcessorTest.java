@@ -18,6 +18,7 @@
 package com.nucleonforge.axelix.sbs.spring.transactions;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -60,8 +61,6 @@ class TransactionMonitoringBeanPostProcessorTest {
 
     private Map<MethodClassKey, Propagation> propagationCache;
 
-    private Map<MethodClassKey, Boolean> canCreateTransactionCache;
-
     private List<Object> transactionalBeans;
 
     @BeforeEach
@@ -69,9 +68,6 @@ class TransactionMonitoringBeanPostProcessorTest {
     void setup() {
         propagationCache = (Map<MethodClassKey, Propagation>)
                 ReflectionTestUtils.getField(transactionMonitoringBeanPostProcessor, "propagationCache");
-
-        canCreateTransactionCache = (Map<MethodClassKey, Boolean>)
-                ReflectionTestUtils.getField(transactionMonitoringBeanPostProcessor, "canCreateTransactionCache");
 
         transactionalBeans = List.of(propagationTestService, propagationTestHelper, ownerRepository);
     }
@@ -100,21 +96,16 @@ class TransactionMonitoringBeanPostProcessorTest {
     @Test
     void testCachesAreFilled() throws NoSuchMethodException {
         assertThat(propagationCache).isNotEmpty();
-        assertThat(canCreateTransactionCache).isNotEmpty();
 
         Method testRequired = PropagationTestService.class.getDeclaredMethod("testRequired", String.class);
         MethodClassKey key = new MethodClassKey(testRequired, PropagationTestService.class);
 
         assertThat(propagationCache).containsKey(key);
-        assertThat(canCreateTransactionCache).containsKey(key);
-        assertThat(canCreateTransactionCache.get(key)).isTrue();
 
         Method testFromNonTransactional = PropagationTestHelper.class.getMethod("testMandatory", String.class);
         key = new MethodClassKey(testFromNonTransactional, PropagationTestHelper.class);
 
         assertThat(propagationCache).containsKey(key);
-        assertThat(canCreateTransactionCache).containsKey(key);
-        assertThat(canCreateTransactionCache.get(key)).isFalse();
     }
 
     @TestConfiguration
@@ -122,7 +113,7 @@ class TransactionMonitoringBeanPostProcessorTest {
 
         @Bean
         public TransactionStatsCollector transactionStatsCollector() {
-            return new DefaultTransactionStatsCollector(30, 10000);
+            return new DefaultTransactionStatsCollector(30, Duration.ofSeconds(10000));
         }
 
         @Bean

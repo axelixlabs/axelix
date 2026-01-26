@@ -37,6 +37,12 @@ import org.springframework.test.context.TestPropertySource;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Integration test for {@link TransactionMonitoringEndpoint}
+ *
+ * @since 26.01.2026
+ * @author Nikita Kirillov
+ */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-transactions-monitoring"})
 class TransactionMonitoringEndpointTest {
@@ -56,7 +62,7 @@ class TransactionMonitoringEndpointTest {
     }
 
     @Test
-    void endpointReturnsStatsAfterTransactionExecution() throws JsonProcessingException {
+    void shouldReturnsStatsAfterTransactionExecution() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         propagationTestHelper.testRequiresNew("Smith");
 
@@ -80,7 +86,7 @@ class TransactionMonitoringEndpointTest {
         assertThatJson(responseBody).node("entrypoints[0].executions").isArray();
         assertThatJson(responseBody).node("entrypoints[0].executions[0]").isObject();
         assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].durationMs")
+                .node("entrypoints[0].executions[0].durationsMs")
                 .isNumber();
         assertThatJson(responseBody)
                 .node("entrypoints[0].executions[0].timestamp")
@@ -99,7 +105,7 @@ class TransactionMonitoringEndpointTest {
     }
 
     @Test
-    void deleteEndpointClearsAllStatsAndCaches() {
+    void shouldClearsAllTransactionMonitoringStats() {
         for (int i = 0; i < 3; i++) {
             propagationTestHelper.testRequiresNew("Johnson");
         }

@@ -17,6 +17,7 @@
  */
 package com.nucleonforge.axelix.sbs.spring.transactions;
 
+import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,12 +37,15 @@ public class DefaultTransactionStatsCollector implements TransactionStatsCollect
     private final int maxTransactionsPerMethod;
     private final ScheduledExecutorService executor;
 
-    public DefaultTransactionStatsCollector(int maxTransactionsPerMethod, int cleanupInterval) {
+    public DefaultTransactionStatsCollector(int maxTransactionsPerMethod, Duration cleanupInterval) {
         this.maxTransactionsPerMethod = maxTransactionsPerMethod;
         this.executor = Executors.newSingleThreadScheduledExecutor();
         // TODO: allow configuring the end-user scheduled executor service
         this.executor.scheduleWithFixedDelay(
-                () -> this.statsMap.values().forEach(TransactionStats::clear), 0L, cleanupInterval, TimeUnit.SECONDS);
+                () -> this.statsMap.values().forEach(TransactionStats::clear),
+                0L,
+                cleanupInterval.toSeconds(),
+                TimeUnit.SECONDS);
     }
 
     @Override

@@ -56,7 +56,7 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
         MethodClassKey key = new MethodClassKey(method, declaringClass);
         Propagation propagation = propagationCache.get(key);
 
-        if (propagation != null && shouldUseNewTransaction(propagation)) {
+        if (propagation != null && shouldCreateNewTransaction(propagation)) {
             long startTime = System.currentTimeMillis();
             try {
                 return invocation.proceed();
@@ -69,7 +69,7 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
         return invocation.proceed();
     }
 
-    private boolean shouldUseNewTransaction(Propagation propagation) {
+    private boolean shouldCreateNewTransaction(Propagation propagation) {
         boolean hasActiveTransaction = TransactionSynchronizationManager.isActualTransactionActive();
 
         return switch (propagation) {

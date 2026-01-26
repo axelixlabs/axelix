@@ -23,9 +23,11 @@ import com.nucleonforge.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 
 /**
- *
+ * Proxying implementation of {@link AbstractEndpointProber} that forwards requests to actuator endpoints
+ * without response transformation.
  *
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 public class ProxyingEndpointProper extends AbstractEndpointProber<byte[]> {
 

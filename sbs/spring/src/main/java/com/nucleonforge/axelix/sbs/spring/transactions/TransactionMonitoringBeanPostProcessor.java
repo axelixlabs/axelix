@@ -23,7 +23,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,13 +59,10 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
 
     private final Map<MethodClassKey, Propagation> propagationCache;
 
-    private final Map<MethodClassKey, Boolean> canCreateTransactionCache;
-
     private final TransactionStatsCollector statsCollector;
 
     public TransactionMonitoringBeanPostProcessor(TransactionStatsCollector statsCollector) {
         this.propagationCache = new ConcurrentHashMap<>();
-        this.canCreateTransactionCache = new ConcurrentHashMap<>();
         this.statsCollector = statsCollector;
     }
 
@@ -78,6 +74,8 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
 
         classesToCheck.add(targetClass);
 
+        // Process Spring Data repository interfaces: @Transactional annotations on repository interface methods
+        // (e.g., default methods in JPA repositories).
         if (AopUtils.isAopProxy(bean)) {
             try {
                 Class<?>[] classes = AopProxyUtils.proxiedUserInterfaces(bean);
@@ -91,12 +89,19 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         }
 
         if (hasTransactionalMethods) {
-            return createTransactionalProxy(bean, targetClass);
+            return createTransactionalProxy(bean);
         } else {
             return bean;
         }
     }
 
+    /**
+     * Processes all public/protected/package-private methods (including inherited and interface methods).
+     * Supported since Spring 6.0+
+     *
+     * @see <a href="https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/annotations.html#transaction-declarative-annotations-method-visibility">
+     *      Spring Framework Documentation - Transaction Method Visibility</a>
+     */
     private boolean preloadMethodPropagationCacheForClass(Class<?> targetClass) {
         boolean canCreateTransaction = false;
 
@@ -104,8 +109,6 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
                 && !Modifier.isPrivate(method.getModifiers())
                 && !Modifier.isStatic(method.getModifiers());
 
-        // Process all public/protected/package-private methods (including inherited and interface methods)
-        // Supported since Spring 6.0+
         Method[] uniqueMethods = ReflectionUtils.getUniqueDeclaredMethods(targetClass, proxyableMethodFilter);
 
         for (Method method : uniqueMethods) {
@@ -121,15 +124,13 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
 
         if (propagation != null) {
             propagationCache.put(key, propagation);
-            boolean canCreate = canCreateTransaction(propagation);
-            canCreateTransactionCache.put(key, canCreate);
-            return canCreate;
+            return canCreateTransaction(propagation);
         }
 
         return false;
     }
 
-    private Object createTransactionalProxy(Object bean, Class<?> targetClass) {
+    private Object createTransactionalProxy(Object bean) {
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.setTarget(bean);
         proxyFactory.setProxyTargetClass(true);
@@ -148,14 +149,14 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         return new StaticMethodMatcherPointcut() {
             @Override
             public boolean matches(@NonNull Method method, @NonNull Class<?> clazz) {
-                if (ReflectionUtils.isObjectMethod(method)) {
-                    return false;
+                MethodClassKey key = new MethodClassKey(method, method.getDeclaringClass());
+                Propagation propagation = propagationCache.get(key);
+
+                if (propagation != null) {
+                    return canCreateTransaction(propagation);
                 }
 
-                MethodClassKey key = new MethodClassKey(method, method.getDeclaringClass());
-                Boolean cachedResult = canCreateTransactionCache.get(key);
-
-                return Objects.requireNonNullElse(cachedResult, false);
+                return false;
             }
         };
     }
