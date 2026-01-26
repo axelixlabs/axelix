@@ -8,8 +8,6 @@ include(
     ":master",
     ":sbs",
     ":sbs:auto-configuration",
-    ":sbs:metrics",
-    ":sbs:postgres",
     ":sbs:spring",
     ":common",
     ":common:api",
