@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.master.api.response;
+package com.nucleonforge.axelix.common.api;
 
 import java.util.List;
 
@@ -31,16 +31,30 @@ public record TransactionMonitoringFeed(List<TransactionalEntrypoint> entrypoint
     /**
      * The transactional entrypoint. In other words,
      *
-     * @param className the short name of the class where transaction is initiated.
+     * @param className  the short name of the class where transaction is initiated.
      * @param methodName the name of the method where transaction is initiated.
      * @param executions currently recorded executions of this transaction entrypoint.
      */
-    public record TransactionalEntrypoint(String className, String methodName, List<TransactionExecution> executions) {}
+    public record TransactionalEntrypoint(
+            String className,
+            String methodName,
+            List<TransactionExecution> executions,
+            ExecutionStats executionStats) {}
 
     /**
+     * A single transaction execution record with timing information.
      *
-     * @param durationsMs
-     * @param timestamp unix timestamp (milliseconds from epoch) when transaction started
+     * @param durationsMs transaction execution duration in milliseconds
+     * @param timestamp   unix timestamp (milliseconds from epoch) when transaction started
      */
-    public record TransactionExecution(long durationsMs, Long timestamp) {}
+    public record TransactionExecution(long durationsMs, long timestamp) {}
+
+    /**
+     * Aggregated execution statistics for a transactional entrypoint.
+     *
+     * @param averageDurationMs average execution duration in milliseconds
+     * @param maxDurationMs     maximum execution duration in milliseconds
+     * @param medianDurationMs  median execution duration in milliseconds
+     */
+    public record ExecutionStats(long averageDurationMs, long maxDurationMs, long medianDurationMs) {}
 }
