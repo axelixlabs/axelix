@@ -11,7 +11,7 @@ By participating, you are expected to uphold this code.
 [[using-github-issues]]
 == Using GitHub Issues
 We use GitHub issues to track bugs and enhancements.
-If you have a general usage question please https://github.com/Nucleon-Forge/axelix/issues[submit a Question ticket] to our Issue Tracker (GitHub).
+If you have a general usage question please https://github.com/axelixlabs/axelix/issues[submit a Question ticket] to our Issue Tracker (GitHub).
 
 If you are reporting a bug, please help to speed up problem diagnosis by providing as much information as possible.
 Ideally, that would include a small sample project that reproduces the problem (Minimal Reproducible Example).
@@ -67,7 +67,7 @@ When reviewing pull requests, however, please refrain from approving or rejectin
 [[reference-documentation]]
 === Reference Documentation
 
-The reference documentation is expressed in MarkDown and lives within the https://github.com/Nucleon-Forge/axelix-docs[Axelix Docs GitHub repository].
+The reference documentation is expressed in MarkDown and lives within the https://github.com/axelixlabs/axelix-docs[Axelix Docs GitHub repository].
 
 [[commit-messages]]
 === Commit messages
