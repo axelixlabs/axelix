@@ -59,7 +59,7 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
 
     @Override
     public @NonNull O invoke(@NonNull InstanceId instanceId, HttpPayload httpPayload)
-            throws EndpointInvocationException, InstanceNotFoundException {
+            throws EndpointInvocationException, BadRequestException, InstanceNotFoundException {
         Instance instance =
                 instanceRegistry.get(instanceId).orElseThrow(() -> new InstanceNotFoundException(instanceId));
 
@@ -69,7 +69,8 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
     }
 
     @Override
-    public @NonNull O invoke(@NonNull String baseUrl, HttpPayload httpPayload) throws EndpointInvocationException {
+    public @NonNull O invoke(@NonNull String baseUrl, HttpPayload httpPayload)
+            throws EndpointInvocationException, BadRequestException {
         HttpRequest request = buildHttpRequest(supports(), httpPayload, baseUrl);
         return invokeInternal(baseUrl, request);
     }
@@ -81,6 +82,9 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
             int statusCode = response.statusCode();
             if (statusCode >= 200 && statusCode < 300) {
                 return messageDeserializationStrategy.deserialize(response.body());
+            } else if (statusCode == 400) {
+                throw new BadRequestException("Endpoint '%s' on instance identified by '%s' responded with %d"
+                        .formatted(supports(), instanceIdentity, statusCode));
             } else {
                 throw new EndpointInvocationException("Endpoint '%s' on instance identified by '%s' responded with %d"
                         .formatted(supports(), instanceIdentity, statusCode));
