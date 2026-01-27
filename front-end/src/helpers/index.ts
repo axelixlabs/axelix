@@ -20,6 +20,7 @@ export * from "./configProps";
 export * from "./environment";
 export * from "./conditions";
 export * from "./threadDump";
+export * from "./siderMenu";
 export * from "./wallboard";
 export * from "./dashboard";
 export * from "./metrics";

@@ -23,8 +23,12 @@ import { useParams } from "react-router-dom";
 
 import { Copy, EmptyHandler, Loader } from "components";
 import { fetchData, isCopyableField, resolveLangIcon, resolveOsIcon } from "helpers";
-import { type IDetailsCardRecord, type IDetailsResponseBody, StatefulRequest } from "models";
-import type { DetailsBuildValuesData } from "models/types/details";
+import {
+    type DetailsBuildValuesData,
+    type IDetailsCardRecord,
+    type IDetailsResponseBody,
+    StatefulRequest,
+} from "models";
 import { getDetailsData } from "services";
 import { VALUE_TRANSFORMERS } from "utils";
 
