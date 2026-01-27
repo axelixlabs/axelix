@@ -5,6 +5,9 @@ build/
 !**/src/test/**/build/
 **/providers
 
+### Axelix ###
+master/local
+
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
