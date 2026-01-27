@@ -45,6 +45,7 @@ jobs:
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
 
       # These are needed in order to publish the final build artifacts into Nexus package registry
+      NEXUS_URL: ${{ secrets.NEXUS_URL }}
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
       NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
       NEXUS_HOST_PORT: ${{ secrets.NEXUS_HOST_PORT }}
