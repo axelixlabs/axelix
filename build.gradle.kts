@@ -19,7 +19,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.axelixlabs.axelix"
+    group = "com.nucleonforge.axelix"
     version = project.findProperty("axelixVersion")!!
 
     repositories {
@@ -57,7 +57,7 @@ subprojects {
                 "jakarta",
                 "",
                 "org.springframework",
-                "com.axelixlabs",
+                "com.nucleonforge",
                 "\\#"
             )
             removeUnusedImports()
@@ -183,7 +183,7 @@ subprojects {
             disableAllChecks = true
 
             check("NullAway", CheckSeverity.ERROR)
-            option("NullAway:AnnotatedPackages", "com.axelixlabs.axelix")
+            option("NullAway:AnnotatedPackages", "com.nucleonforge.axelix")
             option("NullAway:JSpecifyMode", true)
             option("NullAway:CheckOptionalEmptiness", true)
         }
