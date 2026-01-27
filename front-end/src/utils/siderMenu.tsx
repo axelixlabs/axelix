@@ -31,63 +31,108 @@ import SpringIcon from "assets/icons/spring.svg?react";
 import ThreadDumpIcon from "assets/icons/threadDump.svg?react";
 import TransactionIcon from "assets/icons/transaction.svg?react";
 import type { TFunction } from "i18next";
+import { Link } from "react-router-dom";
 
-import type { MenuItem } from "models";
+import type { MenuItem as AntdMenuItem, IMenuItem } from "models";
 
-export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
+const createMenuItems = (items: IMenuItem[]): AntdMenuItem[] => {
+    return items.map(({ path, icon, label }) => ({
+        key: path,
+        icon: icon,
+        label: <Link to={path}>{label}</Link>,
+    }));
+};
+
+export const getItems = (instanceId: string, t: TFunction): AntdMenuItem[] => {
+    const basePath = `/instance/${instanceId}`;
+
+    const insightsMenuItemsData: IMenuItem[] = [
+        {
+            path: `${basePath}/details`,
+            icon: <DetailsIcon />,
+            label: t("Sider.details"),
+        },
+        {
+            path: `${basePath}/metrics`,
+            icon: <MetricsIcon />,
+            label: t("Sider.metrics"),
+        },
+        {
+            path: `${basePath}/loggers`,
+            icon: <LoggersIcon />,
+            label: t("Sider.loggers"),
+        },
+    ];
+
+    const springMenuItemsData: IMenuItem[] = [
+        {
+            path: `${basePath}/environment`,
+            icon: <EnvironmentIcon />,
+            label: t("Sider.environment"),
+        },
+        {
+            path: `${basePath}/beans`,
+            icon: <BeansIcon />,
+            label: t("Sider.beans"),
+        },
+        {
+            path: `${basePath}/config-props`,
+            icon: <ConfigPropsIcon />,
+            label: t("Sider.configurationProperties"),
+        },
+        {
+            path: `${basePath}/scheduled-tasks`,
+            icon: <ScheduledTasksIcon />,
+            label: t("Sider.scheduledTasks"),
+        },
+        {
+            path: `${basePath}/conditions`,
+            icon: <ConditionsIcon />,
+            label: t("Sider.conditions"),
+        },
+        {
+            path: `${basePath}/caches`,
+            icon: <CachesIcon />,
+            label: t("Sider.caches"),
+        },
+        {
+            path: `${basePath}/transactional`,
+            icon: <TransactionIcon />,
+            label: t("Sider.transactionControl"),
+        },
+    ];
+
+    const jvmMenuItemsData: IMenuItem[] = [
+        {
+            path: `${basePath}/thread-dump`,
+            icon: <ThreadDumpIcon />,
+            label: t("Sider.threadDump"),
+        },
+        {
+            path: `${basePath}/garbage-collector`,
+            icon: <GarbageCollectorIcon />,
+            label: t("Sider.garbageCollector"),
+        },
+    ];
+
     return [
         {
             key: "insights",
             icon: <InsightsIcon />,
             label: t("Sider.insights"),
-            children: [
-                { key: `/instance/${instanceId}/details`, icon: <DetailsIcon />, label: t("Sider.details") },
-                { key: `/instance/${instanceId}/metrics`, icon: <MetricsIcon />, label: t("Sider.metrics") },
-                { key: `/instance/${instanceId}/loggers`, icon: <LoggersIcon />, label: t("Sider.loggers") },
-            ],
+            children: createMenuItems(insightsMenuItemsData),
         },
         {
             key: "spring",
             icon: <SpringIcon />,
             label: "Spring Framework",
-            children: [
-                {
-                    key: `/instance/${instanceId}/environment`,
-                    icon: <EnvironmentIcon />,
-                    label: t("Sider.environment"),
-                },
-                { key: `/instance/${instanceId}/beans`, icon: <BeansIcon />, label: t("Sider.beans") },
-                {
-                    key: `/instance/${instanceId}/config-props`,
-                    icon: <ConfigPropsIcon />,
-                    label: t("Sider.configurationProperties"),
-                },
-                {
-                    key: `/instance/${instanceId}/scheduled-tasks`,
-                    icon: <ScheduledTasksIcon />,
-                    label: t("Sider.scheduledTasks"),
-                },
-                { key: `/instance/${instanceId}/conditions`, icon: <ConditionsIcon />, label: t("Sider.conditions") },
-                { key: `/instance/${instanceId}/caches`, icon: <CachesIcon />, label: t("Sider.caches") },
-                {
-                    key: `/instance/${instanceId}/transactional`,
-                    icon: <TransactionIcon />,
-                    label: t("Sider.transactionControl"),
-                },
-            ],
+            children: createMenuItems(springMenuItemsData),
         },
         {
             key: "JVM",
             icon: <JvmIcon />,
             label: "JVM",
-            children: [
-                { key: `/instance/${instanceId}/thread-dump`, icon: <ThreadDumpIcon />, label: t("Sider.threadDump") },
-                {
-                    key: `/instance/${instanceId}/garbage-collector`,
-                    icon: <GarbageCollectorIcon />,
-                    label: t("Sider.garbageCollector"),
-                },
-            ],
+            children: createMenuItems(jvmMenuItemsData),
         },
     ];
 };
