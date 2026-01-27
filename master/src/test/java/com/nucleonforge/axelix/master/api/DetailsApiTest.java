@@ -289,11 +289,18 @@ public class DetailsApiTest {
                 mockWebServer.url(activeInstanceId) + "/actuator",
                 new Instance.VMFeature("AppCDS", "AppCDS Description", false),
                 new Instance.VMFeature("CompressedObjectHeaders", "CompressedObjectHeaders Description", true)));
+
+        registry.register(TestObjectFactory.createInstance(
+                instanceWithoutPluginId,
+                mockWebServer.url(instanceWithoutPluginId) + "/actuator",
+                new Instance.VMFeature("AppCDS", "AppCDS Description", false),
+                new Instance.VMFeature("CompressedObjectHeaders", "CompressedObjectHeaders Description", true)));
     }
 
     @AfterEach
     void cleanup() {
         registry.deRegister(InstanceId.of(activeInstanceId));
+        registry.deRegister(InstanceId.of(instanceWithoutPluginId));
     }
 
     @Test

@@ -184,9 +184,9 @@ class LogFileApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        ResponseEntity<InstanceNotFoundException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/logfile/{instanceId}", InstanceNotFoundException.class, instanceId);
+                .getForEntity("/api/axelix/logfile/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
