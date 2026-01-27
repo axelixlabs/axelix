@@ -51,11 +51,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
-import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.service.export.HeapDumpAnonymizer;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
+import com.nucleonforge.axelix.master.utils.TestRestTemplateBuilder;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
@@ -449,7 +449,7 @@ class StateExportApiTest {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         // when.
-        ResponseEntity<Void> response = scenario.modifier
+        ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
                         "/api/axelix/export-state/{instanceId}",

@@ -48,12 +48,12 @@ import com.nucleonforge.axelix.common.api.request.ScheduledTaskExecuteRequest;
 import com.nucleonforge.axelix.common.api.request.ScheduledTaskIntervalModifyRequest;
 import com.nucleonforge.axelix.common.api.request.ScheduledTaskToggleRequest;
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
-import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
+import com.nucleonforge.axelix.master.utils.TestRestTemplateBuilder;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
@@ -607,7 +607,7 @@ public class ScheduledTasksApiTest {
     @EnumSource(InvalidAuthScenario.class)
     void shouldReturnUnauthorized_OnGetAllScheduledTasks(InvalidAuthScenario scenario) {
         // when.
-        ResponseEntity<?> response = scenario.modifier
+        ResponseEntity<?> response = scenario.getModifier()
                 .apply(restTemplate)
                 .getForEntity("/api/axelix/scheduled-tasks/{instanceId}", Void.class, activeInstanceId);
 
@@ -622,7 +622,7 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        ResponseEntity<Void> response = scenario.modifier
+        ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
                         "/api/axelix/scheduled-tasks/{instanceId}/enable", requestBody, Void.class, activeInstanceId);
@@ -638,7 +638,7 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        ResponseEntity<Void> response = scenario.modifier
+        ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
                         "/api/axelix/scheduled-tasks/{instanceId}/disable", requestBody, Void.class, activeInstanceId);

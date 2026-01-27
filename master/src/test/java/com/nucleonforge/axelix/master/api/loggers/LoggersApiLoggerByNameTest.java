@@ -41,13 +41,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
-import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.api.LoggersApi;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
+import com.nucleonforge.axelix.master.utils.TestRestTemplateBuilder;
 
 import static com.nucleonforge.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
@@ -228,7 +228,7 @@ public class LoggersApiLoggerByNameTest {
         String loggerName = "org.springframework.web";
 
         // when.
-        ResponseEntity<Void> response = scenario.modifier
+        ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .getForEntity(
                         "/api/axelix/loggers/{instanceId}/logger/{loggerName}",

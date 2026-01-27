@@ -21,31 +21,34 @@ import java.util.function.Function;
 
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
-import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
-
 /**
  * This enum contains a set of invalid authentication scenarios used to parameterize API integration tests.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public enum InvalidAuthScenario {
 
-    // Request with invalid cookie-based authentication.
-    INVALID_COOKIE(TestRestTemplateBuilder::withInvalidCookie),
-
-    // Request without an authentication token.
-    NO_TOKEN(TestRestTemplateBuilder::withoutToken),
+    // Request without a cookies with an authentication token.
+    NO_COOKIE(TestRestTemplateBuilder::withoutAuthCookie),
 
     // Request with an expired authentication token.
-    EXPIRED_TOKEN(TestRestTemplateBuilder::withExpiredToken);
+    EXPIRED_TOKEN(TestRestTemplateBuilder::withExpiredToken),
+
+    // Request with a malformed authentication token.
+    MALFORMED_TOKEN(TestRestTemplateBuilder::withMalformedToken);
 
     /**
      * Modifier function that applies an invalid authentication scenario
      * to {@link TestRestTemplateBuilder} and return {@link TestRestTemplate}.
      */
-    public final Function<TestRestTemplateBuilder, TestRestTemplate> modifier;
+    private final Function<TestRestTemplateBuilder, TestRestTemplate> modifier;
 
     InvalidAuthScenario(Function<TestRestTemplateBuilder, TestRestTemplate> modifier) {
         this.modifier = modifier;
+    }
+
+    public Function<TestRestTemplateBuilder, TestRestTemplate> getModifier() {
+        return modifier;
     }
 }

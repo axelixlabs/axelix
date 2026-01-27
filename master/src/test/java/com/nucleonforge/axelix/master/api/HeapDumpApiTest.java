@@ -46,7 +46,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
-import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.export.HeapDumpAnonymizer;
@@ -54,6 +53,7 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
+import com.nucleonforge.axelix.master.utils.TestRestTemplateBuilder;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -190,7 +190,7 @@ class HeapDumpApiTest {
     @EnumSource(InvalidAuthScenario.class)
     void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
         // when.
-        ResponseEntity<Void> response = scenario.modifier
+        ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .getForEntity("/api/axelix/heapdump/{instanceId}", Void.class, activeInstanceId);
 

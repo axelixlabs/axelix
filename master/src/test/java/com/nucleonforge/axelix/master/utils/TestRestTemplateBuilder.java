@@ -15,14 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.nucleonforge.axelix.master;
+package com.nucleonforge.axelix.master.utils;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
@@ -33,8 +32,8 @@ import org.springframework.stereotype.Component;
 import com.nucleonforge.axelix.common.auth.core.Authority;
 import com.nucleonforge.axelix.common.auth.core.DefaultRole;
 import com.nucleonforge.axelix.common.auth.core.DefaultUser;
-import com.nucleonforge.axelix.common.auth.core.JwtAlgorithm;
 import com.nucleonforge.axelix.master.autoconfiguration.auth.CookieProperties;
+import com.nucleonforge.axelix.master.autoconfiguration.auth.JwtProperties;
 import com.nucleonforge.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
 import com.nucleonforge.axelix.master.service.auth.jwt.JwtEncoderService;
 
@@ -65,17 +64,26 @@ public class TestRestTemplateBuilder {
     // kind of have to lean towards a listener here.
     private int testTomcatServerPort;
 
+    private final CookieProperties cookieProperties;
+    private final JwtEncoderService defaultJwtEncoderService;
+    private final JwtEncoderService expiredJwtEncoderService;
+
     @EventListener
     public void handleServletWebServerInitializedEvent(ServletWebServerInitializedEvent event) {
         this.testTomcatServerPort = event.getWebServer().getPort();
     }
 
-    @Autowired
-    private CookieProperties cookieProperties;
+    public TestRestTemplateBuilder(
+            CookieProperties cookieProperties,
+            JwtProperties jwtProperties,
+            JwtEncoderService defaultJwtEncoderService) {
+        this.cookieProperties = cookieProperties;
+        this.defaultJwtEncoderService = defaultJwtEncoderService;
+        this.expiredJwtEncoderService = new DefaultJwtEncoderService(
+                jwtProperties.getAlgorithm(), jwtProperties.getSigningKey(), Duration.ZERO);
+    }
 
-    @Autowired
-    private JwtEncoderService jwtEncoderService;
-
+    // Just a convenient method to communicate to the reader the intent.
     public TestRestTemplate withoutAuthorities() {
         return withAuthorities();
     }
@@ -83,48 +91,42 @@ public class TestRestTemplateBuilder {
     public TestRestTemplate withAuthorities(Authority... authorities) {
         String token = generateToken(authorities);
 
-        return new TestRestTemplate(new RestTemplateBuilder()
-                .rootUri(HOST + testTomcatServerPort)
-                .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(cookieProperties.getName(), token)));
+        return buildWithToken(token);
     }
 
-    public TestRestTemplate withoutToken() {
-        return new TestRestTemplate(new RestTemplateBuilder()
-                .rootUri(HOST + testTomcatServerPort)
-                .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(cookieProperties.getName(), null)));
-    }
-
-    public TestRestTemplate withExpiredToken(Authority... authorities) {
+    // Bad token auth scenarios start
+    TestRestTemplate withExpiredToken(Authority... authorities) {
         String expiredToken = generateExpiredToken(authorities);
 
+        return buildWithToken(expiredToken);
+    }
+
+    TestRestTemplate withMalformedToken() {
+        String malformedToken = "malformed token";
+
+        return buildWithToken(malformedToken);
+    }
+
+    TestRestTemplate withoutAuthCookie() {
+        return new TestRestTemplate(new RestTemplateBuilder().rootUri(HOST + testTomcatServerPort));
+    }
+    // Bad token auth scenarios end
+
+    private TestRestTemplate buildWithToken(String expiredToken) {
         return new TestRestTemplate(new RestTemplateBuilder()
                 .rootUri(HOST + testTomcatServerPort)
                 .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(cookieProperties.getName(), expiredToken)));
     }
 
-    public TestRestTemplate withInvalidCookie(Authority... authorities) {
-        String token = generateToken(authorities);
-
-        return new TestRestTemplate(new RestTemplateBuilder()
-                .rootUri(HOST + testTomcatServerPort)
-                .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted("invalidCookieName", token)));
-    }
-
     private String generateToken(Authority[] authorities) {
-        return jwtEncoderService.generateToken(new DefaultUser(
+        return defaultJwtEncoderService.generateToken(new DefaultUser(
                 USERNAME,
                 PASSWORD,
                 Set.of(new DefaultRole(ROLE_NAME, Arrays.stream(authorities).collect(Collectors.toSet()), Set.of()))));
     }
 
     private String generateExpiredToken(Authority[] authorities) {
-        String hs512Key =
-                "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff";
-        JwtAlgorithm algorithm = JwtAlgorithm.HMAC512;
-        JwtEncoderService jwtEncoderServiceWithExpiredToken =
-                new DefaultJwtEncoderService(algorithm, hs512Key, Duration.ZERO);
-
-        return jwtEncoderServiceWithExpiredToken.generateToken(new DefaultUser(
+        return expiredJwtEncoderService.generateToken(new DefaultUser(
                 USERNAME,
                 PASSWORD,
                 Set.of(new DefaultRole(ROLE_NAME, Arrays.stream(authorities).collect(Collectors.toSet()), Set.of()))));

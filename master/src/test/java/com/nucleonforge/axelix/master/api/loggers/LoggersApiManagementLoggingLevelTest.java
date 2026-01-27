@@ -40,7 +40,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
-import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
 import com.nucleonforge.axelix.master.api.LoggersApi;
 import com.nucleonforge.axelix.master.api.request.LogLevelChangeRequest;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
@@ -48,6 +47,7 @@ import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
 import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
+import com.nucleonforge.axelix.master.utils.TestRestTemplateBuilder;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -296,7 +296,7 @@ public class LoggersApiManagementLoggingLevelTest {
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
 
         // when.
-        ResponseEntity<Void> response = scenario.modifier
+        ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
                         "/api/axelix/loggers/{instanceId}/group/{groupName}",
@@ -316,7 +316,7 @@ public class LoggersApiManagementLoggingLevelTest {
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG");
 
         // when.
-        ResponseEntity<Void> response = scenario.modifier
+        ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
                         "/api/axelix/loggers/{instanceId}/logger/{loggerName}",
@@ -335,7 +335,7 @@ public class LoggersApiManagementLoggingLevelTest {
         String loggerName = "clear.logger.name";
 
         // when.
-        ResponseEntity<Void> response = scenario.modifier
+        ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
                         "/api/axelix/loggers/{instanceId}/logger/{loggerName}/clear",
