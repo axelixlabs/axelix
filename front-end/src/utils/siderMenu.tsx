@@ -33,9 +33,9 @@ import TransactionIcon from "assets/icons/transaction.svg?react";
 import type { TFunction } from "i18next";
 import { Link } from "react-router-dom";
 
-import type { IMenuItems, MenuItem } from "models";
+import type { MenuItem as AntdMenuItem, IMenuItem } from "models";
 
-const createMenuItems = (items: IMenuItems[]): MenuItem[] => {
+const createMenuItems = (items: IMenuItem[]): AntdMenuItem[] => {
     return items.map(({ path, icon, label }) => ({
         key: path,
         icon: icon,
@@ -43,10 +43,10 @@ const createMenuItems = (items: IMenuItems[]): MenuItem[] => {
     }));
 };
 
-export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
+export const getItems = (instanceId: string, t: TFunction): AntdMenuItem[] => {
     const basePath = `/instance/${instanceId}`;
 
-    const insightsMenuItemsData: IMenuItems[] = [
+    const insightsMenuItemsData: IMenuItem[] = [
         {
             path: `${basePath}/details`,
             icon: <DetailsIcon />,
@@ -64,7 +64,7 @@ export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
         },
     ];
 
-    const springMenuItemsData: IMenuItems[] = [
+    const springMenuItemsData: IMenuItem[] = [
         {
             path: `${basePath}/environment`,
             icon: <EnvironmentIcon />,
@@ -102,7 +102,7 @@ export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
         },
     ];
 
-    const JVMMenuItemsData: IMenuItems[] = [
+    const jvmMenuItemsData: IMenuItem[] = [
         {
             path: `${basePath}/thread-dump`,
             icon: <ThreadDumpIcon />,
@@ -132,7 +132,7 @@ export const getItems = (instanceId: string, t: TFunction): MenuItem[] => {
             key: "JVM",
             icon: <JvmIcon />,
             label: "JVM",
-            children: createMenuItems(JVMMenuItemsData),
+            children: createMenuItems(jvmMenuItemsData),
         },
     ];
 };

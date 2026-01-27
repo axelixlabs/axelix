@@ -17,7 +17,7 @@
  */
 import type { JSX } from "react";
 
-export interface IMenuItems {
+export interface IMenuItem {
     /**
      * Route path that the menu item links to.
      */
