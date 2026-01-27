@@ -30,6 +30,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,12 +43,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.nucleonforge.axelix.master.ApplicationEntrypoint;
-import com.nucleonforge.axelix.master.TestRestTemplateBuilder;
-import com.nucleonforge.axelix.master.exception.InstanceNotFoundException;
 import com.nucleonforge.axelix.master.model.instance.InstanceId;
 import com.nucleonforge.axelix.master.service.state.InstanceRegistry;
 import com.nucleonforge.axelix.master.service.transport.EndpointInvocationException;
+import com.nucleonforge.axelix.master.utils.InvalidAuthScenario;
 import com.nucleonforge.axelix.master.utils.TestObjectFactory;
+import com.nucleonforge.axelix.master.utils.TestRestTemplateBuilder;
 
 import static com.nucleonforge.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,6 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 12.11.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LogFileApiTest {
@@ -130,10 +133,12 @@ class LogFileApiTest {
 
     @Test
     void shouldReturnLogFileAsPlainText() {
+        // when.
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity("/api/axelix/logfile/{instanceId}", String.class, activeInstanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
         assertThat(response.getBody()).contains(logContent);
@@ -144,6 +149,7 @@ class LogFileApiTest {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Range", "bytes=0-151");
 
+        // when.
         HttpEntity<Void> entity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
@@ -151,6 +157,7 @@ class LogFileApiTest {
 
         String expectedPartialContent = logContent.substring(0, 152);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PARTIAL_CONTENT);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
         assertThat(response.getBody()).contains(expectedPartialContent);
@@ -162,10 +169,12 @@ class LogFileApiTest {
         String instanceId = UUID.randomUUID().toString();
         registry.register(createInstance(instanceId));
 
+        // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity("/api/axelix/logfile/{instanceId}", EndpointInvocationException.class, instanceId);
 
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -173,10 +182,24 @@ class LogFileApiTest {
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = UUID.randomUUID().toString();
 
-        ResponseEntity<InstanceNotFoundException> response = restTemplate
+        // when.
+        ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/logfile/{instanceId}", InstanceNotFoundException.class, instanceId);
+                .getForEntity("/api/axelix/logfile/{instanceId}", String.class, instanceId);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @ParameterizedTest
+    @EnumSource(InvalidAuthScenario.class)
+    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
+        // when.
+        ResponseEntity<Void> response = scenario.getModifier()
+                .apply(restTemplate)
+                .getForEntity("/api/axelix/logfile/{instanceId}", Void.class, activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 }
