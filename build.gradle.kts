@@ -80,7 +80,7 @@ subprojects {
         repositories {
             maven {
                 name = "NexusAxelix"
-                url = uri("https://158.160.69.73:8443/repository/axile-monorepo/")
+                url = uri(project.findProperty("nexus.url") as String? ?: System.getenv("NEXUS_URL"))
                 credentials {
                     username = project.findProperty("nexus.user") as String? ?: System.getenv("NEXUS_USER")
                     password = project.findProperty("nexus.password") as String? ?: System.getenv("NEXUS_PASSWORD")
@@ -150,13 +150,13 @@ subprojects {
                         }
                         developer {
                             name.set("Ashot Sargsyan")
-                            email.set("axelix@gmail.com") //TODO
+                            email.set("ashotsargsyan527@gmail.com")
                             organization.set("Axelix Labs")
                             organizationUrl.set("https://github.com/axelixlabs")
                         }
                         developer {
                             name.set("Sergey Cherkasov")
-                            email.set("axelix@gmail.com") //TODO
+                            email.set("iamcherkasov.job@gmail.com")
                             organization.set("Axelix Labs")
                             organizationUrl.set("https://github.com/axelixlabs")
                         }
@@ -195,7 +195,7 @@ subprojects {
     }
 
     configure<SigningExtension> {
-        // Signing artifacts only in case publishGprPublicationToGitHu bPackagesRepository is present
+        // Signing artifacts only in case publishGprPublicationToGitHubPackagesRepository is present
         if (gradle.taskGraph.hasTask(":publishGprPublicationToGitHubPackagesRepository")) {
 
             val signingKey = System.getenv("PGP_SIGNING_KEY")

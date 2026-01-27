@@ -4819,7 +4819,7 @@
           "content" : "5bb2201d300f79965ea6729e6a89c3b24e2bbc8fb8c39511c764655600be0b3cb78504e085a86abb23acd7ef1dc24a3ed695a022e1882cfc6ee80239f98d0bc6"
         }
       ],
-      "purl" : "pkg:maven/com.nucleonforge.axile/auto-configuration@1.0.0-SNAPSHOT?type=jar"
+      "purl" : "pkg:maven/com.axelixlabs.axelix/auto-configuration@1.0.0-SNAPSHOT?type=jar"
     },
     {
       "type" : "library",
@@ -4951,8 +4951,8 @@
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/com.nucleonforge.axile/common_auth@1.0.0-SNAPSHOT?type=jar",
-      "group" : "com.nucleonforge.axile",
+      "bom-ref" : "pkg:maven/com.axelixlabs.axelix/common_auth@1.0.0-SNAPSHOT?type=jar",
+      "group" : "com.axelixlabs.axelix",
       "name" : "common_auth",
       "version" : "1.0.0-SNAPSHOT",
       "scope" : "required",
@@ -4990,12 +4990,12 @@
           "content" : "38b9001873cad09e502fd9823c47883ffeebebed418df9ae9a52646d7375649ed3d5683856d17d8b9111ae68d5c45ea4e01e964fa027c5063ed080db6ccf1dce"
         }
       ],
-      "purl" : "pkg:maven/com.nucleonforge.axile/common_auth@1.0.0-SNAPSHOT?type=jar"
+      "purl" : "pkg:maven/com.axelixlabs.axelix/common_auth@1.0.0-SNAPSHOT?type=jar"
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/com.nucleonforge.axile/auth@1.0.0-SNAPSHOT?type=jar",
-      "group" : "com.nucleonforge.axile",
+      "bom-ref" : "pkg:maven/com.axelixlabs.axelix/auth@1.0.0-SNAPSHOT?type=jar",
+      "group" : "com.axelixlabs.axelix",
       "name" : "auth",
       "version" : "1.0.0-SNAPSHOT",
       "scope" : "required",
@@ -5033,7 +5033,7 @@
           "content" : "2fa3be1268e5eae9a7bda6b97899a3a37f18c88774302125e43492f7dbe43aeb664058833cc3bbefbc3151df4c2137d7944ddff601d5cc23781b0329635f795d"
         }
       ],
-      "purl" : "pkg:maven/com.nucleonforge.axile/auth@1.0.0-SNAPSHOT?type=jar"
+      "purl" : "pkg:maven/com.axelixlabs.axelix/auth@1.0.0-SNAPSHOT?type=jar"
     },
     {
       "type" : "library",
@@ -5111,8 +5111,8 @@
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/com.nucleonforge.axile/postgres@1.0.0-SNAPSHOT?type=jar",
-      "group" : "com.nucleonforge.axile",
+      "bom-ref" : "pkg:maven/com.axelixlabs.axelix/postgres@1.0.0-SNAPSHOT?type=jar",
+      "group" : "com.axelixlabs.axelix",
       "name" : "postgres",
       "version" : "1.0.0-SNAPSHOT",
       "scope" : "required",
@@ -5150,12 +5150,12 @@
           "content" : "9ae6d804d4192a904e1c14b71403809b79f888e57c9d52ffb053a8dd812b2a074b14daa99be47124480332e4bd8d1f446e5eb222d9079a4d62328f24d61cfc89"
         }
       ],
-      "purl" : "pkg:maven/com.nucleonforge.axile/postgres@1.0.0-SNAPSHOT?type=jar"
+      "purl" : "pkg:maven/com.axelixlabs.axelix/postgres@1.0.0-SNAPSHOT?type=jar"
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/com.nucleonforge.axile/metrics@1.0.0-SNAPSHOT?type=jar",
-      "group" : "com.nucleonforge.axile",
+      "bom-ref" : "pkg:maven/com.axelixlabs.axelix/metrics@1.0.0-SNAPSHOT?type=jar",
+      "group" : "com.axelixlabs.axelix",
       "name" : "metrics",
       "version" : "1.0.0-SNAPSHOT",
       "scope" : "required",
@@ -5193,12 +5193,12 @@
           "content" : "d946613359646f4c39f75699e7c79ea2d00b775d4eb65147aa688e5e199986401ff18d47f2a18c30dd0d87358afb5eef7725b09f1873d7c494b9b14f87fc14de"
         }
       ],
-      "purl" : "pkg:maven/com.nucleonforge.axile/metrics@1.0.0-SNAPSHOT?type=jar"
+      "purl" : "pkg:maven/com.axelixlabs.axelix/metrics@1.0.0-SNAPSHOT?type=jar"
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/com.nucleonforge.axile/spring@1.0.0-SNAPSHOT?type=jar",
-      "group" : "com.nucleonforge.axile",
+      "bom-ref" : "pkg:maven/com.axelixlabs.axelix/spring@1.0.0-SNAPSHOT?type=jar",
+      "group" : "com.axelixlabs.axelix",
       "name" : "spring",
       "version" : "1.0.0-SNAPSHOT",
       "scope" : "required",
@@ -5236,12 +5236,12 @@
           "content" : "a22e83f23d964f3e800fa759a6ae6d42fae5543ba56360c61a627c4ad75874dc8d6aedccb3abd33f4088328b4ca7b6a5c48e93e75e2bd336e20f4917e31b8ca5"
         }
       ],
-      "purl" : "pkg:maven/com.nucleonforge.axile/spring@1.0.0-SNAPSHOT?type=jar"
+      "purl" : "pkg:maven/com.axelixlabs.axelix/spring@1.0.0-SNAPSHOT?type=jar"
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/com.nucleonforge.axile/domain@1.0.0-SNAPSHOT?type=jar",
-      "group" : "com.nucleonforge.axile",
+      "bom-ref" : "pkg:maven/com.axelixlabs.axelix/domain@1.0.0-SNAPSHOT?type=jar",
+      "group" : "com.axelixlabs.axelix",
       "name" : "domain",
       "version" : "1.0.0-SNAPSHOT",
       "scope" : "required",
@@ -5279,7 +5279,7 @@
           "content" : "1657c751a5c16ef22e4a8f98d7ee5133050a728ec6a42e7c5fc0d68cadf02d81e7c0be6398dfcb7d501cd505e203c305b8de0b0ec80fa3589d8ae92ef6d258ca"
         }
       ],
-      "purl" : "pkg:maven/com.nucleonforge.axile/domain@1.0.0-SNAPSHOT?type=jar"
+      "purl" : "pkg:maven/com.axelixlabs.axelix/domain@1.0.0-SNAPSHOT?type=jar"
     },
     {
       "type" : "library",
@@ -6647,7 +6647,7 @@
         "pkg:maven/org.springframework.boot/spring-boot-starter-web@3.5.0?type=jar",
         "pkg:maven/org.springframework.boot/spring-boot-starter-validation@3.5.0?type=jar",
         "pkg:maven/org.springframework.boot/spring-boot-starter-thymeleaf@3.5.0?type=jar",
-        "pkg:maven/com.nucleonforge.axile/auto-configuration@1.0.0-SNAPSHOT?type=jar",
+        "pkg:maven/com.axelixlabs.axelix/auto-configuration@1.0.0-SNAPSHOT?type=jar",
         "pkg:maven/com.h2database/h2@2.3.232?type=jar",
         "pkg:maven/com.mysql/mysql-connector-j@9.2.0?type=jar",
         "pkg:maven/org.postgresql/postgresql@42.7.5?type=jar",
@@ -7169,14 +7169,14 @@
       "dependsOn" : [ ]
     },
     {
-      "ref" : "pkg:maven/com.nucleonforge.axile/auto-configuration@1.0.0-SNAPSHOT?type=jar",
+      "ref" : "pkg:maven/com.axelixlabs.axelix/auto-configuration@1.0.0-SNAPSHOT?type=jar",
       "dependsOn" : [
         "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
         "pkg:maven/org.slf4j/slf4j-api@2.0.17?type=jar",
-        "pkg:maven/com.nucleonforge.axile/common_auth@1.0.0-SNAPSHOT?type=jar",
-        "pkg:maven/com.nucleonforge.axile/auth@1.0.0-SNAPSHOT?type=jar",
-        "pkg:maven/com.nucleonforge.axile/postgres@1.0.0-SNAPSHOT?type=jar",
-        "pkg:maven/com.nucleonforge.axile/spring@1.0.0-SNAPSHOT?type=jar",
+        "pkg:maven/com.axelixlabs.axelix/common_auth@1.0.0-SNAPSHOT?type=jar",
+        "pkg:maven/com.axelixlabs.axelix/auth@1.0.0-SNAPSHOT?type=jar",
+        "pkg:maven/com.axelixlabs.axelix/postgres@1.0.0-SNAPSHOT?type=jar",
+        "pkg:maven/com.axelixlabs.axelix/spring@1.0.0-SNAPSHOT?type=jar",
         "pkg:maven/io.jsonwebtoken/jjwt-impl@0.12.6?type=jar",
         "pkg:maven/io.jsonwebtoken/jjwt-jackson@0.12.6?type=jar"
       ]
@@ -7186,18 +7186,18 @@
       "dependsOn" : [ ]
     },
     {
-      "ref" : "pkg:maven/com.nucleonforge.axile/common_auth@1.0.0-SNAPSHOT?type=jar",
+      "ref" : "pkg:maven/com.axelixlabs.axelix/common_auth@1.0.0-SNAPSHOT?type=jar",
       "dependsOn" : [
         "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
       ]
     },
     {
-      "ref" : "pkg:maven/com.nucleonforge.axile/auth@1.0.0-SNAPSHOT?type=jar",
+      "ref" : "pkg:maven/com.axelixlabs.axelix/auth@1.0.0-SNAPSHOT?type=jar",
       "dependsOn" : [
         "pkg:maven/io.jsonwebtoken/jjwt-api@0.12.6?type=jar",
         "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
         "pkg:maven/org.slf4j/slf4j-api@2.0.17?type=jar",
-        "pkg:maven/com.nucleonforge.axile/common_auth@1.0.0-SNAPSHOT?type=jar",
+        "pkg:maven/com.axelixlabs.axelix/common_auth@1.0.0-SNAPSHOT?type=jar",
         "pkg:maven/io.jsonwebtoken/jjwt-impl@0.12.6?type=jar",
         "pkg:maven/io.jsonwebtoken/jjwt-jackson@0.12.6?type=jar"
       ]
@@ -7220,12 +7220,12 @@
       ]
     },
     {
-      "ref" : "pkg:maven/com.nucleonforge.axile/postgres@1.0.0-SNAPSHOT?type=jar",
+      "ref" : "pkg:maven/com.axelixlabs.axelix/postgres@1.0.0-SNAPSHOT?type=jar",
       "dependsOn" : [
         "pkg:maven/org.postgresql/postgresql@42.7.5?type=jar",
         "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
         "pkg:maven/org.slf4j/slf4j-api@2.0.17?type=jar",
-        "pkg:maven/com.nucleonforge.axile/metrics@1.0.0-SNAPSHOT?type=jar"
+        "pkg:maven/com.axelixlabs.axelix/metrics@1.0.0-SNAPSHOT?type=jar"
       ]
     },
     {
@@ -7239,22 +7239,22 @@
       "dependsOn" : [ ]
     },
     {
-      "ref" : "pkg:maven/com.nucleonforge.axile/metrics@1.0.0-SNAPSHOT?type=jar",
+      "ref" : "pkg:maven/com.axelixlabs.axelix/metrics@1.0.0-SNAPSHOT?type=jar",
       "dependsOn" : [
         "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
         "pkg:maven/org.slf4j/slf4j-api@2.0.17?type=jar"
       ]
     },
     {
-      "ref" : "pkg:maven/com.nucleonforge.axile/spring@1.0.0-SNAPSHOT?type=jar",
+      "ref" : "pkg:maven/com.axelixlabs.axelix/spring@1.0.0-SNAPSHOT?type=jar",
       "dependsOn" : [
         "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar",
         "pkg:maven/org.slf4j/slf4j-api@2.0.17?type=jar",
-        "pkg:maven/com.nucleonforge.axile/domain@1.0.0-SNAPSHOT?type=jar"
+        "pkg:maven/com.axelixlabs.axelix/domain@1.0.0-SNAPSHOT?type=jar"
       ]
     },
     {
-      "ref" : "pkg:maven/com.nucleonforge.axile/domain@1.0.0-SNAPSHOT?type=jar",
+      "ref" : "pkg:maven/com.axelixlabs.axelix/domain@1.0.0-SNAPSHOT?type=jar",
       "dependsOn" : [
         "pkg:maven/org.jspecify/jspecify@1.0.0?type=jar"
       ]
