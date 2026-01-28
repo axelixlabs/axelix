@@ -1,6 +1,0 @@
-Done! Thank you for installing the Axelix K8S chart!
-
-{{- if and $.Values.ingress.enabled $.Values.ingress.host }}
-Axelix UI is now available under the following URL:
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $.Values.ingress.host }}:{{ if $.Values.ingress.tls }}443{{ else }}80{{ end }}
-{{- end }}

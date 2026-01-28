@@ -1,6 +1,0 @@
-apiVersion: v2
-name: axelix
-description: A Helm chart for deploying Axelix Master to Kubernetes
-type: application
-version: 1.0.0
-appVersion: "1.0.0-SNAPSHOT"
