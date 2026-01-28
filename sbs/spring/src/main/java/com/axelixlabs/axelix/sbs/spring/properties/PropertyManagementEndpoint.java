@@ -33,8 +33,9 @@ import org.springframework.web.bind.annotation.RequestBody;
  *
  * @since 10.07.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
-@RestControllerEndpoint(id = "property-management")
+@RestControllerEndpoint(id = "axelix-property-management")
 public class PropertyManagementEndpoint {
 
     private static final Logger log = LoggerFactory.getLogger(PropertyManagementEndpoint.class);

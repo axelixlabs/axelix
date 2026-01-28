@@ -221,6 +221,6 @@ class ProfileManagementEndpointTest {
     }
 
     private String path() {
-        return "/actuator/profile-management";
+        return "/actuator/axelix-profile-management";
     }
 }
