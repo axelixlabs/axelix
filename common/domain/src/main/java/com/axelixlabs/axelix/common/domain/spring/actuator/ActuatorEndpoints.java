@@ -97,7 +97,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
             of("/health/{component}/{sub-component}", HttpMethod.GET);
 
     // Heap Dump
-    public static final ActuatorEndpoint GET_HEAP_DUMP = of("/heapdump", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_HEAP_DUMP = of("/axelix-heap-dump", HttpMethod.GET);
 
     // Http Exchanges
     public static final ActuatorEndpoint HTTP_EXCHANGES = of("/httpexchanges", HttpMethod.GET);

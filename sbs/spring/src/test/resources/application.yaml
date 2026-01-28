@@ -27,6 +27,7 @@ management:
       exposure:
         include:
           - health
+          - heapdump
           - property-management
           - profile-management
           - axelix-metadata
@@ -40,6 +41,7 @@ management:
           - env
           - axelix-thread-dump
           - axelix-gc
+          - axelix-heap-dump
 
 logging:
   level:
