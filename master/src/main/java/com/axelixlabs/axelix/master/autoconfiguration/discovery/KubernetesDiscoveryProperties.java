@@ -1,0 +1,122 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.axelixlabs.axelix.master.autoconfiguration.discovery;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Properties related to autodiscovery in K8S environments
+ *
+ * @see DiscoveryAutoConfiguration.KubernetesDiscoveryAutoConfiguration
+ * @author Mikhail Polivakha
+ */
+@SuppressWarnings("NullAway")
+public class KubernetesDiscoveryProperties {
+
+    /**
+     * URL of the kube-apiserver to be used by master when discovering
+     * the potentially managed services.
+     */
+    private String kubeApiserverUrl;
+
+    /**
+     * The path inside the K8S Axelix Master pod where the Service Account token resides.
+     */
+    private String saTokenPath = "/var/run/secrets/kubernetes.io/serviceaccount/token";
+
+    /**
+     * The path inside the K8S Axelix Master pod where the certificate of the kube-apiserver resides.
+     */
+    private String caCertPath = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt";
+
+    private DiscoveryFilters filters;
+
+    /**
+     * Filters to be applied during discovery of managed services.
+     *
+     * @author Mikhail Polivakha
+     */
+    public static class DiscoveryFilters {
+
+        /**
+         *
+         */
+        private Set<String> namespaces;
+
+        /**
+         * Labels that are used for filtering of the
+         */
+        private Map<String, String> labels = new HashMap<>();
+
+        public Set<String> getNamespaces() {
+            return namespaces;
+        }
+
+        public DiscoveryFilters setNamespaces(Set<String> namespaces) {
+            this.namespaces = namespaces;
+            return this;
+        }
+
+        public Map<String, String> getLabels() {
+            return labels;
+        }
+
+        public DiscoveryFilters setLabels(Map<String, String> labels) {
+            this.labels = labels;
+            return this;
+        }
+    }
+
+    public String getKubeApiserverUrl() {
+        return kubeApiserverUrl;
+    }
+
+    public KubernetesDiscoveryProperties setKubeApiserverUrl(String kubeApiserverUrl) {
+        this.kubeApiserverUrl = kubeApiserverUrl;
+        return this;
+    }
+
+    public String getSaTokenPath() {
+        return saTokenPath;
+    }
+
+    public KubernetesDiscoveryProperties setSaTokenPath(String saTokenPath) {
+        this.saTokenPath = saTokenPath;
+        return this;
+    }
+
+    public String getCaCertPath() {
+        return caCertPath;
+    }
+
+    public KubernetesDiscoveryProperties setCaCertPath(String caCertPath) {
+        this.caCertPath = caCertPath;
+        return this;
+    }
+
+    public DiscoveryFilters getFilters() {
+        return filters;
+    }
+
+    public KubernetesDiscoveryProperties setFilters(DiscoveryFilters filters) {
+        this.filters = filters;
+        return this;
+    }
+}
