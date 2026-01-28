@@ -1,6 +1,5 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
-import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import kotlin.io.path.readText
@@ -9,11 +8,6 @@ plugins {
     id("java")
     id("maven-publish")
     id("com.diffplug.spotless") version "8.1.0"
-
-    // TODO:
-    //  Migrate to a non-alpha 5 major version of assciidoc plugin.
-    //  See https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/564
-    id("org.asciidoctor.jvm.convert") version "4.0.4"
     id("pmd")
     id("net.ltgt.errorprone") version "4.2.0"
 }
@@ -224,48 +218,4 @@ subprojects {
             "implNote:a:Implementation Note:"
         )
     }
-}
-
-asciidoctorj {
-    modules {
-        diagram {
-            version("2.3.2")
-        }
-    }
-}
-
-val docsDir = layout.projectDirectory.dir("docs")
-val outputDirectory = layout.buildDirectory.dir("build/docs")
-
-tasks.withType<AsciidoctorTask> {
-    attributes(
-        mapOf(
-            "source-highlighter" to "rouge",
-            "toc" to "left",        // Positions the table of contents on the left side
-            "icons" to "font",      // Uses font-based icons rather than image icons or text
-            "imagesdir" to "images" // Default directory for images
-        )
-    )
-
-    asciidoctorj {
-        requires("asciidoctor-diagram")
-    }
-}
-
-val docTypes = listOf("internal", "shared")
-
-docTypes.forEach { docType ->
-    tasks.register<AsciidoctorTask>(docType) {
-        description = "Builds docs for $docType"
-
-        sourceDir(docsDir.dir(docType))
-        setOutputDir(file(outputDirectory))
-    }
-}
-
-tasks.register("buildAllDocs") {
-    group = "Documentation"
-    description = "Builds all AsciiDoc documentation"
-
-    dependsOn(docTypes)
 }
