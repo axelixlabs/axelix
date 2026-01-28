@@ -120,12 +120,12 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint DISABLE_GC_LOGGING = of("/axelix-gc/log/disable", HttpMethod.POST);
 
     // Loggers
-    public static final ActuatorEndpoint GET_ALL_LOGGERS = of("/loggers", HttpMethod.GET);
-    public static final ActuatorEndpoint GET_ONE_LOGGER = of("/loggers/{logger.name}", HttpMethod.GET);
-    public static final ActuatorEndpoint GET_LOGGER_GROUP = of("/loggers/{group.name}", HttpMethod.GET);
-    public static final ActuatorEndpoint SET_ONE_LOGGER = of("/loggers/{logger.name}", HttpMethod.POST);
-    public static final ActuatorEndpoint SET_FOR_LOGGER_GROUP = of("/loggers/{group.name}", HttpMethod.POST);
-    public static final ActuatorEndpoint CLEAR_FOR_LOGGER = of("/loggers/{logger.name}", HttpMethod.POST);
+    public static final ActuatorEndpoint GET_ALL_LOGGERS = of("/axelix-loggers", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_ONE_LOGGER = of("/axelix-loggers/{logger.name}", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_LOGGER_GROUP = of("/axelix-loggers/{group.name}", HttpMethod.GET);
+    public static final ActuatorEndpoint SET_ONE_LOGGER = of("/axelix-loggers/{logger.name}", HttpMethod.POST);
+    public static final ActuatorEndpoint SET_FOR_LOGGER_GROUP = of("/axelix-loggers/{group.name}", HttpMethod.POST);
+    public static final ActuatorEndpoint CLEAR_FOR_LOGGER = of("/axelix-loggers/{logger.name}", HttpMethod.POST);
 
     // Metadata
     public static final ActuatorEndpoint METADATA = of("/axelix-metadata", HttpMethod.GET);

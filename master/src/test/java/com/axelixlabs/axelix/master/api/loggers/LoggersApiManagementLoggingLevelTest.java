@@ -88,11 +88,11 @@ public class LoggersApiManagementLoggingLevelTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/loggers/groupName")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-loggers/groupName")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/loggers/logger.name")) {
+                } else if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger.name")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/loggers/clear.logger.name")) {
+                } else if (path.equals("/" + activeInstanceId + "/axelix-loggers/clear.logger.name")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);

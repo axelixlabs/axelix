@@ -27,6 +27,9 @@ management:
       exposure:
         include:
           - health
+          - configprops
+          - env
+          - loggers
           - property-management
           - profile-management
           - axelix-metadata
@@ -36,10 +39,9 @@ management:
           - axelix-configprops
           - axelix-caches
           - axelix-conditions
-          - configprops
-          - env
           - axelix-thread-dump
           - axelix-gc
+          - axelix-loggers
 
 logging:
   level:

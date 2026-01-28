@@ -18,4 +18,5 @@ com.axelixlabs.axelix.sbs.autoconfiguration.ThreadDumpManagementEndpointAutoConf
 com.axelixlabs.axelix.sbs.autoconfiguration.AxelixMetricsAutoConfiguration
 com.axelixlabs.axelix.sbs.autoconfiguration.GcLogEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.autoconfiguration.TransactionMonitoringAutoConfiguration
+com.axelixlabs.axelix.sbs.autoconfiguration.AxelixLoggersEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.autoconfiguration.JwtAuthAutoConfiguration
