@@ -384,7 +384,7 @@ class StateExportApiTest {
                     return new MockResponse()
                             .setBody(jsonThreadDumpResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/heapdump")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-heap-dump")) {
                     return new MockResponse()
                             .setBody("Mock HPROF binary data")
                             .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
