@@ -388,7 +388,7 @@ class StateExportApiTest {
                     return new MockResponse()
                             .setBody("Mock HPROF binary data")
                             .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/logfile")) {
+                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-log-file")) {
                     return new MockResponse()
                             .setBody(mockLogFileResponse)
                             .addHeader("Content-Type", "text/plain;charset=UTF-8");

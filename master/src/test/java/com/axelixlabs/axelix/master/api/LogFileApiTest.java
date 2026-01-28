@@ -101,7 +101,7 @@ class LogFileApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/logfile")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-log-file")) {
                     String rangeHeader = request.getHeader("Range");
 
                     if (rangeHeader != null && rangeHeader.startsWith("bytes=0-151")) {

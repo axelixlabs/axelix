@@ -110,7 +110,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint REBUILD_INTEGRATIONS_GRAPH = of("/integrationgraph", HttpMethod.POST);
 
     // Log File
-    public static final ActuatorEndpoint GET_LOG_FILE = of("/logfile", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_LOG_FILE = of("/axelix-log-file", HttpMethod.GET);
 
     // Gc Log File
     public static final ActuatorEndpoint GET_STATUS_GC_LOGGING = of("/axelix-gc/log/status", HttpMethod.GET);

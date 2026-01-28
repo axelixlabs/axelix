@@ -27,6 +27,7 @@ management:
       exposure:
         include:
           - health
+          - logfile
           - property-management
           - profile-management
           - axelix-metadata
@@ -40,8 +41,13 @@ management:
           - env
           - axelix-thread-dump
           - axelix-gc
+          - axelix-log-file
 
 logging:
   level:
     org.apache.kafka: WARN
     org.apache.kafka.clients.NetworkClient: ERROR
+    org:
+      springframework: INFO
+  file:
+    name: build/application-test.log
