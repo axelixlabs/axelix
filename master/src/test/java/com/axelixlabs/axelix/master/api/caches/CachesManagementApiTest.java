@@ -122,7 +122,7 @@ class CachesManagementApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}" + cacheStatus,
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,
                         Void.class,
                         Map.of(
@@ -144,7 +144,7 @@ class CachesManagementApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/caches/{instanceId}/{cacheManagerName}" + cacheStatus,
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/" + cacheStatus,
                         null,
                         Void.class,
                         Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
@@ -164,7 +164,7 @@ class CachesManagementApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}" + cacheStatus,
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,
                         EndpointInvocationException.class,
                         Map.of("instanceId", instanceId, "cacheManagerName", "unknown", "cacheName", "unknown"));
@@ -180,7 +180,7 @@ class CachesManagementApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}" + cacheStatus,
+                        "/api/axelix/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,
                         EndpointInvocationException.class,
                         Map.of(

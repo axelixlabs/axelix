@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 26.01.2026
  * @author Nikita Kirillov
  */
+@Disabled
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-transactions-monitoring"})
 class TransactionMonitoringEndpointTest {

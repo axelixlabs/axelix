@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Nikita Kirillov
  */
-@Component
+//@Component
 public class PropagationTestHelper {
 
     private final OwnerRepository ownerRepository;

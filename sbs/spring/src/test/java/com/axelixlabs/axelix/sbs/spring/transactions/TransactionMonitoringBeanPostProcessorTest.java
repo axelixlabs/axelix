@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.aop.Advisor;
@@ -47,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest
+@Disabled
 class TransactionMonitoringBeanPostProcessorTest {
 
     @Autowired

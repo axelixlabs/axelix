@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.transactions;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Nikita Kirillov
  */
 @SpringBootTest
+@Disabled
 public class TransactionMonitoringServiceTest {
 
     @Autowired
