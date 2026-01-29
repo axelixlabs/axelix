@@ -17,23 +17,36 @@
  */
 package com.axelixlabs.axelix.sbs.spring.transactions;
 
+import java.time.Duration;
+import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,10 +58,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 26.01.2026
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
-@Disabled
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-transactions-monitoring"})
+@Import(TransactionMonitoringEndpointTest.TransactionMonitoringEndpointTestConfiguration.class)
 class TransactionMonitoringEndpointTest {
 
     @Autowired
@@ -128,7 +142,10 @@ class TransactionMonitoringEndpointTest {
     }
 
     @TestConfiguration
-    @Import(TransactionMonitoringServiceTest.TransactionMonitoringIntegrationTestConfiguration.class)
+    @EnableJpaRepositories(
+            basePackageClasses = TransactionMonitoringEndpointTest.OwnerRepository.class,
+            considerNestedRepositories = true)
+    @EntityScan(basePackageClasses = TransactionMonitoringEndpointTest.Owner.class)
     static class TransactionMonitoringEndpointTestConfiguration {
 
         @Bean
@@ -137,5 +154,171 @@ class TransactionMonitoringEndpointTest {
             return new TransactionMonitoringEndpoint(
                     (DefaultTransactionMonitoringService) transactionMonitoringService);
         }
+
+        @Bean
+        public TransactionMonitoringService transactionMonitoringService(
+                TransactionStatsCollector transactionStatsCollector) {
+            return new DefaultTransactionMonitoringService(transactionStatsCollector);
+        }
+
+        @Bean
+        public TransactionStatsCollector transactionStatsCollector() {
+            return new DefaultTransactionStatsCollector(30, Duration.ofSeconds(10000));
+        }
+
+        @Bean
+        public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
+                TransactionStatsCollector transactionStatsCollector) {
+            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector);
+        }
+
+        @Bean
+        public PropagationTestHelper propagationTestHelper(
+                OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
+            return new PropagationTestHelper(ownerRepository, self);
+        }
+
+        @Bean
+        public PropagationTestService propagationTestService(
+                OwnerRepository ownerRepository, PropagationTestHelper helper) {
+            return new PropagationTestService(ownerRepository, helper);
+        }
+    }
+
+    /**
+     * Simple {@link Entity} for test.
+     */
+    @Entity
+    static class Owner {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String lastName;
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+    }
+
+    /**
+     * Simple {@link JpaRepository} for test.
+     */
+    interface OwnerRepository extends JpaRepository<Owner, Long> {
+
+        @Transactional
+        default Owner findByLastName(String lastName) {
+            return new Owner();
+        }
+
+        @Transactional(propagation = Propagation.SUPPORTS)
+        default List<Owner> findAll() {
+            return List.of(new Owner());
+        }
+    }
+
+    /**
+     * Test helper for demonstrating transaction propagation scenarios and monitoring.
+     * Used in integration tests to verify transaction tracking behavior.
+     */
+    static class PropagationTestHelper {
+
+        private final OwnerRepository ownerRepository;
+        private final PropagationTestHelper self;
+
+        public PropagationTestHelper(OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
+            this.ownerRepository = ownerRepository;
+            this.self = self;
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testRequiresNew(String lastName) {
+            ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testNestedRequiresNew() {
+            ownerRepository.findByLastName("Franklin");
+        }
+
+        @Transactional(propagation = Propagation.NESTED)
+        public void testNested() {
+            ownerRepository.findByLastName("Schroeder");
+        }
+
+        @Transactional(propagation = Propagation.MANDATORY)
+        public void testMandatory(String lastName) {
+            ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        public void testNotSupported(String lastName) {
+            ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional
+        public void testSelfInvocation() {
+            internalMethod();
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void internalMethod() {
+            ownerRepository.findByLastName("Black");
+        }
+
+        @Transactional
+        public void testCorrectSelfInvocation() {
+            self.requiresNewViaProxy();
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void requiresNewViaProxy() {
+            ownerRepository.findByLastName("White");
+        }
+    }
+
+    /**
+     * Test service for demonstrating transaction propagation scenarios and monitoring.
+     * Used in integration tests to verify transaction tracking behavior.
+     */
+    static class PropagationTestService {
+
+        private final OwnerRepository ownerRepository;
+        private final PropagationTestHelper helperService;
+
+        public PropagationTestService(OwnerRepository ownerRepository, PropagationTestHelper helperService) {
+            this.ownerRepository = ownerRepository;
+            this.helperService = helperService;
+        }
+
+        @Transactional(propagation = Propagation.REQUIRED)
+        void testRequired(String lastName) {
+            ownerRepository.findByLastName(lastName);
+            helperService.testNestedRequiresNew();
+        }
+
+        public void testFromNonTransactional(String lastName) {
+            helperService.testRequiresNew(lastName);
+        }
+
+        @Transactional
+        protected void testRollbackScenario(String lastName) {
+            ownerRepository.findByLastName(lastName);
+            helperService.testNestedRequiresNew();
+            throw new RuntimeException("Test rollback");
+        }
+
+        @Transactional(propagation = Propagation.SUPPORTS)
+        public void testSupports(String lastName) {
+            ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional(propagation = Propagation.SUPPORTS)
+        public void testSupportsWithoutTransaction() {}
     }
 }
