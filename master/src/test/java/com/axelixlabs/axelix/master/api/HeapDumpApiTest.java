@@ -106,7 +106,7 @@ class HeapDumpApiTest {
 
                 String base64Data = Base64.getEncoder().encodeToString(mockHeapDump);
 
-                if (path.equals("/" + activeInstanceId + "/actuator/heapdump")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-heap-dump")) {
                     return new MockResponse()
                             .setBody(base64Data)
                             .addHeader("Content-Type", "application/octet-stream")
