@@ -1,13 +1,20 @@
+import Dependencies.springBootVersion
+import Dependencies.springCloudDependenciesVersion
+
 plugins {
     id("sbs")
     id("com.axelixlabs.axelix-internal")
 }
 
 dependencies {
+    // Impl
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudDependenciesVersion}"))
+
     // Self
     api(project(":common_auth"))
     api(project(":common:api"))
-    api(project(":sbs:spring"))
+    api(project(":sbs:axelix-spring-boot-3:spring"))
 
     // Compile
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")
