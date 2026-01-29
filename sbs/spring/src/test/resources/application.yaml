@@ -40,6 +40,7 @@ management:
           - env
           - axelix-thread-dump
           - axelix-gc
+          - axelix-heap-dump
 
 logging:
   level:
