@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @since 11.07.2025
  * @author Nikita Kirillov
  */
-@RestControllerEndpoint(id = "profile-management")
+@RestControllerEndpoint(id = "axelix-profile-management")
 public class ProfileManagementEndpoint {
 
     private final ProfileMutator profileMutator;

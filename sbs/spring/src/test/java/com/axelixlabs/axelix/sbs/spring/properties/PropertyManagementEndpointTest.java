@@ -233,6 +233,6 @@ class PropertyManagementEndpointTest {
     }
 
     private String path() {
-        return "/actuator/property-management";
+        return "/actuator/axelix-property-management";
     }
 }

@@ -135,10 +135,10 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint GET_SINGLE_METRIC = of("/axelix-metrics/{metric.name}", HttpMethod.GET);
 
     // ProfileManagement
-    public static final ActuatorEndpoint PROFILE_MANAGEMENT = of("/profile-management", HttpMethod.POST);
+    public static final ActuatorEndpoint PROFILE_MANAGEMENT = of("/axelix-profile-management", HttpMethod.POST);
 
     // PropertyManagement
-    public static final ActuatorEndpoint PROPERTY_MANAGEMENT = of("/property-management", HttpMethod.POST);
+    public static final ActuatorEndpoint PROPERTY_MANAGEMENT = of("/axelix-property-management", HttpMethod.POST);
 
     // Quartz
     // TODO: Quartz integration

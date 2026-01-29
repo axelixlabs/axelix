@@ -96,7 +96,7 @@ class PropertyManagementApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/property-management")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-property-management")) {
                     return new MockResponse()
                             .setResponseCode(204)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
