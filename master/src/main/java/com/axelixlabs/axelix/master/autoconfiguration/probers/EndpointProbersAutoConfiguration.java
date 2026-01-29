@@ -48,7 +48,6 @@ import com.axelixlabs.axelix.master.service.serde.EnvironmentPropertyJacksonMess
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogStatusMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.LogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ProfileMutationJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ScheduledTasksJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ThreadDumpJacksonMessageDeserializationStrategy;
@@ -235,13 +234,6 @@ public class EndpointProbersAutoConfiguration {
     public DefaultEndpointProber<Resource> getHeapDumpEndpointProver(
             HeapDumpMessageDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_HEAP_DUMP);
-    }
-
-    // LogFile
-    @Bean
-    public DefaultEndpointProber<Resource> getLogFileEndpointProver(
-            LogFileMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_LOG_FILE);
     }
 
     // Garbage Collector Log
