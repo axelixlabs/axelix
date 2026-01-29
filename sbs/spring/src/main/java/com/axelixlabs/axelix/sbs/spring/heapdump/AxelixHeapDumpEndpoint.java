@@ -34,8 +34,8 @@ public class AxelixHeapDumpEndpoint {
 
     private final HeapDumpWebEndpoint delegate;
 
-    public AxelixHeapDumpEndpoint(HeapDumpWebEndpoint delegate) {
-        this.delegate = delegate;
+    public AxelixHeapDumpEndpoint() {
+        this.delegate = new HeapDumpWebEndpoint();
     }
 
     // IMPORTANT!

@@ -27,7 +27,6 @@ management:
       exposure:
         include:
           - health
-          - heapdump
           - property-management
           - profile-management
           - axelix-metadata

@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.transactions;
 
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Nikita Kirillov
  */
-//@Component
+// @Component
 public class PropagationTestHelper {
 
     private final OwnerRepository ownerRepository;
