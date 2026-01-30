@@ -1,3 +1,5 @@
+import Dependencies.springBootVersion
+
 plugins {
     id("common")
 }
