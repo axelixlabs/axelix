@@ -7,8 +7,8 @@ project(":common_auth").projectDir = file("common/auth")
 include(
     ":master",
     ":sbs",
-    ":sbs:auto-configuration",
-    ":sbs:spring",
+    ":sbs:axelix-spring-boot-3:auto-configuration",
+    ":sbs:axelix-spring-boot-3:spring",
     ":common",
     ":common:api",
     ":common:domain",

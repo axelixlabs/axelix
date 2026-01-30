@@ -1,3 +1,6 @@
+import Dependencies.springBootVersion
+import Dependencies.springCloudDependenciesVersion
+
 plugins {
     id("sbs")
 }
@@ -9,6 +12,10 @@ dependencies {
     implementation(project(":common:utils"))
     api(project(":common:api"))
 
+    // Impl
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudDependenciesVersion}"))
+    implementation("org.slf4j:slf4j-api")
     implementation("com.jayway.jsonpath:json-path") // version comes from spring-boot-dependencies
 
     // Compile

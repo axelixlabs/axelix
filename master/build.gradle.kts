@@ -1,3 +1,6 @@
+import Dependencies.springBootVersion
+import Dependencies.springCloudDependenciesVersion
+
 plugins {
     id("shared")
     id("org.springframework.boot") version Dependencies.springBootVersion
@@ -16,6 +19,8 @@ dependencies {
     implementation(project(":common:utils"))
 
     // Impl
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudDependenciesVersion}"))
     implementation("org.springframework:spring-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -29,6 +34,8 @@ dependencies {
 
 
     // Test
+    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
+    testImplementation(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudDependenciesVersion"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
