@@ -36,7 +36,6 @@ import com.axelixlabs.axelix.master.api.request.state.ConfigPropsStateComponentS
 import com.axelixlabs.axelix.master.api.request.state.EnvStateComponentSettings;
 import com.axelixlabs.axelix.master.api.request.state.GcLogFileStateComponentSettings;
 import com.axelixlabs.axelix.master.api.request.state.HeapDumpStateComponentSettings;
-import com.axelixlabs.axelix.master.api.request.state.LogFileStateComponentSettings;
 import com.axelixlabs.axelix.master.api.request.state.ScheduledTasksStateComponentSettings;
 import com.axelixlabs.axelix.master.api.request.state.StateComponentSettings;
 import com.axelixlabs.axelix.master.api.request.state.StateExportComponent;
@@ -92,7 +91,6 @@ public class StateExportComponentDeserializer extends JsonDeserializer<List<Stat
                 case CONDITIONS -> results.add(new ConditionsStateComponentSettings());
                 case CONFIG_PROPS -> results.add(new ConfigPropsStateComponentSettings());
                 case ENV -> results.add(new EnvStateComponentSettings());
-                case LOG_FILE -> results.add(new LogFileStateComponentSettings());
                 case GC_LOG_FILE -> results.add(new GcLogFileStateComponentSettings());
                 case SCHEDULED_TASKS -> results.add(new ScheduledTasksStateComponentSettings());
             }

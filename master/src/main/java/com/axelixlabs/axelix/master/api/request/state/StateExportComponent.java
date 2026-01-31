@@ -35,7 +35,6 @@ public enum StateExportComponent {
     CONDITIONS,
     CONFIG_PROPS,
     ENV,
-    LOG_FILE,
     GC_LOG_FILE,
     SCHEDULED_TASKS;
 

@@ -113,9 +113,6 @@ class StateExportApiTest {
                         "component" : "THREAD_DUMP"
                     },
                     {
-                        "component" : "LOG_FILE"
-                    },
-                    {
                       "component" : "GC_LOG_FILE"
                     },
                     {
@@ -332,15 +329,6 @@ class StateExportApiTest {
     }
     """;
 
-        String mockLogFileResponse =
-                """
-             2025-11-12T14:05:13.795+05:00  INFO 1868 --- [main] o.s.s.petclinic.PetClinicApplication: Starting PetClinicApplication using Java 17.0.16 with PID 1868 (C:\\Project\\spring-petclinic\\target\\classes started in C:\\Project\\spring-petclinic)
-             2025-11-12T14:05:13.795+05:00  INFO 1868 --- [main] o.s.s.petclinic.PetClinicApplication     : No active profile set, falling back to 1 default profile: "default"
-             2025-11-12T14:05:14.382+05:00  INFO 1868 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-             2025-11-12T14:05:14.429+05:00  INFO 1868 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 30 ms. Found 3 JPA repository interfaces.
-             2025-11-12T14:05:14.531+05:00  INFO 1868 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=4c03ca02-57eb-3d79-a155-785dae504167
-             """;
-
         String mockGcLogFileResponse =
                 """
          [2026-01-11T23:20:50.868+0500][info][gc] GC(348) Concurrent Mark Cycle
@@ -514,7 +502,6 @@ class StateExportApiTest {
                             "scheduled_tasks.json",
                             "thread_dump.json",
                             "heap_dump.hprof",
-                            "log_file.log",
                             "gc_log_file.log");
         }
     }

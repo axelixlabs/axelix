@@ -32,7 +32,6 @@ import com.axelixlabs.axelix.master.service.export.settings.ConfigPropsStateComp
 import com.axelixlabs.axelix.master.service.export.settings.EnvStateComponentSettings;
 import com.axelixlabs.axelix.master.service.export.settings.GcLogFileStateComponentSettings;
 import com.axelixlabs.axelix.master.service.export.settings.HeapDumpStateComponentSettings;
-import com.axelixlabs.axelix.master.service.export.settings.LogFileStateComponentSettings;
 import com.axelixlabs.axelix.master.service.export.settings.ScheduledTasksStateComponentSettings;
 import com.axelixlabs.axelix.master.service.export.settings.ThreadDumpStateComponentSettings;
 
@@ -63,7 +62,6 @@ public class StateExportRequestConverter implements Converter<StateExportRequest
             case CONDITIONS -> new ConditionsStateComponentSettings();
             case CONFIG_PROPS -> new ConfigPropsStateComponentSettings();
             case ENV -> new EnvStateComponentSettings();
-            case LOG_FILE -> new LogFileStateComponentSettings();
             case GC_LOG_FILE -> new GcLogFileStateComponentSettings();
             case SCHEDULED_TASKS -> new ScheduledTasksStateComponentSettings();
         };
