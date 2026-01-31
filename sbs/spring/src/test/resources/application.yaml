@@ -29,7 +29,6 @@ management:
           - health
           - configprops
           - env
-          - loggers
           - property-management
           - profile-management
           - axelix-metadata

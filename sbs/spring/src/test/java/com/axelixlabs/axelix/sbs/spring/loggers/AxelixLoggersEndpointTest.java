@@ -18,11 +18,12 @@
 package com.axelixlabs.axelix.sbs.spring.loggers;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.logging.LoggersEndpoint;
+import org.springframework.boot.logging.LoggerGroups;
+import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -44,14 +45,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(AxelixLoggersEndpointTest.AxelixLoggersEndpointTestConfiguration.class)
 public class AxelixLoggersEndpointTest {
-    private static final Logger logger = LoggerFactory.getLogger(AxelixLoggersEndpointTest.class);
 
     @Autowired
     private TestRestTemplate testRestTemplate;
 
     @Test
     void shouldReturnAllLoggers() {
-        logger.info("Test");
         ResponseEntity<String> response = testRestTemplate.getForEntity("/actuator/axelix-loggers", String.class);
 
         assertThat(response).isNotNull();
@@ -61,8 +60,6 @@ public class AxelixLoggersEndpointTest {
 
     @Test
     void shouldReturnSingleLogger() {
-        logger.info("Test");
-
         String loggerName = AxelixLoggersEndpointTest.class.getName();
 
         ResponseEntity<String> response =
@@ -75,7 +72,6 @@ public class AxelixLoggersEndpointTest {
 
     @Test
     void shouldReturnSetLoggerLevel() {
-        logger.info("Test");
         // language=json
         String request = """
         {
@@ -99,8 +95,10 @@ public class AxelixLoggersEndpointTest {
     static class AxelixLoggersEndpointTestConfiguration {
 
         @Bean
-        public AxelixLoggersEndpoint axelixLoggersEndpoint(LoggersEndpoint loggersEndpoint) {
-            return new AxelixLoggersEndpoint(loggersEndpoint);
+        public AxelixLoggersEndpoint axelixLoggersEndpoint(
+                LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
+            return new AxelixLoggersEndpoint(
+                    new LoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new)));
         }
     }
 }
