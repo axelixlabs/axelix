@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.common.auth.core;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -26,4 +27,33 @@ import java.util.Set;
  * @since 16.07.25
  * @author Mikhail Polivakha
  */
-public record AuthorizationRequest(Set<Authority> requiredAuthorities) {}
+public final class AuthorizationRequest {
+
+    private final Set<Authority> requiredAuthorities;
+
+    public AuthorizationRequest(Set<Authority> requiredAuthorities) {
+        this.requiredAuthorities = requiredAuthorities;
+    }
+
+    public Set<Authority> requiredAuthorities() {
+        return requiredAuthorities;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AuthorizationRequest that = (AuthorizationRequest) o;
+        return Objects.equals(requiredAuthorities, that.requiredAuthorities);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(requiredAuthorities);
+    }
+
+    @Override
+    public String toString() {
+        return "AuthorizationRequest[" + "requiredAuthorities=" + requiredAuthorities + ']';
+    }
+}

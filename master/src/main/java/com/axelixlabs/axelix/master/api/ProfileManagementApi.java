@@ -35,10 +35,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.ProfileMutationResult;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.request.ProfileUpdatedRequest;
 import com.axelixlabs.axelix.master.api.response.ProfileUpdateResponse;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;

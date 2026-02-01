@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.common.api;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The feed of transactions inside a given application.
@@ -26,35 +27,224 @@ import java.util.List;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public record TransactionMonitoringFeed(List<TransactionalEntrypoint> entrypoints) {
+public final class TransactionMonitoringFeed {
+
+    private final List<TransactionalEntrypoint> entrypoints;
+
+    /**
+     * Creates a new TransactionMonitoringFeed.
+     *
+     * @param entrypoints the list of transactional entrypoints.
+     */
+    public TransactionMonitoringFeed(List<TransactionalEntrypoint> entrypoints) {
+        this.entrypoints = entrypoints;
+    }
+
+    public List<TransactionalEntrypoint> entrypoints() {
+        return entrypoints;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TransactionMonitoringFeed that = (TransactionMonitoringFeed) o;
+        return Objects.equals(entrypoints, that.entrypoints);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entrypoints);
+    }
+
+    @Override
+    public String toString() {
+        return "TransactionMonitoringFeed{" + "entrypoints=" + entrypoints + '}';
+    }
 
     /**
      * The transactional entrypoint. In other words,
-     *
-     * @param className  the short name of the class where transaction is initiated.
-     * @param methodName the name of the method where transaction is initiated.
-     * @param executions currently recorded executions of this transaction entrypoint.
      */
-    public record TransactionalEntrypoint(
-            String className,
-            String methodName,
-            List<TransactionExecution> executions,
-            ExecutionStats executionStats) {}
+    public static final class TransactionalEntrypoint {
+
+        private final String className;
+        private final String methodName;
+        private final List<TransactionExecution> executions;
+        private final ExecutionStats executionStats;
+
+        /**
+         * Creates a new TransactionalEntrypoint.
+         *
+         * @param className      the short name of the class where transaction is initiated.
+         * @param methodName     the name of the method where transaction is initiated.
+         * @param executions     currently recorded executions of this transaction entrypoint.
+         * @param executionStats the execution statistics.
+         */
+        public TransactionalEntrypoint(
+                String className,
+                String methodName,
+                List<TransactionExecution> executions,
+                ExecutionStats executionStats) {
+            this.className = className;
+            this.methodName = methodName;
+            this.executions = executions;
+            this.executionStats = executionStats;
+        }
+
+        public String className() {
+            return className;
+        }
+
+        public String methodName() {
+            return methodName;
+        }
+
+        public List<TransactionExecution> executions() {
+            return executions;
+        }
+
+        public ExecutionStats executionStats() {
+            return executionStats;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            TransactionalEntrypoint that = (TransactionalEntrypoint) o;
+            return Objects.equals(className, that.className)
+                    && Objects.equals(methodName, that.methodName)
+                    && Objects.equals(executions, that.executions)
+                    && Objects.equals(executionStats, that.executionStats);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(className, methodName, executions, executionStats);
+        }
+
+        @Override
+        public String toString() {
+            return "TransactionalEntrypoint{"
+                    + "className='"
+                    + className
+                    + '\''
+                    + ", methodName='"
+                    + methodName
+                    + '\''
+                    + ", executions="
+                    + executions
+                    + ", executionStats="
+                    + executionStats
+                    + '}';
+        }
+    }
 
     /**
      * A single transaction execution record with timing information.
-     *
-     * @param durationsMs transaction execution duration in milliseconds
-     * @param timestamp   unix timestamp (milliseconds from epoch) when transaction started
      */
-    public record TransactionExecution(long durationsMs, long timestamp) {}
+    public static final class TransactionExecution {
+
+        private final long durationsMs;
+        private final long timestamp;
+
+        /**
+         * Creates a new TransactionExecution.
+         *
+         * @param durationsMs transaction execution duration in milliseconds
+         * @param timestamp   unix timestamp (milliseconds from epoch) when transaction started
+         */
+        public TransactionExecution(long durationsMs, long timestamp) {
+            this.durationsMs = durationsMs;
+            this.timestamp = timestamp;
+        }
+
+        public long durationsMs() {
+            return durationsMs;
+        }
+
+        public long timestamp() {
+            return timestamp;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            TransactionExecution that = (TransactionExecution) o;
+            return durationsMs == that.durationsMs && timestamp == that.timestamp;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(durationsMs, timestamp);
+        }
+
+        @Override
+        public String toString() {
+            return "TransactionExecution{" + "durationsMs=" + durationsMs + ", timestamp=" + timestamp + '}';
+        }
+    }
 
     /**
      * Aggregated execution statistics for a transactional entrypoint.
-     *
-     * @param averageDurationMs average execution duration in milliseconds
-     * @param maxDurationMs     maximum execution duration in milliseconds
-     * @param medianDurationMs  median execution duration in milliseconds
      */
-    public record ExecutionStats(long averageDurationMs, long maxDurationMs, long medianDurationMs) {}
+    public static final class ExecutionStats {
+
+        private final long averageDurationMs;
+        private final long maxDurationMs;
+        private final long medianDurationMs;
+
+        /**
+         * Creates a new ExecutionStats.
+         *
+         * @param averageDurationMs average execution duration in milliseconds
+         * @param maxDurationMs     maximum execution duration in milliseconds
+         * @param medianDurationMs  median execution duration in milliseconds
+         */
+        public ExecutionStats(long averageDurationMs, long maxDurationMs, long medianDurationMs) {
+            this.averageDurationMs = averageDurationMs;
+            this.maxDurationMs = maxDurationMs;
+            this.medianDurationMs = medianDurationMs;
+        }
+
+        public long averageDurationMs() {
+            return averageDurationMs;
+        }
+
+        public long maxDurationMs() {
+            return maxDurationMs;
+        }
+
+        public long medianDurationMs() {
+            return medianDurationMs;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ExecutionStats that = (ExecutionStats) o;
+            return averageDurationMs == that.averageDurationMs
+                    && maxDurationMs == that.maxDurationMs
+                    && medianDurationMs == that.medianDurationMs;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(averageDurationMs, maxDurationMs, medianDurationMs);
+        }
+
+        @Override
+        public String toString() {
+            return "ExecutionStats{"
+                    + "averageDurationMs="
+                    + averageDurationMs
+                    + ", maxDurationMs="
+                    + maxDurationMs
+                    + ", medianDurationMs="
+                    + medianDurationMs
+                    + '}';
+        }
+    }
 }

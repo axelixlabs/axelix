@@ -17,11 +17,45 @@
  */
 package com.axelixlabs.axelix.common.api.request;
 
+import java.util.Objects;
+
 /**
  * Represents a request to forcibly execute a scheduled task.
  *
- * @param trigger the identifier of the scheduled task to run now. Must not be {@code null}.
- *
  * @author Sergey Cherkasov
  */
-public record ScheduledTaskExecuteRequest(String trigger) {}
+public final class ScheduledTaskExecuteRequest {
+
+    private final String trigger;
+
+    /**
+     * Creates a new ScheduledTaskExecuteRequest.
+     *
+     * @param trigger the identifier of the scheduled task to run now. Must not be {@code null}.
+     */
+    public ScheduledTaskExecuteRequest(String trigger) {
+        this.trigger = trigger;
+    }
+
+    public String trigger() {
+        return trigger;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScheduledTaskExecuteRequest that = (ScheduledTaskExecuteRequest) o;
+        return Objects.equals(trigger, that.trigger);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(trigger);
+    }
+
+    @Override
+    public String toString() {
+        return "ScheduledTaskExecuteRequest{" + "trigger='" + trigger + '\'' + '}';
+    }
+}

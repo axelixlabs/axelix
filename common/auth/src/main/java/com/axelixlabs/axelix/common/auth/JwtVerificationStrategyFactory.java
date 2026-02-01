@@ -33,8 +33,13 @@ public class JwtVerificationStrategyFactory {
     private JwtVerificationStrategyFactory() {}
 
     public static JwtVerificationStrategy createVerificationStrategy(JwtAlgorithm algorithm) {
-        return switch (algorithm) {
-            case HMAC256, HMAC384, HMAC512 -> new HmacVerificationStrategy();
-        };
+        switch (algorithm) {
+            case HMAC256:
+            case HMAC384:
+            case HMAC512:
+                return new HmacVerificationStrategy();
+            default:
+                throw new IllegalArgumentException("Unsupported algorithm: " + algorithm);
+        }
     }
 }

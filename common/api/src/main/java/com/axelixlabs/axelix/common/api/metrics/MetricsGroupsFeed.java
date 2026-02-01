@@ -18,30 +18,144 @@
 package com.axelixlabs.axelix.common.api.metrics;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The response returned by the custom metric groups list endpoint.
  *
- * @param metricsGroups the list of groups.
- *
  * @author Sergey Cherkasov
  */
-public record MetricsGroupsFeed(List<MetricsGroup> metricsGroups) {
+public final class MetricsGroupsFeed {
+
+    private final List<MetricsGroup> metricsGroups;
+
+    /**
+     * Creates a new MetricsGroupsFeed.
+     *
+     * @param metricsGroups the list of groups.
+     */
+    public MetricsGroupsFeed(List<MetricsGroup> metricsGroups) {
+        this.metricsGroups = metricsGroups;
+    }
+
+    public List<MetricsGroup> metricsGroups() {
+        return metricsGroups;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MetricsGroupsFeed that = (MetricsGroupsFeed) o;
+        return Objects.equals(metricsGroups, that.metricsGroups);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(metricsGroups);
+    }
+
+    @Override
+    public String toString() {
+        return "MetricsGroupsFeed{" + "metricsGroups=" + metricsGroups + '}';
+    }
 
     /**
      * DTO that encapsulates information about a metrics group.
-     *
-     * @param groupName the name of the group to which the {@link #metrics} belong to.
-     * @param metrics   the names and descriptions of the metrics inside the given group.
      */
-    public record MetricsGroup(String groupName, List<MetricDescription> metrics) {
+    public static final class MetricsGroup {
+
+        private final String groupName;
+        private final List<MetricDescription> metrics;
+
+        /**
+         * Creates a new MetricsGroup.
+         *
+         * @param groupName the name of the group to which the {@link #metrics()} belong to.
+         * @param metrics   the names and descriptions of the metrics inside the given group.
+         */
+        public MetricsGroup(String groupName, List<MetricDescription> metrics) {
+            this.groupName = groupName;
+            this.metrics = metrics;
+        }
+
+        public String groupName() {
+            return groupName;
+        }
+
+        public List<MetricDescription> metrics() {
+            return metrics;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            MetricsGroup that = (MetricsGroup) o;
+            return Objects.equals(groupName, that.groupName) && Objects.equals(metrics, that.metrics);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(groupName, metrics);
+        }
+
+        @Override
+        public String toString() {
+            return "MetricsGroup{" + "groupName='" + groupName + '\'' + ", metrics=" + metrics + '}';
+        }
 
         /**
          * DTO that encapsulates information about a metric.
-         *
-         * @param metricName   the name of the metric.
-         * @param description  the description of the metrics.
          */
-        public record MetricDescription(String metricName, String description) {}
+        public static final class MetricDescription {
+
+            private final String metricName;
+            private final String description;
+
+            /**
+             * Creates a new MetricDescription.
+             *
+             * @param metricName  the name of the metric.
+             * @param description the description of the metrics.
+             */
+            public MetricDescription(String metricName, String description) {
+                this.metricName = metricName;
+                this.description = description;
+            }
+
+            public String metricName() {
+                return metricName;
+            }
+
+            public String description() {
+                return description;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                MetricDescription that = (MetricDescription) o;
+                return Objects.equals(metricName, that.metricName) && Objects.equals(description, that.description);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(metricName, description);
+            }
+
+            @Override
+            public String toString() {
+                return "MetricDescription{"
+                        + "metricName='"
+                        + metricName
+                        + '\''
+                        + ", description='"
+                        + description
+                        + '\''
+                        + '}';
+            }
+        }
     }
 }

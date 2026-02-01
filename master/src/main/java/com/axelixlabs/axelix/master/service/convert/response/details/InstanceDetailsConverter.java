@@ -33,9 +33,9 @@ import com.axelixlabs.axelix.master.api.response.InstanceDetailsResponse.GitProf
 import com.axelixlabs.axelix.master.api.response.InstanceDetailsResponse.OSProfile;
 import com.axelixlabs.axelix.master.api.response.InstanceDetailsResponse.RuntimeProfile;
 import com.axelixlabs.axelix.master.api.response.InstanceDetailsResponse.SpringProfile;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 

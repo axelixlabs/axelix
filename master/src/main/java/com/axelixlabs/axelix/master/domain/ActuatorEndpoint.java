@@ -17,9 +17,10 @@
  */
 package com.axelixlabs.axelix.master.domain;
 
+import org.jspecify.annotations.NullMarked;
+
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpUrl;
-import org.jspecify.annotations.NullMarked;
 
 /**
  * Spring Actuator Endpoint.

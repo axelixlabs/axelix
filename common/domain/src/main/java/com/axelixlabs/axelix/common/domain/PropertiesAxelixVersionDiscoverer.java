@@ -68,16 +68,16 @@ public class PropertiesAxelixVersionDiscoverer implements AxelixVersionDiscovere
 
     private void checkVersionFound(@Nullable String version) {
         if (version == null) {
-            throw new IllegalStateException(
-                    "Axelix properties file under '%s' does not contain version mapping (value for key '%s')"
-                            .formatted(propertiesFilePath, VERSION_KEY));
+            throw new IllegalStateException(String.format(
+                    "Axelix properties file under '%s' does not contain version mapping (value for key '%s')",
+                    propertiesFilePath, VERSION_KEY));
         }
     }
 
     private void checkResourceFound(@Nullable InputStream resource) {
         if (resource == null) {
-            throw new IllegalStateException(
-                    "The provided path to axelix properties file '%s' cannot be found".formatted(propertiesFilePath));
+            throw new IllegalStateException(String.format(
+                    "The provided path to axelix properties file '%s' cannot be found", propertiesFilePath));
         }
     }
 }

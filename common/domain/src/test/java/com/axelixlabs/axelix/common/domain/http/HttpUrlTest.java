@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.common.domain.http;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +44,7 @@ class HttpUrlTest {
             String url, String eventualUrl, Map<String, String> valuesMap, QueryParameter<?>[] queryParameters) {
         HttpUrl httpUrl = new HttpUrl(url);
 
-        String expand = httpUrl.expand(valuesMap, Arrays.stream(queryParameters).toList());
+        String expand = httpUrl.expand(valuesMap, Arrays.stream(queryParameters).collect(Collectors.toList()));
 
         assertThat(expand).isEqualTo(eventualUrl);
     }

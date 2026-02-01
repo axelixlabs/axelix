@@ -17,14 +17,62 @@
  */
 package com.axelixlabs.axelix.common.api.registration;
 
+import java.util.Objects;
+
 /**
  * Short information about the build of the given service. Provided during initial scan.
  *
- * @param buildTimestamp the timestamp when this application's build was created
- * @param serviceVersion the version of the <strong>managed service itself</strong>, i.e. the version
- *                of the end-service artifact (the V inside GAV coordinate). The assumption is that
- *                is never {@code null}, and it frankly should not be.
- *
  * @author Mikhail Polivakha
  */
-public record ShortBuildInfo(String buildTimestamp, String serviceVersion) {}
+public final class ShortBuildInfo {
+
+    private final String buildTimestamp;
+    private final String serviceVersion;
+
+    /**
+     * Creates a new ShortBuildInfo.
+     *
+     * @param buildTimestamp the timestamp when this application's build was created
+     * @param serviceVersion the version of the <strong>managed service itself</strong>, i.e. the version
+     *                       of the end-service artifact (the V inside GAV coordinate). The assumption is that
+     *                       is never {@code null}, and it frankly should not be.
+     */
+    public ShortBuildInfo(String buildTimestamp, String serviceVersion) {
+        this.buildTimestamp = buildTimestamp;
+        this.serviceVersion = serviceVersion;
+    }
+
+    public String buildTimestamp() {
+        return buildTimestamp;
+    }
+
+    public String serviceVersion() {
+        return serviceVersion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShortBuildInfo that = (ShortBuildInfo) o;
+        return Objects.equals(buildTimestamp, that.buildTimestamp)
+                && Objects.equals(serviceVersion, that.serviceVersion);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(buildTimestamp, serviceVersion);
+    }
+
+    @Override
+    public String toString() {
+        return "ShortBuildInfo{"
+                + "buildTimestamp='"
+                + buildTimestamp
+                + '\''
+                + ", serviceVersion='"
+                + serviceVersion
+                + '\''
+                + '}';
+    }
+}

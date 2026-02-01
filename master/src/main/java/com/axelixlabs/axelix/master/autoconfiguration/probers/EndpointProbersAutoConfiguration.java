@@ -38,7 +38,7 @@ import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
 import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
 import com.axelixlabs.axelix.common.api.metrics.MetricProfile;
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.service.serde.BeansJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ConditionsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ConfigPropsJacksonMessageDeserializationStrategy;

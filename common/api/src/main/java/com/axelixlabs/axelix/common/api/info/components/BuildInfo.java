@@ -17,20 +17,91 @@
  */
 package com.axelixlabs.axelix.common.api.info.components;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * DTO that encapsulates the build information of the given artifact.
  *
- * @see ActuatorEndpoint
- * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/info.html">Info Endpoint</a>
  * @author Sergey Cherkasov
  */
-public record BuildInfo(
-        @JsonProperty("artifact") String artifact,
-        @JsonProperty("name") String name,
-        @JsonProperty("version") String version,
-        @JsonProperty("group") String group,
-        @JsonProperty("time") String time) {}
+public final class BuildInfo {
+
+    private final String artifact;
+    private final String name;
+    private final String version;
+    private final String group;
+    private final String time;
+
+    public BuildInfo(
+            @JsonProperty("artifact") String artifact,
+            @JsonProperty("name") String name,
+            @JsonProperty("version") String version,
+            @JsonProperty("group") String group,
+            @JsonProperty("time") String time) {
+        this.artifact = artifact;
+        this.name = name;
+        this.version = version;
+        this.group = group;
+        this.time = time;
+    }
+
+    public String artifact() {
+        return artifact;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public String version() {
+        return version;
+    }
+
+    public String group() {
+        return group;
+    }
+
+    public String time() {
+        return time;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BuildInfo buildInfo = (BuildInfo) o;
+        return Objects.equals(artifact, buildInfo.artifact)
+                && Objects.equals(name, buildInfo.name)
+                && Objects.equals(version, buildInfo.version)
+                && Objects.equals(group, buildInfo.group)
+                && Objects.equals(time, buildInfo.time);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(artifact, name, version, group, time);
+    }
+
+    @Override
+    public String toString() {
+        return "BuildInfo{"
+                + "artifact='"
+                + artifact
+                + '\''
+                + ", name='"
+                + name
+                + '\''
+                + ", version='"
+                + version
+                + '\''
+                + ", group='"
+                + group
+                + '\''
+                + ", time='"
+                + time
+                + '\''
+                + '}';
+    }
+}

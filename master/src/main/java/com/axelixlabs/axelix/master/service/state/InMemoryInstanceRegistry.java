@@ -26,10 +26,10 @@ import org.jspecify.annotations.NullMarked;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
+import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 
 /**
  * Implementation of the {@link InstanceRegistry} that holds the data in the process memory.

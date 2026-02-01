@@ -25,10 +25,10 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.scheduling.annotation.Scheduled;
 
-import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
+import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.MemoryUsageCache;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 

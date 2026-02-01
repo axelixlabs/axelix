@@ -17,16 +17,59 @@
  */
 package com.axelixlabs.axelix.common.api.env;
 
+import java.util.Objects;
+
 import org.jspecify.annotations.Nullable;
 
 /**
  * The value of a property within a property source.
  *
- * @param value  the string representation of the property's value
- * @param origin the origin of the property if available (e.g. location in a file), may be {@code null}
- *
  * @see EnvironmentProperty
  * @since 03.09.2025
  * @author Nikita Kirillov
  */
-public record PropertyValue(String value, @Nullable String origin) {}
+public final class PropertyValue {
+
+    private final String value;
+
+    @Nullable
+    private final String origin;
+
+    /**
+     * Creates a new PropertyValue.
+     *
+     * @param value  the string representation of the property's value
+     * @param origin the origin of the property if available (e.g. location in a file), may be {@code null}
+     */
+    public PropertyValue(String value, @Nullable String origin) {
+        this.value = value;
+        this.origin = origin;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Nullable
+    public String origin() {
+        return origin;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PropertyValue that = (PropertyValue) o;
+        return Objects.equals(value, that.value) && Objects.equals(origin, that.origin);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, origin);
+    }
+
+    @Override
+    public String toString() {
+        return "PropertyValue{" + "value='" + value + '\'' + ", origin='" + origin + '\'' + '}';
+    }
+}

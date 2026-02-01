@@ -17,13 +17,47 @@
  */
 package com.axelixlabs.axelix.common.api.request;
 
+import java.util.Objects;
+
 /**
  * Represents a request to toggle (enable/disable) a scheduled task.
- *
- * @param trigger the identifier of the scheduled task to toggle. Must not be {@code null}.
  *
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public record ScheduledTaskToggleRequest(String trigger) {}
+public final class ScheduledTaskToggleRequest {
+
+    private final String trigger;
+
+    /**
+     * Creates a new ScheduledTaskToggleRequest.
+     *
+     * @param trigger the identifier of the scheduled task to toggle. Must not be {@code null}.
+     */
+    public ScheduledTaskToggleRequest(String trigger) {
+        this.trigger = trigger;
+    }
+
+    public String trigger() {
+        return trigger;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScheduledTaskToggleRequest that = (ScheduledTaskToggleRequest) o;
+        return Objects.equals(trigger, that.trigger);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(trigger);
+    }
+
+    @Override
+    public String toString() {
+        return "ScheduledTaskToggleRequest{" + "trigger='" + trigger + '\'' + '}';
+    }
+}

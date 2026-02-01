@@ -18,19 +18,54 @@
 package com.axelixlabs.axelix.common.api.loggers;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
-
 /**
  * DTO that encapsulates the logging level information of the loggers group.
  *
- * @see ActuatorEndpoint
- * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html">Loggers Endpoint</a>
  * @author Sergey Cherkasov
  */
-public record LoggerGroup(
-        @JsonProperty("configuredLevel") @Nullable String configuredLevel,
-        @JsonProperty("members") List<String> members) {}
+public final class LoggerGroup {
+
+    @Nullable
+    private final String configuredLevel;
+
+    private final List<String> members;
+
+    public LoggerGroup(
+            @JsonProperty("configuredLevel") @Nullable String configuredLevel,
+            @JsonProperty("members") List<String> members) {
+        this.configuredLevel = configuredLevel;
+        this.members = members;
+    }
+
+    @Nullable
+    public String configuredLevel() {
+        return configuredLevel;
+    }
+
+    public List<String> members() {
+        return members;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LoggerGroup that = (LoggerGroup) o;
+        return Objects.equals(configuredLevel, that.configuredLevel) && Objects.equals(members, that.members);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(configuredLevel, members);
+    }
+
+    @Override
+    public String toString() {
+        return "LoggerGroup{" + "configuredLevel='" + configuredLevel + '\'' + ", members=" + members + '}';
+    }
+}
