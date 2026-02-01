@@ -27,12 +27,21 @@ jobs:
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
       # Use branch from workflow_dispatch input if provided, otherwise default to 'main'
       HELM_CHART_BRANCH: ${{ github.event.inputs.helm_chart_branch || 'main' }}
+
+      # We need Nexus so that the playground repos have the place to pull the dependency from
+      # These are needed in order to publish the final build artifacts into Nexus package registry
+      NEXUS_USER: ${{ secrets.NEXUS_USER }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      NEXUS_HOST_PORT: ${{ secrets.NEXUS_HOST_PORT }}
+      STORE_PASS: ${{ secrets.STORE_PASS }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
       - name: Build Backend
         uses: ./.github/actions/build-backend
+        with:
+          deploy-to-nexus: true
 
       - name: Build Frontend
         uses: ./.github/actions/build-frontend

@@ -1,4 +1,9 @@
 name: "Build Backend"
+inputs:
+  deploy-to-nexus:
+    description: Whether to deploy the built JAR into Nexus or not
+    required: false
+    default: false
 runs:
   using: composite
   steps:
@@ -21,8 +26,23 @@ runs:
         # See https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#using-the-cache-read-only
         cache-read-only: false
 
-    - run: chmod +x gradlew
+    - name: Grant execution access to the wrapper
+      run: chmod +x gradlew
       shell: bash
 
-    - run: ./gradlew build --configuration-cache --build-cache
+    - name: Gradle build
+      run: ./gradlew build --configuration-cache --build-cache
       shell: bash
+
+    - name: Download and trust Nexus SSL certificate for Gradle
+      if: ${{ inputs.deploy-to-nexus }}
+      run: |
+        TRUSTSTORE="$JAVA_HOME/lib/security/cacerts"
+        openssl s_client -connect $NEXUS_HOST_PORT -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM > nexus.crt
+        sudo keytool -importcert -file nexus.crt -alias nexus-ssl -keystore $TRUSTSTORE -storepass $STORE_PASS -noprompt
+            
+        echo "org.gradle.jvmargs=-Djavax.net.ssl.trustStore=$TRUSTSTORE -Djavax.net.ssl.trustStorePassword=$STORE_PASS" >> $HOME/.gradle/gradle.properties
+
+    - name: Publish Libraries to Nexus
+      if: ${{ inputs.deploy-to-nexus }}
+      run: ./gradlew publishNexusPublicationToAxelixRepository
