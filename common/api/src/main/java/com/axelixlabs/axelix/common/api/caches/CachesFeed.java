@@ -19,49 +19,210 @@ package com.axelixlabs.axelix.common.api.caches;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
-
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
  * The response of the caches actuator endpoint contains a map of all cache managers in the application.
  *
  * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/caches.html">Caches Endpoint</a>
  *
- * @param cacheManagers The list of cache managers in the application.
- *
  * @author Sergey Cherkasov
  */
-public record CachesFeed(@JsonProperty("cacheManagers") List<CacheManager> cacheManagers) {
+public final class CachesFeed {
+
+    private final List<CacheManager> cacheManagers;
+
+    /**
+     * Creates a new CachesFeed.
+     *
+     * @param cacheManagers The list of cache managers in the application.
+     */
+    public CachesFeed(@JsonProperty("cacheManagers") List<CacheManager> cacheManagers) {
+        this.cacheManagers = cacheManagers;
+    }
+
     public CachesFeed() {
         this(Collections.emptyList());
     }
 
+    public List<CacheManager> cacheManagers() {
+        return cacheManagers;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CachesFeed that = (CachesFeed) o;
+        return Objects.equals(cacheManagers, that.cacheManagers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cacheManagers);
+    }
+
+    @Override
+    public String toString() {
+        return "CachesFeed{" + "cacheManagers=" + cacheManagers + '}';
+    }
+
     /**
      * DTO that encapsulates a map of all caches inside the given cache manager.
-     *
-     * @param name   The cache manager name.
-     * @param caches The caches are identified by the cache name.
      */
-    public record CacheManager(@JsonProperty("name") String name, @JsonProperty("caches") List<Cache> caches) {}
+    public static final class CacheManager {
+
+        private final String name;
+        private final List<Cache> caches;
+
+        /**
+         * Creates a new CacheManager.
+         *
+         * @param name   The cache manager name.
+         * @param caches The caches are identified by the cache name.
+         */
+        public CacheManager(@JsonProperty("name") String name, @JsonProperty("caches") List<Cache> caches) {
+            this.name = name;
+            this.caches = caches;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public List<Cache> caches() {
+            return caches;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CacheManager that = (CacheManager) o;
+            return Objects.equals(name, that.name) && Objects.equals(caches, that.caches);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, caches);
+        }
+
+        @Override
+        public String toString() {
+            return "CacheManager{" + "name='" + name + '\'' + ", caches=" + caches + '}';
+        }
+    }
 
     /**
      * DTO that encapsulates the full cache name.
-     *
-     * @param name                  The cache name.
-     * @param target                The fully qualified name of the native cache.
-     * @param hitsCount             The number of cache hits, or {@code null} if unknown.
-     * @param missesCount           The number of cache misses, or {@code null} if unknown.
-     * @param estimatedEntrySize    The estimated number of entries in the cache, or {@code null} if unknown.
-     * @param enabled               Whether the cache is enabled ({@code true}) or disabled ({@code false}).
      */
-    public record Cache(
-            @JsonProperty("name") String name,
-            @JsonProperty("target") String target,
-            @JsonProperty("hitsCount") @Nullable Long hitsCount,
-            @JsonProperty("missesCount") @Nullable Long missesCount,
-            @JsonProperty("estimatedEntrySize") @Nullable Long estimatedEntrySize,
-            @JsonProperty("enabled") boolean enabled) {}
+    public static final class Cache {
+
+        private final String name;
+        private final String target;
+
+        @Nullable
+        private final Long hitsCount;
+
+        @Nullable
+        private final Long missesCount;
+
+        @Nullable
+        private final Long estimatedEntrySize;
+
+        private final boolean enabled;
+
+        /**
+         * Creates a new Cache.
+         *
+         * @param name               The cache name.
+         * @param target             The fully qualified name of the native cache.
+         * @param hitsCount          The number of cache hits, or {@code null} if unknown.
+         * @param missesCount        The number of cache misses, or {@code null} if unknown.
+         * @param estimatedEntrySize The estimated number of entries in the cache, or {@code null} if unknown.
+         * @param enabled            Whether the cache is enabled ({@code true}) or disabled ({@code false}).
+         */
+        public Cache(
+                @JsonProperty("name") String name,
+                @JsonProperty("target") String target,
+                @JsonProperty("hitsCount") @Nullable Long hitsCount,
+                @JsonProperty("missesCount") @Nullable Long missesCount,
+                @JsonProperty("estimatedEntrySize") @Nullable Long estimatedEntrySize,
+                @JsonProperty("enabled") boolean enabled) {
+            this.name = name;
+            this.target = target;
+            this.hitsCount = hitsCount;
+            this.missesCount = missesCount;
+            this.estimatedEntrySize = estimatedEntrySize;
+            this.enabled = enabled;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public String target() {
+            return target;
+        }
+
+        @Nullable
+        public Long hitsCount() {
+            return hitsCount;
+        }
+
+        @Nullable
+        public Long missesCount() {
+            return missesCount;
+        }
+
+        @Nullable
+        public Long estimatedEntrySize() {
+            return estimatedEntrySize;
+        }
+
+        public boolean enabled() {
+            return enabled;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Cache cache = (Cache) o;
+            return enabled == cache.enabled
+                    && Objects.equals(name, cache.name)
+                    && Objects.equals(target, cache.target)
+                    && Objects.equals(hitsCount, cache.hitsCount)
+                    && Objects.equals(missesCount, cache.missesCount)
+                    && Objects.equals(estimatedEntrySize, cache.estimatedEntrySize);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, target, hitsCount, missesCount, estimatedEntrySize, enabled);
+        }
+
+        @Override
+        public String toString() {
+            return "Cache{"
+                    + "name='"
+                    + name
+                    + '\''
+                    + ", target='"
+                    + target
+                    + '\''
+                    + ", hitsCount="
+                    + hitsCount
+                    + ", missesCount="
+                    + missesCount
+                    + ", estimatedEntrySize="
+                    + estimatedEntrySize
+                    + ", enabled="
+                    + enabled
+                    + '}';
+        }
+    }
 }

@@ -17,12 +17,46 @@
  */
 package com.axelixlabs.axelix.common.api.gclog;
 
+import java.util.Objects;
+
 /**
  * Request DTO used to enable GC logging.
- *
- * @param level GC log level to apply (e.g. info, debug, trace)
  *
  * @since 28.12.2025
  * @author Nikita Kirillov
  */
-public record GcLogEnableRequest(String level) {}
+public final class GcLogEnableRequest {
+
+    private final String level;
+
+    /**
+     * Creates a new GcLogEnableRequest.
+     *
+     * @param level GC log level to apply (e.g. info, debug, trace)
+     */
+    public GcLogEnableRequest(String level) {
+        this.level = level;
+    }
+
+    public String level() {
+        return level;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GcLogEnableRequest that = (GcLogEnableRequest) o;
+        return Objects.equals(level, that.level);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(level);
+    }
+
+    @Override
+    public String toString() {
+        return "GcLogEnableRequest{" + "level='" + level + '\'' + '}';
+    }
+}

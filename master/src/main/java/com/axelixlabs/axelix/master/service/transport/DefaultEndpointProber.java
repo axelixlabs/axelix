@@ -17,9 +17,9 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
-import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
 import org.jspecify.annotations.NonNull;
 
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 

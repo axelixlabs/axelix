@@ -19,19 +19,59 @@ package com.axelixlabs.axelix.common.api.loggers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
  * The response to loggers actuator endpoint.
  *
- * @see ActuatorEndpoint
- * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html">Loggers Endpoint</a>
  * @author Sergey Cherkasov
  */
-public record ServiceLoggers(
-        @JsonProperty("levels") List<String> levels,
-        @JsonProperty("loggers") Map<String, LoggerLevels> loggers,
-        @JsonProperty("groups") Map<String, LoggerGroup> groups) {}
+public final class ServiceLoggers {
+
+    private final List<String> levels;
+    private final Map<String, LoggerLevels> loggers;
+    private final Map<String, LoggerGroup> groups;
+
+    public ServiceLoggers(
+            @JsonProperty("levels") List<String> levels,
+            @JsonProperty("loggers") Map<String, LoggerLevels> loggers,
+            @JsonProperty("groups") Map<String, LoggerGroup> groups) {
+        this.levels = levels;
+        this.loggers = loggers;
+        this.groups = groups;
+    }
+
+    public List<String> levels() {
+        return levels;
+    }
+
+    public Map<String, LoggerLevels> loggers() {
+        return loggers;
+    }
+
+    public Map<String, LoggerGroup> groups() {
+        return groups;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ServiceLoggers that = (ServiceLoggers) o;
+        return Objects.equals(levels, that.levels)
+                && Objects.equals(loggers, that.loggers)
+                && Objects.equals(groups, that.groups);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(levels, loggers, groups);
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceLoggers{" + "levels=" + levels + ", loggers=" + loggers + ", groups=" + groups + '}';
+    }
+}

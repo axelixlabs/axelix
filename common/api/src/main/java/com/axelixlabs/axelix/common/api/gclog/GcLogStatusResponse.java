@@ -18,18 +18,77 @@
 package com.axelixlabs.axelix.common.api.gclog;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
 /**
  * Response DTO representing the current status of garbage collection logging.
  *
- * @param enabled indicates whether GC logging is currently enabled (true) or disabled (false).
- * @param level The verbosity level of GC logging (e.g., "info", "debug", "trace").
- *              May be null if logging is disabled.
- * @param availableLevels list of available GC log levels supported by the JVM
- *
  * @since 10.01.2026
  * @author Nikita Kirillov
  */
-public record GcLogStatusResponse(boolean enabled, @Nullable String level, List<String> availableLevels) {}
+public final class GcLogStatusResponse {
+
+    private final boolean enabled;
+
+    @Nullable
+    private final String level;
+
+    private final List<String> availableLevels;
+
+    /**
+     * Creates a new GcLogStatusResponse.
+     *
+     * @param enabled         indicates whether GC logging is currently enabled (true) or disabled (false).
+     * @param level           The verbosity level of GC logging (e.g., "info", "debug", "trace").
+     *                        May be null if logging is disabled.
+     * @param availableLevels list of available GC log levels supported by the JVM
+     */
+    public GcLogStatusResponse(boolean enabled, @Nullable String level, List<String> availableLevels) {
+        this.enabled = enabled;
+        this.level = level;
+        this.availableLevels = availableLevels;
+    }
+
+    public boolean enabled() {
+        return enabled;
+    }
+
+    @Nullable
+    public String level() {
+        return level;
+    }
+
+    public List<String> availableLevels() {
+        return availableLevels;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GcLogStatusResponse that = (GcLogStatusResponse) o;
+        return enabled == that.enabled
+                && Objects.equals(level, that.level)
+                && Objects.equals(availableLevels, that.availableLevels);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(enabled, level, availableLevels);
+    }
+
+    @Override
+    public String toString() {
+        return "GcLogStatusResponse{"
+                + "enabled="
+                + enabled
+                + ", level='"
+                + level
+                + '\''
+                + ", availableLevels="
+                + availableLevels
+                + '}';
+    }
+}

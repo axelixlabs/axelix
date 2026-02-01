@@ -45,9 +45,9 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.request.ProfileUpdatedRequest;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;

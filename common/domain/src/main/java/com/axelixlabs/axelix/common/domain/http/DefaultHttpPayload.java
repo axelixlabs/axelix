@@ -35,11 +35,10 @@ public class DefaultHttpPayload implements HttpPayload {
     private final byte[] requestBody;
 
     public DefaultHttpPayload(
-        List<HttpHeader> headers,
-        List<QueryParameter<?>> queryParameters,
-        Map<String, String> pathVariableValues,
-        byte[] requestBody
-    ) {
+            List<HttpHeader> headers,
+            List<QueryParameter<?>> queryParameters,
+            Map<String, String> pathVariableValues,
+            byte[] requestBody) {
         this.headers = headers;
         this.queryParameters = queryParameters;
         this.pathVariableValues = pathVariableValues;

@@ -17,18 +17,59 @@
  */
 package com.axelixlabs.axelix.common.api.info.components;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * DTO that encapsulates the OS information of the given artifact.
  *
- * @see ActuatorEndpoint
- * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/info.html">Info Endpoint</a>
  * @author Sergey Cherkasov
  */
-public record OSInfo(
-        @JsonProperty("name") String name,
-        @JsonProperty("version") String version,
-        @JsonProperty("arch") String arch) {}
+public final class OSInfo {
+
+    private final String name;
+    private final String version;
+    private final String arch;
+
+    public OSInfo(
+            @JsonProperty("name") String name,
+            @JsonProperty("version") String version,
+            @JsonProperty("arch") String arch) {
+        this.name = name;
+        this.version = version;
+        this.arch = arch;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public String version() {
+        return version;
+    }
+
+    public String arch() {
+        return arch;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OSInfo osInfo = (OSInfo) o;
+        return Objects.equals(name, osInfo.name)
+                && Objects.equals(version, osInfo.version)
+                && Objects.equals(arch, osInfo.arch);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, version, arch);
+    }
+
+    @Override
+    public String toString() {
+        return "OSInfo{" + "name='" + name + '\'' + ", version='" + version + '\'' + ", arch='" + arch + '\'' + '}';
+    }
+}

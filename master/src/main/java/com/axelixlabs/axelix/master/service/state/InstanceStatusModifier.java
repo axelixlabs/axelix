@@ -19,9 +19,9 @@ package com.axelixlabs.axelix.master.service.state;
 
 import org.springframework.stereotype.Service;
 
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 
 /**
  * Service for changing the status of an {@link Instance}.

@@ -134,9 +134,9 @@ public final class HttpUrl {
             }
 
             pathVariables.add(new PathVariable(
-                url.substring(left + PATH_VARIABLE_OPEN.length(), right),
-                left,
-                right + PATH_VARIABLE_CLOSE.length()));
+                    url.substring(left + PATH_VARIABLE_OPEN.length(), right),
+                    left,
+                    right + PATH_VARIABLE_CLOSE.length()));
         }
 
         return pathVariables;

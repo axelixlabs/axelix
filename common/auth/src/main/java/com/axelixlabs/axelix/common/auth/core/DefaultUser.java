@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.common.auth.core;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -27,11 +28,50 @@ import java.util.Set;
  * @since 16.07.2025
  * @author Nikita Kirillov
  */
-public record DefaultUser(String username, String password, Set<Role> roles) implements User {
+public final class DefaultUser implements User {
 
-    public DefaultUser {
-        if (roles == null) {
-            roles = Collections.emptySet();
-        }
+    private final String username;
+    private final String password;
+    private final Set<Role> roles;
+
+    public DefaultUser(String username, String password, Set<Role> roles) {
+        this.username = username;
+        this.password = password;
+        this.roles = roles != null ? roles : Collections.emptySet();
+    }
+
+    @Override
+    public String username() {
+        return username;
+    }
+
+    @Override
+    public String password() {
+        return password;
+    }
+
+    @Override
+    public Set<Role> roles() {
+        return roles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DefaultUser that = (DefaultUser) o;
+        return Objects.equals(username, that.username)
+                && Objects.equals(password, that.password)
+                && Objects.equals(roles, that.roles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, password, roles);
+    }
+
+    @Override
+    public String toString() {
+        return "DefaultUser[" + "username=" + username + ", password=" + password + ", roles=" + roles + ']';
     }
 }

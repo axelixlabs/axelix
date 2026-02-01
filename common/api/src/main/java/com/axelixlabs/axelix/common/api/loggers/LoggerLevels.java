@@ -17,18 +17,62 @@
  */
 package com.axelixlabs.axelix.common.api.loggers;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
-
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
  * DTO that encapsulates the logging level information of the single logger.
  *
- * @see ActuatorEndpoint
- * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html">Loggers Endpoint</a>
  * @author Sergey Cherkasov
  */
-public record LoggerLevels(
-        @JsonProperty("configuredLevel") @Nullable String configuredLevel,
-        @JsonProperty("effectiveLevel") String effectiveLevel) {}
+public final class LoggerLevels {
+
+    @Nullable
+    private final String configuredLevel;
+
+    private final String effectiveLevel;
+
+    public LoggerLevels(
+            @JsonProperty("configuredLevel") @Nullable String configuredLevel,
+            @JsonProperty("effectiveLevel") String effectiveLevel) {
+        this.configuredLevel = configuredLevel;
+        this.effectiveLevel = effectiveLevel;
+    }
+
+    @Nullable
+    public String configuredLevel() {
+        return configuredLevel;
+    }
+
+    public String effectiveLevel() {
+        return effectiveLevel;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LoggerLevels that = (LoggerLevels) o;
+        return Objects.equals(configuredLevel, that.configuredLevel)
+                && Objects.equals(effectiveLevel, that.effectiveLevel);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(configuredLevel, effectiveLevel);
+    }
+
+    @Override
+    public String toString() {
+        return "LoggerLevels{"
+                + "configuredLevel='"
+                + configuredLevel
+                + '\''
+                + ", effectiveLevel='"
+                + effectiveLevel
+                + '\''
+                + '}';
+    }
+}

@@ -23,7 +23,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
 
 /**

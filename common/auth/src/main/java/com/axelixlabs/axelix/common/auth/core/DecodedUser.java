@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.common.auth.core;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -24,4 +25,39 @@ import java.util.Set;
  *
  * @author Mikhail Polivakha
  */
-public record DecodedUser(String username, Set<Role> roles) {}
+public final class DecodedUser {
+
+    private final String username;
+    private final Set<Role> roles;
+
+    public DecodedUser(String username, Set<Role> roles) {
+        this.username = username;
+        this.roles = roles;
+    }
+
+    public String username() {
+        return username;
+    }
+
+    public Set<Role> roles() {
+        return roles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DecodedUser that = (DecodedUser) o;
+        return Objects.equals(username, that.username) && Objects.equals(roles, that.roles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, roles);
+    }
+
+    @Override
+    public String toString() {
+        return "DecodedUser[" + "username=" + username + ", roles=" + roles + ']';
+    }
+}

@@ -45,15 +45,15 @@ import org.springframework.stereotype.Component;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpUrl;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 
-import static com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint.of;
+import static com.axelixlabs.axelix.master.domain.ActuatorEndpoint.of;
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -53,9 +53,9 @@ public enum JwtAlgorithm {
             }
         }
 
-        throw new IllegalArgumentException(
-                "Unrecognized value of the Jwt signature generation algorithm '%s'. Supported values are : %s"
-                        .formatted(input, Arrays.toString(values())));
+        throw new IllegalArgumentException(String.format(
+                "Unrecognized value of the Jwt signature generation algorithm '%s'. Supported values are : %s",
+                input, Arrays.toString(values())));
     }
 
     public int getMinKeyLength() {

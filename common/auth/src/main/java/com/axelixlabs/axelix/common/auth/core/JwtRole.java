@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.common.auth.core;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -28,21 +29,57 @@ import java.util.Set;
  * a set of authority names, making it suitable for inclusion in JWT claims.
  * </p>
  *
- * @param name the name of the role (e.g., the class name of the original role object)
- * @param authorities the set of authority names assigned to the role
- * @param components the list of nested roles that are part of this role (i.e. its components)
- *
  * @since 22.07.2025
  * @author Nikita Kirillov
  */
-public record JwtRole(String name, Set<String> authorities, List<JwtRole> components) {
+public final class JwtRole {
 
-    public JwtRole {
-        if (authorities == null) {
-            authorities = Collections.emptySet();
-        }
-        if (components == null) {
-            components = Collections.emptyList();
-        }
+    private final String name;
+    private final Set<String> authorities;
+    private final List<JwtRole> components;
+
+    /**
+     * Creates a new JwtRole.
+     *
+     * @param name the name of the role (e.g., the class name of the original role object)
+     * @param authorities the set of authority names assigned to the role
+     * @param components the list of nested roles that are part of this role (i.e. its components)
+     */
+    public JwtRole(String name, Set<String> authorities, List<JwtRole> components) {
+        this.name = name;
+        this.authorities = authorities != null ? authorities : Collections.emptySet();
+        this.components = components != null ? components : Collections.emptyList();
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public Set<String> authorities() {
+        return authorities;
+    }
+
+    public List<JwtRole> components() {
+        return components;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JwtRole jwtRole = (JwtRole) o;
+        return Objects.equals(name, jwtRole.name)
+                && Objects.equals(authorities, jwtRole.authorities)
+                && Objects.equals(components, jwtRole.components);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, authorities, components);
+    }
+
+    @Override
+    public String toString() {
+        return "JwtRole[" + "name=" + name + ", authorities=" + authorities + ", components=" + components + ']';
     }
 }

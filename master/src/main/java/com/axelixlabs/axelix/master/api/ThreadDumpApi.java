@@ -35,9 +35,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.response.ThreadDumpFeedResponse;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;

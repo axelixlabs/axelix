@@ -17,19 +17,89 @@
  */
 package com.axelixlabs.axelix.common.api.info.components;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
-
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 
 /**
  * DTO that encapsulates the git information of the given artifact.
  *
- * @see ActuatorEndpoint
- * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/info.html">Info Endpoint</a>
  * @author Sergey Cherkasov
  */
-public record GitInfo(@JsonProperty("branch") String branch, @JsonProperty("commit") @Nullable Commit commit) {
+public final class GitInfo {
 
-    public record Commit(@JsonProperty("id") String id, @JsonProperty("time") String time) {}
+    private final String branch;
+
+    @Nullable
+    private final Commit commit;
+
+    public GitInfo(@JsonProperty("branch") String branch, @JsonProperty("commit") @Nullable Commit commit) {
+        this.branch = branch;
+        this.commit = commit;
+    }
+
+    public String branch() {
+        return branch;
+    }
+
+    @Nullable
+    public Commit commit() {
+        return commit;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GitInfo gitInfo = (GitInfo) o;
+        return Objects.equals(branch, gitInfo.branch) && Objects.equals(commit, gitInfo.commit);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(branch, commit);
+    }
+
+    @Override
+    public String toString() {
+        return "GitInfo{" + "branch='" + branch + '\'' + ", commit=" + commit + '}';
+    }
+
+    public static final class Commit {
+
+        private final String id;
+        private final String time;
+
+        public Commit(@JsonProperty("id") String id, @JsonProperty("time") String time) {
+            this.id = id;
+            this.time = time;
+        }
+
+        public String id() {
+            return id;
+        }
+
+        public String time() {
+            return time;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Commit commit = (Commit) o;
+            return Objects.equals(id, commit.id) && Objects.equals(time, commit.time);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id, time);
+        }
+
+        @Override
+        public String toString() {
+            return "Commit{" + "id='" + id + '\'' + ", time='" + time + '\'' + '}';
+        }
+    }
 }

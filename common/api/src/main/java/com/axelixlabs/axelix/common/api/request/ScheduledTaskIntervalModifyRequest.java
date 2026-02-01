@@ -17,12 +17,52 @@
  */
 package com.axelixlabs.axelix.common.api.request;
 
+import java.util.Objects;
+
 /**
  * Represents a request to modify the interval of a scheduled task.
  *
- * @param trigger   the identifier of the scheduled task to modify. Must not be {@code null}.
- * @param interval  the new interval to be assigned.
- *
  * @author Sergey Cherkasov
  */
-public record ScheduledTaskIntervalModifyRequest(String trigger, Long interval) {}
+public final class ScheduledTaskIntervalModifyRequest {
+
+    private final String trigger;
+    private final Long interval;
+
+    /**
+     * Creates a new ScheduledTaskIntervalModifyRequest.
+     *
+     * @param trigger  the identifier of the scheduled task to modify. Must not be {@code null}.
+     * @param interval the new interval to be assigned.
+     */
+    public ScheduledTaskIntervalModifyRequest(String trigger, Long interval) {
+        this.trigger = trigger;
+        this.interval = interval;
+    }
+
+    public String trigger() {
+        return trigger;
+    }
+
+    public Long interval() {
+        return interval;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScheduledTaskIntervalModifyRequest that = (ScheduledTaskIntervalModifyRequest) o;
+        return Objects.equals(trigger, that.trigger) && Objects.equals(interval, that.interval);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(trigger, interval);
+    }
+
+    @Override
+    public String toString() {
+        return "ScheduledTaskIntervalModifyRequest{" + "trigger='" + trigger + '\'' + ", interval=" + interval + '}';
+    }
+}

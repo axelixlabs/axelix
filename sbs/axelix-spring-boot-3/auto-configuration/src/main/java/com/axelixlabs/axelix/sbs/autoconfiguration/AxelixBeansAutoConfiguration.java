@@ -23,7 +23,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.axelixlabs.axelix.sbs.spring.beans.AxelixBeansEndpoint;
 import com.axelixlabs.axelix.sbs.spring.beans.BeanMetaInfoExtractor;
 import com.axelixlabs.axelix.sbs.spring.beans.BeansFeedBuilder;
@@ -35,7 +34,7 @@ import com.axelixlabs.axelix.sbs.spring.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.conditions.DefaultConditionalBeanRefBuilder;
 
 /**
- * Auto-configuration class for {@link ActuatorEndpoints#GET_BEANS} endpoint.
+ * Auto-configuration class for the beans custom actuator endpoint.
  *
  * @since 07.07.2025
  * @author Nikita Kirillov

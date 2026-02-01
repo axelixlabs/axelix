@@ -20,12 +20,10 @@ package com.axelixlabs.axelix.common.api.transform.units;
 import java.util.Set;
 
 import com.axelixlabs.axelix.common.api.transform.BaseUnitValueTransformer;
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 
 /**
- * The base unit that is reported by {@link ActuatorEndpoints#GET_SINGLE_METRIC} which we
- * know and care about. By "care" I mean that we can apply certain transformations for the
- * values that are reported by this base unit.
+ * The base unit  which we know and care about. By "care" I mean that we can
+ * apply certain transformations for the values that are reported by this base unit.
  * <p>
  * For instance, if the value of the given metric is
  * 123456789, and the base unit is {@link BytesMemoryBaseUnit bytes}, then we may be

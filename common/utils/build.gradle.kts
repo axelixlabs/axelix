@@ -11,9 +11,3 @@ dependencies {
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.platform:junit-platform-launcher")
 }
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}

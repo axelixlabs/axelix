@@ -19,10 +19,10 @@ package com.axelixlabs.axelix.master.service.state;
 
 import org.junit.jupiter.api.Test;
 
-import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
+import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;

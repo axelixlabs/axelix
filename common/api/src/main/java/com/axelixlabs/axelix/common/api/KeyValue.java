@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.common.api;
 
+import java.util.Objects;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -25,4 +27,42 @@ import org.jspecify.annotations.Nullable;
  * @since 01.10.2025
  * @author Nikita Kirillov
  */
-public record KeyValue(String key, @Nullable String value) {}
+public final class KeyValue {
+
+    private final String key;
+
+    @Nullable
+    private final String value;
+
+    public KeyValue(String key, @Nullable String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public String key() {
+        return key;
+    }
+
+    @Nullable
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        KeyValue keyValue = (KeyValue) o;
+        return Objects.equals(key, keyValue.key) && Objects.equals(value, keyValue.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key, value);
+    }
+
+    @Override
+    public String toString() {
+        return "KeyValue{" + "key='" + key + '\'' + ", value='" + value + '\'' + '}';
+    }
+}

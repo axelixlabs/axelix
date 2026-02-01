@@ -17,13 +17,47 @@
  */
 package com.axelixlabs.axelix.common.api;
 
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
+import java.util.Objects;
 
 /**
  * The response to profile-management actuator endpoint.
  *
- * @see ActuatorEndpoint
  * @since 24.09.2025
  * @author Nikita Kirillov
  */
-public record ProfileMutationResult(boolean updated, String reason) {}
+public final class ProfileMutationResult {
+
+    private final boolean updated;
+    private final String reason;
+
+    public ProfileMutationResult(boolean updated, String reason) {
+        this.updated = updated;
+        this.reason = reason;
+    }
+
+    public boolean updated() {
+        return updated;
+    }
+
+    public String reason() {
+        return reason;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProfileMutationResult that = (ProfileMutationResult) o;
+        return updated == that.updated && Objects.equals(reason, that.reason);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(updated, reason);
+    }
+
+    @Override
+    public String toString() {
+        return "ProfileMutationResult{" + "updated=" + updated + ", reason='" + reason + '\'' + '}';
+    }
+}
