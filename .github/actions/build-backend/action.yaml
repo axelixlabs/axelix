@@ -42,7 +42,9 @@ runs:
         sudo keytool -importcert -file nexus.crt -alias nexus-ssl -keystore $TRUSTSTORE -storepass $STORE_PASS -noprompt
             
         echo "org.gradle.jvmargs=-Djavax.net.ssl.trustStore=$TRUSTSTORE -Djavax.net.ssl.trustStorePassword=$STORE_PASS" >> $HOME/.gradle/gradle.properties
+      shell: bash
 
     - name: Publish Libraries to Nexus
       if: ${{ inputs.deploy-to-nexus }}
       run: ./gradlew publishNexusPublicationToAxelixRepository
+      shell: bash
