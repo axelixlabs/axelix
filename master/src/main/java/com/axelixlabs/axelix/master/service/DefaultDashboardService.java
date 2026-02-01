@@ -41,8 +41,8 @@ import static com.axelixlabs.axelix.master.api.response.DashboardResponse.Health
 import static com.axelixlabs.axelix.master.api.response.DashboardResponse.MemoryUsage;
 import static com.axelixlabs.axelix.master.api.response.DashboardResponse.MemoryUsageMap;
 import static com.axelixlabs.axelix.master.api.response.DashboardResponse.Status;
-import static com.axelixlabs.axelix.master.service.versions.VersionTrimmer.getMajorMinorVersion;
-import static com.axelixlabs.axelix.master.service.versions.VersionTrimmer.getMajorVersion;
+import static com.axelixlabs.axelix.master.utils.VersionTrimmer.getMajorMinorVersion;
+import static com.axelixlabs.axelix.master.utils.VersionTrimmer.getMajorVersion;
 
 /**
  * Default implementation of {@link DashboardService}.

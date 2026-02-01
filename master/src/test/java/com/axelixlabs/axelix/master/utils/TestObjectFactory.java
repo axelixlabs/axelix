@@ -20,15 +20,9 @@ package com.axelixlabs.axelix.master.utils;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.instancio.Instancio;
-import org.instancio.Select;
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.domain.BuildInfo;
-import com.axelixlabs.axelix.common.domain.ClassPath;
-import com.axelixlabs.axelix.common.domain.ClassPathEntry;
 import com.axelixlabs.axelix.master.model.instance.Instance;
 import com.axelixlabs.axelix.master.model.instance.Instance.VMFeature;
 import com.axelixlabs.axelix.master.model.instance.InstanceId;
@@ -128,13 +122,5 @@ public final class TestObjectFactory {
                 new MemoryUsage(1000L),
                 url,
                 vmFeatures);
-    }
-
-    public static BuildInfo createBuildInfo(ClassPathEntry... classPathEntries) {
-        return Instancio.of(BuildInfo.class)
-                .set(
-                        Select.fields().named("classPathEntries").declaredIn(ClassPath.class),
-                        Arrays.stream(classPathEntries).collect(Collectors.toSet()))
-                .create();
     }
 }
