@@ -28,8 +28,8 @@ import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
-import com.axelixlabs.axelix.master.model.instance.Instance;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
  * Implementation of the {@link InstanceRegistry} that holds the data in the process memory.

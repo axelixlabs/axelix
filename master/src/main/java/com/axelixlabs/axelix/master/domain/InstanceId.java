@@ -15,26 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.model.software.core;
+package com.axelixlabs.axelix.master.domain;
 
 import org.jspecify.annotations.NonNull;
 
-import com.axelixlabs.axelix.master.model.software.SoftwareComponent;
+/**
+ * The wrapper class around the value that represents the ID of the given {@link Instance}.
+ *
+ * @author Mikhail Polivakha
+ */
+public record InstanceId(@NonNull String instanceId) {
 
-public final class JavaVersion implements SoftwareComponent {
-
-    @Override
-    public @NonNull String getName() {
-        return "Java";
-    }
-
-    @Override
-    public String getDescription() {
-        return "The version of Java language being used in the application";
-    }
-
-    @Override
-    public boolean isCore() {
-        return true;
+    public static InstanceId of(@NonNull String instanceId) {
+        return new InstanceId(instanceId);
     }
 }

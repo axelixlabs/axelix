@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
  * Default {@link EndpointInvoker} that delegates the actual query execution to selected {@link EndpointProber}.

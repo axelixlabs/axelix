@@ -19,8 +19,8 @@ package com.axelixlabs.axelix.master.service;
 
 import org.jspecify.annotations.NullMarked;
 
-import com.axelixlabs.axelix.master.model.instance.Instance;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
  * Stores our best estimate of how much memory the given {@link Instance} consumes.

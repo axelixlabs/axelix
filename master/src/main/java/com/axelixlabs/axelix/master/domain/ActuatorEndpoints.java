@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.domain.spring.actuator;
+package com.axelixlabs.axelix.master.domain;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,7 +24,7 @@ import java.util.Set;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
-import static com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint.of;
+import static com.axelixlabs.axelix.master.domain.ActuatorEndpoint.of;
 
 /**
  * Represents all possible {@link ActuatorEndpoint actuator endpoints} that are being used in the system:

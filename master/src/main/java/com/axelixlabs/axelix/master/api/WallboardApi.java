@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.response.InstancesGridResponse;
-import com.axelixlabs.axelix.master.model.instance.Instance;
+import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.convert.response.InstancesToShortProfileConverter;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 

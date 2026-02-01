@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.api.ApiPaths;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**

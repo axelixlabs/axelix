@@ -18,8 +18,8 @@
 package com.axelixlabs.axelix.master.service.export;
 
 import com.axelixlabs.axelix.master.exception.StateExportException;
-import com.axelixlabs.axelix.master.model.instance.Instance;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.collect.InstanceStateCollector;
 
 /**

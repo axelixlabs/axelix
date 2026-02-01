@@ -22,7 +22,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.model.instance.Instance.VMFeature;
+import com.axelixlabs.axelix.master.domain.Instance.VMFeature;
 
 /**
  * The profile of a given details.

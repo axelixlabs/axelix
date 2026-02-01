@@ -48,7 +48,7 @@ import com.axelixlabs.axelix.common.api.request.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.common.api.request.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.request.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;

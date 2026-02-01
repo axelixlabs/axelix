@@ -25,7 +25,7 @@ import org.jspecify.annotations.NullMarked;
 
 import org.springframework.stereotype.Service;
 
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
  * An in-memory representation of {@link MemoryUsageCache}.

@@ -17,12 +17,12 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
 import org.jspecify.annotations.NonNull;
 
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
  * The core service that is responsible to probe certain information from discovered services.

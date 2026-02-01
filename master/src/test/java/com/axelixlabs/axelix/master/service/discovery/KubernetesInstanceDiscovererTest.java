@@ -47,7 +47,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.master.model.instance.Instance;
+import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InMemoryMemoryUsageCache;
 import com.axelixlabs.axelix.master.service.MemoryUsageCache;
 import com.axelixlabs.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;

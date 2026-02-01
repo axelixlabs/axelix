@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.springframework.cloud.client.ServiceInstance;
 
-import com.axelixlabs.axelix.master.model.instance.Instance;
+import com.axelixlabs.axelix.master.domain.Instance;
 
 /**
  * Represents a Kubernetes service instance for {@link KubernetesDiscoveryClient}.

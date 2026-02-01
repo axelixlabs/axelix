@@ -79,12 +79,36 @@ public final class HttpUrl {
      * Variable in the URL path. Defined by name and its position in the URL.
      * <p>
      * Pattern for a given variable in URL is <pre>{ + variable name + }</pre>.
-     *
-     * @param starts the index since the path variable starts in the request, inclusive.
-     * @param ends the index until which path variable spans, exclusive.
-     * @param name the name of the path variable.
      */
-    record PathVariable(String name, int starts, int ends) {}
+    static class PathVariable {
+
+        private final String name;
+        private final int starts;
+        private final int ends;
+
+        /**
+         * @param starts the index since the path variable starts in the request, inclusive.
+         * @param ends the index until which path variable spans, exclusive.
+         * @param name the name of the path variable.
+         */
+        public PathVariable(String name, int starts, int ends) {
+            this.name = name;
+            this.starts = starts;
+            this.ends = ends;
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public int starts() {
+            return starts;
+        }
+
+        public int ends() {
+            return ends;
+        }
+    }
 
     /**
      * Parses the <strong>templated</strong> URL in order to extract the path variables used in the request.
@@ -110,9 +134,9 @@ public final class HttpUrl {
             }
 
             pathVariables.add(new PathVariable(
-                    url.substring(left + PATH_VARIABLE_OPEN.length(), right),
-                    left,
-                    right + PATH_VARIABLE_CLOSE.length()));
+                url.substring(left + PATH_VARIABLE_OPEN.length(), right),
+                left,
+                right + PATH_VARIABLE_CLOSE.length()));
         }
 
         return pathVariables;

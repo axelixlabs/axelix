@@ -23,10 +23,10 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.model.instance.Instance;
-import com.axelixlabs.axelix.master.model.instance.Instance.VMFeature;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
-import com.axelixlabs.axelix.master.model.instance.MemoryUsage;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.Instance.VMFeature;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.MemoryUsage;
 
 /**
  * Utility factory for creating test objects used in unit and integration tests.

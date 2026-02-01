@@ -27,7 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.master.api.response.InstancesGridResponse.InstanceShortProfile;
-import com.axelixlabs.axelix.master.model.instance.Instance;
+import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.convert.response.InstancesToShortProfileConverter;
 
 /**

@@ -35,7 +35,7 @@ import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoints;
-import com.axelixlabs.axelix.master.model.instance.Instance;
+import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 

@@ -23,7 +23,15 @@ package com.axelixlabs.axelix.common.domain.http;
  *
  * @author Mikhail Polivakha
  */
-public record SingleValueQueryParameter(String key, String value) implements QueryParameter<String> {
+public class SingleValueQueryParameter implements QueryParameter<String> {
+
+    private final String key;
+    private final String value;
+
+    public SingleValueQueryParameter(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
 
     @Override
     public String key() {

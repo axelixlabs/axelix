@@ -45,7 +45,7 @@ import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.response.ScheduledTasksResponse;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;

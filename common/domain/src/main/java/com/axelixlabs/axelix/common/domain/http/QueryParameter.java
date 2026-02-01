@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
  * @param <T> the type of the parameter value
  * @author Mikhail Polivakha
  */
-public sealed interface QueryParameter<T> permits SingleValueQueryParameter, MultiValueQueryParameter {
+public interface QueryParameter<T> {
 
     /**
      * @return the key under which the parameter resides

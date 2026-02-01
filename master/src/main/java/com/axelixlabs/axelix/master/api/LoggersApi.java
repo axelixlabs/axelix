@@ -49,7 +49,7 @@ import com.axelixlabs.axelix.master.api.request.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.api.response.loggers.GroupProfileResponse;
 import com.axelixlabs.axelix.master.api.response.loggers.LoggerProfileResponse;
 import com.axelixlabs.axelix.master.api.response.loggers.LoggersResponse;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
