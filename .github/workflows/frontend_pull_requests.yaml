@@ -1,0 +1,25 @@
+name: Frontend Pull Requests
+
+on:
+  pull_request:
+    paths:
+      - 'front-end/**'
+    branches: [ master ]
+
+jobs:
+  check-linked-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for linked issues
+        uses: nearform-actions/github-action-check-linked-issues@v1
+        with:
+          exclude-labels: "refactoring"
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend

@@ -1,6 +1,8 @@
 # Stage: extract Spring Boot application layers
 FROM eclipse-temurin:25-jre-alpine AS layers
+
 WORKDIR /application
+COPY front-end/dist dist
 COPY master/build/libs/master.jar master.jar
 RUN java -Djarmode=layertools -jar master.jar extract
 
@@ -26,11 +28,11 @@ ENV JAVA_ERROR_FILE_OPTS="-XX:ErrorFile=/tmp/java_error.log"
 ENV JAVA_HEAP_DUMP_OPTS="-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp"
 ENV JAVA_ON_OUT_OF_MEMORY_OPTS="-XX:+CrashOnOutOfMemoryError"
 ENV JAVA_GC_LOG_OPTS="-Xlog:gc*,safepoint:/tmp/gc.log::filecount=10,filesize=100M"
+# Custom Java Properties
+ENV JAVA_OTHER_ARGS="-Dkubernetes.trust.certificates=true \
+                     -Dspring.web.resources.static-locations=file:/application/dist"
 
 # TODO: Consider adding AOT Cache
-# Java Properties
-ENV JAVA_OTHER_ARGS="-Dkubernetes.trust.certificates=true"
-
 ENTRYPOINT exec java \
     $JAVA_OTHER_ARGS \
     $JAVA_HEAP_DUMP_OPTS \
