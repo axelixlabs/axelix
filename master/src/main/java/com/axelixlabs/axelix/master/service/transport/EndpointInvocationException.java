@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
 
 /**
  * The exception that occurs when Axelix Master tried to reach a particular {@link ActuatorEndpoint}

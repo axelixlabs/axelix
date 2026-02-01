@@ -17,8 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.export;
 
-import com.axelixlabs.axelix.master.model.instance.Instance;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
  * Abstraction that is capable to generate the file name for the state file archive.

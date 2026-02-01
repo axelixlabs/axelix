@@ -32,9 +32,9 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.master.model.instance.Instance;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
-import com.axelixlabs.axelix.master.model.instance.MemoryUsage;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
 /**

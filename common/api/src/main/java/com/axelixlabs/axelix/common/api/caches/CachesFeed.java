@@ -28,7 +28,6 @@ import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
 /**
  * The response of the caches actuator endpoint contains a map of all cache managers in the application.
  *
- * @see ActuatorEndpoint
  * @apiNote <a href="https://docs.spring.io/spring-boot/api/rest/actuator/caches.html">Caches Endpoint</a>
  *
  * @param cacheManagers The list of cache managers in the application.

@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.request.state.StateExportRequest;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.request.StateExportRequestConverter;
 import com.axelixlabs.axelix.master.service.export.StateArchiveFileNameGenerator;
 import com.axelixlabs.axelix.master.service.export.StateExport;

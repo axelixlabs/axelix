@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
  * Default implementation of {@link StateArchiveFileNameGenerator}.

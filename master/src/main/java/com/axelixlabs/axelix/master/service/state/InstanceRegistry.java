@@ -24,8 +24,8 @@ import org.jspecify.annotations.NonNull;
 
 import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
-import com.axelixlabs.axelix.master.model.instance.Instance;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
  * Central registry of all the {@link Instance instances} that this Master deployment is aware about.

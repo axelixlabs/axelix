@@ -32,7 +32,7 @@ import com.axelixlabs.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTr
 import com.axelixlabs.axelix.master.api.response.DashboardResponse;
 import com.axelixlabs.axelix.master.api.response.software.DistributionResponse;
 import com.axelixlabs.axelix.master.api.response.software.SoftwareDistributions;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InMemoryInstanceRegistry;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 

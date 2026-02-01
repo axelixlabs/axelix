@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api;
 
-import com.axelixlabs.axelix.master.model.instance.Instance;
+import com.axelixlabs.axelix.master.domain.Instance;
 
 /**
  * Constant class that holds the paths to the APIs that Axelix Master exposes

@@ -17,13 +17,13 @@
  */
 package com.axelixlabs.axelix.master.service.transport;
 
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoint;
-import com.axelixlabs.axelix.common.domain.spring.actuator.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 

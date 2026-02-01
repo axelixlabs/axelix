@@ -27,12 +27,24 @@ import java.util.Map;
  * @since 02.09.2025
  * @author Nikita Kirillov
  */
-public record DefaultHttpPayload(
+public class DefaultHttpPayload implements HttpPayload {
+
+    private final List<HttpHeader> headers;
+    private final List<QueryParameter<?>> queryParameters;
+    private final Map<String, String> pathVariableValues;
+    private final byte[] requestBody;
+
+    public DefaultHttpPayload(
         List<HttpHeader> headers,
         List<QueryParameter<?>> queryParameters,
         Map<String, String> pathVariableValues,
-        byte[] requestBody)
-        implements HttpPayload {
+        byte[] requestBody
+    ) {
+        this.headers = headers;
+        this.queryParameters = queryParameters;
+        this.pathVariableValues = pathVariableValues;
+        this.requestBody = requestBody;
+    }
 
     public DefaultHttpPayload(List<HttpHeader> headers) {
         this(headers, Collections.emptyList(), Collections.emptyMap(), new byte[0]);
@@ -52,5 +64,25 @@ public record DefaultHttpPayload(
 
     public DefaultHttpPayload(List<QueryParameter<?>> queryParameters, Map<String, String> pathVariableValues) {
         this(Collections.emptyList(), queryParameters, pathVariableValues, new byte[0]);
+    }
+
+    @Override
+    public List<HttpHeader> headers() {
+        return headers;
+    }
+
+    @Override
+    public List<QueryParameter<?>> queryParameters() {
+        return queryParameters;
+    }
+
+    @Override
+    public Map<String, String> pathVariableValues() {
+        return pathVariableValues;
+    }
+
+    @Override
+    public byte[] requestBody() {
+        return requestBody;
     }
 }

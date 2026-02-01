@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.exception;
 
-import com.axelixlabs.axelix.master.model.instance.Instance;
+import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**

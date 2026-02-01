@@ -28,7 +28,15 @@ import java.util.stream.Collectors;
  *
  * @author Mikhail Polivakha
  */
-public record MultiValueQueryParameter(String key, List<String> values) implements QueryParameter<List<String>> {
+public class MultiValueQueryParameter implements QueryParameter<List<String>> {
+
+    private final String key;
+    private final List<String> values;
+
+    public MultiValueQueryParameter(String key, List<String> values) {
+        this.key = key;
+        this.values = values;
+    }
 
     @Override
     public String key() {

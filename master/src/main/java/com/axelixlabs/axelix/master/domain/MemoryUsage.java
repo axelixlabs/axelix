@@ -15,26 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.model.software.core;
+package com.axelixlabs.axelix.master.domain;
 
-import org.jspecify.annotations.NonNull;
-
-import com.axelixlabs.axelix.master.model.software.SoftwareComponent;
-
-public final class JdkDistribution implements SoftwareComponent {
-
-    @Override
-    public @NonNull String getName() {
-        return "JDK Distribution";
-    }
-
-    @Override
-    public String getDescription() {
-        return "The distribution of JDK being used in the application";
-    }
-
-    @Override
-    public boolean isCore() {
-        return true;
-    }
-}
+/**
+ * Memory usage of the given {@link Instance} in bytes.
+ *
+ * @param heap heap usage in bytes
+ * @author Mikhail Polivakha
+ */
+public record MemoryUsage(double heap) {}

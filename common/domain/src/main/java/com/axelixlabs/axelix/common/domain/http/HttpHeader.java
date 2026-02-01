@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.common.domain.http;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Single http header. Headers are potentially multivalued in http, and
@@ -26,10 +27,18 @@ import java.util.List;
  *
  * @author Mikhail Polivakha
  */
-public record HttpHeader(String name, List<String> values) {
+public class HttpHeader {
+
+    private final String name;
+    private final List<String> values;
+
+    public HttpHeader(String name, List<String> values) {
+        this.name = name;
+        this.values = values;
+    }
 
     public HttpHeader(String name, String... values) {
-        this(name, Arrays.stream(values).toList());
+        this(name, Arrays.stream(values).collect(Collectors.toList()));
     }
 
     /**
@@ -41,5 +50,9 @@ public record HttpHeader(String name, List<String> values) {
         }
 
         return String.join(", ", values);
+    }
+
+    public String name() {
+        return name;
     }
 }

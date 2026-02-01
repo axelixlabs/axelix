@@ -45,7 +45,7 @@ import com.axelixlabs.axelix.master.api.ApiPaths;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.response.caches.CacheProfileResponse;
 import com.axelixlabs.axelix.master.api.response.caches.CachesResponse;
-import com.axelixlabs.axelix.master.model.instance.InstanceId;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 

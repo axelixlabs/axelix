@@ -34,7 +34,7 @@ import com.axelixlabs.axelix.common.api.transform.units.BaseUnit;
 import com.axelixlabs.axelix.master.api.response.DashboardResponse;
 import com.axelixlabs.axelix.master.api.response.software.DistributionResponse;
 import com.axelixlabs.axelix.master.api.response.software.SoftwareDistributions;
-import com.axelixlabs.axelix.master.model.instance.Instance;
+import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 import static com.axelixlabs.axelix.master.api.response.DashboardResponse.HealthStatus;

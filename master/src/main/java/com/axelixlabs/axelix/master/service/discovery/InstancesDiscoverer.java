@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 
-import com.axelixlabs.axelix.master.model.instance.Instance;
+import com.axelixlabs.axelix.master.domain.Instance;
 
 /**
  * The SPI interface for discovering {@link Instance instances} of running applications.
