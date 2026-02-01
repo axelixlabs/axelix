@@ -1,4 +1,4 @@
-name: Build / Deploy Backend
+name: Build / Deploy to Testing Env
 
 on:
   workflow_dispatch:
@@ -11,36 +11,12 @@ on:
   push:
     branches: [ master ]
     paths:
-      - '!front-end/**'
-      - '!docs/**'
       - '!infra/**'
       - '!.editorconfig'
       - '!.gitignore'
-      - 'master/**'
-      - 'distribution/**'
-      - 'sbs/**'
-      - 'common/**'
-      - '.github/workflows/backend.yaml'
-  pull_request:
-    branches: [ master ]
-    paths-ignore:
-      - 'front-end/**'
-      - '.github/workflows/frontend.yaml'
-      - '.github/workflows/release.yaml'
-
-env:
-  SHOULD_DEPLOY: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
+      - '!CONTRIBUTING.adoc'
 
 jobs:
-  check-linked-issues:
-    if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch') }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check for linked issues
-        uses: nearform-actions/github-action-check-linked-issues@v1
-        with:
-          exclude-labels: "refactoring"
-
   build-deploy-source:
     runs-on: ubuntu-latest
     env:
@@ -51,63 +27,25 @@ jobs:
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
       # Use branch from workflow_dispatch input if provided, otherwise default to 'main'
       HELM_CHART_BRANCH: ${{ github.event.inputs.helm_chart_branch || 'main' }}
-
-      # These are needed in order to publish the final build artifacts into Nexus package registry
-      NEXUS_URL: ${{ secrets.NEXUS_URL }}
-      NEXUS_USER: ${{ secrets.NEXUS_USER }}
-      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-      NEXUS_HOST_PORT: ${{ secrets.NEXUS_HOST_PORT }}
-      STORE_PASS: ${{ secrets.STORE_PASS }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      # TODO: Change to java 25 later on
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'liberica'
-          java-version: '17'
+      - name: Build Backend
+        uses: ./.github/actions/build-backend
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          # Configuration Cache in encrypted with this key
-          cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
-          # See https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#using-the-cache-read-only
-          cache-read-only: false
-
-      - name: Grant execute permission for Gradle wrapper
-        run: chmod +x gradlew
-
-      # TODO: We probably would want here to not use build-cache for releases of production artifacts
-      - name: Gradle build
-        run: ./gradlew build --configuration-cache --build-cache
-
-      - name: Download and trust Nexus SSL certificate for Gradle
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
-        run: |
-          TRUSTSTORE="$JAVA_HOME/lib/security/cacerts"
-          openssl s_client -connect $NEXUS_HOST_PORT -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM > nexus.crt
-          sudo keytool -importcert -file nexus.crt -alias nexus-ssl -keystore $TRUSTSTORE -storepass $STORE_PASS -noprompt
-          
-          echo "org.gradle.jvmargs=-Djavax.net.ssl.trustStore=$TRUSTSTORE -Djavax.net.ssl.trustStorePassword=$STORE_PASS" >> $HOME/.gradle/gradle.properties
-
-      - name: Publish Libraries to Nexus
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
-        run: ./gradlew publishNexusPublicationToAxelixRepository
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend
 
       - name: Set up Docker
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         uses: docker/setup-docker-action@v4
 
       - name: Read Gradle Properties file
         uses: madhead/read-java-properties@4
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         id: gradleProperties
         env:
-          # We have to clear the JAVA_HOME here, since because the read-java-properties
-          # is a docker-based action, it assumes to have its own JAVA_HOME, different from
+          # We have to clear the JAVA_HOME here, since the read-java-properties
+          # is a docker-based action, and it assumes to have its own JAVA_HOME, different from
           # the one that we set up above. Be invoking read-java-properties the JAVA_HOME from
           # the runner leaks into container, and overrides the correct JAVA_HOME for the container.
           # So we must clean it up explicitly
@@ -117,14 +55,12 @@ jobs:
           property: axelixVersion
 
       - name: Build Docker Image
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         # TODO:
         #  We need to take the repository part inside the image name from the terraform output
         run: |
-          docker build --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file master/docker/Dockerfile .
+          docker build --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file Dockerfile .
 
       - name: Docker login to Yandex Cloud CR
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         # TODO: Is it possible to authenticate via service account? Cause currently here in the OAUTH_TOKEN is my token
         run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
 

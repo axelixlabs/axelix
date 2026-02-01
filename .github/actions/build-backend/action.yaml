@@ -1,0 +1,28 @@
+name: "Build Backend"
+runs:
+  using: composite
+  steps:
+
+    # That is the important step. Note, that:
+    #   - The gradle JVM process itself run on java 25
+    #   - Then on each individual gradle module (master/sbs3/sbs2) the necessary
+    #     toolchain is specified per individual basis
+    - name: Set up JDK 25
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'liberica'
+        java-version: '25'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        # Configuration Cache in encrypted with this key
+        cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
+        # See https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#using-the-cache-read-only
+        cache-read-only: false
+
+    - name: Grant execute permission for Gradle wrapper
+      run: chmod +x gradlew
+
+    - name: Gradle build - Backend
+      run: ./gradlew build --configuration-cache --build-cache

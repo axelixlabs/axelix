@@ -1,0 +1,27 @@
+name: Backend Pull Requests
+
+on:
+  pull_request:
+    paths:
+      - 'master/**'
+      - 'sbs/**'
+      - 'common/**'
+    branches: [ master ]
+
+jobs:
+  check-linked-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for linked issues
+        uses: nearform-actions/github-action-check-linked-issues@v1
+        with:
+          exclude-labels: "refactoring"
+
+  backend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Build Backend
+        uses: ./.github/actions/build-backend

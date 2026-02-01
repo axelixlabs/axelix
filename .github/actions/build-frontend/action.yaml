@@ -1,0 +1,12 @@
+name: "Build Frontend"
+runs:
+  using: composite
+  steps:
+    - run: npm ci
+      shell: bash
+
+    - run: npm run lint && npm run lint-css && npm run test
+      shell: bash
+
+    - run: npm run build
+      shell: bash
