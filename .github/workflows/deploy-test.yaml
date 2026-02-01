@@ -32,10 +32,10 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Build Backend
-        uses: .github/actions/build-backend
+        uses: ./.github/actions/build-backend
 
       - name: Build Frontend
-        uses: .github/actions/build-frontend
+        uses: ./.github/actions/build-frontend
 
       - name: Set up Docker
         uses: docker/setup-docker-action@v4

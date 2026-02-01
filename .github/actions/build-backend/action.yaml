@@ -21,8 +21,8 @@ runs:
         # See https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#using-the-cache-read-only
         cache-read-only: false
 
-    - name: Grant execute permission for Gradle wrapper
-      run: chmod +x gradlew
+    - run: chmod +x gradlew
+      shell: bash
 
-    - name: Gradle build - Backend
-      run: ./gradlew build --configuration-cache --build-cache
+    - run: ./gradlew build --configuration-cache --build-cache
+      shell: bash
