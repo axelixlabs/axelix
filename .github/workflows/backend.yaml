@@ -2,6 +2,12 @@ name: Build / Deploy Backend
 
 on:
   workflow_dispatch:
+    inputs:
+      helm_chart_branch:
+        description: 'Helm chart branch name'
+        required: false
+        type: string
+        default: 'main'
   push:
     branches: [ master ]
     paths:
@@ -43,6 +49,8 @@ jobs:
       IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
       IMAGE_NAME: master
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
+      # Use branch from workflow_dispatch input if provided, otherwise default to 'main'
+      HELM_CHART_BRANCH: ${{ github.event.inputs.helm_chart_branch || 'main' }}
 
       # These are needed in order to publish the final build artifacts into Nexus package registry
       NEXUS_URL: ${{ secrets.NEXUS_URL }}
@@ -52,7 +60,7 @@ jobs:
       STORE_PASS: ${{ secrets.STORE_PASS }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # TODO: Change to java 25 later on
       - name: Set up JDK 17
@@ -128,9 +136,14 @@ jobs:
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
         run: docker logout
 
-      - name: Checkout source code
+      - name: Checkout helm-charts repository
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          repository: axelixlabs/helm-charts
+          ref: ${{ env.HELM_CHART_BRANCH }}
+          path: helm-charts
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Helm
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
@@ -140,7 +153,7 @@ jobs:
 
       - name: Deploy master to K8S
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
-        working-directory: distributions/chart
+        working-directory: helm-charts/charts/axelix
         run: |
           mkdir -p ~/.kube
           touch ~/.kube/config

@@ -2,6 +2,12 @@ name: Build / Deploy Front-End
 
 on:
   workflow_dispatch:
+    inputs:
+      helm_chart_branch:
+        description: 'Helm chart branch name'
+        required: false
+        type: string
+        default: 'main'
   push:
     branches: [ master ]
     paths:
@@ -40,6 +46,8 @@ jobs:
       IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
       IMAGE_NAME: master-fe
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
+      # Use branch from workflow_dispatch input if provided, otherwise default to 'main'
+      HELM_CHART_BRANCH: ${{ github.event.inputs.helm_chart_branch || 'main' }}
 
       # Vite Config
       VITE_APP_SOURCE_CODE_LINK: https://github.com/axelixlabs/axelix
@@ -52,7 +60,7 @@ jobs:
         working-directory: front-end
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install dependencies
         run: npm ci
@@ -121,6 +129,15 @@ jobs:
         if: ${{ env.MASTER_PUSH_OR_MANUAL  == 'true'}}
         run: docker logout
 
+      - name: Checkout helm-charts repository
+        if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
+        uses: actions/checkout@v5
+        with:
+          repository: axelixlabs/helm-charts
+          ref: ${{ env.HELM_CHART_BRANCH }}
+          path: helm-charts
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup Helm
         if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
         uses: azure/setup-helm@v4.3.0
@@ -129,7 +146,7 @@ jobs:
 
       - name: Deploy master to K8S
         if: ${{ env.MASTER_PUSH_OR_MANUAL == 'true' }}
-        working-directory: distributions/chart
+        working-directory: helm-charts/charts/axelix
         run: |
           mkdir -p ~/.kube
           touch ~/.kube/config
