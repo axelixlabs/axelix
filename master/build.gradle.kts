@@ -15,7 +15,7 @@ dependencies {
     // Self
     implementation(project(":common:domain"))
     implementation(project(":common:api"))
-    implementation(project(":common_auth"))
+    implementation(project(":common:auth"))
     implementation(project(":common:utils"))
 
     // Impl
@@ -47,6 +47,12 @@ dependencies {
 configurations.all {
     exclude(group = "org.apache.logging.log4j", module = "log4j-api")
     exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 // We do not want to generate a regular JAR produced by the "jar" task, Spring Boot plugin will generate what we need

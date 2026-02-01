@@ -24,9 +24,3 @@ dependencies {
     testRuntimeOnly("io.jsonwebtoken:jjwt-impl:${jsonwebtokenVersion}")
     testRuntimeOnly("io.jsonwebtoken:jjwt-jackson:${jsonwebtokenVersion}")
 }
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}

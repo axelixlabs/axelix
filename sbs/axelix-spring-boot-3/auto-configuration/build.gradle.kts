@@ -12,7 +12,7 @@ dependencies {
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudDependenciesVersion}"))
 
     // Self
-    api(project(":common_auth"))
+    api(project(":common:auth"))
     api(project(":common:api"))
     api(project(":sbs:axelix-spring-boot-3:spring"))
 
@@ -26,4 +26,10 @@ dependencies {
 
 axelix {
     properties.put("version", rootProject.version.toString())
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }

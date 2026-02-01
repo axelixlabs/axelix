@@ -7,7 +7,7 @@ plugins {
 
 dependencies {
     // Self
-    implementation(project(":common_auth"))
+    implementation(project(":common:auth"))
     implementation(project(":common:domain"))
     implementation(project(":common:utils"))
     api(project(":common:api"))
@@ -48,5 +48,11 @@ tasks.withType<JavaCompile> {
 tasks {
     test {
         useJUnitPlatform()
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
