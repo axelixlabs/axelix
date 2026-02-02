@@ -12,9 +12,18 @@ The Axelix as a product consists of:
 - **Axelix Master** (or just **'master'**). The application that acts as the backend for the UI/Front-End. The Axelix Master is a Java 17 application. The source code of Axelix master is located inside the **master** directory.
 - **Spring Boot Starter** (or just **'sbs'**) modules. Axelix Master communicates with the Java/Kotlin applications, that include Spring Boot Starter of various versions (like starter for Spring Boot 2, or starter for Spring Boot 3). The source code of all the starters is located inside the **sbs** directory.
 
+### Repository Structure
+
+Other important directories in this project include (not limited to):
+
+- `buildSrc`: this is the `buildSrc` gradle module, that contains convention plugins (like `common`, `sbs` and `shared` convention plugins) and various common settings that are global for the Axelix Java.
+- `common`: contains the common modules - that are the modules that are supposed to be used by both the Axelix Master and, possibly, by ANY of the Spring Boot Axelix Starters (for Spring Boot 2 or Spring Boot 3, regardless).
+
 ### Building
 
-As mentioned above, for Java code, the main build tool is Gradle. You can simply run:
+The backend modules are being built via Gradle build tool. The Axelix Project is a gradle multi-project project.
+
+Therefore, for Java source code, you can simply run:
 
 ```
 ./gradlew clean build
@@ -24,7 +33,9 @@ That is going to also run the linting checks, like spotless and pmd. You can sel
 
 For the front-end, please, inspect the `front-end/packages.json` in order to understand the possible commands that can be run (for testing, linting and building the dist).
 
-The backend modules are being built via Gradle build tool. The Axelix Project is a gradle multi-project project.
+### CI/CD
+
+The CI/CD that is used by this project is GitHub Actions. The source code for the GitHub Actions can be found in the `.github` directory.
 
 ### Overall Behavioral Guidelines
 
