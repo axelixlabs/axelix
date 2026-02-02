@@ -39,16 +39,16 @@ public class SingleMetricConverter implements Converter<MetricProfile, SingleMet
     @Override
     public @NonNull SingleMetricProfileResponse convertInternal(@NonNull MetricProfile source) {
         return new SingleMetricProfileResponse(
-                source.name(),
-                source.description(),
-                source.baseUnit(),
+                source.getName(),
+                source.getDescription(),
+                source.getBaseUnit(),
                 mapMeasurements(source),
-                source.validTagCombinations());
+                source.getValidTagCombinations());
     }
 
     private static List<Measurement> mapMeasurements(MetricProfile source) {
-        return source.measurements().stream()
-                .map(it -> new Measurement(it.value()))
+        return source.getMeasurements().stream()
+                .map(it -> new Measurement(it.getValue()))
                 .toList();
     }
 }

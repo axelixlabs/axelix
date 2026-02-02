@@ -101,8 +101,12 @@ public final class ServiceInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ServiceInfo that = (ServiceInfo) o;
         return Objects.equals(git, that.git)
                 && Objects.equals(build, that.build)

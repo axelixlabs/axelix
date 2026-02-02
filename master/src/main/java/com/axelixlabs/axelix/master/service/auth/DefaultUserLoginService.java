@@ -50,7 +50,7 @@ public class DefaultUserLoginService implements UserLoginService {
         User user = userProvider.load(username);
 
         // TODO: password should be encoded. We need a password encoder or something
-        if (Objects.equals(user.password(), password)) {
+        if (Objects.equals(user.getPassword(), password)) {
             return jwtEncoderService.generateToken(user);
         } else {
             throw INVALID_CREDENTIALS_EXCEPTION;

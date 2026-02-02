@@ -53,8 +53,12 @@ public final class LoggerGroup {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         LoggerGroup that = (LoggerGroup) o;
         return Objects.equals(configuredLevel, that.configuredLevel) && Objects.equals(members, that.members);
     }

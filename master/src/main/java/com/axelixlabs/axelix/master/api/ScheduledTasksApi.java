@@ -36,10 +36,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
-import com.axelixlabs.axelix.common.api.request.ScheduledTaskCronExpressionModifyRequest;
-import com.axelixlabs.axelix.common.api.request.ScheduledTaskExecuteRequest;
-import com.axelixlabs.axelix.common.api.request.ScheduledTaskIntervalModifyRequest;
-import com.axelixlabs.axelix.common.api.request.ScheduledTaskToggleRequest;
+import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
+import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteRequest;
+import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
+import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;

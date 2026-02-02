@@ -35,6 +35,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 public final class BeansFeed {
 
@@ -45,14 +46,18 @@ public final class BeansFeed {
         this.contexts = contexts;
     }
 
-    public Map<String, Context> contexts() {
+    public Map<String, Context> getContexts() {
         return contexts;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         BeansFeed beansFeed = (BeansFeed) o;
         return Objects.equals(contexts, beansFeed.contexts);
     }
@@ -78,18 +83,22 @@ public final class BeansFeed {
             this.beans = beans;
         }
 
-        public String parentId() {
+        public String getParentId() {
             return parentId;
         }
 
-        public Map<String, Bean> beans() {
+        public Map<String, Bean> getBeans() {
             return beans;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Context context = (Context) o;
             return Objects.equals(parentId, context.parentId) && Objects.equals(beans, context.beans);
         }
@@ -122,6 +131,7 @@ public final class BeansFeed {
         private final List<String> qualifiers;
         private final BeanSource beanSource;
 
+        @JsonCreator
         public Bean(
                 @JsonProperty("scope") String scope,
                 @JsonProperty("type") String type,
@@ -133,7 +143,8 @@ public final class BeansFeed {
                 @JsonProperty("isPrimary") boolean isPrimary,
                 @JsonProperty("isConfigPropsBean") boolean isConfigPropsBean,
                 @JsonProperty("qualifiers") List<String> qualifiers,
-                @JsonDeserialize(using = BeanSourceDeserializer.class) BeanSource beanSource) {
+                @JsonProperty("beanSource") @JsonDeserialize(using = BeanSourceDeserializer.class)
+                        BeanSource beanSource) {
             this.scope = scope;
             this.type = type;
             this.proxyType = proxyType;
@@ -147,28 +158,28 @@ public final class BeansFeed {
             this.beanSource = beanSource;
         }
 
-        public String scope() {
+        public String getScope() {
             return scope;
         }
 
-        public String type() {
+        public String getType() {
             return type;
         }
 
-        public ProxyType proxyType() {
+        public ProxyType getProxyType() {
             return proxyType;
         }
 
-        public Set<String> aliases() {
+        public Set<String> getAliases() {
             return aliases;
         }
 
         @Nullable
-        public String autoConfigurationRef() {
+        public String getAutoConfigurationRef() {
             return autoConfigurationRef;
         }
 
-        public Set<BeanDependency> dependencies() {
+        public Set<BeanDependency> getDependencies() {
             return dependencies;
         }
 
@@ -184,18 +195,22 @@ public final class BeansFeed {
             return isConfigPropsBean;
         }
 
-        public List<String> qualifiers() {
+        public List<String> getQualifiers() {
             return qualifiers;
         }
 
-        public BeanSource beanSource() {
+        public BeanSource getBeanSource() {
             return beanSource;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Bean bean = (Bean) o;
             return isLazyInit == bean.isLazyInit
                     && isPrimary == bean.isPrimary
@@ -263,6 +278,7 @@ public final class BeansFeed {
         private final String name;
         private final boolean isConfigPropsDependency;
 
+        @JsonCreator
         public BeanDependency(
                 @JsonProperty("name") String name,
                 @JsonProperty("isConfigPropsDependency") boolean isConfigPropsDependency) {
@@ -270,7 +286,7 @@ public final class BeansFeed {
             this.isConfigPropsDependency = isConfigPropsDependency;
         }
 
-        public String name() {
+        public String getName() {
             return name;
         }
 
@@ -280,8 +296,12 @@ public final class BeansFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             BeanDependency that = (BeanDependency) o;
             return isConfigPropsDependency == that.isConfigPropsDependency && Objects.equals(name, that.name);
         }
@@ -329,7 +349,9 @@ public final class BeansFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
+            if (this == o) {
+                return true;
+            }
             return o != null && getClass() == o.getClass();
         }
 
@@ -349,11 +371,12 @@ public final class BeansFeed {
 
         private final String factoryBeanName;
 
-        public FactoryBean(String factoryBeanName) {
+        @JsonCreator
+        public FactoryBean(@JsonProperty("factoryBeanName") String factoryBeanName) {
             this.factoryBeanName = factoryBeanName;
         }
 
-        public String factoryBeanName() {
+        public String getFactoryBeanName() {
             return factoryBeanName;
         }
 
@@ -365,8 +388,12 @@ public final class BeansFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             FactoryBean that = (FactoryBean) o;
             return Objects.equals(factoryBeanName, that.factoryBeanName);
         }
@@ -395,7 +422,9 @@ public final class BeansFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
+            if (this == o) {
+                return true;
+            }
             return o != null && getClass() == o.getClass();
         }
 
@@ -421,24 +450,27 @@ public final class BeansFeed {
 
         private final String methodName;
 
+        @JsonCreator
         public BeanMethod(
-                @Nullable String enclosingClassName, @Nullable String enclosingClassFullName, String methodName) {
+                @JsonProperty("enclosingClassName") @Nullable String enclosingClassName,
+                @JsonProperty("enclosingClassFullName") @Nullable String enclosingClassFullName,
+                @JsonProperty("methodName") String methodName) {
             this.enclosingClassName = enclosingClassName;
             this.enclosingClassFullName = enclosingClassFullName;
             this.methodName = methodName;
         }
 
         @Nullable
-        public String enclosingClassName() {
+        public String getEnclosingClassName() {
             return enclosingClassName;
         }
 
         @Nullable
-        public String enclosingClassFullName() {
+        public String getEnclosingClassFullName() {
             return enclosingClassFullName;
         }
 
-        public String methodName() {
+        public String getMethodName() {
             return methodName;
         }
 
@@ -450,8 +482,12 @@ public final class BeansFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             BeanMethod that = (BeanMethod) o;
             return Objects.equals(enclosingClassName, that.enclosingClassName)
                     && Objects.equals(enclosingClassFullName, that.enclosingClassFullName)
@@ -492,7 +528,9 @@ public final class BeansFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
+            if (this == o) {
+                return true;
+            }
             return o != null && getClass() == o.getClass();
         }
 

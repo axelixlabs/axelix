@@ -112,17 +112,17 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
         ConfigPropsFeed configPropsFeed = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         // then.
-        Map<String, ConfigPropsFeed.Context> context = configPropsFeed.contexts();
+        Map<String, ConfigPropsFeed.Context> context = configPropsFeed.getContexts();
 
         // bean1
         ConfigPropsFeed.Bean bean1 =
                 getBeanByName(context, "org.springframework.boot.actuate.autoconfigure.endpoint.web.Bean1");
 
         // bean1 -> prefix
-        assertThat(bean1.prefix()).isEqualTo("management.endpoints.web.cors");
+        assertThat(bean1.getPrefix()).isEqualTo("management.endpoints.web.cors");
 
         // bean1 -> properties
-        assertThat(bean1.properties())
+        assertThat(bean1.getProperties())
                 .containsOnly(
                         new KeyValue("allowedOrigins", null),
                         new KeyValue("maxAge", "PT30M"),
@@ -132,7 +132,7 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
                         new KeyValue("allowedMethods", null));
 
         // bean1 -> inputs
-        assertThat(bean1.inputs())
+        assertThat(bean1.getInputs())
                 .containsOnly(
                         new KeyValue("allowedOrigins", null),
                         new KeyValue("maxAge", null),
@@ -145,10 +145,10 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
         ConfigPropsFeed.Bean bean2 = getBeanByName(context, "org.springframework.boot.autoconfigure.web.Bean2");
 
         // bean2 -> prefix
-        assertThat(bean2.prefix()).isEqualTo("spring.web");
+        assertThat(bean2.getPrefix()).isEqualTo("spring.web");
 
         // bean2 -> properties
-        assertThat(bean2.properties())
+        assertThat(bean2.getProperties())
                 .containsOnly(
                         new KeyValue("localeResolver", "ACCEPT_HEADER"),
                         new KeyValue("resources.staticLocations[0]", "classpath:/META-INF/resources/"),
@@ -166,7 +166,7 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
                         new KeyValue("resources.cache.useLastModified", "true"));
 
         // bean2 -> inputs
-        assertThat(bean2.inputs())
+        assertThat(bean2.getInputs())
                 .containsOnly(
                         new KeyValue("localeResolver", null),
                         new KeyValue("resources.staticLocations[0]", null),
@@ -186,7 +186,7 @@ public class ConfigPropsJacksonMessageDeserializationStrategyTest {
 
     private static ConfigPropsFeed.Bean getBeanByName(Map<String, ConfigPropsFeed.Context> context, String beanName) {
         return context.values().stream()
-                .map(ConfigPropsFeed.Context::beans)
+                .map(ConfigPropsFeed.Context::getBeans)
                 .findFirst()
                 .map(beansMap -> beansMap.get(beanName))
                 .get();

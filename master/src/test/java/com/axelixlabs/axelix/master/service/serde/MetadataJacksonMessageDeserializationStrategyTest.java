@@ -48,6 +48,6 @@ class MetadataJacksonMessageDeserializationStrategyTest {
         ServiceMetadata metadata = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         assertThat(metadata).isNotNull();
-        assertThat(metadata.version()).isEqualTo("1.0.0-SNAPSHOT");
+        assertThat(metadata.getVersion()).isEqualTo("1.0.0-SNAPSHOT");
     }
 }

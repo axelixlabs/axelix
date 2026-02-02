@@ -1,2 +1,0 @@
-org.springframework.context.ApplicationListener=\
-com.axelixlabs.axelix.sbs.spring.context.RestartListener

@@ -117,53 +117,54 @@ public class ScheduledTasksJacksonMessageDeserializationStrategyTest {
         ServiceScheduledTasks serviceScheduledTasks = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         // CronTask
-        ServiceScheduledTasks.CronTask cron = serviceScheduledTasks.cron().get(0);
-        assertThat(cron.enabled()).isTrue();
-        assertThat(cron.runnable().target())
+        ServiceScheduledTasks.CronTask cron = serviceScheduledTasks.getCron().get(0);
+        assertThat(cron.isEnabled()).isTrue();
+        assertThat(cron.getRunnable().getTarget())
                 .isEqualTo("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive");
-        assertThat(cron.expression()).isEqualTo("0 0 0/3 1/1 * ?");
-        assertThat(cron.nextExecution().time()).isEqualTo("2025-10-14T06:33:49.999631800Z");
-        assertThat(cron.lastExecution()).isNull();
+        assertThat(cron.getExpression()).isEqualTo("0 0 0/3 1/1 * ?");
+        assertThat(cron.getNextExecution().getTime()).isEqualTo("2025-10-14T06:33:49.999631800Z");
+        assertThat(cron.getLastExecution()).isNull();
 
         // FixedDelayTask
         ServiceScheduledTasks.FixedDelayTask fixedDelay =
-                serviceScheduledTasks.fixedDelay().get(0);
-        assertThat(fixedDelay.enabled()).isTrue();
-        assertThat(fixedDelay.runnable().target())
+                serviceScheduledTasks.getFixedDelay().get(0);
+        assertThat(fixedDelay.isEnabled()).isTrue();
+        assertThat(fixedDelay.getRunnable().getTarget())
                 .isEqualTo("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask");
-        assertThat(fixedDelay.interval()).isEqualTo(2000);
-        assertThat(fixedDelay.initialDelay()).isEqualTo(0);
-        assertThat(fixedDelay.nextExecution().time()).isEqualTo("2025-10-14T06:33:49.063630700Z");
-        assertThat(fixedDelay.lastExecution().status()).isEqualTo("SUCCESS");
-        assertThat(fixedDelay.lastExecution().time()).isEqualTo("2025-10-14T06:33:47.001570800Z");
-        assertThat(fixedDelay.lastExecution().exception()).isNull();
+        assertThat(fixedDelay.getInterval()).isEqualTo(2000);
+        assertThat(fixedDelay.getInitialDelay()).isEqualTo(0);
+        assertThat(fixedDelay.getNextExecution().getTime()).isEqualTo("2025-10-14T06:33:49.063630700Z");
+        assertThat(fixedDelay.getLastExecution().getStatus()).isEqualTo("SUCCESS");
+        assertThat(fixedDelay.getLastExecution().getTime()).isEqualTo("2025-10-14T06:33:47.001570800Z");
+        assertThat(fixedDelay.getLastExecution().getException()).isNull();
 
         // FixedRateTask
         ServiceScheduledTasks.FixedRateTask fixedRate =
-                serviceScheduledTasks.fixedRate().get(0);
-        assertThat(fixedRate.enabled()).isFalse();
-        assertThat(fixedRate.runnable().target())
+                serviceScheduledTasks.getFixedRate().get(0);
+        assertThat(fixedRate.isEnabled()).isFalse();
+        assertThat(fixedRate.getRunnable().getTarget())
                 .isEqualTo("org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
-        assertThat(fixedRate.interval()).isEqualTo(2000);
-        assertThat(fixedRate.initialDelay()).isEqualTo(100);
-        assertThat(fixedRate.nextExecution().time()).isEqualTo("2025-10-14T06:33:50.086630700Z");
-        assertThat(fixedRate.lastExecution().time()).isEqualTo("2025-10-14T06:33:48.092631800Z");
-        assertThat(fixedRate.lastExecution().status()).isEqualTo("ERROR");
-        assertThat(fixedRate.lastExecution().exception()).isNull();
+        assertThat(fixedRate.getInterval()).isEqualTo(2000);
+        assertThat(fixedRate.getInitialDelay()).isEqualTo(100);
+        assertThat(fixedRate.getNextExecution().getTime()).isEqualTo("2025-10-14T06:33:50.086630700Z");
+        assertThat(fixedRate.getLastExecution().getTime()).isEqualTo("2025-10-14T06:33:48.092631800Z");
+        assertThat(fixedRate.getLastExecution().getStatus()).isEqualTo("ERROR");
+        assertThat(fixedRate.getLastExecution().getException()).isNull();
 
         // CustomTask
-        ServiceScheduledTasks.CustomTask custom = serviceScheduledTasks.custom().get(0);
-        assertThat(custom.enabled()).isFalse();
-        assertThat(custom.trigger())
+        ServiceScheduledTasks.CustomTask custom =
+                serviceScheduledTasks.getCustom().get(0);
+        assertThat(custom.isEnabled()).isFalse();
+        assertThat(custom.getTrigger())
                 .isEqualTo(
                         "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$CustomTrigger@4323cbe0");
-        assertThat(custom.runnable().target())
+        assertThat(custom.getRunnable().getTarget())
                 .isEqualTo(
                         "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634");
-        assertThat(custom.nextExecution().time()).isEqualTo("2025-10-14T06:33:50.086630700Z");
-        assertThat(custom.lastExecution().status()).isEqualTo("ERROR");
-        assertThat(custom.lastExecution().time()).isEqualTo("2025-09-18T15:03:34.132500256Z");
-        assertThat(custom.lastExecution().exception().type()).isEqualTo("java.lang.IllegalStateException");
-        assertThat(custom.lastExecution().exception().message()).isEqualTo("Failed while running custom task");
+        assertThat(custom.getNextExecution().getTime()).isEqualTo("2025-10-14T06:33:50.086630700Z");
+        assertThat(custom.getLastExecution().getStatus()).isEqualTo("ERROR");
+        assertThat(custom.getLastExecution().getTime()).isEqualTo("2025-09-18T15:03:34.132500256Z");
+        assertThat(custom.getLastExecution().getException().getType()).isEqualTo("java.lang.IllegalStateException");
+        assertThat(custom.getLastExecution().getException().getMessage()).isEqualTo("Failed while running custom task");
     }
 }

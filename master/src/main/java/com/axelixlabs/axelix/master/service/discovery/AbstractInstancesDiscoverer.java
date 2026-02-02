@@ -118,7 +118,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     }
 
     private boolean isCompatibleVersion(@NonNull InstanceIntermediateProfile profile) {
-        if (profile.metadata().version().equals(axelixVersionDiscoverer.getVersion())) {
+        if (profile.metadata().getVersion().equals(axelixVersionDiscoverer.getVersion())) {
             return true;
         } else {
             logger.warn(

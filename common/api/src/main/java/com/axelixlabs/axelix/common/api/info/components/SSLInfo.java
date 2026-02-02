@@ -44,8 +44,12 @@ public final class SSLInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         SSLInfo sslInfo = (SSLInfo) o;
         return Objects.equals(bundles, sslInfo.bundles);
     }
@@ -85,8 +89,12 @@ public final class SSLInfo {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Bundles bundles = (Bundles) o;
             return Objects.equals(name, bundles.name) && Objects.equals(certificateChains, bundles.certificateChains);
         }
@@ -126,8 +134,12 @@ public final class SSLInfo {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
                 CertificateChains that = (CertificateChains) o;
                 return Objects.equals(alias, that.alias) && Objects.equals(certificates, that.certificates);
             }
@@ -210,8 +222,12 @@ public final class SSLInfo {
 
                 @Override
                 public boolean equals(Object o) {
-                    if (this == o) return true;
-                    if (o == null || getClass() != o.getClass()) return false;
+                    if (this == o) {
+                        return true;
+                    }
+                    if (o == null || getClass() != o.getClass()) {
+                        return false;
+                    }
                     Certificates that = (Certificates) o;
                     return Objects.equals(version, that.version)
                             && Objects.equals(issuer, that.issuer)
@@ -279,8 +295,12 @@ public final class SSLInfo {
 
                     @Override
                     public boolean equals(Object o) {
-                        if (this == o) return true;
-                        if (o == null || getClass() != o.getClass()) return false;
+                        if (this == o) {
+                            return true;
+                        }
+                        if (o == null || getClass() != o.getClass()) {
+                            return false;
+                        }
                         Validity validity = (Validity) o;
                         return Objects.equals(status, validity.status);
                     }

@@ -59,56 +59,59 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
     void shouldLoadAdminUserWithRolesAndAuthorities() {
         String adminUser = "adminUser";
         User user = userProvider.load(adminUser);
-        assertThat(user.username()).isNotNull().isEqualTo(adminUser);
-        assertThat(user.roles()).hasSize(1);
+        assertThat(user.getUsername()).isNotNull().isEqualTo(adminUser);
+        assertThat(user.getRoles()).hasSize(1);
 
-        assertThat(user.roles())
-                .filteredOn(role -> role.name().equals("ROLE_ADMIN"))
+        assertThat(user.getRoles())
+                .filteredOn(role -> role.getName().equals("ROLE_ADMIN"))
                 .hasSize(1)
                 .first()
                 .satisfies(role ->
-                        assertThat(role.authorities()).hasSize(1).containsOnly(DefaultAuthority.PROFILE_MANAGEMENT));
+                        assertThat(role.getAuthorities()).hasSize(1).containsOnly(DefaultAuthority.PROFILE_MANAGEMENT));
 
         // ROLE_ADMIN -> ROLE_ENGINEER, ROLE_CACHE_DISPATCHER
-        Role adminRole = user.roles().iterator().next();
-        Set<Role> adminComponents = adminRole.components();
+        Role adminRole = user.getRoles().iterator().next();
+        Set<Role> adminComponents = adminRole.getComponents();
 
         String roleEngineer = "ROLE_ENGINEER";
         String roleCacheDispatcher = "ROLE_CACHE_DISPATCHER";
 
-        assertThat(adminComponents).hasSize(2).extracting(Role::name).containsOnly(roleEngineer, roleCacheDispatcher);
+        assertThat(adminComponents)
+                .hasSize(2)
+                .extracting(Role::getName)
+                .containsOnly(roleEngineer, roleCacheDispatcher);
 
         // ROLE_ADMIN -> ROLE_ENGINEER
         Role engineerRole = adminComponents.stream()
-                .filter(role -> role.name().equals(roleEngineer))
+                .filter(role -> role.getName().equals(roleEngineer))
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(engineerRole.authorities()).hasSize(1).containsOnly(DefaultAuthority.ENV);
+        assertThat(engineerRole.getAuthorities()).hasSize(1).containsOnly(DefaultAuthority.ENV);
 
         // ROLE_ADMIN -> ROLE_ENGINEER -> ROLE_USER
-        assertThat(engineerRole.components())
-                .filteredOn(role -> role.name().equals("ROLE_USER"))
+        assertThat(engineerRole.getComponents())
+                .filteredOn(role -> role.getName().equals("ROLE_USER"))
                 .hasSize(1)
                 .first()
-                .satisfies(role -> assertThat(role.authorities()).hasSize(1).containsOnly(DefaultAuthority.INFO))
-                .satisfies(role -> assertThat(role.components()).isEmpty());
+                .satisfies(role -> assertThat(role.getAuthorities()).hasSize(1).containsOnly(DefaultAuthority.INFO))
+                .satisfies(role -> assertThat(role.getComponents()).isEmpty());
 
         // ROLE_ADMIN -> ROLE_CACHE_DISPATCHER
         Role cacheDispatcherRole = adminComponents.stream()
-                .filter(role -> role.name().equals(roleCacheDispatcher))
+                .filter(role -> role.getName().equals(roleCacheDispatcher))
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(cacheDispatcherRole.authorities()).hasSize(1).containsOnly(DefaultAuthority.CACHE_DISPATCHER);
+        assertThat(cacheDispatcherRole.getAuthorities()).hasSize(1).containsOnly(DefaultAuthority.CACHE_DISPATCHER);
 
         // ROLE_ADMIN -> ROLE_CACHE_DISPATCHER -> ROLE_CACHE_ACCESS
-        assertThat(cacheDispatcherRole.components())
-                .filteredOn(role -> role.name().equals("ROLE_CACHE_ACCESS"))
+        assertThat(cacheDispatcherRole.getComponents())
+                .filteredOn(role -> role.getName().equals("ROLE_CACHE_ACCESS"))
                 .hasSize(1)
                 .first()
-                .satisfies(role -> assertThat(role.authorities()).hasSize(1).containsOnly(DefaultAuthority.CACHES))
-                .satisfies(role -> assertThat(role.components()).isEmpty());
+                .satisfies(role -> assertThat(role.getAuthorities()).hasSize(1).containsOnly(DefaultAuthority.CACHES))
+                .satisfies(role -> assertThat(role.getComponents()).isEmpty());
     }
 
     @Test
@@ -116,12 +119,12 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
         String basicUser = "basicUser";
         User user = userProvider.load(basicUser);
 
-        assertThat(user.username()).isNotNull().isEqualTo(basicUser);
-        assertThat(user.roles())
+        assertThat(user.getUsername()).isNotNull().isEqualTo(basicUser);
+        assertThat(user.getRoles())
                 .hasSize(1)
-                .filteredOn(role -> role.name().equals("ROLE_BEANS_ACCESS"))
+                .filteredOn(role -> role.getName().equals("ROLE_BEANS_ACCESS"))
                 .first()
-                .satisfies(role -> assertThat(role.authorities()).containsOnly(DefaultAuthority.BEANS));
+                .satisfies(role -> assertThat(role.getAuthorities()).containsOnly(DefaultAuthority.BEANS));
     }
 
     @Test
@@ -129,12 +132,12 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
         String nonexistentAuthorityUser = "nonexistentAuthorityUser";
         User user = userProvider.load(nonexistentAuthorityUser);
 
-        assertThat(user.username()).isNotNull().isEqualTo(nonexistentAuthorityUser);
-        assertThat(user.roles())
+        assertThat(user.getUsername()).isNotNull().isEqualTo(nonexistentAuthorityUser);
+        assertThat(user.getRoles())
                 .hasSize(1)
-                .filteredOn(role -> role.name().equals("ROLE_WITH_NONEXISTENT_AUTHORITY"))
+                .filteredOn(role -> role.getName().equals("ROLE_WITH_NONEXISTENT_AUTHORITY"))
                 .first()
-                .satisfies(role -> assertThat(role.authorities()).isEmpty());
+                .satisfies(role -> assertThat(role.getAuthorities()).isEmpty());
     }
 
     @Test

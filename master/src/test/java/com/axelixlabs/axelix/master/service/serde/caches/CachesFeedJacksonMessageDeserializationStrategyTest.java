@@ -85,51 +85,51 @@ public class CachesFeedJacksonMessageDeserializationStrategyTest {
         CachesFeed caches = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         // ServiceCaches -> CacheManagers
-        List<CachesFeed.CacheManager> cacheManagerList = caches.cacheManagers();
+        List<CachesFeed.CacheManager> cacheManagerList = caches.getCacheManagers();
         assertThat(cacheManagerList).hasSize(2);
 
         CachesFeed.CacheManager another = cacheManagerList.stream()
-                .filter(cm -> "anotherCacheManager".equals(cm.name()))
+                .filter(cm -> "anotherCacheManager".equals(cm.getName()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(another.caches()).hasSize(1);
+        assertThat(another.getCaches()).hasSize(1);
 
         CachesFeed.CacheManager main = cacheManagerList.stream()
-                .filter(cm -> "cacheManager".equals(cm.name()))
+                .filter(cm -> "cacheManager".equals(cm.getName()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(main.caches()).hasSize(2);
+        assertThat(main.getCaches()).hasSize(2);
 
         // "anotherCacheManager" -> Caches -> "countries"
-        assertThat(another.caches()).hasSize(1);
-        CachesFeed.Cache anotherCountries = another.caches().get(0);
-        assertThat(anotherCountries.name()).isEqualTo("countries");
-        assertThat(anotherCountries.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
-        assertThat(anotherCountries.hitsCount()).isEqualTo(15);
-        assertThat(anotherCountries.missesCount()).isEqualTo(2);
-        assertThat(anotherCountries.estimatedEntrySize()).isEqualTo(10);
-        assertThat(anotherCountries.enabled()).isFalse();
+        assertThat(another.getCaches()).hasSize(1);
+        CachesFeed.Cache anotherCountries = another.getCaches().get(0);
+        assertThat(anotherCountries.getName()).isEqualTo("countries");
+        assertThat(anotherCountries.getTarget()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        assertThat(anotherCountries.getHitsCount()).isEqualTo(15);
+        assertThat(anotherCountries.getMissesCount()).isEqualTo(2);
+        assertThat(anotherCountries.getEstimatedEntrySize()).isEqualTo(10);
+        assertThat(anotherCountries.isEnabled()).isFalse();
 
         // "cacheManager" -> Caches -> "countries"
-        CachesFeed.Cache mainCountries = main.caches().stream()
-                .filter(c -> "countries".equals(c.name()))
+        CachesFeed.Cache mainCountries = main.getCaches().stream()
+                .filter(c -> "countries".equals(c.getName()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(mainCountries.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
-        assertThat(mainCountries.hitsCount()).isEqualTo(35);
-        assertThat(mainCountries.missesCount()).isEqualTo(5);
-        assertThat(mainCountries.estimatedEntrySize()).isEqualTo(10);
-        assertThat(mainCountries.enabled()).isFalse();
+        assertThat(mainCountries.getTarget()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        assertThat(mainCountries.getHitsCount()).isEqualTo(35);
+        assertThat(mainCountries.getMissesCount()).isEqualTo(5);
+        assertThat(mainCountries.getEstimatedEntrySize()).isEqualTo(10);
+        assertThat(mainCountries.isEnabled()).isFalse();
 
         // "cacheManager" -> Caches -> "cities"
-        CachesFeed.Cache mainCities = main.caches().stream()
-                .filter(c -> "cities".equals(c.name()))
+        CachesFeed.Cache mainCities = main.getCaches().stream()
+                .filter(c -> "cities".equals(c.getName()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(mainCities.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
-        assertThat(mainCities.hitsCount()).isEqualTo(25);
-        assertThat(mainCities.missesCount()).isEqualTo(5);
-        assertThat(mainCities.estimatedEntrySize()).isEqualTo(6);
-        assertThat(mainCities.enabled()).isFalse();
+        assertThat(mainCities.getTarget()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        assertThat(mainCities.getHitsCount()).isEqualTo(25);
+        assertThat(mainCities.getMissesCount()).isEqualTo(5);
+        assertThat(mainCities.getEstimatedEntrySize()).isEqualTo(6);
+        assertThat(mainCities.isEnabled()).isFalse();
     }
 }

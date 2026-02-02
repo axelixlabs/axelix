@@ -96,12 +96,12 @@ public class MetricsGroupsJacksonDeserializationStrategyTest {
         MetricsGroupsFeed metricsGroups = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         // then.
-        assertThat(metricsGroups.metricsGroups()).isNotEmpty().hasSize(3);
+        assertThat(metricsGroups.getMetricsGroups()).isNotEmpty().hasSize(3);
 
         // jvm
         MetricsGroup jvmGroup = getMetricsGroup(metricsGroups, "jvm");
-        assertThat(jvmGroup.groupName()).isEqualTo("jvm");
-        assertThat(jvmGroup.metrics())
+        assertThat(jvmGroup.getGroupName()).isEqualTo("jvm");
+        assertThat(jvmGroup.getMetrics())
                 .containsOnly(
                         new MetricDescription(
                                 "jvm.gc.memory.allocated",
@@ -113,8 +113,8 @@ public class MetricsGroupsJacksonDeserializationStrategyTest {
 
         // process
         MetricsGroup processGroup = getMetricsGroup(metricsGroups, "process");
-        assertThat(processGroup.groupName()).isEqualTo("process");
-        assertThat(processGroup.metrics())
+        assertThat(processGroup.getGroupName()).isEqualTo("process");
+        assertThat(processGroup.getMetrics())
                 .containsOnly(
                         new MetricDescription(
                                 "process.cpu.time", "The \"cpu time\" used by the Java Virtual Machine process"),
@@ -123,16 +123,16 @@ public class MetricsGroupsJacksonDeserializationStrategyTest {
 
         // tomcat
         MetricsGroup tomcatGroup = getMetricsGroup(metricsGroups, "tomcat");
-        assertThat(tomcatGroup.groupName()).isEqualTo("tomcat");
-        assertThat(tomcatGroup.metrics())
+        assertThat(tomcatGroup.getGroupName()).isEqualTo("tomcat");
+        assertThat(tomcatGroup.getMetrics())
                 .containsOnly(
                         new MetricDescription("tomcat.sessions.active.current", null),
                         new MetricDescription("tomcat.sessions.active.max", null));
     }
 
     private MetricsGroup getMetricsGroup(MetricsGroupsFeed response, String groupName) {
-        return response.metricsGroups().stream()
-                .filter(group -> group.groupName().equals(groupName))
+        return response.getMetricsGroups().stream()
+                .filter(group -> group.getGroupName().equals(groupName))
                 .findFirst()
                 .get();
     }

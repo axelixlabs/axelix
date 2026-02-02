@@ -38,9 +38,9 @@ public class MetricsGroupsFeedConverter implements Converter<MetricsGroupsFeed, 
 
     @Override
     public @NonNull MetricsGroupsFeedResponse convertInternal(@NonNull MetricsGroupsFeed source) {
-        List<MetricsGroup> metricsGroups = source.metricsGroups().stream()
-                .map(metricsGroup ->
-                        new MetricsGroup(metricsGroup.groupName(), convertMetricDescription(metricsGroup.metrics())))
+        List<MetricsGroup> metricsGroups = source.getMetricsGroups().stream()
+                .map(metricsGroup -> new MetricsGroup(
+                        metricsGroup.getGroupName(), convertMetricDescription(metricsGroup.getMetrics())))
                 .toList();
 
         return new MetricsGroupsFeedResponse(metricsGroups);
@@ -49,7 +49,7 @@ public class MetricsGroupsFeedConverter implements Converter<MetricsGroupsFeed, 
     private List<MetricsGroupsFeedResponse.MetricsGroup.MetricDescription> convertMetricDescription(
             List<MetricsGroupsFeed.MetricsGroup.MetricDescription> metrics) {
         return metrics.stream()
-                .map(metric -> new MetricsGroup.MetricDescription(metric.metricName(), metric.description()))
+                .map(metric -> new MetricsGroup.MetricDescription(metric.getMetricName(), metric.getDescription()))
                 .toList();
     }
 }

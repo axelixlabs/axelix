@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.common.api;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -34,24 +36,29 @@ public final class KeyValue {
     @Nullable
     private final String value;
 
-    public KeyValue(String key, @Nullable String value) {
+    @JsonCreator
+    public KeyValue(@JsonProperty("key") String key, @JsonProperty("value") @Nullable String value) {
         this.key = key;
         this.value = value;
     }
 
-    public String key() {
+    public String getKey() {
         return key;
     }
 
     @Nullable
-    public String value() {
+    public String getValue() {
         return value;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         KeyValue keyValue = (KeyValue) o;
         return Objects.equals(key, keyValue.key) && Objects.equals(value, keyValue.value);
     }

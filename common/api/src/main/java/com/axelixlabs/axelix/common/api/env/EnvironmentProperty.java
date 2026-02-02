@@ -74,8 +74,12 @@ public final class EnvironmentProperty {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         EnvironmentProperty that = (EnvironmentProperty) o;
         return Objects.equals(property, that.property)
                 && Objects.equals(activeProfiles, that.activeProfiles)
@@ -107,7 +111,7 @@ public final class EnvironmentProperty {
         private final String source;
         private final String value;
 
-        public Property(String source, String value) {
+        public Property(@JsonProperty("source") String source, @JsonProperty("value") String value) {
             this.source = source;
             this.value = value;
         }
@@ -122,8 +126,12 @@ public final class EnvironmentProperty {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Property property = (Property) o;
             return Objects.equals(source, property.source) && Objects.equals(value, property.value);
         }
@@ -163,8 +171,12 @@ public final class EnvironmentProperty {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             SourceEntry that = (SourceEntry) o;
             return Objects.equals(sourceName, that.sourceName) && Objects.equals(property, that.property);
         }

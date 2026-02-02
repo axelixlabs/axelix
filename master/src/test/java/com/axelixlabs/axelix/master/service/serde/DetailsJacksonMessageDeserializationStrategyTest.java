@@ -84,33 +84,33 @@ public class DetailsJacksonMessageDeserializationStrategyTest {
         // when.
         InstanceDetails instanceDetails = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
-        GitDetails git = instanceDetails.git();
-        assertThat(git.commitShaShort()).isEqualTo("7a663cb");
-        assertThat(git.branch()).isEqualTo("local/local-test");
-        assertThat(git.commitAuthor().name()).isEqualTo("Mikhail Polivakha");
-        assertThat(git.commitAuthor().email()).isEqualTo("mikhailpolivakha@github.com");
-        assertThat(git.commitTimestamp()).isEqualTo("2025-11-23T02:25:22Z");
+        GitDetails git = instanceDetails.getGit();
+        assertThat(git.getCommitShaShort()).isEqualTo("7a663cb");
+        assertThat(git.getBranch()).isEqualTo("local/local-test");
+        assertThat(git.getCommitAuthor().getName()).isEqualTo("Mikhail Polivakha");
+        assertThat(git.getCommitAuthor().getEmail()).isEqualTo("mikhailpolivakha@github.com");
+        assertThat(git.getCommitTimestamp()).isEqualTo("2025-11-23T02:25:22Z");
 
-        SpringDetails spring = instanceDetails.spring();
-        assertThat(spring.springBootVersion()).isEqualTo("3.5.0");
-        assertThat(spring.springFrameworkVersion()).isEqualTo("7.0");
-        assertThat(spring.springCloudVersion()).isEqualTo("2023.0.1");
+        SpringDetails spring = instanceDetails.getSpring();
+        assertThat(spring.getSpringBootVersion()).isEqualTo("3.5.0");
+        assertThat(spring.getSpringFrameworkVersion()).isEqualTo("7.0");
+        assertThat(spring.getSpringCloudVersion()).isEqualTo("2023.0.1");
 
-        RuntimeDetails runtime = instanceDetails.runtime();
-        assertThat(runtime.javaVersion()).isEqualTo("17.0.16");
-        assertThat(runtime.jdkVendor()).isEqualTo("Corretto-17.0.16.8.1");
-        assertThat(runtime.garbageCollector()).isEqualTo("G1 GC");
-        assertThat(runtime.kotlinVersion()).isEqualTo("1.9.0");
+        RuntimeDetails runtime = instanceDetails.getRuntime();
+        assertThat(runtime.getJavaVersion()).isEqualTo("17.0.16");
+        assertThat(runtime.getJdkVendor()).isEqualTo("Corretto-17.0.16.8.1");
+        assertThat(runtime.getGarbageCollector()).isEqualTo("G1 GC");
+        assertThat(runtime.getKotlinVersion()).isEqualTo("1.9.0");
 
-        BuildDetails build = instanceDetails.build();
-        assertThat(build.artifact()).isEqualTo("spring-petclinic");
-        assertThat(build.version()).isEqualTo("3.5.0-SNAPSHOT");
-        assertThat(build.group()).isEqualTo("org.springframework.samples");
-        assertThat(build.time()).isEqualTo("2025-10-29T15:10:54.770Z");
+        BuildDetails build = instanceDetails.getBuild();
+        assertThat(build.getArtifact()).isEqualTo("spring-petclinic");
+        assertThat(build.getVersion()).isEqualTo("3.5.0-SNAPSHOT");
+        assertThat(build.getGroup()).isEqualTo("org.springframework.samples");
+        assertThat(build.getTime()).isEqualTo("2025-10-29T15:10:54.770Z");
 
-        OsDetails os = instanceDetails.os();
-        assertThat(os.name()).isEqualTo("Windows 10");
-        assertThat(os.version()).isEqualTo("10.0");
-        assertThat(os.arch()).isEqualTo("amd64");
+        OsDetails os = instanceDetails.getOs();
+        assertThat(os.getName()).isEqualTo("Windows 10");
+        assertThat(os.getVersion()).isEqualTo("10.0");
+        assertThat(os.getArch()).isEqualTo("amd64");
     }
 }

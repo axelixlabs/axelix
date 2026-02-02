@@ -41,24 +41,28 @@ public final class DefaultUser implements User {
     }
 
     @Override
-    public String username() {
+    public String getUsername() {
         return username;
     }
 
     @Override
-    public String password() {
+    public String getPassword() {
         return password;
     }
 
     @Override
-    public Set<Role> roles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         DefaultUser that = (DefaultUser) o;
         return Objects.equals(username, that.username)
                 && Objects.equals(password, that.password)

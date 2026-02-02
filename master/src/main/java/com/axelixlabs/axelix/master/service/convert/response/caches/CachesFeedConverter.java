@@ -39,7 +39,7 @@ public class CachesFeedConverter implements Converter<CachesFeed, CachesResponse
 
     @Override
     public @NonNull CachesResponse convertInternal(@NonNull CachesFeed source) {
-        if (!source.cacheManagers().isEmpty()) {
+        if (!source.getCacheManagers().isEmpty()) {
             return new CachesResponse(convertCacheManager(source));
         }
 
@@ -47,15 +47,20 @@ public class CachesFeedConverter implements Converter<CachesFeed, CachesResponse
     }
 
     private List<CacheManagers> convertCacheManager(CachesFeed source) {
-        return source.cacheManagers().stream()
-                .map(cm -> new CacheManagers(cm.name(), convertCache(cm.caches())))
+        return source.getCacheManagers().stream()
+                .map(cm -> new CacheManagers(cm.getName(), convertCache(cm.getCaches())))
                 .toList();
     }
 
     private List<Caches> convertCache(List<CachesFeed.Cache> caches) {
         return caches.stream()
                 .map(c -> new Caches(
-                        c.name(), c.target(), c.hitsCount(), c.missesCount(), c.estimatedEntrySize(), c.enabled()))
+                        c.getName(),
+                        c.getTarget(),
+                        c.getHitsCount(),
+                        c.getMissesCount(),
+                        c.getEstimatedEntrySize(),
+                        c.isEnabled()))
                 .toList();
     }
 }

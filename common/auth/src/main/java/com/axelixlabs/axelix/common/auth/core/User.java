@@ -21,7 +21,7 @@ import java.util.Set;
 
 /**
  * SPI interface of a User. The user, from a conceptual perspective, is
- * identified by his/her {@link #username()} and a set of {@link #roles()}
+ * identified by his/her {@link #getUsername()} and a set of {@link #getRoles()}
  * that are assigned to him/her.
  *
  * @since 16.07.25
@@ -33,15 +33,15 @@ public interface User {
     /**
      * Username of the given user.
      */
-    String username();
+    String getUsername();
 
     /**
      * Password of the given user.
      */
-    String password();
+    String getPassword();
 
     /**
      * Set of {@link Role roles} that are assigned to this User.
      */
-    Set<Role> roles();
+    Set<Role> getRoles();
 }

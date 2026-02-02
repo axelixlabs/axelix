@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -41,14 +42,18 @@ public final class ConfigPropsFeed {
         this.contexts = contexts;
     }
 
-    public Map<String, Context> contexts() {
+    public Map<String, Context> getContexts() {
         return contexts;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ConfigPropsFeed that = (ConfigPropsFeed) o;
         return Objects.equals(contexts, that.contexts);
     }
@@ -83,18 +88,22 @@ public final class ConfigPropsFeed {
             this.parentId = parentId;
         }
 
-        public Map<String, Bean> beans() {
+        public Map<String, Bean> getBeans() {
             return beans;
         }
 
-        public String parentId() {
+        public String getParentId() {
             return parentId;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Context context = (Context) o;
             return Objects.equals(beans, context.beans) && Objects.equals(parentId, context.parentId);
         }
@@ -128,6 +137,7 @@ public final class ConfigPropsFeed {
          *                   — which value was applied and from which source
          *                   — to configure a specific property.
          */
+        @JsonCreator
         public Bean(
                 @JsonProperty("prefix") String prefix,
                 @JsonProperty("properties") List<KeyValue> properties,
@@ -137,22 +147,26 @@ public final class ConfigPropsFeed {
             this.inputs = inputs;
         }
 
-        public String prefix() {
+        public String getPrefix() {
             return prefix;
         }
 
-        public List<KeyValue> properties() {
+        public List<KeyValue> getProperties() {
             return properties;
         }
 
-        public List<KeyValue> inputs() {
+        public List<KeyValue> getInputs() {
             return inputs;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Bean bean = (Bean) o;
             return Objects.equals(prefix, bean.prefix)
                     && Objects.equals(properties, bean.properties)

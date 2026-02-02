@@ -51,8 +51,8 @@ public class SingleCacheJacksonMessageDeserializationStrategyTest {
         SingleCache cache = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
         // then
-        assertThat(cache.name()).isEqualTo("cities");
-        assertThat(cache.target()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
-        assertThat(cache.cacheManager()).isEqualTo("cacheManager");
+        assertThat(cache.getName()).isEqualTo("cities");
+        assertThat(cache.getTarget()).isEqualTo("java.util.concurrent.ConcurrentHashMap");
+        assertThat(cache.getCacheManager()).isEqualTo("cacheManager");
     }
 }

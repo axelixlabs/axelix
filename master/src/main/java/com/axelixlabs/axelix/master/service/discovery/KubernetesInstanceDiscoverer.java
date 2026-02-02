@@ -71,16 +71,16 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
             return new Instance(
                     InstanceId.of(k8sInstance.getInstanceId()),
                     k8sInstance.podName(),
-                    profile.metadata().serviceVersion(),
-                    profile.metadata().versions().java(),
-                    profile.metadata().versions().springBoot(),
-                    profile.metadata().versions().springFramework(),
-                    profile.metadata().versions().kotlin(),
-                    profile.metadata().jdkVendor(),
-                    profile.metadata().commitShortSha(),
+                    profile.metadata().getServiceVersion(),
+                    profile.metadata().getSoftwareVersions().getJava(),
+                    profile.metadata().getSoftwareVersions().getSpringBoot(),
+                    profile.metadata().getSoftwareVersions().getSpringFramework(),
+                    profile.metadata().getSoftwareVersions().getKotlin(),
+                    profile.metadata().getJdkVendor(),
+                    profile.metadata().getCommitShortSha(),
                     deployedAt,
                     mapStatus(profile),
-                    new MemoryUsage(profile.metadata().memoryDetails().heap()),
+                    new MemoryUsage(profile.metadata().getMemoryDetails().getHeap()),
                     serviceInstance.getUri().toString() + "/actuator",
                     mapVMFeatures(profile));
         } else {
@@ -89,13 +89,13 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     }
 
     private static List<Instance.VMFeature> mapVMFeatures(InstanceIntermediateProfile profile) {
-        return profile.metadata().vmFeatures().stream()
-                .map(it -> new Instance.VMFeature(it.name(), it.description(), it.enabled()))
+        return profile.metadata().getVmFeatures().stream()
+                .map(it -> new Instance.VMFeature(it.getName(), it.getDescription(), it.isEnabled()))
                 .toList();
     }
 
     private static Instance.InstanceStatus mapStatus(InstanceIntermediateProfile profile) {
-        ServiceMetadata.HealthStatus healthStatus = profile.metadata().healthStatus();
+        ServiceMetadata.HealthStatus healthStatus = profile.metadata().getHealthStatus();
 
         if (healthStatus == null) {
             return Instance.InstanceStatus.UNKNOWN;

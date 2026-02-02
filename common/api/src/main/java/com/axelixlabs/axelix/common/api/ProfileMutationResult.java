@@ -19,6 +19,9 @@ package com.axelixlabs.axelix.common.api;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * The response to profile-management actuator endpoint.
  *
@@ -30,7 +33,8 @@ public final class ProfileMutationResult {
     private final boolean updated;
     private final String reason;
 
-    public ProfileMutationResult(boolean updated, String reason) {
+    @JsonCreator
+    public ProfileMutationResult(@JsonProperty("updated") boolean updated, @JsonProperty("reason") String reason) {
         this.updated = updated;
         this.reason = reason;
     }
@@ -45,8 +49,12 @@ public final class ProfileMutationResult {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ProfileMutationResult that = (ProfileMutationResult) o;
         return updated == that.updated && Objects.equals(reason, that.reason);
     }

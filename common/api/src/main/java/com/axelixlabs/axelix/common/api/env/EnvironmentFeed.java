@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.common.api.env;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
@@ -44,6 +45,7 @@ public final class EnvironmentFeed {
      * @param defaultProfiles  the list of default Spring profiles.
      * @param propertySources  the list of property sources with their short profiles.
      */
+    @JsonCreator
     public EnvironmentFeed(
             @JsonProperty("activeProfiles") List<String> activeProfiles,
             @JsonProperty("defaultProfiles") List<String> defaultProfiles,
@@ -53,22 +55,26 @@ public final class EnvironmentFeed {
         this.propertySources = propertySources;
     }
 
-    public List<String> activeProfiles() {
+    public List<String> getActiveProfiles() {
         return activeProfiles;
     }
 
-    public List<String> defaultProfiles() {
+    public List<String> getDefaultProfiles() {
         return defaultProfiles;
     }
 
-    public List<PropertySource> propertySources() {
+    public List<PropertySource> getPropertySources() {
         return propertySources;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         EnvironmentFeed that = (EnvironmentFeed) o;
         return Objects.equals(activeProfiles, that.activeProfiles)
                 && Objects.equals(defaultProfiles, that.defaultProfiles)
@@ -111,6 +117,7 @@ public final class EnvironmentFeed {
          * @param sourceDescription the custom description of this property source, if any.
          * @param properties        the list of property entries.
          */
+        @JsonCreator
         public PropertySource(
                 @JsonProperty("sourceName") String sourceName,
                 @JsonProperty("sourceDescription") @Nullable String sourceDescription,
@@ -120,23 +127,27 @@ public final class EnvironmentFeed {
             this.properties = properties;
         }
 
-        public String sourceName() {
+        public String getSourceName() {
             return sourceName;
         }
 
         @Nullable
-        public String sourceDescription() {
+        public String getSourceDescription() {
             return sourceDescription;
         }
 
-        public List<Property> properties() {
+        public List<Property> getProperties() {
             return properties;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             PropertySource that = (PropertySource) o;
             return Objects.equals(sourceName, that.sourceName)
                     && Objects.equals(sourceDescription, that.sourceDescription)
@@ -173,6 +184,7 @@ public final class EnvironmentFeed {
         @Nullable
         private final String value;
 
+        @JsonProperty("isPrimary")
         private final boolean isPrimary;
 
         @Nullable
@@ -202,6 +214,7 @@ public final class EnvironmentFeed {
          *                            then the property is considered deprecated.
          * @param injectionPoints     the injection points where this property is used.
          */
+        @JsonCreator
         public Property(
                 @JsonProperty("propertyName") String propertyName,
                 @JsonProperty("value") @Nullable String value,
@@ -219,12 +232,12 @@ public final class EnvironmentFeed {
             this.injectionPoints = injectionPoints;
         }
 
-        public String propertyName() {
+        public String getPropertyName() {
             return propertyName;
         }
 
         @Nullable
-        public String value() {
+        public String getValue() {
             return value;
         }
 
@@ -233,29 +246,33 @@ public final class EnvironmentFeed {
         }
 
         @Nullable
-        public String configPropsBeanName() {
+        public String getConfigPropsBeanName() {
             return configPropsBeanName;
         }
 
         @Nullable
-        public String description() {
+        public String getDescription() {
             return description;
         }
 
         @Nullable
-        public Deprecation deprecation() {
+        public Deprecation getDeprecation() {
             return deprecation;
         }
 
         @Nullable
-        public List<InjectionPoint> injectionPoints() {
+        public List<InjectionPoint> getInjectionPoints() {
             return injectionPoints;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Property property = (Property) o;
             return isPrimary == property.isPrimary
                     && Objects.equals(propertyName, property.propertyName)
@@ -309,18 +326,23 @@ public final class EnvironmentFeed {
          *
          * @param message explaining why the property is deprecated and, optionally, what should be used instead.
          */
+        @JsonCreator
         public Deprecation(@JsonProperty("message") String message) {
             this.message = message;
         }
 
-        public String message() {
+        public String getMessage() {
             return message;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Deprecation that = (Deprecation) o;
             return Objects.equals(message, that.message);
         }
@@ -354,6 +376,7 @@ public final class EnvironmentFeed {
          * @param targetName         the target name (field name, method name, or parameter name).
          * @param propertyExpression the property expression used (e.g., "${some.property:default}").
          */
+        @JsonCreator
         public InjectionPoint(
                 @JsonProperty("beanName") String beanName,
                 @JsonProperty("injectionType") InjectionType injectionType,
@@ -365,26 +388,30 @@ public final class EnvironmentFeed {
             this.propertyExpression = propertyExpression;
         }
 
-        public String beanName() {
+        public String getBeanName() {
             return beanName;
         }
 
-        public InjectionType injectionType() {
+        public InjectionType getInjectionType() {
             return injectionType;
         }
 
-        public String targetName() {
+        public String getTargetName() {
             return targetName;
         }
 
-        public String propertyExpression() {
+        public String getPropertyExpression() {
             return propertyExpression;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             InjectionPoint that = (InjectionPoint) o;
             return Objects.equals(beanName, that.beanName)
                     && injectionType == that.injectionType

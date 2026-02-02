@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.common.api.env;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -41,7 +43,8 @@ public final class PropertyValue {
      * @param value  the string representation of the property's value
      * @param origin the origin of the property if available (e.g. location in a file), may be {@code null}
      */
-    public PropertyValue(String value, @Nullable String origin) {
+    @JsonCreator
+    public PropertyValue(@JsonProperty("value") String value, @JsonProperty("origin") @Nullable String origin) {
         this.value = value;
         this.origin = origin;
     }
@@ -57,8 +60,12 @@ public final class PropertyValue {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         PropertyValue that = (PropertyValue) o;
         return Objects.equals(value, that.value) && Objects.equals(origin, that.origin);
     }

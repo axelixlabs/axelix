@@ -35,18 +35,22 @@ public final class DecodedUser {
         this.roles = roles;
     }
 
-    public String username() {
+    public String getUsername() {
         return username;
     }
 
-    public Set<Role> roles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         DecodedUser that = (DecodedUser) o;
         return Objects.equals(username, that.username) && Objects.equals(roles, that.roles);
     }

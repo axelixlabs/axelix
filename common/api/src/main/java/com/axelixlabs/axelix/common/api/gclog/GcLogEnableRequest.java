@@ -19,6 +19,9 @@ package com.axelixlabs.axelix.common.api.gclog;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Request DTO used to enable GC logging.
  *
@@ -34,18 +37,23 @@ public final class GcLogEnableRequest {
      *
      * @param level GC log level to apply (e.g. info, debug, trace)
      */
-    public GcLogEnableRequest(String level) {
+    @JsonCreator
+    public GcLogEnableRequest(@JsonProperty("level") String level) {
         this.level = level;
     }
 
-    public String level() {
+    public String getLevel() {
         return level;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         GcLogEnableRequest that = (GcLogEnableRequest) o;
         return Objects.equals(level, that.level);
     }

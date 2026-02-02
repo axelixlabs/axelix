@@ -46,8 +46,12 @@ public final class TransactionMonitoringFeed {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         TransactionMonitoringFeed that = (TransactionMonitoringFeed) o;
         return Objects.equals(entrypoints, that.entrypoints);
     }
@@ -109,8 +113,12 @@ public final class TransactionMonitoringFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             TransactionalEntrypoint that = (TransactionalEntrypoint) o;
             return Objects.equals(className, that.className)
                     && Objects.equals(methodName, that.methodName)
@@ -169,8 +177,12 @@ public final class TransactionMonitoringFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             TransactionExecution that = (TransactionExecution) o;
             return durationsMs == that.durationsMs && timestamp == that.timestamp;
         }
@@ -222,8 +234,12 @@ public final class TransactionMonitoringFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             ExecutionStats that = (ExecutionStats) o;
             return averageDurationMs == that.averageDurationMs
                     && maxDurationMs == that.maxDurationMs

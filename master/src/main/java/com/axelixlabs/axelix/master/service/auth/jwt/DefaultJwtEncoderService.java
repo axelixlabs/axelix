@@ -65,7 +65,7 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
             List<JwtRole> roleClaims = buildRoleClaims(user);
 
             JwtBuilder builder = Jwts.builder()
-                    .subject(user.username())
+                    .subject(user.getUsername())
                     .issuedAt(Date.from(now))
                     .expiration(Date.from(now.plus(lifespan)))
                     .claim(TokenClaim.ROLES.getEncoding(), roleClaims);
@@ -83,22 +83,22 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
             throw new JwtTokenGenerationException("User cannot be null");
         }
 
-        if (user.username() == null || user.username().isEmpty()) {
+        if (user.getUsername() == null || user.getUsername().isEmpty()) {
             throw new JwtTokenGenerationException("Username cannot be null or empty");
         }
     }
 
     private List<JwtRole> buildRoleClaims(User user) {
-        return user.roles().stream().map(this::toJwtRole).toList();
+        return user.getRoles().stream().map(this::toJwtRole).toList();
     }
 
     private JwtRole toJwtRole(Role role) {
         Set<String> authorities =
-                role.authorities().stream().map(Authority::getName).collect(Collectors.toSet());
+                role.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
 
         List<JwtRole> components =
-                role.components().stream().map(this::toJwtRole).toList();
+                role.getComponents().stream().map(this::toJwtRole).toList();
 
-        return new JwtRole(role.name(), authorities, components);
+        return new JwtRole(role.getName(), authorities, components);
     }
 }

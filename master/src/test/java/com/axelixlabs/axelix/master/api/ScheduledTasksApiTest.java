@@ -43,10 +43,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.common.api.request.ScheduledTaskCronExpressionModifyRequest;
-import com.axelixlabs.axelix.common.api.request.ScheduledTaskExecuteRequest;
-import com.axelixlabs.axelix.common.api.request.ScheduledTaskIntervalModifyRequest;
-import com.axelixlabs.axelix.common.api.request.ScheduledTaskToggleRequest;
+import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
+import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteRequest;
+import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
+import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -348,7 +348,7 @@ public class ScheduledTasksApiTest {
                         String.class,
                         activeInstanceId);
 
-        // then
+        // then.
         assertThat(body.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 

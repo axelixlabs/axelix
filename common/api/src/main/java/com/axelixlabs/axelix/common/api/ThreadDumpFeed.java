@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -43,7 +45,10 @@ public final class ThreadDumpFeed {
      * @param threadContentionMonitoringEnabled whether the thread contention monitoring is enabled.
      * @param threads                           thread dump itself.
      */
-    public ThreadDumpFeed(boolean threadContentionMonitoringEnabled, List<ThreadInfo> threads) {
+    @JsonCreator
+    public ThreadDumpFeed(
+            @JsonProperty("threadContentionMonitoringEnabled") boolean threadContentionMonitoringEnabled,
+            @JsonProperty("threads") List<ThreadInfo> threads) {
         this.threadContentionMonitoringEnabled = threadContentionMonitoringEnabled;
         this.threads = threads;
     }
@@ -64,8 +69,12 @@ public final class ThreadDumpFeed {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ThreadDumpFeed that = (ThreadDumpFeed) o;
         return threadContentionMonitoringEnabled == that.threadContentionMonitoringEnabled
                 && Objects.equals(threads, that.threads);
@@ -217,25 +226,26 @@ public final class ThreadDumpFeed {
         private final MonitorInfo[] lockedMonitors;
         private final LockInfo[] lockedSynchronizers;
 
+        @JsonCreator
         public ThreadInfo(
-                String threadName,
-                long threadId,
-                long blockedTime,
-                long blockedCount,
-                long waitedTime,
-                long waitedCount,
-                @Nullable LockInfo lockInfo,
-                @Nullable String lockName,
-                long lockOwnerId,
-                @Nullable String lockOwnerName,
-                boolean daemon,
-                boolean inNative,
-                boolean suspended,
-                State threadState,
-                int priority,
-                StackTraceElement[] stackTrace,
-                MonitorInfo[] lockedMonitors,
-                LockInfo[] lockedSynchronizers) {
+                @JsonProperty("threadName") String threadName,
+                @JsonProperty("threadId") long threadId,
+                @JsonProperty("blockedTime") long blockedTime,
+                @JsonProperty("blockedCount") long blockedCount,
+                @JsonProperty("waitedTime") long waitedTime,
+                @JsonProperty("waitedCount") long waitedCount,
+                @JsonProperty("lockInfo") @Nullable LockInfo lockInfo,
+                @JsonProperty("lockName") @Nullable String lockName,
+                @JsonProperty("lockOwnerId") long lockOwnerId,
+                @JsonProperty("lockOwnerName") @Nullable String lockOwnerName,
+                @JsonProperty("daemon") boolean daemon,
+                @JsonProperty("inNative") boolean inNative,
+                @JsonProperty("suspended") boolean suspended,
+                @JsonProperty("threadState") State threadState,
+                @JsonProperty("priority") int priority,
+                @JsonProperty("stackTrace") StackTraceElement[] stackTrace,
+                @JsonProperty("lockedMonitors") MonitorInfo[] lockedMonitors,
+                @JsonProperty("lockedSynchronizers") LockInfo[] lockedSynchronizers) {
             this.threadName = threadName;
             this.threadId = threadId;
             this.blockedTime = blockedTime;
@@ -333,8 +343,12 @@ public final class ThreadDumpFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             ThreadInfo that = (ThreadInfo) o;
             return threadId == that.threadId
                     && blockedTime == that.blockedTime
@@ -431,7 +445,9 @@ public final class ThreadDumpFeed {
         private final String className;
         private final int identityHashCode;
 
-        public LockInfo(String className, int identityHashCode) {
+        @JsonCreator
+        public LockInfo(
+                @JsonProperty("className") String className, @JsonProperty("identityHashCode") int identityHashCode) {
             this.className = className;
             this.identityHashCode = identityHashCode;
         }
@@ -446,8 +462,12 @@ public final class ThreadDumpFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             LockInfo lockInfo = (LockInfo) o;
             return identityHashCode == lockInfo.identityHashCode && Objects.equals(className, lockInfo.className);
         }
@@ -496,8 +516,12 @@ public final class ThreadDumpFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             MonitorInfo that = (MonitorInfo) o;
             return identityHashCode == that.identityHashCode
                     && lockedStackDepth == that.lockedStackDepth
@@ -556,15 +580,16 @@ public final class ThreadDumpFeed {
 
         private final boolean nativeMethod;
 
+        @JsonCreator
         public StackTraceElement(
-                @Nullable String classLoaderName,
-                String className,
-                @Nullable String fileName,
-                int lineNumber,
-                String methodName,
-                @Nullable String moduleName,
-                @Nullable String moduleVersion,
-                boolean nativeMethod) {
+                @JsonProperty("classLoaderName") @Nullable String classLoaderName,
+                @JsonProperty("className") String className,
+                @JsonProperty("fileName") @Nullable String fileName,
+                @JsonProperty("lineNumber") int lineNumber,
+                @JsonProperty("methodName") String methodName,
+                @JsonProperty("moduleName") @Nullable String moduleName,
+                @JsonProperty("moduleVersion") @Nullable String moduleVersion,
+                @JsonProperty("nativeMethod") boolean nativeMethod) {
             this.classLoaderName = classLoaderName;
             this.className = className;
             this.fileName = fileName;
@@ -613,8 +638,12 @@ public final class ThreadDumpFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             StackTraceElement that = (StackTraceElement) o;
             return lineNumber == that.lineNumber
                     && nativeMethod == that.nativeMethod

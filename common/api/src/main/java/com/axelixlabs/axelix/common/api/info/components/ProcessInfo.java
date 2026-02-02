@@ -85,8 +85,12 @@ public final class ProcessInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ProcessInfo that = (ProcessInfo) o;
         return Objects.equals(pid, that.pid)
                 && Objects.equals(parentPid, that.parentPid)
@@ -157,8 +161,12 @@ public final class ProcessInfo {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Memory memory = (Memory) o;
             return Objects.equals(heap, memory.heap)
                     && Objects.equals(nonHeap, memory.nonHeap)
@@ -218,8 +226,12 @@ public final class ProcessInfo {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
                 Heap heap = (Heap) o;
                 return Objects.equals(max, heap.max)
                         && Objects.equals(used, heap.used)
@@ -274,8 +286,12 @@ public final class ProcessInfo {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
                 NonHeap nonHeap = (NonHeap) o;
                 return Objects.equals(max, nonHeap.max)
                         && Objects.equals(used, nonHeap.used)
@@ -324,8 +340,12 @@ public final class ProcessInfo {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
                 GarbageCollectors that = (GarbageCollectors) o;
                 return Objects.equals(name, that.name) && Objects.equals(collectionCount, that.collectionCount);
             }
@@ -378,8 +398,12 @@ public final class ProcessInfo {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             VirtualThreads that = (VirtualThreads) o;
             return Objects.equals(mounted, that.mounted)
                     && Objects.equals(queued, that.queued)

@@ -145,14 +145,14 @@ class KubernetesInstanceDiscovererTest {
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
-              "versions" : {
+              "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
               "healthStatus" : "UP",
-              "memory" : {
+              "memoryDetails" : {
                 "heap" : 12000
               },
               "vmFeatures": [
@@ -228,14 +228,14 @@ class KubernetesInstanceDiscovererTest {
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
-              "versions" : {
+              "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
               "healthStatus" : "UP",
-              "memory" : {
+              "memoryDetails" : {
                 "heap" : 12000
               },
               "vmFeatures": [
@@ -255,14 +255,14 @@ class KubernetesInstanceDiscovererTest {
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
-              "versions" : {
+              "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
               "healthStatus" : "UP",
-              "memory" : {
+              "memoryDetails" : {
                 "heap" : 12000
               },
               "vmFeatures": [
@@ -361,14 +361,14 @@ class KubernetesInstanceDiscovererTest {
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
-              "versions" : {
+              "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
               "healthStatus" : "UP",
-              "memory" : {
+              "memoryDetails" : {
                 "heap" : 12000
               },
               "vmFeatures": [
@@ -447,14 +447,14 @@ class KubernetesInstanceDiscovererTest {
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
-              "versions" : {
+              "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
               "healthStatus" : "UP",
-              "memory" : {
+              "memoryDetails" : {
                 "heap" : 12000
               },
               "vmFeatures": [
@@ -467,8 +467,7 @@ class KubernetesInstanceDiscovererTest {
             }
         """;
 
-        mockWebServer.enqueue(
-                new MockResponse().setBody(response).addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE));
+        mockWebServer.enqueue(new MockResponse().setBody(response).addHeader("Content-Type", "application/json"));
 
         ServiceInstance healthyK8SPod = Instancio.of(KubernetesServiceInstance.class)
                 .set(Select.field("instanceId"), healthyK8SInstanceId)

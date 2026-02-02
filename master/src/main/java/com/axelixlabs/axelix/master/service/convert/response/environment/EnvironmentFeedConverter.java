@@ -46,14 +46,14 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
 
     @Override
     public @NonNull EnvironmentFeedResponse convertInternal(@NonNull EnvironmentFeed source) {
-        List<String> activeProfiles = source.activeProfiles();
-        List<String> defaultProfiles = source.defaultProfiles();
+        List<String> activeProfiles = source.getActiveProfiles();
+        List<String> defaultProfiles = source.getDefaultProfiles();
         List<PropertySourceShortProfile> propertySources = new ArrayList<>();
 
-        for (PropertySource propertySource : source.propertySources()) {
+        for (PropertySource propertySource : source.getPropertySources()) {
             List<PropertyEntry> properties = convertPropertyEntries(propertySource);
             propertySources.add(new PropertySourceShortProfile(
-                    propertySource.sourceName(), propertySource.sourceDescription(), properties));
+                    propertySource.getSourceName(), propertySource.getSourceDescription(), properties));
         }
 
         return new EnvironmentFeedResponse(activeProfiles, defaultProfiles, propertySources);
@@ -62,16 +62,16 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
     private List<PropertyEntry> convertPropertyEntries(PropertySource propertySource) {
         List<PropertyEntry> properties = new ArrayList<>();
 
-        if (propertySource.properties() != null) {
-            for (EnvironmentFeed.Property property : propertySource.properties()) {
+        if (propertySource.getProperties() != null) {
+            for (EnvironmentFeed.Property property : propertySource.getProperties()) {
                 properties.add(new PropertyEntry(
-                        property.propertyName(),
-                        property.value(),
+                        property.getPropertyName(),
+                        property.getValue(),
                         property.isPrimary(),
-                        property.configPropsBeanName(),
-                        property.description(),
-                        mapDeprecation(property.deprecation()),
-                        mapInjectionPoints(property.injectionPoints())));
+                        property.getConfigPropsBeanName(),
+                        property.getDescription(),
+                        mapDeprecation(property.getDeprecation()),
+                        mapInjectionPoints(property.getInjectionPoints())));
             }
         }
 
@@ -84,7 +84,7 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
             return null;
         }
 
-        return new EnvironmentFeedResponse.Deprecation(deprecation.message());
+        return new EnvironmentFeedResponse.Deprecation(deprecation.getMessage());
     }
 
     private @Nullable List<EnvironmentFeedResponse.InjectionPoint> mapInjectionPoints(
@@ -96,7 +96,10 @@ public class EnvironmentFeedConverter implements Converter<EnvironmentFeed, Envi
         List<EnvironmentFeedResponse.InjectionPoint> result = new ArrayList<>();
         for (EnvironmentFeed.InjectionPoint ip : injectionPoints) {
             result.add(new InjectionPoint(
-                    ip.beanName(), mapInjectionType(ip.injectionType()), ip.targetName(), ip.propertyExpression()));
+                    ip.getBeanName(),
+                    mapInjectionType(ip.getInjectionType()),
+                    ip.getTargetName(),
+                    ip.getPropertyExpression()));
         }
         return result;
     }

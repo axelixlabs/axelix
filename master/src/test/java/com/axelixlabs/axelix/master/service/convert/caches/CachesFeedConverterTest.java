@@ -41,7 +41,7 @@ public class CachesFeedConverterTest {
     void testConvertHappyPath() {
         // when.
         CachesResponse response = subject.convertInternal(getCaches());
-        CachesResponse emptyResponse = subject.convertInternal(new CachesFeed());
+        CachesResponse emptyResponse = subject.convertInternal(new CachesFeed(List.of()));
 
         // then
         assertThat(response).isNotNull();

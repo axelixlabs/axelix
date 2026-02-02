@@ -1,0 +1,84 @@
+/*
+ * Copyright (C) 2025-2026 Axelix Labs
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
+
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+
+import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
+import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.beans.CachingBeansFeedBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeanMetaInfoExtractor;
+import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeansFeedBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
+
+/**
+ * Auto-configuration class for {@link AxelixBeansEndpoint}.
+ *
+ * @since 07.07.2025
+ * @author Nikita Kirillov
+ * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
+ */
+@AutoConfiguration
+public class AxelixBeansAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
+        return new DefaultConditionalBeanRefBuilder();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public BeanMetaInfoExtractor beanMetaInfoExtractor(
+            ConfigurableApplicationContext configurableApplicationContext,
+            ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
+        return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
+    }
+
+    @Bean
+    public BeansFeedBuilder defaultBeansFeedBuilder(
+            BeanMetaInfoExtractor beanMetaInfoExtractor, ConfigurableApplicationContext context) {
+        return new DefaultBeansFeedBuilder(beanMetaInfoExtractor, context);
+    }
+
+    @Bean
+    @Primary
+    public BeansFeedBuilder cachingBeansFeedBuilder(BeansFeedBuilder defaultBeansFeedBuilder) {
+        return new CachingBeansFeedBuilder(defaultBeansFeedBuilder);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AxelixBeansEndpoint beansEndpointExtension(BeansFeedBuilder cachingBeansFeedBuilder) {
+        return new AxelixBeansEndpoint(cachingBeansFeedBuilder);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
+        return new QualifiersPersistencePostProcessor();
+    }
+}

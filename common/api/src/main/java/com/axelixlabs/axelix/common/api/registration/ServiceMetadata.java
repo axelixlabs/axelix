@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.common.api.registration;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
@@ -39,7 +40,7 @@ public final class ServiceMetadata {
     private final String serviceVersion;
     private final String commitShortSha;
     private final String jdkVendor;
-    private final SoftwareVersions versions;
+    private final SoftwareVersions softwareVersions;
     private final HealthStatus healthStatus;
     private final MemoryDetails memoryDetails;
     private final List<VMFeature> vmFeatures;
@@ -47,81 +48,86 @@ public final class ServiceMetadata {
     /**
      * Creates a new ServiceMetadata.
      *
-     * @param version        the version of <strong>the axelix starter</strong> in the remote instance.
-     *                       Might be {@code null} in case the instance is not supposed to be managed.
-     * @param serviceVersion the version of the <strong>managed service itself</strong>, i.e. the version
-     *                       of the end-service artifact (the V inside GAV coordinate). The assumption is that
-     *                       is never {@code null}, and it frankly should not be.
-     * @param commitShortSha the short commit hash (i.e. 'a622a54' or smth like that). Assuming it
-     *                       to never be {@code null}.
-     * @param jdkVendor      the JDK vendor name.
-     * @param versions       the software versions.
-     * @param healthStatus   the health status of the given instance that is reported by started infrastructure.
-     *                       Never {@code null}.
-     * @param memoryDetails  the memory details.
-     * @param vmFeatures     the VM features.
+     * @param version          the version of <strong>the axelix starter</strong> in the remote instance.
+     *                         Might be {@code null} in case the instance is not supposed to be managed.
+     * @param serviceVersion   the version of the <strong>managed service itself</strong>, i.e. the version
+     *                         of the end-service artifact (the V inside GAV coordinate). The assumption is that
+     *                         is never {@code null}, and it frankly should not be.
+     * @param commitShortSha   the short commit hash (i.e. 'a622a54' or smth like that). Assuming it
+     *                         to never be {@code null}.
+     * @param jdkVendor        the JDK vendor name.
+     * @param softwareVersions the software versions.
+     * @param healthStatus     the health status of the given instance that is reported by started infrastructure.
+     *                         Never {@code null}.
+     * @param memoryDetails    the memory details.
+     * @param vmFeatures       the VM features.
      */
+    @JsonCreator
     public ServiceMetadata(
             @JsonProperty("version") String version,
             @JsonProperty("serviceVersion") String serviceVersion,
             @JsonProperty("commitShortSha") String commitShortSha,
             @JsonProperty("jdkVendor") String jdkVendor,
-            @JsonProperty("versions") SoftwareVersions versions,
+            @JsonProperty("softwareVersions") SoftwareVersions softwareVersions,
             @JsonProperty("healthStatus") HealthStatus healthStatus,
-            @JsonProperty("memory") MemoryDetails memoryDetails,
+            @JsonProperty("memoryDetails") MemoryDetails memoryDetails,
             @JsonProperty("vmFeatures") List<VMFeature> vmFeatures) {
         this.version = version;
         this.serviceVersion = serviceVersion;
         this.commitShortSha = commitShortSha;
         this.jdkVendor = jdkVendor;
-        this.versions = versions;
+        this.softwareVersions = softwareVersions;
         this.healthStatus = healthStatus;
         this.memoryDetails = memoryDetails;
         this.vmFeatures = vmFeatures;
     }
 
-    public String version() {
+    public String getVersion() {
         return version;
     }
 
-    public String serviceVersion() {
+    public String getServiceVersion() {
         return serviceVersion;
     }
 
-    public String commitShortSha() {
+    public String getCommitShortSha() {
         return commitShortSha;
     }
 
-    public String jdkVendor() {
+    public String getJdkVendor() {
         return jdkVendor;
     }
 
-    public SoftwareVersions versions() {
-        return versions;
+    public SoftwareVersions getSoftwareVersions() {
+        return softwareVersions;
     }
 
-    public HealthStatus healthStatus() {
+    public HealthStatus getHealthStatus() {
         return healthStatus;
     }
 
-    public MemoryDetails memoryDetails() {
+    public MemoryDetails getMemoryDetails() {
         return memoryDetails;
     }
 
-    public List<VMFeature> vmFeatures() {
+    public List<VMFeature> getVmFeatures() {
         return vmFeatures;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ServiceMetadata that = (ServiceMetadata) o;
         return Objects.equals(version, that.version)
                 && Objects.equals(serviceVersion, that.serviceVersion)
                 && Objects.equals(commitShortSha, that.commitShortSha)
                 && Objects.equals(jdkVendor, that.jdkVendor)
-                && Objects.equals(versions, that.versions)
+                && Objects.equals(softwareVersions, that.softwareVersions)
                 && healthStatus == that.healthStatus
                 && Objects.equals(memoryDetails, that.memoryDetails)
                 && Objects.equals(vmFeatures, that.vmFeatures);
@@ -130,7 +136,14 @@ public final class ServiceMetadata {
     @Override
     public int hashCode() {
         return Objects.hash(
-                version, serviceVersion, commitShortSha, jdkVendor, versions, healthStatus, memoryDetails, vmFeatures);
+                version,
+                serviceVersion,
+                commitShortSha,
+                jdkVendor,
+                softwareVersions,
+                healthStatus,
+                memoryDetails,
+                vmFeatures);
     }
 
     @Override
@@ -149,7 +162,7 @@ public final class ServiceMetadata {
                 + jdkVendor
                 + '\''
                 + ", versions="
-                + versions
+                + softwareVersions
                 + ", healthStatus="
                 + healthStatus
                 + ", memoryDetails="
@@ -168,28 +181,36 @@ public final class ServiceMetadata {
         private final String description;
         private final boolean enabled;
 
-        public VMFeature(String name, String description, boolean enabled) {
+        @JsonCreator
+        public VMFeature(
+                @JsonProperty("name") String name,
+                @JsonProperty("description") String description,
+                @JsonProperty("enabled") boolean enabled) {
             this.name = name;
             this.description = description;
             this.enabled = enabled;
         }
 
-        public String name() {
+        public String getName() {
             return name;
         }
 
-        public String description() {
+        public String getDescription() {
             return description;
         }
 
-        public boolean enabled() {
+        public boolean isEnabled() {
             return enabled;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             VMFeature vmFeature = (VMFeature) o;
             return enabled == vmFeature.enabled
                     && Objects.equals(name, vmFeature.name)
@@ -254,6 +275,7 @@ public final class ServiceMetadata {
          * @param kotlin          the version of Kotlin that service is currently using. Might be {@code null} in case
          *                        the service is not using kotlin.
          */
+        @JsonCreator
         public SoftwareVersions(
                 @JsonProperty("java") String java,
                 @JsonProperty("springBoot") String springBoot,
@@ -265,27 +287,31 @@ public final class ServiceMetadata {
             this.kotlin = kotlin;
         }
 
-        public String java() {
+        public String getJava() {
             return java;
         }
 
-        public String springBoot() {
+        public String getSpringBoot() {
             return springBoot;
         }
 
-        public String springFramework() {
+        public String getSpringFramework() {
             return springFramework;
         }
 
         @Nullable
-        public String kotlin() {
+        public String getKotlin() {
             return kotlin;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             SoftwareVersions that = (SoftwareVersions) o;
             return Objects.equals(java, that.java)
                     && Objects.equals(springBoot, that.springBoot)
@@ -329,18 +355,23 @@ public final class ServiceMetadata {
          *
          * @param heap the estimated heap size of the given instance.
          */
+        @JsonCreator
         public MemoryDetails(@JsonProperty("heap") long heap) {
             this.heap = heap;
         }
 
-        public long heap() {
+        public long getHeap() {
             return heap;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             MemoryDetails that = (MemoryDetails) o;
             return heap == that.heap;
         }

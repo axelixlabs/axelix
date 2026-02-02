@@ -1,0 +1,48 @@
+axelix:
+  sbs:
+    auth:
+      jwt:
+        algorithm: "HMAC512"
+        signing-key: "22573444698685aa77750b88ad6e99ef1f94a7a909bc7df63f7a80666208c201ab7a584e6e05e6c9d0aa94b723f843ff"
+
+spring:
+  config:
+    import: "classpath:tokens.yml"
+  info:
+    git:
+      location: classpath:other/git.properties
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - axelix-property-management
+          - axelix-profile-management
+          - axelix-metadata
+          - axelix-beans
+          - axelix-env
+          - axelix-metrics
+          - axelix-configprops
+          - axelix-caches
+          - axelix-conditions
+          - configprops
+          - env
+          - axelix-thread-dump
+          - axelix-gc
+          - axelix-heap-dump
+
+logging:
+  level:
+    org.apache.kafka: WARN
+    org.apache.kafka.clients.NetworkClient: ERROR

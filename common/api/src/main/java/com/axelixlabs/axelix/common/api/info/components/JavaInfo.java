@@ -72,8 +72,12 @@ public final class JavaInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         JavaInfo javaInfo = (JavaInfo) o;
         return Objects.equals(version, javaInfo.version)
                 && Objects.equals(vendor, javaInfo.vendor)
@@ -121,8 +125,12 @@ public final class JavaInfo {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Vendor vendor = (Vendor) o;
             return Objects.equals(name, vendor.name) && Objects.equals(version, vendor.version);
         }
@@ -158,8 +166,12 @@ public final class JavaInfo {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Runtime runtime = (Runtime) o;
             return Objects.equals(name, runtime.name) && Objects.equals(version, runtime.version);
         }
@@ -204,8 +216,12 @@ public final class JavaInfo {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             JVM jvm = (JVM) o;
             return Objects.equals(name, jvm.name)
                     && Objects.equals(vendor, jvm.vendor)

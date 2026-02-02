@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.common.api.gclog;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -45,29 +47,37 @@ public final class GcLogStatusResponse {
      *                        May be null if logging is disabled.
      * @param availableLevels list of available GC log levels supported by the JVM
      */
-    public GcLogStatusResponse(boolean enabled, @Nullable String level, List<String> availableLevels) {
+    @JsonCreator
+    public GcLogStatusResponse(
+            @JsonProperty("enabled") boolean enabled,
+            @JsonProperty("level") @Nullable String level,
+            @JsonProperty("availableLevels") List<String> availableLevels) {
         this.enabled = enabled;
         this.level = level;
         this.availableLevels = availableLevels;
     }
 
-    public boolean enabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
     @Nullable
-    public String level() {
+    public String getLevel() {
         return level;
     }
 
-    public List<String> availableLevels() {
+    public List<String> getAvailableLevels() {
         return availableLevels;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         GcLogStatusResponse that = (GcLogStatusResponse) o;
         return enabled == that.enabled
                 && Objects.equals(level, that.level)

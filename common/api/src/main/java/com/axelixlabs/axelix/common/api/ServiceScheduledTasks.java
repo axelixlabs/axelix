@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.common.api;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
@@ -45,6 +46,7 @@ public final class ServiceScheduledTasks {
      * @param fixedRate  The list of scheduled interval between task executions, measured from the start of the previous task execution, if any.
      * @param custom     The list of tasks with a configured user triggers, if any.
      */
+    @JsonCreator
     public ServiceScheduledTasks(
             @JsonProperty("cron") List<CronTask> cron,
             @JsonProperty("fixedDelay") List<FixedDelayTask> fixedDelay,
@@ -56,26 +58,30 @@ public final class ServiceScheduledTasks {
         this.custom = custom;
     }
 
-    public List<CronTask> cron() {
+    public List<CronTask> getCron() {
         return cron;
     }
 
-    public List<FixedDelayTask> fixedDelay() {
+    public List<FixedDelayTask> getFixedDelay() {
         return fixedDelay;
     }
 
-    public List<FixedRateTask> fixedRate() {
+    public List<FixedRateTask> getFixedRate() {
         return fixedRate;
     }
 
-    public List<CustomTask> custom() {
+    public List<CustomTask> getCustom() {
         return custom;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ServiceScheduledTasks that = (ServiceScheduledTasks) o;
         return Objects.equals(cron, that.cron)
                 && Objects.equals(fixedDelay, that.fixedDelay)
@@ -129,6 +135,7 @@ public final class ServiceScheduledTasks {
          * @param lastExecution The last execution of this task, if any.
          * @param enabled       The indicator showing whether the cron task is enabled {@code true} or disabled {@code false}.
          */
+        @JsonCreator
         public CronTask(
                 @JsonProperty("runnable") Runnable runnable,
                 @JsonProperty("expression") String expression,
@@ -142,32 +149,36 @@ public final class ServiceScheduledTasks {
             this.enabled = enabled;
         }
 
-        public Runnable runnable() {
+        public Runnable getRunnable() {
             return runnable;
         }
 
-        public String expression() {
+        public String getExpression() {
             return expression;
         }
 
         @Nullable
-        public NextExecution nextExecution() {
+        public NextExecution getNextExecution() {
             return nextExecution;
         }
 
         @Nullable
-        public LastExecution lastExecution() {
+        public LastExecution getLastExecution() {
             return lastExecution;
         }
 
-        public boolean enabled() {
+        public boolean isEnabled() {
             return enabled;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             CronTask cronTask = (CronTask) o;
             return enabled == cronTask.enabled
                     && Objects.equals(runnable, cronTask.runnable)
@@ -228,6 +239,7 @@ public final class ServiceScheduledTasks {
          * @param lastExecution The last execution of this task, if any.
          * @param enabled       The indicator showing whether the cron task is enabled {@code true} or disabled {@code false}.
          */
+        @JsonCreator
         public FixedDelayTask(
                 @JsonProperty("runnable") Runnable runnable,
                 @JsonProperty("interval") Number interval,
@@ -243,36 +255,40 @@ public final class ServiceScheduledTasks {
             this.enabled = enabled;
         }
 
-        public Runnable runnable() {
+        public Runnable getRunnable() {
             return runnable;
         }
 
-        public Number interval() {
+        public Number getInterval() {
             return interval;
         }
 
-        public Number initialDelay() {
+        public Number getInitialDelay() {
             return initialDelay;
         }
 
         @Nullable
-        public NextExecution nextExecution() {
+        public NextExecution getNextExecution() {
             return nextExecution;
         }
 
         @Nullable
-        public LastExecution lastExecution() {
+        public LastExecution getLastExecution() {
             return lastExecution;
         }
 
-        public boolean enabled() {
+        public boolean isEnabled() {
             return enabled;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             FixedDelayTask that = (FixedDelayTask) o;
             return enabled == that.enabled
                     && Objects.equals(runnable, that.runnable)
@@ -335,6 +351,7 @@ public final class ServiceScheduledTasks {
          * @param lastExecution The last execution of this task, if any.
          * @param enabled       The indicator showing whether the cron task is enabled {@code true} or disabled {@code false}.
          */
+        @JsonCreator
         public FixedRateTask(
                 @JsonProperty("runnable") Runnable runnable,
                 @JsonProperty("interval") Number interval,
@@ -350,36 +367,40 @@ public final class ServiceScheduledTasks {
             this.enabled = enabled;
         }
 
-        public Runnable runnable() {
+        public Runnable getRunnable() {
             return runnable;
         }
 
-        public Number interval() {
+        public Number getInterval() {
             return interval;
         }
 
-        public Number initialDelay() {
+        public Number getInitialDelay() {
             return initialDelay;
         }
 
         @Nullable
-        public NextExecution nextExecution() {
+        public NextExecution getNextExecution() {
             return nextExecution;
         }
 
         @Nullable
-        public LastExecution lastExecution() {
+        public LastExecution getLastExecution() {
             return lastExecution;
         }
 
-        public boolean enabled() {
+        public boolean isEnabled() {
             return enabled;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             FixedRateTask that = (FixedRateTask) o;
             return enabled == that.enabled
                     && Objects.equals(runnable, that.runnable)
@@ -440,6 +461,7 @@ public final class ServiceScheduledTasks {
          * @param lastExecution The last execution of this task, if any.
          * @param enabled       The indicator showing whether the cron task is enabled {@code true} or disabled {@code false}.
          */
+        @JsonCreator
         public CustomTask(
                 @JsonProperty("runnable") Runnable runnable,
                 @JsonProperty("trigger") String trigger,
@@ -453,32 +475,36 @@ public final class ServiceScheduledTasks {
             this.enabled = enabled;
         }
 
-        public Runnable runnable() {
+        public Runnable getRunnable() {
             return runnable;
         }
 
-        public String trigger() {
+        public String getTrigger() {
             return trigger;
         }
 
         @Nullable
-        public NextExecution nextExecution() {
+        public NextExecution getNextExecution() {
             return nextExecution;
         }
 
         @Nullable
-        public LastExecution lastExecution() {
+        public LastExecution getLastExecution() {
             return lastExecution;
         }
 
-        public boolean enabled() {
+        public boolean isEnabled() {
             return enabled;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             CustomTask that = (CustomTask) o;
             return enabled == that.enabled
                     && Objects.equals(runnable, that.runnable)
@@ -530,6 +556,7 @@ public final class ServiceScheduledTasks {
          * @param time      The time of the last execution of a task.
          * @param exception The exception that may occur, if any.
          */
+        @JsonCreator
         public LastExecution(
                 @JsonProperty("status") String status,
                 @JsonProperty("time") String time,
@@ -539,23 +566,27 @@ public final class ServiceScheduledTasks {
             this.exception = exception;
         }
 
-        public String status() {
+        public String getStatus() {
             return status;
         }
 
-        public String time() {
+        public String getTime() {
             return time;
         }
 
         @Nullable
-        public Exception exception() {
+        public Exception getException() {
             return exception;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             LastExecution that = (LastExecution) o;
             return Objects.equals(status, that.status)
                     && Objects.equals(time, that.time)
@@ -597,23 +628,28 @@ public final class ServiceScheduledTasks {
              * @param type    The type of exception thrown by the task, if any.
              * @param message The message of the exception thrown by the task, if any.
              */
+            @JsonCreator
             public Exception(@JsonProperty("type") String type, @JsonProperty("message") String message) {
                 this.type = type;
                 this.message = message;
             }
 
-            public String type() {
+            public String getType() {
                 return type;
             }
 
-            public String message() {
+            public String getMessage() {
                 return message;
             }
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
                 Exception exception = (Exception) o;
                 return Objects.equals(type, exception.type) && Objects.equals(message, exception.message);
             }
@@ -639,18 +675,23 @@ public final class ServiceScheduledTasks {
 
         private final String time;
 
+        @JsonCreator
         public NextExecution(@JsonProperty("time") String time) {
             this.time = time;
         }
 
-        public String time() {
+        public String getTime() {
             return time;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             NextExecution that = (NextExecution) o;
             return Objects.equals(time, that.time);
         }
@@ -675,23 +716,23 @@ public final class ServiceScheduledTasks {
 
         private final String target;
 
-        /**
-         * Creates a new Runnable.
-         *
-         * @param target The target for execution.
-         */
+        @JsonCreator
         public Runnable(@JsonProperty("target") String target) {
             this.target = target;
         }
 
-        public String target() {
+        public String getTarget() {
             return target;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Runnable runnable = (Runnable) o;
             return Objects.equals(target, runnable.target);
         }

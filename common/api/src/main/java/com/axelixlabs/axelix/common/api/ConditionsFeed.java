@@ -53,8 +53,12 @@ public final class ConditionsFeed {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ConditionsFeed that = (ConditionsFeed) o;
         return Objects.equals(positiveConditions, that.positiveConditions)
                 && Objects.equals(negativeConditions, that.negativeConditions);
@@ -97,8 +101,12 @@ public final class ConditionsFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             PositiveCondition that = (PositiveCondition) o;
             return Objects.equals(target, that.target) && Objects.equals(matches, that.matches);
         }
@@ -144,8 +152,12 @@ public final class ConditionsFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             NegativeCondition that = (NegativeCondition) o;
             return Objects.equals(target, that.target)
                     && Objects.equals(notMatched, that.notMatched)
@@ -192,8 +204,12 @@ public final class ConditionsFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             ConditionMatch that = (ConditionMatch) o;
             return Objects.equals(condition, that.condition) && Objects.equals(message, that.message);
         }

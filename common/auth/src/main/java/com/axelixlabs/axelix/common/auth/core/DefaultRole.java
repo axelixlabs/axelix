@@ -45,24 +45,28 @@ public final class DefaultRole implements Role {
     }
 
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
     @Override
-    public Set<Authority> authorities() {
+    public Set<Authority> getAuthorities() {
         return authorities;
     }
 
     @Override
-    public Set<Role> components() {
+    public Set<Role> getComponents() {
         return components;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         DefaultRole that = (DefaultRole) o;
         return Objects.equals(name, that.name)
                 && Objects.equals(authorities, that.authorities)

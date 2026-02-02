@@ -66,11 +66,11 @@ public class InstanceDetailsConverter implements Converter<DetailsConversionRequ
         Instance instance = instanceRegistry.get(instanceId).orElseThrow(InstanceNotFoundException::new);
 
         String serviceName = instance.name();
-        GitProfile gitProfile = gitDetailsConverter(source.git());
-        RuntimeProfile runtimeProfile = runtimeDetailsConverter(source.runtime());
-        SpringProfile springProfile = springDetailsConverter(source.spring());
-        BuildProfile buildProfile = buildDetailsConverter(source.build());
-        OSProfile osProfile = osDetailsConverter(source.os());
+        GitProfile gitProfile = gitDetailsConverter(source.getGit());
+        RuntimeProfile runtimeProfile = runtimeDetailsConverter(source.getRuntime());
+        SpringProfile springProfile = springDetailsConverter(source.getSpring());
+        BuildProfile buildProfile = buildDetailsConverter(source.getBuild());
+        OSProfile osProfile = osDetailsConverter(source.getOs());
 
         return new InstanceDetailsResponse(
                 serviceName, gitProfile, runtimeProfile, springProfile, buildProfile, osProfile, instance.vmFeatures());
@@ -78,34 +78,34 @@ public class InstanceDetailsConverter implements Converter<DetailsConversionRequ
 
     private GitProfile gitDetailsConverter(GitDetails gitDetails) {
         return new InstanceDetailsResponse.GitProfile(
-                gitDetails.commitShaShort(),
-                gitDetails.branch(),
-                gitDetails.commitAuthor().name(),
-                gitDetails.commitAuthor().email(),
-                gitDetails.commitTimestamp());
+                gitDetails.getCommitShaShort(),
+                gitDetails.getBranch(),
+                gitDetails.getCommitAuthor().getName(),
+                gitDetails.getCommitAuthor().getEmail(),
+                gitDetails.getCommitTimestamp());
     }
 
     private RuntimeProfile runtimeDetailsConverter(RuntimeDetails runtimeDetails) {
         return new RuntimeProfile(
-                runtimeDetails.javaVersion(),
-                runtimeDetails.kotlinVersion(),
-                runtimeDetails.jdkVendor(),
-                runtimeDetails.garbageCollector());
+                runtimeDetails.getJavaVersion(),
+                runtimeDetails.getKotlinVersion(),
+                runtimeDetails.getJdkVendor(),
+                runtimeDetails.getGarbageCollector());
     }
 
     private SpringProfile springDetailsConverter(SpringDetails springDetails) {
         return new SpringProfile(
-                springDetails.springBootVersion(),
-                springDetails.springFrameworkVersion(),
-                springDetails.springCloudVersion());
+                springDetails.getSpringBootVersion(),
+                springDetails.getSpringFrameworkVersion(),
+                springDetails.getSpringCloudVersion());
     }
 
     private BuildProfile buildDetailsConverter(BuildDetails buildDetails) {
         return new InstanceDetailsResponse.BuildProfile(
-                buildDetails.artifact(), buildDetails.version(), buildDetails.group(), buildDetails.time());
+                buildDetails.getArtifact(), buildDetails.getVersion(), buildDetails.getGroup(), buildDetails.getTime());
     }
 
     private OSProfile osDetailsConverter(OsDetails osDetails) {
-        return new OSProfile(osDetails.name(), osDetails.version(), osDetails.arch());
+        return new OSProfile(osDetails.getName(), osDetails.getVersion(), osDetails.getArch());
     }
 }

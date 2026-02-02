@@ -33,14 +33,14 @@ public interface Role {
      *
      * @return the name of the role.
      */
-    String name();
+    String getName();
 
     /**
      * Authorities of a given role.
      *
      * @return immutable set of {@link Authority} objects associated with this role
      */
-    Set<Authority> authorities();
+    Set<Authority> getAuthorities();
 
     /**
      * Component roles that are included in this role.
@@ -51,5 +51,5 @@ public interface Role {
      *
      * @return immutable set of {@link Role} objects included in this role
      */
-    Set<Role> components();
+    Set<Role> getComponents();
 }

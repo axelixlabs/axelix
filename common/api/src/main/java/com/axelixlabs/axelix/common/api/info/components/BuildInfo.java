@@ -69,8 +69,12 @@ public final class BuildInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         BuildInfo buildInfo = (BuildInfo) o;
         return Objects.equals(artifact, buildInfo.artifact)
                 && Objects.equals(name, buildInfo.name)

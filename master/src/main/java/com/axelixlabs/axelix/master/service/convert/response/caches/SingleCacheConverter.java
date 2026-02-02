@@ -35,6 +35,6 @@ public class SingleCacheConverter implements Converter<SingleCache, CacheProfile
 
     @Override
     public @NonNull CacheProfileResponse convertInternal(@NonNull SingleCache source) {
-        return new CacheProfileResponse(source.name(), source.target(), source.cacheManager());
+        return new CacheProfileResponse(source.getName(), source.getTarget(), source.getCacheManager());
     }
 }

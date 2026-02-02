@@ -57,8 +57,12 @@ public final class GitInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         GitInfo gitInfo = (GitInfo) o;
         return Objects.equals(commitShaShort, gitInfo.commitShaShort)
                 && Objects.equals(branch, gitInfo.branch)
@@ -113,8 +117,12 @@ public final class GitInfo {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             CommitAuthor that = (CommitAuthor) o;
             return Objects.equals(name, that.name) && Objects.equals(email, that.email);
         }

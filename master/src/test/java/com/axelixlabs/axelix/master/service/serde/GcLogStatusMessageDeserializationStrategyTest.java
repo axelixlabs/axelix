@@ -55,8 +55,8 @@ class GcLogStatusMessageDeserializationStrategyTest {
 
         GcLogStatusResponse gcLogStatusResponse = subject.deserialize(STATUS_RESPONSE.getBytes());
         assertThat(gcLogStatusResponse).isNotNull();
-        assertThat(gcLogStatusResponse.enabled()).isTrue();
-        assertThat(gcLogStatusResponse.level()).isEqualTo("info");
-        assertThat(gcLogStatusResponse.availableLevels()).containsOnly("info", "debug", "warning", "error", "trace");
+        assertThat(gcLogStatusResponse.isEnabled()).isTrue();
+        assertThat(gcLogStatusResponse.getLevel()).isEqualTo("info");
+        assertThat(gcLogStatusResponse.getAvailableLevels()).containsOnly("info", "debug", "warning", "error", "trace");
     }
 }

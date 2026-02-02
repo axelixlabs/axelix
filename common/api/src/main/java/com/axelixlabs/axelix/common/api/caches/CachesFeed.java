@@ -17,10 +17,10 @@
  */
 package com.axelixlabs.axelix.common.api.caches;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
@@ -40,22 +40,23 @@ public final class CachesFeed {
      *
      * @param cacheManagers The list of cache managers in the application.
      */
+    @JsonCreator
     public CachesFeed(@JsonProperty("cacheManagers") List<CacheManager> cacheManagers) {
         this.cacheManagers = cacheManagers;
     }
 
-    public CachesFeed() {
-        this(Collections.emptyList());
-    }
-
-    public List<CacheManager> cacheManagers() {
+    public List<CacheManager> getCacheManagers() {
         return cacheManagers;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         CachesFeed that = (CachesFeed) o;
         return Objects.equals(cacheManagers, that.cacheManagers);
     }
@@ -84,23 +85,28 @@ public final class CachesFeed {
          * @param name   The cache manager name.
          * @param caches The caches are identified by the cache name.
          */
+        @JsonCreator
         public CacheManager(@JsonProperty("name") String name, @JsonProperty("caches") List<Cache> caches) {
             this.name = name;
             this.caches = caches;
         }
 
-        public String name() {
+        public String getName() {
             return name;
         }
 
-        public List<Cache> caches() {
+        public List<Cache> getCaches() {
             return caches;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             CacheManager that = (CacheManager) o;
             return Objects.equals(name, that.name) && Objects.equals(caches, that.caches);
         }
@@ -145,6 +151,7 @@ public final class CachesFeed {
          * @param estimatedEntrySize The estimated number of entries in the cache, or {@code null} if unknown.
          * @param enabled            Whether the cache is enabled ({@code true}) or disabled ({@code false}).
          */
+        @JsonCreator
         public Cache(
                 @JsonProperty("name") String name,
                 @JsonProperty("target") String target,
@@ -160,37 +167,41 @@ public final class CachesFeed {
             this.enabled = enabled;
         }
 
-        public String name() {
+        public String getName() {
             return name;
         }
 
-        public String target() {
+        public String getTarget() {
             return target;
         }
 
         @Nullable
-        public Long hitsCount() {
+        public Long getHitsCount() {
             return hitsCount;
         }
 
         @Nullable
-        public Long missesCount() {
+        public Long getMissesCount() {
             return missesCount;
         }
 
         @Nullable
-        public Long estimatedEntrySize() {
+        public Long getEstimatedEntrySize() {
             return estimatedEntrySize;
         }
 
-        public boolean enabled() {
+        public boolean isEnabled() {
             return enabled;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Cache cache = (Cache) o;
             return enabled == cache.enabled
                     && Objects.equals(name, cache.name)

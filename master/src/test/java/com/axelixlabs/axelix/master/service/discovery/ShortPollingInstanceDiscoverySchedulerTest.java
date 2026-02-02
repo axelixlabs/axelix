@@ -130,14 +130,14 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
-              "versions" : {
+              "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
               "healthStatus" : "UP",
-              "memory" : {
+              "memoryDetails" : {
                 "heap" : 12000
               },
               "vmFeatures": [
@@ -199,14 +199,14 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
-              "versions" : {
+              "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "25",
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
               "healthStatus" : "UP",
-              "memory" : {
+              "memoryDetails" : {
                 "heap" : 12000
               },
               "vmFeatures": [
@@ -227,14 +227,14 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "910230",
               "jdkVendor" : "BellSoft",
-              "versions" : {
+              "softwareVersions" : {
                 "springBoot" : "3.5.2",
                 "java" : "25",
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
               "healthStatus" : "DOWN",
-              "memory" : {
+              "memoryDetails" : {
                 "heap" : 12000
               },
               "vmFeatures": [
@@ -292,14 +292,14 @@ class ShortPollingInstanceDiscoverySchedulerTest {
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "910230",
               "jdkVendor" : "BellSoft",
-              "versions" : {
+              "softwareVersions" : {
                 "springBoot" : "3.5.2",
                 "java" : "25",
                 "springFramework" : "6.1.2",
                 "kotlin" : null
               },
               "healthStatus" : "DOWN",
-              "memory" : {
+              "memoryDetails" : {
                 "heap" : 12000
               },
               "vmFeatures": [

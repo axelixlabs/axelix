@@ -79,7 +79,7 @@ class ServiceMetadataEndpointProberTest {
               "serviceVersion" : "3.5.0-SNAPSHOT",
               "commitShortSha" : "a8b0929",
               "jdkVendor" : "BellSoft",
-              "versions" : {
+              "softwareVersions" : {
                 "springBoot" : "3.5.0",
                 "java" : "17.0.14u",
                 "springFramework" : "6.1.2",
@@ -112,12 +112,12 @@ class ServiceMetadataEndpointProberTest {
         ServiceMetadata metadata = metadataEndpointProber.invoke(instanceUrl + "/actuator", NoHttpPayload.INSTANCE);
 
         assertThat(metadata).isNotNull();
-        assertThat(metadata.version()).isEqualTo("1.0.0-SNAPSHOT");
-        assertThat(metadata.serviceVersion()).isEqualTo("3.5.0-SNAPSHOT");
-        assertThat(metadata.commitShortSha()).isEqualTo("a8b0929");
-        assertThat(metadata.versions().java()).isEqualTo("17.0.14u");
-        assertThat(metadata.versions().springBoot()).isEqualTo("3.5.0");
-        assertThat(metadata.healthStatus()).isEqualTo(ServiceMetadata.HealthStatus.UP);
+        assertThat(metadata.getVersion()).isEqualTo("1.0.0-SNAPSHOT");
+        assertThat(metadata.getServiceVersion()).isEqualTo("3.5.0-SNAPSHOT");
+        assertThat(metadata.getCommitShortSha()).isEqualTo("a8b0929");
+        assertThat(metadata.getSoftwareVersions().getJava()).isEqualTo("17.0.14u");
+        assertThat(metadata.getSoftwareVersions().getSpringBoot()).isEqualTo("3.5.0");
+        assertThat(metadata.getHealthStatus()).isEqualTo(ServiceMetadata.HealthStatus.UP);
     }
 
     @Test

@@ -37,11 +37,11 @@ public class ConfigPropsFeedConverter implements Converter<ConfigPropsFeed, Conf
     public @NonNull ConfigPropsFeedResponse convertInternal(@NonNull ConfigPropsFeed source) {
         ConfigPropsFeedResponse response = new ConfigPropsFeedResponse();
 
-        source.contexts().values().forEach(context -> {
-            if (context != null && context.beans() != null) {
-                context.beans()
-                        .forEach((beanName, bean) -> response.addBean(
-                                new ConfigPropsProfile(beanName, bean.prefix(), bean.properties(), bean.inputs())));
+        source.getContexts().values().forEach(context -> {
+            if (context != null && context.getBeans() != null) {
+                context.getBeans()
+                        .forEach((beanName, bean) -> response.addBean(new ConfigPropsProfile(
+                                beanName, bean.getPrefix(), bean.getProperties(), bean.getInputs())));
             }
         });
 

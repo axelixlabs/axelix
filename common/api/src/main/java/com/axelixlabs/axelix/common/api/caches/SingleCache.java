@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.common.api.caches;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
@@ -56,6 +57,7 @@ public final class SingleCache {
      * @param estimatedEntrySize The estimated number of entries in the cache, or {@code null} if unknown.
      * @param enabled            Whether the cache is enabled ({@code true}) or disabled ({@code false}).
      */
+    @JsonCreator
     public SingleCache(
             @JsonProperty("name") String name,
             @JsonProperty("target") String target,
@@ -73,41 +75,45 @@ public final class SingleCache {
         this.enabled = enabled;
     }
 
-    public String name() {
+    public String getName() {
         return name;
     }
 
-    public String target() {
+    public String getTarget() {
         return target;
     }
 
-    public String cacheManager() {
+    public String getCacheManager() {
         return cacheManager;
     }
 
     @Nullable
-    public Long hitsCount() {
+    public Long getHitsCount() {
         return hitsCount;
     }
 
     @Nullable
-    public Long missesCount() {
+    public Long getMissesCount() {
         return missesCount;
     }
 
     @Nullable
-    public Long estimatedEntrySize() {
+    public Long getEstimatedEntrySize() {
         return estimatedEntrySize;
     }
 
-    public boolean enabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         SingleCache that = (SingleCache) o;
         return enabled == that.enabled
                 && Objects.equals(name, that.name)

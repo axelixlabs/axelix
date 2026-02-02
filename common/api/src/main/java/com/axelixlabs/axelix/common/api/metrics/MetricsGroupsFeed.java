@@ -20,6 +20,9 @@ package com.axelixlabs.axelix.common.api.metrics;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * The response returned by the custom metric groups list endpoint.
  *
@@ -34,18 +37,23 @@ public final class MetricsGroupsFeed {
      *
      * @param metricsGroups the list of groups.
      */
-    public MetricsGroupsFeed(List<MetricsGroup> metricsGroups) {
+    @JsonCreator
+    public MetricsGroupsFeed(@JsonProperty("metricsGroups") List<MetricsGroup> metricsGroups) {
         this.metricsGroups = metricsGroups;
     }
 
-    public List<MetricsGroup> metricsGroups() {
+    public List<MetricsGroup> getMetricsGroups() {
         return metricsGroups;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MetricsGroupsFeed that = (MetricsGroupsFeed) o;
         return Objects.equals(metricsGroups, that.metricsGroups);
     }
@@ -71,26 +79,32 @@ public final class MetricsGroupsFeed {
         /**
          * Creates a new MetricsGroup.
          *
-         * @param groupName the name of the group to which the {@link #metrics()} belong to.
+         * @param groupName the name of the group to which the {@link #getMetrics()} belong to.
          * @param metrics   the names and descriptions of the metrics inside the given group.
          */
-        public MetricsGroup(String groupName, List<MetricDescription> metrics) {
+        @JsonCreator
+        public MetricsGroup(
+                @JsonProperty("groupName") String groupName, @JsonProperty("metrics") List<MetricDescription> metrics) {
             this.groupName = groupName;
             this.metrics = metrics;
         }
 
-        public String groupName() {
+        public String getGroupName() {
             return groupName;
         }
 
-        public List<MetricDescription> metrics() {
+        public List<MetricDescription> getMetrics() {
             return metrics;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             MetricsGroup that = (MetricsGroup) o;
             return Objects.equals(groupName, that.groupName) && Objects.equals(metrics, that.metrics);
         }
@@ -119,23 +133,29 @@ public final class MetricsGroupsFeed {
              * @param metricName  the name of the metric.
              * @param description the description of the metrics.
              */
-            public MetricDescription(String metricName, String description) {
+            @JsonCreator
+            public MetricDescription(
+                    @JsonProperty("metricName") String metricName, @JsonProperty("description") String description) {
                 this.metricName = metricName;
                 this.description = description;
             }
 
-            public String metricName() {
+            public String getMetricName() {
                 return metricName;
             }
 
-            public String description() {
+            public String getDescription() {
                 return description;
             }
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
                 MetricDescription that = (MetricDescription) o;
                 return Objects.equals(metricName, that.metricName) && Objects.equals(description, that.description);
             }

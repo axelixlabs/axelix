@@ -50,8 +50,12 @@ public final class GitInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         GitInfo gitInfo = (GitInfo) o;
         return Objects.equals(branch, gitInfo.branch) && Objects.equals(commit, gitInfo.commit);
     }
@@ -86,8 +90,12 @@ public final class GitInfo {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             Commit commit = (Commit) o;
             return Objects.equals(id, commit.id) && Objects.equals(time, commit.time);
         }

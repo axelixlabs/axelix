@@ -52,8 +52,12 @@ public final class ShortBuildInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ShortBuildInfo that = (ShortBuildInfo) o;
         return Objects.equals(buildTimestamp, that.buildTimestamp)
                 && Objects.equals(serviceVersion, that.serviceVersion);

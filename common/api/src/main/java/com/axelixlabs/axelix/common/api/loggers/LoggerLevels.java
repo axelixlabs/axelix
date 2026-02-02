@@ -52,8 +52,12 @@ public final class LoggerLevels {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         LoggerLevels that = (LoggerLevels) o;
         return Objects.equals(configuredLevel, that.configuredLevel)
                 && Objects.equals(effectiveLevel, that.effectiveLevel);

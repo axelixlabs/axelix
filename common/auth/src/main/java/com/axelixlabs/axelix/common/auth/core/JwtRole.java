@@ -51,22 +51,26 @@ public final class JwtRole {
         this.components = components != null ? components : Collections.emptyList();
     }
 
-    public String name() {
+    public String getName() {
         return name;
     }
 
-    public Set<String> authorities() {
+    public Set<String> getAuthorities() {
         return authorities;
     }
 
-    public List<JwtRole> components() {
+    public List<JwtRole> getComponents() {
         return components;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         JwtRole jwtRole = (JwtRole) o;
         return Objects.equals(name, jwtRole.name)
                 && Objects.equals(authorities, jwtRole.authorities)

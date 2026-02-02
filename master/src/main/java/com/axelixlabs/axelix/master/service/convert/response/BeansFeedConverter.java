@@ -50,25 +50,25 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
     public @NonNull BeansFeedResponse convertInternal(@NonNull BeansFeed source) {
         BeansFeedResponse beansFeedResponse = new BeansFeedResponse();
 
-        source.contexts().values().forEach(context -> {
-            if (context != null && context.beans() != null) {
-                context.beans().forEach((beanName, bean) -> {
+        source.getContexts().values().forEach(context -> {
+            if (context != null && context.getBeans() != null) {
+                context.getBeans().forEach((beanName, bean) -> {
                     boolean isConfigPropsBean = bean.isConfigPropsBean();
                     String processedBeanName =
                             isConfigPropsBean ? BeanNameUtils.stripConfigPropsPrefix(beanName) : beanName;
 
                     BeanShortProfile profile = new BeanShortProfile(
                             processedBeanName,
-                            bean.scope(),
-                            bean.type(),
-                            ProxyType.valueOf(bean.proxyType().name()),
-                            bean.aliases(),
-                            bean.autoConfigurationRef(),
-                            convertDependencies(bean.dependencies()),
+                            bean.getScope(),
+                            bean.getType(),
+                            ProxyType.valueOf(bean.getProxyType().name()),
+                            bean.getAliases(),
+                            bean.getAutoConfigurationRef(),
+                            convertDependencies(bean.getDependencies()),
                             bean.isPrimary(),
                             bean.isLazyInit(),
                             isConfigPropsBean,
-                            bean.qualifiers(),
+                            bean.getQualifiers(),
                             covertBeanSource(bean));
                     beansFeedResponse.addBean(profile);
                 });
@@ -83,7 +83,7 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
                 .map(dep -> {
                     boolean isConfigPropsDep = dep.isConfigPropsDependency();
                     String processedDepName =
-                            isConfigPropsDep ? BeanNameUtils.stripConfigPropsPrefix(dep.name()) : dep.name();
+                            isConfigPropsDep ? BeanNameUtils.stripConfigPropsPrefix(dep.getName()) : dep.getName();
 
                     return new BeanDependencyProfile(processedDepName, isConfigPropsDep);
                 })
@@ -91,17 +91,17 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
     }
 
     private static BeanSource covertBeanSource(BeansFeed.Bean bean) {
-        BeansFeed.BeanSource beanSource = bean.beanSource();
+        BeansFeed.BeanSource beanSource = bean.getBeanSource();
 
         // TODO: migrate to switch over the sealed interface on java 21
         return switch (beanSource.origin()) {
             case COMPONENT_ANNOTATION -> new ComponentVariant();
             case BEAN_METHOD ->
                 new BeanMethod(
-                        ((BeansFeed.BeanMethod) beanSource).enclosingClassName(),
-                        ((BeansFeed.BeanMethod) beanSource).enclosingClassFullName(),
-                        ((BeansFeed.BeanMethod) beanSource).methodName());
-            case FACTORY_BEAN -> new FactoryBean(((BeansFeed.FactoryBean) beanSource).factoryBeanName());
+                        ((BeansFeed.BeanMethod) beanSource).getEnclosingClassName(),
+                        ((BeansFeed.BeanMethod) beanSource).getEnclosingClassFullName(),
+                        ((BeansFeed.BeanMethod) beanSource).getMethodName());
+            case FACTORY_BEAN -> new FactoryBean(((BeansFeed.FactoryBean) beanSource).getFactoryBeanName());
             case SYNTHETIC_BEAN -> new BeanShortProfile.SyntheticBean();
             case UNKNOWN -> new UnknownBean();
         };

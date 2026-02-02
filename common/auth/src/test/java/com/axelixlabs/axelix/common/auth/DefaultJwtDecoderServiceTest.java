@@ -78,54 +78,54 @@ class DefaultJwtDecoderServiceTest {
     void shouldDecodeValidJwtToken() {
         DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithTwoRole);
 
-        Role userRole = decodedUser.roles().stream()
-                .filter(role -> role.name().equals("ROLE_USER"))
+        Role userRole = decodedUser.getRoles().stream()
+                .filter(role -> role.getName().equals("ROLE_USER"))
                 .findFirst()
                 .orElseThrow();
 
-        Role engineerRole = decodedUser.roles().stream()
-                .filter(role -> role.name().equals("ROLE_ENGINEER"))
+        Role engineerRole = decodedUser.getRoles().stream()
+                .filter(role -> role.getName().equals("ROLE_ENGINEER"))
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(userRole.authorities()).containsAll(Set.of(DefaultAuthority.ENV, DefaultAuthority.INFO));
-        assertThat(engineerRole.authorities()).containsAll(Set.of(DefaultAuthority.BEANS, DefaultAuthority.HEALTH));
+        assertThat(userRole.getAuthorities()).containsAll(Set.of(DefaultAuthority.ENV, DefaultAuthority.INFO));
+        assertThat(engineerRole.getAuthorities()).containsAll(Set.of(DefaultAuthority.BEANS, DefaultAuthority.HEALTH));
     }
 
     @Test
     void shouldDecodeValidJwtToken_WithRoleHierarchy() {
         DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithAdminRoleHierarchy);
 
-        Role rootRole = decodedUser.roles().stream()
-                .filter(role -> role.name().equals("ROLE_ROOT"))
+        Role rootRole = decodedUser.getRoles().stream()
+                .filter(role -> role.getName().equals("ROLE_ROOT"))
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(rootRole.components()).hasSize(2);
+        assertThat(rootRole.getComponents()).hasSize(2);
 
-        Role adminRole = rootRole.components().stream()
-                .filter(role -> role.name().equals("ROLE_ADMIN"))
+        Role adminRole = rootRole.getComponents().stream()
+                .filter(role -> role.getName().equals("ROLE_ADMIN"))
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(adminRole.authorities()).contains(DefaultAuthority.PROFILE_MANAGEMENT);
+        assertThat(adminRole.getAuthorities()).contains(DefaultAuthority.PROFILE_MANAGEMENT);
 
-        Role engineerRole = adminRole.components().iterator().next();
+        Role engineerRole = adminRole.getComponents().iterator().next();
 
-        assertThat(engineerRole.name()).isEqualTo("ROLE_ENGINEER");
-        assertThat(engineerRole.authorities()).isEqualTo(Set.of(DefaultAuthority.ENV));
+        assertThat(engineerRole.getName()).isEqualTo("ROLE_ENGINEER");
+        assertThat(engineerRole.getAuthorities()).isEqualTo(Set.of(DefaultAuthority.ENV));
 
-        Role userRole = engineerRole.components().iterator().next();
+        Role userRole = engineerRole.getComponents().iterator().next();
 
-        assertThat(userRole.name()).isEqualTo("ROLE_USER");
-        assertThat(userRole.authorities()).isEqualTo(Set.of(DefaultAuthority.INFO));
+        assertThat(userRole.getName()).isEqualTo("ROLE_USER");
+        assertThat(userRole.getAuthorities()).isEqualTo(Set.of(DefaultAuthority.INFO));
 
-        Role readRole = rootRole.components().stream()
-                .filter(role -> role.name().equals("ROLE_READ"))
+        Role readRole = rootRole.getComponents().stream()
+                .filter(role -> role.getName().equals("ROLE_READ"))
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(readRole.authorities()).contains(DefaultAuthority.BEANS);
+        assertThat(readRole.getAuthorities()).contains(DefaultAuthority.BEANS);
     }
 
     @Test
@@ -159,17 +159,17 @@ class DefaultJwtDecoderServiceTest {
     void shouldOmitInvalidAuthority() {
         DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithUnrecognizedAuthorities);
 
-        assertThat(decodedUser.roles())
+        assertThat(decodedUser.getRoles())
                 .first()
-                .satisfies(role -> assertThat(role.authorities()).hasSize(1).containsOnly(DefaultAuthority.ENV));
+                .satisfies(role -> assertThat(role.getAuthorities()).hasSize(1).containsOnly(DefaultAuthority.ENV));
     }
 
     @Test
     void shouldDecodeValidJwtTokenWithoutUserRoles() {
         DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenWithEmptyRoles);
 
-        assertThat(decodedUser.username()).isEqualTo("userWithEmptyRoles");
-        assertThat(decodedUser.roles()).isEmpty();
+        assertThat(decodedUser.getUsername()).isEqualTo("userWithEmptyRoles");
+        assertThat(decodedUser.getRoles()).isEmpty();
     }
 
     @Test

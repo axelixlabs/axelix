@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.common.api;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
@@ -45,6 +46,7 @@ public final class InstanceDetails {
      * @param build   The DTO containing build component details.
      * @param os      The DTO containing OS component details.
      */
+    @JsonCreator
     public InstanceDetails(
             @JsonProperty("git") GitDetails git,
             @JsonProperty("spring") SpringDetails spring,
@@ -58,30 +60,34 @@ public final class InstanceDetails {
         this.os = os;
     }
 
-    public GitDetails git() {
+    public GitDetails getGit() {
         return git;
     }
 
-    public SpringDetails spring() {
+    public SpringDetails getSpring() {
         return spring;
     }
 
-    public RuntimeDetails runtime() {
+    public RuntimeDetails getRuntime() {
         return runtime;
     }
 
-    public BuildDetails build() {
+    public BuildDetails getBuild() {
         return build;
     }
 
-    public OsDetails os() {
+    public OsDetails getOs() {
         return os;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         InstanceDetails that = (InstanceDetails) o;
         return Objects.equals(git, that.git)
                 && Objects.equals(spring, that.spring)
@@ -129,6 +135,7 @@ public final class InstanceDetails {
          * @param commitAuthor    The commit author information.
          * @param commitTimestamp The timestamp of the commit.
          */
+        @JsonCreator
         public GitDetails(
                 @JsonProperty("commitShaShort") String commitShaShort,
                 @JsonProperty("branch") String branch,
@@ -140,26 +147,30 @@ public final class InstanceDetails {
             this.commitTimestamp = commitTimestamp;
         }
 
-        public String commitShaShort() {
+        public String getCommitShaShort() {
             return commitShaShort;
         }
 
-        public String branch() {
+        public String getBranch() {
             return branch;
         }
 
-        public CommitAuthor commitAuthor() {
+        public CommitAuthor getCommitAuthor() {
             return commitAuthor;
         }
 
-        public String commitTimestamp() {
+        public String getCommitTimestamp() {
             return commitTimestamp;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             GitDetails that = (GitDetails) o;
             return Objects.equals(commitShaShort, that.commitShaShort)
                     && Objects.equals(branch, that.branch)
@@ -203,23 +214,28 @@ public final class InstanceDetails {
              * @param name  The commit author name.
              * @param email The commit author email.
              */
+            @JsonCreator
             public CommitAuthor(@JsonProperty("name") String name, @JsonProperty("email") String email) {
                 this.name = name;
                 this.email = email;
             }
 
-            public String name() {
+            public String getName() {
                 return name;
             }
 
-            public String email() {
+            public String getEmail() {
                 return email;
             }
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
                 CommitAuthor that = (CommitAuthor) o;
                 return Objects.equals(name, that.name) && Objects.equals(email, that.email);
             }
@@ -255,6 +271,7 @@ public final class InstanceDetails {
          * @param springFrameworkVersion The version of the Spring Framework.
          * @param springCloudVersion     The version of the Spring Cloud, if any.
          */
+        @JsonCreator
         public SpringDetails(
                 @JsonProperty("springBootVersion") String springBootVersion,
                 @JsonProperty("springFrameworkVersion") String springFrameworkVersion,
@@ -264,23 +281,27 @@ public final class InstanceDetails {
             this.springCloudVersion = springCloudVersion;
         }
 
-        public String springBootVersion() {
+        public String getSpringBootVersion() {
             return springBootVersion;
         }
 
-        public String springFrameworkVersion() {
+        public String getSpringFrameworkVersion() {
             return springFrameworkVersion;
         }
 
         @Nullable
-        public String springCloudVersion() {
+        public String getSpringCloudVersion() {
             return springCloudVersion;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             SpringDetails that = (SpringDetails) o;
             return Objects.equals(springBootVersion, that.springBootVersion)
                     && Objects.equals(springFrameworkVersion, that.springFrameworkVersion)
@@ -329,6 +350,7 @@ public final class InstanceDetails {
          * @param garbageCollector The name of the garbage collector.
          * @param kotlinVersion    The version of the kotlin, if any.
          */
+        @JsonCreator
         public RuntimeDetails(
                 @JsonProperty("javaVersion") String javaVersion,
                 @JsonProperty("jdkVendor") String jdkVendor,
@@ -340,27 +362,31 @@ public final class InstanceDetails {
             this.kotlinVersion = kotlinVersion;
         }
 
-        public String javaVersion() {
+        public String getJavaVersion() {
             return javaVersion;
         }
 
-        public String jdkVendor() {
+        public String getJdkVendor() {
             return jdkVendor;
         }
 
-        public String garbageCollector() {
+        public String getGarbageCollector() {
             return garbageCollector;
         }
 
         @Nullable
-        public String kotlinVersion() {
+        public String getKotlinVersion() {
             return kotlinVersion;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             RuntimeDetails that = (RuntimeDetails) o;
             return Objects.equals(javaVersion, that.javaVersion)
                     && Objects.equals(jdkVendor, that.jdkVendor)
@@ -421,26 +447,30 @@ public final class InstanceDetails {
             this.time = time;
         }
 
-        public String artifact() {
+        public String getArtifact() {
             return artifact;
         }
 
-        public String version() {
+        public String getVersion() {
             return version;
         }
 
-        public String group() {
+        public String getGroup() {
             return group;
         }
 
-        public String time() {
+        public String getTime() {
             return time;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             BuildDetails that = (BuildDetails) o;
             return Objects.equals(artifact, that.artifact)
                     && Objects.equals(version, that.version)
@@ -497,22 +527,26 @@ public final class InstanceDetails {
             this.arch = arch;
         }
 
-        public String name() {
+        public String getName() {
             return name;
         }
 
-        public String version() {
+        public String getVersion() {
             return version;
         }
 
-        public String arch() {
+        public String getArch() {
             return arch;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             OsDetails osDetails = (OsDetails) o;
             return Objects.equals(name, osDetails.name)
                     && Objects.equals(version, osDetails.version)

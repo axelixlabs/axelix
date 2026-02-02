@@ -113,85 +113,85 @@ class BeansJacksonMessageDeserializationStrategyTest {
 
         BeansFeed beansFeed = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
-        assertThat(beansFeed.contexts()).hasEntrySatisfying("application", context -> {
-            assertThat(context.parentId()).isEqualTo("parentContext");
-            assertThat(context.beans()).hasSize(3);
+        assertThat(beansFeed.getContexts()).hasEntrySatisfying("application", context -> {
+            assertThat(context.getParentId()).isEqualTo("parentContext");
+            assertThat(context.getBeans()).hasSize(3);
 
-            BeansFeed.Bean first = context.beans()
+            BeansFeed.Bean first = context.getBeans()
                     .get(
                             "org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration$DispatcherServletRegistrationConfiguration");
-            assertThat(first.aliases()).containsOnly("abc", "bcd");
-            assertThat(first.autoConfigurationRef())
+            assertThat(first.getAliases()).containsOnly("abc", "bcd");
+            assertThat(first.getAutoConfigurationRef())
                     .isEqualTo("DispatcherServletAutoConfiguration.DispatcherServletRegistrationConfiguration");
-            assertThat(first.dependencies()).isEmpty();
-            assertThat(first.scope()).isEqualTo("singleton");
-            assertThat(first.proxyType()).isEqualTo(BeansFeed.ProxyType.JDK_PROXY);
-            assertThat(first.type())
+            assertThat(first.getDependencies()).isEmpty();
+            assertThat(first.getScope()).isEqualTo("singleton");
+            assertThat(first.getProxyType()).isEqualTo(BeansFeed.ProxyType.JDK_PROXY);
+            assertThat(first.getType())
                     .isEqualTo(
                             "org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration$DispatcherServletRegistrationConfiguration");
             assertThat(first.isLazyInit()).isFalse();
             assertThat(first.isPrimary()).isTrue();
             assertThat(first.isConfigPropsBean()).isTrue();
-            assertThat(first.qualifiers()).containsOnly("qualifier1");
-            assertThat(first.beanSource()).isInstanceOf(BeansFeed.ComponentVariant.class);
+            assertThat(first.getQualifiers()).containsOnly("qualifier1");
+            assertThat(first.getBeanSource()).isInstanceOf(BeansFeed.ComponentVariant.class);
 
-            BeansFeed.Bean second = context.beans()
+            BeansFeed.Bean second = context.getBeans()
                     .get("org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration");
-            assertThat(second.aliases()).isEmpty();
-            assertThat(second.autoConfigurationRef())
+            assertThat(second.getAliases()).isEmpty();
+            assertThat(second.getAutoConfigurationRef())
                     .isEqualTo("HibernateJpaConfiguration#entityManagerFactoryBuilder");
-            assertThat(second.dependencies())
+            assertThat(second.getDependencies())
                     .hasSize(2)
                     .satisfiesExactlyInAnyOrder(
                             dep -> {
-                                assertThat(dep.name())
+                                assertThat(dep.getName())
                                         .isEqualTo(
                                                 "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties");
                                 assertThat(dep.isConfigPropsDependency()).isTrue();
                             },
                             dep -> {
-                                assertThat(dep.name())
+                                assertThat(dep.getName())
                                         .isEqualTo(
                                                 "com.axelixlabs.axelix.sbs.autoconfiguration.AxelixBeansAutoConfiguration");
                                 assertThat(dep.isConfigPropsDependency()).isFalse();
                             });
-            assertThat(second.scope()).isEqualTo("singleton");
-            assertThat(second.proxyType()).isEqualTo(BeansFeed.ProxyType.CGLIB);
-            assertThat(second.type())
+            assertThat(second.getScope()).isEqualTo("singleton");
+            assertThat(second.getProxyType()).isEqualTo(BeansFeed.ProxyType.CGLIB);
+            assertThat(second.getType())
                     .isEqualTo("org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration");
             assertThat(second.isLazyInit()).isTrue();
             assertThat(second.isPrimary()).isFalse();
             assertThat(second.isConfigPropsBean()).isFalse();
-            assertThat(second.qualifiers()).isEmpty();
-            assertThat(second.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
-            assertThat((BeansFeed.BeanMethod) second.beanSource())
-                    .extracting(BeansFeed.BeanMethod::methodName)
+            assertThat(second.getQualifiers()).isEmpty();
+            assertThat(second.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat((BeansFeed.BeanMethod) second.getBeanSource())
+                    .extracting(BeansFeed.BeanMethod::getMethodName)
                     .isEqualTo("entityManagerFactoryBuilder");
 
-            assertThat((BeansFeed.BeanMethod) second.beanSource())
-                    .extracting(BeansFeed.BeanMethod::enclosingClassName)
+            assertThat((BeansFeed.BeanMethod) second.getBeanSource())
+                    .extracting(BeansFeed.BeanMethod::getEnclosingClassName)
                     .isEqualTo("HibernateJpaConfiguration");
 
-            assertThat((BeansFeed.BeanMethod) second.beanSource())
-                    .extracting(BeansFeed.BeanMethod::enclosingClassFullName)
+            assertThat((BeansFeed.BeanMethod) second.getBeanSource())
+                    .extracting(BeansFeed.BeanMethod::getEnclosingClassFullName)
                     .isEqualTo("org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration");
 
-            BeansFeed.Bean third = context.beans()
+            BeansFeed.Bean third = context.getBeans()
                     .get("org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration");
-            assertThat(third.aliases()).isEmpty();
-            assertThat(third.autoConfigurationRef()).isNull();
-            assertThat(third.dependencies()).isEmpty();
-            assertThat(third.scope()).isEqualTo("singleton");
-            assertThat(third.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(third.type())
+            assertThat(third.getAliases()).isEmpty();
+            assertThat(third.getAutoConfigurationRef()).isNull();
+            assertThat(third.getDependencies()).isEmpty();
+            assertThat(third.getScope()).isEqualTo("singleton");
+            assertThat(third.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(third.getType())
                     .isEqualTo("org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration");
             assertThat(third.isLazyInit()).isFalse();
             assertThat(third.isPrimary()).isFalse();
             assertThat(third.isConfigPropsBean()).isTrue();
-            assertThat(third.qualifiers()).containsOnly("main", "secondary");
-            assertThat(third.beanSource()).isInstanceOf(BeansFeed.FactoryBean.class);
-            assertThat((BeansFeed.FactoryBean) third.beanSource())
-                    .extracting(BeansFeed.FactoryBean::factoryBeanName)
+            assertThat(third.getQualifiers()).containsOnly("main", "secondary");
+            assertThat(third.getBeanSource()).isInstanceOf(BeansFeed.FactoryBean.class);
+            assertThat((BeansFeed.FactoryBean) third.getBeanSource())
+                    .extracting(BeansFeed.FactoryBean::getFactoryBeanName)
                     .isEqualTo("org.springframework.data.repository.config.PropertiesBasedNamedQueriesFactoryBean");
         });
     }
