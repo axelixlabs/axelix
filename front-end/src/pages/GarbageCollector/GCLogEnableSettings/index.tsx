@@ -15,12 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Modal, Select } from "antd";
+import { Select } from "antd";
 import type { AxiosError } from "axios";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
+import { UniversalModal } from "components";
 import { extractErrorCode } from "helpers";
 import { type IErrorResponse, type IGCLoggingStatusResponseBody, StatelessRequest } from "models";
 import { enableGCLogging } from "services";
@@ -81,18 +82,14 @@ export const GCLogEnableSettings = ({ isModalOpen, setIsModalOpen, logginsStatus
     };
 
     return (
-        <Modal
+        <UniversalModal
             title={t("GC.modalWindow.title")}
             open={isModalOpen}
             onOk={onOk}
-            onCancel={onClose}
+            displayCancel={false}
+            onClose={onClose}
             okText={t("GC.modalWindow.submit")}
-            centered
-            width={550}
             loading={enableGCLoggingData.loading}
-            cancelButtonProps={{
-                style: { display: "none" },
-            }}
         >
             <div className={styles.ContentWrapper}>
                 <div>{t("GC.modalWindow.selectLoggingLevel")}:</div>
@@ -104,6 +101,6 @@ export const GCLogEnableSettings = ({ isModalOpen, setIsModalOpen, logginsStatus
                     className={styles.LoggingLevelSelect}
                 />
             </div>
-        </Modal>
+        </UniversalModal>
     );
 };

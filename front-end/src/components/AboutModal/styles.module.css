@@ -17,15 +17,16 @@
 }
 
 .ParagraphGutter > a {
-    color: #1677ff;
+    color: var(--axelix-primary-blue);
     transition: color 0.3s;
 }
 
 .ParagraphGutter > a:hover {
-    color: #69b1ff;
+    color: var(--axelix-primary-light-blue);
 }
 
 .ActionsWrapper {
     display: flex;
     column-gap: 12px;
+    margin-bottom: 20px;
 }

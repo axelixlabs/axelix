@@ -17,9 +17,11 @@
  */
 import { FileTextOutlined, GithubOutlined, ReadOutlined } from "@ant-design/icons";
 
-import { Button, Modal } from "antd";
+import { Button } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { Trans, useTranslation } from "react-i18next";
+
+import { UniversalModal } from "components";
 
 import styles from "./styles.module.css";
 
@@ -44,21 +46,14 @@ export function AboutModal({ open, setOpen }: IProps) {
     const referenceGuideLink = import.meta.env.VITE_APP_REFERENCE_GUIDE_LINK;
     const blogLink = import.meta.env.VITE_APP_BLOG_LINK;
 
+    // TODO: Can we move that logic into the UniversalModal as well? Like, onClose
+    // is almost always by default going to close the modal
     const onClose = (): void => {
         setOpen(false);
     };
 
     return (
-        <Modal
-            open={open}
-            onOk={onClose}
-            onCancel={onClose}
-            centered
-            width={550}
-            cancelButtonProps={{
-                style: { display: "none" },
-            }}
-        >
+        <UniversalModal open={open} onOk={onClose} onClose={onClose} displayCancel={false}>
             <div className={styles.HeaderWrapper}>
                 <p className="TextMedium">{t("About.title")}</p>
                 <p className={styles.Version}>
@@ -114,6 +109,6 @@ export function AboutModal({ open, setOpen }: IProps) {
                     {t("About.blog")}
                 </Button>
             </div>
-        </Modal>
+        </UniversalModal>
     );
 }

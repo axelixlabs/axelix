@@ -74,3 +74,20 @@ export interface IClearCacheRequestData {
      */
     cacheManager: string;
 }
+
+export interface IUpdateCacheStatusRequestData {
+    /**
+     * Instance id of service
+     */
+    instanceId: string;
+
+    /**
+     * Name of the cache manager
+     */
+    cacheManagerName: string;
+
+    /**
+     * Name of the cache
+     */
+    cacheName: string;
+}

@@ -24,7 +24,7 @@
     user-select: none;
     border: 1px solid var(--axelix-medium-grey);
     background-color: var(--axelix-primary-white);
-    transition: all 0.3s;
+    transition-duration: 0.3s;
 }
 
 .RadioButton input {

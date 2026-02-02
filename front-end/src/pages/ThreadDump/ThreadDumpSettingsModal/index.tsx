@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Modal } from "antd";
 import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
+
+import { UniversalModal } from "components";
 
 import { ContentionMonitoringStatusSwitch } from "./ContentionMonitoringStatusSwitch";
 import styles from "./styles.module.css";
@@ -26,7 +27,7 @@ interface IProps {
     /**
      * Indicates whether the modal is open
      */
-    isModalopen: boolean;
+    isModalOpen: boolean;
 
     /**
      * Setter to update the modal open state
@@ -39,7 +40,7 @@ interface IProps {
     contentionMonitoring: boolean;
 }
 
-export const ThreadDumpSettingsModal = ({ isModalopen, setIsModalOpen, contentionMonitoring }: IProps) => {
+export const ThreadDumpSettingsModal = ({ isModalOpen, setIsModalOpen, contentionMonitoring }: IProps) => {
     const { t } = useTranslation();
 
     const onClose = (): void => {
@@ -47,18 +48,12 @@ export const ThreadDumpSettingsModal = ({ isModalopen, setIsModalOpen, contentio
     };
 
     return (
-        // TODO: In our project, <Modal> component from аntd is used in several places.
-        // In the future, we may consider creating a universal component for it.
-        <Modal
+        <UniversalModal
             title={t("ThreadDump.Settings.title")}
-            open={isModalopen}
+            open={isModalOpen}
             onOk={onClose}
-            onCancel={onClose}
-            centered
-            width={550}
-            cancelButtonProps={{
-                style: { display: "none" },
-            }}
+            displayCancel={false}
+            onClose={onClose}
         >
             <div className={styles.ModalContentWrapper}>
                 <div className={styles.SettingsItemWrapper}>
@@ -66,6 +61,6 @@ export const ThreadDumpSettingsModal = ({ isModalopen, setIsModalOpen, contentio
                     <ContentionMonitoringStatusSwitch contentionMonitoring={contentionMonitoring} />
                 </div>
             </div>
-        </Modal>
+        </UniversalModal>
     );
 };

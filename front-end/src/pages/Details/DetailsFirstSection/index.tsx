@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button, List, Modal, Switch } from "antd";
+import { Button, List, Switch } from "antd";
 import DownloadIcon from "assets/icons/download.svg?react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { Loader } from "components";
+import { Loader, UniversalModal } from "components";
 import { downloadFile } from "helpers";
 import { EExportableComponent } from "models";
 import { exportStateData } from "services";
@@ -75,6 +75,8 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
         );
     };
 
+    const modalTitle = isLoading ? t("Details.exportConfigurationLoading") : t("Details.exportConfigurationOptions");
+
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.MainTitle}>{instanceName}</div>
@@ -86,15 +88,12 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
             >
                 {t("Details.downloadState")}
             </Button>
-            <Modal
-                title={isLoading ? t("Details.exportConfigurationLoading") : t("Details.exportConfigurationOptions")}
-                cancelText={t("cancel")}
+            <UniversalModal
+                title={modalTitle}
                 open={isModalOpen}
                 onOk={handleOk}
-                onCancel={() => setIsModalOpen(false)}
-                centered
-                okButtonProps={{ disabled: isLoading }}
-                cancelButtonProps={{ disabled: isLoading }}
+                onClose={() => setIsModalOpen(false)}
+                loading={isLoading}
             >
                 {isLoading ? (
                     <div className={styles.LoaderWrapper}>
@@ -112,7 +111,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                         className={styles.List}
                     />
                 )}
-            </Modal>
+            </UniversalModal>
         </div>
     );
 };

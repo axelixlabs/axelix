@@ -49,7 +49,7 @@ export const ThreadDumpFirstSection = ({ setSearch, addonAfter, contentionMonito
     return (
         <>
             <ThreadDumpSettingsModal
-                isModalopen={isModalOpen}
+                isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
                 contentionMonitoring={contentionMonitoring}
             />
