@@ -16,6 +16,10 @@ on:
       - '!.gitignore'
       - '!CONTRIBUTING.adoc'
 
+env:
+  SHOULD_DEPLOY: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
+
+
 jobs:
   build-deploy-source:
     runs-on: ubuntu-latest
