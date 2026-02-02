@@ -7,7 +7,9 @@ runs:
       shell: bash
 
     - run: npm run lint && npm run lint-css && npm run test
+      working-directory: ./front-end
       shell: bash
 
     - run: npm run build
+      working-directory: ./front-end
       shell: bash
