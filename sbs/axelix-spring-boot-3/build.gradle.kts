@@ -2,6 +2,13 @@ plugins {
     id("sbs")
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    options.release = 17
+}
+
+val springBootVersion = "3.0.13"
+val springCloudVersion = "2022.0.4"
+
 dependencies {
     // Self
     api(project(":common:auth"))
@@ -10,8 +17,8 @@ dependencies {
     api(project(":common:utils"))
 
     // Impl
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.0.13"))
-    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2022.0.4"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"))
     implementation("org.slf4j:slf4j-api")
     implementation("com.jayway.jsonpath:json-path") // version comes from spring-boot-dependencies
 
@@ -23,7 +30,7 @@ dependencies {
     compileOnly("com.github.ben-manes.caffeine:caffeine")
 
     // processor
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:3.0.13")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
 
     // Test
     testImplementation("org.junit.jupiter:junit-jupiter")
