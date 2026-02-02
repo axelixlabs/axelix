@@ -22,16 +22,26 @@ import { useTranslation } from "react-i18next";
 export interface IProps {
     /** Whether the modal is visible */
     open: boolean;
+
     /** Callback when the OK button is clicked */
     onOk: () => void;
+
     /** Modal title */
     title?: string;
+
     /** Callback when the modal is cancelled or closed */
-    onCancel?: () => void;
+    onClose?: () => void;
+
     /** Text for the OK button */
     okText?: string;
+
     /** Loading state for the OK button */
     loading?: boolean;
+
+    /**
+     * Whether to display the cancel button or not
+     */
+    displayCancel?: boolean;
 }
 
 export const UniversalModal = ({
@@ -39,9 +49,10 @@ export const UniversalModal = ({
     title,
     open,
     onOk,
-    onCancel,
+    onClose,
     okText,
     loading,
+    displayCancel = true,
 }: PropsWithChildren<IProps>) => {
     const { t } = useTranslation();
 
@@ -50,12 +61,21 @@ export const UniversalModal = ({
             title={title}
             open={open}
             onOk={onOk}
-            onCancel={onCancel}
+            onCancel={onClose}
             centered
             width={550}
             okText={okText}
             cancelText={t("cancel")}
             loading={loading}
+            cancelButtonProps={
+                !displayCancel
+                    ? {
+                          style: {
+                              display: "none",
+                          },
+                      }
+                    : {}
+            }
         >
             {children}
         </Modal>

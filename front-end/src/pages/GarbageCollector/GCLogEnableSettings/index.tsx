@@ -86,7 +86,8 @@ export const GCLogEnableSettings = ({ isModalOpen, setIsModalOpen, logginsStatus
             title={t("GC.modalWindow.title")}
             open={isModalOpen}
             onOk={onOk}
-            onCancel={onClose}
+            displayCancel={false}
+            onClose={onClose}
             okText={t("GC.modalWindow.submit")}
             loading={enableGCLoggingData.loading}
         >

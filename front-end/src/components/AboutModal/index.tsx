@@ -46,12 +46,14 @@ export function AboutModal({ open, setOpen }: IProps) {
     const referenceGuideLink = import.meta.env.VITE_APP_REFERENCE_GUIDE_LINK;
     const blogLink = import.meta.env.VITE_APP_BLOG_LINK;
 
+    // TODO: Can we move that logic into the UniversalModal as well? Like, onClose
+    // is almost always by default going to close the modal
     const onClose = (): void => {
         setOpen(false);
     };
 
     return (
-        <UniversalModal open={open} onOk={onClose} onCancel={onClose}>
+        <UniversalModal open={open} onOk={onClose} onClose={onClose} displayCancel={false}>
             <div className={styles.HeaderWrapper}>
                 <p className="TextMedium">{t("About.title")}</p>
                 <p className={styles.Version}>

@@ -92,7 +92,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
                 title={modalTitle}
                 open={isModalOpen}
                 onOk={handleOk}
-                onCancel={() => setIsModalOpen(false)}
+                onClose={() => setIsModalOpen(false)}
                 loading={isLoading}
             >
                 {isLoading ? (

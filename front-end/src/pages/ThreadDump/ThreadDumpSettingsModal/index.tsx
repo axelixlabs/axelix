@@ -27,7 +27,7 @@ interface IProps {
     /**
      * Indicates whether the modal is open
      */
-    isModalopen: boolean;
+    isModalOpen: boolean;
 
     /**
      * Setter to update the modal open state
@@ -40,7 +40,7 @@ interface IProps {
     contentionMonitoring: boolean;
 }
 
-export const ThreadDumpSettingsModal = ({ isModalopen, setIsModalOpen, contentionMonitoring }: IProps) => {
+export const ThreadDumpSettingsModal = ({ isModalOpen, setIsModalOpen, contentionMonitoring }: IProps) => {
     const { t } = useTranslation();
 
     const onClose = (): void => {
@@ -48,7 +48,13 @@ export const ThreadDumpSettingsModal = ({ isModalopen, setIsModalOpen, contentio
     };
 
     return (
-        <UniversalModal title={t("ThreadDump.Settings.title")} open={isModalopen} onOk={onClose} onCancel={onClose}>
+        <UniversalModal
+            title={t("ThreadDump.Settings.title")}
+            open={isModalOpen}
+            onOk={onClose}
+            displayCancel={false}
+            onClose={onClose}
+        >
             <div className={styles.ModalContentWrapper}>
                 <div className={styles.SettingsItemWrapper}>
                     <div>{t("ThreadDump.Settings.contentionMonitoring")}</div>
