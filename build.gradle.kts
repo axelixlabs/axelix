@@ -74,7 +74,7 @@ subprojects {
         repositories {
             maven {
                 name = "NexusAxelix"
-                url = uri(project.findProperty("nexus.url") as String? ?: System.getenv("NEXUS_HOST_PORT"))
+                url = uri(project.findProperty("nexus.url") as String? ?: System.getenv("NEXUS_URL"))
                 credentials {
                     username = project.findProperty("nexus.user") as String? ?: System.getenv("NEXUS_USER")
                     password = project.findProperty("nexus.password") as String? ?: System.getenv("NEXUS_PASSWORD")
