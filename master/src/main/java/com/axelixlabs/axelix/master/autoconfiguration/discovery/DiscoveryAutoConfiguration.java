@@ -33,10 +33,14 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.service.MemoryUsageCache;
+import com.axelixlabs.axelix.master.service.SelfRegisteredServiceCache;
 import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
-import com.axelixlabs.axelix.master.service.discovery.KubernetesDiscoveryClient;
-import com.axelixlabs.axelix.master.service.discovery.KubernetesInstanceDiscoverer;
-import com.axelixlabs.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
+import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesDiscoveryClient;
+import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
+import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesShortPollingInstanceScheduler;
+import com.axelixlabs.axelix.master.service.discovery.selfregistered.SelfRegisteredDiscoveryClient;
+import com.axelixlabs.axelix.master.service.discovery.selfregistered.SelfRegisteredInstanceDiscoverer;
+import com.axelixlabs.axelix.master.service.discovery.selfregistered.SelfRegisteredShortPollingInstanceScheduler;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
@@ -44,18 +48,11 @@ import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndp
  * Auto-configuration for K8S related components.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "auto", havingValue = "true")
 public class DiscoveryAutoConfiguration {
-
-    @Bean
-    public ShortPollingInstanceDiscoveryScheduler shortPollingInstanceDiscoveryScheduler(
-            InstancesDiscoverer instancesDiscoverer,
-            InstanceRegistry instanceRegistry,
-            MemoryUsageCache memoryUsageCache) {
-        return new ShortPollingInstanceDiscoveryScheduler(instancesDiscoverer, instanceRegistry, memoryUsageCache);
-    }
 
     @AutoConfiguration
     @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "platform", havingValue = "kubernetes")
@@ -93,6 +90,42 @@ public class DiscoveryAutoConfiguration {
                 AxelixVersionDiscoverer axelixVersionDiscoverer) {
             return new KubernetesInstanceDiscoverer(
                     discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
+        }
+
+        @Bean
+        public KubernetesShortPollingInstanceScheduler shortPollingInstanceDiscoveryScheduler(
+                InstancesDiscoverer instancesDiscoverer,
+                InstanceRegistry instanceRegistry,
+                MemoryUsageCache memoryUsageCache) {
+            return new KubernetesShortPollingInstanceScheduler(instancesDiscoverer, instanceRegistry, memoryUsageCache);
+        }
+    }
+
+    @AutoConfiguration
+    @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "platform", havingValue = "self-registry")
+    static class SelfRegisteredDiscoveryAutoConfiguration {
+
+        @Bean
+        public DiscoveryClient selfRegisteredDiscoveryClient(SelfRegisteredServiceCache cache) {
+            return new SelfRegisteredDiscoveryClient(cache);
+        }
+
+        @Bean
+        public SelfRegisteredInstanceDiscoverer selfRegisteredInstanceDiscoverer(
+                DiscoveryClient discoveryClient,
+                ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
+                AxelixVersionDiscoverer axelixVersionDiscoverer) {
+            return new SelfRegisteredInstanceDiscoverer(
+                    discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
+        }
+
+        @Bean
+        public SelfRegisteredShortPollingInstanceScheduler selfRegisteredShortPollingInstanceScheduler(
+                InstancesDiscoverer instancesDiscoverer,
+                InstanceRegistry instanceRegistry,
+                MemoryUsageCache memoryUsageCache) {
+            return new SelfRegisteredShortPollingInstanceScheduler(
+                    instancesDiscoverer, instanceRegistry, memoryUsageCache);
         }
     }
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.discovery;
+package com.axelixlabs.axelix.master.service.discovery.selfregistered;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -35,25 +35,27 @@ import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
+import com.axelixlabs.axelix.master.service.InMemorySelfRegisteredServiceCache;
+import com.axelixlabs.axelix.master.service.discovery.AbstractInstancesDiscoverer;
+import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
 /**
- * Kubernetes implementation of {@link InstancesDiscoverer}.
+ * Axelix Service implementation of {@link InstancesDiscoverer}.
  * <p>This service discovers running instances of services registered
- * in a Kubernetes cluster.</p>
+ * in a {@link InMemorySelfRegisteredServiceCache}.</p>
  *
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
-
-    private static final Logger log = LoggerFactory.getLogger(KubernetesInstanceDiscoverer.class);
+public class SelfRegisteredInstanceDiscoverer extends AbstractInstancesDiscoverer {
+    private static final Logger log = LoggerFactory.getLogger(SelfRegisteredInstanceDiscoverer.class);
 
     /**
      * The string key that represent the pod's creation timestamp.
      */
-    public static final String POD_CREATION_TIMESTAMP = "creationTimestamp";
+    public static final String CONTAINER_CREATION_TIMESTAMP = "creationTimestamp";
 
-    public KubernetesInstanceDiscoverer(
+    public SelfRegisteredInstanceDiscoverer(
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
             AxelixVersionDiscoverer axelixVersionDiscoverer) {
@@ -64,13 +66,13 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     protected Instance toDomainInstance(InstanceIntermediateProfile profile) throws IllegalArgumentException {
         ServiceInstance serviceInstance = profile.serviceInstance();
 
-        if (serviceInstance instanceof KubernetesServiceInstance k8sInstance) {
+        if (serviceInstance instanceof SelfRegisteredServiceInstance selfRegisteredServiceInstance) {
 
-            Instant deployedAt = extractPodDeployTimestamp(k8sInstance);
+            Instant deployedAt = extractPodDeployTimestamp(selfRegisteredServiceInstance);
 
             return new Instance(
-                    InstanceId.of(k8sInstance.getInstanceId()),
-                    k8sInstance.podName(),
+                    InstanceId.of(selfRegisteredServiceInstance.getInstanceId()),
+                    selfRegisteredServiceInstance.serviceName(),
                     profile.metadata().getServiceVersion(),
                     profile.metadata().getSoftwareVersions().getJava(),
                     profile.metadata().getSoftwareVersions().getSpringBoot(),
@@ -109,14 +111,14 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
     }
 
     @Nullable
-    private static Instant extractPodDeployTimestamp(KubernetesServiceInstance k8sInstance) {
-        String deployedAtAsString = k8sInstance.getDeploymentAt();
+    private static Instant extractPodDeployTimestamp(SelfRegisteredServiceInstance serviceInstance) {
+        String deployedAtAsString = serviceInstance.getDeploymentAt();
 
         if (deployedAtAsString == null) {
             log.warn(
-                    "The K8S pod's {} {} filed in metadata is null",
-                    k8sInstance.getInstanceId(),
-                    POD_CREATION_TIMESTAMP);
+                    "The self-registered service {} {} filed in metadata is null",
+                    serviceInstance.getInstanceId(),
+                    CONTAINER_CREATION_TIMESTAMP);
             return null;
         }
 
@@ -126,22 +128,21 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
         } catch (DateTimeParseException e) {
             log.warn(
                     """
-                Unable to parse the deployment timestamp of the pod : {}.
-                That will affect the corresponding service on the wallboard UI
-                """,
-                    k8sInstance.getInstanceId(),
+        Unable to parse the deployment timestamp of the self-registered service : {}.
+        That will affect the corresponding service on the wallboard UI
+        """,
+                    serviceInstance.getInstanceId(),
                     e);
             return null;
         }
     }
 
     private static String buildErrorMessage(ServiceInstance serviceInstance) {
-        return "Unable to register K8S pod '%s' as a managed instance - expected %s to be an instance of %s, but actually is %s"
+        return "Unable to register self-registered service '%s' as a managed instance - expected %s to be an instance of %s, but actually is %s"
                 .formatted(
                         serviceInstance.getInstanceId(),
                         ServiceInstance.class.getSimpleName(),
-                        org.springframework.cloud.kubernetes.commons.discovery.KubernetesServiceInstance.class
-                                .getName(),
+                        SelfRegisteredServiceInstance.class.getName(),
                         serviceInstance.getClass().getName());
     }
 }

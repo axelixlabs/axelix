@@ -50,6 +50,8 @@ import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InMemoryMemoryUsageCache;
 import com.axelixlabs.axelix.master.service.MemoryUsageCache;
+import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
+import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
 import com.axelixlabs.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InMemoryInstanceRegistry;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;

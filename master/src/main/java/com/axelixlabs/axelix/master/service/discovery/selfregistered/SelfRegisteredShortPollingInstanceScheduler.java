@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.discovery;
+package com.axelixlabs.axelix.master.service.discovery.selfregistered;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,27 +27,25 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
+import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
 import com.axelixlabs.axelix.master.service.MemoryUsageCache;
+import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
- * Job that performs periodical discovering and refresh of managed service instances in the registry.
+ * Job that performs periodic discovery and refresh of self-registered service instances in the registry.
  *
- * @since 29.10.2025
- * @author Nikita Kirillov
- * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public class ShortPollingInstanceDiscoveryScheduler {
+public class SelfRegisteredShortPollingInstanceScheduler {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShortPollingInstanceDiscoveryScheduler.class);
+    private static final Logger logger = LoggerFactory.getLogger(SelfRegisteredShortPollingInstanceScheduler.class);
 
     private final InstancesDiscoverer instancesDiscoverer;
     private final InstanceRegistry instanceRegistry;
     private final MemoryUsageCache memoryUsageCache;
 
-    public ShortPollingInstanceDiscoveryScheduler(
+    public SelfRegisteredShortPollingInstanceScheduler(
             InstancesDiscoverer instancesDiscoverer,
             InstanceRegistry instanceRegistry,
             MemoryUsageCache memoryUsageCache) {
@@ -71,10 +69,8 @@ public class ShortPollingInstanceDiscoveryScheduler {
         }
 
         Set<InstanceId> currentlyRegisteredIds = getCurrentlyRegisteredIds();
-        Set<InstanceId> discoveredIds = getDiscoveredIds(discoveredInstances);
 
-        registerNewInstances(discoveredInstances);
-        deregisterMissingInstances(currentlyRegisteredIds, discoveredIds);
+        registerNewInstances(discoveredInstances, currentlyRegisteredIds);
 
         logger.debug("Registered instances: {}", instanceRegistry.getAll().size());
     }
@@ -83,28 +79,21 @@ public class ShortPollingInstanceDiscoveryScheduler {
         return instanceRegistry.getAll().stream().map(Instance::id).collect(Collectors.toSet());
     }
 
-    private Set<InstanceId> getDiscoveredIds(Set<Instance> discoveredInstances) {
-        return discoveredInstances.stream().map(Instance::id).collect(Collectors.toSet());
-    }
-
-    private void registerNewInstances(Set<Instance> discoveredInstances) {
+    private void registerNewInstances(Set<Instance> discoveredInstances, Set<InstanceId> currentlyRegisteredIds) {
         for (Instance instance : discoveredInstances) {
-            instanceRegistry.replace(instance);
-            memoryUsageCache.putHeapSize(instance.id(), instance.memoryUsage().heap());
-        }
-    }
-
-    private void deregisterMissingInstances(Set<InstanceId> currentlyRegisteredIds, Set<InstanceId> discoveredIds) {
-        for (InstanceId existingId : currentlyRegisteredIds) {
-            if (!discoveredIds.contains(existingId)) {
+            if (currentlyRegisteredIds.contains(instance.id())) {
+                instanceRegistry.replace(instance);
+            } else {
                 try {
-                    instanceRegistry.deRegister(existingId);
-                    memoryUsageCache.clear(existingId);
-                    logger.debug("Deregistered instance: {}", existingId);
-                } catch (InstanceNotFoundException e) {
-                    logger.debug("Instance not found during deregistration: {}", existingId);
+                    instanceRegistry.register(instance);
+                    logger.debug("Registered new instance: {}", instance.id());
+                } catch (InstanceAlreadyRegisteredException e) {
+                    logger.warn(
+                            "The Instance '{}' expected to be new, but found in registry. That is not expected and should be reported to maintainers.",
+                            instance.id());
                 }
             }
+            memoryUsageCache.putHeapSize(instance.id(), instance.memoryUsage().heap());
         }
     }
 }
