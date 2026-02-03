@@ -32,6 +32,7 @@ import com.axelixlabs.axelix.common.api.BeansFeed.ProxyType;
  * @author Sergey  Cherkasov
  */
 public final class BeanMetaInfo {
+
     @Nullable
     private final String autoConfigurationRef;
 
@@ -83,8 +84,12 @@ public final class BeanMetaInfo {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
         var that = (BeanMetaInfo) obj;
         return Objects.equals(this.autoConfigurationRef, that.autoConfigurationRef)
                 && Objects.equals(this.proxyType, that.proxyType)

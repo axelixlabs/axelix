@@ -99,8 +99,12 @@ public class AxelixConditionsEndpoint {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
             var that = (FlattenedConditionsDescriptor) obj;
             return Objects.equals(this.positiveConditions, that.positiveConditions)
                     && Objects.equals(this.negativeConditions, that.negativeConditions);
@@ -138,8 +142,12 @@ public class AxelixConditionsEndpoint {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
             var that = (PositiveCondition) obj;
             return Objects.equals(this.target, that.target) && Objects.equals(this.matches, that.matches);
         }
@@ -180,8 +188,12 @@ public class AxelixConditionsEndpoint {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
             var that = (NegativeCondition) obj;
             return Objects.equals(this.target, that.target)
                     && Objects.equals(this.notMatched, that.notMatched)
@@ -221,8 +233,12 @@ public class AxelixConditionsEndpoint {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
             var that = (ConditionMatch) obj;
             return Objects.equals(this.condition, that.condition) && Objects.equals(this.message, that.message);
         }
