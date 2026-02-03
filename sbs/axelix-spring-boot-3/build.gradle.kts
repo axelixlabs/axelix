@@ -1,5 +1,6 @@
 plugins {
     id("sbs")
+    id("com.axelixlabs.axelix-internal")
 }
 
 tasks.withType<JavaCompile>().configureEach {
