@@ -55,3 +55,7 @@ tasks {
         useJUnitPlatform()
     }
 }
+
+axelix {
+    properties.put("version", rootProject.version.toString())
+}
