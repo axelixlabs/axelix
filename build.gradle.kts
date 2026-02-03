@@ -13,7 +13,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.axelixlabs.axelix"
+    group = "com.axelixlabs"
     version = project.findProperty("axelixVersion")!!
 
     repositories {

@@ -6,8 +6,8 @@ axelix:
       kubernetes:
         kube-apiserver-url: https://158.160.194.14:443
         # Should be set-up in local .env file or by any other means
-        sa-token-path: ${LOCAL_TOKEN_PATH:}
-        ca-cert-path: ${LOCAL_CA_PATH:}
+        sa-token-path: ${SA_TOKEN_PATH:}
+        ca-cert-path: ${CA_CERT_PATH:}
         filters:
           namespaces: default
     auth:

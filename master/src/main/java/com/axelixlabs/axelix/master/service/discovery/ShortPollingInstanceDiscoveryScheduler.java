@@ -27,7 +27,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.MemoryUsageCache;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -74,7 +73,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
         Set<InstanceId> currentlyRegisteredIds = getCurrentlyRegisteredIds();
         Set<InstanceId> discoveredIds = getDiscoveredIds(discoveredInstances);
 
-        registerNewInstances(discoveredInstances, currentlyRegisteredIds);
+        registerNewInstances(discoveredInstances);
         deregisterMissingInstances(currentlyRegisteredIds, discoveredIds);
 
         logger.debug("Registered instances: {}", instanceRegistry.getAll().size());
@@ -88,20 +87,9 @@ public class ShortPollingInstanceDiscoveryScheduler {
         return discoveredInstances.stream().map(Instance::id).collect(Collectors.toSet());
     }
 
-    private void registerNewInstances(Set<Instance> discoveredInstances, Set<InstanceId> currentlyRegisteredIds) {
+    private void registerNewInstances(Set<Instance> discoveredInstances) {
         for (Instance instance : discoveredInstances) {
-            if (currentlyRegisteredIds.contains(instance.id())) {
-                instanceRegistry.replace(instance);
-            } else {
-                try {
-                    instanceRegistry.register(instance);
-                    logger.debug("Registered new instance: {}", instance.id());
-                } catch (InstanceAlreadyRegisteredException e) {
-                    logger.warn(
-                            "The Instance '{}' expected to be new, but found in registry. That is not expected and should be reported to maintainers.",
-                            instance.id());
-                }
-            }
+            instanceRegistry.replace(instance);
             memoryUsageCache.putHeapSize(instance.id(), instance.memoryUsage().heap());
         }
     }

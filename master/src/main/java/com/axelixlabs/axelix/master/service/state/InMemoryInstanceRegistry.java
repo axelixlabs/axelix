@@ -23,6 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
 
@@ -40,6 +42,7 @@ import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 @Component
 public class InMemoryInstanceRegistry implements InstanceRegistry {
 
+    private final Logger logger = LoggerFactory.getLogger(InMemoryInstanceRegistry.class);
     private final ConcurrentMap<InstanceId, Instance> source;
 
     public InMemoryInstanceRegistry() {
@@ -66,7 +69,14 @@ public class InMemoryInstanceRegistry implements InstanceRegistry {
 
     @Override
     public void replace(Instance instance) {
-        source.compute(instance.id(), (id, existing) -> instance);
+        source.compute(instance.id(), (id, existing) -> {
+            if (existing == null) {
+                logger.debug("Registered new instance: {}", instance.id());
+            } else {
+                logger.debug("Instance '{}' was replaced inside the registry", instance.id());
+            }
+            return instance;
+        });
     }
 
     @Override
