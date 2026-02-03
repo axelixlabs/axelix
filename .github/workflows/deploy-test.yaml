@@ -16,10 +16,6 @@ on:
       - '!.gitignore'
       - '!CONTRIBUTING.adoc'
 
-env:
-  SHOULD_DEPLOY: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
-
-
 jobs:
   build-deploy-source:
     runs-on: ubuntu-latest
@@ -79,15 +75,12 @@ jobs:
         run: echo $DOCKER_CR_OAUTH_TOKEN | docker login --username oauth --password-stdin $CR_URL
 
       - name: Docker push to Yandex Cloud CR
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         run: docker push $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }}
 
       - name: Docker logout
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         run: docker logout
 
       - name: Checkout helm-charts repository
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         uses: actions/checkout@v5
         with:
           repository: axelixlabs/helm-charts
@@ -96,13 +89,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Helm
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         uses: azure/setup-helm@v4.3.0
         with:
           version: v3.14.0
 
       - name: Deploy master to K8S
-        if: ${{ env.SHOULD_DEPLOY == 'true' }}
         working-directory: helm-charts/charts/axelix
         run: |
           mkdir -p ~/.kube
