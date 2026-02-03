@@ -67,7 +67,7 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
         if (serviceInstance instanceof KubernetesServiceInstance k8sInstance) {
 
             Instant deployedAt = extractPodDeployTimestamp(k8sInstance);
-
+            log.info(profile.metadata().toString());
             return new Instance(
                     InstanceId.of(k8sInstance.getInstanceId()),
                     k8sInstance.podName(),

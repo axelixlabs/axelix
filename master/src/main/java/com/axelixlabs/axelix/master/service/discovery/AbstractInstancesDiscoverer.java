@@ -106,7 +106,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
 
         try {
             ServiceMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
-
+            logger.info(metadata.toString());
             return new InstanceIntermediateProfile(serviceInstance, metadata);
         } catch (EndpointInvocationException error) {
             logger.warn(
