@@ -50,8 +50,12 @@ public final class PropertyMutationRequest {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
         var that = (PropertyMutationRequest) obj;
         return Objects.equals(this.propertyName, that.propertyName) && Objects.equals(this.newValue, that.newValue);
     }

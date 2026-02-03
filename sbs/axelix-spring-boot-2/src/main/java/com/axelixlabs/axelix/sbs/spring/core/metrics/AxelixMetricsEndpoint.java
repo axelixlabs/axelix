@@ -143,8 +143,12 @@ public class AxelixMetricsEndpoint {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
             var that = (TransformedMeasurements) obj;
             return Objects.equals(this.baseUnit, that.baseUnit) && Objects.equals(this.measurements, that.measurements);
         }

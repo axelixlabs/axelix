@@ -58,8 +58,12 @@ public final class PropertyMetadata {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
         var that = (PropertyMetadata) obj;
         return Objects.equals(this.description, that.description) && Objects.equals(this.deprecation, that.deprecation);
     }
@@ -94,8 +98,12 @@ public final class PropertyMetadata {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
             var that = (Deprecation) obj;
             return Objects.equals(this.message, that.message);
         }

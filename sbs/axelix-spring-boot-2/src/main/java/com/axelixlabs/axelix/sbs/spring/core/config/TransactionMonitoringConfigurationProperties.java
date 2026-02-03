@@ -60,8 +60,12 @@ public final class TransactionMonitoringConfigurationProperties {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
         var that = (TransactionMonitoringConfigurationProperties) obj;
         return Objects.equals(this.maxTransactionsPerMethod, that.maxTransactionsPerMethod)
                 && Objects.equals(this.cleanupInterval, that.cleanupInterval);
