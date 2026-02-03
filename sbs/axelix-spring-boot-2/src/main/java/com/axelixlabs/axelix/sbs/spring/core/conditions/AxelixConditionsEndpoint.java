@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.sbs.spring.core.conditions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
@@ -74,15 +76,165 @@ public class AxelixConditionsEndpoint {
         }
         return matches.stream()
                 .map(m -> new ConditionMatch(m.getCondition(), m.getMessage()))
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    public record FlattenedConditionsDescriptor(
-            List<PositiveCondition> positiveConditions, List<NegativeCondition> negativeConditions) {}
+    public static final class FlattenedConditionsDescriptor {
+        private final List<PositiveCondition> positiveConditions;
+        private final List<NegativeCondition> negativeConditions;
 
-    public record PositiveCondition(String target, List<ConditionMatch> matches) {}
+        public FlattenedConditionsDescriptor(
+                List<PositiveCondition> positiveConditions, List<NegativeCondition> negativeConditions) {
+            this.positiveConditions = positiveConditions;
+            this.negativeConditions = negativeConditions;
+        }
 
-    public record NegativeCondition(String target, List<ConditionMatch> notMatched, List<ConditionMatch> matched) {}
+        public List<PositiveCondition> positiveConditions() {
+            return positiveConditions;
+        }
 
-    public record ConditionMatch(String condition, String message) {}
+        public List<NegativeCondition> negativeConditions() {
+            return negativeConditions;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (FlattenedConditionsDescriptor) obj;
+            return Objects.equals(this.positiveConditions, that.positiveConditions)
+                    && Objects.equals(this.negativeConditions, that.negativeConditions);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(positiveConditions, negativeConditions);
+        }
+
+        @Override
+        public String toString() {
+            return "FlattenedConditionsDescriptor[" + "positiveConditions="
+                    + positiveConditions + ", " + "negativeConditions="
+                    + negativeConditions + ']';
+        }
+    }
+
+    public static final class PositiveCondition {
+        private final String target;
+        private final List<ConditionMatch> matches;
+
+        public PositiveCondition(String target, List<ConditionMatch> matches) {
+            this.target = target;
+            this.matches = matches;
+        }
+
+        public String target() {
+            return target;
+        }
+
+        public List<ConditionMatch> matches() {
+            return matches;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (PositiveCondition) obj;
+            return Objects.equals(this.target, that.target) && Objects.equals(this.matches, that.matches);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(target, matches);
+        }
+
+        @Override
+        public String toString() {
+            return "PositiveCondition[" + "target=" + target + ", " + "matches=" + matches + ']';
+        }
+    }
+
+    public static final class NegativeCondition {
+        private final String target;
+        private final List<ConditionMatch> notMatched;
+        private final List<ConditionMatch> matched;
+
+        public NegativeCondition(String target, List<ConditionMatch> notMatched, List<ConditionMatch> matched) {
+            this.target = target;
+            this.notMatched = notMatched;
+            this.matched = matched;
+        }
+
+        public String target() {
+            return target;
+        }
+
+        public List<ConditionMatch> notMatched() {
+            return notMatched;
+        }
+
+        public List<ConditionMatch> matched() {
+            return matched;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (NegativeCondition) obj;
+            return Objects.equals(this.target, that.target)
+                    && Objects.equals(this.notMatched, that.notMatched)
+                    && Objects.equals(this.matched, that.matched);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(target, notMatched, matched);
+        }
+
+        @Override
+        public String toString() {
+            return "NegativeCondition[" + "target="
+                    + target + ", " + "notMatched="
+                    + notMatched + ", " + "matched="
+                    + matched + ']';
+        }
+    }
+
+    public static final class ConditionMatch {
+        private final String condition;
+        private final String message;
+
+        public ConditionMatch(String condition, String message) {
+            this.condition = condition;
+            this.message = message;
+        }
+
+        public String condition() {
+            return condition;
+        }
+
+        public String message() {
+            return message;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (ConditionMatch) obj;
+            return Objects.equals(this.condition, that.condition) && Objects.equals(this.message, that.message);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(condition, message);
+        }
+
+        @Override
+        public String toString() {
+            return "ConditionMatch[" + "condition=" + condition + ", " + "message=" + message + ']';
+        }
+    }
 }

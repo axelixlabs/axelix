@@ -75,24 +75,24 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                     BeanMetaInfo metaInfo = enricher.extract(beanName, targetContext.getBeanFactory());
 
                     Set<BeansFeed.BeanDependency> enrichedDependencies = resolveDependencies(
-                            beanDescriptor.getDependencies(), configPropsBeanMap, metaInfo.beanSource());
+                            beanDescriptor.getDependencies(), configPropsBeanMap, metaInfo.getBeanSource());
 
-                    String beanType = resolveBeanTypeName(beanDescriptor, metaInfo.beanSource());
+                    String beanType = resolveBeanTypeName(beanDescriptor, metaInfo.getBeanSource());
 
                     beans.put(
                             beanName,
                             new BeansFeed.Bean(
                                     beanDescriptor.getScope(),
                                     beanType,
-                                    metaInfo.proxyType(),
+                                    metaInfo.getProxyType(),
                                     toSet(beanDescriptor.getAliases()),
-                                    metaInfo.autoConfigurationRef(),
+                                    metaInfo.getAutoConfigurationRef(),
                                     enrichedDependencies,
                                     metaInfo.isLazyInit(),
                                     metaInfo.isPrimary(),
                                     configPropsBeanMap.containsKey(beanName),
-                                    metaInfo.qualifiers(),
-                                    metaInfo.beanSource()));
+                                    metaInfo.getQualifiers(),
+                                    metaInfo.getBeanSource()));
                 });
             }
 
@@ -112,7 +112,8 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
 
         while (current != null) {
 
-            if (contextId.equals(current.getId()) && current instanceof ConfigurableApplicationContext cac) {
+            if (contextId.equals(current.getId()) && current instanceof ConfigurableApplicationContext) {
+                ConfigurableApplicationContext cac = (ConfigurableApplicationContext) current;
                 return cac;
             }
 
@@ -137,7 +138,8 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                 .filter(dep -> {
                     // For some reason, @Bean methods inside configuration classes have enclosing
                     // @Configuration class as their dependency.
-                    if (beanSource instanceof BeansFeed.BeanMethod beanMethod) {
+                    if (beanSource instanceof BeansFeed.BeanMethod) {
+                        BeansFeed.BeanMethod beanMethod = (BeansFeed.BeanMethod) beanSource;
                         try {
                             String[] beanNamesForType =
                                     context.getBeanNamesForType(Class.forName(beanMethod.getEnclosingClassFullName()));
@@ -157,7 +159,8 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
     private String resolveBeanTypeName(BeansEndpoint.BeanDescriptor beanDescriptor, BeansFeed.BeanSource beanSource) {
         Class<?> clazz = beanDescriptor.getType();
 
-        if (clazz.isHidden() && beanSource instanceof BeansFeed.BeanMethod && clazz.getInterfaces().length > 0) {
+        // TODO: clazz.isHidden() && beanSource instanceof BeansFeed.BeanMethod && clazz.getInterfaces().length > 0
+        if (beanSource instanceof BeansFeed.BeanMethod && clazz.getInterfaces().length > 0) {
             return clazz.getInterfaces()[0].getName();
         }
 

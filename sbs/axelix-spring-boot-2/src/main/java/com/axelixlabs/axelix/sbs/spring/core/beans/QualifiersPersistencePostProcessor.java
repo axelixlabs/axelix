@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.beans;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -44,7 +45,8 @@ public class QualifiersPersistencePostProcessor implements BeanFactoryPostProces
         for (String beanName : beanFactory.getBeanDefinitionNames()) {
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
 
-            if (beanDefinition instanceof AnnotatedBeanDefinition annotatedBeanDefinition) {
+            if (beanDefinition instanceof AnnotatedBeanDefinition) {
+                AnnotatedBeanDefinition annotatedBeanDefinition = (AnnotatedBeanDefinition) beanDefinition;
 
                 MethodMetadata factoryMethodMetadata = annotatedBeanDefinition.getFactoryMethodMetadata();
 
@@ -69,7 +71,7 @@ public class QualifiersPersistencePostProcessor implements BeanFactoryPostProces
                 .filter(it -> Qualifier.class.equals(it.getType()))
                 .map(it -> it.getValue(MergedAnnotation.VALUE, String.class).orElse(null))
                 .filter(Objects::nonNull)
-                .toList();
+                .collect(Collectors.toList());
 
         DefaultQualifiersRegistry.INSTANCE.registerQualifiers(beanName, qualifiers);
     }

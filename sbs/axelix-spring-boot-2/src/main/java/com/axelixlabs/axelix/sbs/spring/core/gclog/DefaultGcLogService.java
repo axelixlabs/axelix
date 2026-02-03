@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.gclog;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -181,7 +182,7 @@ public class DefaultGcLogService implements GcLogService {
                             .map(String::trim)
                             .map(String::toLowerCase)
                             .filter(level -> !level.equals("off"))
-                            .toList();
+                            .collect(Collectors.toList());
                 }
             }
 

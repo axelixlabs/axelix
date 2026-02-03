@@ -17,26 +17,97 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
+import java.util.Objects;
+
 import org.jspecify.annotations.Nullable;
 
 /**
  * Metadata for a Spring Boot property, including description and deprecation info.
  *
- * @param description the property description.
- * @param deprecation deprecation related information. If {@code null}, the
- *                    property is not considered deprecated. If not {@code null},
- *                    then the property is considered deprecated.
- *
  * @since 04.12.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public record PropertyMetadata(@Nullable String description, @Nullable Deprecation deprecation) {
+public final class PropertyMetadata {
+    @Nullable
+    private final String description;
+
+    @Nullable
+    private final Deprecation deprecation;
+
+    /**
+     * @param description the property description.
+     * @param deprecation deprecation related information. If {@code null}, the
+     *                    property is not considered deprecated. If not {@code null},
+     *                    then the property is considered deprecated.
+     */
+    public PropertyMetadata(@Nullable String description, @Nullable Deprecation deprecation) {
+        this.description = description;
+        this.deprecation = deprecation;
+    }
+
+    @Nullable
+    public String description() {
+        return description;
+    }
+
+    @Nullable
+    public Deprecation deprecation() {
+        return deprecation;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (PropertyMetadata) obj;
+        return Objects.equals(this.description, that.description) && Objects.equals(this.deprecation, that.deprecation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, deprecation);
+    }
+
+    @Override
+    public String toString() {
+        return "PropertyMetadata[" + "description=" + description + ", " + "deprecation=" + deprecation + ']';
+    }
 
     /**
      * Deprecation metadata for a property.
-     *
-     * @param message explaining why the property is deprecated and, optionally, what should be used instead.
      */
-    public record Deprecation(String message) {}
+    public static final class Deprecation {
+
+        private final String message;
+
+        /**
+         * @param message explaining why the property is deprecated and, optionally, what should be used instead.
+         */
+        public Deprecation(String message) {
+            this.message = message;
+        }
+
+        public String message() {
+            return message;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (Deprecation) obj;
+            return Objects.equals(this.message, that.message);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(message);
+        }
+
+        @Override
+        public String toString() {
+            return "Deprecation[" + "message=" + message + ']';
+        }
+    }
 }

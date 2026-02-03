@@ -60,14 +60,16 @@ public class DefaultPropertyNameDiscoverer implements PropertyNameDiscoverer {
     // from highest to lowest priority.
     private @Nullable String extractPropertyNames(PropertySource<?> source, String normalizedPropertyName) {
 
-        if (source instanceof CompositePropertySource composite) {
+        if (source instanceof CompositePropertySource) {
+            CompositePropertySource composite = (CompositePropertySource) source;
             for (PropertySource<?> nest : composite.getPropertySources()) {
                 String foundPropertyName = extractPropertyNames(nest, normalizedPropertyName);
                 if (foundPropertyName != null) {
                     return foundPropertyName;
                 }
             }
-        } else if (source instanceof EnumerablePropertySource<?> enumerable) {
+        } else if (source instanceof EnumerablePropertySource<?>) {
+            EnumerablePropertySource<?> enumerable = (EnumerablePropertySource<?>) source;
             for (String name : enumerable.getPropertyNames()) {
                 if (normalizedPropertyName.equals(propertyNameNormalizer.normalize(name))) {
                     return name;

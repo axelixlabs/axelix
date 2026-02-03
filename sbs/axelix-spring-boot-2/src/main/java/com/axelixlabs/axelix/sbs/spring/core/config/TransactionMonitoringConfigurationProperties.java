@@ -18,22 +18,27 @@
 package com.axelixlabs.axelix.sbs.spring.core.config;
 
 import java.time.Duration;
+import java.util.Objects;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Configuration properties for transaction monitoring feature.
  *
- * @param maxTransactionsPerMethod maximum number of transaction records to keep per method.
- * @param cleanupInterval          interval for clearing old transaction records.
- *
  * @since 26.01.2026
  * @author Nikita Kirillov
  */
 @ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
-public record TransactionMonitoringConfigurationProperties(Integer maxTransactionsPerMethod, Duration cleanupInterval) {
+public final class TransactionMonitoringConfigurationProperties {
 
-    public TransactionMonitoringConfigurationProperties {
+    private final Integer maxTransactionsPerMethod;
+    private final Duration cleanupInterval;
+
+    /**
+     * @param maxTransactionsPerMethod maximum number of transaction records to keep per method.
+     * @param cleanupInterval          interval for clearing old transaction records.
+     */
+    public TransactionMonitoringConfigurationProperties(Integer maxTransactionsPerMethod, Duration cleanupInterval) {
         if (maxTransactionsPerMethod == null) {
             maxTransactionsPerMethod = 30;
         }
@@ -41,5 +46,36 @@ public record TransactionMonitoringConfigurationProperties(Integer maxTransactio
         if (cleanupInterval == null) {
             cleanupInterval = Duration.ofSeconds(5);
         }
+        this.maxTransactionsPerMethod = maxTransactionsPerMethod;
+        this.cleanupInterval = cleanupInterval;
+    }
+
+    public Integer maxTransactionsPerMethod() {
+        return maxTransactionsPerMethod;
+    }
+
+    public Duration cleanupInterval() {
+        return cleanupInterval;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (TransactionMonitoringConfigurationProperties) obj;
+        return Objects.equals(this.maxTransactionsPerMethod, that.maxTransactionsPerMethod)
+                && Objects.equals(this.cleanupInterval, that.cleanupInterval);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(maxTransactionsPerMethod, cleanupInterval);
+    }
+
+    @Override
+    public String toString() {
+        return "TransactionMonitoringConfigurationProperties[" + "maxTransactionsPerMethod="
+                + maxTransactionsPerMethod + ", " + "cleanupInterval="
+                + cleanupInterval + ']';
     }
 }

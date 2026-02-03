@@ -257,7 +257,7 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
-        public QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
+        public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
             return new QualifiersPersistencePostProcessor();
         }
 

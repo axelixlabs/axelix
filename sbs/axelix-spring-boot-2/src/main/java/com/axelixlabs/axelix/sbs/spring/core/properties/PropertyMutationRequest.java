@@ -17,14 +17,52 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.properties;
 
+import java.util.Objects;
+
 /**
  * Represents a request to update (mutate) a specific configuration property
  * in the application.
  *
- * @param propertyName the name of the property to update. Must not be {@code null}.
- * @param newValue the new value to assign to the property.  May be {@code null} or empty.
- *
  * @since 26.09.2025
  * @author Nikita Kirillov
  */
-public record PropertyMutationRequest(String propertyName, String newValue) {}
+public final class PropertyMutationRequest {
+
+    private final String propertyName;
+    private final String newValue;
+
+    /**
+     * @param propertyName the name of the property to update. Must not be {@code null}.
+     * @param newValue the new value to assign to the property.  May be {@code null} or empty.
+     */
+    public PropertyMutationRequest(String propertyName, String newValue) {
+        this.propertyName = propertyName;
+        this.newValue = newValue;
+    }
+
+    public String propertyName() {
+        return propertyName;
+    }
+
+    public String newValue() {
+        return newValue;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (PropertyMutationRequest) obj;
+        return Objects.equals(this.propertyName, that.propertyName) && Objects.equals(this.newValue, that.newValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(propertyName, newValue);
+    }
+
+    @Override
+    public String toString() {
+        return "PropertyMutationRequest[" + "propertyName=" + propertyName + ", " + "newValue=" + newValue + ']';
+    }
+}

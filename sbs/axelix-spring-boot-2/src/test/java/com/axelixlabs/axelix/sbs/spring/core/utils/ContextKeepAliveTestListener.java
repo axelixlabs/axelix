@@ -59,7 +59,8 @@ public class ContextKeepAliveTestListener extends AbstractTestExecutionListener 
                     FieldUtils.getField("mergedContextConfiguration", testContext);
             ApplicationContext context = cacheAwareContextLoaderDelegate.loadContext(mergedContextConfiguration);
 
-            if (context instanceof ConfigurableApplicationContext cac) {
+            if (context instanceof ConfigurableApplicationContext) {
+                ConfigurableApplicationContext cac = (ConfigurableApplicationContext) context;
                 if (!cac.isActive()) {
                     logger.info("Context is not active, attempting to refresh...");
                     try {

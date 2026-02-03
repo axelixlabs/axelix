@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
@@ -80,11 +81,11 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
         List<PropertySource> enrichedSources = originalDescriptor.getPropertySources().stream()
                 .map(source -> enrichPropertySource(source, primarySourceMap, configPropsMapping))
-                .toList();
+                .collect(Collectors.toList());
 
         return new EnvironmentFeed(
                 originalDescriptor.getActiveProfiles(),
-                Arrays.stream(environment.getDefaultProfiles()).toList(),
+                Arrays.stream(environment.getDefaultProfiles()).collect(Collectors.toList()),
                 enrichedSources);
     }
 
@@ -134,7 +135,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                             buildFromMetadata(metadata),
                             injectionPoints);
                 })
-                .toList();
+                .collect(Collectors.toList());
 
         return new PropertySource(
                 source.getName(),

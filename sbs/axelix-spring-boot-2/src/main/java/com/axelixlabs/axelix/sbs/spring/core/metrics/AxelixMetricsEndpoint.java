@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -123,7 +124,41 @@ public class AxelixMetricsEndpoint {
         return new TransformedMeasurements(resultingBaseUnit, resultingMeasurements);
     }
 
-    record TransformedMeasurements(String baseUnit, List<Measurement> measurements) {}
+    public static final class TransformedMeasurements {
+        private final String baseUnit;
+        private final List<Measurement> measurements;
+
+        public TransformedMeasurements(String baseUnit, List<Measurement> measurements) {
+            this.baseUnit = baseUnit;
+            this.measurements = measurements;
+        }
+
+        public String baseUnit() {
+            return baseUnit;
+        }
+
+        public List<Measurement> measurements() {
+            return measurements;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (TransformedMeasurements) obj;
+            return Objects.equals(this.baseUnit, that.baseUnit) && Objects.equals(this.measurements, that.measurements);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(baseUnit, measurements);
+        }
+
+        @Override
+        public String toString() {
+            return "TransformedMeasurements[" + "baseUnit=" + baseUnit + ", " + "measurements=" + measurements + ']';
+        }
+    }
 
     private List<Map<String, String>> getValidTagCombinations(String metricName) {
         Collection<Meter> meters = this.registry.find(metricName).meters();

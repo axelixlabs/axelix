@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.properties;
 
+import java.util.Objects;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -25,13 +27,62 @@ import org.jspecify.annotations.Nullable;
  * @since 04.07.25
  * @author Mikhail Polivakha
  */
-public record PropertySourceDescription(
-        String name, PropertySourceOrigin origin, Class<?> clazz, @Nullable String fileName) {
+public final class PropertySourceDescription {
 
-    enum PropertySourceOrigin {
-        PROPERTIES_FILE,
-        ENVIRONMENT_VARIABLES,
-        SYSTEM_ARGS,
-        CUSTOM,
+    private final String name;
+    private final PropertySourceOrigin origin;
+    private final Class<?> clazz;
+
+    @Nullable
+    private final String fileName;
+
+    public PropertySourceDescription(
+            String name, PropertySourceOrigin origin, Class<?> clazz, @Nullable String fileName) {
+        this.name = name;
+        this.origin = origin;
+        this.clazz = clazz;
+        this.fileName = fileName;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public PropertySourceOrigin origin() {
+        return origin;
+    }
+
+    public Class<?> clazz() {
+        return clazz;
+    }
+
+    @Nullable
+    public String fileName() {
+        return fileName;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (PropertySourceDescription) obj;
+        return Objects.equals(this.name, that.name)
+                && Objects.equals(this.origin, that.origin)
+                && Objects.equals(this.clazz, that.clazz)
+                && Objects.equals(this.fileName, that.fileName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, origin, clazz, fileName);
+    }
+
+    @Override
+    public String toString() {
+        return "PropertySourceDescription[" + "name="
+                + name + ", " + "origin="
+                + origin + ", " + "clazz="
+                + clazz + ", " + "fileName="
+                + fileName + ']';
     }
 }

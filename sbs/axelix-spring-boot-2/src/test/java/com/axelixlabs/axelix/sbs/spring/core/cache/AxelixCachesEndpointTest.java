@@ -106,19 +106,14 @@ class AxelixCachesEndpointTest {
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         JsonAssertions.assertThatJson(response.getBody())
-                .isEqualTo(
-                        // language=json
-                        """
-                {
-                    "cacheManager" : "cache2",
-                    "name" : "cache1",
-                    "target" : "java.util.concurrent.ConcurrentHashMap",
-                    "enabled" : true,
-                    "estimatedEntrySize" : 0,
-                    "hitsCount" : 0,
-                    "missesCount":0
-                }
-                """);
+                .isEqualTo("{\n" + "    \"cacheManager\" : \"cache2\",\n"
+                        + "    \"name\" : \"cache1\",\n"
+                        + "    \"target\" : \"java.util.concurrent.ConcurrentHashMap\",\n"
+                        + "    \"enabled\" : true,\n"
+                        + "    \"estimatedEntrySize\" : 0,\n"
+                        + "    \"hitsCount\" : 0,\n"
+                        + "    \"missesCount\":0\n"
+                        + "}");
     }
 
     @Test

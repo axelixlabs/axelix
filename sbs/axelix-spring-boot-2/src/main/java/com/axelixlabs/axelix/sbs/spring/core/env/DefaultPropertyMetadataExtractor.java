@@ -181,7 +181,7 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
         boolean hasReplacement = StringUtils.hasText(replacement);
 
         if (hasReason && hasReplacement) {
-            return "%s %s %s property.".formatted(reason, DEPRECATION_PREFIX, replacement);
+            return String.format("%s %s %s property.", reason, DEPRECATION_PREFIX, replacement);
         }
 
         if (hasReason) {
@@ -189,7 +189,7 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
         }
 
         if (hasReplacement) {
-            return "%s %s property.".formatted(DEPRECATION_PREFIX, replacement);
+            return String.format("%s %s property.", DEPRECATION_PREFIX, replacement);
         }
 
         return DEFAULT_DEPRECATION_MESSAGE;
@@ -232,11 +232,13 @@ public class DefaultPropertyMetadataExtractor implements PropertyMetadataExtract
     }
 
     private Set<String> extractPropertyNames(PropertySource<?> source) {
-        if (source instanceof CompositePropertySource composite) {
+        if (source instanceof CompositePropertySource) {
+            CompositePropertySource composite = (CompositePropertySource) source;
             for (PropertySource<?> nest : composite.getPropertySources()) {
                 extractPropertyNames(nest);
             }
-        } else if (source instanceof EnumerablePropertySource<?> enumerable) {
+        } else if (source instanceof EnumerablePropertySource<?>) {
+            EnumerablePropertySource<?> enumerable = (EnumerablePropertySource<?>) source;
             return Set.of(enumerable.getPropertyNames());
         }
         return Set.of();

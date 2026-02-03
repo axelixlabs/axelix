@@ -15,19 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.cache.exception;
-
-import org.springframework.cache.Cache;
+package com.axelixlabs.axelix.sbs.spring.core.properties;
 
 /**
- * Exception thrown when a requested {@link Cache} is not found.
+ * Represents the origin of a property source.
  *
- * @since 25.11.2025
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
-public class CacheNotFoundException extends RuntimeException {
-
-    public CacheNotFoundException(String cacheName, String cacheManagerName) {
-        super(String.format("Cache '%s' is not found inside the cache manager '%s'", cacheName, cacheManagerName));
-    }
+public enum PropertySourceOrigin {
+    PROPERTIES_FILE,
+    ENVIRONMENT_VARIABLES,
+    SYSTEM_ARGS,
+    CUSTOM
 }

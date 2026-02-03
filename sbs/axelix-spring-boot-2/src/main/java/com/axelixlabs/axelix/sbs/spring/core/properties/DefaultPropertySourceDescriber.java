@@ -25,7 +25,6 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.core.io.support.ResourcePropertySource;
 
-import com.axelixlabs.axelix.sbs.spring.core.properties.PropertySourceDescription.PropertySourceOrigin;
 import com.axelixlabs.axelix.sbs.spring.core.utils.FieldUtils;
 
 /**
@@ -49,8 +48,8 @@ public class DefaultPropertySourceDescriber implements PropertySourceDescriber {
 
     @Nullable
     private String determineFileName(PropertySourceOrigin origin, PropertySource<?> propertySource) {
-        if (PropertySourceOrigin.PROPERTIES_FILE.equals(origin)
-                && propertySource instanceof ResourcePropertySource rps) {
+        if (PropertySourceOrigin.PROPERTIES_FILE.equals(origin) && propertySource instanceof ResourcePropertySource) {
+            ResourcePropertySource rps = (ResourcePropertySource) propertySource;
             return FieldUtils.getField("resourceName", rps);
         } else {
             return null;
@@ -58,16 +57,18 @@ public class DefaultPropertySourceDescriber implements PropertySourceDescriber {
     }
 
     private static PropertySourceOrigin determineOrigin(PropertySource<?> propertySource) {
-        if (propertySource instanceof SystemEnvironmentPropertySource s) {
-            if (StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME.equals(s.getName())) {
+        if (propertySource instanceof SystemEnvironmentPropertySource) {
+            SystemEnvironmentPropertySource seps = (SystemEnvironmentPropertySource) propertySource;
+            if (StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME.equals(seps.getName())) {
                 return PropertySourceOrigin.ENVIRONMENT_VARIABLES;
             } else {
                 return PropertySourceOrigin.CUSTOM;
             }
         } else if (propertySource instanceof ResourcePropertySource) {
             return PropertySourceOrigin.PROPERTIES_FILE;
-        } else if (propertySource instanceof PropertiesPropertySource s) {
-            if (StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME.equals(s.getName())) {
+        } else if (propertySource instanceof PropertiesPropertySource) {
+            PropertiesPropertySource pps = (PropertiesPropertySource) propertySource;
+            if (StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME.equals(pps.getName())) {
                 return PropertySourceOrigin.SYSTEM_ARGS;
             } else {
                 return PropertySourceOrigin.CUSTOM;

@@ -95,7 +95,8 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     private ProxyType analyzeProxyType(Class<?> beanType) {
         if (Proxy.isProxyClass(beanType)) {
             return ProxyType.JDK_PROXY;
-        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR) && !beanType.isHidden()) {
+            // TODO: beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)  && !beanType.isHidden()
+        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
             return ProxyType.CGLIB;
         }
         return ProxyType.NO_PROXYING;
@@ -121,7 +122,8 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
             return new BeansFeed.FactoryBean(beanDefinition.getBeanClassName());
         }
 
-        if (beanDefinition instanceof AnnotatedBeanDefinition annotatedDef) {
+        if (beanDefinition instanceof AnnotatedBeanDefinition) {
+            AnnotatedBeanDefinition annotatedDef = (AnnotatedBeanDefinition) beanDefinition;
             AnnotationMetadata metadata = annotatedDef.getMetadata();
 
             var mergedComponentAnnotation = metadata.getAnnotations().get(Component.class);
@@ -131,7 +133,8 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
             }
         }
 
-        if (beanDefinition instanceof AbstractBeanDefinition abstractBeanDefinition) {
+        if (beanDefinition instanceof AbstractBeanDefinition) {
+            AbstractBeanDefinition abstractBeanDefinition = (AbstractBeanDefinition) beanDefinition;
             if (abstractBeanDefinition.isSynthetic()) {
                 return new SyntheticBean();
             }
@@ -163,10 +166,12 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
             return null;
         }
 
-        if (source instanceof StandardMethodMetadata metadata) {
+        if (source instanceof StandardMethodMetadata) {
+            StandardMethodMetadata metadata = (StandardMethodMetadata) source;
             Method introspectedMethod = metadata.getIntrospectedMethod();
             return introspectedMethod.getDeclaringClass();
-        } else if (source instanceof MethodMetadata metadata) {
+        } else if (source instanceof MethodMetadata) {
+            MethodMetadata metadata = (MethodMetadata) source;
             try {
                 return Class.forName(metadata.getDeclaringClassName());
             } catch (Exception ignored) {

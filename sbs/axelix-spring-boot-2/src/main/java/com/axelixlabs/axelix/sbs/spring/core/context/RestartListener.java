@@ -56,7 +56,8 @@ public class RestartListener implements SmartApplicationListener {
 
     @Override
     public void onApplicationEvent(@NonNull ApplicationEvent input) {
-        if (input instanceof ApplicationPreparedEvent applicationPreparedEvent) {
+        if (input instanceof ApplicationPreparedEvent) {
+            ApplicationPreparedEvent applicationPreparedEvent = (ApplicationPreparedEvent) input;
             this.snapshot = new ApplicationSnapshotEvent(
                     applicationPreparedEvent.getApplicationContext(),
                     applicationPreparedEvent.getSpringApplication(),

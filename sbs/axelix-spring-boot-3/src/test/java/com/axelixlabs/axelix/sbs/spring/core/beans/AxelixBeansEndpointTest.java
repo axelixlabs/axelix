@@ -82,7 +82,7 @@ class AxelixBeansEndpointTest {
         }
 
         @Bean(QUALIFIERS_PERSISTENCE_POST_PROCESSOR)
-        public QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
+        public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
             return new QualifiersPersistencePostProcessor();
         }
 

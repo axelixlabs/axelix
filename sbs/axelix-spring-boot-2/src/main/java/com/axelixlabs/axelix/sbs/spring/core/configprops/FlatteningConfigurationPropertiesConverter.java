@@ -74,10 +74,12 @@ public class FlatteningConfigurationPropertiesConverter implements Configuration
 
     @SuppressWarnings("unchecked")
     private List<KeyValue> flattenEntry(String key, Object value) {
-        if (value instanceof Map<?, ?> map) {
+        if (value instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) value;
             return flattenMap(key, (Map<String, Object>) map);
         }
-        if (value instanceof List<?> list) {
+        if (value instanceof List<?>) {
+            List<?> list = (List<?>) value;
             return flattenList(key, list);
         }
         return List.of(new KeyValue(key, value.toString()));

@@ -51,7 +51,7 @@ public class DefaultServiceMetricsGroupsAssembler implements ServiceMetricsGroup
 
         List<MetricsGroup> metricsGroup = metricsByGroupName.entrySet().stream()
                 .map(entry -> new MetricsGroup(entry.getKey(), entry.getValue()))
-                .toList();
+                .collect(Collectors.toList());
 
         return new MetricsGroupsFeed(metricsGroup);
     }
@@ -63,11 +63,12 @@ public class DefaultServiceMetricsGroupsAssembler implements ServiceMetricsGroup
         return metricsNameMapping.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .map(entry -> new MetricDescription(entry.getKey(), entry.getValue()))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private void collectMetricNamesAndDescription(Map<String, String> names, MeterRegistry registry) {
-        if (registry instanceof CompositeMeterRegistry composite) {
+        if (registry instanceof CompositeMeterRegistry) {
+            CompositeMeterRegistry composite = (CompositeMeterRegistry) registry;
             composite.getRegistries().forEach(member -> collectMetricNamesAndDescription(names, member));
         } else {
             registry.getMeters()
