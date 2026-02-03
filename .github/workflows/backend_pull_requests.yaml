@@ -19,6 +19,10 @@ jobs:
 
   backend-build:
     runs-on: ubuntu-latest
+    env:
+      NEXUS_USER: ${{ secrets.NEXUS_USER }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      NEXUS_URL: ${{ secrets.NEXUS_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
