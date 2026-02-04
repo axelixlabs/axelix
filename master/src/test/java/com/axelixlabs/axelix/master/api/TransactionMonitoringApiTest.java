@@ -68,11 +68,11 @@ class TransactionMonitoringApiTest {
                 "methodName": "testCorrectSelfInvocation",
                 "executions": [
                     {
-                        "durationsMs": 3,
+                        "durationMs": 3,
                         "timestamp": 1769442500006
                     },
                     {
-                        "durationsMs": 2,
+                        "durationMs": 2,
                         "timestamp": 1769442510007
                     }
                 ],
@@ -87,11 +87,11 @@ class TransactionMonitoringApiTest {
                 "methodName": "findByLastName",
                 "executions": [
                     {
-                        "durationsMs": 1,
+                        "durationMs": 1,
                         "timestamp": 1769442500006
                     },
                     {
-                        "durationsMs": 3,
+                        "durationMs": 3,
                         "timestamp": 1769442510007
                     }
                 ],
@@ -138,11 +138,11 @@ class TransactionMonitoringApiTest {
                 "methodName": "testCorrectSelfInvocation",
                 "executions": [
                     {
-                        "durationsMs": 3,
+                        "durationMs": 3,
                         "timestamp": 1769442500006
                     },
                     {
-                        "durationsMs": 2,
+                        "durationMs": 2,
                         "timestamp": 1769442510007
                     }
                 ],
@@ -157,11 +157,11 @@ class TransactionMonitoringApiTest {
                 "methodName": "findByLastName",
                 "executions": [
                     {
-                        "durationsMs": 1,
+                        "durationMs": 1,
                         "timestamp": 1769442500006
                     },
                     {
-                        "durationsMs": 3,
+                        "durationMs": 3,
                         "timestamp": 1769442510007
                     }
                 ],

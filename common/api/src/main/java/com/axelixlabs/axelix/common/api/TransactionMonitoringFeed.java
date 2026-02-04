@@ -40,7 +40,7 @@ public final class TransactionMonitoringFeed {
         this.entrypoints = entrypoints;
     }
 
-    public List<TransactionalEntrypoint> entrypoints() {
+    public List<TransactionalEntrypoint> getEntrypoints() {
         return entrypoints;
     }
 
@@ -95,19 +95,19 @@ public final class TransactionMonitoringFeed {
             this.executionStats = executionStats;
         }
 
-        public String className() {
+        public String getClassName() {
             return className;
         }
 
-        public String methodName() {
+        public String getMethodName() {
             return methodName;
         }
 
-        public List<TransactionExecution> executions() {
+        public List<TransactionExecution> getExecutions() {
             return executions;
         }
 
-        public ExecutionStats executionStats() {
+        public ExecutionStats getExecutionStats() {
             return executionStats;
         }
 
@@ -153,25 +153,25 @@ public final class TransactionMonitoringFeed {
      */
     public static final class TransactionExecution {
 
-        private final long durationsMs;
+        private final long durationMs;
         private final long timestamp;
 
         /**
          * Creates a new TransactionExecution.
          *
-         * @param durationsMs transaction execution duration in milliseconds
+         * @param durationMs transaction execution duration in milliseconds
          * @param timestamp   unix timestamp (milliseconds from epoch) when transaction started
          */
-        public TransactionExecution(long durationsMs, long timestamp) {
-            this.durationsMs = durationsMs;
+        public TransactionExecution(long durationMs, long timestamp) {
+            this.durationMs = durationMs;
             this.timestamp = timestamp;
         }
 
-        public long durationsMs() {
-            return durationsMs;
+        public long getDurationMs() {
+            return durationMs;
         }
 
-        public long timestamp() {
+        public long getTimestamp() {
             return timestamp;
         }
 
@@ -184,17 +184,17 @@ public final class TransactionMonitoringFeed {
                 return false;
             }
             TransactionExecution that = (TransactionExecution) o;
-            return durationsMs == that.durationsMs && timestamp == that.timestamp;
+            return durationMs == that.durationMs && timestamp == that.timestamp;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(durationsMs, timestamp);
+            return Objects.hash(durationMs, timestamp);
         }
 
         @Override
         public String toString() {
-            return "TransactionExecution{" + "durationsMs=" + durationsMs + ", timestamp=" + timestamp + '}';
+            return "TransactionExecution{" + "durationMs=" + durationMs + ", timestamp=" + timestamp + '}';
         }
     }
 
@@ -220,15 +220,15 @@ public final class TransactionMonitoringFeed {
             this.medianDurationMs = medianDurationMs;
         }
 
-        public long averageDurationMs() {
+        public long getAverageDurationMs() {
             return averageDurationMs;
         }
 
-        public long maxDurationMs() {
+        public long getMaxDurationMs() {
             return maxDurationMs;
         }
 
-        public long medianDurationMs() {
+        public long getMedianDurationMs() {
             return medianDurationMs;
         }
 
