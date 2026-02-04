@@ -160,3 +160,15 @@ export interface IColorPallete {
      */
     colorPrimaryActive: string;
 }
+
+export interface ISelectOptionData {
+    /**
+     * The select option value
+     */
+    value: string;
+
+    /**
+     * The select option label
+     */
+    label: string;
+}

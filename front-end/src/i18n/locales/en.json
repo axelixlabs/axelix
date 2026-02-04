@@ -10,6 +10,7 @@
     "on": "ON",
     "off": "OFF",
     "documentation": "Documentation",
+    "value": "Value",
     "Details": {
         "downloadState": "Download state",
         "exportConfigurationOptions": "List of state export components",
@@ -176,7 +177,6 @@
         }
     },
     "Metrics": {
-        "value": "Value",
         "baseUnit": "Base Unit",
         "tags": "Tags",
         "selectValue": "Select value",
@@ -246,5 +246,14 @@
         "mainTitle": "Garbage Collector Log",
         "triggerButtonText": "Trigger GC",
         "triggered": "The garbage collector was triggered"
+    },
+    "Wallboard": {
+        "save": "Save",
+        "addFilter": "Add filter",
+        "field": "Field",
+        "comparison": "Comparison",
+        "equal": "Equal",
+        "lessThanOrEqual": "Less than or equal",
+        "greaterThanOrEqual": "Greater than or equal"
     }
 }

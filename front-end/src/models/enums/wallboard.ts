@@ -15,32 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EInstanceStatus, EWallboardFilterComparisons, EWallboardFilterTechnologies } from "models";
-
-export interface IInstanceCard {
-    instanceId: string;
-    springBootVersion: string;
-    javaVersion: string;
-    status: EInstanceStatus;
-    name: string;
-    serviceVersion: string;
-    commitShaShort: string;
-    deployedFor: string;
+export enum EWallboardFilterTechnologies {
+    SPRING_BOOT = "Spring boot",
+    JAVA = "Java",
 }
 
-export interface IServiceCardsResponseBody {
-    instances: IInstanceCard[];
-}
-
-export interface IWallboardFilterEntity {
-    id: string;
-    technology: EWallboardFilterTechnologies;
-    comparison: EWallboardFilterComparisons;
-    version: string;
-}
-
-export interface IWallboardLocalFilterInitialState {
-    technology: null | EWallboardFilterTechnologies;
-    comparison: null | EWallboardFilterComparisons;
-    version: null | string;
+export enum EWallboardFilterComparisons {
+    EQUAL = "Equal",
+    LESS_THAN_EQUAL = "Less than equal",
+    GREATER_THAN_EQUAL = "Greater than equal",
 }

@@ -17,16 +17,19 @@
  */
 import { useEffect, useState } from "react";
 
-import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterInstances } from "helpers";
-import { type IServiceCardsResponseBody, StatefulRequest } from "models";
+import { EmptyHandler, Loader } from "components";
+import { fetchData, filterInstances, filterWallboardInstances } from "helpers";
+import { type IServiceCardsResponseBody, type IWallboardFilterEntity, StatefulRequest } from "models";
 import { getWallboardData } from "services";
 
 import { WallboardCard } from "./WallboardCard";
+import { WallboardFirstSection } from "./WallboardFirstSection";
 import styles from "./styles.module.css";
 
 const Wallboard = () => {
     const [search, setSearch] = useState<string>("");
+
+    const [filters, setFilters] = useState<IWallboardFilterEntity[]>([]);
     const [wallboard, setWallboard] = useState(StatefulRequest.loading<IServiceCardsResponseBody>());
 
     useEffect(() => {
@@ -42,13 +45,20 @@ const Wallboard = () => {
     }
 
     const instanceCards = wallboard.response!.instances;
-    const effectiveInstanceCards = search ? filterInstances(instanceCards, search) : instanceCards;
 
+    const filteredInstances = filters.length > 0 ? filterWallboardInstances(instanceCards, filters) : instanceCards;
+    const effectiveInstanceCards = search ? filterInstances(filteredInstances, search) : filteredInstances;
     const addonAfter = `${effectiveInstanceCards.length} / ${instanceCards.length}`;
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
+            <WallboardFirstSection
+                addonAfter={addonAfter}
+                setSearch={setSearch}
+                instanceCards={instanceCards}
+                filters={filters}
+                setFilters={setFilters}
+            />
 
             <EmptyHandler isEmpty={effectiveInstanceCards.length === 0}>
                 <div className={styles.CardsResponsiveWrapper}>

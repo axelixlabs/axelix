@@ -10,6 +10,7 @@
     "on": "ВКЛ",
     "off": "ВЫКЛ",
     "documentation": "Документация",
+    "value": "Значение",
     "Details": {
         "downloadState": "Выгрузить состояние",
         "exportConfigurationOptions": "Список компонентов состояния для экспорта",
@@ -176,7 +177,6 @@
         }
     },
     "Metrics": {
-        "value": "Значение",
         "baseUnit": "Базовая Единица",
         "tags": "Теги",
         "selectValue": "Выберите значение",
@@ -245,5 +245,14 @@
         "mainTitle": "Лог Сборщика Мусора",
         "triggerButtonText": "Запустить GC",
         "triggered": "Сборщик мусора был вызван"
+    },
+    "Wallboard": {
+        "save": "Сохранить",
+        "addFilter": "Добавить фильтр",
+        "field": "Поле",
+        "comparison": "Сравнение",
+        "equal": "Равно",
+        "lessThanOrEqual": "Меньше или равно",
+        "greaterThanOrEqual": "Больше или равно"
     }
 }

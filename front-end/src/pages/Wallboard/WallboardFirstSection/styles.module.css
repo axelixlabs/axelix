@@ -1,0 +1,13 @@
+.MainWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    row-gap: 8px;
+    margin-bottom: 30px;
+}
+
+.FiltersWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

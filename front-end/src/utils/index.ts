@@ -19,6 +19,7 @@ export * from "./scheduledTasks";
 export * from "./threadDump";
 export * from "./siderMenu";
 export * from "./dashboard";
+export * from "./wallboard";
 export * from "./loggers";
 export * from "./details";
 export * from "./metrics";
