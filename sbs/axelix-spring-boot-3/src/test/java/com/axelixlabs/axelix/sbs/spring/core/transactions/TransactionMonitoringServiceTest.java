@@ -17,16 +17,28 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
+import java.time.Duration;
+import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.IllegalTransactionStateException;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed;
@@ -41,10 +53,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  *
  * @since 22.01.2026
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @SpringBootTest
-@Disabled
+@Import(TransactionMonitoringServiceTest.TransactionMonitoringIntegrationTestConfiguration.class)
 public class TransactionMonitoringServiceTest {
+    private final String PATH_PROPAGATION_TEST_HELPER = PropagationTestHelper.class.getName();
+    private final String PATH_PROPAGATION_TEST_SERVICE = PropagationTestService.class.getName();
 
     @Autowired
     private OwnerRepository ownerRepository;
@@ -71,28 +86,26 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        var testRequiredMethod = monitoringFeed.entrypoints().stream()
-                .filter(method -> "com.axelixlabs.axelix.sbs.spring.transactions.PropagationTestService"
-                                .equals(method.className())
-                        && "testRequired".equals(method.methodName()))
+        var testRequiredMethod = monitoringFeed.getEntrypoints().stream()
+                .filter(method -> PATH_PROPAGATION_TEST_SERVICE.equals(method.getClassName())
+                        && "testRequired".equals(method.getMethodName()))
                 .findFirst();
 
         assertThat(testRequiredMethod).isPresent();
-        assertThat(testRequiredMethod.get().executionStats()).isNotNull();
-        assertThat(testRequiredMethod.get().executions().size()).isEqualTo(3);
+        assertThat(testRequiredMethod.get().getExecutionStats()).isNotNull();
+        assertThat(testRequiredMethod.get().getExecutions().size()).isEqualTo(3);
 
-        var nestedRequiresNewMethod = monitoringFeed.entrypoints().stream()
-                .filter(method ->
-                        "com.axelixlabs.axelix.sbs.spring.transactions.PropagationTestHelper".equals(method.className())
-                                && "testNestedRequiresNew".equals(method.methodName()))
+        var nestedRequiresNewMethod = monitoringFeed.getEntrypoints().stream()
+                .filter(method -> PATH_PROPAGATION_TEST_HELPER.equals(method.getClassName())
+                        && "testNestedRequiresNew".equals(method.getMethodName()))
                 .findFirst();
 
         assertThat(nestedRequiresNewMethod).isPresent();
-        assertThat(testRequiredMethod.get().executionStats()).isNotNull();
-        assertThat(testRequiredMethod.get().executions().size()).isEqualTo(3);
+        assertThat(testRequiredMethod.get().getExecutionStats()).isNotNull();
+        assertThat(testRequiredMethod.get().getExecutions().size()).isEqualTo(3);
 
-        boolean hasRepositoryMethod = monitoringFeed.entrypoints().stream()
-                .anyMatch(method -> method.methodName().contains("findByLastName"));
+        boolean hasRepositoryMethod = monitoringFeed.getEntrypoints().stream()
+                .anyMatch(method -> method.getMethodName().contains("findByLastName"));
         assertThat(hasRepositoryMethod).isFalse();
     }
 
@@ -102,15 +115,14 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.entrypoints()).hasSize(1);
+        assertThat(monitoringFeed.getEntrypoints()).hasSize(1);
 
-        var requiresNewMethod = monitoringFeed.entrypoints().get(0);
-        assertThat(requiresNewMethod.className())
-                .isEqualTo("com.axelixlabs.axelix.sbs.spring.transactions.PropagationTestHelper");
-        assertThat(requiresNewMethod.methodName()).isEqualTo("testRequiresNew");
+        var requiresNewMethod = monitoringFeed.getEntrypoints().get(0);
+        assertThat(requiresNewMethod.getClassName()).isEqualTo(PATH_PROPAGATION_TEST_HELPER);
+        assertThat(requiresNewMethod.getMethodName()).isEqualTo("testRequiresNew");
 
-        boolean hasRepositoryMethod = monitoringFeed.entrypoints().stream()
-                .anyMatch(method -> method.methodName().contains("findByLastName"));
+        boolean hasRepositoryMethod = monitoringFeed.getEntrypoints().stream()
+                .anyMatch(method -> method.getMethodName().contains("findByLastName"));
         assertThat(hasRepositoryMethod).isFalse();
     }
 
@@ -121,25 +133,23 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        var rollbackMethod = monitoringFeed.entrypoints().stream()
-                .filter(method -> "com.axelixlabs.axelix.sbs.spring.transactions.PropagationTestService"
-                                .equals(method.className())
-                        && "testRollbackScenario".equals(method.methodName()))
+        var rollbackMethod = monitoringFeed.getEntrypoints().stream()
+                .filter(method -> PATH_PROPAGATION_TEST_SERVICE.equals(method.getClassName())
+                        && "testRollbackScenario".equals(method.getMethodName()))
                 .findFirst();
 
         assertThat(rollbackMethod).isPresent();
-        assertThat(rollbackMethod.get().executionStats()).isNotNull();
-        assertThat(rollbackMethod.get().executions().size()).isEqualTo(1);
+        assertThat(rollbackMethod.get().getExecutionStats()).isNotNull();
+        assertThat(rollbackMethod.get().getExecutions().size()).isEqualTo(1);
 
-        var nestedMethod = monitoringFeed.entrypoints().stream()
-                .filter(method ->
-                        "com.axelixlabs.axelix.sbs.spring.transactions.PropagationTestHelper".equals(method.className())
-                                && "testNestedRequiresNew".equals(method.methodName()))
+        var nestedMethod = monitoringFeed.getEntrypoints().stream()
+                .filter(method -> PATH_PROPAGATION_TEST_HELPER.equals(method.getClassName())
+                        && "testNestedRequiresNew".equals(method.getMethodName()))
                 .findFirst();
 
         assertThat(nestedMethod).isPresent();
-        assertThat(nestedMethod.get().executionStats()).isNotNull();
-        assertThat(nestedMethod.get().executions().size()).isEqualTo(1);
+        assertThat(nestedMethod.get().getExecutionStats()).isNotNull();
+        assertThat(nestedMethod.get().getExecutions().size()).isEqualTo(1);
     }
 
     @Test
@@ -148,17 +158,17 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        boolean hasTestNotSupported = monitoringFeed.entrypoints().stream()
-                .anyMatch(method -> "testNotSupported".equals(method.methodName()));
+        boolean hasTestNotSupported = monitoringFeed.getEntrypoints().stream()
+                .anyMatch(method -> "testNotSupported".equals(method.getMethodName()));
         assertThat(hasTestNotSupported)
                 .as("'testNotSupported()' should not be tracked")
                 .isFalse();
 
-        boolean hasFindByLastName = monitoringFeed.entrypoints().stream()
-                .anyMatch(method -> method.methodName().contains("findByLastName"));
+        boolean hasFindByLastName = monitoringFeed.getEntrypoints().stream()
+                .anyMatch(method -> method.getMethodName().contains("findByLastName"));
         assertThat(hasFindByLastName).as("'findByLastName()' should be tracked").isTrue();
 
-        assertThat(monitoringFeed.entrypoints()).hasSize(1);
+        assertThat(monitoringFeed.getEntrypoints()).hasSize(1);
     }
 
     // testSupports() should NOT be tracked (reuses test's transaction)
@@ -169,7 +179,7 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.entrypoints()).isEmpty();
+        assertThat(monitoringFeed.getEntrypoints()).isEmpty();
     }
 
     @Test
@@ -178,7 +188,7 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.entrypoints()).hasSize(0);
+        assertThat(monitoringFeed.getEntrypoints()).hasSize(0);
     }
 
     // testMandatory() should NOT be tracked (reuses test's transaction)
@@ -189,7 +199,7 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.entrypoints()).isEmpty();
+        assertThat(monitoringFeed.getEntrypoints()).isEmpty();
     }
 
     @Test
@@ -200,7 +210,7 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.entrypoints()).isEmpty();
+        assertThat(monitoringFeed.getEntrypoints()).isEmpty();
     }
 
     // internalMethod() should NOT be tracked (bypasses proxy)
@@ -210,12 +220,11 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.entrypoints()).hasSize(1);
+        assertThat(monitoringFeed.getEntrypoints()).hasSize(1);
 
-        boolean hasTestSelfInvocation = monitoringFeed.entrypoints().stream()
-                .anyMatch(method ->
-                        "com.axelixlabs.axelix.sbs.spring.transactions.PropagationTestHelper".equals(method.className())
-                                && "testSelfInvocation".equals(method.methodName()));
+        boolean hasTestSelfInvocation = monitoringFeed.getEntrypoints().stream()
+                .anyMatch(method -> PATH_PROPAGATION_TEST_HELPER.equals(method.getClassName())
+                        && "testSelfInvocation".equals(method.getMethodName()));
         assertThat(hasTestSelfInvocation).isTrue();
     }
 
@@ -225,16 +234,14 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.entrypoints()).hasSize(2);
+        assertThat(monitoringFeed.getEntrypoints()).hasSize(2);
 
-        boolean hasTestCorrectSelfInvocation = monitoringFeed.entrypoints().stream()
-                .anyMatch(method ->
-                        "com.axelixlabs.axelix.sbs.spring.transactions.PropagationTestHelper".equals(method.className())
-                                && "testCorrectSelfInvocation".equals(method.methodName()));
-        boolean hasRequiresNewViaProxy = monitoringFeed.entrypoints().stream()
-                .anyMatch(method ->
-                        "com.axelixlabs.axelix.sbs.spring.transactions.PropagationTestHelper".equals(method.className())
-                                && "requiresNewViaProxy".equals(method.methodName()));
+        boolean hasTestCorrectSelfInvocation = monitoringFeed.getEntrypoints().stream()
+                .anyMatch(method -> PATH_PROPAGATION_TEST_HELPER.equals(method.getClassName())
+                        && "testCorrectSelfInvocation".equals(method.getMethodName()));
+        boolean hasRequiresNewViaProxy = monitoringFeed.getEntrypoints().stream()
+                .anyMatch(method -> PATH_PROPAGATION_TEST_HELPER.equals(method.getClassName())
+                        && "requiresNewViaProxy".equals(method.getMethodName()));
 
         assertThat(hasTestCorrectSelfInvocation)
                 .as("'testCorrectSelfInvocation()' should be tracked (creates new transaction)")
@@ -250,12 +257,11 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.entrypoints()).hasSize(1);
+        assertThat(monitoringFeed.getEntrypoints()).hasSize(1);
 
-        boolean hasTestNested = monitoringFeed.entrypoints().stream()
-                .anyMatch(method ->
-                        "com.axelixlabs.axelix.sbs.spring.transactions.PropagationTestHelper".equals(method.className())
-                                && "testNested".equals(method.methodName()));
+        boolean hasTestNested = monitoringFeed.getEntrypoints().stream()
+                .anyMatch(method -> PATH_PROPAGATION_TEST_HELPER.equals(method.getClassName())
+                        && "testNested".equals(method.getMethodName()));
 
         assertThat(hasTestNested).isTrue();
     }
@@ -267,11 +273,14 @@ public class TransactionMonitoringServiceTest {
 
         TransactionMonitoringFeed monitoringFeed = transactionMonitoringService.getMonitoringFeed();
 
-        assertThat(monitoringFeed.entrypoints()).isEmpty();
+        assertThat(monitoringFeed.getEntrypoints()).isEmpty();
     }
 
     @TestConfiguration
-    @Import(TransactionMonitoringBeanPostProcessorTest.TransactionMonitoringBeanPostProcessorTestConfiguration.class)
+    @EnableJpaRepositories(
+            basePackageClasses = TransactionMonitoringServiceTest.OwnerRepository.class,
+            considerNestedRepositories = true)
+    @EntityScan(basePackageClasses = TransactionMonitoringServiceTest.Owner.class)
     static class TransactionMonitoringIntegrationTestConfiguration {
 
         @Bean
@@ -279,5 +288,165 @@ public class TransactionMonitoringServiceTest {
                 TransactionStatsCollector transactionStatsCollector) {
             return new DefaultTransactionMonitoringService(transactionStatsCollector);
         }
+
+        @Bean
+        public TransactionStatsCollector transactionStatsCollector() {
+            return new DefaultTransactionStatsCollector(30, Duration.ofSeconds(10000));
+        }
+
+        @Bean
+        public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
+                TransactionStatsCollector transactionStatsCollector) {
+            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector);
+        }
+
+        @Bean
+        public PropagationTestHelper propagationTestHelper(
+                OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
+            return new PropagationTestHelper(ownerRepository, self);
+        }
+
+        @Bean
+        public PropagationTestService propagationTestService(
+                OwnerRepository ownerRepository, PropagationTestHelper helper) {
+            return new PropagationTestService(ownerRepository, helper);
+        }
+    }
+
+    /**
+     * Simple {@link Entity} for test.
+     */
+    @Entity
+    static class Owner {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String lastName;
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+    }
+
+    /**
+     * Simple {@link JpaRepository} for test.
+     */
+    interface OwnerRepository extends JpaRepository<Owner, Long> {
+
+        @Transactional
+        default Owner findByLastName(String lastName) {
+            return new Owner();
+        }
+
+        @Transactional(propagation = Propagation.SUPPORTS)
+        default List<Owner> findAll() {
+            return List.of(new Owner());
+        }
+    }
+
+    /**
+     * Test helper for demonstrating transaction propagation scenarios and monitoring.
+     * Used in integration tests to verify transaction tracking behavior.
+     */
+    static class PropagationTestHelper {
+
+        private final OwnerRepository ownerRepository;
+        private final PropagationTestHelper self;
+
+        public PropagationTestHelper(OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
+            this.ownerRepository = ownerRepository;
+            this.self = self;
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testRequiresNew(String lastName) {
+            ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testNestedRequiresNew() {
+            ownerRepository.findByLastName("Franklin");
+        }
+
+        @Transactional(propagation = Propagation.NESTED)
+        public void testNested() {
+            ownerRepository.findByLastName("Schroeder");
+        }
+
+        @Transactional(propagation = Propagation.MANDATORY)
+        public void testMandatory(String lastName) {
+            ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        public void testNotSupported(String lastName) {
+            ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional
+        public void testSelfInvocation() {
+            internalMethod();
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void internalMethod() {
+            ownerRepository.findByLastName("Black");
+        }
+
+        @Transactional
+        public void testCorrectSelfInvocation() {
+            self.requiresNewViaProxy();
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void requiresNewViaProxy() {
+            ownerRepository.findByLastName("White");
+        }
+    }
+
+    /**
+     * Test service for demonstrating transaction propagation scenarios and monitoring.
+     * Used in integration tests to verify transaction tracking behavior.
+     */
+    static class PropagationTestService {
+
+        private final OwnerRepository ownerRepository;
+        private final PropagationTestHelper helperService;
+
+        public PropagationTestService(OwnerRepository ownerRepository, PropagationTestHelper helperService) {
+            this.ownerRepository = ownerRepository;
+            this.helperService = helperService;
+        }
+
+        @Transactional(propagation = Propagation.REQUIRED)
+        void testRequired(String lastName) {
+            ownerRepository.findByLastName(lastName);
+            helperService.testNestedRequiresNew();
+        }
+
+        public void testFromNonTransactional(String lastName) {
+            helperService.testRequiresNew(lastName);
+        }
+
+        @Transactional
+        protected void testRollbackScenario(String lastName) {
+            ownerRepository.findByLastName(lastName);
+            helperService.testNestedRequiresNew();
+            throw new RuntimeException("Test rollback");
+        }
+
+        @Transactional(propagation = Propagation.SUPPORTS)
+        public void testSupports(String lastName) {
+            ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional(propagation = Propagation.SUPPORTS)
+        public void testSupportsWithoutTransaction() {}
     }
 }
