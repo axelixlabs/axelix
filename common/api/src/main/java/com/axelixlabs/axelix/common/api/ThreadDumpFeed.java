@@ -59,11 +59,11 @@ public final class ThreadDumpFeed {
                 Arrays.stream(jmxThreads).map(ThreadDumpFeed::toApiThread).collect(Collectors.toList()));
     }
 
-    public boolean threadContentionMonitoringEnabled() {
+    public boolean getThreadContentionMonitoringEnabled() {
         return threadContentionMonitoringEnabled;
     }
 
-    public List<ThreadInfo> threads() {
+    public List<ThreadInfo> getThreads() {
         return threads;
     }
 
@@ -266,78 +266,78 @@ public final class ThreadDumpFeed {
             this.lockedSynchronizers = lockedSynchronizers;
         }
 
-        public String threadName() {
+        public String getThreadName() {
             return threadName;
         }
 
-        public long threadId() {
+        public long getThreadId() {
             return threadId;
         }
 
-        public long blockedTime() {
+        public long getBlockedTime() {
             return blockedTime;
         }
 
-        public long blockedCount() {
+        public long getBlockedCount() {
             return blockedCount;
         }
 
-        public long waitedTime() {
+        public long getWaitedTime() {
             return waitedTime;
         }
 
-        public long waitedCount() {
+        public long getWaitedCount() {
             return waitedCount;
         }
 
         @Nullable
-        public LockInfo lockInfo() {
+        public LockInfo getLockInfo() {
             return lockInfo;
         }
 
         @Nullable
-        public String lockName() {
+        public String getLockName() {
             return lockName;
         }
 
-        public long lockOwnerId() {
+        public long getLockOwnerId() {
             return lockOwnerId;
         }
 
         @Nullable
-        public String lockOwnerName() {
+        public String getLockOwnerName() {
             return lockOwnerName;
         }
 
-        public boolean daemon() {
+        public boolean isDaemon() {
             return daemon;
         }
 
-        public boolean inNative() {
+        public boolean isInNative() {
             return inNative;
         }
 
-        public boolean suspended() {
+        public boolean isSuspended() {
             return suspended;
         }
 
-        public State threadState() {
+        public State getThreadState() {
             return threadState;
         }
 
-        public int priority() {
+        public int getPriority() {
             return priority;
         }
 
-        public StackTraceElement[] stackTrace() {
+        public StackTraceElement[] getStackTrace() {
             return stackTrace;
         }
 
-        public MonitorInfo[] lockedMonitors() {
+        public MonitorInfo[] getLockedMonitors() {
             return lockedMonitors;
         }
 
-        public LockInfo[] lockedSynchronizers() {
+        public LockInfo[] getLockedSynchronizers() {
             return lockedSynchronizers;
         }
 
@@ -452,11 +452,11 @@ public final class ThreadDumpFeed {
             this.identityHashCode = identityHashCode;
         }
 
-        public String className() {
+        public String getClassName() {
             return className;
         }
 
-        public int identityHashCode() {
+        public int getIdentityHashCode() {
             return identityHashCode;
         }
 
@@ -498,19 +498,19 @@ public final class ThreadDumpFeed {
             this.lockedStackFrame = lockedStackFrame;
         }
 
-        public String className() {
+        public String getClassName() {
             return className;
         }
 
-        public int identityHashCode() {
+        public int getIdentityHashCode() {
             return identityHashCode;
         }
 
-        public int lockedStackDepth() {
+        public int getLockedStackDepth() {
             return lockedStackDepth;
         }
 
-        public StackTraceElement lockedStackFrame() {
+        public StackTraceElement getLockedStackFrame() {
             return lockedStackFrame;
         }
 
@@ -601,38 +601,38 @@ public final class ThreadDumpFeed {
         }
 
         @Nullable
-        public String classLoaderName() {
+        public String getClassLoaderName() {
             return classLoaderName;
         }
 
-        public String className() {
+        public String getClassName() {
             return className;
         }
 
         @Nullable
-        public String fileName() {
+        public String getFileName() {
             return fileName;
         }
 
-        public int lineNumber() {
+        public int getLineNumber() {
             return lineNumber;
         }
 
-        public String methodName() {
+        public String getMethodName() {
             return methodName;
         }
 
         @Nullable
-        public String moduleName() {
+        public String getModuleName() {
             return moduleName;
         }
 
         @Nullable
-        public String moduleVersion() {
+        public String getModuleVersion() {
             return moduleVersion;
         }
 
-        public boolean nativeMethod() {
+        public boolean getNativeMethod() {
             return nativeMethod;
         }
 

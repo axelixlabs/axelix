@@ -120,77 +120,77 @@ class ThreadDumpJacksonMessageDeserializationStrategyTest {
 
         ThreadDumpFeed threadDumpFeed = subject.deserialize(jsonResponse.getBytes(StandardCharsets.UTF_8));
 
-        assertThat(threadDumpFeed.threads()).hasSize(2);
+        assertThat(threadDumpFeed.getThreads()).hasSize(2);
 
-        ThreadInfo firstThread = threadDumpFeed.threads().get(0);
-        assertThat(firstThread.threadName()).isEqualTo("Test worker");
-        assertThat(firstThread.threadId()).isEqualTo(1);
-        assertThat(firstThread.blockedTime()).isEqualTo(-1);
-        assertThat(firstThread.blockedCount()).isEqualTo(37);
-        assertThat(firstThread.waitedTime()).isEqualTo(-1);
-        assertThat(firstThread.waitedCount()).isEqualTo(109);
-        assertThat(firstThread.lockOwnerId()).isEqualTo(-1);
+        ThreadInfo firstThread = threadDumpFeed.getThreads().get(0);
+        assertThat(firstThread.getThreadName()).isEqualTo("Test worker");
+        assertThat(firstThread.getThreadId()).isEqualTo(1);
+        assertThat(firstThread.getBlockedTime()).isEqualTo(-1);
+        assertThat(firstThread.getBlockedCount()).isEqualTo(37);
+        assertThat(firstThread.getWaitedTime()).isEqualTo(-1);
+        assertThat(firstThread.getWaitedCount()).isEqualTo(109);
+        assertThat(firstThread.getLockOwnerId()).isEqualTo(-1);
         assertThat(firstThread.daemon()).isFalse();
-        assertThat(firstThread.inNative()).isFalse();
-        assertThat(firstThread.suspended()).isFalse();
-        assertThat(firstThread.threadState()).isEqualTo(State.RUNNABLE);
-        assertThat(firstThread.priority()).isEqualTo(5);
-        assertThat(firstThread.lockInfo()).isNull();
-        assertThat(firstThread.lockName()).isNull();
-        assertThat(firstThread.lockOwnerName()).isNull();
+        assertThat(firstThread.isInNative()).isFalse();
+        assertThat(firstThread.isSuspended()).isFalse();
+        assertThat(firstThread.getThreadState()).isEqualTo(State.RUNNABLE);
+        assertThat(firstThread.getPriority()).isEqualTo(5);
+        assertThat(firstThread.getLockInfo()).isNull();
+        assertThat(firstThread.getLockName()).isNull();
+        assertThat(firstThread.getLockOwnerName()).isNull();
 
-        assertThat(firstThread.stackTrace()).hasSize(2);
-        StackTraceElement firstStackTrace = firstThread.stackTrace()[0];
-        assertThat(firstStackTrace.moduleName()).isEqualTo("java.management");
-        assertThat(firstStackTrace.moduleVersion()).isEqualTo("17.0.17");
-        assertThat(firstStackTrace.methodName()).isEqualTo("dumpThreads0");
-        assertThat(firstStackTrace.fileName()).isEqualTo("ThreadImpl.java");
-        assertThat(firstStackTrace.lineNumber()).isEqualTo(-2);
-        assertThat(firstStackTrace.nativeMethod()).isTrue();
-        assertThat(firstStackTrace.className()).isEqualTo("sun.management.ThreadImpl");
+        assertThat(firstThread.getStackTrace()).hasSize(2);
+        StackTraceElement firstStackTrace = firstThread.getStackTrace()[0];
+        assertThat(firstStackTrace.getModuleName()).isEqualTo("java.management");
+        assertThat(firstStackTrace.getModuleVersion()).isEqualTo("17.0.17");
+        assertThat(firstStackTrace.getMethodName()).isEqualTo("dumpThreads0");
+        assertThat(firstStackTrace.getFileName()).isEqualTo("ThreadImpl.java");
+        assertThat(firstStackTrace.getLineNumber()).isEqualTo(-2);
+        assertThat(firstStackTrace.getNativeMethod()).isTrue();
+        assertThat(firstStackTrace.getClassName()).isEqualTo("sun.management.ThreadImpl");
 
-        StackTraceElement secondStackTrace = firstThread.stackTrace()[1];
-        assertThat(secondStackTrace.methodName()).isEqualTo("dumpAllThreads");
-        assertThat(secondStackTrace.lineNumber()).isEqualTo(528);
-        assertThat(secondStackTrace.nativeMethod()).isFalse();
+        StackTraceElement secondStackTrace = firstThread.getStackTrace()[1];
+        assertThat(secondStackTrace.getMethodName()).isEqualTo("dumpAllThreads");
+        assertThat(secondStackTrace.getLineNumber()).isEqualTo(528);
+        assertThat(secondStackTrace.getNativeMethod()).isFalse();
 
-        assertThat(firstThread.lockedMonitors()).isEmpty();
-        assertThat(firstThread.lockedSynchronizers()).isEmpty();
+        assertThat(firstThread.getLockedMonitors()).isEmpty();
+        assertThat(firstThread.getLockedSynchronizers()).isEmpty();
 
-        ThreadInfo secondThread = threadDumpFeed.threads().get(1);
-        assertThat(secondThread.threadName()).isEqualTo("Finalizer");
-        assertThat(secondThread.threadId()).isEqualTo(3);
-        assertThat(secondThread.blockedTime()).isEqualTo(-1);
-        assertThat(secondThread.blockedCount()).isEqualTo(0);
-        assertThat(secondThread.waitedTime()).isEqualTo(-1);
-        assertThat(secondThread.waitedCount()).isEqualTo(1);
-        assertThat(secondThread.lockName()).isEqualTo("java.lang.ref.ReferenceQueue$Lock@60ffdc9f");
-        assertThat(secondThread.lockOwnerId()).isEqualTo(-1);
+        ThreadInfo secondThread = threadDumpFeed.getThreads().get(1);
+        assertThat(secondThread.getThreadName()).isEqualTo("Finalizer");
+        assertThat(secondThread.getThreadId()).isEqualTo(3);
+        assertThat(secondThread.getBlockedTime()).isEqualTo(-1);
+        assertThat(secondThread.getBlockedCount()).isEqualTo(0);
+        assertThat(secondThread.getWaitedTime()).isEqualTo(-1);
+        assertThat(secondThread.getWaitedCount()).isEqualTo(1);
+        assertThat(secondThread.getLockName()).isEqualTo("java.lang.ref.ReferenceQueue$Lock@60ffdc9f");
+        assertThat(secondThread.getLockOwnerId()).isEqualTo(-1);
         assertThat(secondThread.daemon()).isTrue();
-        assertThat(secondThread.inNative()).isFalse();
-        assertThat(secondThread.suspended()).isFalse();
-        assertThat(secondThread.threadState()).isEqualTo(State.WAITING);
-        assertThat(secondThread.priority()).isEqualTo(8);
+        assertThat(secondThread.isInNative()).isFalse();
+        assertThat(secondThread.isSuspended()).isFalse();
+        assertThat(secondThread.getThreadState()).isEqualTo(State.WAITING);
+        assertThat(secondThread.getPriority()).isEqualTo(8);
 
-        assertThat(secondThread.lockInfo()).isNotNull();
-        assertThat(secondThread.lockInfo().className()).isEqualTo("java.lang.ref.ReferenceQueue$Lock");
-        assertThat(secondThread.lockInfo().identityHashCode()).isEqualTo(1627380895);
+        assertThat(secondThread.getLockInfo()).isNotNull();
+        assertThat(secondThread.getLockInfo().getClassName()).isEqualTo("java.lang.ref.ReferenceQueue$Lock");
+        assertThat(secondThread.getLockInfo().getIdentityHashCode()).isEqualTo(1627380895);
 
-        assertThat(secondThread.stackTrace()).hasSize(2);
-        StackTraceElement secondThreadFirstFrame = secondThread.stackTrace()[0];
-        assertThat(secondThreadFirstFrame.moduleName()).isEqualTo("java.base");
-        assertThat(secondThreadFirstFrame.methodName()).isEqualTo("wait");
-        assertThat(secondThreadFirstFrame.nativeMethod()).isTrue();
-        assertThat(secondThreadFirstFrame.className()).isEqualTo("java.lang.Object");
+        assertThat(secondThread.getStackTrace()).hasSize(2);
+        StackTraceElement secondThreadFirstFrame = secondThread.getStackTrace()[0];
+        assertThat(secondThreadFirstFrame.getModuleName()).isEqualTo("java.base");
+        assertThat(secondThreadFirstFrame.getMethodName()).isEqualTo("wait");
+        assertThat(secondThreadFirstFrame.getNativeMethod()).isTrue();
+        assertThat(secondThreadFirstFrame.getClassName()).isEqualTo("java.lang.Object");
 
-        StackTraceElement secondThreadSecondFrame = secondThread.stackTrace()[1];
-        assertThat(secondThreadSecondFrame.fileName()).isEqualTo("Finalizer.java");
-        assertThat(secondThreadSecondFrame.lineNumber()).isEqualTo(172);
-        assertThat(secondThreadSecondFrame.methodName()).isEqualTo("run");
-        assertThat(secondThreadSecondFrame.nativeMethod()).isFalse();
-        assertThat(secondThreadSecondFrame.className()).isEqualTo("java.lang.ref.Finalizer$FinalizerThread");
+        StackTraceElement secondThreadSecondFrame = secondThread.getStackTrace()[1];
+        assertThat(secondThreadSecondFrame.getFileName()).isEqualTo("Finalizer.java");
+        assertThat(secondThreadSecondFrame.getLineNumber()).isEqualTo(172);
+        assertThat(secondThreadSecondFrame.getMethodName()).isEqualTo("run");
+        assertThat(secondThreadSecondFrame.getNativeMethod()).isFalse();
+        assertThat(secondThreadSecondFrame.getClassName()).isEqualTo("java.lang.ref.Finalizer$FinalizerThread");
 
-        assertThat(secondThread.lockedMonitors()).isEmpty();
-        assertThat(secondThread.lockedSynchronizers()).isEmpty();
+        assertThat(secondThread.getLockedMonitors()).isEmpty();
+        assertThat(secondThread.getLockedSynchronizers()).isEmpty();
     }
 }

@@ -27,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,6 +55,15 @@ public class ThreadDumpManagementEndpointTest {
     }
 
     @Test
+    void shouldReceiveThreadDumpJson() {
+        // when.
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-thread-dump", String.class);
+
+        // then.
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+    }
+
+    @Test
     void shouldDisableThreadContentionMonitoring() {
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
         threadMXBean.setThreadContentionMonitoringEnabled(true);
@@ -67,6 +77,7 @@ public class ThreadDumpManagementEndpointTest {
 
     @TestConfiguration
     static class ThreadDumpManagementEndpointTestConfiguration {
+
         @Bean
         public ThreadDumpContentionMonitoringManagement management() {
             return new DefaultThreadDumpContentionMonitoringManagement();

@@ -47,41 +47,41 @@ public class ThreadDumpFeedConverter implements Converter<ThreadDumpFeed, Thread
     public @NonNull ThreadDumpFeedResponse convertInternal(@NonNull ThreadDumpFeed source) {
         List<ThreadInfo> result = new ArrayList<>();
 
-        source.threads()
+        source.getThreads()
                 .forEach(currentThread -> result.add(new ThreadInfo(
-                        currentThread.threadName(),
-                        currentThread.threadId(),
-                        currentThread.blockedTime(),
-                        currentThread.blockedCount(),
-                        currentThread.waitedTime(),
-                        currentThread.waitedCount(),
-                        convertLockInfo(currentThread.lockInfo()),
-                        currentThread.lockName(),
-                        currentThread.lockOwnerId(),
-                        currentThread.lockOwnerName(),
-                        currentThread.daemon(),
-                        currentThread.inNative(),
-                        currentThread.suspended(),
-                        convertState(currentThread.threadState()),
-                        currentThread.priority(),
-                        Arrays.stream(currentThread.stackTrace())
+                        currentThread.getThreadName(),
+                        currentThread.getThreadId(),
+                        currentThread.getBlockedTime(),
+                        currentThread.getBlockedCount(),
+                        currentThread.getWaitedTime(),
+                        currentThread.getWaitedCount(),
+                        convertLockInfo(currentThread.getLockInfo()),
+                        currentThread.getLockName(),
+                        currentThread.getLockOwnerId(),
+                        currentThread.getLockOwnerName(),
+                        currentThread.isDaemon(),
+                        currentThread.isInNative(),
+                        currentThread.isSuspended(),
+                        convertState(currentThread.getThreadState()),
+                        currentThread.getPriority(),
+                        Arrays.stream(currentThread.getStackTrace())
                                 .map(this::convertStackTraceElement)
                                 .toArray(StackTraceElement[]::new),
-                        Arrays.stream(currentThread.lockedMonitors())
+                        Arrays.stream(currentThread.getLockedMonitors())
                                 .map(this::convertMonitorInfo)
                                 .toArray(MonitorInfo[]::new),
-                        Arrays.stream(currentThread.lockedSynchronizers())
+                        Arrays.stream(currentThread.getLockedSynchronizers())
                                 .map(this::convertLockInfo)
                                 .toArray(LockInfo[]::new))));
 
-        return new ThreadDumpFeedResponse(source.threadContentionMonitoringEnabled(), result);
+        return new ThreadDumpFeedResponse(source.getThreadContentionMonitoringEnabled(), result);
     }
 
     private @Nullable LockInfo convertLockInfo(ThreadDumpFeed.@Nullable LockInfo source) {
         if (source == null) {
             return null;
         }
-        return new LockInfo(source.className(), source.identityHashCode());
+        return new LockInfo(source.getClassName(), source.getIdentityHashCode());
     }
 
     private State convertState(ThreadDumpFeed.State source) {
@@ -97,21 +97,21 @@ public class ThreadDumpFeedConverter implements Converter<ThreadDumpFeed, Thread
 
     private StackTraceElement convertStackTraceElement(ThreadDumpFeed.StackTraceElement source) {
         return new StackTraceElement(
-                source.classLoaderName(),
-                source.className(),
-                source.fileName(),
-                source.lineNumber(),
-                source.methodName(),
-                source.moduleName(),
-                source.moduleVersion(),
-                source.nativeMethod());
+                source.getClassLoaderName(),
+                source.getClassName(),
+                source.getFileName(),
+                source.getLineNumber(),
+                source.getMethodName(),
+                source.getModuleName(),
+                source.getModuleVersion(),
+                source.getNativeMethod());
     }
 
     private MonitorInfo convertMonitorInfo(ThreadDumpFeed.MonitorInfo source) {
         return new MonitorInfo(
-                source.className(),
-                source.identityHashCode(),
-                source.lockedStackDepth(),
-                convertStackTraceElement(source.lockedStackFrame()));
+                source.getClassName(),
+                source.getIdentityHashCode(),
+                source.getLockedStackDepth(),
+                convertStackTraceElement(source.getLockedStackFrame()));
     }
 }
