@@ -17,14 +17,15 @@
  */
 package com.axelixlabs.axelix.master.api.internal;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
-import com.axelixlabs.axelix.master.service.discovery.selfregistered.ManagementSelfRegisteredService;
+import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.master.service.discovery.selfregistered.SelfRegisteredServiceDiscoverer;
 
 /**
  * The API used for service self-registration.
@@ -33,17 +34,18 @@ import com.axelixlabs.axelix.master.service.discovery.selfregistered.ManagementS
  */
 @RestController
 @RequestMapping(path = InternalApiPaths.SelfRegistryApi.MAIN)
+@ConditionalOnBean(SelfRegisteredServiceDiscoverer.class)
 public class SelfRegisteredApi {
 
-    private final ManagementSelfRegisteredService managementSelfRegisteredService;
+    private final SelfRegisteredServiceDiscoverer selfRegisteredServiceDiscoverer;
 
-    public SelfRegisteredApi(ManagementSelfRegisteredService managementSelfRegisteredService) {
-        this.managementSelfRegisteredService = managementSelfRegisteredService;
+    public SelfRegisteredApi(SelfRegisteredServiceDiscoverer selfRegisteredServiceDiscoverer) {
+        this.selfRegisteredServiceDiscoverer = selfRegisteredServiceDiscoverer;
     }
 
     @PostMapping(path = InternalApiPaths.SelfRegistryApi.SERVICE_REGISTER)
-    public ResponseEntity<Void> registryServiceInstance(@RequestBody ServiceMetadata request) {
-        managementSelfRegisteredService.registerNewInstances(request);
+    public ResponseEntity<Void> registryServiceInstance(@RequestBody SelfRegistrationMetadata request) {
+        selfRegisteredServiceDiscoverer.registerNewInstances(request);
         return ResponseEntity.noContent().build();
     }
 }

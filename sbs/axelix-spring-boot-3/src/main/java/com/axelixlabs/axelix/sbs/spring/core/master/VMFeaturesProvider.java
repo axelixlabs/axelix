@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.util.List;
 
-import com.axelixlabs.axelix.common.api.registration.ServiceMetadata.VMFeature;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.VMFeature;
 
 /**
  * Provides the information about specific VM features that are either used, or can potentially

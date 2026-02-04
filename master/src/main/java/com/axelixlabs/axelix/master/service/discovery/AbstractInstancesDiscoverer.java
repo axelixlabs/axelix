@@ -31,7 +31,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
 
-import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
@@ -105,7 +105,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
         String actuatorUrl = serviceInstance.getUri().toString() + ACTUATOR_ENDPOINT_POSTFIX;
 
         try {
-            ServiceMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
+            BasicDiscoveryMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);
 
             return new InstanceIntermediateProfile(serviceInstance, metadata);
         } catch (EndpointInvocationException error) {
@@ -134,7 +134,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
      *
      * @author Mikhail Polivakha
      */
-    protected record InstanceIntermediateProfile(ServiceInstance serviceInstance, ServiceMetadata metadata) {}
+    protected record InstanceIntermediateProfile(ServiceInstance serviceInstance, BasicDiscoveryMetadata metadata) {}
 
     private @Nullable Instance toDomainInstanceSafe(InstanceIntermediateProfile intermediateProfile) {
         try {

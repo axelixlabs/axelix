@@ -22,7 +22,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.master.service.MemoryUsageCache;
-import com.axelixlabs.axelix.master.service.discovery.selfregistered.ManagementSelfRegisteredService;
+import com.axelixlabs.axelix.master.service.discovery.DefaultInstanceFactory;
+import com.axelixlabs.axelix.master.service.discovery.DefaultManagementInstance;
+import com.axelixlabs.axelix.master.service.discovery.InstanceFactory;
+import com.axelixlabs.axelix.master.service.discovery.ManagementInstance;
+import com.axelixlabs.axelix.master.service.discovery.selfregistered.SelfRegisteredServiceDiscoverer;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -35,8 +39,18 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 public class SelfRegisteredAutoConfiguration {
 
     @Bean
-    public ManagementSelfRegisteredService managementSelfRegisteredService(
-            InstanceRegistry instanceRegistry, MemoryUsageCache memoryUsageCache) {
-        return new ManagementSelfRegisteredService(instanceRegistry, memoryUsageCache);
+    public ManagementInstance managementInstance(InstanceRegistry instanceRegistry, MemoryUsageCache memoryUsageCache) {
+        return new DefaultManagementInstance(instanceRegistry, memoryUsageCache);
+    }
+
+    @Bean
+    public InstanceFactory instanceFactory() {
+        return new DefaultInstanceFactory();
+    }
+
+    @Bean
+    public SelfRegisteredServiceDiscoverer managementSelfRegisteredService(
+            ManagementInstance managementInstance, InstanceFactory instanceFactory) {
+        return new SelfRegisteredServiceDiscoverer(managementInstance, instanceFactory);
     }
 }

@@ -85,6 +85,9 @@ class KubernetesInstanceDiscovererTest {
     @Autowired
     private AxelixVersionDiscoverer axelixVersionDiscoverer;
 
+    @Autowired
+    private DefaultInstanceFactory instanceFactory;
+
     private URI uri;
 
     private KubernetesInstanceDiscoverer subject;
@@ -118,6 +121,11 @@ class KubernetesInstanceDiscovererTest {
         public AxelixVersionDiscoverer axelixVersionDiscoverer() {
             return () -> "1.0.0-SNAPSHOT";
         }
+
+        @Bean
+        public DefaultInstanceFactory instanceFactory() {
+            return new DefaultInstanceFactory();
+        }
     }
 
     @BeforeEach
@@ -127,7 +135,7 @@ class KubernetesInstanceDiscovererTest {
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
 
         subject = new KubernetesInstanceDiscoverer(
-                discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
+                discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer, instanceFactory);
     }
 
     @AfterEach

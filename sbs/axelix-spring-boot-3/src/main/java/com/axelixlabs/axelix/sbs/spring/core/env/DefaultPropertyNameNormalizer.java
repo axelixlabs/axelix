@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+// TODO This normalizer is used in multiple places across the system, so we need to extract this logic into a shared
+// common module.
 /**
  * Default implementation {@link PropertyNameNormalizer}.
  *

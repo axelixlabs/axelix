@@ -26,8 +26,8 @@ import org.springframework.boot.actuate.health.Status;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
-import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 
@@ -69,24 +69,24 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     }
 
     @Override
-    public ServiceMetadata assemble() {
+    public BasicDiscoveryMetadata assemble() {
         var shortBuildInfo = shortBuildInfoProvider.getShortBuildInfo();
         var gitCommitInfo = gitInformationProvider.getGitCommitInfo();
 
-        return new ServiceMetadata(
+        return new BasicDiscoveryMetadata(
                 axelixVersionDiscoverer.getVersion(),
                 shortBuildInfo.map(ShortBuildInfo::serviceVersion).orElse(""),
                 gitCommitInfo.map(GitInfo::commitShaShort).orElse(""),
                 System.getProperty("java.vendor"),
                 buildSoftwareVersionInUse(),
                 getCurrentHealth(),
-                new ServiceMetadata.MemoryDetails(
+                new BasicDiscoveryMetadata.MemoryDetails(
                         memoryMXBean.getHeapMemoryUsage().getUsed()),
                 vmFeaturesProvider.discover());
     }
 
-    private ServiceMetadata.SoftwareVersions buildSoftwareVersionInUse() {
-        return new ServiceMetadata.SoftwareVersions(
+    private BasicDiscoveryMetadata.SoftwareVersions buildSoftwareVersionInUse() {
+        return new BasicDiscoveryMetadata.SoftwareVersions(
                 System.getProperty("java.version"),
                 libraryDiscoverer.getRequiredLibraryVersion("spring-boot", "org.springframework.boot"),
                 libraryDiscoverer.getRequiredLibraryVersion("spring-core", "org.springframework"),
@@ -95,19 +95,19 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                         .orElse(null));
     }
 
-    private ServiceMetadata.HealthStatus getCurrentHealth() {
+    private BasicDiscoveryMetadata.HealthStatus getCurrentHealth() {
         Status status = healthEndpoint.health().getStatus();
 
         if (status == Status.UP) {
-            return ServiceMetadata.HealthStatus.UP;
+            return BasicDiscoveryMetadata.HealthStatus.UP;
         }
 
         if (status == Status.DOWN) {
-            return ServiceMetadata.HealthStatus.DOWN;
+            return BasicDiscoveryMetadata.HealthStatus.DOWN;
         }
 
         // defaulting to unknown in case of UNKNOWN, OUT_OF_SERVICE and custom statuses
-        return ServiceMetadata.HealthStatus.UNKNOWN;
+        return BasicDiscoveryMetadata.HealthStatus.UNKNOWN;
     }
 
     private static String missingGitInfoProvider() {

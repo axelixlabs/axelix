@@ -17,25 +17,16 @@
  */
 package com.axelixlabs.axelix.master.service.discovery.k8s;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.List;
-
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
-import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
-import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.domain.MemoryUsage;
 import com.axelixlabs.axelix.master.service.discovery.AbstractInstancesDiscoverer;
+import com.axelixlabs.axelix.master.service.discovery.InstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
@@ -45,21 +36,21 @@ import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndp
  * in a Kubernetes cluster.</p>
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
 
     private static final Logger log = LoggerFactory.getLogger(KubernetesInstanceDiscoverer.class);
 
-    /**
-     * The string key that represent the pod's creation timestamp.
-     */
-    public static final String POD_CREATION_TIMESTAMP = "creationTimestamp";
+    private final InstanceFactory instanceFactory;
 
     public KubernetesInstanceDiscoverer(
             DiscoveryClient discoveryClient,
             ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber,
-            AxelixVersionDiscoverer axelixVersionDiscoverer) {
+            AxelixVersionDiscoverer axelixVersionDiscoverer,
+            InstanceFactory instanceFactory) {
         super(log, discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
+        this.instanceFactory = instanceFactory;
     }
 
     @Override
@@ -67,73 +58,14 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
         ServiceInstance serviceInstance = profile.serviceInstance();
 
         if (serviceInstance instanceof KubernetesServiceInstance k8sInstance) {
-
-            Instant deployedAt = extractPodDeployTimestamp(k8sInstance);
-
-            return new Instance(
-                    InstanceId.of(k8sInstance.getInstanceId()),
+            return instanceFactory.createInstance(
+                    k8sInstance.getInstanceId(),
                     k8sInstance.podName(),
-                    profile.metadata().getServiceVersion(),
-                    profile.metadata().getSoftwareVersions().getJava(),
-                    profile.metadata().getSoftwareVersions().getSpringBoot(),
-                    profile.metadata().getSoftwareVersions().getSpringFramework(),
-                    profile.metadata().getSoftwareVersions().getKotlin(),
-                    profile.metadata().getJdkVendor(),
-                    profile.metadata().getCommitShortSha(),
-                    deployedAt,
-                    mapStatus(profile),
-                    new MemoryUsage(profile.metadata().getMemoryDetails().getHeap()),
-                    serviceInstance.getUri().toString() + "/actuator",
-                    mapVMFeatures(profile));
+                    k8sInstance.getDeploymentAt(),
+                    serviceInstance.getUri().toString(),
+                    profile.metadata());
         } else {
             throw new IllegalArgumentException(buildErrorMessage(serviceInstance));
-        }
-    }
-
-    private static List<Instance.VMFeature> mapVMFeatures(InstanceIntermediateProfile profile) {
-        return profile.metadata().getVmFeatures().stream()
-                .map(it -> new Instance.VMFeature(it.getName(), it.getDescription(), it.isEnabled()))
-                .toList();
-    }
-
-    private static Instance.InstanceStatus mapStatus(InstanceIntermediateProfile profile) {
-        ServiceMetadata.HealthStatus healthStatus = profile.metadata().getHealthStatus();
-
-        if (healthStatus == null) {
-            return Instance.InstanceStatus.UNKNOWN;
-        }
-
-        return switch (healthStatus) {
-            case UP -> Instance.InstanceStatus.UP;
-            case DOWN -> Instance.InstanceStatus.DOWN;
-            case UNKNOWN -> Instance.InstanceStatus.UNKNOWN;
-        };
-    }
-
-    @Nullable
-    private static Instant extractPodDeployTimestamp(KubernetesServiceInstance k8sInstance) {
-        String deployedAtAsString = k8sInstance.getDeploymentAt();
-
-        if (deployedAtAsString == null) {
-            log.warn(
-                    "The K8S pod's {} {} filed in metadata is null",
-                    k8sInstance.getInstanceId(),
-                    POD_CREATION_TIMESTAMP);
-            return null;
-        }
-
-        try {
-            return OffsetDateTime.parse(deployedAtAsString, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-                    .toInstant();
-        } catch (DateTimeParseException e) {
-            log.warn(
-                    """
-                Unable to parse the deployment timestamp of the pod : {}.
-                That will affect the corresponding service on the wallboard UI
-                """,
-                    k8sInstance.getInstanceId(),
-                    e);
-            return null;
         }
     }
 

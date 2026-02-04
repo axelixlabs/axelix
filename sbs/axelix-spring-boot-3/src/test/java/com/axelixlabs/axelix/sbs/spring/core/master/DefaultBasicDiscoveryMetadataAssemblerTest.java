@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 
-import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,9 +45,9 @@ import static org.assertj.core.api.Assertions.assertThat;
     CommitIdPluginGitInformationProvider.class,
     CommitIdPluginShortBuildInfoProvider.class,
     DefaultServiceMetadataAssembler.class,
-    DefaultServiceMetadataAssemblerTest.CurrentConfig.class
+    DefaultBasicDiscoveryMetadataAssemblerTest.CurrentConfig.class
 })
-class DefaultServiceMetadataAssemblerTest {
+class DefaultBasicDiscoveryMetadataAssemblerTest {
 
     @Autowired
     private DefaultServiceMetadataAssembler subject;
@@ -80,7 +80,7 @@ class DefaultServiceMetadataAssemblerTest {
         Mockito.when(healthEndpoint.health()).thenReturn(Health.up().build());
 
         // when.
-        ServiceMetadata serviceMetadata = subject.assemble();
+        BasicDiscoveryMetadata serviceMetadata = subject.assemble();
 
         // then.
         assertThat(serviceMetadata.getCommitShortSha()).isEqualTo("a8b0929");
@@ -88,7 +88,7 @@ class DefaultServiceMetadataAssemblerTest {
         assertThat(serviceMetadata.getSoftwareVersions().getJava()).isEqualTo(System.getProperty("java.version"));
         assertThat(serviceMetadata.getVersion()).isEqualTo("1.1.3");
         assertThat(serviceMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo("3.5.0");
-        assertThat(serviceMetadata.getHealthStatus()).isEqualTo(ServiceMetadata.HealthStatus.UP);
+        assertThat(serviceMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
         assertThat(serviceMetadata.getMemoryDetails()).isNotNull();
     }
 }

@@ -25,17 +25,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Represents the metadata of a service instance as exposed by the custom starter actuator endpoint.
+ * Represents the basic metadata of a service instance as exposed by the custom starter actuator endpoint.
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
- * @author Sergey Cherkasov
  */
 @SuppressWarnings(
         "NullAway") // TODO: we need to think about nullability here. It is not obvious what the correct setup is in
 // this case
-public final class ServiceMetadata {
+public final class BasicDiscoveryMetadata {
 
     private final String version;
     private final String serviceVersion;
@@ -45,7 +44,6 @@ public final class ServiceMetadata {
     private final HealthStatus healthStatus;
     private final MemoryDetails memoryDetails;
     private final List<VMFeature> vmFeatures;
-    private final Metadata metadata;
 
     /**
      * Creates a new ServiceMetadata.
@@ -63,10 +61,9 @@ public final class ServiceMetadata {
      *                         Never {@code null}.
      * @param memoryDetails    the memory details.
      * @param vmFeatures       the VM features.
-     * @param metadata         additional metadata about the service.
      */
     @JsonCreator
-    public ServiceMetadata(
+    public BasicDiscoveryMetadata(
             @JsonProperty("version") String version,
             @JsonProperty("serviceVersion") String serviceVersion,
             @JsonProperty("commitShortSha") String commitShortSha,
@@ -74,8 +71,7 @@ public final class ServiceMetadata {
             @JsonProperty("softwareVersions") SoftwareVersions softwareVersions,
             @JsonProperty("healthStatus") HealthStatus healthStatus,
             @JsonProperty("memoryDetails") MemoryDetails memoryDetails,
-            @JsonProperty("vmFeatures") List<VMFeature> vmFeatures,
-            @JsonProperty("metadata") Metadata metadata) {
+            @JsonProperty("vmFeatures") List<VMFeature> vmFeatures) {
         this.version = version;
         this.serviceVersion = serviceVersion;
         this.commitShortSha = commitShortSha;
@@ -84,7 +80,6 @@ public final class ServiceMetadata {
         this.healthStatus = healthStatus;
         this.memoryDetails = memoryDetails;
         this.vmFeatures = vmFeatures;
-        this.metadata = metadata;
     }
 
     public String getVersion() {
@@ -119,10 +114,6 @@ public final class ServiceMetadata {
         return vmFeatures;
     }
 
-    public Metadata getMetadata() {
-        return metadata;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -131,7 +122,7 @@ public final class ServiceMetadata {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ServiceMetadata that = (ServiceMetadata) o;
+        BasicDiscoveryMetadata that = (BasicDiscoveryMetadata) o;
         return Objects.equals(version, that.version)
                 && Objects.equals(serviceVersion, that.serviceVersion)
                 && Objects.equals(commitShortSha, that.commitShortSha)
@@ -139,8 +130,7 @@ public final class ServiceMetadata {
                 && Objects.equals(softwareVersions, that.softwareVersions)
                 && healthStatus == that.healthStatus
                 && Objects.equals(memoryDetails, that.memoryDetails)
-                && Objects.equals(vmFeatures, that.vmFeatures)
-                && Objects.equals(metadata, that.metadata);
+                && Objects.equals(vmFeatures, that.vmFeatures);
     }
 
     @Override
@@ -153,8 +143,7 @@ public final class ServiceMetadata {
                 softwareVersions,
                 healthStatus,
                 memoryDetails,
-                vmFeatures,
-                metadata);
+                vmFeatures);
     }
 
     @Override
@@ -180,8 +169,6 @@ public final class ServiceMetadata {
                 + memoryDetails
                 + ", vmFeatures="
                 + vmFeatures
-                + ", metadata="
-                + metadata
                 + '}';
     }
 
@@ -397,81 +384,6 @@ public final class ServiceMetadata {
         @Override
         public String toString() {
             return "MemoryDetails{" + "heap=" + heap + '}';
-        }
-    }
-
-    /**
-     * Additional metadata about the service.
-     */
-    public static final class Metadata {
-        private final String serviceId;
-
-        @Nullable
-        private final String serviceName;
-
-        @Nullable
-        private final String serviceURL;
-
-        private final String deploymentAt;
-
-        /**
-         * Creates a new {@link Metadata}.
-         *
-         * @param serviceId     unique identifier (uid) of the service
-         * @param serviceName   name of the service
-         * @param serviceURL    the URL of the service, e.g. {@code https://my-app:6061}
-         * @param deploymentAt  timestamp when the service was created
-         */
-        @JsonCreator
-        public Metadata(
-                @JsonProperty("serviceId") String serviceId,
-                @JsonProperty("serviceName") @Nullable String serviceName,
-                @JsonProperty("serviceURL") @Nullable String serviceURL,
-                @JsonProperty("deploymentAt") String deploymentAt) {
-            this.serviceId = serviceId;
-            this.serviceName = serviceName;
-            this.serviceURL = serviceURL;
-            this.deploymentAt = deploymentAt;
-        }
-
-        public String getServiceId() {
-            return serviceId;
-        }
-
-        public String getDeploymentAt() {
-            return deploymentAt;
-        }
-
-        public @Nullable String getServiceURL() {
-            return serviceURL;
-        }
-
-        public @Nullable String getServiceName() {
-            return serviceName;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-            Metadata metadata = (Metadata) o;
-            return Objects.equals(serviceId, metadata.serviceId)
-                    && Objects.equals(serviceName, metadata.serviceName)
-                    && Objects.equals(serviceURL, metadata.serviceURL)
-                    && Objects.equals(deploymentAt, metadata.deploymentAt);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(serviceId, serviceName, serviceURL, deploymentAt);
-        }
-
-        @Override
-        public String toString() {
-            return "Metadata{" + "serviceId='"
-                    + serviceId + '\'' + ", serviceName='"
-                    + serviceName + '\'' + ", serviceURL='"
-                    + serviceURL + '\'' + ", deploymentAt='"
-                    + deploymentAt + '\'' + '}';
         }
     }
 }
