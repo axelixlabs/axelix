@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.internal;
+package com.axelixlabs.axelix.master.api.internal;
 
 /**
  * Constant class containing API paths for interaction between Axelix Master and Starter.
