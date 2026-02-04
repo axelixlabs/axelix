@@ -130,7 +130,7 @@ class ThreadDumpJacksonMessageDeserializationStrategyTest {
         assertThat(firstThread.getWaitedTime()).isEqualTo(-1);
         assertThat(firstThread.getWaitedCount()).isEqualTo(109);
         assertThat(firstThread.getLockOwnerId()).isEqualTo(-1);
-        assertThat(firstThread.daemon()).isFalse();
+        assertThat(firstThread.isDaemon()).isFalse();
         assertThat(firstThread.isInNative()).isFalse();
         assertThat(firstThread.isSuspended()).isFalse();
         assertThat(firstThread.getThreadState()).isEqualTo(State.RUNNABLE);
@@ -166,7 +166,7 @@ class ThreadDumpJacksonMessageDeserializationStrategyTest {
         assertThat(secondThread.getWaitedCount()).isEqualTo(1);
         assertThat(secondThread.getLockName()).isEqualTo("java.lang.ref.ReferenceQueue$Lock@60ffdc9f");
         assertThat(secondThread.getLockOwnerId()).isEqualTo(-1);
-        assertThat(secondThread.daemon()).isTrue();
+        assertThat(secondThread.isDaemon()).isTrue();
         assertThat(secondThread.isInNative()).isFalse();
         assertThat(secondThread.isSuspended()).isFalse();
         assertThat(secondThread.getThreadState()).isEqualTo(State.WAITING);

@@ -10,11 +10,11 @@ on:
         default: 'main'
   push:
     branches: [ master ]
-    paths:
-      - '!infra/**'
-      - '!.editorconfig'
-      - '!.gitignore'
-      - '!CONTRIBUTING.adoc'
+    paths-ignore:
+      - 'infra/**'
+      - '.editorconfig'
+      - '.gitignore'
+      - 'CONTRIBUTING.adoc'
 
 jobs:
   build-deploy-source:
