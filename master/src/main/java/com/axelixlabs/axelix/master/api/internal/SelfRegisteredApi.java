@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.internal;
+package com.axelixlabs.axelix.master.api.internal;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.axelixlabs.axelix.common.api.selfregistered.SelfRegisteredServiceRequest;
-import com.axelixlabs.axelix.master.service.InMemorySelfRegisteredServiceCache;
+import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
+import com.axelixlabs.axelix.master.service.discovery.selfregistered.ManagementSelfRegisteredService;
 
 /**
  * The API used for service self-registration.
@@ -35,15 +35,15 @@ import com.axelixlabs.axelix.master.service.InMemorySelfRegisteredServiceCache;
 @RequestMapping(path = InternalApiPaths.SelfRegistryApi.MAIN)
 public class SelfRegisteredApi {
 
-    private final InMemorySelfRegisteredServiceCache cache;
+    private final ManagementSelfRegisteredService managementSelfRegisteredService;
 
-    public SelfRegisteredApi(InMemorySelfRegisteredServiceCache cache) {
-        this.cache = cache;
+    public SelfRegisteredApi(ManagementSelfRegisteredService managementSelfRegisteredService) {
+        this.managementSelfRegisteredService = managementSelfRegisteredService;
     }
 
     @PostMapping(path = InternalApiPaths.SelfRegistryApi.SERVICE_REGISTER)
-    public ResponseEntity<Void> registryServiceInstance(@RequestBody SelfRegisteredServiceRequest request) {
-        cache.putService(request);
+    public ResponseEntity<Void> registryServiceInstance(@RequestBody ServiceMetadata request) {
+        managementSelfRegisteredService.registerNewInstances(request);
         return ResponseEntity.noContent().build();
     }
 }

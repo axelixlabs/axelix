@@ -49,14 +49,13 @@ import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
-import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesShortPollingInstanceScheduler;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link KubernetesShortPollingInstanceScheduler}.
+ * Integration tests for {@link ShortPollingInstanceDiscoveryScheduler}.
  *
  * @since 29.10.2025
  * @author Nikita Kirillov
@@ -68,12 +67,12 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.master.discovery.polling.fixed-delay=1000",
             "axelix.master.discovery.polling.initial-delay=0"
         })
-class KubernetesShortPollingInstanceSchedulerTest {
+class ShortPollingInstanceDiscoverySchedulerTest {
 
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private KubernetesShortPollingInstanceScheduler subject;
+    private ShortPollingInstanceDiscoveryScheduler subject;
 
     @MockBean
     private KubernetesClient kubernetesClient;
