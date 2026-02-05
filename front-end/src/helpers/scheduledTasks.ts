@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import cronstrue from "cronstrue";
+
 import type { IScheduledTasksResponseBody } from "models";
 
 export const filterScheduledTasks = (
@@ -41,3 +43,11 @@ export const filterScheduledTasks = (
 export function isEmpty(resp: IScheduledTasksResponseBody): boolean {
     return resp.cron.length === 0 && resp.fixedDelay.length === 0 && resp.fixedRate.length === 0;
 }
+
+export const getCronDescription = (cron: string): string => {
+    try {
+        return cronstrue.toString(cron);
+    } catch {
+        return "Invalid cron expression";
+    }
+};

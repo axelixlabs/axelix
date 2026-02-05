@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EditableValue, TooltipWithCopy } from "components";
+import { getCronDescription } from "helpers";
 import { type ICron } from "models";
 import { changeCronExpression } from "services";
 
@@ -48,6 +49,7 @@ export const CronTaskTableRow = ({ task }: IProps) => {
             <div className="RowChunk">
                 <EditableValue
                     initialValue={task.expression}
+                    tooltipFormatter={getCronDescription}
                     onNewValue={(newValue) => {
                         changeCronExpression({
                             instanceId: instanceId!,
