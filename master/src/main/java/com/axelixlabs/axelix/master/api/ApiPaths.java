@@ -72,11 +72,6 @@ public final class ApiPaths {
          * Environment feed for a single instance, providing all environment properties.
          */
         public static final String FEED = "/feed/{instanceId}";
-
-        /**
-         * Endpoint for fetching a specific property of an instance.
-         */
-        public static final String PROPERTY = "/{instanceId}/property/{propertyName}";
     }
 
     public static final class StateExportApi {

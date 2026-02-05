@@ -31,7 +31,6 @@ import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.common.api.env.EnvironmentProperty;
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
 import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
@@ -44,7 +43,6 @@ import com.axelixlabs.axelix.master.service.serde.ConditionsJacksonMessageDeseri
 import com.axelixlabs.axelix.master.service.serde.ConfigPropsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.EnvironmentJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.EnvironmentPropertyJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogStatusMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
@@ -220,13 +218,6 @@ public class EndpointProbersAutoConfiguration {
             EnvironmentJacksonMessageDeserializationStrategy deserializationStrategy) {
         return new DefaultEndpointProber<>(
                 instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES);
-    }
-
-    @Bean
-    public DefaultEndpointProber<EnvironmentProperty> getSingleEnvironmentEndpointProver(
-            EnvironmentPropertyJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_ENV_PROPERTY);
     }
 
     // HeapDump

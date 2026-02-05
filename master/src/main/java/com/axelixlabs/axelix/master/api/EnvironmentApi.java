@@ -17,12 +17,10 @@
  */
 package com.axelixlabs.axelix.master.api;
 
-import java.util.Map;
 import java.util.Objects;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.links.Link;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,13 +33,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.common.api.env.EnvironmentProperty;
-import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
-import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.response.EnvironmentFeedResponse;
-import com.axelixlabs.axelix.master.api.response.EnvironmentPropertyResponse;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
@@ -63,15 +57,11 @@ public class EnvironmentApi {
 
     private final EndpointInvoker endpointInvoker;
     private final Converter<EnvironmentFeed, EnvironmentFeedResponse> envConverter;
-    private final Converter<EnvironmentProperty, EnvironmentPropertyResponse> envPropertyConverter;
 
     public EnvironmentApi(
-            EndpointInvoker endpointInvoker,
-            Converter<EnvironmentFeed, EnvironmentFeedResponse> envConverter,
-            Converter<EnvironmentProperty, EnvironmentPropertyResponse> envPropertyConverter) {
+            EndpointInvoker endpointInvoker, Converter<EnvironmentFeed, EnvironmentFeedResponse> envConverter) {
         this.endpointInvoker = endpointInvoker;
         this.envConverter = envConverter;
-        this.envPropertyConverter = envPropertyConverter;
     }
 
     @Operation(
@@ -110,49 +100,5 @@ public class EnvironmentApi {
         EnvironmentFeed result = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
         return Objects.requireNonNull(envConverter.convert(result));
-    }
-
-    @Operation(
-            summary = "Returns a specific property of an instance",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Environment(env)",
-                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/env.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = EnvironmentPropertyResponse.class))),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameters({
-        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "propertyName", description = "Name of the environment property", required = true)
-    })
-    @GetMapping(path = ApiPaths.EnvironmentApi.PROPERTY)
-    public EnvironmentPropertyResponse getSingleEnvironmentProperty(
-            @PathVariable("instanceId") String instanceId, @PathVariable("propertyName") String propertyName) {
-        HttpPayload payload = new DefaultHttpPayload(Map.of("property.name", propertyName));
-
-        EnvironmentProperty result =
-                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_SINGLE_ENV_PROPERTY, payload);
-        return Objects.requireNonNull(envPropertyConverter.convert(result));
     }
 }
