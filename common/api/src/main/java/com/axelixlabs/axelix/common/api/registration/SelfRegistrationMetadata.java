@@ -58,7 +58,7 @@ public class SelfRegistrationMetadata {
         this.deploymentAt = deploymentAt;
     }
 
-    public BasicDiscoveryMetadata getDefaultServiceMetadata() {
+    public BasicDiscoveryMetadata getBasicDiscoveryMetadata() {
         return basicDiscoveryMetadata;
     }
 
@@ -98,11 +98,21 @@ public class SelfRegistrationMetadata {
 
     @Override
     public String toString() {
-        return "SelfRegistrationMetadata{" + "basicDiscoveryMetadata="
-                + basicDiscoveryMetadata + ", instanceId='"
-                + instanceId + '\'' + ", instanceName='"
-                + instanceName + '\'' + ", instanceUrl='"
-                + instanceUrl + '\'' + ", deploymentAt='"
-                + deploymentAt + '\'' + '}';
+        return "SelfRegistrationMetadata{"
+                + "basicDiscoveryMetadata="
+                + basicDiscoveryMetadata
+                + ", instanceId='"
+                + instanceId
+                + '\''
+                + ", instanceName='"
+                + instanceName
+                + '\''
+                + ", instanceUrl='"
+                + instanceUrl
+                + '\''
+                + ", deploymentAt='"
+                + deploymentAt
+                + '\''
+                + '}';
     }
 }

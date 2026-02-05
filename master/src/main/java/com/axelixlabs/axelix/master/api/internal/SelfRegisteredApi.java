@@ -58,7 +58,7 @@ public class SelfRegisteredApi {
                 request.getInstanceName(),
                 request.getDeploymentAt(),
                 request.getInstanceUrl(),
-                request.getDefaultServiceMetadata());
+                request.getBasicDiscoveryMetadata());
         instanceManager.registerInstances(instance);
 
         return ResponseEntity.noContent().build();

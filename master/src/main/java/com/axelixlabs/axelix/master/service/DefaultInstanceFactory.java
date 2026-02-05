@@ -48,14 +48,14 @@ public class DefaultInstanceFactory implements InstanceFactory {
     private static final String ACTUATOR_ENDPOINT_POSTFIX = "/actuator";
 
     public Instance createInstance(
-            String serviceId,
-            String serviceName,
+            String instanceId,
+            String instanceName,
             String deploymentAt,
-            String serviceUrl,
+            String instanceUrl,
             BasicDiscoveryMetadata metadata) {
         return new Instance(
-                InstanceId.of(serviceId),
-                serviceName,
+                InstanceId.of(instanceId),
+                instanceName,
                 metadata.getServiceVersion(),
                 metadata.getSoftwareVersions().getJava(),
                 metadata.getSoftwareVersions().getSpringBoot(),
@@ -63,10 +63,10 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 metadata.getSoftwareVersions().getKotlin(),
                 metadata.getJdkVendor(),
                 metadata.getCommitShortSha(),
-                extractDeployTimestamp(deploymentAt, serviceId, serviceName),
+                extractDeployTimestamp(deploymentAt, instanceId, instanceName),
                 convertServiceStatus(metadata.getHealthStatus()),
                 new MemoryUsage(metadata.getMemoryDetails().getHeap()),
-                serviceUrl + ACTUATOR_ENDPOINT_POSTFIX,
+                instanceUrl + ACTUATOR_ENDPOINT_POSTFIX,
                 convertMapVMFeatures(metadata.getVmFeatures()));
     }
 
@@ -85,7 +85,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
     }
 
     @Nullable
-    private Instant extractDeployTimestamp(String deploymentAt, String serviceId, String serviceName) {
+    private Instant extractDeployTimestamp(String deploymentAt, String instanceId, String instanceName) {
         try {
             return OffsetDateTime.parse(deploymentAt, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
                     .toInstant();
@@ -95,8 +95,8 @@ public class DefaultInstanceFactory implements InstanceFactory {
             Unable to parse the deployment timestamp of the Service : {} with name {}.
             That will affect the corresponding service on the wallboard UI
             """,
-                    serviceId,
-                    serviceName,
+                    instanceId,
+                    instanceName,
                     e);
             return null;
         }
