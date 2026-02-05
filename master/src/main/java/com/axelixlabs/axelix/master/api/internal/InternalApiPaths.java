@@ -29,7 +29,7 @@ public final class InternalApiPaths {
     public static final class SelfRegistryApi {
 
         /**
-         * Base path for all beans APIs.
+         * Base path for all self-registration services APIs.
          */
         public static final String MAIN = "/service";
 

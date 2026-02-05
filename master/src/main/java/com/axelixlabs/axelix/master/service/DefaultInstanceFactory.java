@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.discovery;
+package com.axelixlabs.axelix.master.service;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -26,6 +26,8 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.HealthStatus;
@@ -39,6 +41,7 @@ import com.axelixlabs.axelix.master.domain.MemoryUsage;
  *
  * @author Sergey Cherkasov
  */
+@Service
 public class DefaultInstanceFactory implements InstanceFactory {
     private static final Logger logger = LoggerFactory.getLogger(DefaultInstanceFactory.class);
 

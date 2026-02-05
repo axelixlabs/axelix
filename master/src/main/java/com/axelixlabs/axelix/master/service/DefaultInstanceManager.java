@@ -15,14 +15,15 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.discovery;
+package com.axelixlabs.axelix.master.service;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.MemoryUsageCache;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -30,12 +31,13 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  *
  * @author Sergey Cherkasov
  */
-public class DefaultManagementInstance implements ManagementInstance {
+@Service
+public class DefaultInstanceManager implements InstanceManager {
 
     private final InstanceRegistry instanceRegistry;
     private final MemoryUsageCache memoryUsageCache;
 
-    public DefaultManagementInstance(InstanceRegistry instanceRegistry, MemoryUsageCache memoryUsageCache) {
+    public DefaultInstanceManager(InstanceRegistry instanceRegistry, MemoryUsageCache memoryUsageCache) {
         this.instanceRegistry = instanceRegistry;
         this.memoryUsageCache = memoryUsageCache;
     }

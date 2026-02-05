@@ -17,7 +17,9 @@
  */
 package com.axelixlabs.axelix.master.api.internal;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import io.swagger.v3.oas.annotations.Hidden;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,27 +27,40 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
-import com.axelixlabs.axelix.master.service.discovery.selfregistered.SelfRegisteredServiceDiscoverer;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.service.InstanceFactory;
+import com.axelixlabs.axelix.master.service.InstanceManager;
 
 /**
  * The API used for service self-registration.
  *
  * @author Sergey Cherkasov
  */
+@Hidden
 @RestController
 @RequestMapping(path = InternalApiPaths.SelfRegistryApi.MAIN)
-@ConditionalOnBean(SelfRegisteredServiceDiscoverer.class)
+@ConditionalOnProperty(prefix = "axelix.master.discovery", name = "auto", havingValue = "false")
 public class SelfRegisteredApi {
 
-    private final SelfRegisteredServiceDiscoverer selfRegisteredServiceDiscoverer;
+    private final InstanceManager instanceManager;
+    private final InstanceFactory instanceFactory;
 
-    public SelfRegisteredApi(SelfRegisteredServiceDiscoverer selfRegisteredServiceDiscoverer) {
-        this.selfRegisteredServiceDiscoverer = selfRegisteredServiceDiscoverer;
+    public SelfRegisteredApi(InstanceManager instanceManager, InstanceFactory instanceFactory) {
+        this.instanceManager = instanceManager;
+        this.instanceFactory = instanceFactory;
     }
 
     @PostMapping(path = InternalApiPaths.SelfRegistryApi.SERVICE_REGISTER)
     public ResponseEntity<Void> registryServiceInstance(@RequestBody SelfRegistrationMetadata request) {
-        selfRegisteredServiceDiscoverer.registerNewInstances(request);
+
+        Instance instance = instanceFactory.createInstance(
+                request.getInstanceId(),
+                request.getInstanceName(),
+                request.getDeploymentAt(),
+                request.getInstanceUrl(),
+                request.getDefaultServiceMetadata());
+        instanceManager.registerInstances(instance);
+
         return ResponseEntity.noContent().build();
     }
 }

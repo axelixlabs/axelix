@@ -1,5 +1,4 @@
 com.axelixlabs.axelix.master.autoconfiguration.discovery.DiscoveryAutoConfiguration
-com.axelixlabs.axelix.master.autoconfiguration.discovery.SelfRegisteredAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.probers.EndpointProbersAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.MemoryTransformerAutoConfiguration

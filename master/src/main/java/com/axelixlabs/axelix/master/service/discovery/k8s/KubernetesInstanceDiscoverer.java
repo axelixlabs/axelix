@@ -25,8 +25,8 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.AbstractInstancesDiscoverer;
-import com.axelixlabs.axelix.master.service.discovery.InstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
