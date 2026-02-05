@@ -56,6 +56,18 @@ public interface InstanceRegistry {
     void deRegister(InstanceId instanceId) throws InstanceNotFoundException;
 
     /**
+     * Quietly deregisters the {@link Instance} by the given instanceId.
+     *
+     * @param instanceId the id of the instance that is supposed to be deregistered.
+     */
+    default void deRegisterQuietly(InstanceId instanceId) {
+        try {
+            deRegister(instanceId);
+        } catch (InstanceNotFoundException ignored) {
+        }
+    }
+
+    /**
      * Deregister and register the {@link Instance}. If the {@link Instance} with such {@link InstanceId}
      * is not present in the registry, then simply new {@link Instance} is registered.
      *
