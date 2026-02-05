@@ -139,29 +139,6 @@ class EnvironmentApiTest {
         }
         """;
 
-    private static final String EXPECTED_ENV_PROPERTY_JSON =
-            // language=json
-            """
-        {
-          "source": "systemProperties",
-          "value": "HotSpot 64-Bit Tiered Compilers",
-          "propertySources": [
-                {
-                  "name": "systemProperties",
-                  "property": {
-                    "value": "HotSpot 64-Bit Tiered Compilers"
-                  }
-                },
-                {
-                  "name": "systemEnvironment",
-                  "property": {
-                    "value": "HotSpot 64-Bit"
-                  }
-                }
-          ]
-        }
-        """;
-
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
@@ -264,48 +241,6 @@ class EnvironmentApiTest {
         }
         """;
 
-        // language=json
-        String jsonEnvPropertyResponse =
-                """
-            {
-              "property": {
-                "source": "systemProperties",
-                "value": "HotSpot 64-Bit Tiered Compilers"
-              },
-              "activeProfiles": ["production"],
-              "defaultProfiles": ["default", "development"],
-              "propertySources": [
-                {
-                  "name": "server.ports"
-                },
-                {
-                  "name": "servletConfigInitParams"
-                },
-                {
-                  "name": "servletContextInitParams"
-                },
-                {
-                  "name": "systemProperties",
-                  "property": {
-                    "value": "HotSpot 64-Bit Tiered Compilers"
-                  }
-                },
-                {
-                  "name": "systemEnvironment",
-                  "property": {
-                    "value": "HotSpot 64-Bit"
-                  }
-                },
-                {
-                  "name": "springCloudClientHostInfo"
-                },
-                {
-                  "name": "Management Server"
-                }
-              ]
-            }
-        """;
-
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
@@ -315,10 +250,6 @@ class EnvironmentApiTest {
                 if (path.equals("/" + activeInstanceId + "/actuator/axelix-env")) {
                     return new MockResponse()
                             .setBody(jsonEnvResponse)
-                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/actuator/env/sun.management.compiler")) {
-                    return new MockResponse()
-                            .setBody(jsonEnvPropertyResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -349,25 +280,6 @@ class EnvironmentApiTest {
     }
 
     @Test
-    void shouldReturnJSONEnvironmentProperty() {
-        String propertyName = "sun.management.compiler";
-
-        // when.
-        ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
-                .getForEntity(
-                        "/api/axelix/env/{instanceId}/property/{propertyName}",
-                        String.class,
-                        activeInstanceId,
-                        propertyName);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_ENV_PROPERTY_JSON);
-    }
-
-    @Test
     @DisplayName("Should return 500 on EndpointInvocationError when fetching EnvironmentFeed")
     void shouldReturnInternalServerErrorOnEnvFeed() {
         String instanceId = UUID.randomUUID().toString();
@@ -377,23 +289,6 @@ class EnvironmentApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity("/api/axelix/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Test
-    @DisplayName("Should return 500 on EndpointInvocationError when fetching EnvironmentProperty")
-    void shouldReturnInternalServerErrorOnEnvProperty() {
-        String propertyName = "sun.management.compiler";
-        String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId));
-
-        // when.
-        ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
-                .getForEntity(
-                        "/api/axelix/env/{instanceId}/property/{propertyName}", String.class, instanceId, propertyName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -419,24 +314,6 @@ class EnvironmentApiTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .getForEntity("/api/axelix/env/feed/{instanceId}", Void.class, activeInstanceId);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorizedOnEnvProperty(InvalidAuthScenario scenario) {
-        String propertyName = "sun.management.compiler";
-
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .getForEntity(
-                        "/api/axelix/env/{instanceId}/property/{propertyName}",
-                        Void.class,
-                        activeInstanceId,
-                        propertyName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

@@ -88,7 +88,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     // Environment
     public static final ActuatorEndpoint GET_ALL_ENV_PROPERTIES = of("/axelix-env", HttpMethod.GET);
-    public static final ActuatorEndpoint GET_SINGLE_ENV_PROPERTY = of("/env/{property.name}", HttpMethod.GET);
 
     // Health
     public static final ActuatorEndpoint HEALTH = of("/health", HttpMethod.GET);
@@ -198,7 +197,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 ENABLE_CACHE_MANAGER,
                 DISABLE_CACHES_MANAGER,
                 GET_ALL_ENV_PROPERTIES,
-                GET_SINGLE_ENV_PROPERTY,
                 GET_CONDITIONS,
                 GET_CONFIG_PROPS,
                 GET_CONFIG_PROPS_BY_PREFIX,
