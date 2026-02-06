@@ -31,11 +31,7 @@ interface IProps {
     tooltipFormatter?: (value: string) => string;
 }
 
-/*
- * Most likely, in the future this component will be removed
- * when we improve the EditableValue component.
- */
-export const CronExpressionOptionalTooltip = ({ children, tooltipFormatter, value }: PropsWithChildren<IProps>) => {
+export const OptionalTooltip = ({ children, tooltipFormatter, value }: PropsWithChildren<IProps>) => {
     if (tooltipFormatter) {
         return <Tooltip title={tooltipFormatter(value)}>{children}</Tooltip>;
     }
