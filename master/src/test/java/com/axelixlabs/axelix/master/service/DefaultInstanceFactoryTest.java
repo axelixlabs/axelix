@@ -27,7 +27,7 @@ import com.axelixlabs.axelix.master.domain.Instance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link InstanceFactory}.
+ * Unit tests for {@link InstanceFactory}.
  *
  * @author Sergey Cherkasov
  */
