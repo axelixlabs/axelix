@@ -20,7 +20,7 @@ import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import { useState } from "react";
 
-import { CronExpressionOptionalTooltip } from "./CronExpressionOptionalTooltip";
+import { OptionalTooltip } from "./OptionalTooltip";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -69,9 +69,9 @@ export const EditableValue = ({
     if (!editingValue) {
         return (
             <div className={className}>
-                <CronExpressionOptionalTooltip value={actualValue} tooltipFormatter={tooltipFormatter}>
+                <OptionalTooltip value={actualValue} tooltipFormatter={tooltipFormatter}>
                     {actualValue}
-                </CronExpressionOptionalTooltip>
+                </OptionalTooltip>
 
                 <Button
                     icon={<EditOutlined />}
@@ -85,13 +85,13 @@ export const EditableValue = ({
 
     return (
         <div className={editClassName}>
-            <CronExpressionOptionalTooltip value={actualValue} tooltipFormatter={tooltipFormatter}>
+            <OptionalTooltip value={actualValue} tooltipFormatter={tooltipFormatter}>
                 <Input
                     value={actualValue}
                     onChange={(e) => setActualValue(e.target.value)}
                     className={styles.EditPropertyField}
                 />
-            </CronExpressionOptionalTooltip>
+            </OptionalTooltip>
 
             <Button
                 icon={<CloseOutlined />}
