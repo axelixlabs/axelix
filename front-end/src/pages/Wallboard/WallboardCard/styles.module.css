@@ -1,82 +1,89 @@
 .Card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border-radius: var(--axelix-border-radius-large);
-    box-shadow: var(--axelix-box-shadow-bold);
+    border-radius: 16px;
+    background-color: #f9fafb;
+    box-shadow: var(--axelix-box-shadow-light);
+    border: 1px solid var(--axelix-medium-grey);
+    transition: all 0.3s;
 }
 
 .Card:hover {
-    cursor: pointer;
+    box-shadow: var(--axelix-box-shadow-bold);
+    transform: translateY(-10px);
     color: inherit;
 }
 
-.CardHeader {
-    display: grid;
-    place-items: center;
-    flex: 1;
-    padding: 8px;
-    text-align: center;
-    font-weight: 500;
-    border-radius: var(--axelix-border-radius-large);
-    word-break: normal;
-    transition: color 0.3s;
+.DOWN {
+    background-color: #ff000813;
 }
 
-.Card:hover > .CardHeader {
-    color: var(--axelix-primary-green);
+.UNKNOWN {
+    background-color: var(--axelix-light-grey);
 }
 
-.CardUP {
-    border: 1px solid var(--axelix-primary-green);
+.Header {
+    padding: 14px 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    column-gap: 8px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+    min-height: 75px;
 }
 
-.CardHeaderUP {
-    background-color: var(--axelix-primary-light-green);
-    outline: 1px solid var(--axelix-primary-green);
+.Title {
+    word-break: break-all;
 }
 
-.CardDOWN {
-    border: 1px solid var(--axelix-primary-red);
+.QuestionIcon {
+    margin-top: 2px;
+    animation: pulse 1.2s ease-in-out infinite;
 }
 
-.CardHeaderDOWN {
-    background-color: var(--axelix-primary-light-red);
-    outline: 1px solid var(--axelix-primary-red);
-}
-
-.CardUNKNOWN {
-    border: 1px solid var(--axelix-bold-grey);
-}
-
-.CardHeaderUNKNOWN {
-    background-color: var(--axelix-medium-grey);
-    outline: 1px solid var(--axelix-bold-grey);
-}
-
-/* TODO: Add correct color in future */
-.CardRELOAD {
-    border: 1px solid red;
-}
-
-.CardHeaderRELOAD {
-    background-color: blueviolet;
-    outline: 1px solid blue;
-}
-
-.CardBody {
+.Body {
     display: flex;
     flex-direction: column;
     row-gap: 8px;
-    padding: 8px;
+    padding: 16px;
 }
 
-.CardBodyChunk {
-    display: flex;
-    column-gap: 8px;
-}
-
-.HashAndTimeWrapper {
+.BodyChunk {
     display: flex;
     justify-content: space-between;
+    column-gap: 8px;
+    font-size: 14px;
+}
+
+.Label {
+    color: #4b5563;
+}
+
+.Value {
+    font-weight: 500;
+    color: var(--axelix-primary-black);
+}
+
+.Footer {
+    padding-top: 10px;
+    border-top: 1px dashed var(--axelix-medium-grey);
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }

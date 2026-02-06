@@ -50,7 +50,7 @@ const Wallboard = () => {
         <>
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
 
-            <EmptyHandler isEmpty={instanceCards.length === 0}>
+            <EmptyHandler isEmpty={effectiveInstanceCards.length === 0}>
                 <div className={styles.CardsResponsiveWrapper}>
                     {effectiveInstanceCards.map((data) => (
                         <WallboardCard data={data} key={data.instanceId} />
