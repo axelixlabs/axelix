@@ -49,7 +49,7 @@ export const InfoTooltip = ({ children, text, placement = "right" }: PropsWithCh
             placement={placement}
             color="#1890ff"
         >
-            {children || <QuestionIcon className={styles.QuestionIcon} />}
+            {children || <QuestionIcon color="#00ab55" className={styles.QuestionIcon} />}
         </Tooltip>
     );
 };

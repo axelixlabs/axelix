@@ -9,53 +9,81 @@
 .Card:hover {
     box-shadow: var(--axelix-box-shadow-bold);
     transform: translateY(-10px);
-    color: var(--axelix-primary-green);
+    color: inherit;
 }
 
-.CardHeader {
+.DOWN {
+    background-color: #ff000813;
+}
+
+.UNKNOWN {
+    background-color: var(--axelix-light-grey);
+}
+
+.Header {
     padding: 14px 16px;
     font-weight: 600;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
+    column-gap: 8px;
     border-bottom: 1px solid var(--axelix-medium-grey);
+    min-height: 75px;
 }
 
-.CardBody {
+.Title {
+    word-break: break-all;
+}
+
+.QuestionIcon {
+    margin-top: 2px;
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+.Body {
     display: flex;
     flex-direction: column;
     row-gap: 8px;
     padding: 16px;
 }
 
-.CardBodyChunk {
+.BodyChunk {
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
+    column-gap: 8px;
+    font-size: 14px;
 }
 
-.BodyChunkLabel {
+.Label {
     color: #4b5563;
 }
 
-.BodyChunkValue {
+.Value {
     font-weight: 500;
-    color: #111827;
+    color: var(--axelix-primary-black);
 }
 
-.CardFooter {
-    margin-top: 10px;
+.Footer {
     padding-top: 10px;
-    border-top: 1px dashed #e5e7eb;
+    border-top: 1px dashed var(--axelix-medium-grey);
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 14px;
 }
 
-.Commit {
-    color: #374151;
-}
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
 
-.Time {
-    color: #6b7280;
+    50% {
+        transform: scale(1.15);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
