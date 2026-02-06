@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service;
 
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -38,16 +37,17 @@ import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link InstanceManager}.
+ * Integration tests for {@link InstanceRegistrar}.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DefaultInstanceManagerTest.DefaultInstanceManagerTestConfiguration.class)
-public class DefaultInstanceManagerTest {
+@ContextConfiguration(classes = DefaultInstanceRegistrarTest.DefaultInstanceManagerTestConfiguration.class)
+public class DefaultInstanceRegistrarTest {
 
     @Autowired
-    private InstanceManager instanceManager;
+    private InstanceRegistrar instanceRegistrar;
 
     @Autowired
     private MemoryUsageCache memoryUsageCache;
@@ -64,8 +64,8 @@ public class DefaultInstanceManagerTest {
         }
 
         @Bean
-        public InstanceManager instanceManager(InstanceRegistry instanceRegistry, MemoryUsageCache memoryUsageCache) {
-            return new DefaultInstanceManager(instanceRegistry, memoryUsageCache);
+        public InstanceRegistrar instanceManager(InstanceRegistry instanceRegistry, MemoryUsageCache memoryUsageCache) {
+            return new DefaultInstanceRegistrar(instanceRegistry, memoryUsageCache);
         }
 
         @Bean
@@ -80,7 +80,7 @@ public class DefaultInstanceManagerTest {
         Instance instance = TestObjectFactory.createInstance(instanceId);
 
         // when.
-        instanceManager.registerInstances(instance);
+        instanceRegistrar.register(instance);
 
         // then.
         assertThat(instanceRegistry.get(InstanceId.of(instanceId))).isNotEmpty();
@@ -88,32 +88,16 @@ public class DefaultInstanceManagerTest {
     }
 
     @Test
-    void shouldDeregisterMissingInstances() {
+    void shouldDeregister() {
         String instanceId = UUID.randomUUID().toString();
         Instance instance = TestObjectFactory.createInstance(instanceId);
-        instanceManager.registerInstances(instance);
+        instanceRegistrar.register(instance);
 
         // when.
-        instanceManager.deregisterMissingInstances(InstanceId.of(instanceId));
+        instanceRegistrar.deregister(InstanceId.of(instanceId));
 
         // then.
         assertThat(instanceRegistry.get(InstanceId.of(instanceId))).isEmpty();
         assertThat(memoryUsageCache.getHeapSize(InstanceId.of(instanceId))).isEqualTo(-1.0);
-    }
-
-    @Test
-    void shouldGetAllInstanceId() {
-        Instance instance1 = TestObjectFactory.createInstance(UUID.randomUUID().toString());
-        Instance instance2 = TestObjectFactory.createInstance(UUID.randomUUID().toString());
-        Instance instance3 = TestObjectFactory.createInstance(UUID.randomUUID().toString());
-        instanceRegistry.register(instance1);
-        instanceRegistry.register(instance2);
-        instanceRegistry.register(instance3);
-
-        // when.
-        Set<InstanceId> result = instanceManager.getAllInstanceId();
-
-        // then.
-        assertThat(result).hasSize(3);
     }
 }

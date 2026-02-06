@@ -17,9 +17,6 @@
  */
 package com.axelixlabs.axelix.master.service;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -27,32 +24,29 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
- * Default implementation {@link InstanceFactory}.
+ * Default implementation {@link InstanceRegistrar}.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @Service
-public class DefaultInstanceManager implements InstanceManager {
+public class DefaultInstanceRegistrar implements InstanceRegistrar {
 
     private final InstanceRegistry instanceRegistry;
     private final MemoryUsageCache memoryUsageCache;
 
-    public DefaultInstanceManager(InstanceRegistry instanceRegistry, MemoryUsageCache memoryUsageCache) {
+    public DefaultInstanceRegistrar(InstanceRegistry instanceRegistry, MemoryUsageCache memoryUsageCache) {
         this.instanceRegistry = instanceRegistry;
         this.memoryUsageCache = memoryUsageCache;
     }
 
-    public void registerInstances(Instance instance) {
+    public void register(Instance instance) {
         instanceRegistry.replace(instance);
         memoryUsageCache.putHeapSize(instance.id(), instance.memoryUsage().heap());
     }
 
-    public void deregisterMissingInstances(InstanceId instanceId) {
+    public void deregister(InstanceId instanceId) {
         instanceRegistry.deRegister(instanceId);
         memoryUsageCache.clear(instanceId);
-    }
-
-    public Set<InstanceId> getAllInstanceId() {
-        return instanceRegistry.getAll().stream().map(Instance::id).collect(Collectors.toSet());
     }
 }

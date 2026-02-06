@@ -40,18 +40,18 @@ import com.axelixlabs.axelix.master.domain.MemoryUsage;
  * Default implementation {@link InstanceFactory}.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @Service
 public class DefaultInstanceFactory implements InstanceFactory {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultInstanceFactory.class);
 
-    private static final String ACTUATOR_ENDPOINT_POSTFIX = "/actuator";
+    private static final Logger logger = LoggerFactory.getLogger(DefaultInstanceFactory.class);
 
     public Instance createInstance(
             String instanceId,
             String instanceName,
             String deploymentAt,
-            String instanceUrl,
+            String instanceActuatorUrl,
             BasicDiscoveryMetadata metadata) {
         return new Instance(
                 InstanceId.of(instanceId),
@@ -66,7 +66,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 extractDeployTimestamp(deploymentAt, instanceId, instanceName),
                 convertServiceStatus(metadata.getHealthStatus()),
                 new MemoryUsage(metadata.getMemoryDetails().getHeap()),
-                instanceUrl + ACTUATOR_ENDPOINT_POSTFIX,
+                instanceActuatorUrl,
                 convertMapVMFeatures(metadata.getVmFeatures()));
     }
 

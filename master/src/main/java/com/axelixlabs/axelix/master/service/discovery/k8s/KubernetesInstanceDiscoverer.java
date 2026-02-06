@@ -38,6 +38,9 @@ import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndp
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
+// TODO:
+//  We're loosing the need for concrete InstancesDiscoverers. We need to
+//  re-consider this abstraction in general.
 public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
 
     private static final Logger log = LoggerFactory.getLogger(KubernetesInstanceDiscoverer.class);
@@ -62,7 +65,7 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
                     k8sInstance.getInstanceId(),
                     k8sInstance.podName(),
                     k8sInstance.getDeploymentAt(),
-                    serviceInstance.getUri().toString(),
+                    serviceInstance.getUri() + ACTUATOR_ENDPOINT_POSTFIX,
                     profile.metadata());
         } else {
             throw new IllegalArgumentException(buildErrorMessage(serviceInstance));

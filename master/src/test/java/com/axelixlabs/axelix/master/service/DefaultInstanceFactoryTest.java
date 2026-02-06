@@ -42,7 +42,7 @@ public class DefaultInstanceFactoryTest {
                 "3c994958-924f-4a12-87d0-a8782e97af10",
                 "petclinic",
                 "2025-02-03T13:29:29Z",
-                "http://localhost:8080",
+                "http://localhost:8080/actuator",
                 mapMetadata());
 
         // then.

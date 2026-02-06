@@ -27,12 +27,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public class SelfRegistrationMetadata {
+
     private final BasicDiscoveryMetadata basicDiscoveryMetadata;
     private final String instanceId;
     private final String instanceName;
-    private final String instanceUrl;
+    private final String instanceActuatorUrl;
     private final String deploymentAt;
 
     /**
@@ -41,7 +43,8 @@ public class SelfRegistrationMetadata {
      * @param basicDiscoveryMetadata    the basic metadata of a service instance
      * @param instanceId                unique identifier (uid) of the service
      * @param instanceName              name of the service
-     * @param instanceUrl               the URL of the service, e.g. {@code https://my-app:6061}
+     * @param instanceActuatorUrl       the URL of the service, including the postfix for the actuator path,
+     *                                  e.g. {@code https://my-app:6061/actuator}.
      * @param deploymentAt              timestamp when the service was created
      */
     @JsonCreator
@@ -49,12 +52,12 @@ public class SelfRegistrationMetadata {
             @JsonProperty("basicDiscoveryMetadata") BasicDiscoveryMetadata basicDiscoveryMetadata,
             @JsonProperty("instanceId") String instanceId,
             @JsonProperty("instanceName") String instanceName,
-            @JsonProperty("instanceUrl") String instanceUrl,
+            @JsonProperty("instanceUrl") String instanceActuatorUrl,
             @JsonProperty("deploymentAt") String deploymentAt) {
         this.basicDiscoveryMetadata = basicDiscoveryMetadata;
         this.instanceId = instanceId;
         this.instanceName = instanceName;
-        this.instanceUrl = instanceUrl;
+        this.instanceActuatorUrl = instanceActuatorUrl;
         this.deploymentAt = deploymentAt;
     }
 
@@ -71,7 +74,7 @@ public class SelfRegistrationMetadata {
     }
 
     public String getInstanceUrl() {
-        return instanceUrl;
+        return instanceActuatorUrl;
     }
 
     public String getDeploymentAt() {
@@ -87,13 +90,13 @@ public class SelfRegistrationMetadata {
         return Objects.equals(basicDiscoveryMetadata, that.basicDiscoveryMetadata)
                 && Objects.equals(instanceId, that.instanceId)
                 && Objects.equals(instanceName, that.instanceName)
-                && Objects.equals(instanceUrl, that.instanceUrl)
+                && Objects.equals(instanceActuatorUrl, that.instanceActuatorUrl)
                 && Objects.equals(deploymentAt, that.deploymentAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(basicDiscoveryMetadata, instanceId, instanceName, instanceUrl, deploymentAt);
+        return Objects.hash(basicDiscoveryMetadata, instanceId, instanceName, instanceActuatorUrl, deploymentAt);
     }
 
     @Override
@@ -108,7 +111,7 @@ public class SelfRegistrationMetadata {
                 + instanceName
                 + '\''
                 + ", instanceUrl='"
-                + instanceUrl
+                + instanceActuatorUrl
                 + '\''
                 + ", deploymentAt='"
                 + deploymentAt

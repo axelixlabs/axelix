@@ -55,7 +55,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     // https://docs.spring.io/spring-boot/docs/2.1.7.RELEASE/reference/html/production-ready-monitoring.html#production-ready-customizing-management-server-context-path
     //  So, we have to take this into account. It is however unclear how
     //  we can do that in case of automatic discovery.
-    private static final String ACTUATOR_ENDPOINT_POSTFIX = "/actuator";
+    protected static final String ACTUATOR_ENDPOINT_POSTFIX = "/actuator";
 
     private final Logger logger;
     private final DiscoveryClient discoveryClient;

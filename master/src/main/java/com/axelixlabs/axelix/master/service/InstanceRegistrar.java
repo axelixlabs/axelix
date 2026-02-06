@@ -17,37 +17,33 @@
  */
 package com.axelixlabs.axelix.master.service;
 
-import java.util.Set;
-
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
- * Allows interaction with {@link Instance} and manages their registration in the {@link InstanceRegistry}.
+ * Component that is responsible for the Instance registration/de-registration process.
+ * <p>
+ * The implementation of this class serve as the entrypoint for the {@link Instance} registration
+ * or deregistration process. In other words, when calling either register/de-register methods
+ * on this API, the implementation guarantee that the passed {@link Instance} is fully and completely
+ * reigstered/de-registered inside/from Master.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
-public interface InstanceManager {
+public interface InstanceRegistrar {
 
     /**
-     * Register the given {@link Instance} inside the registry.
+     * Register the given {@link Instance} inside master.
      *
      * @param instance the {@link Instance} to be registered
      */
-    void registerInstances(Instance instance);
+    void register(Instance instance);
 
     /**
-     * Clear the record of the service with the given {@link InstanceId}.
+     * Clear the necessary state associated with {@link Instance} with the given {@link InstanceId}.
      *
      * @param instanceId the id of the {@link Instance} to deregister.
      */
-    void deregisterMissingInstances(InstanceId instanceId);
-
-    /**
-     * Get all {@link InstanceId} registered in {@link InstanceRegistry}.
-     *
-     * @return all {@link InstanceId}
-     */
-    Set<InstanceId> getAllInstanceId();
+    void deregister(InstanceId instanceId);
 }

@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
-import com.axelixlabs.axelix.master.service.InstanceManager;
+import com.axelixlabs.axelix.master.service.InstanceRegistrar;
 
 /**
  * The API used for service self-registration.
@@ -42,11 +42,11 @@ import com.axelixlabs.axelix.master.service.InstanceManager;
 @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "auto", havingValue = "false")
 public class SelfRegisteredApi {
 
-    private final InstanceManager instanceManager;
+    private final InstanceRegistrar instanceRegistrar;
     private final InstanceFactory instanceFactory;
 
-    public SelfRegisteredApi(InstanceManager instanceManager, InstanceFactory instanceFactory) {
-        this.instanceManager = instanceManager;
+    public SelfRegisteredApi(InstanceRegistrar instanceRegistrar, InstanceFactory instanceFactory) {
+        this.instanceRegistrar = instanceRegistrar;
         this.instanceFactory = instanceFactory;
     }
 
@@ -59,7 +59,7 @@ public class SelfRegisteredApi {
                 request.getDeploymentAt(),
                 request.getInstanceUrl(),
                 request.getBasicDiscoveryMetadata());
-        instanceManager.registerInstances(instance);
+        instanceRegistrar.register(instance);
 
         return ResponseEntity.noContent().build();
     }

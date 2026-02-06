@@ -43,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"axelix.master.discovery.auto=false"})
 public class SelfRegisteredApiTest {
+
     // language=json
     private static final String JSON_REQUEST =
             """
@@ -72,7 +73,7 @@ public class SelfRegisteredApiTest {
        },
          "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
          "instanceName" : "petclinic",
-         "instanceURL" : "http://localhost:8080",
+         "instanceUrl" : "http://localhost:8080/actuator",
          "deploymentAt" : "2025-02-03T13:29:29Z"
      }
     """;

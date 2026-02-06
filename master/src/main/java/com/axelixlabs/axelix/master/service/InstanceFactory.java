@@ -31,11 +31,12 @@ public interface InstanceFactory {
     /**
      * The method for creating a new {@link Instance}.
      *
-     * @param instanceId      unique identifier (uid) of the service
-     * @param instanceName    name of the service
-     * @param instanceUrl     the URL of the service, e.g. {@code https://my-app:6061}
-     * @param deploymentAt    timestamp when the service was created
-     * @param metadata        the basic metadata of a service instance
+     * @param instanceId          unique identifier (uid) of the service
+     * @param instanceName        name of the service
+     * @param instanceActuatorUrl the URL of the service, including the postfix with actuator path, e.g. {@code https://my-app:6061/actuator}.
+     *                            This postfix qualification is required, since actuator path is not guaranteed to always be {@code /actuator}
+     * @param deploymentAt        timestamp when the service was created
+     * @param metadata            the basic metadata of a service instance
      *
      * @return the created {@link Instance}.
      */
@@ -43,6 +44,6 @@ public interface InstanceFactory {
             String instanceId,
             String instanceName,
             String deploymentAt,
-            String instanceUrl,
+            String instanceActuatorUrl,
             BasicDiscoveryMetadata metadata);
 }

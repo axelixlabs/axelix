@@ -28,7 +28,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
-import com.axelixlabs.axelix.master.service.InstanceManager;
+import com.axelixlabs.axelix.master.service.InstanceRegistrar;
+import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
  * Job that performs periodical discovering and refresh of managed service instances in the registry.
@@ -43,12 +44,16 @@ public class ShortPollingInstanceDiscoveryScheduler {
     private static final Logger logger = LoggerFactory.getLogger(ShortPollingInstanceDiscoveryScheduler.class);
 
     private final InstancesDiscoverer instancesDiscoverer;
-    private final InstanceManager instanceManager;
+    private final InstanceRegistrar instanceRegistrar;
+    private final InstanceRegistry instanceRegistry;
 
     public ShortPollingInstanceDiscoveryScheduler(
-            InstancesDiscoverer instancesDiscoverer, InstanceManager instanceManager) {
+            InstancesDiscoverer instancesDiscoverer,
+            InstanceRegistrar instanceRegistrar,
+            InstanceRegistry instanceRegistry) {
         this.instancesDiscoverer = instancesDiscoverer;
-        this.instanceManager = instanceManager;
+        this.instanceRegistrar = instanceRegistrar;
+        this.instanceRegistry = instanceRegistry;
     }
 
     @Scheduled(fixedDelayString = "${axelix.master.discovery.polling.fixed-delay:60000}")
@@ -65,10 +70,12 @@ public class ShortPollingInstanceDiscoveryScheduler {
                     this.getClass().getSimpleName());
         }
 
-        Set<InstanceId> currentlyRegisteredIds = instanceManager.getAllInstanceId();
+        Set<InstanceId> currentlyRegisteredIds =
+                instanceRegistry.getAll().stream().map(Instance::id).collect(Collectors.toSet());
         Set<InstanceId> discoveredIds = getDiscoveredIds(discoveredInstances);
 
-        registerNewInstances(discoveredInstances);
+        discoveredInstances.forEach(instanceRegistrar::register);
+
         deregisterMissingInstances(currentlyRegisteredIds, discoveredIds);
 
         logger.debug("Registered instances: {}", currentlyRegisteredIds.size());
@@ -78,17 +85,11 @@ public class ShortPollingInstanceDiscoveryScheduler {
         return discoveredInstances.stream().map(Instance::id).collect(Collectors.toSet());
     }
 
-    private void registerNewInstances(Set<Instance> discoveredInstances) {
-        for (Instance instance : discoveredInstances) {
-            instanceManager.registerInstances(instance);
-        }
-    }
-
     private void deregisterMissingInstances(Set<InstanceId> currentlyRegisteredIds, Set<InstanceId> discoveredIds) {
         for (InstanceId existingId : currentlyRegisteredIds) {
             if (!discoveredIds.contains(existingId)) {
                 try {
-                    instanceManager.deregisterMissingInstances(existingId);
+                    instanceRegistrar.deregister(existingId);
                     logger.debug("Deregistered instance: {}", existingId);
                 } catch (InstanceNotFoundException e) {
                     logger.debug("Instance not found during deregistration: {}", existingId);
