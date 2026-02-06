@@ -31,7 +31,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfiguratio
  */
 public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistrationMetadataAssembler {
 
-    private final SelfRegistrationConfigurationProperties properties;
+    private final SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties;
 
     private final ServiceMetadataAssembler serviceMetadataAssembler;
 
@@ -39,12 +39,17 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
 
     private final String deploymentAt;
 
+    private final String fullActuatorUrl;
+
     public DefaultSelfRegistrationMetadataAssembler(
-            ServiceMetadataAssembler serviceMetadataAssembler, SelfRegistrationConfigurationProperties properties) {
-        this.properties = properties;
+            ServiceMetadataAssembler serviceMetadataAssembler,
+            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+            String baseActuatorPath) {
+        this.selfRegistrationConfigurationProperties = selfRegistrationConfigurationProperties;
         this.serviceMetadataAssembler = serviceMetadataAssembler;
         this.instanceId = UUID.randomUUID().toString();
         this.deploymentAt = Instant.now().toString();
+        this.fullActuatorUrl = joinPath(selfRegistrationConfigurationProperties.getInstanceUrl(), baseActuatorPath);
     }
 
     @Override
@@ -52,8 +57,13 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
         return new SelfRegistrationMetadata(
                 serviceMetadataAssembler.assemble(),
                 instanceId,
-                properties.getInstanceName(),
-                properties.getInstanceUrl(),
+                selfRegistrationConfigurationProperties.getInstanceName(),
+                fullActuatorUrl,
                 deploymentAt);
+    }
+
+    private String joinPath(String instanceUrl, String baseActuatorPath) {
+        String cleanHost = instanceUrl.endsWith("/") ? instanceUrl.substring(0, instanceUrl.length() - 1) : instanceUrl;
+        return cleanHost + baseActuatorPath;
     }
 }

@@ -38,9 +38,9 @@ public class SelfRegistrationConfigurationProperties {
 
     private final String masterUrl;
 
-    private final String instanceUrl;
-
     private final String instanceName;
+
+    private final String instanceUrl;
 
     private Duration heartbeatInterval = Duration.of(60, ChronoUnit.SECONDS);
 

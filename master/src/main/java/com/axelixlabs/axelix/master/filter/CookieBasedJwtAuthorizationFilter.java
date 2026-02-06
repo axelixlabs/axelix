@@ -61,7 +61,10 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         // as well as actuator health endpoints
         return !path.startsWith("/api/")
                 || path.startsWith("/api/actuator/health")
-                || path.equalsIgnoreCase("/api/external/users/login");
+                || path.equalsIgnoreCase("/api/external/users/login")
+                // TODO: Temporary exclusion until the instance-to-master auth strategy is finalized.
+                // See: https://github.com/axelixlabs/axelix/issues/672
+                || path.equalsIgnoreCase("/api/axelix/service/register");
     }
 
     @Override

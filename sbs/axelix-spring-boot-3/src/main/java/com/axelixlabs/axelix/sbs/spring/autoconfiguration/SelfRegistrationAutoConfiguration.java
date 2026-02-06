@@ -17,7 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -37,7 +40,8 @@ import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
  * @since 04.02.2026
  * @author Nikita Kirillov
  */
-@AutoConfiguration(after = AxelixMetadataEndpointConfiguration.class)
+@AutoConfiguration(after = {AxelixMetadataEndpointConfiguration.class, WebEndpointAutoConfiguration.class})
+@ConditionalOnClass(WebEndpointProperties.class)
 @EnableConfigurationProperties(SelfRegistrationConfigurationProperties.class)
 @ConditionalOnProperty(value = "axelix.sbs.discovery.auto", havingValue = "true")
 public class SelfRegistrationAutoConfiguration {
@@ -52,9 +56,10 @@ public class SelfRegistrationAutoConfiguration {
     @ConditionalOnMissingBean
     public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
-            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
+            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+            WebEndpointProperties webEndpointProperties) {
         return new DefaultSelfRegistrationMetadataAssembler(
-                serviceMetadataAssembler, selfRegistrationConfigurationProperties);
+                serviceMetadataAssembler, selfRegistrationConfigurationProperties, webEndpointProperties.getBasePath());
     }
 
     @Bean
