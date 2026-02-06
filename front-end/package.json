@@ -19,6 +19,7 @@
         "@reduxjs/toolkit": "^2.9.0",
         "antd": "^6.0.0",
         "axios": "^1.12.2",
+        "cronstrue": "^3.11.0",
         "date-fns": "^4.1.0",
         "i18next": "^25.5.2",
         "i18next-browser-languagedetector": "^8.2.0",
