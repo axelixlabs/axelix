@@ -22,7 +22,7 @@ import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.axelixlabs.axelix.common.api.registration.ServiceMetadata.VMFeature;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.VMFeature;
 
 /**
  * {@link VMFeaturesProvider} based on the scanning the virtual machine launch options.

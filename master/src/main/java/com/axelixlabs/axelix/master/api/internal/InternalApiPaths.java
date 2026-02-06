@@ -15,22 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.master;
-
-import java.util.List;
-
-import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata.VMFeature;
+package com.axelixlabs.axelix.master.api.internal;
 
 /**
- * Provides the information about specific VM features that are either used, or can potentially
- * be used for the benefit of the current application, for example AppCDS, AotCache, Compressed Object Headers etc.
+ * Constant class containing API paths for interaction between Axelix Master and Starter.
  *
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public interface VMFeaturesProvider {
+public final class InternalApiPaths {
 
-    /**
-     * @return the actual list of VM features.
-     */
-    List<VMFeature> discover();
+    private InternalApiPaths() {}
+
+    public static final class SelfRegistryApi {
+
+        /**
+         * Base path for all self-registration services APIs.
+         */
+        public static final String MAIN = "/service";
+
+        /**
+         * Endpoint for service self-registration.
+         */
+        public static final String SERVICE_REGISTER = "/register";
+    }
 }

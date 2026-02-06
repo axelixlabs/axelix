@@ -48,8 +48,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
 import com.axelixlabs.axelix.master.service.InMemoryMemoryUsageCache;
 import com.axelixlabs.axelix.master.service.MemoryUsageCache;
+import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
+import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
 import com.axelixlabs.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InMemoryInstanceRegistry;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -82,6 +85,9 @@ class KubernetesInstanceDiscovererTest {
 
     @Autowired
     private AxelixVersionDiscoverer axelixVersionDiscoverer;
+
+    @Autowired
+    private DefaultInstanceFactory instanceFactory;
 
     private URI uri;
 
@@ -116,6 +122,11 @@ class KubernetesInstanceDiscovererTest {
         public AxelixVersionDiscoverer axelixVersionDiscoverer() {
             return () -> "1.0.0-SNAPSHOT";
         }
+
+        @Bean
+        public DefaultInstanceFactory instanceFactory() {
+            return new DefaultInstanceFactory();
+        }
     }
 
     @BeforeEach
@@ -125,7 +136,7 @@ class KubernetesInstanceDiscovererTest {
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
 
         subject = new KubernetesInstanceDiscoverer(
-                discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer);
+                discoveryClient, managedServiceMetadataEndpointProber, axelixVersionDiscoverer, instanceFactory);
     }
 
     @AfterEach

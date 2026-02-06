@@ -22,24 +22,24 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for {@link ServiceMetadata}.
+ * {@link JacksonMessageDeserializationStrategy} for {@link BasicDiscoveryMetadata}.
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
  */
 @Component
 public class MetadataJacksonMessageDeserializationStrategy
-        extends JacksonMessageDeserializationStrategy<ServiceMetadata> {
+        extends JacksonMessageDeserializationStrategy<BasicDiscoveryMetadata> {
 
     public MetadataJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
     @Override
-    public @NonNull Class<ServiceMetadata> supported() {
-        return ServiceMetadata.class;
+    public @NonNull Class<BasicDiscoveryMetadata> supported() {
+        return BasicDiscoveryMetadata.class;
     }
 }

@@ -28,7 +28,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
-import com.axelixlabs.axelix.master.service.MemoryUsageCache;
+import com.axelixlabs.axelix.master.service.InstanceRegistrar;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -44,16 +44,16 @@ public class ShortPollingInstanceDiscoveryScheduler {
     private static final Logger logger = LoggerFactory.getLogger(ShortPollingInstanceDiscoveryScheduler.class);
 
     private final InstancesDiscoverer instancesDiscoverer;
+    private final InstanceRegistrar instanceRegistrar;
     private final InstanceRegistry instanceRegistry;
-    private final MemoryUsageCache memoryUsageCache;
 
     public ShortPollingInstanceDiscoveryScheduler(
             InstancesDiscoverer instancesDiscoverer,
-            InstanceRegistry instanceRegistry,
-            MemoryUsageCache memoryUsageCache) {
+            InstanceRegistrar instanceRegistrar,
+            InstanceRegistry instanceRegistry) {
         this.instancesDiscoverer = instancesDiscoverer;
+        this.instanceRegistrar = instanceRegistrar;
         this.instanceRegistry = instanceRegistry;
-        this.memoryUsageCache = memoryUsageCache;
     }
 
     @Scheduled(fixedDelayString = "${axelix.master.discovery.polling.fixed-delay:60000}")
@@ -70,36 +70,26 @@ public class ShortPollingInstanceDiscoveryScheduler {
                     this.getClass().getSimpleName());
         }
 
-        Set<InstanceId> currentlyRegisteredIds = getCurrentlyRegisteredIds();
+        Set<InstanceId> currentlyRegisteredIds =
+                instanceRegistry.getAll().stream().map(Instance::id).collect(Collectors.toSet());
         Set<InstanceId> discoveredIds = getDiscoveredIds(discoveredInstances);
 
-        registerNewInstances(discoveredInstances);
+        discoveredInstances.forEach(instanceRegistrar::register);
+
         deregisterMissingInstances(currentlyRegisteredIds, discoveredIds);
 
-        logger.debug("Registered instances: {}", instanceRegistry.getAll().size());
-    }
-
-    private Set<InstanceId> getCurrentlyRegisteredIds() {
-        return instanceRegistry.getAll().stream().map(Instance::id).collect(Collectors.toSet());
+        logger.debug("Registered instances: {}", currentlyRegisteredIds.size());
     }
 
     private Set<InstanceId> getDiscoveredIds(Set<Instance> discoveredInstances) {
         return discoveredInstances.stream().map(Instance::id).collect(Collectors.toSet());
     }
 
-    private void registerNewInstances(Set<Instance> discoveredInstances) {
-        for (Instance instance : discoveredInstances) {
-            instanceRegistry.replace(instance);
-            memoryUsageCache.putHeapSize(instance.id(), instance.memoryUsage().heap());
-        }
-    }
-
     private void deregisterMissingInstances(Set<InstanceId> currentlyRegisteredIds, Set<InstanceId> discoveredIds) {
         for (InstanceId existingId : currentlyRegisteredIds) {
             if (!discoveredIds.contains(existingId)) {
                 try {
-                    instanceRegistry.deRegister(existingId);
-                    memoryUsageCache.clear(existingId);
+                    instanceRegistrar.deregister(existingId);
                     logger.debug("Deregistered instance: {}", existingId);
                 } catch (InstanceNotFoundException e) {
                     logger.debug("Instance not found during deregistration: {}", existingId);

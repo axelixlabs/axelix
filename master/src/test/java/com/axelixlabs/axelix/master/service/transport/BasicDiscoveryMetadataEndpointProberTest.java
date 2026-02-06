@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 
@@ -49,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
-class ServiceMetadataEndpointProberTest {
+class BasicDiscoveryMetadataEndpointProberTest {
 
     private static final String activeInstanceUrl = UUID.randomUUID().toString();
 
@@ -109,7 +109,8 @@ class ServiceMetadataEndpointProberTest {
     @Test
     void shouldReturnMetadata() throws EndpointInvocationException {
         String instanceUrl = mockWebServer.url(activeInstanceUrl).toString();
-        ServiceMetadata metadata = metadataEndpointProber.invoke(instanceUrl + "/actuator", NoHttpPayload.INSTANCE);
+        BasicDiscoveryMetadata metadata =
+                metadataEndpointProber.invoke(instanceUrl + "/actuator", NoHttpPayload.INSTANCE);
 
         assertThat(metadata).isNotNull();
         assertThat(metadata.getVersion()).isEqualTo("1.0.0-SNAPSHOT");
@@ -117,7 +118,7 @@ class ServiceMetadataEndpointProberTest {
         assertThat(metadata.getCommitShortSha()).isEqualTo("a8b0929");
         assertThat(metadata.getSoftwareVersions().getJava()).isEqualTo("17.0.14u");
         assertThat(metadata.getSoftwareVersions().getSpringBoot()).isEqualTo("3.5.0");
-        assertThat(metadata.getHealthStatus()).isEqualTo(ServiceMetadata.HealthStatus.UP);
+        assertThat(metadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
     }
 
     @Test

@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 
 /**
  * Assembles the metadata about this particular service
@@ -27,7 +27,7 @@ import com.axelixlabs.axelix.common.api.registration.ServiceMetadata;
 public interface ServiceMetadataAssembler {
 
     /**
-     * @return assembled {@link ServiceMetadata}.
+     * @return assembled {@link BasicDiscoveryMetadata}.
      */
-    ServiceMetadata assemble();
+    BasicDiscoveryMetadata assemble();
 }

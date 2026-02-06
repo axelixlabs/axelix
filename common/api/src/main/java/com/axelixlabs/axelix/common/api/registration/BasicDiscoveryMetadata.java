@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Represents the metadata of a service instance as exposed by the custom starter actuator endpoint.
+ * Represents the basic metadata of a service instance as exposed by the custom starter actuator endpoint.
  *
  * @since 18.09.2025
  * @author Nikita Kirillov
@@ -34,7 +34,7 @@ import org.jspecify.annotations.Nullable;
 @SuppressWarnings(
         "NullAway") // TODO: we need to think about nullability here. It is not obvious what the correct setup is in
 // this case
-public final class ServiceMetadata {
+public final class BasicDiscoveryMetadata {
 
     private final String version;
     private final String serviceVersion;
@@ -63,7 +63,7 @@ public final class ServiceMetadata {
      * @param vmFeatures       the VM features.
      */
     @JsonCreator
-    public ServiceMetadata(
+    public BasicDiscoveryMetadata(
             @JsonProperty("version") String version,
             @JsonProperty("serviceVersion") String serviceVersion,
             @JsonProperty("commitShortSha") String commitShortSha,
@@ -122,7 +122,7 @@ public final class ServiceMetadata {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ServiceMetadata that = (ServiceMetadata) o;
+        BasicDiscoveryMetadata that = (BasicDiscoveryMetadata) o;
         return Objects.equals(version, that.version)
                 && Objects.equals(serviceVersion, that.serviceVersion)
                 && Objects.equals(commitShortSha, that.commitShortSha)
