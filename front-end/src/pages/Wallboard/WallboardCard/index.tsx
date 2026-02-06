@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 import type { IInstanceCard } from "models";
 
 import styles from "./styles.module.css";
+import { Badge } from "antd";
 
 interface IProps {
     /**
@@ -30,15 +31,39 @@ interface IProps {
 
 export const WallboardCard = ({ data }: IProps) => {
     return (
-        <Link to={`/instance/${data.instanceId}/details`} className={`${styles.Card} ${styles[`Card${data.status}`]}`}>
-            <div className={`${styles.CardHeader} ${styles[`CardHeader${data.status}`]}`}>{data.name}</div>
+        <Link to={`/instance/${data.instanceId}/details`} className={styles.Card}>
+            <div className={styles.CardHeader}>
+                {data.name}
+                <Badge
+                    status="processing"
+                    color="#00ab55"
+                    styles={{
+                        indicator: {
+                            width: "8px",
+                            height: "8px",
+                        },
+                    }}
+                />
+            </div>
             <div className={styles.CardBody}>
-                <div>Version: {data.serviceVersion}</div>
-                <div>Spring Boot: {data.springBootVersion}</div>
-                <div>Java: {data.javaVersion}</div>
-                <div className={styles.HashAndTimeWrapper}>
-                    <span>Commit: {data.commitShaShort}</span>
-                    <span>{data.deployedFor}</span>
+                <div className={styles.CardBodyChunk}>
+                    <div className={styles.BodyChunkLabel}>Version:</div>
+                    <div className={styles.BodyChunkValue}>{data.serviceVersion}</div>
+                </div>
+
+                <div className={styles.CardBodyChunk}>
+                    <span className={styles.BodyChunkLabel}>Spring Boot</span>
+                    <span className={styles.BodyChunkValue}>{data.springBootVersion}</span>
+                </div>
+
+                <div className={styles.CardBodyChunk}>
+                    <span className={styles.BodyChunkLabel}>Java</span>
+                    <span className={styles.BodyChunkValue}>{data.javaVersion}</span>
+                </div>
+
+                <div className={styles.CardFooter}>
+                    <div className={styles.Commit}>Commit: {data.commitShaShort}</div>
+                    <span className={styles.Time}>{data.deployedFor}</span>
                 </div>
             </div>
         </Link>
