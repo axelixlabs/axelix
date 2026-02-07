@@ -87,7 +87,7 @@ public class SelfRegisteredApiTest {
         // when.
         ResponseEntity<Void> response = restTemplate
                 .withAuthorities()
-                .postForEntity("/axelix/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
+                .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(HttpStatus.NO_CONTENT);
@@ -99,7 +99,7 @@ public class SelfRegisteredApiTest {
         // when.
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
-                .postForEntity("/axelix/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
+                .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

@@ -126,7 +126,7 @@ class PropertyManagementApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/property-management/{instanceId}",
+                        "/api/external/property-management/{instanceId}",
                         defaultEntity(request),
                         Void.class,
                         activeInstanceId);
@@ -150,7 +150,7 @@ class PropertyManagementApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/property-management/{instanceId}",
+                        "/api/external/property-management/{instanceId}",
                         defaultEntity(request),
                         EndpointInvocationException.class,
                         instanceId);
@@ -168,7 +168,7 @@ class PropertyManagementApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/property-management/{instanceId}",
+                        "/api/external/property-management/{instanceId}",
                         request,
                         EndpointInvocationException.class,
                         instanceId);
@@ -186,7 +186,7 @@ class PropertyManagementApiTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/axelix/api/external/property-management/{instanceId}",
+                        "/api/external/property-management/{instanceId}",
                         defaultEntity(request),
                         Void.class,
                         activeInstanceId);

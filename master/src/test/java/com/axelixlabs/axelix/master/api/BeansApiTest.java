@@ -291,7 +291,7 @@ class BeansApiTest {
         // when.
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/beans/feed/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/api/external/beans/feed/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -308,7 +308,7 @@ class BeansApiTest {
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -321,7 +321,7 @@ class BeansApiTest {
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -333,7 +333,7 @@ class BeansApiTest {
         // when.
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
-                .getForEntity("/axelix/api/external/beans/feed/{instanceId}", Void.class, activeInstanceId);
+                .getForEntity("/api/external/beans/feed/{instanceId}", Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

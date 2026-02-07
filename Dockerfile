@@ -26,8 +26,8 @@ COPY --from=layers /application/spring-boot-loader/ ./
 COPY --from=layers /application/snapshot-dependencies/ ./
 COPY --from=layers /application/application/ ./
 
-# Copy the front-end static files distribution
-COPY --from=layers /application/dist/ ./application/dist
+# Copy the front-end static files distribution (path must match static-locations below)
+COPY --from=layers /application/dist/ ./dist
 
 # JVM options
 ENV JAVA_ERROR_FILE_OPTS="-XX:ErrorFile=/tmp/java_error.log"
@@ -36,7 +36,7 @@ ENV JAVA_ON_OUT_OF_MEMORY_OPTS="-XX:+CrashOnOutOfMemoryError"
 ENV JAVA_GC_LOG_OPTS="-Xlog:gc*,safepoint:/tmp/gc.log::filecount=10,filesize=100M"
 # Custom Java Properties
 ENV JAVA_OTHER_ARGS="-Dkubernetes.trust.certificates=true \
-                     -Dspring.web.resources.static-locations=file:/application/dist"
+                     -Dspring.web.resources.static-locations=file:/application/dist/"
 
 # TODO: Consider adding AOT Cache
 ENTRYPOINT exec java \

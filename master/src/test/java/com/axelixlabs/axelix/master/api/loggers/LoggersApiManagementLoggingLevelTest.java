@@ -118,7 +118,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<String> body = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/group/{groupName}",
+                        "/api/external/loggers/{instanceId}/group/{groupName}",
                         requestBody,
                         String.class,
                         activeInstanceId,
@@ -137,7 +137,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<String> body = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         requestBody,
                         String.class,
                         activeInstanceId,
@@ -155,7 +155,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
                         null,
                         String.class,
                         activeInstanceId,
@@ -177,7 +177,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<?> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/group/{groupName}",
+                        "/api/external/loggers/{instanceId}/group/{groupName}",
                         requestBody,
                         Void.class,
                         instanceId,
@@ -199,7 +199,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<?> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         requestBody,
                         Void.class,
                         instanceId,
@@ -220,7 +220,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<?> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
                         null,
                         Void.class,
                         instanceId,
@@ -240,7 +240,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/group/{groupName}",
+                        "/api/external/loggers/{instanceId}/group/{groupName}",
                         requestBody,
                         EndpointInvocationException.class,
                         instanceId,
@@ -260,7 +260,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         requestBody,
                         EndpointInvocationException.class,
                         instanceId,
@@ -279,7 +279,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
                         null,
                         EndpointInvocationException.class,
                         instanceId,
@@ -299,7 +299,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/group/{groupName}",
+                        "/api/external/loggers/{instanceId}/group/{groupName}",
                         requestBody,
                         Void.class,
                         activeInstanceId,
@@ -319,7 +319,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         requestBody,
                         Void.class,
                         activeInstanceId,
@@ -338,7 +338,7 @@ public class LoggersApiManagementLoggingLevelTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
                         null,
                         Void.class,
                         activeInstanceId,

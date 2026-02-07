@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
 import com.axelixlabs.axelix.master.service.DashboardService;
 

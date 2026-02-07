@@ -1,9 +1,6 @@
 spring:
   application:
     name: axelix
-  mvc:
-    servlet:
-      path: /${spring.application.name}
   config:
     import: "classpath:tokens.yml"
 

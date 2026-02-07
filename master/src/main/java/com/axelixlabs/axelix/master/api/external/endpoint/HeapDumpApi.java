@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -38,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.export.HeapDumpAnonymizer;

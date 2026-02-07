@@ -123,7 +123,7 @@ class CachesManagementApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
+                        "/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,
                         Void.class,
                         Map.of(
@@ -145,7 +145,7 @@ class CachesManagementApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/caches/{instanceId}/{cacheManagerName}/" + cacheStatus,
+                        "/api/external/caches/{instanceId}/{cacheManagerName}/" + cacheStatus,
                         null,
                         Void.class,
                         Map.of("instanceId", activeInstanceId, "cacheManagerName", "cacheManager"));
@@ -165,7 +165,7 @@ class CachesManagementApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
+                        "/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,
                         EndpointInvocationException.class,
                         Map.of("instanceId", instanceId, "cacheManagerName", "unknown", "cacheName", "unknown"));
@@ -181,7 +181,7 @@ class CachesManagementApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
+                        "/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,
                         EndpointInvocationException.class,
                         Map.of(
@@ -203,7 +203,7 @@ class CachesManagementApiTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/axelix/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + operation,
+                        "/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + operation,
                         null,
                         Void.class,
                         Map.of(

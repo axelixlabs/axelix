@@ -28,8 +28,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.DecodedUser;
-import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
@@ -89,7 +89,8 @@ class DefaultJwtDecoderServiceTest {
                 .orElseThrow();
 
         assertThat(userRole.getAuthorities()).containsAll(Set.of(ExternalAuthority.ENV, ExternalAuthority.INFO));
-        assertThat(engineerRole.getAuthorities()).containsAll(Set.of(ExternalAuthority.BEANS, ExternalAuthority.HEALTH));
+        assertThat(engineerRole.getAuthorities())
+                .containsAll(Set.of(ExternalAuthority.BEANS, ExternalAuthority.HEALTH));
     }
 
     @Test

@@ -209,7 +209,7 @@ public class LoggersApiAllLoggersTest {
         // when
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/loggers/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/api/external/loggers/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -226,7 +226,7 @@ public class LoggersApiAllLoggersTest {
         // when.
         ResponseEntity<?> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/loggers/{instanceId}", Void.class, instanceId);
+                .getForEntity("/api/external/loggers/{instanceId}", Void.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -239,7 +239,7 @@ public class LoggersApiAllLoggersTest {
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/loggers/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/loggers/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -251,7 +251,7 @@ public class LoggersApiAllLoggersTest {
         // when.
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
-                .getForEntity("/axelix/api/external/loggers/{instanceId}", Void.class, activeInstanceId);
+                .getForEntity("/api/external/loggers/{instanceId}", Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

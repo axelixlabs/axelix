@@ -216,7 +216,7 @@ public class DashboardApiTest {
     void shouldReturnJSONDashboardResponse() {
         // when.
         ResponseEntity<String> response =
-                restTemplate.withoutAuthorities().getForEntity("/axelix/api/external/dashboard", String.class);
+                restTemplate.withoutAuthorities().getForEntity("/api/external/dashboard", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -232,7 +232,7 @@ public class DashboardApiTest {
 
         // when.
         ResponseEntity<String> response =
-                restTemplate.withoutAuthorities().getForEntity("/axelix/api/external/dashboard", String.class);
+                restTemplate.withoutAuthorities().getForEntity("/api/external/dashboard", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -251,7 +251,7 @@ public class DashboardApiTest {
         try {
             // when.
             ResponseEntity<String> response =
-                    restTemplate.withoutAuthorities().getForEntity("/axelix/api/external/dashboard", String.class);
+                    restTemplate.withoutAuthorities().getForEntity("/api/external/dashboard", String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -270,7 +270,7 @@ public class DashboardApiTest {
     void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
         // when.
         ResponseEntity<Void> response =
-                scenario.getModifier().apply(restTemplate).getForEntity("/axelix/api/external/dashboard", Void.class);
+                scenario.getModifier().apply(restTemplate).getForEntity("/api/external/dashboard", Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

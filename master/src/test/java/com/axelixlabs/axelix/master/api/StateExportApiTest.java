@@ -401,7 +401,7 @@ class StateExportApiTest {
         ResponseEntity<?> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/export-state/{instanceId}",
+                        "/api/external/export-state/{instanceId}",
                         new HttpEntity<>(HTTP_REQUEST_BODY, headers),
                         Void.class,
                         instanceId);
@@ -419,7 +419,7 @@ class StateExportApiTest {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/export-state/{instanceId}",
+                        "/api/external/export-state/{instanceId}",
                         new HttpEntity<>(HTTP_REQUEST_BODY, headers),
                         String.class,
                         unknownInstanceId);
@@ -437,7 +437,7 @@ class StateExportApiTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/axelix/api/external/export-state/{instanceId}",
+                        "/api/external/export-state/{instanceId}",
                         new HttpEntity<>(HTTP_REQUEST_BODY, headers),
                         Void.class,
                         activeInstanceId);
@@ -460,7 +460,7 @@ class StateExportApiTest {
         ResponseEntity<byte[]> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/export-state/{instanceId}",
+                        "/api/external/export-state/{instanceId}",
                         new HttpEntity<>(HTTP_REQUEST_BODY, headers),
                         byte[].class,
                         activeInstanceId);

@@ -17,12 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.internal.endpoint;
 
-import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
-import com.axelixlabs.axelix.master.api.internal.ApiPaths;
-import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
-import com.axelixlabs.axelix.master.domain.Instance;
-import com.axelixlabs.axelix.master.service.InstanceFactory;
-import com.axelixlabs.axelix.master.service.InstanceRegistrar;
 import io.swagger.v3.oas.annotations.Hidden;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,6 +24,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.master.api.internal.ApiPaths;
+import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.service.InstanceFactory;
+import com.axelixlabs.axelix.master.service.InstanceRegistrar;
 
 /**
  * The API used for service self-registration.

@@ -228,7 +228,7 @@ public class MetricsApiTest {
         // when.
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/metrics/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/api/external/metrics/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -245,7 +245,7 @@ public class MetricsApiTest {
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/metrics/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/metrics/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -258,7 +258,7 @@ public class MetricsApiTest {
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/metrics/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/metrics/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -270,7 +270,7 @@ public class MetricsApiTest {
         // when.
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
-                .getForEntity("/axelix/api/external/metrics/{instanceId}", Void.class, activeInstanceId);
+                .getForEntity("/api/external/metrics/{instanceId}", Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

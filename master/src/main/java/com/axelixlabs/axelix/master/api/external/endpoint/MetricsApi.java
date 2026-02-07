@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.links.Link;
@@ -45,6 +44,7 @@ import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.QueryParameter;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.metrics.MetricsGroupsFeedResponse;
 import com.axelixlabs.axelix.master.api.external.response.metrics.SingleMetricProfileResponse;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;

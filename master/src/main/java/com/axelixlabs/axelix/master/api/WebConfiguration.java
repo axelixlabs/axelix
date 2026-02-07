@@ -17,13 +17,13 @@
  */
 package com.axelixlabs.axelix.master.api;
 
-import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerTypePredicate;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 
 /**
  * Web layer related configuration.
@@ -33,10 +33,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
 
-    // 2 docker containers
-    // /axelix/api/external <-- api external
-    // /axelix/api/internal <-- api internal
-    // /axelix/static/ <-- js/css
+    // /api/external <-- api external
+    // /api/internal <-- api internal
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
 

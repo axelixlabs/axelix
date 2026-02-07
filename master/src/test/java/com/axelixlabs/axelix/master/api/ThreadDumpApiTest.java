@@ -286,7 +286,7 @@ class ThreadDumpApiTest {
     void shouldReturnJSONThreadDumpFeed() {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/thread-dump/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/api/external/thread-dump/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -303,7 +303,7 @@ class ThreadDumpApiTest {
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -315,7 +315,7 @@ class ThreadDumpApiTest {
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -328,7 +328,7 @@ class ThreadDumpApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
+                        "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
                         null,
                         Void.class,
@@ -348,7 +348,7 @@ class ThreadDumpApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
+                        "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
                         null,
                         EndpointInvocationException.class,
@@ -368,7 +368,7 @@ class ThreadDumpApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/axelix/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
+                        "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
                         null,
                         EndpointInvocationException.class,
@@ -384,7 +384,7 @@ class ThreadDumpApiTest {
         // when.
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
-                .getForEntity("/axelix/api/external/thread-dump/{instanceId}", Void.class, activeInstanceId);
+                .getForEntity("/api/external/thread-dump/{instanceId}", Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -397,7 +397,7 @@ class ThreadDumpApiTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/axelix/api/external/thread-dump/{instanceId}/thread-contention-monitoring/enable",
+                        "/api/external/thread-dump/{instanceId}/thread-contention-monitoring/enable",
                         null,
                         Void.class,
                         Map.of("instanceId", activeInstanceId));
@@ -413,7 +413,7 @@ class ThreadDumpApiTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/axelix/api/external/thread-dump/{instanceId}/thread-contention-monitoring/disable",
+                        "/api/external/thread-dump/{instanceId}/thread-contention-monitoring/disable",
                         null,
                         Void.class,
                         Map.of("instanceId", activeInstanceId));

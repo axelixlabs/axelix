@@ -148,7 +148,7 @@ public class LoggersApiLoggerByNameTest {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         String.class,
                         activeInstanceId,
                         loggerName);
@@ -175,7 +175,7 @@ public class LoggersApiLoggerByNameTest {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         String.class,
                         activeInstanceId,
                         loggerName);
@@ -198,7 +198,7 @@ public class LoggersApiLoggerByNameTest {
         ResponseEntity<?> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}", Void.class, instanceId, loggerName);
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}", Void.class, instanceId, loggerName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -213,7 +213,7 @@ public class LoggersApiLoggerByNameTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         EndpointInvocationException.class,
                         instanceId,
                         loggerName);
@@ -231,7 +231,7 @@ public class LoggersApiLoggerByNameTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .getForEntity(
-                        "/axelix/api/external/loggers/{instanceId}/logger/{loggerName}",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         Void.class,
                         activeInstanceId,
                         loggerName);

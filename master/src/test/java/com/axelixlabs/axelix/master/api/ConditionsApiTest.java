@@ -230,7 +230,7 @@ class ConditionsApiTest {
         // when.
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/conditions/feed/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/api/external/conditions/feed/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -248,7 +248,7 @@ class ConditionsApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/axelix/api/external/conditions/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                        "/api/external/conditions/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -262,7 +262,7 @@ class ConditionsApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/axelix/api/external/conditions/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                        "/api/external/conditions/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -274,7 +274,7 @@ class ConditionsApiTest {
         // when.
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
-                .getForEntity("/axelix/api/external/conditions/feed/{instanceId}", Void.class, activeInstanceId);
+                .getForEntity("/api/external/conditions/feed/{instanceId}", Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

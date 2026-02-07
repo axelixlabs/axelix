@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.DecodedUser;
-import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -70,10 +70,12 @@ class DefaultAuthorizerTest {
 
     @Test
     void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInInnerRole() {
-        Role innerRole1 = new DefaultRole("firstInnerTestRole", Set.of(ExternalAuthority.PROPERTY_MANAGEMENT), Set.of());
+        Role innerRole1 =
+                new DefaultRole("firstInnerTestRole", Set.of(ExternalAuthority.PROPERTY_MANAGEMENT), Set.of());
         Role role1 = new DefaultRole("firstTestRole", null, Set.of(innerRole1));
 
-        Role innerRole2 = new DefaultRole("secondInnerTestRole", Set.of(ExternalAuthority.PROFILE_MANAGEMENT), Set.of());
+        Role innerRole2 =
+                new DefaultRole("secondInnerTestRole", Set.of(ExternalAuthority.PROFILE_MANAGEMENT), Set.of());
         Role role2 = new DefaultRole("secondTestRole", null, Set.of(innerRole2));
 
         DecodedUser user = new DecodedUser("testUser", Set.of(role1, role2));

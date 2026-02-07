@@ -22,9 +22,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
+import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.StaticAdminCredentialsProperties;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
@@ -52,7 +52,8 @@ public class StaticAdminUserProvider implements UserProvider {
                     username,
                     staticCredentialsConfig.getPassword(),
                     Set.of(new DefaultRole(
-                            ADMIN_ROLE, Arrays.stream(ExternalAuthority.values()).collect(Collectors.toSet()))));
+                            ADMIN_ROLE,
+                            Arrays.stream(ExternalAuthority.values()).collect(Collectors.toSet()))));
         } else {
             throw new UserNotFoundException(username);
         }

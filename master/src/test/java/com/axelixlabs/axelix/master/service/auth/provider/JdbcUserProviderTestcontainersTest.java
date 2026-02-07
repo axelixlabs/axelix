@@ -66,8 +66,9 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
                 .filteredOn(role -> role.getName().equals("ROLE_ADMIN"))
                 .hasSize(1)
                 .first()
-                .satisfies(role ->
-                        assertThat(role.getAuthorities()).hasSize(1).containsOnly(ExternalAuthority.PROFILE_MANAGEMENT));
+                .satisfies(role -> assertThat(role.getAuthorities())
+                        .hasSize(1)
+                        .containsOnly(ExternalAuthority.PROFILE_MANAGEMENT));
 
         // ROLE_ADMIN -> ROLE_ENGINEER, ROLE_CACHE_DISPATCHER
         Role adminRole = user.getRoles().iterator().next();

@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import jakarta.servlet.http.HttpServletRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.api.external.response.UserProfileResponse;
 import com.axelixlabs.axelix.master.service.auth.CookieService;

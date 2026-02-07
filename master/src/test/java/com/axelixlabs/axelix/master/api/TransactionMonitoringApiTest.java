@@ -207,7 +207,7 @@ class TransactionMonitoringApiTest {
     void shouldReturnJSONTransactionsMonitoringFeed() throws InterruptedException {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/transaction-monitoring/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/api/external/transaction-monitoring/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -226,7 +226,7 @@ class TransactionMonitoringApiTest {
     void shouldClearTransactionsMonitoringStats() throws InterruptedException {
         restTemplate
                 .withoutAuthorities()
-                .delete("/axelix/api/external/transaction-monitoring/{instanceId}", Map.of("instanceId", activeInstanceId));
+                .delete("/api/external/transaction-monitoring/{instanceId}", Map.of("instanceId", activeInstanceId));
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest(10l, TimeUnit.SECONDS);
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");

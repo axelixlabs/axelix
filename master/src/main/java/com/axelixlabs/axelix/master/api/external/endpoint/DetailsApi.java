@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Objects;
 
-import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,6 +34,7 @@ import com.axelixlabs.axelix.common.api.InstanceDetails;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.InstanceDetailsResponse;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;

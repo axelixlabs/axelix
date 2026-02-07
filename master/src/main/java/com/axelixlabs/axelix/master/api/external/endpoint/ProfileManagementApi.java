@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Objects;
 
-import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -37,6 +36,7 @@ import com.axelixlabs.axelix.common.api.ProfileMutationResult;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.ProfileUpdatedRequest;
 import com.axelixlabs.axelix.master.api.external.response.ProfileUpdateResponse;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;

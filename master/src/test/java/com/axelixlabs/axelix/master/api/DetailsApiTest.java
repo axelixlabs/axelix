@@ -309,7 +309,7 @@ public class DetailsApiTest {
         // when.
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/details/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/api/external/details/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -322,7 +322,7 @@ public class DetailsApiTest {
         // when.
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/details/{instanceId}", String.class, instanceWithoutPluginId);
+                .getForEntity("/api/external/details/{instanceId}", String.class, instanceWithoutPluginId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -339,7 +339,7 @@ public class DetailsApiTest {
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/details/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/details/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -352,7 +352,7 @@ public class DetailsApiTest {
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/axelix/api/external/details/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/details/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -364,7 +364,7 @@ public class DetailsApiTest {
         // when.
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
-                .getForEntity("/axelix/api/external/details/{instanceId}", Void.class, activeInstanceId);
+                .getForEntity("/api/external/details/{instanceId}", Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
