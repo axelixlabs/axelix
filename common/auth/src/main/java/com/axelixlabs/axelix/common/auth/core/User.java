@@ -27,7 +27,6 @@ import java.util.Set;
  * @since 16.07.25
  * @author Mikhail Polivakha
  */
-// TODO: add jspecify annotations
 public interface User {
 
     /**
