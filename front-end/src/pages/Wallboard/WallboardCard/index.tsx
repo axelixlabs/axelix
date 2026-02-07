@@ -15,8 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Badge } from "antd";
+import { Badge, Tooltip } from "antd";
 import QuestionIcon from "assets/icons/question.svg?react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { EInstanceStatus, type IInstanceCard } from "models";
@@ -31,9 +32,33 @@ interface IProps {
 }
 
 export const WallboardCard = ({ data }: IProps) => {
+    const textRef = useRef<HTMLDivElement>(null);
+    const [isEllipsis, setIsEllipsis] = useState<boolean>(false);
+
     const isUp = data.status === EInstanceStatus.UP;
     const isUnknown = data.status === EInstanceStatus.UNKNOWN;
     const isDown = data.status === EInstanceStatus.DOWN;
+
+    useEffect(() => {
+        const element = textRef.current;
+
+        if (!element) {
+            return;
+        }
+
+        const checkTruncation = (): void => {
+            setIsEllipsis(element.scrollHeight > element.clientHeight + 1);
+        };
+
+        const resizeObserver = new ResizeObserver(() => checkTruncation());
+
+        resizeObserver.observe(element);
+        checkTruncation();
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
 
     return (
         <Link
@@ -41,8 +66,11 @@ export const WallboardCard = ({ data }: IProps) => {
             className={`${styles.Card} ${!isUp ? styles[data.status] : ""}`}
         >
             <div className={styles.Header}>
-                {/* TODO: Here we need to show an ellipsis with a tooltip */}
-                <div className={styles.Title}>{data.name}</div>
+                <Tooltip title={isEllipsis ? data.name : undefined}>
+                    <div ref={textRef} className={styles.Title}>
+                        {data.name}
+                    </div>
+                </Tooltip>
                 {!isUnknown ? (
                     <Badge
                         status={isDown ? "processing" : undefined}
@@ -55,7 +83,7 @@ export const WallboardCard = ({ data }: IProps) => {
                         }}
                     />
                 ) : (
-                    <QuestionIcon className={styles.QuestionIcon} style={{ flexShrink: "0" }} />
+                    <QuestionIcon className={styles.QuestionIcon} />
                 )}
             </div>
             <div className={styles.Body}>
