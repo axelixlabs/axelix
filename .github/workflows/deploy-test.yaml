@@ -23,7 +23,7 @@ jobs:
       DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
       CR_URL: ${{ vars.CR_URL }}
       IMAGE_REPOSITORY: ${{ vars.CR_URL }}/${{ vars.CR_MASTER_REPOSITORY }}
-      IMAGE_NAME: master
+      IMAGE_NAME: axelix
       KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
       # Use branch from workflow_dispatch input if provided, otherwise default to 'main'
       HELM_CHART_BRANCH: ${{ github.event.inputs.helm_chart_branch || 'main' }}
@@ -65,8 +65,6 @@ jobs:
           property: axelixVersion
 
       - name: Build Docker Image
-        # TODO:
-        #  We need to take the repository part inside the image name from the terraform output
         run: |
           docker build --tag $IMAGE_REPOSITORY/$IMAGE_NAME:${{ steps.gradleProperties.outputs.value }} --file Dockerfile .
 
@@ -101,13 +99,10 @@ jobs:
           echo "$KUBE_CONFIG_BASE64" | base64 --decode > ~/.kube/config
           chmod 600 ~/.kube/config
           helm upgrade \
-            --set frontend.image.pullPolicy=Always \
-            --set backend.image.pullPolicy=Always \
-            --set frontend.image.name=$IMAGE_REPOSITORY/master-fe \
-            --set frontend.image.tag=${{ steps.gradleProperties.outputs.value }} \
-            --set backend.image.name=$IMAGE_REPOSITORY/$IMAGE_NAME \
-            --set backend.image.tag=${{ steps.gradleProperties.outputs.value }} \
-            --install master . \
+            --set image.pullPolicy=Always \
+            --set image.name=$IMAGE_REPOSITORY/$IMAGE_NAME \
+            --set image.ref=${{ steps.gradleProperties.outputs.value }} \
+            --install axelix-master . \
             -f values.yaml
 
   dispatch:

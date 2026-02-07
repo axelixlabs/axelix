@@ -2,12 +2,15 @@
 FROM eclipse-temurin:25-jre-alpine AS layers
 
 WORKDIR /application
+
+# Copy distributions
 COPY front-end/dist dist
 COPY master/build/libs/master.jar master.jar
+
 RUN java -Djarmode=layertools -jar master.jar extract
 
 # Stage: final runtime image
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:25-jre-alpine AS final
 
 VOLUME /tmp
 
@@ -22,6 +25,9 @@ COPY --from=layers /application/dependencies/ ./
 COPY --from=layers /application/spring-boot-loader/ ./
 COPY --from=layers /application/snapshot-dependencies/ ./
 COPY --from=layers /application/application/ ./
+
+# Copy the front-end static files distribution
+COPY --from=layers /application/dist/ ./application/dist
 
 # JVM options
 ENV JAVA_ERROR_FILE_OPTS="-XX:ErrorFile=/tmp/java_error.log"
