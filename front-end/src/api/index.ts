@@ -25,7 +25,7 @@ import { IS_AUTH } from "utils";
  * Browser will route such requests (with no host:port) to the same origin as the current
  */
 export const apiFetch = axios.create({
-    baseURL: `/api/axelix`,
+    baseURL: `/api/external`,
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",

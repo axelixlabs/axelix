@@ -54,12 +54,15 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         this.authCookieName = authCookieName;
     }
 
+    private static final Set<String> PERMIT_WITHOUT_AUTH =
+            Set.of("/api/external/users/login", "/api/actuator/health/readiness", "/api/actuator/health/liveness");
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        // TODO:
-        //  Here, the login endpoint URL is hardcoded, which is not really a good thing to be doing
-        return Set.of("/api/external/users/login", "/api/actuator/health/readiness", "/api/actuator/health/liveness")
-                .contains(request.getRequestURI());
+        String path = request.getRequestURI();
+
+        // Static content (/, /index.html, /assets/*, etc.) is served at root and does not require auth
+        return !path.startsWith("/api/") || PERMIT_WITHOUT_AUTH.contains(path);
     }
 
     @Override
