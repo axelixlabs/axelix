@@ -22,9 +22,9 @@ package com.axelixlabs.axelix.master.api.internal;
  *
  * @author Sergey Cherkasov
  */
-public final class InternalApiPaths {
+public final class ApiPaths {
 
-    private InternalApiPaths() {}
+    private ApiPaths() {}
 
     public static final class SelfRegistryApi {
 

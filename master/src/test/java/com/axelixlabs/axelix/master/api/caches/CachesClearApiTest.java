@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.api.caches;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -103,10 +104,10 @@ public class CachesClearApiTest {
     @Test
     void shouldClearAllCaches() throws InterruptedException {
         // when
-        restTemplate.withoutAuthorities().delete("/api/axelix/caches/{instanceId}", activeInstanceId);
+        restTemplate.withoutAuthorities().delete("/axelix/api/external/caches/{instanceId}", activeInstanceId);
 
         // then.
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        RecordedRequest recordedRequest = mockWebServer.takeRequest(10, TimeUnit.SECONDS);
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
         assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/actuator/axelix-caches");
     }
@@ -119,10 +120,10 @@ public class CachesClearApiTest {
         restTemplate
                 .withoutAuthorities()
                 .delete(
-                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=testCacheManager",
+                        "/axelix/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=testCacheManager",
                         Map.of("instanceId", activeInstanceId, "cacheName", cacheName));
         // then.
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        RecordedRequest recordedRequest = mockWebServer.takeRequest(10, TimeUnit.SECONDS);
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
         assertThat(recordedRequest.getPath())
                 .isEqualTo("/" + activeInstanceId + "/actuator/axelix-caches/testCacheManager/%s".formatted(cacheName));

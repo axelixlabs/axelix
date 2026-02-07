@@ -35,7 +35,7 @@ import com.axelixlabs.axelix.common.auth.core.User;
 @NullMarked
 public final class ManagedServiceUser implements User {
 
-    private static final ManagedServiceUser STARTER_USER = new ManagedServiceUser();
+    public static final ManagedServiceUser STARTER_USER = new ManagedServiceUser();
 
     private ManagedServiceUser() {}
 

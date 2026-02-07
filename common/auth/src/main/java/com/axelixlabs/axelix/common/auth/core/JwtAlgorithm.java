@@ -27,6 +27,7 @@ import java.util.Arrays;
  * @author Nikita Kirillov
  */
 public enum JwtAlgorithm {
+
     HMAC256(32, "HS256"),
     HMAC384(48, "HS384"),
     HMAC512(64, "HS512");

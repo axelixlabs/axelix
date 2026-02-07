@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.links.Link;
@@ -35,7 +36,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.metrics.MetricProfile;
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
@@ -59,7 +59,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @author Nikita Kirillov
  */
 @Tag(name = "Metrics API Controller", description = "The endpoint that provides access to the metrics of the instances")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.MetricsApi.MAIN)
 public class MetricsApi {
 

@@ -145,7 +145,7 @@ class HeapDumpApiTest {
         // when.
         ResponseEntity<byte[]> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/heapdump/{instanceId}", byte[].class, activeInstanceId);
+                .getForEntity("/axelix/api/external/heapdump/{instanceId}", byte[].class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -168,7 +168,7 @@ class HeapDumpApiTest {
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/heapdump/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/axelix/api/external/heapdump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -181,7 +181,7 @@ class HeapDumpApiTest {
         // when.
         ResponseEntity<InstanceNotFoundException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/heapdump/{instanceId}", InstanceNotFoundException.class, instanceId);
+                .getForEntity("/axelix/api/external/heapdump/{instanceId}", InstanceNotFoundException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -193,7 +193,7 @@ class HeapDumpApiTest {
         // when.
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
-                .getForEntity("/api/axelix/heapdump/{instanceId}", Void.class, activeInstanceId);
+                .getForEntity("/axelix/api/external/heapdump/{instanceId}", Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

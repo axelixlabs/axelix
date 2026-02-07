@@ -32,7 +32,7 @@ public class InternalAuthorities {
      */
     public static final InternalAuthority SELF_REGISTER_AUTHORITY = new InternalAuthority("INTERNAL.SELF_REGISTER");
 
-    public static class InternalAuthority implements Authority {
+    public static final class InternalAuthority implements Authority {
 
         private final String authorityName;
 

@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Objects;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,7 +35,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
@@ -51,7 +51,7 @@ import com.axelixlabs.axelix.master.service.export.ZipArchiveInstanceStateExport
  * @author Nikita Kirillov
  * @since 27.10.2025
  */
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.StateExportApi.MAIN)
 public class StateExportApi {
 

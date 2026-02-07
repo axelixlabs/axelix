@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 
 import java.util.Map;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -30,7 +31,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
@@ -49,7 +49,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 @Tag(
         name = "Caches Management API",
         description = "The caches management endpoint provides operations to manage application's caches.")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.CachesApi.MAIN)
 public class CachesManagementApi {
 

@@ -326,7 +326,7 @@ public class ScheduledTasksApiTest {
         // when.
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/axelix/api/external/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -344,7 +344,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<String> body = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
+                        "/axelix/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
                         String.class,
                         activeInstanceId);
@@ -363,7 +363,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/modify/cron-expression",
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
                         Void.class,
                         activeInstanceId);
@@ -382,7 +382,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/modify/interval",
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
                         Void.class,
                         activeInstanceId);
@@ -401,7 +401,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/execute", requestBody, Void.class, activeInstanceId);
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/execute", requestBody, Void.class, activeInstanceId);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -417,7 +417,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
+                        "/axelix/api/external/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -431,7 +431,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
+                        "/axelix/api/external/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -451,7 +451,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
+                        "/axelix/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
                         EndpointInvocationException.class,
                         instanceId);
@@ -472,7 +472,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
+                        "/axelix/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
                         EndpointInvocationException.class,
                         instanceId);
@@ -494,7 +494,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/modify/cron-expression",
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
                         Void.class,
                         instanceId);
@@ -513,7 +513,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/modify/cron-expression",
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
                         Void.class,
                         instanceId);
@@ -535,7 +535,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/modify/interval",
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
                         Void.class,
                         instanceId);
@@ -554,7 +554,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/modify/interval",
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
                         Void.class,
                         instanceId);
@@ -576,7 +576,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/modify/interval",
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
                         Void.class,
                         instanceId);
@@ -595,7 +595,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/modify/interval",
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
                         Void.class,
                         instanceId);
@@ -610,7 +610,7 @@ public class ScheduledTasksApiTest {
         // when.
         ResponseEntity<?> response = scenario.getModifier()
                 .apply(restTemplate)
-                .getForEntity("/api/axelix/scheduled-tasks/{instanceId}", Void.class, activeInstanceId);
+                .getForEntity("/axelix/api/external/scheduled-tasks/{instanceId}", Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -626,7 +626,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/enable", requestBody, Void.class, activeInstanceId);
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/enable", requestBody, Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -642,7 +642,7 @@ public class ScheduledTasksApiTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/api/axelix/scheduled-tasks/{instanceId}/disable", requestBody, Void.class, activeInstanceId);
+                        "/axelix/api/external/scheduled-tasks/{instanceId}/disable", requestBody, Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

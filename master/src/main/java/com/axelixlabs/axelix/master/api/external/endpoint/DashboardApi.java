@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
@@ -38,7 +38,7 @@ import com.axelixlabs.axelix.master.service.DashboardService;
  * @author Mikhail Polivakha
  */
 @Tag(name = "Dashboard API", description = "API for rendering the dashboard")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.DashboardApi.MAIN)
 public class DashboardApi {
 

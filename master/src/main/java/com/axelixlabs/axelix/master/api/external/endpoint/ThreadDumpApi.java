@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Objects;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.links.Link;
@@ -31,7 +32,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
@@ -53,7 +53,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 @Tag(
         name = "Thread Dump API",
         description = "The threaddump endpoint provides access to the thread dump of the application’s JVM.")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.ThreadDumpApi.MAIN)
 public class ThreadDumpApi {
 

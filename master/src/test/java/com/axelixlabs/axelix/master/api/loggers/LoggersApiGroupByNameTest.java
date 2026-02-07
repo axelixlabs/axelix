@@ -147,7 +147,7 @@ public class LoggersApiGroupByNameTest {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/loggers/{instanceId}/group/{groupName}",
+                        "/axelix/api/external/loggers/{instanceId}/group/{groupName}",
                         String.class,
                         activeInstanceId,
                         groupName);
@@ -175,7 +175,7 @@ public class LoggersApiGroupByNameTest {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/loggers/{instanceId}/group/{groupName}",
+                        "/axelix/api/external/loggers/{instanceId}/group/{groupName}",
                         String.class,
                         activeInstanceId,
                         groupName);
@@ -197,7 +197,7 @@ public class LoggersApiGroupByNameTest {
         // when.
         ResponseEntity<?> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/loggers/{instanceId}/group/{groupName}", Void.class, instanceId, groupName);
+                .getForEntity("/axelix/api/external/loggers/{instanceId}/group/{groupName}", Void.class, instanceId, groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -212,7 +212,7 @@ public class LoggersApiGroupByNameTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/loggers/{instanceId}/group/{groupName}",
+                        "/axelix/api/external/loggers/{instanceId}/group/{groupName}",
                         EndpointInvocationException.class,
                         instanceId,
                         groupName);
@@ -230,7 +230,7 @@ public class LoggersApiGroupByNameTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .getForEntity(
-                        "/api/axelix/loggers/{instanceId}/group/{groupName}", Void.class, activeInstanceId, groupName);
+                        "/axelix/api/external/loggers/{instanceId}/group/{groupName}", Void.class, activeInstanceId, groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

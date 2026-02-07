@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Set;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +28,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
@@ -43,7 +43,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * @author Mikhail Polivakha
  */
 @Tag(name = "Wallboard API", description = "The endpoints related to wallboard grid rendering")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.InstancesApi.MAIN)
 public class WallboardApi {
 

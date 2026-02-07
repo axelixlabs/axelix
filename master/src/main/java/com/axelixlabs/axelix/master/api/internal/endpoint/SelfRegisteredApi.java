@@ -17,6 +17,12 @@
  */
 package com.axelixlabs.axelix.master.api.internal.endpoint;
 
+import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.master.api.internal.ApiPaths;
+import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.service.InstanceFactory;
+import com.axelixlabs.axelix.master.service.InstanceRegistrar;
 import io.swagger.v3.oas.annotations.Hidden;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,13 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
-import com.axelixlabs.axelix.master.api.internal.InternalApiPaths;
-import com.axelixlabs.axelix.master.domain.Instance;
-import com.axelixlabs.axelix.master.service.InstanceFactory;
-import com.axelixlabs.axelix.master.service.InstanceRegistrar;
 
 /**
  * The API used for service self-registration.
@@ -38,8 +37,8 @@ import com.axelixlabs.axelix.master.service.InstanceRegistrar;
  * @author Sergey Cherkasov
  */
 @Hidden
-@RestController
-@RequestMapping(path = InternalApiPaths.SelfRegistryApi.MAIN)
+@InternalApiRestController
+@RequestMapping(path = ApiPaths.SelfRegistryApi.MAIN)
 @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "auto", havingValue = "false")
 public class SelfRegisteredApi {
 
@@ -51,7 +50,7 @@ public class SelfRegisteredApi {
         this.instanceFactory = instanceFactory;
     }
 
-    @PostMapping(path = InternalApiPaths.SelfRegistryApi.SERVICE_REGISTER)
+    @PostMapping(path = ApiPaths.SelfRegistryApi.SERVICE_REGISTER)
     public ResponseEntity<Void> registryServiceInstance(@RequestBody SelfRegistrationMetadata request) {
 
         Instance instance = instanceFactory.createInstance(

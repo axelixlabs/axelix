@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 import java.util.Map;
 import java.util.Objects;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -33,7 +34,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
@@ -55,7 +55,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @author Sergey Cherkasov
  */
 @Tag(name = "Caches API", description = "The caches endpoint provides access to the application’s caches.")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.CachesApi.MAIN)
 public class CachesReadApi {
 

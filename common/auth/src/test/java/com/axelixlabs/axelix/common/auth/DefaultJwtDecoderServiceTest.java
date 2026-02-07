@@ -28,7 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.DecodedUser;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -88,8 +88,8 @@ class DefaultJwtDecoderServiceTest {
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(userRole.getAuthorities()).containsAll(Set.of(DefaultAuthority.ENV, DefaultAuthority.INFO));
-        assertThat(engineerRole.getAuthorities()).containsAll(Set.of(DefaultAuthority.BEANS, DefaultAuthority.HEALTH));
+        assertThat(userRole.getAuthorities()).containsAll(Set.of(ExternalAuthority.ENV, ExternalAuthority.INFO));
+        assertThat(engineerRole.getAuthorities()).containsAll(Set.of(ExternalAuthority.BEANS, ExternalAuthority.HEALTH));
     }
 
     @Test
@@ -108,24 +108,24 @@ class DefaultJwtDecoderServiceTest {
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(adminRole.getAuthorities()).contains(DefaultAuthority.PROFILE_MANAGEMENT);
+        assertThat(adminRole.getAuthorities()).contains(ExternalAuthority.PROFILE_MANAGEMENT);
 
         Role engineerRole = adminRole.getComponents().iterator().next();
 
         assertThat(engineerRole.getName()).isEqualTo("ROLE_ENGINEER");
-        assertThat(engineerRole.getAuthorities()).isEqualTo(Set.of(DefaultAuthority.ENV));
+        assertThat(engineerRole.getAuthorities()).isEqualTo(Set.of(ExternalAuthority.ENV));
 
         Role userRole = engineerRole.getComponents().iterator().next();
 
         assertThat(userRole.getName()).isEqualTo("ROLE_USER");
-        assertThat(userRole.getAuthorities()).isEqualTo(Set.of(DefaultAuthority.INFO));
+        assertThat(userRole.getAuthorities()).isEqualTo(Set.of(ExternalAuthority.INFO));
 
         Role readRole = rootRole.getComponents().stream()
                 .filter(role -> role.getName().equals("ROLE_READ"))
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(readRole.getAuthorities()).contains(DefaultAuthority.BEANS);
+        assertThat(readRole.getAuthorities()).contains(ExternalAuthority.BEANS);
     }
 
     @Test
@@ -134,7 +134,7 @@ class DefaultJwtDecoderServiceTest {
         JwtDecoderService decoder256 = new DefaultJwtDecoderService(JwtAlgorithm.HMAC256, key256);
 
         DecodedUser expectedUser = new DecodedUser(
-                "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(DefaultAuthority.MAPPINGS), Set.of())));
+                "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(ExternalAuthority.MAPPINGS), Set.of())));
 
         DecodedUser decodedUser = decoder256.decodeTokenToUser(tokenWithHs256Algorithm);
 
@@ -148,7 +148,7 @@ class DefaultJwtDecoderServiceTest {
         JwtDecoderService decoder384 = new DefaultJwtDecoderService(JwtAlgorithm.HMAC384, key384);
 
         DecodedUser expectedUser = new DecodedUser(
-                "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(DefaultAuthority.BEANS), Set.of())));
+                "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(ExternalAuthority.BEANS), Set.of())));
 
         DecodedUser decodedUser = decoder384.decodeTokenToUser(tokenWithHs384Algorithm);
 
@@ -161,7 +161,7 @@ class DefaultJwtDecoderServiceTest {
 
         assertThat(decodedUser.getRoles())
                 .first()
-                .satisfies(role -> assertThat(role.getAuthorities()).hasSize(1).containsOnly(DefaultAuthority.ENV));
+                .satisfies(role -> assertThat(role.getAuthorities()).hasSize(1).containsOnly(ExternalAuthority.ENV));
     }
 
     @Test

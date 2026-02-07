@@ -74,7 +74,7 @@ class UserApiTest {
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
         ResponseEntity<String> response =
-                restTemplate.exchange("/api/axelix/users/login", HttpMethod.POST, request, String.class);
+                restTemplate.exchange("/axelix/api/external/users/login", HttpMethod.POST, request, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -98,7 +98,7 @@ class UserApiTest {
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
         ResponseEntity<String> response =
-                restTemplate.exchange("/api/axelix/users/login", HttpMethod.POST, request, String.class);
+                restTemplate.exchange("/axelix/api/external/users/login", HttpMethod.POST, request, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
@@ -117,7 +117,7 @@ class UserApiTest {
         HttpEntity<Void> logoutEntity = new HttpEntity<>(headers);
 
         ResponseEntity<String> logoutResponse =
-                restTemplate.exchange("/api/axelix/users/logout", HttpMethod.POST, logoutEntity, String.class);
+                restTemplate.exchange("/axelix/api/external/users/logout", HttpMethod.POST, logoutEntity, String.class);
 
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -134,7 +134,7 @@ class UserApiTest {
         HttpEntity<Void> logoutEntity = new HttpEntity<>(headers);
 
         ResponseEntity<String> logoutResponse =
-                restTemplate.exchange("/api/axelix/users/logout", HttpMethod.POST, logoutEntity, String.class);
+                restTemplate.exchange("/axelix/api/external/users/logout", HttpMethod.POST, logoutEntity, String.class);
 
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }

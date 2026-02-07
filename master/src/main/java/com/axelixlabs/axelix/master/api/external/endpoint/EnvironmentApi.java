@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Objects;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.links.Link;
@@ -30,7 +31,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
@@ -52,7 +52,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 @Tag(
         name = "Environment API",
         description = "The env endpoint provides information about the application’s Environment.")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.EnvironmentApi.MAIN)
 public class EnvironmentApi {
 

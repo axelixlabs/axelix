@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.api;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -206,7 +207,7 @@ class TransactionMonitoringApiTest {
     void shouldReturnJSONTransactionsMonitoringFeed() throws InterruptedException {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/transaction-monitoring/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/axelix/api/external/transaction-monitoring/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -225,9 +226,9 @@ class TransactionMonitoringApiTest {
     void shouldClearTransactionsMonitoringStats() throws InterruptedException {
         restTemplate
                 .withoutAuthorities()
-                .delete("/api/axelix/transaction-monitoring/{instanceId}", Map.of("instanceId", activeInstanceId));
+                .delete("/axelix/api/external/transaction-monitoring/{instanceId}", Map.of("instanceId", activeInstanceId));
 
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        RecordedRequest recordedRequest = mockWebServer.takeRequest(10l, TimeUnit.SECONDS);
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
         assertThat(recordedRequest.getPath())
                 .isEqualTo("/" + activeInstanceId + "/actuator/axelix-transactions-monitoring");

@@ -59,9 +59,9 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         // TODO:
         //  Here, the login endpoint URL is hardcoded, which is not really a good thing to be doing
         return Set.of(
-                        "/api/axelix/users/login",
-                        "/api/axelix/actuator/health/readiness",
-                        "/api/axelix/actuator/health/liveness")
+                        "/axelix/api/external/users/login",
+                        "/axelix/api/actuator/health/readiness",
+                        "/axelix/api/actuator/health/liveness")
                 .contains(request.getRequestURI());
     }
 

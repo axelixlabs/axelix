@@ -31,7 +31,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -130,7 +130,7 @@ public class JdbcUserProvider implements UserProvider {
             RoleBuilder rb =
                     roleBuilders.computeIfAbsent(roleId, id -> new RoleBuilder(roleId, roleName, parentRoleId));
 
-            DefaultAuthority authority = safeAuthoritiesFromString(authorityName);
+            ExternalAuthority authority = safeAuthoritiesFromString(authorityName);
             if (authority != null) {
                 rb.authorities.add(authority);
             }
@@ -187,9 +187,9 @@ public class JdbcUserProvider implements UserProvider {
     }
 
     @SuppressWarnings("NullAway")
-    private DefaultAuthority safeAuthoritiesFromString(String name) {
+    private ExternalAuthority safeAuthoritiesFromString(String name) {
         try {
-            return DefaultAuthority.valueOf(name);
+            return ExternalAuthority.valueOf(name);
         } catch (IllegalArgumentException ignored) {
             return null;
         }

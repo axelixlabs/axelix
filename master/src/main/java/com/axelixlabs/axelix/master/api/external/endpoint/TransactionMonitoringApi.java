@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
@@ -36,7 +36,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @since 20.01.2026
  * @author Nikita Kirillov
  */
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.TransactionMonitoringApi.MAIN)
 public class TransactionMonitoringApi {
 

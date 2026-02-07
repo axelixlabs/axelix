@@ -327,7 +327,7 @@ public class ConfigPropsApiFeedTest {
         // when.
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/configprops/feed/{instanceId}", String.class, activeInstanceId);
+                .getForEntity("/axelix/api/external/configprops/feed/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -346,7 +346,7 @@ public class ConfigPropsApiFeedTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                        "/axelix/api/external/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -360,7 +360,7 @@ public class ConfigPropsApiFeedTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                        "/axelix/api/external/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -372,7 +372,7 @@ public class ConfigPropsApiFeedTest {
         // when.
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
-                .getForEntity("/api/axelix/configprops/feed/{instanceId}", Void.class, activeInstanceId);
+                .getForEntity("/axelix/api/external/configprops/feed/{instanceId}", Void.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);

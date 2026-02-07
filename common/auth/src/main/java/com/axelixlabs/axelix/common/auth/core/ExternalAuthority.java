@@ -18,7 +18,7 @@
 package com.axelixlabs.axelix.common.auth.core;
 
 /**
- * Enumeration of authorities required for accessing specific Actuator endpoints.
+ * Enumeration of authorities required for accessing specific front-end endpoints.
  *
  * <p>Each authority corresponds to a single Spring Boot Actuator endpoint or a custom extension.</p>
  *
@@ -27,13 +27,8 @@ package com.axelixlabs.axelix.common.auth.core;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-// TODO:
-//  Well, conceptually, it becomes more and more clear that the authorities on the master
-//  are going to diverge the authorities on the starter side. The problem is that each
-//  individual API on the master side is going to be backed by either 0, 1 or N APIs on
-//  the starter, so there is no 1:1 mapping. So, the authority on the "master" side
-//  will be probably be translated, colloquially, to 0, 1 or N authorities on the starter side.
-public enum DefaultAuthority implements Authority {
+// TODO: Move this class to Master
+public enum ExternalAuthority implements Authority {
 
     /**
      * Grants access to actuator cache control operations.

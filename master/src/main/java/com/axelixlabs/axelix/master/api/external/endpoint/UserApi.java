@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import jakarta.servlet.http.HttpServletRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
@@ -49,7 +49,7 @@ import com.axelixlabs.axelix.master.service.auth.UserLoginService;
  * @author Nikita Kirillov
  */
 @Tag(name = "API for working with Users", description = "The endpoints for user login and authentication")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.UsersApi.MAIN)
 public class UserApi {
 

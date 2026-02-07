@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,7 +32,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
@@ -51,7 +51,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @author Nikita Kirillov
  */
 @Tag(name = "GC Log File API", description = "API for managing GC logging and retrieving GC logs")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.GcLogFileApi.MAIN)
 public class GcLogFileApi {
 

@@ -7,7 +7,7 @@ spring:
     name: axelix
   mvc:
     servlet:
-      path: /api/${spring.application.name}
+      path: /${spring.application.name}
 
 management:
   endpoint:

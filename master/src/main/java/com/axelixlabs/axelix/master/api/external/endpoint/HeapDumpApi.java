@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -33,7 +34,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
@@ -49,7 +49,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @since 12.11.2025
  * @author Nikita Kirillov
  */
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.HeapDumpApi.MAIN)
 public class HeapDumpApi {
 

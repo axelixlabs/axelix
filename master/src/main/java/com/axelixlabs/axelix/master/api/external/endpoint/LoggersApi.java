@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -35,7 +36,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
 import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
@@ -65,7 +65,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
         name = "Loggers API",
         description =
                 "The loggers endpoint provides access to the application’s loggers and the configuration of their levels.")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.LoggersApi.MAIN)
 public class LoggersApi {
 

@@ -147,7 +147,7 @@ class ProfileManagementApiTest {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/profile-management/{instanceId}",
+                        "/axelix/api/external/profile-management/{instanceId}",
                         defaultEntity(request),
                         String.class,
                         activeInstanceId);
@@ -174,7 +174,7 @@ class ProfileManagementApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/profile-management/{instanceId}",
+                        "/axelix/api/external/profile-management/{instanceId}",
                         defaultEntity(request),
                         EndpointInvocationException.class,
                         instanceId);
@@ -192,7 +192,7 @@ class ProfileManagementApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/profile-management/{instanceId}",
+                        "/axelix/api/external/profile-management/{instanceId}",
                         request,
                         EndpointInvocationException.class,
                         instanceId);
@@ -210,7 +210,7 @@ class ProfileManagementApiTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .postForEntity(
-                        "/api/axelix/profile-management/{instanceId}",
+                        "/axelix/api/external/profile-management/{instanceId}",
                         defaultEntity(request),
                         Void.class,
                         activeInstanceId);

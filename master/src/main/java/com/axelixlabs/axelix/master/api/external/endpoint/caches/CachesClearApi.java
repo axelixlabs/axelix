@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 
 import java.util.Map;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -32,7 +33,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
@@ -50,7 +50,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @author Mikhail Polivakha
  */
 @Tag(name = "Caches API", description = "The caches endpoint provides access to the application’s caches.")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.CachesApi.MAIN)
 public class CachesClearApi {
 

@@ -232,7 +232,7 @@ public class CachesReadApiTest {
         // when
         ResponseEntity<CachesResponse> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/caches/{instanceId}", CachesResponse.class, activeInstanceId);
+                .getForEntity("/axelix/api/external/caches/{instanceId}", CachesResponse.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -260,7 +260,7 @@ public class CachesReadApiTest {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=" + requestedCacheManagerName,
+                        "/axelix/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=" + requestedCacheManagerName,
                         String.class,
                         activeInstanceId,
                         requestedCacheName);
@@ -283,7 +283,7 @@ public class CachesReadApiTest {
         // when
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/caches/{instanceId}", String.class, activeInstanceIdEmptyCaches);
+                .getForEntity("/axelix/api/external/caches/{instanceId}", String.class, activeInstanceIdEmptyCaches);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -300,7 +300,7 @@ public class CachesReadApiTest {
         // when.
         ResponseEntity<?> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/caches/{instanceId}", Void.class, instanceId);
+                .getForEntity("/axelix/api/external/caches/{instanceId}", Void.class, instanceId);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -313,7 +313,7 @@ public class CachesReadApiTest {
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/caches/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/axelix/api/external/caches/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -330,7 +330,7 @@ public class CachesReadApiTest {
         ResponseEntity<?> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
+                        "/axelix/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
                         Void.class,
                         instanceId,
                         cacheName);
@@ -348,7 +348,7 @@ public class CachesReadApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
+                        "/axelix/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
                         EndpointInvocationException.class,
                         instanceId,
                         cacheName);
@@ -363,7 +363,7 @@ public class CachesReadApiTest {
 
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
-                .getForEntity("/api/axelix/caches/{instanceId}", Void.class, activeInstanceId);
+                .getForEntity("/axelix/api/external/caches/{instanceId}", Void.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
@@ -376,7 +376,7 @@ public class CachesReadApiTest {
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
                 .getForEntity(
-                        "/api/axelix/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
+                        "/axelix/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
                         Void.class,
                         activeInstanceId,
                         cacheName);

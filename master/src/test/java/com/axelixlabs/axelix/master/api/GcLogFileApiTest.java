@@ -149,7 +149,7 @@ class GcLogFileApiTest {
     void shouldReturnGcLogFileAsPlainText() {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/garbage-collector/logs/{instanceId}/file", String.class, activeInstanceId);
+                .getForEntity("/axelix/api/external/garbage-collector/logs/{instanceId}/file", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
@@ -160,7 +160,7 @@ class GcLogFileApiTest {
     void shouldReturnStatusGcLogging() {
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/axelix/garbage-collector/logs/{instanceId}/status", String.class, activeInstanceId);
+                .getForEntity("/axelix/api/external/garbage-collector/logs/{instanceId}/status", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -172,7 +172,7 @@ class GcLogFileApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/garbage-collector/{instanceId}/trigger",
+                        "/axelix/api/external/garbage-collector/{instanceId}/trigger",
                         HttpEntity.EMPTY,
                         Void.class,
                         activeInstanceId);
@@ -186,7 +186,7 @@ class GcLogFileApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/garbage-collector/logs/{instanceId}/enable",
+                        "/axelix/api/external/garbage-collector/logs/{instanceId}/enable",
                         requestBody,
                         Void.class,
                         activeInstanceId);
@@ -199,7 +199,7 @@ class GcLogFileApiTest {
         ResponseEntity<Void> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/axelix/garbage-collector/logs/{instanceId}/disable",
+                        "/axelix/api/external/garbage-collector/logs/{instanceId}/disable",
                         HttpEntity.EMPTY,
                         Void.class,
                         activeInstanceId);
@@ -217,7 +217,7 @@ class GcLogFileApiTest {
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/garbage-collector/logs/{instanceId}/file",
+                        "/axelix/api/external/garbage-collector/logs/{instanceId}/file",
                         EndpointInvocationException.class,
                         instanceId);
 
@@ -231,7 +231,7 @@ class GcLogFileApiTest {
         ResponseEntity<InstanceNotFoundException> response = restTemplate
                 .withoutAuthorities()
                 .getForEntity(
-                        "/api/axelix/garbage-collector/logs/{instanceId}/file",
+                        "/axelix/api/external/garbage-collector/logs/{instanceId}/file",
                         InstanceNotFoundException.class,
                         instanceId);
 

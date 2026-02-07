@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DecodedUser;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -115,9 +115,9 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
     }
 
     @Nullable
-    private DefaultAuthority safeAuthoritiesFromString(String name) {
+    private ExternalAuthority safeAuthoritiesFromString(String name) {
         try {
-            return DefaultAuthority.valueOf(name);
+            return ExternalAuthority.valueOf(name);
         } catch (IllegalArgumentException ignored) {
             return null;
         }

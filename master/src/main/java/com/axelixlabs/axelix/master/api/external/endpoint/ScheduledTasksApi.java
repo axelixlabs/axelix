@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Objects;
 
+import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,7 +34,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
@@ -60,7 +60,7 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 @Tag(
         name = "ScheduledTasks API",
         description = "The scheduled-tasks endpoint provides information about the application’s scheduled tasks.")
-@RestController
+@ExternalApiRestController
 @RequestMapping(path = ApiPaths.ScheduledTasksApi.MAIN)
 public class ScheduledTasksApi {
 
