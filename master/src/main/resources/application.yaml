@@ -6,12 +6,14 @@ spring:
   application:
     name: axelix
 
+
 management:
   endpoint:
     health:
       enabled: true
   endpoints:
     web:
+      base-path: /api/actuator
       exposure:
         include: [ "health" ]
 axelix:

@@ -4,6 +4,16 @@ spring:
   config:
     import: "classpath:tokens.yml"
 
+management:
+  endpoint:
+    health:
+      enabled: true
+  endpoints:
+    web:
+      base-path: /api/actuator
+      exposure:
+        include: [ "health" ]
+
 axelix:
   config:
     auth:
