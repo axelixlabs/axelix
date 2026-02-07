@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.autoconfiguration.auth;
 
 import java.io.IOException;
-import java.util.Set;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -54,15 +53,15 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         this.authCookieName = authCookieName;
     }
 
-    private static final Set<String> PERMIT_WITHOUT_AUTH =
-            Set.of("/api/external/users/login", "/api/actuator/health/readiness", "/api/actuator/health/liveness");
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
 
         // Static content (/, /index.html, /assets/*, etc.) is served at root and does not require auth
-        return !path.startsWith("/api/") || PERMIT_WITHOUT_AUTH.contains(path);
+        // as well as actuator health endpoints
+        return !path.startsWith("/api/")
+                || path.startsWith("/api/actuator/health")
+                || path.equalsIgnoreCase("/api/external/users/login");
     }
 
     @Override
