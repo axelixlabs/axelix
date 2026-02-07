@@ -21,7 +21,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.api.HeapDumpApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.HeapDumpApi;
 import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.HeapDumpStateComponentSettings;

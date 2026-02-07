@@ -27,7 +27,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.info.components.SSLInfo;
-import com.axelixlabs.axelix.master.api.response.info.components.SSLProfile;
+import com.axelixlabs.axelix.master.api.external.response.info.components.SSLProfile;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 
 /**

@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.service.export.collect;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.api.GcLogFileApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.GcLogFileApi;
 import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.GcLogFileStateComponentSettings;

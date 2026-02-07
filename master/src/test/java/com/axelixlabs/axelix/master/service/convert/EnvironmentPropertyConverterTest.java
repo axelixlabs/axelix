@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentProperty;
 import com.axelixlabs.axelix.common.api.env.PropertyValue;
-import com.axelixlabs.axelix.master.api.response.EnvironmentPropertyResponse;
+import com.axelixlabs.axelix.master.api.external.response.EnvironmentPropertyResponse;
 import com.axelixlabs.axelix.master.service.convert.response.environment.EnvironmentPropertyConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

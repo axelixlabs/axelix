@@ -25,8 +25,8 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.stereotype.Service;
 
-import com.axelixlabs.axelix.master.api.response.InstancesGridResponse.InstanceShortProfile;
-import com.axelixlabs.axelix.master.api.response.InstancesGridResponse.InstanceStatus;
+import com.axelixlabs.axelix.master.api.external.response.InstancesGridResponse.InstanceShortProfile;
+import com.axelixlabs.axelix.master.api.external.response.InstancesGridResponse.InstanceStatus;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.convert.utils.DateTimeFormattingUtils;
 

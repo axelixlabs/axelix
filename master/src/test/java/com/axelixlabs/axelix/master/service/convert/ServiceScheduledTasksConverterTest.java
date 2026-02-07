@@ -22,7 +22,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
-import com.axelixlabs.axelix.master.api.response.ScheduledTasksResponse;
+import com.axelixlabs.axelix.master.api.external.response.ScheduledTasksResponse;
 import com.axelixlabs.axelix.master.service.convert.response.ServiceScheduledTasksConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

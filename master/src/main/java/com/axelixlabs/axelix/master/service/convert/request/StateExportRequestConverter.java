@@ -21,8 +21,8 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.api.request.state.StateComponentSettings;
-import com.axelixlabs.axelix.master.api.request.state.StateExportRequest;
+import com.axelixlabs.axelix.master.api.external.request.state.StateComponentSettings;
+import com.axelixlabs.axelix.master.api.external.request.state.StateExportRequest;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.export.StateExport;
 import com.axelixlabs.axelix.master.service.export.settings.BeansStateComponentSettings;
@@ -54,7 +54,7 @@ public class StateExportRequestConverter implements Converter<StateExportRequest
         return switch (it.getComponent()) {
             case HEAP_DUMP ->
                 new HeapDumpStateComponentSettings(
-                        ((com.axelixlabs.axelix.master.api.request.state.HeapDumpStateComponentSettings) it)
+                        ((com.axelixlabs.axelix.master.api.external.request.state.HeapDumpStateComponentSettings) it)
                                 .sanitized());
             case THREAD_DUMP -> new ThreadDumpStateComponentSettings();
             case BEANS -> new BeansStateComponentSettings();

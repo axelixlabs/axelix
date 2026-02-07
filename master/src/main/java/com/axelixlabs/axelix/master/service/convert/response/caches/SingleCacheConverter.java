@@ -22,7 +22,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
-import com.axelixlabs.axelix.master.api.response.caches.CacheProfileResponse;
+import com.axelixlabs.axelix.master.api.external.response.caches.CacheProfileResponse;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 
 /**

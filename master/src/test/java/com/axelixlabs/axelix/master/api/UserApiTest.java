@@ -32,7 +32,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.axelixlabs.axelix.master.api.request.LoginRequest;
+import com.axelixlabs.axelix.master.api.external.endpoint.UserApi;
+import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.JwtProperties;
 

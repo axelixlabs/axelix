@@ -26,9 +26,9 @@ import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.api.BeansFeed.BeanDependency;
-import com.axelixlabs.axelix.master.api.response.BeanShortProfile;
-import com.axelixlabs.axelix.master.api.response.BeanShortProfile.BeanDependencyProfile;
-import com.axelixlabs.axelix.master.api.response.BeansFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile;
+import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile.BeanDependencyProfile;
+import com.axelixlabs.axelix.master.api.external.response.BeansFeedResponse;
 import com.axelixlabs.axelix.master.service.convert.response.BeansFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

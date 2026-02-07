@@ -23,7 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
-import com.axelixlabs.axelix.master.api.response.metrics.MetricsGroupsFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.metrics.MetricsGroupsFeedResponse;
 import com.axelixlabs.axelix.master.service.convert.response.metrics.MetricsGroupsFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

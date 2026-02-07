@@ -26,11 +26,11 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.ConditionsFeed;
-import com.axelixlabs.axelix.master.api.response.ConditionsFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.ConditionsFeedResponse;
 
-import static com.axelixlabs.axelix.master.api.response.ConditionsFeedResponse.ConditionMatch;
-import static com.axelixlabs.axelix.master.api.response.ConditionsFeedResponse.NegativeCondition;
-import static com.axelixlabs.axelix.master.api.response.ConditionsFeedResponse.PositiveCondition;
+import static com.axelixlabs.axelix.master.api.external.response.ConditionsFeedResponse.ConditionMatch;
+import static com.axelixlabs.axelix.master.api.external.response.ConditionsFeedResponse.NegativeCondition;
+import static com.axelixlabs.axelix.master.api.external.response.ConditionsFeedResponse.PositiveCondition;
 
 /**
  * The {@link Converter} from {@link ConditionsFeed} to {@link ConditionsFeedResponse}.

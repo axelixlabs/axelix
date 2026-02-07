@@ -26,7 +26,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
-import com.axelixlabs.axelix.master.api.response.ScheduledTasksResponse;
+import com.axelixlabs.axelix.master.api.external.response.ScheduledTasksResponse;
 
 /**
  * The {@link Converter} from {@link ServiceScheduledTasks} to {@link ScheduledTasksResponse}.

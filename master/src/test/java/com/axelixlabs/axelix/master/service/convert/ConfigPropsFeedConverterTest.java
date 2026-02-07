@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
-import com.axelixlabs.axelix.master.api.response.ConfigPropsFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.ConfigPropsFeedResponse;
 import com.axelixlabs.axelix.master.service.convert.response.ConfigPropsFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

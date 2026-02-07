@@ -24,8 +24,8 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
-import com.axelixlabs.axelix.master.api.response.metrics.MetricsGroupsFeedResponse;
-import com.axelixlabs.axelix.master.api.response.metrics.MetricsGroupsFeedResponse.MetricsGroup;
+import com.axelixlabs.axelix.master.api.external.response.metrics.MetricsGroupsFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.metrics.MetricsGroupsFeedResponse.MetricsGroup;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 
 /**

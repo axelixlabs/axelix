@@ -27,8 +27,8 @@ import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionType;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Property;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
-import com.axelixlabs.axelix.master.api.response.EnvironmentFeedResponse;
-import com.axelixlabs.axelix.master.api.response.EnvironmentFeedResponse.PropertySourceShortProfile;
+import com.axelixlabs.axelix.master.api.external.response.EnvironmentFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.EnvironmentFeedResponse.PropertySourceShortProfile;
 import com.axelixlabs.axelix.master.service.convert.response.environment.EnvironmentFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

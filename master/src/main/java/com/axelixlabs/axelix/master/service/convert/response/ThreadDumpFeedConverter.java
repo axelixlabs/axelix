@@ -27,12 +27,12 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
-import com.axelixlabs.axelix.master.api.response.ThreadDumpFeedResponse;
-import com.axelixlabs.axelix.master.api.response.ThreadDumpFeedResponse.LockInfo;
-import com.axelixlabs.axelix.master.api.response.ThreadDumpFeedResponse.MonitorInfo;
-import com.axelixlabs.axelix.master.api.response.ThreadDumpFeedResponse.StackTraceElement;
-import com.axelixlabs.axelix.master.api.response.ThreadDumpFeedResponse.State;
-import com.axelixlabs.axelix.master.api.response.ThreadDumpFeedResponse.ThreadInfo;
+import com.axelixlabs.axelix.master.api.external.response.ThreadDumpFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.ThreadDumpFeedResponse.LockInfo;
+import com.axelixlabs.axelix.master.api.external.response.ThreadDumpFeedResponse.MonitorInfo;
+import com.axelixlabs.axelix.master.api.external.response.ThreadDumpFeedResponse.StackTraceElement;
+import com.axelixlabs.axelix.master.api.external.response.ThreadDumpFeedResponse.State;
+import com.axelixlabs.axelix.master.api.external.response.ThreadDumpFeedResponse.ThreadInfo;
 
 /**
  * The {@link Converter} from {@link ThreadDumpFeed} to {@link ThreadDumpFeedResponse}.

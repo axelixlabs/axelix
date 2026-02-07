@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.service.convert.loggers;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
-import com.axelixlabs.axelix.master.api.response.loggers.LoggerProfileResponse;
+import com.axelixlabs.axelix.master.api.external.response.loggers.LoggerProfileResponse;
 import com.axelixlabs.axelix.master.service.convert.response.loggers.LoggerLevelsConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -27,15 +27,15 @@ import org.springframework.stereotype.Service;
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.api.BeansFeed.BeanDependency;
 import com.axelixlabs.axelix.common.utils.BeanNameUtils;
-import com.axelixlabs.axelix.master.api.response.BeanShortProfile;
-import com.axelixlabs.axelix.master.api.response.BeanShortProfile.BeanDependencyProfile;
-import com.axelixlabs.axelix.master.api.response.BeanShortProfile.BeanMethod;
-import com.axelixlabs.axelix.master.api.response.BeanShortProfile.BeanSource;
-import com.axelixlabs.axelix.master.api.response.BeanShortProfile.ComponentVariant;
-import com.axelixlabs.axelix.master.api.response.BeanShortProfile.FactoryBean;
-import com.axelixlabs.axelix.master.api.response.BeanShortProfile.ProxyType;
-import com.axelixlabs.axelix.master.api.response.BeanShortProfile.UnknownBean;
-import com.axelixlabs.axelix.master.api.response.BeansFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile;
+import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile.BeanDependencyProfile;
+import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile.BeanMethod;
+import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile.BeanSource;
+import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile.ComponentVariant;
+import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile.FactoryBean;
+import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile.ProxyType;
+import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile.UnknownBean;
+import com.axelixlabs.axelix.master.api.external.response.BeansFeedResponse;
 
 /**
  * The {@link Converter} from {@link BeansFeed} to {@link BeansFeedResponse}.

@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.service.convert.caches;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
-import com.axelixlabs.axelix.master.api.response.caches.CacheProfileResponse;
+import com.axelixlabs.axelix.master.api.external.response.caches.CacheProfileResponse;
 import com.axelixlabs.axelix.master.service.convert.response.caches.SingleCacheConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

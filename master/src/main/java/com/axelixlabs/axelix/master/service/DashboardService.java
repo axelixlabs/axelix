@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service;
 
-import com.axelixlabs.axelix.master.api.response.DashboardResponse;
+import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
 
 /**
  * Service that collects information necessary for dashboard rendering.

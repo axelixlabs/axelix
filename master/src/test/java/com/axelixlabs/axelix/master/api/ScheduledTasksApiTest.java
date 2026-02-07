@@ -48,6 +48,7 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteReques
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
+import com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;

@@ -22,7 +22,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
-import com.axelixlabs.axelix.master.api.response.loggers.GroupProfileResponse;
+import com.axelixlabs.axelix.master.api.external.response.loggers.GroupProfileResponse;
 import com.axelixlabs.axelix.master.service.convert.response.loggers.LoggerGroupConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

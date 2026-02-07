@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.api.ConditionsApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.ConditionsApi;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.ConditionsStateComponentSettings;
 

@@ -41,7 +41,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
-import com.axelixlabs.axelix.master.api.response.caches.CachesResponse;
+import com.axelixlabs.axelix.master.api.external.endpoint.caches.CachesReadApi;
+import com.axelixlabs.axelix.master.api.external.response.caches.CachesResponse;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;

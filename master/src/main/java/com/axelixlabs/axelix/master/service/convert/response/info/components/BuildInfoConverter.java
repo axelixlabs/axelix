@@ -22,7 +22,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.info.components.BuildInfo;
-import com.axelixlabs.axelix.master.api.response.info.components.BuildProfile;
+import com.axelixlabs.axelix.master.api.external.response.info.components.BuildProfile;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 
 /**

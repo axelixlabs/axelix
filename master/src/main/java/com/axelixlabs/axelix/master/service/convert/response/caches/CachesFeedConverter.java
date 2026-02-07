@@ -24,9 +24,9 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
-import com.axelixlabs.axelix.master.api.response.caches.CachesResponse;
-import com.axelixlabs.axelix.master.api.response.caches.CachesResponse.CacheManagers;
-import com.axelixlabs.axelix.master.api.response.caches.CachesResponse.Caches;
+import com.axelixlabs.axelix.master.api.external.response.caches.CachesResponse;
+import com.axelixlabs.axelix.master.api.external.response.caches.CachesResponse.CacheManagers;
+import com.axelixlabs.axelix.master.api.external.response.caches.CachesResponse.Caches;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 
 /**

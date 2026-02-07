@@ -22,8 +22,8 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
-import com.axelixlabs.axelix.master.api.response.ConfigPropsFeedResponse;
-import com.axelixlabs.axelix.master.api.response.ConfigPropsFeedResponse.ConfigPropsProfile;
+import com.axelixlabs.axelix.master.api.external.response.ConfigPropsFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.ConfigPropsFeedResponse.ConfigPropsProfile;
 
 /**
  * The {@link Converter} from {@link ConfigPropsFeed} to {@link ConfigPropsFeedResponse}.

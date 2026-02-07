@@ -27,11 +27,11 @@ import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
-import com.axelixlabs.axelix.master.api.response.EnvironmentFeedResponse;
-import com.axelixlabs.axelix.master.api.response.EnvironmentFeedResponse.InjectionPoint;
-import com.axelixlabs.axelix.master.api.response.EnvironmentFeedResponse.InjectionType;
-import com.axelixlabs.axelix.master.api.response.EnvironmentFeedResponse.PropertyEntry;
-import com.axelixlabs.axelix.master.api.response.EnvironmentFeedResponse.PropertySourceShortProfile;
+import com.axelixlabs.axelix.master.api.external.response.EnvironmentFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.EnvironmentFeedResponse.InjectionPoint;
+import com.axelixlabs.axelix.master.api.external.response.EnvironmentFeedResponse.InjectionType;
+import com.axelixlabs.axelix.master.api.external.response.EnvironmentFeedResponse.PropertyEntry;
+import com.axelixlabs.axelix.master.api.external.response.EnvironmentFeedResponse.PropertySourceShortProfile;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 
 /**

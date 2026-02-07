@@ -22,7 +22,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
-import com.axelixlabs.axelix.master.api.response.loggers.GroupProfileResponse;
+import com.axelixlabs.axelix.master.api.external.response.loggers.GroupProfileResponse;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 
 /**

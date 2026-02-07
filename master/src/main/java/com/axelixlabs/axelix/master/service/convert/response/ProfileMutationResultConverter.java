@@ -22,7 +22,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.ProfileMutationResult;
-import com.axelixlabs.axelix.master.api.response.ProfileUpdateResponse;
+import com.axelixlabs.axelix.master.api.external.response.ProfileUpdateResponse;
 
 /**
  * The {@link Converter} from {@link ProfileMutationResult} to {@link ProfileUpdateResponse}

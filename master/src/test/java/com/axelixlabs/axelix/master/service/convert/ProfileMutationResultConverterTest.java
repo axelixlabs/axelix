@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.service.convert;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.ProfileMutationResult;
-import com.axelixlabs.axelix.master.api.response.ProfileUpdateResponse;
+import com.axelixlabs.axelix.master.api.external.response.ProfileUpdateResponse;
 import com.axelixlabs.axelix.master.service.convert.response.ProfileMutationResultConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

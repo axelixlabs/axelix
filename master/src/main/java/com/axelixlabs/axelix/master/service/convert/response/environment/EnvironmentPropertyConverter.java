@@ -25,7 +25,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentProperty;
-import com.axelixlabs.axelix.master.api.response.EnvironmentPropertyResponse;
+import com.axelixlabs.axelix.master.api.external.response.EnvironmentPropertyResponse;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 
 /**

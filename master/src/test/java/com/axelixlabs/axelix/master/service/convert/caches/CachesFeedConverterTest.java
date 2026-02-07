@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.Cache;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheManager;
-import com.axelixlabs.axelix.master.api.response.caches.CachesResponse;
+import com.axelixlabs.axelix.master.api.external.response.caches.CachesResponse;
 import com.axelixlabs.axelix.master.service.convert.response.caches.CachesFeedConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -23,7 +23,7 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.api.ConditionsFeed;
-import com.axelixlabs.axelix.master.api.response.ConditionsFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.ConditionsFeedResponse;
 import com.axelixlabs.axelix.master.service.convert.response.BeansFeedConverter;
 import com.axelixlabs.axelix.master.service.convert.response.ConditionFeedConverter;
 
