@@ -109,7 +109,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
 
             return new InstanceIntermediateProfile(serviceInstance, metadata);
         } catch (EndpointInvocationException error) {
-            logger.warn(
+            logger.debug(
                     "Unable to reach the managed service with id : {}. Skipping instance registration",
                     serviceInstance.getInstanceId(),
                     error);
