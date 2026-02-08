@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.api;
 import java.io.IOException;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.resource.PathResourceResolver;
@@ -48,6 +49,7 @@ public final class SpaBundlesPathResourceResolver extends PathResourceResolver {
     }
 
     @Override
+    @Nullable
     protected Resource getResource(@NonNull String resourcePath, Resource location) throws IOException {
 
         Resource relative = location.createRelative(resourcePath);

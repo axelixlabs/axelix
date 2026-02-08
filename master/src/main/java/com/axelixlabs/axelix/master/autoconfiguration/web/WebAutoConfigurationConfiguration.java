@@ -19,10 +19,10 @@ package com.axelixlabs.axelix.master.autoconfiguration.web;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 import org.springframework.web.method.HandlerTypePredicate;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -40,16 +40,24 @@ import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 @AutoConfiguration
 public class WebAutoConfigurationConfiguration {
 
+    @Bean
     @ConfigurationProperties(prefix = "axelix.master.web.static-resources")
     public WebProperties webProperties() {
         return new WebProperties();
     }
 
-    @Configuration
-    static class WebMvcAutoConfiguration implements WebMvcConfigurer {
+    @Bean
+    public WebMvcAutoConfiguration webMvcAutoConfiguration(WebProperties webProperties) {
+        return new WebMvcAutoConfiguration(webProperties);
+    }
 
-        @Autowired
-        private WebProperties webProperties;
+    public static class WebMvcAutoConfiguration implements WebMvcConfigurer {
+
+        private final WebProperties webProperties;
+
+        WebMvcAutoConfiguration(WebProperties webProperties) {
+            this.webProperties = webProperties;
+        }
 
         @Override
         public void configurePathMatch(PathMatchConfigurer configurer) {
@@ -64,6 +72,9 @@ public class WebAutoConfigurationConfiguration {
         @Override
         public void addResourceHandlers(ResourceHandlerRegistry registry) {
             try {
+                // Setting the lowset priority for the static front-end resources ResourceHandler,
+                // so that the pattern /** is inspected at very last.
+                registry.setOrder(Ordered.LOWEST_PRECEDENCE);
                 registry.addResourceHandler("/**")
                         .addResourceLocations(webProperties.getLocation())
                         .resourceChain(true)
