@@ -44,8 +44,6 @@ public final class ApiPaths {
         public static final String MAIN = "/applications";
 
         public static final String GRID = "/grid";
-
-        public static final String SINGLE = "/single/{name}";
     }
 
     public static final class BeansApi {

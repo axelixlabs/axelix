@@ -36,7 +36,7 @@ ENV JAVA_ON_OUT_OF_MEMORY_OPTS="-XX:+CrashOnOutOfMemoryError"
 ENV JAVA_GC_LOG_OPTS="-Xlog:gc*,safepoint:/tmp/gc.log::filecount=10,filesize=100M"
 # Custom Java Properties
 ENV JAVA_OTHER_ARGS="-Dkubernetes.trust.certificates=true \
-                     -Dspring.web.resources.static-locations=file:/application/dist/"
+                     -Daxelix.master.web.static-resources.location=file:/application/dist/"
 
 # TODO: Consider adding AOT Cache
 ENTRYPOINT exec java \

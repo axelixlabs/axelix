@@ -25,6 +25,9 @@ axelix:
         role-authority-table: role_authorities
         role-components-table: role_components
   master:
+    web:
+      static-resources:
+        location: classpath:/spa-dist
     auth:
       jwt:
         algorithm: "HMAC512"

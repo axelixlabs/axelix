@@ -37,6 +37,19 @@ For the front-end, please, inspect the `front-end/packages.json` in order to und
 
 The CI/CD that is used by this project is GitHub Actions. The source code for the GitHub Actions can be found in the `.github` directory.
 
+### Writing Tests
+
+When you're writing tests, please, make sure to follow the principles:
+
+1. Tests must be isolated, meaning, the execution or the outcome of execution of the given single test should NOT affect any other tests.
+2. When writing individual tests, make sure that tests always follow the arrange/act/assert principle, insert the one-liner comments before each section:
+
+- // given.
+- // when.
+- // then.
+
+In a very rare occasions the principles above MAY be violated, but you should always ask before attempting to do so and explain your reasoning. 
+
 ### Overall Behavioral Guidelines
 
 ## 1. Think Before Coding

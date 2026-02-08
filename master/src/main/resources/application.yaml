@@ -6,7 +6,6 @@ spring:
   application:
     name: axelix
 
-
 management:
   endpoint:
     health:
