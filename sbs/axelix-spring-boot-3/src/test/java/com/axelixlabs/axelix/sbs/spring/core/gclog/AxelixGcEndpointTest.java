@@ -43,8 +43,8 @@ import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(GcLogEndpointTest.GcLogEndpointTestConfiguration.class)
-class GcLogEndpointTest {
+@Import(AxelixGcEndpointTest.AxelixGcEndpointTestTestConfiguration.class)
+class AxelixGcEndpointTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -161,7 +161,7 @@ class GcLogEndpointTest {
     }
 
     @TestConfiguration
-    static class GcLogEndpointTestConfiguration {
+    static class AxelixGcEndpointTestTestConfiguration {
 
         @Bean
         public JcmdExecutor jcmdExecutor() {
@@ -174,8 +174,8 @@ class GcLogEndpointTest {
         }
 
         @Bean
-        public GcLogEndpoint gcLogEndpoint(GcLogService gcLogService) {
-            return new GcLogEndpoint(gcLogService);
+        public AxelixGcEndpoint axelixGcEndpoint(GcLogService gcLogService) {
+            return new AxelixGcEndpoint(gcLogService);
         }
     }
 }

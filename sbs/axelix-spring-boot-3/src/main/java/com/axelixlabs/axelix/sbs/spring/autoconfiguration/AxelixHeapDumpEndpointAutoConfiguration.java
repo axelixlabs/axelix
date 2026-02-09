@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ import com.axelixlabs.axelix.sbs.spring.core.heapdump.AxelixHeapDumpEndpoint;
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
+@ConditionalOnAvailableEndpoint(endpoint = AxelixHeapDumpEndpoint.class)
 public class AxelixHeapDumpEndpointAutoConfiguration {
 
     @Bean

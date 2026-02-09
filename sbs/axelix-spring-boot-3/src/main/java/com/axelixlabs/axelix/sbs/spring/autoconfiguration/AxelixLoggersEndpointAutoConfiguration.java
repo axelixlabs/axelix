@@ -18,8 +18,10 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.actuate.autoconfigure.logging.LoggersEndpointAutoConfiguration;
 import org.springframework.boot.actuate.logging.LoggersEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.boot.logging.LoggerGroups;
@@ -33,13 +35,16 @@ import com.axelixlabs.axelix.sbs.spring.core.loggers.AxelixLoggersEndpoint;
  *
  * @author Sergey Cherkasov
  */
-@AutoConfiguration
+@AutoConfiguration(after = LoggersEndpointAutoConfiguration.class)
 public class AxelixLoggersEndpointAutoConfiguration {
 
     /**
      * {@link LoggingSystem} and {@link LoggerGroups} beans are registered dynamically in {@link LoggingApplicationListener}.
      */
     @Bean
+    @ConditionalOnBean(LoggingSystem.class)
+    // TODO: We might need condition here (e.g. package-private OnEnabledLoggingSystemCondition.class in class
+    // LoggersEndpointAutoConfiguration.class),
     @ConditionalOnMissingBean
     public AxelixLoggersEndpoint axelixLoggersEndpoint(
             LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
