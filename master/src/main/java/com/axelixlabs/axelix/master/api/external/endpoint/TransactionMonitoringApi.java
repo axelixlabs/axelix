@@ -17,6 +17,10 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
@@ -46,12 +52,21 @@ public class TransactionMonitoringApi {
         this.endpointInvoker = endpointInvoker;
     }
 
+    @DefaultApiResponse(summary = "Returns transaction statistics for the given instance.")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(type = "string")))
+    @InstanceIdParameter
     @GetMapping(path = ApiPaths.TransactionMonitoringApi.INSTANCE_ID, produces = MediaType.APPLICATION_JSON_VALUE)
     public byte[] getTransactionFeed(@PathVariable("instanceId") String instanceId) {
         return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.TRANSACTION_STATS_GET, NoHttpPayload.INSTANCE);
     }
 
+    @DefaultApiResponse(summary = "Clears transaction statistics for the given instance.")
+    @ApiResponse(description = "OK", responseCode = "200")
+    @InstanceIdParameter
     @DeleteMapping(path = ApiPaths.TransactionMonitoringApi.INSTANCE_ID)
     public void clearTransactionStats(@PathVariable("instanceId") String instanceId) {
         endpointInvoker.invoke(

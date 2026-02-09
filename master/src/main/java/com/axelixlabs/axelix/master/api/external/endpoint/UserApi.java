@@ -19,10 +19,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -34,11 +31,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.api.external.response.UserProfileResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.UserLoginService;
 
@@ -67,37 +64,20 @@ public class UserApi {
      * @param loginRequest request for login
      * @return the HTTP Response with the Authorization header
      */
-    @Operation(
-            summary = "Log-in by the username/password combination",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        headers = {
-                            @Header(
-                                    name = "Set-Cookie",
-                                    required = true,
-                                    description = "The JWT token that should be subsequently used for auth purposes")
-                        }),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Unauthorized. Most likely the credentials pair username/password is wrong",
-                        responseCode = "401"),
-                @ApiResponse(description = "Forbidden. The access into the system is forbidden", responseCode = "403"),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
+    @DefaultApiResponse(summary = "Log-in by the username/password combination")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            headers = {
+                @Header(
+                        name = "Set-Cookie",
+                        required = true,
+                        description = "The JWT token that should be subsequently used for auth purposes")
             })
+    @ApiResponse(
+            description = "Unauthorized. Most likely the credentials pair username/password is wrong",
+            responseCode = "401")
+    @ApiResponse(description = "Forbidden. The access into the system is forbidden", responseCode = "403")
     @PostMapping(path = ApiPaths.UsersApi.LOGIN)
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         String token = userLoginService.login(loginRequest.username(), loginRequest.password());
@@ -114,29 +94,12 @@ public class UserApi {
      *
      * @return the HTTP Response with expired aut token cookie.
      */
-    @Operation(
-            summary = "Log-out current user",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        headers = {@Header(name = "Set-Cookie", required = true, description = "The expired cookie")}),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(description = "Unauthorized", responseCode = "401"),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
+    @DefaultApiResponse(summary = "Log-out current user")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            headers = {@Header(name = "Set-Cookie", required = true, description = "The expired cookie")})
+    @ApiResponse(description = "Unauthorized", responseCode = "401")
     @PostMapping(path = ApiPaths.UsersApi.LOGOUT)
     public ResponseEntity<?> logout() {
         ResponseCookie cookie = cookieService.buildExpiredAuthCookie();

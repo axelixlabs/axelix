@@ -20,10 +20,7 @@ package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 import java.util.Map;
 import java.util.Objects;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.links.Link;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,11 +36,12 @@ import com.axelixlabs.axelix.common.api.caches.SingleCache;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.caches.CacheProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.caches.CachesResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
@@ -72,37 +70,12 @@ public class CachesReadApi {
         this.singleCacheConverter = singleCacheConverter;
     }
 
-    @Operation(
-            summary = "Returns details of the application's caches.",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Caches",
-                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/caches.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = CachesResponse.class))),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
+    @DefaultApiResponse(summary = "Returns details of the application's caches.")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = CachesResponse.class)))
+    @InstanceIdParameter
     @GetMapping(path = ApiPaths.CachesApi.INSTANCE_ID)
     public CachesResponse getAllCaches(@PathVariable("instanceId") String instanceId) {
         CachesFeed feed = endpointInvoker.invoke(
@@ -111,44 +84,20 @@ public class CachesReadApi {
         return Objects.requireNonNull(cachesFeedConverter.convert(feed));
     }
 
-    @Operation(
-            summary = "Returns details of the requested cache by its name and cache manager name.",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Caches",
-                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/caches.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = CacheProfileResponse.class))),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameters({
-        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "cacheName", description = "The name of the cache to find", required = true),
-        @Parameter(
-                name = "cacheManager",
-                description = "The name of the cache manager where the cache with the given 'cacheName' resides",
-                required = true)
-    })
+    @DefaultApiResponse(summary = "Returns details of the requested cache by its name and cache manager name.")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = CacheProfileResponse.class)))
+    @Parameter(name = "cacheName", description = "The name of the cache to find", required = true)
+    @Parameter(
+            name = "cacheManager",
+            description = "The name of the cache manager where the cache with the given 'cacheName' resides",
+            required = true)
+    @InstanceIdParameter
     @GetMapping(path = ApiPaths.CachesApi.CACHE_NAME)
     public CacheProfileResponse getCacheByNameWithQueryParameter(
             @PathVariable("instanceId") String instanceId,
