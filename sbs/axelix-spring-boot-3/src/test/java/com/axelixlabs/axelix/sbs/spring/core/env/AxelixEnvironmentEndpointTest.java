@@ -180,7 +180,7 @@ class AxelixEnvironmentEndpointTest {
                 .allSatisfy(properties -> assertThatJson(properties).isArray().allSatisfy(property -> {
                     assertThatJson(property)
                             .isObject()
-                            .containsKey("propertyName")
+                            .containsKey("name")
                             .containsKey("isPrimary")
                             .containsKey("value")
                             .containsKey("configPropsBeanName")
@@ -238,9 +238,9 @@ class AxelixEnvironmentEndpointTest {
                 restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         assertThat(response.getBody().getPropertySources())
-                .filteredOn(e -> e.getSourceName().equals(sourceName))
+                .filteredOn(e -> e.getName().equals(sourceName))
                 .first()
-                .satisfies(e -> e.getSourceDescription().equals(sourceDescription));
+                .satisfies(e -> e.getDescription().equals(sourceDescription));
     }
 
     private static Stream<Arguments> propertySourceDescription() {
@@ -258,8 +258,8 @@ class AxelixEnvironmentEndpointTest {
 
         return response.getBody().getPropertySources().stream()
                 .flatMap(src -> src.getProperties().stream()
-                        .filter(p -> p.getPropertyName().equals(propertyName))
-                        .map(p -> Map.entry(src.getSourceName(), p)))
+                        .filter(p -> p.getName().equals(propertyName))
+                        .map(p -> Map.entry(src.getName(), p)))
                 .toList();
     }
 
