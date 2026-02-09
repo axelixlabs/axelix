@@ -19,9 +19,6 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Objects;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.links.Link;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,10 +30,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.ConfigPropsFeedResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
@@ -66,38 +64,15 @@ public class ConfigPropsApi {
         this.configpropsFeedConverter = configpropsFeedConverter;
     }
 
-    @Operation(
-            summary = "Returns all @ConfigurationProperties beans of the application.",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Configuration Properties",
-                                    description =
-                                            "https://docs.spring.io/spring-boot/api/rest/actuator/configprops.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = ConfigPropsFeedResponse.class))),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
+    @DefaultApiResponse(summary = "Returns all @ConfigurationProperties beans of the application.")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ConfigPropsFeedResponse.class)))
+    @InstanceIdParameter
     @GetMapping(path = ApiPaths.ConfigPropsApi.FEED)
     public ConfigPropsFeedResponse getConfigpropsFeed(@PathVariable("instanceId") String instanceId) {
         ConfigPropsFeed result = endpointInvoker.invoke(
