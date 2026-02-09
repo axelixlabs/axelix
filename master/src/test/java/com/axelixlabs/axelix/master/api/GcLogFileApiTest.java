@@ -43,9 +43,7 @@ import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.GcLogFileApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
@@ -215,12 +213,9 @@ class GcLogFileApiTest {
 
         registry.register(createInstance(instanceId));
 
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity(
-                        "/api/external/garbage-collector/logs/{instanceId}/file",
-                        EndpointInvocationException.class,
-                        instanceId);
+                .getForEntity("/api/external/garbage-collector/logs/{instanceId}/file", String.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -229,13 +224,10 @@ class GcLogFileApiTest {
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = UUID.randomUUID().toString();
 
-        ResponseEntity<InstanceNotFoundException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity(
-                        "/api/external/garbage-collector/logs/{instanceId}/file",
-                        InstanceNotFoundException.class,
-                        instanceId);
+                .getForEntity("/api/external/garbage-collector/logs/{instanceId}/file", String.class, instanceId);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 }

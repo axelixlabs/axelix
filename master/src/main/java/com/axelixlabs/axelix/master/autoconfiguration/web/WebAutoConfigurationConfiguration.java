@@ -17,18 +17,13 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.web;
 
-import java.io.IOException;
-
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.Ordered;
 import org.springframework.web.method.HandlerTypePredicate;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.axelixlabs.axelix.master.api.SpaBundlesPathResourceResolver;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 
@@ -67,23 +62,6 @@ public class WebAutoConfigurationConfiguration {
                     "/api/external", HandlerTypePredicate.forAnnotation(ExternalApiRestController.class));
             configurer.addPathPrefix(
                     "/api/internal", HandlerTypePredicate.forAnnotation(InternalApiRestController.class));
-        }
-
-        @Override
-        public void addResourceHandlers(ResourceHandlerRegistry registry) {
-            try {
-                // Setting the lowset priority for the static front-end resources ResourceHandler,
-                // so that the pattern /** is inspected at very last.
-                registry.setOrder(Ordered.LOWEST_PRECEDENCE);
-                registry.addResourceHandler("/**")
-                        .addResourceLocations(webProperties.getLocation())
-                        .resourceChain(true)
-                        .addResolver(new SpaBundlesPathResourceResolver(
-                                webProperties.getLocation().createRelative("index.html")));
-            } catch (IOException e) {
-                throw new IllegalStateException(
-                        "Unable to find the index.html inside the root directory for the SPA application", e);
-            }
         }
     }
 }
