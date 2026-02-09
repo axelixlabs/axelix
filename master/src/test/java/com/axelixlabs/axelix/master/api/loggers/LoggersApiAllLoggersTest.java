@@ -62,6 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LoggersApiAllLoggersTest {
+
     // language=json
     private static final String EXPECTED_ALL_LOGGERS_JSON =
             """
@@ -185,7 +186,7 @@ public class LoggersApiAllLoggersTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/loggers")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-loggers")) {
                     return new MockResponse()
                             .setBody(jsonResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

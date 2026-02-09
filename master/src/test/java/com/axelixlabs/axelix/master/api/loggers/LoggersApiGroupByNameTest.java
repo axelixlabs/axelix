@@ -108,11 +108,11 @@ public class LoggersApiGroupByNameTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/loggers/test")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-loggers/test")) {
                     return new MockResponse()
                             .setBody(jsonLoggerGroupsWithConfiguredLevelResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/loggers/web")) {
+                } else if (path.equals("/" + activeInstanceId + "/axelix-loggers/web")) {
                     return new MockResponse()
                             .setBody(jsonLoggerGroupsResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);

@@ -32,6 +32,7 @@ management:
           - axelix-metadata
           - axelix-beans
           - axelix-env
+          - axelix-loggers
           - axelix-metrics
           - axelix-configprops
           - axelix-caches
