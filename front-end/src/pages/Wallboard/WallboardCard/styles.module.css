@@ -32,12 +32,17 @@
 }
 
 .Title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     word-break: break-all;
+    overflow: hidden;
 }
 
 .QuestionIcon {
-    margin-top: 2px;
+    margin-top: 3px;
     animation: pulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
 }
 
 .Body {
