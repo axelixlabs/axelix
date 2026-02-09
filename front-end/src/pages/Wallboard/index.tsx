@@ -16,10 +16,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { EmptyHandler, Loader } from "components";
 import { fetchData, filterInstances, filterWallboardInstances } from "helpers";
-import { type IServiceCardsResponseBody, type IWallboardFilterEntity, StatefulRequest } from "models";
+import { type IServiceCardsResponseBody, type IWallboardSingleOperandFilter, StatefulRequest } from "models";
 import { getWallboardData } from "services";
 
 import { WallboardCard } from "./WallboardCard";
@@ -27,9 +28,10 @@ import { WallboardFirstSection } from "./WallboardFirstSection";
 import styles from "./styles.module.css";
 
 const Wallboard = () => {
+    const { t } = useTranslation();
     const [search, setSearch] = useState<string>("");
 
-    const [filters, setFilters] = useState<IWallboardFilterEntity[]>([]);
+    const [filters, setFilters] = useState<IWallboardSingleOperandFilter[]>([]);
     const [wallboard, setWallboard] = useState(StatefulRequest.loading<IServiceCardsResponseBody>());
 
     useEffect(() => {
@@ -46,7 +48,7 @@ const Wallboard = () => {
 
     const instanceCards = wallboard.response!.instances;
 
-    const filteredInstances = filters.length > 0 ? filterWallboardInstances(instanceCards, filters) : instanceCards;
+    const filteredInstances = filters.length > 0 ? filterWallboardInstances(instanceCards, filters, t) : instanceCards;
     const effectiveInstanceCards = search ? filterInstances(filteredInstances, search) : filteredInstances;
     const addonAfter = `${effectiveInstanceCards.length} / ${instanceCards.length}`;
 

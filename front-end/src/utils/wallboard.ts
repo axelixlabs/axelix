@@ -17,23 +17,45 @@
  */
 import type { TFunction } from "i18next";
 
-import { EWallboardFilterComparisons, EWallboardFilterTechnologies, type ISelectOptionData } from "models";
+import { getAllJavaVersions, getAllSpringBootVersions, isJavaMatch, isSpringBootMatch } from "helpers";
+import {
+    EWallboardFilterKey,
+    EWallboardFilterOperator,
+    type ISelectOptionData,
+    type IWallboardFilterDefinition,
+} from "models";
 
-export const wallboardFilterTechnologies: ISelectOptionData[] = [
-    {
-        value: EWallboardFilterTechnologies.SPRING_BOOT,
-        label: EWallboardFilterTechnologies.SPRING_BOOT,
-    },
-    {
-        value: EWallboardFilterTechnologies.JAVA,
-        label: EWallboardFilterTechnologies.JAVA,
-    },
+export const filteringKeys = Object.values(EWallboardFilterKey).map((source) => {
+    return {
+        value: source,
+        label: source,
+    };
+});
+
+const getOperators = (t: TFunction): ISelectOptionData[] => [
+    { value: EWallboardFilterOperator.EQUAL, label: t("Wallboard.filter.equal") },
+    { value: EWallboardFilterOperator.GREATER_THAN_EQUAL, label: t("Wallboard.filter.greaterThanOrEqual") },
+    { value: EWallboardFilterOperator.LESS_THAN_EQUAL, label: t("Wallboard.filter.lessThanOrEqual") },
 ];
 
-export const wallboardFilterComparisons = (t: TFunction): ISelectOptionData[] => {
-    return [
-        { value: EWallboardFilterComparisons.EQUAL, label: t("Wallboard.equal") },
-        { value: EWallboardFilterComparisons.LESS_THAN_EQUAL, label: t("Wallboard.lessThanOrEqual") },
-        { value: EWallboardFilterComparisons.GREATER_THAN_EQUAL, label: t("Wallboard.greaterThanOrEqual") },
-    ];
+export const getWallboardFilterDefinitions = (
+    t: TFunction,
+): Record<EWallboardFilterKey, IWallboardFilterDefinition> => {
+    return {
+        [EWallboardFilterKey.JAVA]: {
+            key: EWallboardFilterKey.JAVA,
+            operators: getOperators(t),
+            getSelectOptionsData: (instances) =>
+                getAllJavaVersions(instances).map((version) => ({ value: version, label: version })),
+            match: (instance, filter) => isJavaMatch(instance, filter),
+        },
+
+        [EWallboardFilterKey.SPRING_BOOT]: {
+            key: EWallboardFilterKey.SPRING_BOOT,
+            operators: getOperators(t),
+            getSelectOptionsData: (instances) =>
+                getAllSpringBootVersions(instances).map((version) => ({ value: version, label: version })),
+            match: (instance, filter) => isSpringBootMatch(instance, filter),
+        },
+    };
 };

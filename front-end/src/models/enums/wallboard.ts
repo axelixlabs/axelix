@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export enum EWallboardFilterTechnologies {
+export enum EWallboardFilterKey {
     SPRING_BOOT = "Spring boot",
     JAVA = "Java",
 }
 
-export enum EWallboardFilterComparisons {
-    EQUAL = "Equal",
-    LESS_THAN_EQUAL = "Less than equal",
-    GREATER_THAN_EQUAL = "Greater than equal",
+export enum EWallboardFilterOperator {
+    EQUAL = "=",
+    LESS_THAN_EQUAL = "<=",
+    GREATER_THAN_EQUAL = ">=",
 }

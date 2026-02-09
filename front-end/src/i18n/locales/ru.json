@@ -247,12 +247,14 @@
         "triggered": "Сборщик мусора был вызван"
     },
     "Wallboard": {
-        "save": "Сохранить",
-        "addFilter": "Добавить фильтр",
-        "field": "Поле",
-        "comparison": "Сравнение",
-        "equal": "Равно",
-        "lessThanOrEqual": "Меньше или равно",
-        "greaterThanOrEqual": "Больше или равно"
+        "filter": {
+            "save": "Сохранить",
+            "addFilter": "Добавить фильтр",
+            "field": "Поле",
+            "comparison": "Сравнение",
+            "equal": "Равно",
+            "lessThanOrEqual": "Меньше или равно",
+            "greaterThanOrEqual": "Больше или равно"
+        }
     }
 }
