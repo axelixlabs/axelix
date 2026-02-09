@@ -30,6 +30,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfiguration {
 
+    /**
+     * Defines the handling logic for {@link DefaultApiResponse} custom annotation.
+     */
     @Bean
     public OperationCustomizer apiDefaultApiResponseyCustomizer() {
         return (operation, handlerMethod) -> {

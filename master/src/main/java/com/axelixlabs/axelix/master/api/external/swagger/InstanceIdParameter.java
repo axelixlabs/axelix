@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
- * Meta-annotation that provides unified access to the default {@link Parameter}
+ * Composed-annotation that provides unified access to the default {@link Parameter}
  * annotation describing the {@link InstanceId} parameter.
  *
  * @author Sergey Cherkasov

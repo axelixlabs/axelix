@@ -30,8 +30,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 
 /**
- * Default meta-annotation providing unified access to {@link ApiResponse}
- * annotations for error codes 400 (Bad Request) and 500 (Internal Server Error).
+ * Default composed-annotation providing unified access to common {@link ApiResponse API Responses}
+ * for error codes 400 (Bad Request) and 500 (Internal Server Error).
  *
  *
  * @author Sergey Cherkasov
