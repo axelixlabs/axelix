@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +45,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostPr
  * @author Mikhail Polivakha
  */
 @AutoConfiguration(after = {AxelixConfigurationsPropertiesEndpointAutoConfiguration.class})
+@ConditionalOnAvailableEndpoint(endpoint = AxelixEnvironmentEndpoint.class)
 public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean

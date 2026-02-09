@@ -43,6 +43,7 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.ServiceMetricsGroupsAssembl
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
+// TODO we need to revisit this autoconfiguration, it depends on MetricsEndpoint, I don't think this is entirely correct
 @AutoConfiguration(after = MetricsAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = MetricsEndpoint.class)
 public class AxelixMetricsAutoConfiguration {
