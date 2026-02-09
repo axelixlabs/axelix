@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -34,7 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilde
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
 
 /**
- * Auto-configuration class for {@link AxelixBeansEndpoint}.
+ * Auto-configuration class for the beans custom actuator endpoint.
  *
  * @since 07.07.2025
  * @author Nikita Kirillov
@@ -42,7 +43,8 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRe
  * @author Mikhail Polivakha
  */
 @AutoConfiguration
-public class AxelixBeansAutoConfiguration {
+@ConditionalOnAvailableEndpoint(endpoint = AxelixBeansEndpoint.class)
+public class AxelixBeansEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
@@ -72,7 +74,7 @@ public class AxelixBeansAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxelixBeansEndpoint beansEndpointExtension(BeansFeedBuilder cachingBeansFeedBuilder) {
+    public AxelixBeansEndpoint axelixBeansEndpoint(BeansFeedBuilder cachingBeansFeedBuilder) {
         return new AxelixBeansEndpoint(cachingBeansFeedBuilder);
     }
 
