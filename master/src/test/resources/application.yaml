@@ -27,7 +27,7 @@ axelix:
   master:
     web:
       static-resources:
-        location: classpath:/spa-dist
+        location: classpath:/spa-dist/
     auth:
       jwt:
         algorithm: "HMAC512"
