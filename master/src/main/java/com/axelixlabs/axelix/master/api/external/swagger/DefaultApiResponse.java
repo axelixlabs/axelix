@@ -26,13 +26,13 @@ import java.lang.annotation.Target;
  * Default meta-annotation that aggregates {@link DefaultErrorApiResponse}
  * and allows specifying summary and description.
  *
- *
  * @author Sergey Cherkasov
  */
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @DefaultErrorApiResponse
 public @interface DefaultApiResponse {
+
     String summary() default "";
 
     String description() default "";
