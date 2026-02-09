@@ -103,37 +103,37 @@ public final class EnvironmentFeed {
      */
     public static final class PropertySource {
 
-        private final String sourceName;
+        private final String name;
 
         @Nullable
-        private final String sourceDescription;
+        private final String description;
 
         private final List<Property> properties;
 
         /**
          * Creates a new PropertySource.
          *
-         * @param sourceName        the sourceName of the property source.
-         * @param sourceDescription the custom description of this property source, if any.
-         * @param properties        the list of property entries.
+         * @param name        the sourceName of the property source.
+         * @param description the custom description of this property source, if any.
+         * @param properties  the list of property entries.
          */
         @JsonCreator
         public PropertySource(
-                @JsonProperty("sourceName") String sourceName,
-                @JsonProperty("sourceDescription") @Nullable String sourceDescription,
+                @JsonProperty("name") String name,
+                @JsonProperty("description") @Nullable String description,
                 @JsonProperty("properties") List<Property> properties) {
-            this.sourceName = sourceName;
-            this.sourceDescription = sourceDescription;
+            this.name = name;
+            this.description = description;
             this.properties = properties;
         }
 
-        public String getSourceName() {
-            return sourceName;
+        public String getName() {
+            return name;
         }
 
         @Nullable
-        public String getSourceDescription() {
-            return sourceDescription;
+        public String getDescription() {
+            return description;
         }
 
         public List<Property> getProperties() {
@@ -149,28 +149,22 @@ public final class EnvironmentFeed {
                 return false;
             }
             PropertySource that = (PropertySource) o;
-            return Objects.equals(sourceName, that.sourceName)
-                    && Objects.equals(sourceDescription, that.sourceDescription)
+            return Objects.equals(name, that.name)
+                    && Objects.equals(description, that.description)
                     && Objects.equals(properties, that.properties);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(sourceName, sourceDescription, properties);
+            return Objects.hash(name, description, properties);
         }
 
         @Override
         public String toString() {
-            return "PropertySource{"
-                    + "sourceName='"
-                    + sourceName
-                    + '\''
-                    + ", sourceDescription='"
-                    + sourceDescription
-                    + '\''
-                    + ", properties="
-                    + properties
-                    + '}';
+            return "PropertySource{" + "name='"
+                    + name + '\'' + ", description='"
+                    + description + '\'' + ", properties="
+                    + properties + '}';
         }
     }
 
@@ -179,7 +173,7 @@ public final class EnvironmentFeed {
      */
     public static final class Property {
 
-        private final String propertyName;
+        private final String name;
 
         @Nullable
         private final String value;
@@ -202,7 +196,7 @@ public final class EnvironmentFeed {
         /**
          * Creates a new Property.
          *
-         * @param propertyName        the property name.
+         * @param name                the property name.
          * @param value               the string representation of the property's value.
          * @param isPrimary           whether this property value is primary (i.e. this value takes precedence over the other values
          *                            from other property sources).
@@ -216,14 +210,14 @@ public final class EnvironmentFeed {
          */
         @JsonCreator
         public Property(
-                @JsonProperty("propertyName") String propertyName,
+                @JsonProperty("name") String name,
                 @JsonProperty("value") @Nullable String value,
                 @JsonProperty("isPrimary") boolean isPrimary,
                 @JsonProperty("configPropsBeanName") @Nullable String configPropsBeanName,
                 @JsonProperty("description") @Nullable String description,
                 @JsonProperty("deprecation") @Nullable Deprecation deprecation,
                 @JsonProperty("injectionPoints") @Nullable List<InjectionPoint> injectionPoints) {
-            this.propertyName = propertyName;
+            this.name = name;
             this.value = value;
             this.isPrimary = isPrimary;
             this.configPropsBeanName = configPropsBeanName;
@@ -232,8 +226,8 @@ public final class EnvironmentFeed {
             this.injectionPoints = injectionPoints;
         }
 
-        public String getPropertyName() {
-            return propertyName;
+        public String getName() {
+            return name;
         }
 
         @Nullable
@@ -275,7 +269,7 @@ public final class EnvironmentFeed {
             }
             Property property = (Property) o;
             return isPrimary == property.isPrimary
-                    && Objects.equals(propertyName, property.propertyName)
+                    && Objects.equals(name, property.name)
                     && Objects.equals(value, property.value)
                     && Objects.equals(configPropsBeanName, property.configPropsBeanName)
                     && Objects.equals(description, property.description)
@@ -285,32 +279,19 @@ public final class EnvironmentFeed {
 
         @Override
         public int hashCode() {
-            return Objects.hash(
-                    propertyName, value, isPrimary, configPropsBeanName, description, deprecation, injectionPoints);
+            return Objects.hash(name, value, isPrimary, configPropsBeanName, description, deprecation, injectionPoints);
         }
 
         @Override
         public String toString() {
-            return "Property{"
-                    + "propertyName='"
-                    + propertyName
-                    + '\''
-                    + ", value='"
-                    + value
-                    + '\''
-                    + ", isPrimary="
-                    + isPrimary
-                    + ", configPropsBeanName='"
-                    + configPropsBeanName
-                    + '\''
-                    + ", description='"
-                    + description
-                    + '\''
-                    + ", deprecation="
-                    + deprecation
-                    + ", injectionPoints="
-                    + injectionPoints
-                    + '}';
+            return "Property{" + "name='"
+                    + name + '\'' + ", value='"
+                    + value + '\'' + ", isPrimary="
+                    + isPrimary + ", configPropsBeanName='"
+                    + configPropsBeanName + '\'' + ", description='"
+                    + description + '\'' + ", deprecation="
+                    + deprecation + ", injectionPoints="
+                    + injectionPoints + '}';
         }
     }
 

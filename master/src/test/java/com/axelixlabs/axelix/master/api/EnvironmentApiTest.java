@@ -81,7 +81,8 @@ class EnvironmentApiTest {
                   "value": "17",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
-                  "description": null
+                  "description": null,
+                  "injectionPoints": null
                 },
                 {
                   "name": "java.vm.vendor",
@@ -109,7 +110,8 @@ class EnvironmentApiTest {
                   "value": "Java_Liberica_jdk/17.0.16-12/x64",
                   "isPrimary": true,
                   "configPropsBeanName": null,
-                  "description": "System Environment Property \\"JAVA_HOME\\""
+                  "description": "System Environment Property \\"JAVA_HOME\\"",
+                  "injectionPoints": null
                 },
                 {
                   "name": "logging.path",
@@ -119,7 +121,8 @@ class EnvironmentApiTest {
                   "description": "Location of the log file. For instance, `/var/log`.",
                   "deprecation": {
                       "message": "Deprecated in favor of logging.file.path property."
-                  }
+                  },
+                  "injectionPoints": null
                 }
               ]
             },
@@ -132,7 +135,8 @@ class EnvironmentApiTest {
                   "value": "1000",
                   "isPrimary": true,
                   "configPropsBeanName": null,
-                  "description": null
+                  "description": null,
+                  "injectionPoints": null
                 }
               ]
             }
@@ -172,11 +176,11 @@ class EnvironmentApiTest {
           "defaultProfiles": ["default", "development"],
           "propertySources": [
             {
-              "sourceName": "systemProperties",
-              "sourceDescription": "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'",
+              "name": "systemProperties",
+              "description": "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'",
               "properties": [
                 {
-                  "propertyName": "java.specification.version",
+                  "name": "java.specification.version",
                   "value": "17",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
@@ -184,7 +188,7 @@ class EnvironmentApiTest {
                   "injectionPoints": null
                 },
                 {
-                  "propertyName": "java.vm.vendor",
+                  "name": "java.vm.vendor",
                   "value": "BellSoft",
                   "isPrimary": true,
                   "configPropsBeanName": "org.springframework.boot.test.property.SystemProperties",
@@ -201,11 +205,11 @@ class EnvironmentApiTest {
               ]
             },
             {
-              "sourceName": "systemEnvironment",
-              "sourceDescription": "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application.*'",
+              "name": "systemEnvironment",
+              "description": "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application.*'",
               "properties": [
                 {
-                  "propertyName": "JAVA_HOME",
+                  "name": "JAVA_HOME",
                   "value": "Java_Liberica_jdk/17.0.16-12/x64",
                   "isPrimary": true,
                   "configPropsBeanName": null,
@@ -213,7 +217,7 @@ class EnvironmentApiTest {
                   "injectionPoints": null
                 },
                 {
-                  "propertyName": "logging.path",
+                  "name": "logging.path",
                   "value": "pattern",
                   "isPrimary": true,
                   "configPropsBeanName": null,
@@ -226,15 +230,16 @@ class EnvironmentApiTest {
               ]
             },
             {
-              "sourceName": "Config resource classpath:actuate/env/",
-              "sourceDescription": "Contains properties from the 'application.*' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources.",
+              "name": "Config resource classpath:actuate/env/",
+              "description": "Contains properties from the 'application.*' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources.",
               "properties": [
                 {
-                  "propertyName": "com.example.cache.max-size",
+                  "name": "com.example.cache.max-size",
                   "value": "1000",
                   "isPrimary": true,
                   "configPropsBeanName": null,
-                  "description": null
+                  "description": null,
+                  "injectionPoints": null
                 }
               ]
             }

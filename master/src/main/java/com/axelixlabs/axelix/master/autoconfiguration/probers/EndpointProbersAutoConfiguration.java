@@ -27,9 +27,6 @@ import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
 import com.axelixlabs.axelix.common.api.InstanceDetails;
 import com.axelixlabs.axelix.common.api.ProfileMutationResult;
 import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
-import com.axelixlabs.axelix.common.api.caches.CachesFeed;
-import com.axelixlabs.axelix.common.api.caches.SingleCache;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
 import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
 import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
@@ -40,13 +37,10 @@ import com.axelixlabs.axelix.master.service.serde.BeansJacksonMessageDeserializa
 import com.axelixlabs.axelix.master.service.serde.ConditionsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ConfigPropsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.EnvironmentJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ProfileMutationJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ScheduledTasksJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.caches.SingleCacheJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.LoggerLevelsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.ServiceLoggersJacksonMessageDeserializationStrategy;
@@ -147,16 +141,13 @@ public class EndpointProbersAutoConfiguration {
     }
 
     @Bean
-    public DefaultEndpointProber<SingleCache> getSingleCacheEndpointProver(
-            SingleCacheJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_CACHE);
+    public ProxyingEndpointProber getSingleCacheEndpointProver() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_SINGLE_CACHE);
     }
 
     @Bean
-    public DefaultEndpointProber<CachesFeed> getAllCachesEndpointProver(
-            ServiceCachesJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_ALL_CACHES);
+    public ProxyingEndpointProber getAllCachesEndpointProver() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_ALL_CACHES);
     }
 
     // Details
@@ -208,10 +199,8 @@ public class EndpointProbersAutoConfiguration {
 
     // Environment Property
     @Bean
-    public DefaultEndpointProber<EnvironmentFeed> getAllEnvironmentEndpointProver(
-            EnvironmentJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES);
+    public ProxyingEndpointProber getAllEnvironmentEndpointProver() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_ALL_ENV_PROPERTIES);
     }
 
     // HeapDump

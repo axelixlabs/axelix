@@ -40,9 +40,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
-import com.axelixlabs.axelix.master.api.external.endpoint.caches.CachesReadApi;
-import com.axelixlabs.axelix.master.api.external.response.caches.CachesResponse;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
@@ -57,7 +56,7 @@ import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests of {@link CachesReadApi}.
+ * Integration tests of {@link }.
  *
  * @author Sergey Cherkasov
  */
@@ -230,9 +229,9 @@ public class CachesReadApiTest {
     @Test
     void shouldReturnJSONAllCachesResponse() {
         // when
-        ResponseEntity<CachesResponse> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/external/caches/{instanceId}", CachesResponse.class, activeInstanceId);
+                .getForEntity("/api/external/caches/{instanceId}", String.class, activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -281,9 +280,9 @@ public class CachesReadApiTest {
             """;
 
         // when
-        ResponseEntity<String> response = restTemplate
+        ResponseEntity<CachesFeed> response = restTemplate
                 .withoutAuthorities()
-                .getForEntity("/api/external/caches/{instanceId}", String.class, activeInstanceIdEmptyCaches);
+                .getForEntity("/api/external/caches/{instanceId}", CachesFeed.class, activeInstanceIdEmptyCaches);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
