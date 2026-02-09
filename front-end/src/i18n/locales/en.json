@@ -248,12 +248,14 @@
         "triggered": "The garbage collector was triggered"
     },
     "Wallboard": {
-        "save": "Save",
-        "addFilter": "Add filter",
-        "field": "Field",
-        "comparison": "Comparison",
-        "equal": "Equal",
-        "lessThanOrEqual": "Less than or equal",
-        "greaterThanOrEqual": "Greater than or equal"
+        "filter": {
+            "save": "Save",
+            "addFilter": "Add filter",
+            "field": "Field",
+            "comparison": "Comparison",
+            "equal": "Equal",
+            "lessThanOrEqual": "Less than or equal",
+            "greaterThanOrEqual": "Greater than or equal"
+        }
     }
 }

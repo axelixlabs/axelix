@@ -15,13 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import {
-    EWallboardFilterComparisons,
-    EWallboardFilterTechnologies,
-    type IInstanceCard,
-    type ISelectOptionData,
-    type IWallboardFilterEntity,
-} from "models";
+import type { TFunction } from "i18next";
+
+import { EWallboardFilterOperator, type IInstanceCard, type IWallboardSingleOperandFilter } from "models";
+import { getWallboardFilterDefinitions } from "utils";
 
 export const filterInstances = (instances: IInstanceCard[], search: string): IInstanceCard[] => {
     const formattedSearch = search.toLowerCase().trim();
@@ -51,56 +48,53 @@ export const getAllSpringBootVersions = (instances: IInstanceCard[]): string[] =
     return Array.from(allVersions);
 };
 
-export const getWallboardFilterVersions = (versions: string[]): ISelectOptionData[] => {
-    return versions.map((version) => ({
-        value: version,
-        label: version,
-    }));
-};
-
 const parseVersion = (version: string): number[] => {
     return version.split(".").map(Number);
 };
 
-function isJavaMatch(cardVersion: string, filter: IWallboardFilterEntity | undefined): boolean {
+export const isJavaMatch = (instance: IInstanceCard, filter: IWallboardSingleOperandFilter): boolean => {
     if (!filter) {
         return true;
     }
 
-    const [cardMajorVersion] = parseVersion(cardVersion);
-    const [filterMajorVersion] = parseVersion(filter.version);
+    const [cardMajorVersion] = parseVersion(instance.javaVersion);
+    const [filterMajorVersion] = parseVersion(filter.operand);
 
-    if (filter.comparison === EWallboardFilterComparisons.EQUAL) {
+    if (filter.operator === EWallboardFilterOperator.EQUAL) {
         return cardMajorVersion === filterMajorVersion;
     }
-    if (filter.comparison === EWallboardFilterComparisons.GREATER_THAN_EQUAL) {
+
+    if (filter.operator === EWallboardFilterOperator.GREATER_THAN_EQUAL) {
         return cardMajorVersion >= filterMajorVersion;
     }
-    if (filter.comparison === EWallboardFilterComparisons.LESS_THAN_EQUAL) {
+
+    if (filter.operator === EWallboardFilterOperator.LESS_THAN_EQUAL) {
         return cardMajorVersion <= filterMajorVersion;
     }
 
     return true;
-}
+};
 
-function isSpringBootMatch(cardVersion: string, filter: IWallboardFilterEntity | undefined): boolean {
+export const isSpringBootMatch = (instance: IInstanceCard, filter: IWallboardSingleOperandFilter): boolean => {
     if (!filter) {
         return true;
     }
 
-    const [cardMajorVersion, cardMinorVersion] = parseVersion(cardVersion);
-    const [filterMajorVersion, filterMinorVersion] = parseVersion(filter.version);
+    const [cardMajorVersion, cardMinorVersion] = parseVersion(instance.springBootVersion);
+    const [filterMajorVersion, filterMinorVersion] = parseVersion(filter.operand);
 
-    if (filter.comparison === EWallboardFilterComparisons.EQUAL) {
+    if (filter.operator === EWallboardFilterOperator.EQUAL) {
         return cardMajorVersion === filterMajorVersion && cardMinorVersion === filterMinorVersion;
     }
-    if (filter.comparison === EWallboardFilterComparisons.GREATER_THAN_EQUAL) {
+
+    if (filter.operator === EWallboardFilterOperator.GREATER_THAN_EQUAL) {
         return (
             cardMajorVersion > filterMajorVersion ||
             (cardMajorVersion === filterMajorVersion && cardMinorVersion >= filterMinorVersion)
         );
     }
-    if (filter.comparison === EWallboardFilterComparisons.LESS_THAN_EQUAL) {
+
+    if (filter.operator === EWallboardFilterOperator.LESS_THAN_EQUAL) {
         return (
             cardMajorVersion < filterMajorVersion ||
             (cardMajorVersion === filterMajorVersion && cardMinorVersion <= filterMinorVersion)
@@ -108,23 +102,27 @@ function isSpringBootMatch(cardVersion: string, filter: IWallboardFilterEntity |
     }
 
     return true;
-}
+};
 
 export const filterWallboardInstances = (
     instances: IInstanceCard[],
-    filters: IWallboardFilterEntity[],
+    filters: IWallboardSingleOperandFilter[],
+    t: TFunction,
 ): IInstanceCard[] => {
-    const allJavaFilters = filters.filter(({ technology }) => technology === EWallboardFilterTechnologies.JAVA);
-    const allSpringBootFilters = filters.filter(
-        ({ technology }) => technology === EWallboardFilterTechnologies.SPRING_BOOT,
-    );
+    const lastFilters: Record<string, IWallboardSingleOperandFilter> = {};
 
-    const lastJavaFilter = allJavaFilters.at(-1);
-    const lastSpringBootFilter = allSpringBootFilters.at(-1);
-
-    return instances.filter((card) => {
-        const javaMatch = isJavaMatch(card.javaVersion, lastJavaFilter);
-        const springBootMatch = isSpringBootMatch(card.springBootVersion, lastSpringBootFilter);
-        return javaMatch && springBootMatch;
+    filters.forEach((filter) => {
+        lastFilters[filter.key] = filter;
     });
+
+    return instances.filter((instance) =>
+        Object.values(lastFilters).every((filter) => {
+            const definition = getWallboardFilterDefinitions(t)[filter.key];
+            if (!definition) {
+                return true;
+            }
+
+            return definition.match(instance, filter);
+        }),
+    );
 };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EInstanceStatus, EWallboardFilterComparisons, EWallboardFilterTechnologies } from "models";
+import type { EInstanceStatus, EWallboardFilterKey, EWallboardFilterOperator, ISelectOptionData } from "models";
 
 export interface IInstanceCard {
     instanceId: string;
@@ -32,15 +32,22 @@ export interface IServiceCardsResponseBody {
     instances: IInstanceCard[];
 }
 
-export interface IWallboardFilterEntity {
+export interface IWallboardSingleOperandFilter {
     id: string;
-    technology: EWallboardFilterTechnologies;
-    comparison: EWallboardFilterComparisons;
-    version: string;
+    key: EWallboardFilterKey;
+    operator: EWallboardFilterOperator;
+    operand: string;
 }
 
 export interface IWallboardLocalFilterInitialState {
-    technology: null | EWallboardFilterTechnologies;
-    comparison: null | EWallboardFilterComparisons;
-    version: null | string;
+    key: EWallboardFilterKey | null;
+    operator: EWallboardFilterOperator | null;
+    operand: string | null;
+}
+
+export interface IWallboardFilterDefinition {
+    key: string;
+    operators: ISelectOptionData[];
+    getSelectOptionsData: (instances: IInstanceCard[]) => ISelectOptionData[];
+    match: (instance: IInstanceCard, filter: IWallboardSingleOperandFilter) => boolean;
 }

@@ -20,7 +20,7 @@ import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { PageSearch } from "components";
-import type { IInstanceCard, IWallboardFilterEntity } from "models";
+import type { IInstanceCard, IWallboardSingleOperandFilter } from "models";
 
 import { WallboardFilter } from "../WallboardFilter";
 
@@ -45,12 +45,12 @@ interface IProps {
     /**
      * All filters data
      */
-    filters: IWallboardFilterEntity[];
+    filters: IWallboardSingleOperandFilter[];
 
     /**
      * SetState to update filters
      */
-    setFilters: Dispatch<SetStateAction<IWallboardFilterEntity[]>>;
+    setFilters: Dispatch<SetStateAction<IWallboardSingleOperandFilter[]>>;
 }
 
 export const WallboardFirstSection = ({ addonAfter, setSearch, instanceCards, filters, setFilters }: IProps) => {
@@ -71,7 +71,7 @@ export const WallboardFirstSection = ({ addonAfter, setSearch, instanceCards, fi
             <div className={styles.MainWrapper}>
                 <PageSearch addonAfter={addonAfter} setSearch={setSearch} removeBottomGutter />
                 <div className={styles.FiltersWrapper}>
-                    {filters.map(({ technology, comparison, version, id }) => (
+                    {filters.map(({ key, operator, operand, id }) => (
                         <Tag
                             closeIcon
                             color="#838383"
@@ -79,7 +79,7 @@ export const WallboardFirstSection = ({ addonAfter, setSearch, instanceCards, fi
                             onClose={() => removeWallboardFilter(id)}
                             key={id}
                         >
-                            {technology}: {comparison} {version}
+                            {key} {operator} {operand}
                         </Tag>
                     ))}
 
@@ -98,7 +98,7 @@ export const WallboardFirstSection = ({ addonAfter, setSearch, instanceCards, fi
                         onOpenChange={handleOpenChange}
                         styles={{ container: { width: "500px" } }}
                     >
-                        <Button size="small">+ {t("Wallboard.addFilter")}</Button>
+                        <Button size="small">+ {t("Wallboard.filter.addFilter")}</Button>
                     </Popover>
                 </div>
             </div>

@@ -19,9 +19,8 @@ import { Button, Select } from "antd";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { getAllJavaVersions, getAllSpringBootVersions, getWallboardFilterVersions } from "helpers";
-import type { IInstanceCard, IWallboardFilterEntity, IWallboardLocalFilterInitialState } from "models";
-import { wallboardFilterComparisons, wallboardFilterTechnologies } from "utils";
+import type { IInstanceCard, IWallboardLocalFilterInitialState, IWallboardSingleOperandFilter } from "models";
+import { filteringKeys, getWallboardFilterDefinitions } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -39,38 +38,33 @@ interface IProps {
     /**
      * All filters data
      */
-    filters: IWallboardFilterEntity[];
+    filters: IWallboardSingleOperandFilter[];
 
     /**
      * SetState to update filters
      */
-    setFilters: Dispatch<SetStateAction<IWallboardFilterEntity[]>>;
+    setFilters: Dispatch<SetStateAction<IWallboardSingleOperandFilter[]>>;
 }
 
 const localFilterInitialState: IWallboardLocalFilterInitialState = {
-    technology: null,
-    comparison: null,
-    version: null,
+    key: null,
+    operator: null,
+    operand: null,
 };
 
 export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setFilters }: IProps) => {
     const { t } = useTranslation();
 
     const [localFilter, setLocalFilter] = useState<IWallboardLocalFilterInitialState>(localFilterInitialState);
-    const { technology, comparison, version } = localFilter;
-
-    const javaVersions = getAllJavaVersions(instanceCards);
-    const springBootVersions = getAllSpringBootVersions(instanceCards);
-
-    const versions = !technology ? [] : technology === "Java" ? javaVersions : springBootVersions;
+    const { key, operator, operand } = localFilter;
 
     const addFilter = (): void => {
-        if (!technology || !comparison || !version) {
+        if (!key || !operator || !operand) {
             // TODO: In the future, a validation error or another case will be shown
             return;
         }
 
-        const filterId = `${technology}${comparison}${version}`;
+        const filterId = `${key}${operator}${operand}`;
 
         const isFilterExist = filters.some(({ id }) => id === filterId);
 
@@ -83,9 +77,9 @@ export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setF
             ...prev,
             {
                 id: filterId,
-                technology: technology,
-                comparison: comparison,
-                version: version,
+                key: key,
+                operator: operator,
+                operand: operand,
             },
         ]);
 
@@ -99,37 +93,41 @@ export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setF
         setLocalFilter(localFilterInitialState);
     };
 
+    const currentFilterDefinition = key ? getWallboardFilterDefinitions(t)[key] : undefined;
+    const operatorOptions = currentFilterDefinition?.operators ?? [];
+    const operandOptions = currentFilterDefinition?.getSelectOptionsData(instanceCards) ?? [];
+
     return (
         <>
             <div className={styles.FieldAndComparisonWrapper}>
                 <div className={styles.SelectWrapper}>
-                    <label className={styles.Label}>{t("Wallboard.field")}</label>
+                    <label className={styles.Label}>{t("Wallboard.filter.field")}</label>
                     <Select
-                        placeholder={t("Wallboard.field")}
-                        value={technology}
-                        onChange={(value) => {
-                            setLocalFilter((prev) => ({
-                                ...prev,
-                                technology: value,
-                                version: null,
-                            }));
+                        placeholder={t("Wallboard.filter.field")}
+                        value={key}
+                        onChange={(key) => {
+                            setLocalFilter({
+                                operator: null,
+                                key: key,
+                                operand: null,
+                            });
                         }}
-                        options={wallboardFilterTechnologies}
+                        options={filteringKeys}
                     />
                 </div>
 
                 <div className={styles.SelectWrapper}>
-                    <label className={styles.Label}>{t("Wallboard.comparison")}</label>
+                    <label className={styles.Label}>{t("Wallboard.filter.comparison")}</label>
                     <Select
-                        placeholder={t("Wallboard.comparison")}
-                        value={comparison}
-                        onChange={(value) => {
+                        placeholder={t("Wallboard.filter.comparison")}
+                        value={operator}
+                        onChange={(operator) => {
                             setLocalFilter((prev) => ({
                                 ...prev,
-                                comparison: value,
+                                operator: operator,
                             }));
                         }}
-                        options={wallboardFilterComparisons(t)}
+                        options={operatorOptions}
                     />
                 </div>
             </div>
@@ -138,21 +136,21 @@ export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setF
                 <label className={styles.Label}>{t("value")}</label>
                 <Select
                     placeholder={t("value")}
-                    value={version}
-                    onChange={(value) => {
+                    value={operand}
+                    onChange={(operand) => {
                         setLocalFilter((prev) => ({
                             ...prev,
-                            version: value,
+                            operand: operand,
                         }));
                     }}
-                    options={getWallboardFilterVersions(versions)}
+                    options={operandOptions}
                 />
             </div>
 
             <div className={styles.ActionsButtonsWrapper}>
                 <Button onClick={closePopover}>{t("cancel")}</Button>
                 <Button type="primary" onClick={addFilter}>
-                    {t("Wallboard.save")}
+                    {t("Wallboard.filter.save")}
                 </Button>
             </div>
         </>
