@@ -19,9 +19,6 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 
 import java.util.Objects;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.links.Link;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,10 +31,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.ThreadDumpFeedResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
@@ -65,38 +63,15 @@ public class ThreadDumpApi {
         this.converter = converter;
     }
 
-    @Operation(
-            summary = "The threaddump endpoint provides a thread dump from the application’s JVM.",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Thread Dump",
-                                    description =
-                                            "https://docs.spring.io/spring-boot/api/rest/actuator/threaddump.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = ThreadDumpFeedResponse.class))),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
+    @DefaultApiResponse(summary = "The threaddump endpoint provides a thread dump from the application’s JVM.")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ThreadDumpFeedResponse.class)))
+    @InstanceIdParameter
     @GetMapping(ApiPaths.ThreadDumpApi.INSTANCE_ID)
     public ThreadDumpFeedResponse getThreadDump(@PathVariable("instanceId") String instanceId) {
         ThreadDumpFeed result = endpointInvoker.invoke(
@@ -105,26 +80,9 @@ public class ThreadDumpApi {
         return Objects.requireNonNull(converter.convert(result));
     }
 
-    @Operation(
-            summary = "Endpoint allows enabling thread contention monitoring.",
-            responses = {
-                @ApiResponse(description = "OK", responseCode = "200"),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
+    @DefaultApiResponse(summary = "Endpoint allows enabling thread contention monitoring.")
+    @ApiResponse(description = "OK", responseCode = "200")
+    @InstanceIdParameter
     @PostMapping(ApiPaths.ThreadDumpApi.ENABLE_CONTENTION_MONITORING)
     public void enableContentionMonitoring(@PathVariable("instanceId") String instanceId) {
         endpointInvoker.invokeNoValue(
@@ -133,26 +91,9 @@ public class ThreadDumpApi {
                 NoHttpPayload.INSTANCE);
     }
 
-    @Operation(
-            summary = "Endpoint allows disabling thread contention monitoring.",
-            responses = {
-                @ApiResponse(description = "OK", responseCode = "200"),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
+    @DefaultApiResponse(summary = "Endpoint allows disabling thread contention monitoring.")
+    @ApiResponse(description = "OK", responseCode = "200")
+    @InstanceIdParameter
     @PostMapping(ApiPaths.ThreadDumpApi.DISABLE_CONTENTION_MONITORING)
     public void disableContentionMonitoring(@PathVariable("instanceId") String instanceId) {
         endpointInvoker.invokeNoValue(

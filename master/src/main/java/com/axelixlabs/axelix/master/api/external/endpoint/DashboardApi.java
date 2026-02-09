@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,10 +25,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.service.DashboardService;
 
 /**
@@ -48,31 +47,14 @@ public class DashboardApi {
         this.dashboardService = dashboardService;
     }
 
-    @Operation(
-            summary = "Retrieve information about the entire ecosystem to render the dashboard",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = DashboardResponse.class))),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
+    @DefaultApiResponse(summary = "Retrieve information about the entire ecosystem to render the dashboard")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = DashboardResponse.class)))
     @GetMapping
     public DashboardResponse getDashboard() {
         return dashboardService.getDashboardInfo();

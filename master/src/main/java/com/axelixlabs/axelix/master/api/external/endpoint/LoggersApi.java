@@ -21,10 +21,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.links.Link;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,13 +39,14 @@ import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.api.external.response.loggers.GroupProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.loggers.LoggerProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.loggers.LoggersResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
@@ -88,37 +86,13 @@ public class LoggersApi {
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
 
-    @Operation(
-            summary = "Returns details of the application’s loggers.",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Loggers",
-                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = LoggersResponse.class))),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameter(name = "instanceId", description = "Application Instance ID", required = true)
+    @DefaultApiResponse(summary = "Returns the feed of the application’s loggers.")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = LoggersResponse.class)))
+    @InstanceIdParameter
     @GetMapping(path = ApiPaths.LoggersApi.INSTANCE_ID)
     public LoggersResponse getAllLoggers(@PathVariable("instanceId") String instanceId) {
         ServiceLoggers loggers = endpointInvoker.invoke(
@@ -127,40 +101,16 @@ public class LoggersApi {
         return Objects.requireNonNull(loggersResponseConverter.convert(loggers));
     }
 
-    @Operation(
-            summary = "Returns details of the requested logger group.",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Loggers",
-                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = GroupProfileResponse.class))),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameters({
-        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "groupName", description = "The name of the logger group to find", required = true)
-    })
+    @DefaultApiResponse(summary = "Returns the profile of the of the requested logger group.")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = GroupProfileResponse.class)))
+    @InstanceIdParameter
+    @Parameter(name = "groupName", description = "The name of the logger group to find", required = true)
     @GetMapping(path = ApiPaths.LoggersApi.GROUP_NAME)
     public GroupProfileResponse getGroupByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("groupName") String groupName) {
@@ -171,40 +121,16 @@ public class LoggersApi {
         return Objects.requireNonNull(groupProfileConverter.convert(group));
     }
 
-    @Operation(
-            summary = "Returns the details of the requested logger.",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Loggers",
-                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html")
-                        },
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = LoggerProfileResponse.class))),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameters({
-        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
-    })
+    @DefaultApiResponse(summary = "Returns the details of the requested logger.")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = LoggerProfileResponse.class)))
+    @InstanceIdParameter
+    @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
     @GetMapping(path = ApiPaths.LoggersApi.LOGGER_NAME)
     public LoggerProfileResponse getLoggerByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
@@ -215,38 +141,13 @@ public class LoggersApi {
         return Objects.requireNonNull(loggerProfileConverter.convert(logger));
     }
 
-    @Operation(
-            summary = "The request specifies the desired logging level for a logger by its name.",
+    @DefaultApiResponse(
+            summary = "Change the logging level for a given logger by its name.",
             description =
-                    "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Loggers",
-                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html")
-                        }),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameters({
-        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
-    })
+                    "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE")
+    @ApiResponse(description = "OK", responseCode = "200")
+    @InstanceIdParameter
+    @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
     @PostMapping(path = ApiPaths.LoggersApi.LOGGER_NAME)
     public void setLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId,
@@ -258,38 +159,13 @@ public class LoggersApi {
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_ONE_LOGGER, payload);
     }
 
-    @Operation(
+    @DefaultApiResponse(
             summary = "The request specifies the desired logging level for a logger group by its name.",
             description =
-                    "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Loggers",
-                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html")
-                        }),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameters({
-        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "groupName", description = "The name of the logger group to find", required = true)
-    })
+                    "Suggested logging levels that the user can select to configure the logger: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE")
+    @ApiResponse(description = "OK", responseCode = "200")
+    @InstanceIdParameter
+    @Parameter(name = "groupName", description = "The name of the logger group to find", required = true)
     @PostMapping(path = ApiPaths.LoggersApi.GROUP_NAME)
     public void setLoggingLevelByGroupName(
             @PathVariable("instanceId") String instanceId,
@@ -301,36 +177,11 @@ public class LoggersApi {
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
     }
 
-    @Operation(
-            summary = "Clears the configured logging level of a logger, reverting it to the global/default setting.",
-            responses = {
-                @ApiResponse(
-                        description = "OK",
-                        responseCode = "200",
-                        links = {
-                            @Link(
-                                    name = "Actuator/Loggers",
-                                    description = "https://docs.spring.io/spring-boot/api/rest/actuator/loggers.html")
-                        }),
-                @ApiResponse(
-                        description = "Bad Request",
-                        responseCode = "400",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class))),
-                @ApiResponse(
-                        description = "Internal Server Error",
-                        responseCode = "500",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        schema = @Schema(implementation = SimpleApiError.class)))
-            })
-    @Parameters({
-        @Parameter(name = "instanceId", description = "Application Instance ID", required = true),
-        @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
-    })
+    @DefaultApiResponse(
+            summary = "Clears the configured logging level of a logger, reverting it to the default setting")
+    @ApiResponse(description = "OK", responseCode = "200")
+    @InstanceIdParameter
+    @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
     @PostMapping(path = ApiPaths.LoggersApi.CLEAR_FOR_LOGGER)
     public void clearLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
