@@ -29,11 +29,11 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
  */
-public class ProxyingEndpointProper extends AbstractEndpointProber<byte[]> {
+public class ProxyingEndpointProber extends AbstractEndpointProber<byte[]> {
 
     private final ActuatorEndpoint actuatorEndpoint;
 
-    public ProxyingEndpointProper(InstanceRegistry instanceRegistry, ActuatorEndpoint actuatorEndpoint) {
+    public ProxyingEndpointProber(InstanceRegistry instanceRegistry, ActuatorEndpoint actuatorEndpoint) {
         super(instanceRegistry, binary -> binary);
         this.actuatorEndpoint = actuatorEndpoint;
     }

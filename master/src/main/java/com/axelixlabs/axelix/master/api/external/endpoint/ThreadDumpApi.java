@@ -17,13 +17,13 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.Objects;
-
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,12 +33,10 @@ import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.ThreadDumpFeedResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -56,28 +54,23 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class ThreadDumpApi {
 
     private final EndpointInvoker endpointInvoker;
-    private final Converter<ThreadDumpFeed, ThreadDumpFeedResponse> converter;
 
-    public ThreadDumpApi(EndpointInvoker endpointInvoker, Converter<ThreadDumpFeed, ThreadDumpFeedResponse> converter) {
+    public ThreadDumpApi(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
-        this.converter = converter;
     }
 
     @DefaultApiResponse(summary = "The threaddump endpoint provides a thread dump from the application’s JVM.")
     @ApiResponse(
             description = "OK",
             responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ThreadDumpFeedResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThreadDumpFeed.class)))
     @InstanceIdParameter
     @GetMapping(ApiPaths.ThreadDumpApi.INSTANCE_ID)
-    public ThreadDumpFeedResponse getThreadDump(@PathVariable("instanceId") String instanceId) {
-        ThreadDumpFeed result = endpointInvoker.invoke(
+    public ResponseEntity<byte[]> getThreadDump(@PathVariable("instanceId") String instanceId) {
+        byte[] body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_THREAD_DUMP, NoHttpPayload.INSTANCE);
 
-        return Objects.requireNonNull(converter.convert(result));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
     @DefaultApiResponse(summary = "Endpoint allows enabling thread contention monitoring.")
