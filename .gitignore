@@ -48,6 +48,9 @@ bin/
 ### VS Code ###
 .vscode/
 
+### Cursor ###
+.cursor/.env
+
 ### Mac OS ###
 .DS_Store
 /.idea/inspectionProfiles/Project_Default.xml
