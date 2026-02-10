@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.support.CronExpression;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,7 +42,9 @@ import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.ScheduledTasksResponse;
+import com.axelixlabs.axelix.master.api.external.request.CronExpressionValidationRequest;
+import com.axelixlabs.axelix.master.api.external.response.scheduledtask.CronExpressionValidationResponse;
+import com.axelixlabs.axelix.master.api.external.response.scheduledtask.ScheduledTasksResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
@@ -102,6 +105,20 @@ public class ScheduledTasksApi {
             @PathVariable("instanceId") String instanceId, @RequestBody ScheduledTaskToggleRequest request) {
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.ENABLE_SCHEDULED_TASK, payload);
+    }
+
+    @DefaultApiResponse(summary = "Validate the provided cron expression")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = CronExpressionValidationResponse.class)))
+    @PostMapping(path = ApiPaths.ScheduledTasksApi.VALIDATE_CRON_EXPRESSION)
+    public CronExpressionValidationResponse validateCronExpression(
+            @RequestBody CronExpressionValidationRequest request) {
+        return new CronExpressionValidationResponse(CronExpression.isValidExpression(request.cronExpression()));
     }
 
     @DefaultApiResponse(summary = "Allows disabling a scheduled task.")
