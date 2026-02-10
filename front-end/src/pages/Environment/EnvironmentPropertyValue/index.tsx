@@ -60,7 +60,7 @@ export const EnvironmentPropertyValue = ({ property }: IProps) => {
                 onNewValue={(newValue) => updatePropertyClickHandler(newValue)}
             />
             <Tooltip title={t("Environments.primaryProperty")}>
-                <CrownIcon className={!isPrimary ? styles.IconPlaceholder : ""} />
+                <CrownIcon className={`${styles.PrimaryIcon} ${!isPrimary ? styles.IconPlaceholder : ""}`} />
             </Tooltip>
         </div>
     );
