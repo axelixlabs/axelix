@@ -46,7 +46,7 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
             force: false,
             instanceId: instanceId!,
             statusType: runnable.enabled ? "disable" : "enable",
-            targetScheduledTask: runnable.runnable.target,
+            trigger: runnable.runnable.target,
         })
             .then(() => {
                 message.success(runnable.enabled ? t("ScheduledTasks.disabled") : t("ScheduledTasks.enabled"));

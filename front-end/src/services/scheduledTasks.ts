@@ -28,10 +28,10 @@ export const getScheduledTasksData = (instanceId: string) => {
 };
 
 export const updateScheduledTasksStatus = (data: IUpdateScheduledTasksStatusRequestData) => {
-    const { instanceId, statusType, targetScheduledTask, force } = data;
+    const { instanceId, statusType, trigger, force } = data;
 
     return apiFetch.post(`scheduled-tasks/${instanceId}/${statusType}`, {
-        targetScheduledTask: targetScheduledTask,
+        trigger: trigger,
         force: force,
     });
 };
