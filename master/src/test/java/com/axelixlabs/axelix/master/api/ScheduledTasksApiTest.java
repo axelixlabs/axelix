@@ -79,7 +79,6 @@ public class ScheduledTasksApiTest {
          {
           "cron": [
             {
-              "enabled": true,
               "runnable": {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.alive"
               },
@@ -88,35 +87,37 @@ public class ScheduledTasksApiTest {
                 "time": "2025-10-14T06:33:49.999631800Z"
               },
               "lastExecution": {
-                "status": "STARTED",
-                "time": "2025-10-14T06:33:48.014578100Z"
-              }
+                "exception": null,
+                "time": "2025-10-14T06:33:48.014578100Z",
+                "status": "STARTED"
+              },
+              "enabled": true
             },
             {
-              "enabled": true,
               "runnable": {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
               },
               "expression": "*/5 * * * * *",
               "nextExecution": {
                 "time": "2025-10-14T06:33:49.999631800Z"
-              }
+              },
+              "enabled": true
             },
             {
-              "enabled": true,
               "runnable": {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask"
               },
               "expression": "*/2 * * * * *",
               "lastExecution": {
-                "status": "SUCCESS",
-                "time": "2025-10-14T06:33:48.014578100Z"
-              }
+                "exception": null,
+                "time": "2025-10-14T06:33:48.014578100Z",
+                "status": "SUCCESS"
+              },
+              "enabled": true
             }
           ],
           "fixedDelay": [
             {
-              "enabled": true,
               "runnable": {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedDelayTask"
               },
@@ -126,14 +127,15 @@ public class ScheduledTasksApiTest {
                 "time": "2025-10-14T06:33:49.063630700Z"
               },
               "lastExecution": {
-                "status": "SUCCESS",
-                "time": "2025-10-14T06:33:47.001570800Z"
-              }
+                "exception": null,
+                "time": "2025-10-14T06:33:47.001570800Z",
+                "status": "SUCCESS"
+              },
+              "enabled": true
             }
           ],
           "fixedRate": [
             {
-              "enabled": false,
               "runnable": {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
               },
@@ -141,12 +143,12 @@ public class ScheduledTasksApiTest {
               "initialDelay": 100,
               "nextExecution": {
                 "time": "2025-10-14T06:33:50.086630700Z"
-              }
+              },
+              "enabled": false
             }
           ],
           "custom": [
             {
-              "enabled": false,
               "runnable": {
                 "target": "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig$$Lambda$1969/0x000001ed01b91ca8@1e1c1634"
               },
@@ -155,13 +157,14 @@ public class ScheduledTasksApiTest {
                 "time": "2025-10-14T06:33:50.086630700Z"
               },
               "lastExecution": {
-                "status": "ERROR",
-                "time": "2025-09-18T15:03:34.132500256Z",
                 "exception": {
                   "type": "java.lang.IllegalStateException",
                   "message": "Failed while running custom task"
-                }
-              }
+                },
+                "status": "ERROR",
+                "time": "2025-09-18T15:03:34.132500256Z"
+              },
+              "enabled": false
             }
           ]
         }

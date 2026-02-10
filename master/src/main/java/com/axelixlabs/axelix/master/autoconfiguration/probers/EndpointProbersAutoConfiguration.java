@@ -26,12 +26,9 @@ import com.axelixlabs.axelix.common.api.ConditionsFeed;
 import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
 import com.axelixlabs.axelix.common.api.InstanceDetails;
 import com.axelixlabs.axelix.common.api.ProfileMutationResult;
-import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
 import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
 import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
-import com.axelixlabs.axelix.common.api.metrics.MetricProfile;
-import com.axelixlabs.axelix.common.api.metrics.MetricsGroupsFeed;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.service.serde.BeansJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ConditionsJacksonMessageDeserializationStrategy;
@@ -40,12 +37,9 @@ import com.axelixlabs.axelix.master.service.serde.DetailsJacksonMessageDeseriali
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ProfileMutationJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.ScheduledTasksJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.LoggerLevelsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.ServiceLoggersJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.metrics.MetricsGroupsJacksonDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.metrics.SingleMetricJacksonDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.DefaultEndpointProber;
 import com.axelixlabs.axelix.master.service.transport.DiscardingAbstractEndpointProber;
@@ -184,17 +178,13 @@ public class EndpointProbersAutoConfiguration {
 
     // Metrics
     @Bean
-    public DefaultEndpointProber<MetricsGroupsFeed> getMetricGroupsEndpointProver(
-            MetricsGroupsJacksonDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_METRIC_GROUPS);
+    public ProxyingEndpointProber getMetricGroupsEndpointProver() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_METRIC_GROUPS);
     }
 
     @Bean
-    public DefaultEndpointProber<MetricProfile> getSingleMetricEndpointProver(
-            SingleMetricJacksonDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SINGLE_METRIC);
+    public ProxyingEndpointProber getSingleMetricEndpointProver() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_SINGLE_METRIC);
     }
 
     // Environment Property
@@ -240,10 +230,8 @@ public class EndpointProbersAutoConfiguration {
 
     // Scheduled tasks
     @Bean
-    public DefaultEndpointProber<ServiceScheduledTasks> getScheduledTasksEndpointProber(
-            ScheduledTasksJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_SCHEDULED_TASKS);
+    public ProxyingEndpointProber getScheduledTasksEndpointProber() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_SCHEDULED_TASKS);
     }
 
     @Bean
