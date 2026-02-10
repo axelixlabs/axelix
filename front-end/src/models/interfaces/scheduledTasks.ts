@@ -61,7 +61,7 @@ export interface IScheduledTasksResponseBody {
 
 export interface IUpdateScheduledTasksStatusRequestData {
     instanceId: string;
-    targetScheduledTask: string;
+    trigger: string;
     force: boolean;
     statusType: "enable" | "disable";
 }
