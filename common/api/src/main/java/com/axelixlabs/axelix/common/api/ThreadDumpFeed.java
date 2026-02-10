@@ -226,6 +226,28 @@ public final class ThreadDumpFeed {
         private final MonitorInfo[] lockedMonitors;
         private final LockInfo[] lockedSynchronizers;
 
+        /**
+         * Thread information. ThreadInfo contains the information about a thread.
+         *
+         * @param threadName name of the thread.
+         * @param threadId id of the thread.
+         * @param blockedTime time in milliseconds that the thread has spent blocked. -1 if thread contention monitoring is disabled.
+         * @param blockedCount total number of times that the thread has been blocked.
+         * @param waitedTime time in milliseconds that the thread has spent waiting. -1 if thread contention monitoring is disabled.
+         * @param waitedCount total number of times that the thread has waited for notification.
+         * @param lockInfo object for which the thread is blocked waiting.
+         * @param lockName description of the object on which the thread is blocked.
+         * @param lockOwnerId id of the thread that owns the object on which the thread is blocked. -1 if the thread is not blocked.
+         * @param lockOwnerName name of the thread that owns the object on which the thread is blocked.
+         * @param daemon whether the thread is a daemon thread.
+         * @param inNative whether the thread is executing native code.
+         * @param suspended whether the thread is suspended.
+         * @param threadState state of the thread
+         * @param priority priority of the thread.
+         * @param stackTrace stack trace of the thread.
+         * @param lockedMonitors monitors locked by this thread.
+         * @param lockedSynchronizers synchronizers locked by this thread.
+         */
         @JsonCreator
         public ThreadInfo(
                 @JsonProperty("threadName") String threadName,
@@ -445,6 +467,12 @@ public final class ThreadDumpFeed {
         private final String className;
         private final int identityHashCode;
 
+        /**
+         * Object for which the thread is blocked waiting.
+         *
+         * @param className fully qualified class name of the lock object.
+         * @param identityHashCode identity hash code of the lock object.
+         */
         @JsonCreator
         public LockInfo(
                 @JsonProperty("className") String className, @JsonProperty("identityHashCode") int identityHashCode) {
@@ -490,8 +518,20 @@ public final class ThreadDumpFeed {
         private final int lockedStackDepth;
         private final StackTraceElement lockedStackFrame;
 
+        /**
+         * Monitors locked by this thread.
+         *
+         * @param className class name of the lock object.
+         * @param identityHashCode identity hash code of the lock object.
+         * @param lockedStackDepth stack depth where the monitor was locked.
+         * @param lockedStackFrame stack frame that locked the monitor.
+         */
+        @JsonCreator
         public MonitorInfo(
-                String className, int identityHashCode, int lockedStackDepth, StackTraceElement lockedStackFrame) {
+                @JsonProperty("className") String className,
+                @JsonProperty("identityHashCode") int identityHashCode,
+                @JsonProperty("lockedStackDepth") int lockedStackDepth,
+                @JsonProperty("lockedStackFrame") StackTraceElement lockedStackFrame) {
             this.className = className;
             this.identityHashCode = identityHashCode;
             this.lockedStackDepth = lockedStackDepth;
@@ -550,6 +590,9 @@ public final class ThreadDumpFeed {
         }
     }
 
+    /**
+     * State of the thread
+     */
     public enum State {
         NEW,
         RUNNABLE,
@@ -580,6 +623,18 @@ public final class ThreadDumpFeed {
 
         private final boolean nativeMethod;
 
+        /**
+         * Stack trace of the thread.
+         *
+         * @param classLoaderName name of the class loader of the class that contains the execution point identified by this entry.
+         * @param className name of the class that contains the execution point identified by this entry.
+         * @param fileName Name of the source file that contains the execution point identified by this entry.
+         * @param lineNumber line number of the execution point identified by this entry. Negative if unknown.
+         * @param methodName name of the method.
+         * @param moduleName name of the module that contains the execution point identified by this entry.
+         * @param moduleVersion version of the module that contains the execution point identified by this entry.
+         * @param nativeMethod whether the execution point is a native method.
+         */
         @JsonCreator
         public StackTraceElement(
                 @JsonProperty("classLoaderName") @Nullable String classLoaderName,

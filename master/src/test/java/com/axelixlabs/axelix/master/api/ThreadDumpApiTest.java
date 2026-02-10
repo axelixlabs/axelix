@@ -117,10 +117,6 @@ class ThreadDumpApiTest {
           "blockedCount" : 0,
           "waitedTime" : -1,
           "waitedCount" : 1,
-          "lockInfo" : {
-            "className" : "java.lang.ref.ReferenceQueue$Lock",
-            "identityHashCode" : 1627380895
-          },
           "lockName" : "java.lang.ref.ReferenceQueue$Lock@60ffdc9f",
           "lockOwnerId" : -1,
           "lockOwnerName" : null,
@@ -149,7 +145,11 @@ class ThreadDumpApiTest {
             "nativeMethod" : false
           } ],
           "lockedMonitors" : [ ],
-          "lockedSynchronizers" : [ ]
+          "lockedSynchronizers" : [ ],
+          "lockInfo" : {
+            "className" : "java.lang.ref.ReferenceQueue$Lock",
+            "identityHashCode" : 1627380895
+          }
         } ]
     }
     """;
@@ -189,28 +189,33 @@ class ThreadDumpApiTest {
          "blockedCount" : 37,
          "waitedTime" : -1,
          "waitedCount" : 109,
+         "lockInfo" : null,
+         "lockName" : null,
          "lockOwnerId" : -1,
+         "lockOwnerName" : null,
          "daemon" : false,
          "inNative" : false,
          "suspended" : false,
          "threadState" : "RUNNABLE",
          "priority" : 5,
          "stackTrace" : [ {
-           "moduleName" : "java.management",
-           "moduleVersion" : "17.0.17",
-           "methodName" : "dumpThreads0",
+           "classLoaderName" : null,
+           "className" : "sun.management.ThreadImpl",
            "fileName" : "ThreadImpl.java",
            "lineNumber" : -2,
-           "nativeMethod" : true,
-           "className" : "sun.management.ThreadImpl"
-         }, {
+           "methodName" : "dumpThreads0",
            "moduleName" : "java.management",
            "moduleVersion" : "17.0.17",
-           "methodName" : "dumpAllThreads",
+           "nativeMethod" : true
+         }, {
+           "classLoaderName" : null,
+           "className" : "sun.management.ThreadImpl",
            "fileName" : "ThreadImpl.java",
            "lineNumber" : 528,
-           "nativeMethod" : false,
-           "className" : "sun.management.ThreadImpl"
+           "methodName" : "dumpAllThreads",
+           "moduleName" : "java.management",
+           "moduleVersion" : "17.0.17",
+           "nativeMethod" : false
          } ],
          "lockedMonitors" : [ ],
          "lockedSynchronizers" : [ ]
@@ -223,26 +228,30 @@ class ThreadDumpApiTest {
          "waitedCount" : 1,
          "lockName" : "java.lang.ref.ReferenceQueue$Lock@60ffdc9f",
          "lockOwnerId" : -1,
+         "lockOwnerName" : null,
          "daemon" : true,
          "inNative" : false,
          "suspended" : false,
          "threadState" : "WAITING",
          "priority" : 8,
          "stackTrace" : [ {
-           "moduleName" : "java.base",
-           "moduleVersion" : "17.0.17",
-           "methodName" : "wait",
+           "classLoaderName" : null,
+           "className" : "java.lang.Object",
+           "fileName" : null,
            "lineNumber" : -2,
-           "nativeMethod" : true,
-           "className" : "java.lang.Object"
-         }, {
+           "methodName" : "wait",
            "moduleName" : "java.base",
            "moduleVersion" : "17.0.17",
-           "methodName" : "run",
+           "nativeMethod" : true
+         }, {
+           "classLoaderName" : null,
+           "className" : "java.lang.ref.Finalizer$FinalizerThread",
            "fileName" : "Finalizer.java",
            "lineNumber" : 172,
-           "nativeMethod" : false,
-           "className" : "java.lang.ref.Finalizer$FinalizerThread"
+           "methodName" : "run",
+           "moduleName" : "java.base",
+           "moduleVersion" : "17.0.17",
+           "nativeMethod" : false
          } ],
          "lockedMonitors" : [ ],
          "lockedSynchronizers" : [ ],

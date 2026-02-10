@@ -27,7 +27,6 @@ import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
 import com.axelixlabs.axelix.common.api.InstanceDetails;
 import com.axelixlabs.axelix.common.api.ProfileMutationResult;
 import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
-import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
@@ -48,7 +47,6 @@ import com.axelixlabs.axelix.master.service.serde.GcLogStatusMessageDeserializat
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ProfileMutationJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ScheduledTasksJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.ThreadDumpJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.caches.ServiceCachesJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.caches.SingleCacheJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
@@ -60,7 +58,7 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.DefaultEndpointProber;
 import com.axelixlabs.axelix.master.service.transport.DiscardingAbstractEndpointProber;
 import com.axelixlabs.axelix.master.service.transport.EndpointProber;
-import com.axelixlabs.axelix.master.service.transport.ProxyingEndpointProper;
+import com.axelixlabs.axelix.master.service.transport.ProxyingEndpointProber;
 
 /**
  * Configuration that creates necessary {@link EndpointProber} instances to
@@ -179,10 +177,8 @@ public class EndpointProbersAutoConfiguration {
 
     // ThreadDump
     @Bean
-    public DefaultEndpointProber<ThreadDumpFeed> getThreadDumpEndpointProber(
-            ThreadDumpJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_THREAD_DUMP);
+    public ProxyingEndpointProber getThreadDumpEndpointProber() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_THREAD_DUMP);
     }
 
     @Bean
@@ -322,8 +318,8 @@ public class EndpointProbersAutoConfiguration {
 
     // @Transaction monitoring
     @Bean
-    public ProxyingEndpointProper transactionMonitoringProxyingEndpointProper() {
-        return new ProxyingEndpointProper(instanceRegistry, ActuatorEndpoints.TRANSACTION_STATS_GET);
+    public ProxyingEndpointProber transactionMonitoringProxyingEndpointProper() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.TRANSACTION_STATS_GET);
     }
 
     @Bean
