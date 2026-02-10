@@ -30,7 +30,6 @@ import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
 import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
 import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
@@ -43,7 +42,6 @@ import com.axelixlabs.axelix.master.service.serde.ConfigPropsJacksonMessageDeser
 import com.axelixlabs.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.EnvironmentJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.GcLogStatusMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ProfileMutationJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.ScheduledTasksJacksonMessageDeserializationStrategy;
@@ -232,10 +230,8 @@ public class EndpointProbersAutoConfiguration {
     }
 
     @Bean
-    public DefaultEndpointProber<GcLogStatusResponse> getGcLogStatusEndpointProber(
-            GcLogStatusMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_STATUS_GC_LOGGING);
+    public ProxyingEndpointProber getGcLogStatusEndpointProber() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_STATUS_GC_LOGGING);
     }
 
     @Bean
