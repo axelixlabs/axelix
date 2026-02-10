@@ -60,7 +60,7 @@ public class SpaStaticResourcesHandler {
     }
 
     // TODO: Add ETag caching support
-    @GetMapping(value = "/**")
+    @GetMapping({"/", "/index.html", "/{path:^(?!swagger-ui).*$}/**"})
     public ResponseEntity<Resource> getResource(HttpServletRequest request) throws IOException {
         String contextPath = request.getServletPath();
 
