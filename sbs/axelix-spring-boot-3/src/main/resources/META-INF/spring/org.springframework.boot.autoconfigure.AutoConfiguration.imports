@@ -18,6 +18,6 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.ProfileManagementAutoConfigur
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.PropertyManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.SpringCloudFeignAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.autoconfiguration.SpringCloudFeignIntegrationAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration
