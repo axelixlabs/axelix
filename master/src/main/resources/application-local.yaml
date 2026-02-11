@@ -1,5 +1,8 @@
 axelix:
   master:
+    web:
+      static-resources:
+        location: ../front-end/dist
     discovery:
       auto: true
       platform: kubernetes
