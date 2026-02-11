@@ -21,6 +21,8 @@ import java.util.Set;
 
 import feign.Feign;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;
@@ -58,22 +60,13 @@ class SpringCloudFeignIntegrationAutoConfigurationTest {
         });
     }
 
-    @Test
-    void shouldNotActivateAutoConfiguration_whenFeignClassMissing() {
-        contextRunner.withClassLoader(new FilteredClassLoader(Feign.class)).run(context -> {
+    @ParameterizedTest
+    @ValueSource(classes = {Feign.class, FeignClient.class})
+    void shouldNotActivateAutoConfiguration_whenFeignClassMissing(Class<?> toBeExcluded) {
+        contextRunner.withClassLoader(new FilteredClassLoader(toBeExcluded)).run(context -> {
             assertThat(context).doesNotHaveBean(SpringCloudFeignIntegrationAutoConfiguration.class);
             assertThat(context).doesNotHaveBean(IntegrationComponentDiscoverer.class);
         });
-    }
-
-    @Test
-    void shouldNotActivateAutoConfiguration_whenFeignClientClassMissing() {
-        contextRunner
-                .withClassLoader(new FilteredClassLoader(FeignClient.class))
-                .run(context -> {
-                    assertThat(context).doesNotHaveBean(SpringCloudFeignIntegrationAutoConfiguration.class);
-                    assertThat(context).doesNotHaveBean(IntegrationComponentDiscoverer.class);
-                });
     }
 
     @Test
