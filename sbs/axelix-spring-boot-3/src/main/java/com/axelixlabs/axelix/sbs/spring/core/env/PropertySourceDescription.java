@@ -17,8 +17,11 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jspecify.annotations.Nullable;
 
@@ -107,6 +110,12 @@ public enum PropertySourceDescription {
             RandomValuePropertySource.RANDOM_PROPERTY_SOURCE_NAME,
             "Contains dynamically generated random values for placeholders like ${random.*}");
 
+    // Matches Spring's config resource property source names to extract the file name and location.
+    // Example: "Config resource 'class path resource [application-dev.properties]' via location 'optional:classpath:/'"
+    // Example: "Config resource 'file [/etc/app/application-prod.yaml]' via location 'optional:file:/etc/app/'"
+    private static final Pattern CONFIG_RESOURCE_PATTERN =
+            Pattern.compile("Config resource '(?:class path resource|file) \\[([^]]+)]' via location '([^']+)'");
+
     private final String sourceName;
     private final String description;
 
@@ -115,12 +124,30 @@ public enum PropertySourceDescription {
         this.description = description;
     }
 
-    public String getSourceName() {
-        return sourceName;
-    }
-
     public String getDescription() {
         return description;
+    }
+
+    public static PropertySourceDisplayData resolveDisplayData(String sourceName) {
+        if (sourceName.startsWith("Config resource")) {
+            Matcher matcher = CONFIG_RESOURCE_PATTERN.matcher(sourceName);
+            if (matcher.find()) {
+                String displayName = Paths.get(matcher.group(1)).getFileName().toString();
+                String description = buildConfigResourceDescription(displayName, matcher.group(2));
+                return new PropertySourceDisplayData(displayName, description);
+            }
+        }
+        return new PropertySourceDisplayData(sourceName, getDescriptionBySourceName(sourceName));
+    }
+
+    private static String buildConfigResourceDescription(String fileName, String location) {
+        return "Properties that are loaded from " + fileName + " located in " + location;
+    }
+
+    private static @Nullable String getDescriptionBySourceName(String sourceName) {
+        return findBySourceName(sourceName)
+                .map(PropertySourceDescription::getDescription)
+                .orElse(null);
     }
 
     private static Optional<PropertySourceDescription> findBySourceName(String sourceName) {
@@ -129,9 +156,8 @@ public enum PropertySourceDescription {
                 .findFirst();
     }
 
-    public static @Nullable String getDescriptionBySourceName(String sourceName) {
-        return findBySourceName(sourceName)
-                .map(PropertySourceDescription::getDescription)
-                .orElse(null);
-    }
+    /**
+     * DTO, used to decouple the raw Spring property source name from its user-friendly representation.
+     */
+    public record PropertySourceDisplayData(String displayName, @Nullable String description) {}
 }
