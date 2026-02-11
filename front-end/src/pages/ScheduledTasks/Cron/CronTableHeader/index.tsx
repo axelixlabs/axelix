@@ -17,18 +17,18 @@
  */
 import { useTranslation } from "react-i18next";
 
-import styles from "./styles.module.css";
+import styles from "../../styles.module.css";
 
 export const CronTableHeader = () => {
     const { t } = useTranslation();
 
     return (
         <>
-            <div className={`TableHeader ${styles.CronTableHeader}`}>
-                <div className="RowChunk">{t("ScheduledTasks.runnable")}</div>
-                <div className={`RowChunk ${styles.CenteredRowChunk}`}>{t("ScheduledTasks.expression")}</div>
-                <div className={`RowChunk ${styles.CenteredRowChunk}`}>{t("status")}</div>
-                <div className={`RowChunk ${styles.CenteredRowChunk}`}>{t("ScheduledTasks.run")}</div>
+            <div className={styles.RowChunksWrapper}>
+                <div className={styles.RowChunk}>{t("ScheduledTasks.runnable")}</div>
+                <div className={styles.RowChunk}>{t("ScheduledTasks.expression")}</div>
+                <div className={styles.RowChunk}>{t("status")}</div>
+                <div className={styles.RowChunk}>{t("ScheduledTasks.run")}</div>
             </div>
         </>
     );

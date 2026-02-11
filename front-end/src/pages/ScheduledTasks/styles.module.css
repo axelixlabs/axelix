@@ -6,3 +6,72 @@
 .SectionWrapper:not(:last-child) {
     margin-bottom: 40px;
 }
+
+.CronTaskTable,
+.FixedTaskTable {
+    display: grid;
+    border-radius: var(--axelix-border-radius-large);
+    border: 1px solid var(--axelix-light-grey);
+    overflow: hidden;
+}
+
+.CronTaskTable {
+    grid-template-columns: 1fr repeat(3, min-content);
+}
+
+.FixedTaskTable {
+    grid-template-columns: 1fr repeat(4, min-content);
+}
+
+.RowChunksWrapper {
+    display: contents;
+}
+
+.RowChunk,
+.BodyRowChunk {
+    padding: 16px;
+    border-bottom: 1px solid var(--axelix-light-grey);
+    white-space: nowrap;
+    border-right: 1px solid var(--axelix-light-grey);
+}
+
+.RowChunk {
+    background-color: var(--axelix-primary-light-green);
+    font-weight: 600;
+    text-align: center;
+}
+
+.BodyRowChunk {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.RowChunk:first-child {
+    text-align: left;
+}
+
+.BodyRowChunk:first-child {
+    justify-content: flex-start;
+    min-width: 0;
+}
+
+:is(.RowChunk, .BodyRowChunk):last-child {
+    border: none;
+}
+
+.RowChunksWrapper:nth-child(even) .BodyRowChunk {
+    background-color: #f9f9f9;
+}
+
+.RowChunksWrapper:hover .BodyRowChunk {
+    background-color: #f5f5f5;
+}
+
+.IntervalWrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    column-gap: 8px;
+}

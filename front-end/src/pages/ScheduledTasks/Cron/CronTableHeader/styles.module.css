@@ -1,7 +1,0 @@
-.CronTableHeader {
-    grid-template-columns: 1fr 230px 110px 110px;
-}
-
-.CenteredRowChunk {
-    justify-content: center;
-}
