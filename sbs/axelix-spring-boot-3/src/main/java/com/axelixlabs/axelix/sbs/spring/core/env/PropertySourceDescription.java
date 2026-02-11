@@ -61,6 +61,8 @@ public enum PropertySourceDescription {
             "applicationInfo",
             "Contains application metadata extracted from the 'MANIFEST.MF' file and core Spring Boot properties 'spring.application.*'"),
 
+    // TODO: simplify the description here. It is not true that the config file is necessarily loaded from the
+    // classpath.
     APPLICATION_PROPERTIES(
             "Config resource",
             "Contains properties from the 'application*.properties/yaml' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources."),
@@ -110,9 +112,24 @@ public enum PropertySourceDescription {
             RandomValuePropertySource.RANDOM_PROPERTY_SOURCE_NAME,
             "Contains dynamically generated random values for placeholders like ${random.*}");
 
-    // Matches Spring's config resource property source names to extract the file name and location.
-    // Example: "Config resource 'class path resource [application-dev.properties]' via location 'optional:classpath:/'"
-    // Example: "Config resource 'file [/etc/app/application-prod.yaml]' via location 'optional:file:/etc/app/'"
+    /**
+     * Matches Spring's config resource property source names to extract the file name and location.
+     * <p>
+     * Example: "Config resource 'class path resource [application-dev.properties]' via location 'optional:classpath:/'"
+     * Example: "Config resource 'file [/etc/app/application-prod.yaml]' via location 'optional:file:/etc/app/'"
+     * <p>
+     * Well, yes, this approach is not that reliable, and we know that. However, the problem is that the name of the given
+     * {@link org.springframework.core.env.PropertySource}, especially those that we care about, i.e.
+     * <ol>
+     *     <li>{@link org.springframework.boot.env.OriginTrackedMapPropertySource})</li>
+     *     <li>{@link org.springframework.core.io.support.ResourcePropertySource})</li>
+     * </ol>
+     *
+     * contains all the information required for us to present it in a user-friendly way. And, apparently, it is the easiest
+     * approach out there to get this info, since all the PropertySources above loose all the information about the underlying
+     * {@link org.springframework.core.io.Resource}, it is just gone at runtime. We can of course try to overcome this by writing
+     * custom machinery around PropertySources, but that just does not justify the engineering effort.
+     */
     private static final Pattern CONFIG_RESOURCE_PATTERN =
             Pattern.compile("Config resource '(?:class path resource|file) \\[([^]]+)]' via location '([^']+)'");
 
@@ -133,15 +150,12 @@ public enum PropertySourceDescription {
             Matcher matcher = CONFIG_RESOURCE_PATTERN.matcher(sourceName);
             if (matcher.find()) {
                 String displayName = Paths.get(matcher.group(1)).getFileName().toString();
-                String description = buildConfigResourceDescription(displayName, matcher.group(2));
+                String description = String.format(
+                        "Properties that are loaded from %s located in %s", displayName, matcher.group(2));
                 return new PropertySourceDisplayData(displayName, description);
             }
         }
         return new PropertySourceDisplayData(sourceName, getDescriptionBySourceName(sourceName));
-    }
-
-    private static String buildConfigResourceDescription(String fileName, String location) {
-        return "Properties that are loaded from " + fileName + " located in " + location;
     }
 
     private static @Nullable String getDescriptionBySourceName(String sourceName) {
