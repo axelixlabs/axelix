@@ -28,6 +28,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.lang.Assert;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
@@ -54,6 +55,9 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
     private final String signingKey;
 
     public DefaultJwtDecoderService(JwtAlgorithm algorithm, String signingKey) {
+        Assert.notNull(algorithm, "The jwt signing algorithm is not specified, although it is required");
+        Assert.notNull(algorithm, "The jwt signing key is not specified, although it is required");
+
         this.verificationStrategy = JwtVerificationStrategyFactory.createVerificationStrategy(algorithm);
         this.signingKey = Objects.requireNonNull(signingKey);
     }

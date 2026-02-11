@@ -66,9 +66,7 @@ class LibraryDiscovererAutoConfigurationTest {
     @Test
     void shouldCreateNoOpLibraryDiscoverer_whenNeitherResourceNorPropertyPresent() {
         contextRunner
-                .withClassLoader(new FilteredClassLoader(
-                        new ClassPathResource("META-INF/other/application.cdx.json"),
-                        new ClassPathResource("META-INF/sbom/application.cdx.json")))
+                .withClassLoader(new FilteredClassLoader(new ClassPathResource("META-INF/sbom/application.cdx.json")))
                 .run(context -> {
                     assertThat(context).hasSingleBean(LibraryDiscoverer.class);
                     assertThat(context.getBean(LibraryDiscoverer.class))

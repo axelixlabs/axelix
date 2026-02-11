@@ -52,7 +52,7 @@ class ScheduledTaskManagementAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues("management.endpoints.web.exposure.include=axelix-scheduled-tasks")
-            .withUserConfiguration(EnableSchedulingConfig.class, TaskSchedulerConfig.class)
+            .withUserConfiguration(EnableSchedulingConfig.class)
             .withConfiguration(AutoConfigurations.of(ScheduledTaskManagementAutoConfiguration.class));
 
     @Test
@@ -72,7 +72,7 @@ class ScheduledTaskManagementAutoConfigurationTest {
     @Test
     void shouldNotActivateAutoConfiguration_withoutRequiredProperty() {
         new ApplicationContextRunner()
-                .withUserConfiguration(EnableSchedulingConfig.class, TaskSchedulerConfig.class)
+                .withUserConfiguration(EnableSchedulingConfig.class)
                 .withConfiguration(AutoConfigurations.of(ScheduledTaskManagementAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(ScheduledTaskManagementAutoConfiguration.class);
@@ -114,10 +114,8 @@ class ScheduledTaskManagementAutoConfigurationTest {
 
     @TestConfiguration
     @EnableScheduling
-    static class EnableSchedulingConfig {}
+    static class EnableSchedulingConfig {
 
-    @TestConfiguration
-    static class TaskSchedulerConfig {
         @Bean
         public TaskScheduler taskScheduler() {
             return new ThreadPoolTaskScheduler();

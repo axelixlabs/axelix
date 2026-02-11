@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.util.Map;
 
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -248,7 +249,7 @@ class JwtAuthorizationFilterTest {
      * {@link JwtAuthorizationFilter} for use in the test suite.
      */
     @SpringBootConfiguration
-    @EnableAutoConfiguration
+    @EnableAutoConfiguration(exclude = JwtAuthAutoConfiguration.class)
     static class JwtAuthorizationFilterTestConfiguration {
 
         @Bean
