@@ -23,6 +23,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -51,6 +52,7 @@ import com.axelixlabs.axelix.sbs.spring.core.scheduled.TriggerBasedTaskReschedul
  */
 @AutoConfiguration
 @ConditionalOnBean(ScheduledAnnotationBeanPostProcessor.class)
+@ConditionalOnAvailableEndpoint(endpoint = AxelixScheduledTasksEndpoint.class)
 public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean

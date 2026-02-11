@@ -17,12 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import io.jsonwebtoken.JwtParser;
-
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -53,8 +49,6 @@ import com.axelixlabs.axelix.sbs.spring.core.config.AuthConfigurationProperties;
  * @since 22.07.2025
  */
 @AutoConfiguration
-@ConditionalOnProperty(name = "axelix.sbs.auth.jwt")
-@ConditionalOnClass({JwtDecoderService.class, JwtParser.class})
 @EnableConfigurationProperties(AuthConfigurationProperties.class)
 public class JwtAuthAutoConfiguration {
 
