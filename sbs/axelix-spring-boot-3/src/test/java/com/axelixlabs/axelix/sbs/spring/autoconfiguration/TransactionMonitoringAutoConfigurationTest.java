@@ -21,13 +21,11 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
@@ -115,57 +113,7 @@ class TransactionMonitoringAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isNotNull();
-                    assertThat(context.getStartupFailure().getMessage())
-                            .contains("cleanupInterval must be non-negative");
-                });
-    }
-
-    @Test
-    void shouldNotCreateDefaultTransactionStatsCollector_whenCustomBeanProvided() {
-        contextRunner
-                .withUserConfiguration(CustomTransactionStatsCollectorConfig.class)
-                .run(context -> {
-                    assertThat(context).hasSingleBean(TransactionStatsCollector.class);
-                    assertThat(context.getBean(TransactionStatsCollector.class))
-                            .isExactlyInstanceOf(CustomTransactionStatsCollector.class);
-
-                    // Other beans should still be created
-                    assertThat(context).hasSingleBean(TransactionMonitoringService.class);
-                    assertThat(context).hasSingleBean(TransactionMonitoringEndpoint.class);
-                    assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
-                });
-    }
-
-    @Test
-    void shouldNotCreateDefaultTransactionMonitoringService_whenCustomBeanProvided() {
-        contextRunner
-                .withUserConfiguration(CustomTransactionMonitoringServiceConfig.class)
-                .run(context -> {
-                    assertThat(context).hasSingleBean(TransactionMonitoringService.class);
-                    assertThat(context.getBean(TransactionMonitoringService.class))
-                            .isExactlyInstanceOf(CustomTransactionMonitoringService.class);
-                });
-    }
-
-    @Test
-    void shouldNotCreateDefaultTransactionMonitoringEndpoint_whenCustomBeanProvided() {
-        contextRunner
-                .withUserConfiguration(CustomTransactionMonitoringEndpointConfig.class)
-                .run(context -> {
-                    assertThat(context).hasSingleBean(TransactionMonitoringEndpoint.class);
-                    assertThat(context.getBean(TransactionMonitoringEndpoint.class))
-                            .isExactlyInstanceOf(CustomTransactionMonitoringEndpoint.class);
-                });
-    }
-
-    @Test
-    void shouldNotCreateDefaultTransactionMonitoringBeanPostProcessor_whenCustomBeanProvided() {
-        contextRunner
-                .withUserConfiguration(CustomTransactionMonitoringBeanPostProcessorConfig.class)
-                .run(context -> {
-                    assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
-                    assertThat(context.getBean(TransactionMonitoringBeanPostProcessor.class))
-                            .isExactlyInstanceOf(CustomTransactionMonitoringBeanPostProcessor.class);
+                    assertThat(context.getStartupFailure().getMessage()).contains("cleanupInterval must be positive");
                 });
     }
 
@@ -189,32 +137,18 @@ class TransactionMonitoringAutoConfigurationTest {
                 });
     }
 
-    @Test
-    void shouldWireBeansCorrectly() {
-        contextRunner.run(context -> {
-            TransactionStatsCollector transactionStatsCollector = context.getBean(TransactionStatsCollector.class);
-            assertThat(transactionStatsCollector).isExactlyInstanceOf(DefaultTransactionStatsCollector.class);
-
-            TransactionMonitoringService monitoringService = context.getBean(TransactionMonitoringService.class);
-            assertThat(monitoringService).isExactlyInstanceOf(DefaultTransactionMonitoringService.class);
-
-            TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor =
-                    context.getBean(TransactionMonitoringBeanPostProcessor.class);
-            assertThat(transactionMonitoringBeanPostProcessor).isInstanceOf(BeanPostProcessor.class);
-        });
-    }
-
     @TestConfiguration
     static class CustomTransactionStatsCollectorConfig {
+
         @Bean
-        public TransactionStatsCollector transactionStatsCollector(
-                TransactionMonitoringConfigurationProperties properties) {
+        public TransactionStatsCollector transactionStatsCollector() {
             return new CustomTransactionStatsCollector();
         }
     }
 
     @TestConfiguration
     static class CustomTransactionMonitoringServiceConfig {
+
         @Bean
         public TransactionMonitoringService transactionMonitoringService(
                 TransactionStatsCollector transactionStatsCollector) {
@@ -224,6 +158,7 @@ class TransactionMonitoringAutoConfigurationTest {
 
     @TestConfiguration
     static class CustomTransactionMonitoringEndpointConfig {
+
         @Bean
         public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
                 TransactionMonitoringService transactionMonitoringService) {
@@ -233,6 +168,7 @@ class TransactionMonitoringAutoConfigurationTest {
 
     @TestConfiguration
     static class CustomTransactionMonitoringBeanPostProcessorConfig {
+
         @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector) {

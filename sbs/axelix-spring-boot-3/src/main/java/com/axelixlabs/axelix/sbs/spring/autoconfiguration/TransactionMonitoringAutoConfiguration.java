@@ -48,7 +48,7 @@ public class TransactionMonitoringAutoConfiguration {
     public TransactionStatsCollector transactionStatsCollector(
             TransactionMonitoringConfigurationProperties properties) {
         Assert.isTrue(properties.maxTransactionsPerMethod() > 0, "maxTransactionsPerMethod must be positive");
-        Assert.isTrue(properties.cleanupInterval().toSeconds() > 0L, "cleanupInterval must be non-negative");
+        Assert.isTrue(properties.cleanupInterval().toSeconds() > 0L, "cleanupInterval must be positive");
         return new DefaultTransactionStatsCollector(
                 properties.maxTransactionsPerMethod(), properties.cleanupInterval());
     }
