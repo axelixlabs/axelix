@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,7 @@ import com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpManagementEndp
  * @author Sergey Cherkasov
  */
 @AutoConfiguration
+@ConditionalOnAvailableEndpoint(endpoint = ThreadDumpManagementEndpoint.class)
 public class ThreadDumpManagementEndpointAutoConfiguration {
 
     @Bean

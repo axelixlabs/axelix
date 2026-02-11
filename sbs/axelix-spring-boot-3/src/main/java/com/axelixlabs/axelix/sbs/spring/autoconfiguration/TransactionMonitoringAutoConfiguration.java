@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -38,6 +39,7 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollec
  * @author Nikita Kirillov
  */
 @AutoConfiguration
+@ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
 @EnableConfigurationProperties(TransactionMonitoringConfigurationProperties.class)
 public class TransactionMonitoringAutoConfiguration {
 
@@ -46,7 +48,7 @@ public class TransactionMonitoringAutoConfiguration {
     public TransactionStatsCollector transactionStatsCollector(
             TransactionMonitoringConfigurationProperties properties) {
         Assert.isTrue(properties.maxTransactionsPerMethod() > 0, "maxTransactionsPerMethod must be positive");
-        Assert.isTrue(properties.cleanupInterval().toSeconds() > 0L, "cleanupInterval must be non-negative");
+        Assert.isTrue(properties.cleanupInterval().toSeconds() > 0L, "cleanupInterval must be positive");
         return new DefaultTransactionStatsCollector(
                 properties.maxTransactionsPerMethod(), properties.cleanupInterval());
     }

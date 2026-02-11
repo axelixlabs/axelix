@@ -21,6 +21,7 @@ import feign.Feign;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -40,9 +41,10 @@ import com.axelixlabs.axelix.sbs.spring.core.integrations.http.HttpIntegration;
  */
 @AutoConfiguration
 @ConditionalOnClass({Feign.class, FeignClient.class})
-public class SpringCloudFeignAutoConfiguration {
+public class SpringCloudFeignIntegrationAutoConfiguration {
 
     @Bean
+    @ConditionalOnMissingBean
     public IntegrationComponentDiscoverer<HttpIntegration> feignClientIntegrationDiscoverer(
             ApplicationContext context) {
         return new FeignClientIntegrationDiscoverer(context);
