@@ -100,15 +100,15 @@ class DefaultEnvPropertyEnricherTest {
         EnvironmentFeed environmentFeed = enricher.enrich(defaultDescriptor);
 
         List<PropertySource> configResourceSources = environmentFeed.getPropertySources().stream()
-                .filter(it -> it.getSourceName().endsWith(".yaml"))
+                .filter(it -> it.getName().endsWith(".yaml"))
                 .toList();
 
         assertThat(configResourceSources).isNotEmpty();
 
         configResourceSources.forEach(source -> {
-            assertThat(source.getSourceName()).isEqualTo("application.yaml");
+            assertThat(source.getName()).isEqualTo("application.yaml");
 
-            assertThat(source.getSourceDescription())
+            assertThat(source.getDescription())
                     .isEqualTo("Properties that are loaded from application.yaml located in optional:classpath:/");
         });
     }
