@@ -10,6 +10,6 @@
     justify-content: flex-end;
 }
 
-.UpdateButton {
+.EditActionButtons {
     flex-shrink: 0;
 }

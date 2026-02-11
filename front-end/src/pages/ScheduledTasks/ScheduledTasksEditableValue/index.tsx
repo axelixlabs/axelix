@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { CheckOutlined, EditOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 
 import { App, Button, Input, Popover } from "antd";
 import type { AxiosResponse } from "axios";
@@ -92,11 +92,19 @@ export const ScheduledTasksEditableValue = ({ initialValue, successMessage, tool
                         </OptionalTooltip>
 
                         <Button
+                            icon={<CloseOutlined />}
+                            type="primary"
+                            onClick={() => setTempValue(initialValue)}
+                            loading={loading}
+                            className={styles.EditActionButtons}
+                        />
+
+                        <Button
                             icon={<CheckOutlined />}
                             type="primary"
                             onClick={handleUpdate}
                             loading={loading}
-                            className={styles.UpdateButton}
+                            className={styles.EditActionButtons}
                         />
                     </div>
                 }
