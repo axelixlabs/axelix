@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.api.external.endpoint.caches;
 
 import java.util.Map;
-import java.util.Objects;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,6 +25,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,13 +39,10 @@ import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.caches.CacheProfileResponse;
-import com.axelixlabs.axelix.master.api.external.response.caches.CachesResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -58,40 +56,30 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class CachesReadApi {
 
     private final EndpointInvoker endpointInvoker;
-    private final Converter<CachesFeed, CachesResponse> cachesFeedConverter;
-    private final Converter<SingleCache, CacheProfileResponse> singleCacheConverter;
 
-    public CachesReadApi(
-            EndpointInvoker endpointInvoker,
-            Converter<CachesFeed, CachesResponse> cachesFeedConverter,
-            Converter<SingleCache, CacheProfileResponse> singleCacheConverter) {
+    public CachesReadApi(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
-        this.cachesFeedConverter = cachesFeedConverter;
-        this.singleCacheConverter = singleCacheConverter;
     }
 
     @DefaultApiResponse(summary = "Returns details of the application's caches.")
     @ApiResponse(
             description = "OK",
             responseCode = "200",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = CachesResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = CachesFeed.class)))
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.CachesApi.INSTANCE_ID)
-    public CachesResponse getAllCaches(@PathVariable("instanceId") String instanceId) {
-        CachesFeed feed = endpointInvoker.invoke(
+    public ResponseEntity<byte[]> getAllCaches(@PathVariable("instanceId") String instanceId) {
+        byte[] body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_CACHES, NoHttpPayload.INSTANCE);
 
-        return Objects.requireNonNull(cachesFeedConverter.convert(feed));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
     @DefaultApiResponse(summary = "Returns details of the requested cache by its name and cache manager name.")
     @ApiResponse(
             description = "OK",
             responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = CacheProfileResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = SingleCache.class)))
     @Parameter(name = "cacheName", description = "The name of the cache to find", required = true)
     @Parameter(
             name = "cacheManager",
@@ -99,14 +87,14 @@ public class CachesReadApi {
             required = true)
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.CachesApi.CACHE_NAME)
-    public CacheProfileResponse getCacheByNameWithQueryParameter(
+    public ResponseEntity<byte[]> getCacheByNameWithQueryParameter(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("cacheName") String cacheName,
             @RequestParam("cacheManager") String cacheManager) {
 
         HttpPayload payload = new DefaultHttpPayload(Map.of("cacheManagerName", cacheManager, "cacheName", cacheName));
-        SingleCache response =
-                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_SINGLE_CACHE, payload);
-        return Objects.requireNonNull(singleCacheConverter.convert(response));
+        byte[] body = endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_SINGLE_CACHE, payload);
+
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 }

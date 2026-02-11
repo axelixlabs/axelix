@@ -116,12 +116,12 @@ class DefaultEnvPropertyEnricherTest {
     private static Property findProperty(
             EnvironmentFeed environmentFeed, String propertySourceName, String propertyName) {
         PropertySource propertySource = environmentFeed.getPropertySources().stream()
-                .filter(it -> it.getSourceName().equals(propertySourceName))
+                .filter(it -> it.getName().equals(propertySourceName))
                 .findFirst()
                 .orElseThrow();
 
         return propertySource.getProperties().stream()
-                .filter(it -> it.getPropertyName().equals(propertyName))
+                .filter(it -> it.getName().equals(propertyName))
                 .findFirst()
                 .orElseThrow();
     }
