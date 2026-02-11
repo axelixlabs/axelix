@@ -17,13 +17,12 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.Objects;
-
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronExpression;
@@ -44,12 +43,10 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.CronExpressionValidationRequest;
 import com.axelixlabs.axelix.master.api.external.response.scheduledtask.CronExpressionValidationResponse;
-import com.axelixlabs.axelix.master.api.external.response.scheduledtask.ScheduledTasksResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -67,15 +64,11 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class ScheduledTasksApi {
 
     private final EndpointInvoker endpointInvoker;
-    private final Converter<ServiceScheduledTasks, ScheduledTasksResponse> converter;
     private final JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy;
 
     public ScheduledTasksApi(
-            EndpointInvoker endpointInvoker,
-            Converter<ServiceScheduledTasks, ScheduledTasksResponse> converter,
-            JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
+            EndpointInvoker endpointInvoker, JacksonMessageSerializationStrategy jacksonMessageSerializationStrategy) {
         this.endpointInvoker = endpointInvoker;
-        this.converter = converter;
         this.jacksonMessageSerializationStrategy = jacksonMessageSerializationStrategy;
     }
 
@@ -86,13 +79,13 @@ public class ScheduledTasksApi {
             content =
                     @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ScheduledTasksResponse.class)))
+                            schema = @Schema(implementation = ServiceScheduledTasks.class)))
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.ScheduledTasksApi.INSTANCE_ID)
-    public ScheduledTasksResponse getAllScheduledTasks(@PathVariable("instanceId") String instanceId) {
-        ServiceScheduledTasks serviceScheduledTasks = endpointInvoker.invoke(
+    public ResponseEntity<byte[]> getAllScheduledTasks(@PathVariable("instanceId") String instanceId) {
+        byte[] body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_SCHEDULED_TASKS, NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(converter.convert(serviceScheduledTasks));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
     @DefaultApiResponse(
