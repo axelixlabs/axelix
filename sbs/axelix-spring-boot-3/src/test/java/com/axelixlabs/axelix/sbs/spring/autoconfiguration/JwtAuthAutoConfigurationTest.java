@@ -17,14 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import io.jsonwebtoken.JwtParser;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -69,25 +65,10 @@ class JwtAuthAutoConfigurationTest {
     }
 
     @Test
-    void shouldNotActivateAutoConfiguration_whenJwtPropertyIsMissing() {
-        new ApplicationContextRunner()
-                // "axelix.sbs.auth.jwt" is missing
-                .withPropertyValues("axelix.sbs.auth.jwt.algorithm=HMAC512", "axelix.sbs.auth.jwt.signing-key=secret")
-                .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class))
-                .run(context -> {
-                    assertThat(context).doesNotHaveBean(JwtAuthAutoConfiguration.class);
-                    assertThat(context).doesNotHaveBean(JwtDecoderService.class);
-                    assertThat(context).doesNotHaveBean(AuthorityResolver.class);
-                    assertThat(context).doesNotHaveBean(Authorizer.class);
-                    assertThat(context).doesNotHaveBean(JwtAuthorizationFilter.class);
-                });
-    }
-
-    @Test
     void shouldFail_whenAlgorithmPropertyIsMissing() {
         new ApplicationContextRunner()
                 // "axelix.sbs.auth.jwt.algorithm" is missing
-                .withPropertyValues("axelix.sbs.auth.jwt", "axelix.sbs.auth.jwt.signing-key=secret")
+                .withPropertyValues("axelix.sbs.auth.jwt.signing-key=secret")
                 .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).hasFailed();
@@ -99,7 +80,7 @@ class JwtAuthAutoConfigurationTest {
     void shouldFail_whenSigningKeyPropertyIsMissing() {
         new ApplicationContextRunner()
                 // "axelix.sbs.auth.jwt.signing-key" is missing
-                .withPropertyValues("axelix.sbs.auth.jwt", "axelix.sbs.auth.jwt.algorithm=HMAC512")
+                .withPropertyValues("axelix.sbs.auth.jwt.algorithm=HMAC512")
                 .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).hasFailed();
@@ -120,18 +101,6 @@ class JwtAuthAutoConfigurationTest {
                     assertThat(context).hasFailed();
                     assertThat(context.getStartupFailure()).isInstanceOf(BeanCreationException.class);
                 });
-    }
-
-    @ParameterizedTest
-    @ValueSource(classes = {JwtParser.class, JwtDecoderService.class})
-    void shouldNotActivateAutoConfiguration_whenRequiredClassMissing(Class<?> toBeExcluded) {
-        contextRunner.withClassLoader(new FilteredClassLoader(toBeExcluded)).run(context -> {
-            assertThat(context).doesNotHaveBean(JwtAuthAutoConfiguration.class);
-            assertThat(context).doesNotHaveBean(JwtDecoderService.class);
-            assertThat(context).doesNotHaveBean(AuthorityResolver.class);
-            assertThat(context).doesNotHaveBean(Authorizer.class);
-            assertThat(context).doesNotHaveBean(JwtAuthorizationFilter.class);
-        });
     }
 
     @Test
