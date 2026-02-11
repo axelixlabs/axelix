@@ -93,6 +93,26 @@ class DefaultEnvPropertyEnricherTest {
                 .isTrue();
     }
 
+    @Test
+    void shouldNormalizeConfigResourcePropertySourceNameAndDescription() {
+        EnvironmentDescriptor defaultDescriptor = environmentEndpoint.environment(null);
+
+        EnvironmentFeed environmentFeed = enricher.enrich(defaultDescriptor);
+
+        List<PropertySource> configResourceSources = environmentFeed.getPropertySources().stream()
+                .filter(it -> it.getSourceName().endsWith(".yaml"))
+                .toList();
+
+        assertThat(configResourceSources).isNotEmpty();
+
+        configResourceSources.forEach(source -> {
+            assertThat(source.getSourceName()).isEqualTo("application.yaml");
+
+            assertThat(source.getSourceDescription())
+                    .isEqualTo("Properties that are loaded from application.yaml located in optional:classpath:/");
+        });
+    }
+
     private static Property findProperty(
             EnvironmentFeed environmentFeed, String propertySourceName, String propertyName) {
         PropertySource propertySource = environmentFeed.getPropertySources().stream()
