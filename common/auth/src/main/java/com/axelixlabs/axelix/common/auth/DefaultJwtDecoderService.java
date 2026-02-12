@@ -56,7 +56,7 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
 
     public DefaultJwtDecoderService(JwtAlgorithm algorithm, String signingKey) {
         Assert.notNull(algorithm, "The jwt signing algorithm is not specified, although it is required");
-        Assert.notNull(algorithm, "The jwt signing key is not specified, although it is required");
+        Assert.notNull(signingKey, "The jwt signing key is not specified, although it is required");
 
         this.verificationStrategy = JwtVerificationStrategyFactory.createVerificationStrategy(algorithm);
         this.signingKey = Objects.requireNonNull(signingKey);
