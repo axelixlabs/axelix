@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.util.Map;
 
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +42,7 @@ import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;

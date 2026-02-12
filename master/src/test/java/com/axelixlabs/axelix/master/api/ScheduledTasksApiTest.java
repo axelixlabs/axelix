@@ -48,9 +48,9 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteReques
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
+import com.axelixlabs.axelix.master.api.error.SimpleApiError;
+import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi;
-import com.axelixlabs.axelix.master.api.external.request.CronExpressionValidationRequest;
-import com.axelixlabs.axelix.master.api.external.response.scheduledtask.CronExpressionValidationResponse;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
@@ -360,9 +360,9 @@ public class ScheduledTasksApiTest {
 
     @Test
     void shouldModifyCronExpressionScheduledTask() {
-
+        // given.
         ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 0 0/3 1/1 * ?");
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -373,8 +373,31 @@ public class ScheduledTasksApiTest {
                         Void.class,
                         activeInstanceId);
 
-        // then
+        // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidCronExpressions")
+    @DisplayName("Should return 400 Bad Request for invalid cron expression")
+    void shouldReturnBadRequest_OnModifyCronExpressionWithInvalidExpression(String invalidCronExpression) {
+        // given.
+        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", invalidCronExpression);
+
+        // when.
+        ResponseEntity<SimpleApiError> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
+                        requestBody,
+                        SimpleApiError.class,
+                        activeInstanceId);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ApiErrorCodes.INVALID_CRON_EXPRESSION.getErrorCode());
     }
 
     @Test
@@ -495,7 +518,7 @@ public class ScheduledTasksApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 0 0/3 1/1 * ?");
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
 
         // when.
         registry.register(createInstance(instanceId));
@@ -515,7 +538,7 @@ public class ScheduledTasksApiTest {
     void shouldReturnBadRequestForUnregisteredInstance_OnModifyCronExpression() {
         String instanceId = UUID.randomUUID().toString();
         ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 0 0/3 1/1 * ?");
+                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", "*/5 * * * * *");
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -659,60 +682,17 @@ public class ScheduledTasksApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
-    @Test
-    void shouldReturnValidTrue_ForValidCronExpression() {
-        // given.
-        CronExpressionValidationRequest request = new CronExpressionValidationRequest("*/5 * * * * *");
-
-        // when.
-        ResponseEntity<CronExpressionValidationResponse> response = restTemplate
-                .withoutAuthorities()
-                .postForEntity(
-                        "/api/external/scheduled-tasks/validate-cron-expression",
-                        request,
-                        CronExpressionValidationResponse.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().valid()).isTrue();
-    }
-
-    @Test
-    void shouldReturnValidFalse_ForInvalidCronExpression() {
-        // given.
-        CronExpressionValidationRequest request = new CronExpressionValidationRequest("invalid-cron");
-
-        // when.
-        ResponseEntity<CronExpressionValidationResponse> response = restTemplate
-                .withoutAuthorities()
-                .postForEntity(
-                        "/api/external/scheduled-tasks/validate-cron-expression",
-                        request,
-                        CronExpressionValidationResponse.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().valid()).isFalse();
-    }
-
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnValidateCronExpression(InvalidAuthScenario scenario) {
-        // given.
-        CronExpressionValidationRequest request = new CronExpressionValidationRequest("*/5 * * * * *");
-
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity("/api/external/scheduled-tasks/validate-cron-expression", request, Void.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
     private static Stream<Arguments> managementScheduledTask() {
         return Stream.of(Arguments.of("/enable"), Arguments.of("/disable"));
+    }
+
+    private static Stream<Arguments> invalidCronExpressions() {
+        return Stream.of(
+                Arguments.of(""),
+                Arguments.of("invalid"),
+                Arguments.of("* * *"),
+                Arguments.of("*/5 * * * * * *"),
+                Arguments.of("60 * * * * *"),
+                Arguments.of("* 60 * * * *"));
     }
 }

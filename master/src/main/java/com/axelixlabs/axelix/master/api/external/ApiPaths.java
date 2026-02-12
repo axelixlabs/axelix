@@ -313,10 +313,7 @@ public final class ApiPaths {
          * Endpoint allows enabling a scheduled task.
          */
         public static final String ENABLE_TASK = "/{instanceId}/enable";
-        /**
-         * Endpoint allows enabling a scheduled task.
-         */
-        public static final String VALIDATE_CRON_EXPRESSION = "/validate-cron-expression";
+
         /**
          * Endpoint allows disabling a scheduled task.
          */

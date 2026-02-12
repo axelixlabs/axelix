@@ -39,10 +39,10 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModif
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.api.error.SimpleApiError;
+import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.request.CronExpressionValidationRequest;
-import com.axelixlabs.axelix.master.api.external.response.scheduledtask.CronExpressionValidationResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
@@ -100,20 +100,6 @@ public class ScheduledTasksApi {
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.ENABLE_SCHEDULED_TASK, payload);
     }
 
-    @DefaultApiResponse(summary = "Validate the provided cron expression")
-    @ApiResponse(
-            description = "OK",
-            responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = CronExpressionValidationResponse.class)))
-    @PostMapping(path = ApiPaths.ScheduledTasksApi.VALIDATE_CRON_EXPRESSION)
-    public CronExpressionValidationResponse validateCronExpression(
-            @RequestBody CronExpressionValidationRequest request) {
-        return new CronExpressionValidationResponse(CronExpression.isValidExpression(request.cronExpression()));
-    }
-
     @DefaultApiResponse(summary = "Allows disabling a scheduled task.")
     @ApiResponse(description = "OK", responseCode = "200")
     @InstanceIdParameter
@@ -128,9 +114,15 @@ public class ScheduledTasksApi {
     @ApiResponse(description = "No Content", responseCode = "204")
     @InstanceIdParameter
     @PostMapping(path = ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION)
-    public ResponseEntity<Void> modifyCronExpression(
+    public ResponseEntity<?> modifyCronExpression(
             @PathVariable("instanceId") String instanceId,
             @RequestBody ScheduledTaskCronExpressionModifyRequest request) {
+
+        if (!CronExpression.isValidExpression(request.getCronExpression())) {
+            // TODO: Again, that is bad to pass status code to SimpleApiError
+            return ResponseEntity.badRequest()
+                    .body(new SimpleApiError(ApiErrorCodes.INVALID_CRON_EXPRESSION.getErrorCode(), 400));
+        }
 
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
         endpointInvoker.invokeNoValue(
