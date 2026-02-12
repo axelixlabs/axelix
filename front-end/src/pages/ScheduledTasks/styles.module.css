@@ -51,6 +51,9 @@
     text-align: left;
 }
 
+/*
+ First component is presumably 'Runnable', so it needs as much space as possible.
+*/
 .BodyRowChunk:first-child {
     justify-content: flex-start;
     min-width: 0;
