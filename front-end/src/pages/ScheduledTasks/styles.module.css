@@ -27,7 +27,7 @@
     display: contents;
 }
 
-.RowChunk,
+.HeaderRowChunk,
 .BodyRowChunk {
     padding: 16px;
     border-bottom: 1px solid var(--axelix-light-grey);
@@ -35,7 +35,7 @@
     border-right: 1px solid var(--axelix-light-grey);
 }
 
-.RowChunk {
+.HeaderRowChunk {
     background-color: var(--axelix-primary-light-green);
     font-weight: 600;
     text-align: center;
@@ -47,7 +47,7 @@
     align-items: center;
 }
 
-.RowChunk:first-child {
+.HeaderRowChunk:first-child {
     text-align: left;
 }
 
@@ -59,7 +59,7 @@
     min-width: 0;
 }
 
-:is(.RowChunk, .BodyRowChunk):last-child {
+:is(.HeaderRowChunk, .BodyRowChunk):last-child {
     border: none;
 }
 

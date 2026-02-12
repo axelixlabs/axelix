@@ -25,10 +25,10 @@ export const CronTableHeader = () => {
     return (
         <>
             <div className={styles.RowChunksWrapper}>
-                <div className={styles.RowChunk}>{t("ScheduledTasks.runnable")}</div>
-                <div className={styles.RowChunk}>{t("ScheduledTasks.expression")}</div>
-                <div className={styles.RowChunk}>{t("status")}</div>
-                <div className={styles.RowChunk}>{t("ScheduledTasks.run")}</div>
+                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.runnable")}</div>
+                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.expression")}</div>
+                <div className={styles.HeaderRowChunk}>{t("status")}</div>
+                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.run")}</div>
             </div>
         </>
     );

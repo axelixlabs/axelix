@@ -24,11 +24,11 @@ export const FixedTaskTableHeader = () => {
 
     return (
         <div className={styles.RowChunksWrapper}>
-            <div className={styles.RowChunk}>{t("ScheduledTasks.runnable")}</div>
-            <div className={styles.RowChunk}>{t("ScheduledTasks.initialDelay")}</div>
-            <div className={styles.RowChunk}>{t("ScheduledTasks.interval")}</div>
-            <div className={styles.RowChunk}>{t("status")}</div>
-            <div className={styles.RowChunk}>{t("ScheduledTasks.run")}</div>
+            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.runnable")}</div>
+            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.initialDelay")}</div>
+            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.interval")}</div>
+            <div className={styles.HeaderRowChunk}>{t("status")}</div>
+            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.run")}</div>
         </div>
     );
 };
