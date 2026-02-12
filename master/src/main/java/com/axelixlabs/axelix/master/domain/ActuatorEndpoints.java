@@ -121,7 +121,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint GET_LOGGER_GROUP = of("/axelix-loggers/{group.name}", HttpMethod.GET);
     public static final ActuatorEndpoint SET_ONE_LOGGER = of("/axelix-loggers/{logger.name}", HttpMethod.POST);
     public static final ActuatorEndpoint SET_FOR_LOGGER_GROUP = of("/axelix-loggers/{group.name}", HttpMethod.POST);
-    public static final ActuatorEndpoint CLEAR_FOR_LOGGER = of("/axelix-loggers/{logger.name}", HttpMethod.POST);
+    public static final ActuatorEndpoint RESET_FOR_LOGGER = of("/axelix-loggers/reset/{logger.name}", HttpMethod.POST);
 
     // Metadata
     public static final ActuatorEndpoint METADATA = of("/axelix-metadata", HttpMethod.GET);
@@ -214,7 +214,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 GET_LOGGER_GROUP,
                 SET_ONE_LOGGER,
                 SET_FOR_LOGGER_GROUP,
-                CLEAR_FOR_LOGGER,
+                RESET_FOR_LOGGER,
                 METADATA,
                 GET_METRIC_GROUPS,
                 GET_SINGLE_METRIC,

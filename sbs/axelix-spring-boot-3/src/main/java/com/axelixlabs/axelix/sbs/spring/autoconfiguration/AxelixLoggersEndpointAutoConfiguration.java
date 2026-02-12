@@ -45,6 +45,6 @@ public class AxelixLoggersEndpointAutoConfiguration {
             LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
 
         return new AxelixLoggersEndpoint(
-                new LoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new)));
+                loggingSystem, new LoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new)));
     }
 }

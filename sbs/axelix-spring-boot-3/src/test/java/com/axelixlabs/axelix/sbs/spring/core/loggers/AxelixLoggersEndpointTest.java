@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.logging.LoggersEndpoint;
+import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerGroups;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,10 +50,15 @@ public class AxelixLoggersEndpointTest {
     @Autowired
     private TestRestTemplate testRestTemplate;
 
+    @Autowired
+    private LoggingSystem loggingSystem;
+
     @Test
     void shouldReturnAllLoggers() {
+        // when.
         ResponseEntity<String> response = testRestTemplate.getForEntity("/actuator/axelix-loggers", String.class);
 
+        // then.
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains(AxelixLoggersEndpointTest.class.getName());
@@ -62,9 +68,11 @@ public class AxelixLoggersEndpointTest {
     void shouldReturnSingleLogger() {
         String loggerName = AxelixLoggersEndpointTest.class.getName();
 
+        // when.
         ResponseEntity<String> response =
                 testRestTemplate.getForEntity("/actuator/axelix-loggers/" + loggerName, String.class);
 
+        // then.
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains("effectiveLevel");
@@ -72,6 +80,7 @@ public class AxelixLoggersEndpointTest {
 
     @Test
     void shouldReturnSetLoggerLevel() {
+        String loggerName = AxelixLoggersEndpointTest.class.getName();
         // language=json
         String request = """
         {
@@ -79,16 +88,73 @@ public class AxelixLoggersEndpointTest {
         }
         """;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(request, headers);
-        String loggerName = AxelixLoggersEndpointTest.class.getName();
+        // when.
+        ResponseEntity<String> response = testRestTemplate.postForEntity(
+                "/actuator/axelix-loggers/" + loggerName, defaultJsonEntity(request), String.class);
 
-        ResponseEntity<String> response =
-                testRestTemplate.postForEntity("/actuator/axelix-loggers/" + loggerName, entity, String.class);
-
+        // then.
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void shouldResetLogLevel_WhenLogLevelAffectsOtherLoggers() {
+        loggingSystem.setLogLevel("a.b", LogLevel.WARN);
+        loggingSystem.setLogLevel("a.b.c", null);
+        loggingSystem.setLogLevel("a.b.c.d", null);
+
+        // language=json
+        String request = """
+        {
+          "configuredLevel":"error"
+        }
+        """;
+
+        testRestTemplate.postForEntity("/actuator/axelix-loggers/" + "a.b.c", defaultJsonEntity(request), String.class);
+        assertThat(getLogLevel("a.b.c")).isEqualTo(LogLevel.ERROR);
+        assertThat(getLogLevel("a.b.c.d")).isEqualTo(LogLevel.ERROR);
+
+        // when.
+        testRestTemplate.postForEntity("/actuator/axelix-loggers/reset/" + "a.b.c", null, String.class);
+
+        // then.
+        assertThat(getLogLevel("a.b.c")).isEqualTo(LogLevel.WARN);
+        assertThat(getLogLevel("a.b.c.d")).isEqualTo(LogLevel.WARN);
+    }
+
+    @Test
+    void shouldResetLogLevel_WhenLogLevelDoesNotAffectOtherLoggers() {
+        loggingSystem.setLogLevel("a.b", LogLevel.WARN);
+        loggingSystem.setLogLevel("a.b.c", null);
+        loggingSystem.setLogLevel("a.b.c.d", LogLevel.DEBUG);
+
+        // language=json
+        String request = """
+        {
+          "configuredLevel":"error"
+        }
+        """;
+
+        testRestTemplate.postForEntity("/actuator/axelix-loggers/" + "a.b.c", defaultJsonEntity(request), String.class);
+        assertThat(getLogLevel("a.b.c")).isEqualTo(LogLevel.ERROR);
+        assertThat(getLogLevel("a.b.c.d")).isEqualTo(LogLevel.DEBUG);
+
+        // when.
+        testRestTemplate.postForEntity("/actuator/axelix-loggers/reset/" + "a.b.c", null, String.class);
+
+        // then.
+        assertThat(getLogLevel("a.b.c")).isEqualTo(LogLevel.WARN);
+        assertThat(getLogLevel("a.b.c.d")).isEqualTo(LogLevel.DEBUG);
+    }
+
+    private LogLevel getLogLevel(String loggerName) {
+        return loggingSystem.getLoggerConfiguration(loggerName).getEffectiveLevel();
+    }
+
+    private <T> HttpEntity<T> defaultJsonEntity(T request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(request, headers);
     }
 
     @TestConfiguration
@@ -98,7 +164,7 @@ public class AxelixLoggersEndpointTest {
         public AxelixLoggersEndpoint axelixLoggersEndpoint(
                 LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
             return new AxelixLoggersEndpoint(
-                    new LoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new)));
+                    loggingSystem, new LoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new)));
         }
     }
 }

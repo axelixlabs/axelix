@@ -27,12 +27,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
 import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
 import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
@@ -41,7 +43,6 @@ import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.request.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.api.external.response.loggers.GroupProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.loggers.LoggerProfileResponse;
 import com.axelixlabs.axelix.master.api.external.response.loggers.LoggersResponse;
@@ -177,18 +178,19 @@ public class LoggersApi {
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
     }
 
-    @DefaultApiResponse(
-            summary = "Clears the configured logging level of a logger, reverting it to the default setting")
-    @ApiResponse(description = "OK", responseCode = "200")
+    @DefaultApiResponse(summary = "Reset the configured logging level of a logger, reverting it to the default setting")
+    @ApiResponse(description = "No content", responseCode = "204")
     @InstanceIdParameter
     @Parameter(name = "loggerName", description = "The name of the logger to find", required = true)
-    @PostMapping(path = ApiPaths.LoggersApi.CLEAR_FOR_LOGGER)
-    public void clearLoggingLevelByLoggerName(
+    @PostMapping(path = ApiPaths.LoggersApi.RESET_FOR_LOGGER)
+    public ResponseEntity<Void> resetLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
 
         HttpPayload payload = HttpPayload.json(
                 Map.of("logger.name", loggerName),
                 jacksonMessageSerializationStrategy.serialize(Collections.emptyMap()));
-        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.CLEAR_FOR_LOGGER, payload);
+        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.RESET_FOR_LOGGER, payload);
+
+        return ResponseEntity.noContent().build();
     }
 }
