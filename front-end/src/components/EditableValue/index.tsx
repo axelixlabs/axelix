@@ -20,7 +20,6 @@ import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import { useState } from "react";
 
-import { OptionalTooltip } from "./OptionalTooltip";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -44,12 +43,6 @@ interface IProps {
      * @param value the new value after change.
      */
     onNewValue: (value: string) => void;
-
-    /**
-     * Function to generate a tooltip for the value.
-     * Receives the current value and returns a string to display.
-     */
-    tooltipFormatter?: (value: string) => string;
 }
 
 export const EditableValue = ({
@@ -57,7 +50,6 @@ export const EditableValue = ({
     onNewValue,
     className = styles.DefaultPropertyValueWrapper,
     editClassName = styles.DefaultEditPropertyWrapper,
-    tooltipFormatter,
 }: IProps) => {
     // TODO:
     //  We need to improve this component:
@@ -69,9 +61,7 @@ export const EditableValue = ({
     if (!editingValue) {
         return (
             <div className={className}>
-                <OptionalTooltip value={actualValue} tooltipFormatter={tooltipFormatter}>
-                    {actualValue}
-                </OptionalTooltip>
+                {actualValue}
 
                 <Button
                     icon={<EditOutlined />}
@@ -85,13 +75,11 @@ export const EditableValue = ({
 
     return (
         <div className={editClassName}>
-            <OptionalTooltip value={actualValue} tooltipFormatter={tooltipFormatter}>
-                <Input
-                    value={actualValue}
-                    onChange={(e) => setActualValue(e.target.value)}
-                    className={styles.EditPropertyField}
-                />
-            </OptionalTooltip>
+            <Input
+                value={actualValue}
+                onChange={(e) => setActualValue(e.target.value)}
+                className={styles.EditPropertyField}
+            />
 
             <Button
                 icon={<CloseOutlined />}

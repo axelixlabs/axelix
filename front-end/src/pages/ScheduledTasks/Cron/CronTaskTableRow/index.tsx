@@ -15,19 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App } from "antd";
+import { ScheduledTasksEditableValue } from "../..//ScheduledTasksEditableValue";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { EditableValue, TooltipWithCopy } from "components";
+import { TooltipWithCopy } from "components";
 import { getCronDescription } from "helpers";
 import { type ICron } from "models";
 import { changeCronExpression } from "services";
 
 import { ForceRunTask } from "../../ForceRunTask";
 import { ScheduledTasksStatusSwitch } from "../../ScheduledTasksStatusSwitch";
-
-import styles from "./styles.module.css";
+import styles from "../../styles.module.css";
 
 interface IProps {
     /**
@@ -38,37 +37,31 @@ interface IProps {
 
 export const CronTaskTableRow = ({ task }: IProps) => {
     const { instanceId } = useParams();
-    const { message } = App.useApp();
     const { t } = useTranslation();
 
     return (
-        <div className={`TableRow ${styles.CronTaskTableRow}`}>
-            <div className={`RowChunk ${styles.TooltipWrapperChunk}`}>
+        <div className={styles.RowChunksWrapper}>
+            <div className={styles.BodyRowChunk}>
                 <TooltipWithCopy text={task.runnable.target} />
             </div>
-            <div className="RowChunk">
-                <EditableValue
+            <div className={styles.BodyRowChunk}>
+                <ScheduledTasksEditableValue
                     initialValue={task.expression}
-                    tooltipFormatter={getCronDescription}
                     onNewValue={(newValue) => {
-                        changeCronExpression({
+                        return changeCronExpression({
                             instanceId: instanceId!,
                             newCronExpression: newValue,
                             trigger: task.runnable.target,
-                        })
-                            .then(() => {
-                                message.success(t("ScheduledTasks.cronExpressionChangeSuccess"));
-                            })
-                            .catch(() => {
-                                message.error(t("ScheduledTasks.cronExpressionChangeError"));
-                            });
+                        });
                     }}
+                    tooltipFormatter={getCronDescription}
+                    successMessage={t("ScheduledTasks.cronExpressionChangeSuccess")}
                 />
             </div>
-            <div className={`RowChunk ${styles.CenteredRowChunk}`}>
+            <div className={styles.BodyRowChunk}>
                 <ScheduledTasksStatusSwitch runnable={task} />
             </div>
-            <div className={`RowChunk ${styles.CenteredRowChunk}`}>
+            <div className={styles.BodyRowChunk}>
                 <ForceRunTask trigger={task.runnable.target} />
             </div>
         </div>

@@ -17,20 +17,18 @@
  */
 import { useTranslation } from "react-i18next";
 
-import styles from "./styles.module.css";
+import styles from "../../styles.module.css";
 
 export const FixedTaskTableHeader = () => {
     const { t } = useTranslation();
 
     return (
-        <div className={`TableHeader ${styles.TableHeader}`}>
-            <div className="RowChunk">{t("ScheduledTasks.runnable")}</div>
-            <div className={`RowChunk ${styles.CenteredRowChunk} ${styles.InitialDelayRowChunk}`}>
-                {t("ScheduledTasks.initialDelay")}
-            </div>
-            <div className={`RowChunk ${styles.CenteredRowChunk}`}>{t("ScheduledTasks.interval")}</div>
-            <div className={`RowChunk ${styles.CenteredRowChunk}`}>{t("status")}</div>
-            <div className={`RowChunk ${styles.CenteredRowChunk}`}>{t("ScheduledTasks.run")}</div>
+        <div className={styles.RowChunksWrapper}>
+            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.runnable")}</div>
+            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.initialDelay")}</div>
+            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.interval")}</div>
+            <div className={styles.HeaderRowChunk}>{t("status")}</div>
+            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.run")}</div>
         </div>
     );
 };

@@ -41,7 +41,7 @@ export const FixedTasks = ({ taskTitle, fixedTasks }: IProps) => {
         <div className={styles.SectionWrapper}>
             <div className={`TextMedium ${styles.TaskType}`}>{taskTitle}</div>
 
-            <div className="CustomizedTable">
+            <div className={styles.FixedTaskTable}>
                 <FixedTaskTableHeader />
 
                 <EmptyHandler isEmpty={fixedTasks.length === 0}>
