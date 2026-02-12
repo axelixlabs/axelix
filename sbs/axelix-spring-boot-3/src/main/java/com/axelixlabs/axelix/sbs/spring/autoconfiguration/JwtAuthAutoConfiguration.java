@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -34,21 +35,13 @@ import com.axelixlabs.axelix.sbs.spring.core.config.AuthConfigurationProperties;
 
 /**
  * {@link AutoConfiguration} for JWT-based authentication support.
- * <p>
- * This configuration provides default beans for:
- * <ul>
- *   <li>{@link JwtDecoderService} — for decoding and restoring {@code User} objects from tokens.</li>
- *   <li>{@link AuthorityResolver} — to resolve required authorities based on request paths.</li>
- *   <li>{@link Authorizer} — to authorize {@code User} objects against authorization requests.</li>
- *   <li>{@link JwtAuthorizationFilter} — a servlet filter that enforces JWT authorization on incoming requests.</li>
- *   <li>{@link FilterRegistrationBean} for {@link JwtAuthorizationFilter} — registers the filter and restricts it to "/actuator/*" URL pattern.</li>
- * </ul>
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  * @since 22.07.2025
  */
 @AutoConfiguration
+@ConditionalOnProperty(name = "axelix.sbs.auth.jwt")
 @EnableConfigurationProperties(AuthConfigurationProperties.class)
 public class JwtAuthAutoConfiguration {
 
