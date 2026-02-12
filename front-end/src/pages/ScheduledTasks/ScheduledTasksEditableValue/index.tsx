@@ -34,7 +34,7 @@ interface IProps {
      * Callback to invoke when the value chane accepted.
      * @param value the new value after change.
      */
-    onNewValue: (value: string) => Promise<AxiosResponse<any>>; // FIX: Fix the type in future
+    onNewValue: (value: string) => Promise<AxiosResponse<any>>; // TODO: Fix the type in future
 
     /**
      * Function to generate a tooltip for the value.
@@ -64,26 +64,23 @@ export const ScheduledTasksEditableValue = ({ initialValue, successMessage, tool
                 setActualValue(tempValue);
                 setIsPopoverOpen(false);
             })
+            // TODO: Add bad request handling from backend
             .finally(() => {
                 setLoading(false);
             });
     };
 
-    const handleOpenChange = (newOpen: boolean): void => {
-        setIsPopoverOpen(newOpen);
-    };
-
     return (
         <div className={styles.IntervalPreviewWrapper}>
-            <OptionalTooltip value={actualValue} tooltipFormatter={tooltipFormatter}>
+            <OptionalTooltip value={tempValue} tooltipFormatter={isPopoverOpen ? undefined : tooltipFormatter}>
                 {actualValue}
             </OptionalTooltip>
             <Popover
                 open={isPopoverOpen}
-                onOpenChange={handleOpenChange}
+                onOpenChange={(newOpen) => setIsPopoverOpen(newOpen)}
                 content={
                     <div className={styles.EditWrapper}>
-                        <OptionalTooltip value={actualValue} tooltipFormatter={tooltipFormatter}>
+                        <OptionalTooltip value={tempValue} tooltipFormatter={tooltipFormatter}>
                             <Input
                                 value={tempValue}
                                 onChange={(e) => setTempValue(e.target.value)}
@@ -94,8 +91,10 @@ export const ScheduledTasksEditableValue = ({ initialValue, successMessage, tool
                         <Button
                             icon={<CloseOutlined />}
                             type="primary"
-                            onClick={() => setTempValue(initialValue)}
-                            loading={loading}
+                            onClick={() => {
+                                setTempValue(initialValue);
+                                setIsPopoverOpen(false);
+                            }}
                             className={styles.EditActionButtons}
                         />
 
