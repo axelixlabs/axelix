@@ -26,6 +26,7 @@ import org.springframework.util.Assert;
 
 import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.JwtDecoderService;
+import com.axelixlabs.axelix.master.filter.CookieBasedJwtAuthorizationFilter;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;

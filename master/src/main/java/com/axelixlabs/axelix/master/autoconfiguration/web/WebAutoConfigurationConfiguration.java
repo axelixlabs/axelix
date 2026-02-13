@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.web;
 
+import java.io.IOException;
+
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
+import com.axelixlabs.axelix.master.filter.SpaStaticResourcesServingFilter;
 
 /**
  * Web layer related auto-configuration.
@@ -42,17 +45,17 @@ public class WebAutoConfigurationConfiguration {
     }
 
     @Bean
-    public WebMvcAutoConfiguration webMvcAutoConfiguration(WebProperties webProperties) {
-        return new WebMvcAutoConfiguration(webProperties);
+    public SpaStaticResourcesServingFilter spaStaticResourcesServingFilter(WebProperties webProperties)
+            throws IOException {
+        return new SpaStaticResourcesServingFilter(webProperties);
+    }
+
+    @Bean
+    public WebMvcAutoConfiguration webMvcAutoConfiguration() {
+        return new WebMvcAutoConfiguration();
     }
 
     public static class WebMvcAutoConfiguration implements WebMvcConfigurer {
-
-        private final WebProperties webProperties;
-
-        WebMvcAutoConfiguration(WebProperties webProperties) {
-            this.webProperties = webProperties;
-        }
 
         @Override
         public void configurePathMatch(PathMatchConfigurer configurer) {

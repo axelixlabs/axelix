@@ -15,31 +15,30 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.spa;
+package com.axelixlabs.axelix.master.filter;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebProperties;
 
 /**
- * And endpoint that is supposed to serve the SPA related files (js,css,html).
+ * Filter that is designed to handle the static SPA resources.
  *
  * @author Mikhail Polivakha
  */
-@RestController
-public class SpaStaticResourcesHandler {
+public class SpaStaticResourcesServingFilter extends OncePerRequestFilter {
 
     private final WebProperties webProperties;
     private final Resource indexHtmlLocation;
@@ -54,14 +53,19 @@ public class SpaStaticResourcesHandler {
         MEDIA_TYPES_CACHE.put("htm", MediaType.parseMediaType("text/html"));
     }
 
-    public SpaStaticResourcesHandler(WebProperties webProperties) throws IOException {
+    public SpaStaticResourcesServingFilter(WebProperties webProperties) throws IOException {
         this.webProperties = webProperties;
         this.indexHtmlLocation = webProperties.getLocation().createRelative("index.html");
     }
 
-    // TODO: Add ETag caching support
-    @GetMapping(value = "/**")
-    public ResponseEntity<Resource> getResource(HttpServletRequest request) throws IOException {
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getServletPath().startsWith("/api");
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws IOException {
         String contextPath = request.getServletPath();
 
         Resource resolvedResource = resolveResourceToReturn(contextPath);
@@ -69,8 +73,12 @@ public class SpaStaticResourcesHandler {
         String fileExtension = getFileExtension(resolvedResource);
 
         MediaType mediaType = MEDIA_TYPES_CACHE.get(fileExtension);
+        if (mediaType != null) {
+            response.setContentType(mediaType.toString());
+        }
 
-        return ResponseEntity.status(HttpStatus.OK).contentType(mediaType).body(resolvedResource);
+        response.setStatus(HttpStatus.OK.value());
+        response.getOutputStream().write(resolvedResource.getContentAsByteArray());
     }
 
     // yeah, that's right, for some goddamn reason null-away STILL thinks that assert null check is not sufficient
@@ -86,6 +94,10 @@ public class SpaStaticResourcesHandler {
     private Resource resolveResourceToReturn(String contextPath) throws IOException {
         Resource relative = webProperties.getLocation().createRelative(contextPath);
 
-        return relative.exists() && relative.isReadable() ? relative : indexHtmlLocation;
+        try {
+            return relative.exists() && relative.isReadable() ? relative : indexHtmlLocation;
+        } catch (IllegalArgumentException e) { // spring throws in certain scenarios
+            return indexHtmlLocation;
+        }
     }
 }
