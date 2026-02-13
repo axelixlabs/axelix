@@ -17,10 +17,13 @@
  */
 import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 
-import { App, Button, Input, Popover } from "antd";
+import { App, Button, Input, Popover, Tooltip } from "antd";
 import type { AxiosResponse } from "axios";
 import { OptionalTooltip } from "pages/ScheduledTasks/OptionalTooltip";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+
+import { EIgnoredErrors } from "models";
 
 import styles from "./styles.module.css";
 
@@ -48,26 +51,45 @@ interface IProps {
     successMessage: string;
 }
 
+// TODO: Reduce this component in the future by splitting it into separate components.
 export const ScheduledTasksEditableValue = ({ initialValue, successMessage, tooltipFormatter, onNewValue }: IProps) => {
     const { message } = App.useApp();
+    const { t } = useTranslation();
 
     const [actualValue, setActualValue] = useState<string>(initialValue);
     const [tempValue, setTempValue] = useState<string>(initialValue);
     const [loading, setLoading] = useState<boolean>(false);
     const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
+    const [isNotValidCronExpression, setIsNotValidCronExpression] = useState<boolean>(false);
 
     const handleUpdate = async (): Promise<void> => {
         setLoading(true);
-        onNewValue(actualValue)
+        setIsNotValidCronExpression(false);
+
+        const normalizedTempValue = tempValue.trim();
+
+        onNewValue(normalizedTempValue)
             .then(() => {
                 message.success(successMessage);
-                setActualValue(tempValue);
+                setActualValue(normalizedTempValue);
                 setIsPopoverOpen(false);
             })
-            // TODO: Add bad request handling from backend
+            .catch((error) => {
+                const errorCode = error.response?.data?.errorCode;
+
+                if (errorCode === EIgnoredErrors.INVALID_CRON_EXPRESSION) {
+                    setIsNotValidCronExpression(true);
+                }
+            })
             .finally(() => {
                 setLoading(false);
             });
+    };
+
+    const handleCancel = (): void => {
+        setIsNotValidCronExpression(false);
+        setTempValue(actualValue);
+        setIsPopoverOpen(false);
     };
 
     return (
@@ -77,24 +99,44 @@ export const ScheduledTasksEditableValue = ({ initialValue, successMessage, tool
             </OptionalTooltip>
             <Popover
                 open={isPopoverOpen}
-                onOpenChange={(newOpen) => setIsPopoverOpen(newOpen)}
+                onOpenChange={(newOpen) => {
+                    setIsPopoverOpen(newOpen);
+                    setIsNotValidCronExpression(false);
+                    setTempValue(actualValue);
+                }}
                 content={
                     <div className={styles.EditWrapper}>
-                        <OptionalTooltip value={tempValue} tooltipFormatter={tooltipFormatter}>
-                            <Input
-                                value={tempValue}
-                                onChange={(e) => setTempValue(e.target.value)}
-                                disabled={loading}
-                            />
-                        </OptionalTooltip>
+                        {isNotValidCronExpression ? (
+                            <Tooltip
+                                title={t("ScheduledTasks.cronExpressionValidationError")}
+                                color="red"
+                                open={isNotValidCronExpression}
+                                getPopupContainer={(triggerNode) => triggerNode.parentElement!}
+                            >
+                                <Input
+                                    value={tempValue}
+                                    onChange={(e) => {
+                                        setTempValue(e.target.value);
+                                        setIsNotValidCronExpression(false);
+                                    }}
+                                    disabled={loading}
+                                    status="error"
+                                />
+                            </Tooltip>
+                        ) : (
+                            <OptionalTooltip value={tempValue} tooltipFormatter={tooltipFormatter}>
+                                <Input
+                                    value={tempValue}
+                                    onChange={(e) => setTempValue(e.target.value)}
+                                    disabled={loading}
+                                />
+                            </OptionalTooltip>
+                        )}
 
                         <Button
                             icon={<CloseOutlined />}
                             type="primary"
-                            onClick={() => {
-                                setTempValue(initialValue);
-                                setIsPopoverOpen(false);
-                            }}
+                            onClick={handleCancel}
                             className={styles.EditActionButtons}
                         />
 
