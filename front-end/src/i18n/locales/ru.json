@@ -165,7 +165,8 @@
         "run": "Запуск",
         "runSuccess": "Запланированная задача была принудительно запущена",
         "fixedTaskIntervalChangeSuccess": "Интервал был изменён",
-        "cronExpressionChangeSuccess": "Cron-выражение было изменено"
+        "cronExpressionChangeSuccess": "Cron-выражение было изменено",
+        "cronExpressionValidationError": "Неверное CRON выражение"
     },
     "Error": {
         "title": "Ошибка",
