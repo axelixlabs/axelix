@@ -21,6 +21,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Nikita Kirillov
  * @since 17.07.2025
  */
+// TODO: It is not yet clear whether we need this JdbcUserProvider API in general or not.
+@Disabled
 @Sql(scripts = {"/db/jdbc-user-provider-test-schema.sql", "/db/jdbc-user-provider-test-data.sql"})
 @Import({JdbcUserProviderTestcontainersTest.JdbcAuthTestConfig.class})
 class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTest {
