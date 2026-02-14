@@ -62,7 +62,8 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
                 return invocation.proceed();
             } finally {
                 long duration = System.nanoTime() - startTime;
-                statsCollector.recordTransaction(key, new TransactionRecord(duration / 1_000_000, startTime));
+                statsCollector.recordTransaction(
+                        key, new TransactionRecord(duration / 1_000_000, startTime / 1_000_000));
             }
         }
 
