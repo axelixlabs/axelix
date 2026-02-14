@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixBeansAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixBeansEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCachesEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConditionsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertiesEndpointAutoConfiguration;
@@ -53,7 +53,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
  */
 @SpringBootApplication(
         exclude = {
-            AxelixBeansAutoConfiguration.class,
+            AxelixBeansEndpointAutoConfiguration.class,
             AxelixCachesEndpointAutoConfiguration.class,
             AxelixConditionsEndpointAutoConfiguration.class,
             AxelixConfigurationsPropertiesEndpointAutoConfiguration.class,
