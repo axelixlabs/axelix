@@ -28,7 +28,7 @@ import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * Тext to display after the search field
+     * Text to display after the search field
      */
     addonAfter: string;
 

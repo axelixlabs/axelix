@@ -39,15 +39,14 @@ export interface IWallboardSingleOperandFilter {
     operand: string;
 }
 
-export interface IWallboardLocalFilterInitialState {
+export interface IWallboardLocalFilterBuilder {
     key: EWallboardFilterKey | null;
     operator: EWallboardFilterOperator | null;
     operand: string | null;
 }
 
 export interface IWallboardFilterDefinition {
-    key: string;
-    operators: ISelectOptionData[];
-    getSelectOptionsData: (instances: IInstanceCard[]) => ISelectOptionData[];
+    operatorOptions: ISelectOptionData[];
+    getOperandsOptions: (instances: IInstanceCard[]) => ISelectOptionData[];
     match: (instance: IInstanceCard, filter: IWallboardSingleOperandFilter) => boolean;
 }

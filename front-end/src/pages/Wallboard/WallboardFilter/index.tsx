@@ -19,7 +19,7 @@ import { Button, Select } from "antd";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { IInstanceCard, IWallboardLocalFilterInitialState, IWallboardSingleOperandFilter } from "models";
+import type { IInstanceCard, IWallboardLocalFilterBuilder, IWallboardSingleOperandFilter } from "models";
 import { filteringKeys, getWallboardFilterDefinitions } from "utils";
 
 import styles from "./styles.module.css";
@@ -46,7 +46,7 @@ interface IProps {
     setFilters: Dispatch<SetStateAction<IWallboardSingleOperandFilter[]>>;
 }
 
-const localFilterInitialState: IWallboardLocalFilterInitialState = {
+const emptyBuilder: IWallboardLocalFilterBuilder = {
     key: null,
     operator: null,
     operand: null,
@@ -55,8 +55,8 @@ const localFilterInitialState: IWallboardLocalFilterInitialState = {
 export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setFilters }: IProps) => {
     const { t } = useTranslation();
 
-    const [localFilter, setLocalFilter] = useState<IWallboardLocalFilterInitialState>(localFilterInitialState);
-    const { key, operator, operand } = localFilter;
+    const [filterBuilder, setFilterBuilder] = useState<IWallboardLocalFilterBuilder>(emptyBuilder);
+    const { key, operator, operand } = filterBuilder;
 
     const addFilter = (): void => {
         if (!key || !operator || !operand) {
@@ -85,17 +85,17 @@ export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setF
 
         setIsPopoverOpen(false);
 
-        setLocalFilter(localFilterInitialState);
+        setFilterBuilder(emptyBuilder);
     };
 
     const closePopover = (): void => {
         setIsPopoverOpen(false);
-        setLocalFilter(localFilterInitialState);
+        setFilterBuilder(emptyBuilder);
     };
 
     const currentFilterDefinition = key ? getWallboardFilterDefinitions(t)[key] : undefined;
-    const operatorOptions = currentFilterDefinition?.operators ?? [];
-    const operandOptions = currentFilterDefinition?.getSelectOptionsData(instanceCards) ?? [];
+    const operatorOptions = currentFilterDefinition?.operatorOptions ?? [];
+    const operandOptions = currentFilterDefinition?.getOperandsOptions(instanceCards) ?? [];
 
     return (
         <>
@@ -106,7 +106,7 @@ export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setF
                         placeholder={t("Wallboard.filter.field")}
                         value={key}
                         onChange={(key) => {
-                            setLocalFilter({
+                            setFilterBuilder({
                                 operator: null,
                                 key: key,
                                 operand: null,
@@ -122,7 +122,7 @@ export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setF
                         placeholder={t("Wallboard.filter.comparison")}
                         value={operator}
                         onChange={(operator) => {
-                            setLocalFilter((prev) => ({
+                            setFilterBuilder((prev) => ({
                                 ...prev,
                                 operator: operator,
                             }));
@@ -138,7 +138,7 @@ export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setF
                     placeholder={t("value")}
                     value={operand}
                     onChange={(operand) => {
-                        setLocalFilter((prev) => ({
+                        setFilterBuilder((prev) => ({
                             ...prev,
                             operand: operand,
                         }));

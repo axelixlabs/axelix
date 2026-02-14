@@ -17,7 +17,7 @@
  */
 import type { TFunction } from "i18next";
 
-import { getAllJavaVersions, getAllSpringBootVersions, isJavaMatch, isSpringBootMatch } from "helpers";
+import { getAllJavaVersions, getAllSpringBootVersions, semVerMatch } from "helpers";
 import {
     EWallboardFilterKey,
     EWallboardFilterOperator,
@@ -43,19 +43,17 @@ export const getWallboardFilterDefinitions = (
 ): Record<EWallboardFilterKey, IWallboardFilterDefinition> => {
     return {
         [EWallboardFilterKey.JAVA]: {
-            key: EWallboardFilterKey.JAVA,
-            operators: getOperators(t),
-            getSelectOptionsData: (instances) =>
+            operatorOptions: getOperators(t),
+            getOperandsOptions: (instances) =>
                 getAllJavaVersions(instances).map((version) => ({ value: version, label: version })),
-            match: (instance, filter) => isJavaMatch(instance, filter),
+            match: (instance, filter) => semVerMatch(instance.javaVersion, filter),
         },
 
         [EWallboardFilterKey.SPRING_BOOT]: {
-            key: EWallboardFilterKey.SPRING_BOOT,
-            operators: getOperators(t),
-            getSelectOptionsData: (instances) =>
+            operatorOptions: getOperators(t),
+            getOperandsOptions: (instances) =>
                 getAllSpringBootVersions(instances).map((version) => ({ value: version, label: version })),
-            match: (instance, filter) => isSpringBootMatch(instance, filter),
+            match: (instance, filter) => semVerMatch(instance.springBootVersion, filter),
         },
     };
 };

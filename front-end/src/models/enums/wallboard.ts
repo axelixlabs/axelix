@@ -15,11 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+
+/**
+ * Possibles filtering options available on the wallboard.
+ */
 export enum EWallboardFilterKey {
     SPRING_BOOT = "Spring boot",
     JAVA = "Java",
 }
 
+/**
+ * All possible filtering operators (the "super-set" of all) that can be possibly
+ * applied to any of the {@link EWallboardFilterKey}.
+ */
 export enum EWallboardFilterOperator {
     EQUAL = "=",
     LESS_THAN_EQUAL = "<=",
