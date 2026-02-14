@@ -1,0 +1,2 @@
+[2026-02-14T12:49:15.586+0300][trace][gc] GC(176) Restored 48415 marks, occupying 756 K
+[2026-02-14T12:49:15.596+0300][info ][gc] GC(176) Pause Full (System.gc()) 275M->191M(340M) 60,245ms

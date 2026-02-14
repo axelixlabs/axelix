@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
@@ -42,8 +41,7 @@ class AxelixCachesEndpointAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues("management.endpoints.web.exposure.include=axelix-caches")
-            .withConfiguration(
-                    AutoConfigurations.of(AxelixCachesEndpointAutoConfiguration.class, CacheAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(AxelixCachesEndpointAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {

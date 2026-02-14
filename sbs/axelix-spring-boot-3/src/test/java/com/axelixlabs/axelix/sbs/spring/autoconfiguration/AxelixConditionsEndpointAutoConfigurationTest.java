@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpointAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -40,8 +39,7 @@ class AxelixConditionsEndpointAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues("management.endpoints.web.exposure.include=axelix-conditions")
-            .withConfiguration(AutoConfigurations.of(
-                    AxelixConditionsEndpointAutoConfiguration.class, ConditionsReportEndpointAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(AxelixConditionsEndpointAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
