@@ -1,0 +1,25 @@
+.FieldAndComparisonWrapper {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    column-gap: 20px;
+}
+
+.SelectWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
+    margin-bottom: 30px;
+}
+
+.Label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--axelix-bold-grey);
+}
+
+.ActionsButtonsWrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    column-gap: 8px;
+}

@@ -101,7 +101,7 @@ export const MetricBody = ({ metric }: IProps) => {
     return (
         <div className={styles.MainWrapper}>
             <div className={styles.MetricDataWrapper}>
-                <div>{t("Metrics.value")}:</div>
+                <div>{t("value")}:</div>
                 <div>{measurementLastValue}</div>
 
                 {singleMetricFeed.baseUnit && (
