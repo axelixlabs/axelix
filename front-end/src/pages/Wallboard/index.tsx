@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EmptyHandler, Loader } from "components";
-import { fetchData, filterInstances, filterWallboardInstances } from "helpers";
+import { fetchData, filterWallboardInstances } from "helpers";
 import { type IServiceCardsResponseBody, type IWallboardSingleOperandFilter, StatefulRequest } from "models";
 import { getWallboardData } from "services";
 
@@ -48,8 +48,13 @@ const Wallboard = () => {
 
     const instanceCards = wallboard.response!.instances;
 
-    const filteredInstances = filters.length > 0 ? filterWallboardInstances(instanceCards, filters, t) : instanceCards;
-    const effectiveInstanceCards = search ? filterInstances(filteredInstances, search) : filteredInstances;
+    /* eslint-disable */
+    const effectiveInstanceCards =
+        (filters.length > 0 || search)
+            ? filterWallboardInstances(instanceCards, search, filters, t)
+            : instanceCards;
+    /* eslint-enable */
+
     const addonAfter = `${effectiveInstanceCards.length} / ${instanceCards.length}`;
 
     return (
