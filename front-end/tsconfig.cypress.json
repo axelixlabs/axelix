@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "target": "es5",
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.cypress.tsbuildinfo",
         "lib": ["es6", "dom"],
         "rootDir": "./cypress",
         "strict": true,

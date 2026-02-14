@@ -12,7 +12,6 @@ dist
 dist-ssr
 *.local
 .env
-tsconfig.cypress.tsbuildinfo
 .editorconfig
 
 # Editor directories and files
