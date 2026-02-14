@@ -23,7 +23,6 @@ import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -47,14 +46,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 09.02.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 class AxelixEnvironmentEndpointAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withPropertyValues("management.endpoints.web.exposure.include=axelix-env,axelix-configprops")
-            .withConfiguration(AutoConfigurations.of(
-                    AxelixEnvironmentEndpointAutoConfiguration.class,
-                    AxelixConfigurationsPropertiesEndpointAutoConfiguration.class));
+            .withPropertyValues("management.endpoints.web.exposure.include=axelix-env")
+            .withConfiguration(AutoConfigurations.of(AxelixEnvironmentEndpointAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
@@ -71,46 +69,16 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
     @Test
     void shouldNotActivateAutoConfigurationWithoutRequiredProperty() {
         new ApplicationContextRunner()
-                .withPropertyValues(
-                        "management.endpoints.web.exposure.include=axelix-configprops",
-                        "management.endpoints.web.exposure.exclude=axelix-env")
-                .withConfiguration(AutoConfigurations.of(
-                        AxelixEnvironmentEndpointAutoConfiguration.class,
-                        AxelixConfigurationsPropertiesEndpointAutoConfiguration.class))
+                .withPropertyValues("management.endpoints.web.exposure.exclude=axelix-env")
+                .withConfiguration(AutoConfigurations.of(AxelixEnvironmentEndpointAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(AxelixEnvironmentEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(PropertyMetadataExtractor.class);
                     assertThat(context).doesNotHaveBean(EnvPropertyEnricher.class);
                     assertThat(context).doesNotHaveBean(AxelixEnvironmentEndpoint.class);
                     assertThat(context).doesNotHaveBean(ValueInjectionTrackerBeanPostProcessor.class);
-
-                    // Beans smartSanitizingFunction and propertyNameNormalizer are provided by
-                    // AxelixConfigurationsPropertiesEndpointAutoConfiguration, which remains active.
-                    assertThat(context).hasSingleBean(SmartSanitizingFunction.class);
-                    assertThat(context).hasSingleBean(PropertyNameNormalizer.class);
-                });
-    }
-
-    @Test
-    void shouldFailWhenConfigPropsExcludedBecauseEndpointsConfigurationPropertiesMissing() {
-        // Test demonstrates that when axelix-configprops endpoint is excluded,
-        // AxelixConfigurationsPropertiesEndpointAutoConfiguration is not activated,
-        // which means @EnableConfigurationProperties(EndpointsConfigurationProperties.class)
-        // doesn't run, and the EndpointsConfigurationProperties bean is not created.
-        // This causes AxelixEnvironmentEndpointAutoConfiguration to fail because
-        // SmartSanitizingFunction depends on EndpointsConfigurationProperties.
-
-        new ApplicationContextRunner()
-                .withPropertyValues(
-                        "management.endpoints.web.exposure.include=axelix-env",
-                        "management.endpoints.web.exposure.exclude=axelix-configprops")
-                .withConfiguration(AutoConfigurations.of(
-                        AxelixEnvironmentEndpointAutoConfiguration.class,
-                        AxelixConfigurationsPropertiesEndpointAutoConfiguration.class))
-                .run(context -> {
-                    // Context should fail to start
-                    assertThat(context).hasFailed();
-                    assertThat(context.getStartupFailure()).isInstanceOf(UnsatisfiedDependencyException.class);
+                    assertThat(context).doesNotHaveBean(SmartSanitizingFunction.class);
+                    assertThat(context).doesNotHaveBean(PropertyNameNormalizer.class);
                 });
     }
 
