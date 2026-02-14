@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import apiFetch from "api/apiFetch";
+import { apiFetch } from "api";
 
-export const getTransactionalData = () => {
+export const getTransactionalData = (instanceId: string) => {
     // TODO: Replace this with the real path
-    return apiFetch.get(`transaction-monitoring/mock-data`);
+    return apiFetch.get(`transaction-monitoring/${instanceId}`);
 };
