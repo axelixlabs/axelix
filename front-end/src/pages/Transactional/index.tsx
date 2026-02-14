@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterTransactionalData } from "helpers";
@@ -28,8 +29,10 @@ const Transactional = () => {
     const [transactionalData, setTransactionalData] = useState(StatefulRequest.loading<ITransactionalResponseData>());
     const [search, setSearch] = useState<string>("");
 
+    const { instanceId } = useParams();
+
     useEffect(() => {
-        fetchData(setTransactionalData, () => getTransactionalData());
+        fetchData(setTransactionalData, () => getTransactionalData(instanceId!));
     }, []);
 
     if (transactionalData.loading) {

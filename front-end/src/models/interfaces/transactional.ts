@@ -23,7 +23,7 @@ interface ITransactionalExecution {
     /**
      * Execution duration in milliseconds.
      */
-    durationsMs: number;
+    durationMs: number;
 
     /**
      * Execution timestamp (milliseconds from epoch).

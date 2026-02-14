@@ -58,7 +58,7 @@ export const TransactionalAccordionBody = ({ transactional }: IProps) => {
                     return [formattedValue, "Duration"];
                 }}
             />
-            <Bar dataKey="durationsMs" fill="url(#gradient)" />
+            <Bar dataKey="durationMs" fill="url(#gradient)" />
         </BarChart>
     );
 };
