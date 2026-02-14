@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { EInstanceStatus } from "../enums/globals";
+import type { EInstanceStatus, EWallboardFilterKey, EWallboardFilterOperator, ISelectOptionData } from "models";
 
 export interface IInstanceCard {
     instanceId: string;
@@ -30,4 +30,23 @@ export interface IInstanceCard {
 
 export interface IServiceCardsResponseBody {
     instances: IInstanceCard[];
+}
+
+export interface IWallboardSingleOperandFilter {
+    id: string;
+    key: EWallboardFilterKey;
+    operator: EWallboardFilterOperator;
+    operand: string;
+}
+
+export interface IWallboardLocalFilterBuilder {
+    key: EWallboardFilterKey | null;
+    operator: EWallboardFilterOperator | null;
+    operand: string | null;
+}
+
+export interface IWallboardFilterDefinition {
+    operatorOptions: ISelectOptionData[];
+    getOperandsOptions: (instances: IInstanceCard[]) => ISelectOptionData[];
+    match: (instance: IInstanceCard, filter: IWallboardSingleOperandFilter) => boolean;
 }

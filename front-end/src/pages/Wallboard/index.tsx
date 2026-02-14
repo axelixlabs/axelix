@@ -16,17 +16,22 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterInstances } from "helpers";
-import { type IServiceCardsResponseBody, StatefulRequest } from "models";
+import { EmptyHandler, Loader } from "components";
+import { fetchData, filterWallboardInstances } from "helpers";
+import { type IServiceCardsResponseBody, type IWallboardSingleOperandFilter, StatefulRequest } from "models";
 import { getWallboardData } from "services";
 
 import { WallboardCard } from "./WallboardCard";
+import { WallboardFirstSection } from "./WallboardFirstSection";
 import styles from "./styles.module.css";
 
 const Wallboard = () => {
+    const { t } = useTranslation();
     const [search, setSearch] = useState<string>("");
+
+    const [filters, setFilters] = useState<IWallboardSingleOperandFilter[]>([]);
     const [wallboard, setWallboard] = useState(StatefulRequest.loading<IServiceCardsResponseBody>());
 
     useEffect(() => {
@@ -42,13 +47,25 @@ const Wallboard = () => {
     }
 
     const instanceCards = wallboard.response!.instances;
-    const effectiveInstanceCards = search ? filterInstances(instanceCards, search) : instanceCards;
+
+    /* eslint-disable */
+    const effectiveInstanceCards =
+        (filters.length > 0 || search)
+            ? filterWallboardInstances(instanceCards, search, filters, t)
+            : instanceCards;
+    /* eslint-enable */
 
     const addonAfter = `${effectiveInstanceCards.length} / ${instanceCards.length}`;
 
     return (
         <>
-            <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
+            <WallboardFirstSection
+                addonAfter={addonAfter}
+                setSearch={setSearch}
+                instanceCards={instanceCards}
+                filters={filters}
+                setFilters={setFilters}
+            />
 
             <EmptyHandler isEmpty={effectiveInstanceCards.length === 0}>
                 <div className={styles.CardsResponsiveWrapper}>
