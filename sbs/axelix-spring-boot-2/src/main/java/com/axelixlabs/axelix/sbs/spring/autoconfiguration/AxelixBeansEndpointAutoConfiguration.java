@@ -34,7 +34,7 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilde
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
 
 /**
- * Auto-configuration class for the beans custom actuator endpoint.
+ * Auto-configuration class for {@link AxelixBeansEndpoint}.
  *
  * @since 07.07.2025
  * @author Nikita Kirillov
@@ -42,7 +42,7 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRe
  * @author Mikhail Polivakha
  */
 @AutoConfiguration
-public class AxelixBeansAutoConfiguration {
+public class AxelixBeansEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
@@ -72,7 +72,7 @@ public class AxelixBeansAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxelixBeansEndpoint axelixBeansEndpoint(BeansFeedBuilder cachingBeansFeedBuilder) {
+    public AxelixBeansEndpoint beansEndpointExtension(BeansFeedBuilder cachingBeansFeedBuilder) {
         return new AxelixBeansEndpoint(cachingBeansFeedBuilder);
     }
 
