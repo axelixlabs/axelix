@@ -27,10 +27,10 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCachesEndpointAu
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConditionsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertiesEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixEnvironmentEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ContextRestarterAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GcLogEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.PropertyManagementAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
@@ -54,7 +54,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEn
             AxelixHeapDumpEndpointAutoConfiguration.class,
             AxelixMetricsAutoConfiguration.class,
             ContextRestarterAutoConfiguration.class,
-            GcLogEndpointAutoConfiguration.class,
+            AxelixGcEndpointAutoConfiguration.class,
             JwtAuthAutoConfiguration.class,
             PropertyManagementAutoConfiguration.class,
             ThreadDumpManagementEndpointAutoConfiguration.class

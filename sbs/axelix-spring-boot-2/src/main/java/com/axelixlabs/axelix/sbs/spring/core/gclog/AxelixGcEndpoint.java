@@ -35,11 +35,11 @@ import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
  * @author Nikita Kirillov
  */
 @RestControllerEndpoint(id = "axelix-gc")
-public class GcLogEndpoint {
+public class AxelixGcEndpoint {
 
     private final GcLogService gcLogService;
 
-    public GcLogEndpoint(GcLogService gcLogService) {
+    public AxelixGcEndpoint(GcLogService gcLogService) {
         this.gcLogService = gcLogService;
     }
 

@@ -7,7 +7,7 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixLoggersEndpointAutoConf
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ContextRestarterAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.GcLogEndpointAutoConfiguration
+com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.PropertyManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration

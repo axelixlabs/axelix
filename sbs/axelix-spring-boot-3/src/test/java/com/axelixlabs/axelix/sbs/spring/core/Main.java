@@ -28,11 +28,11 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConditionsEndpoi
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertiesEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixDetailsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixEnvironmentEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ContextRestarterAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GcLogEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.KafkaIntegrationAutoConfiguration;
@@ -63,7 +63,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
             AxelixMetadataEndpointConfiguration.class,
             AxelixMetricsAutoConfiguration.class,
             ContextRestarterAutoConfiguration.class,
-            GcLogEndpointAutoConfiguration.class,
+            AxelixGcEndpointAutoConfiguration.class,
             GitInformationProviderAutoConfiguration.class,
             JwtAuthAutoConfiguration.class,
             KafkaIntegrationAutoConfiguration.class,

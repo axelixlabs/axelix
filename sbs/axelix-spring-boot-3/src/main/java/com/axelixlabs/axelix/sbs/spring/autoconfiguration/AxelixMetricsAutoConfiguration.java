@@ -22,9 +22,8 @@ import java.util.Set;
 import io.micrometer.core.instrument.MeterRegistry;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
-import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
@@ -43,8 +42,9 @@ import com.axelixlabs.axelix.sbs.spring.core.metrics.ServiceMetricsGroupsAssembl
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@AutoConfiguration(after = MetricsAutoConfiguration.class)
-@ConditionalOnAvailableEndpoint(endpoint = MetricsEndpoint.class)
+@AutoConfiguration
+@ConditionalOnAvailableEndpoint(endpoint = AxelixMetricsEndpoint.class)
+@ConditionalOnBean(MeterRegistry.class)
 public class AxelixMetricsAutoConfiguration {
 
     @Bean
