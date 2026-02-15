@@ -113,7 +113,7 @@ jobs:
         playground_repo: [
           'axelixlabs/notification-service',
           'axelixlabs/feature-service',
-          'axelixlabs/spring-petclinic'
+          'axelixlabs/spring-petclinic',
           'axelixlabs/spring-petclinic-sb-2'
         ]
     runs-on: ubuntu-latest
