@@ -50,7 +50,7 @@ export const NegativeConditions = ({ negativeMatches }: IProps) => {
                                 <>
                                     <div className={styles.ConditionHeaderSection}>
                                         <span style={{ fontWeight: 300 }}>Method:</span> {methodName}
-                                        <Copy text={className} />
+                                        <Copy text={methodName} />
                                     </div>
                                 </>
                             )}

@@ -33,11 +33,8 @@ const ScheduledTasks = () => {
     const [scheduledTasks, setScheduledTasks] = useState(StatefulRequest.loading<IScheduledTasksResponseBody>());
     const [search, setSearch] = useState<string>("");
 
-    const fetchScheduledTasks = (instanceId: string) =>
-        fetchData(setScheduledTasks, () => getScheduledTasksData(instanceId));
-
     useEffect(() => {
-        fetchScheduledTasks(instanceId!);
+        fetchData(setScheduledTasks, () => getScheduledTasksData(instanceId!));
     }, []);
 
     if (scheduledTasks.loading) {

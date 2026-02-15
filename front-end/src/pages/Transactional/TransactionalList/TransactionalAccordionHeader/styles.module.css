@@ -1,0 +1,36 @@
+.MainWrapper {
+    display: flex;
+    place-content: center space-between;
+    align-items: center;
+}
+
+.HeaderWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: space-between;
+}
+
+.LabelWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    font-weight: 300;
+    word-break: break-all;
+}
+
+.Label {
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+.TagsWrapper {
+    display: flex;
+    column-gap: 8px;
+}
+
+.Tags {
+    font-weight: 600;
+    padding: 5px;
+    border-radius: 50px;
+}
