@@ -1,0 +1,68 @@
+== Auth Configuration
+
+This table outlines the auth-related configuration of the Axile Master.
+
+[cols="1,2,2", options="header"]
+|===
+| Term
+| Definition
+| Possible Values
+
+| *algorithm*
+| The algorithm used for JWT construction.
+| `HMAC256`, `HMAC384`, `HMAC512`
+
+| *signing_key*
+| The key used for generating the token signature.
+| Must be at least 32/48/64 bytes depending on the algorithm.
+
+| *lifespan*
+| The validity duration of the token.
+| Duration format, e.g., `3h`, `1d`, `15m`
+|===
+
+== Usage Sample
+
+YAML configuration example usage:
+
+[source,yaml]
+----
+axile:
+  master:
+    auth:
+      jwt:
+        # The algorithm used for jwt construction
+        algorithm: "HMAC256"
+        # The key to be used for generating a sign
+        signing_key: "P3>Lm3w4r8X-"
+        # Token lives for 3 hours
+        lifespan: 3h
+----
+
+The equivalent example for Java properties file:
+
+[source,properties]
+----
+# The algorithm used for jwt construction
+axile.master.auth.jwt.algorithm=HMAC256
+
+# The key to be used for generating a sign
+axile.master.auth.jwt.signing_key=P3>Lm3w4r8X-
+
+# Token lives for 3 hours
+axile.master.auth.jwt.lifespan=3d
+----
+
+The equivalent example for environment variables:
+
+[source,bash]
+----
+# The algorithm used for jwt construction
+AXILE_MASTER_AUTH_JWT_ALGORITHM=HMAC256
+
+# The key to be used for generating a sign
+AXILE_MASTER_AUTH_JWT_SIGNING_KEY=P3>Lm3w4r8X-
+
+# Token lives for 3 hours
+AXILE_MASTER_AUTH_JWT_LIFESPAN=3d
+----

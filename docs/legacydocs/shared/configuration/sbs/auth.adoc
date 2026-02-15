@@ -1,0 +1,41 @@
+== Auth Configuration
+
+This table outlines the auth-related configuration of the Axile SBS.
+
+[cols="2,1,2,4,2", options="header"]
+|===
+| Property Key | Mandatory | Property Default Value | Description | Example
+| *axile.sbs.auth.sign-check-key*
+| Yes
+| N/A
+| This is the key that the service should use in order to decrypt the JWT incoming token. It might be the same as the key used by Axile Master in case of HMAC, or it might be different, depends on the signature algorithm employed.
+| 0x80070713463E7749B9
+|===
+
+== Usage Sample
+
+YAML configuration example usage:
+
+[source,yaml]
+----
+axile:
+  sbs:
+    auth:
+      sign-check-key: 0x80070713463E7749B9
+----
+
+The equivalent example for Java properties file:
+
+[source,properties]
+----
+# The key that should be used to decrypt the JWT
+axile.sbs.auth.sign-check-key=0x80070713463E7749B9
+----
+
+The equivalent example for environment variables:
+
+[source,bash]
+----
+# The algorithm used for jwt construction
+AXILE_SBS_AUTH_SIGN_CHECK_KEY=0x80070713463E7749B9
+----

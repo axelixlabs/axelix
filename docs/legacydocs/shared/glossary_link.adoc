@@ -1,0 +1,3 @@
+= Glossary
+
+There is a good change that the terms used in this document that are not quite clear for you are explained in the <<global_glossary, Glossary>>. Give a look.

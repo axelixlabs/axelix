@@ -1,0 +1,25 @@
+/* TODO: Make some improvs in future*/
+.CellValueWithRowChunk {
+    text-align: left;
+    vertical-align: middle;
+}
+
+.CellValueFragmentWithIconCenter {
+    text-align: center;
+    vertical-align: bottom;
+}
+
+.CellValueFragmentWithIconLeft {
+    text-align: left;
+    vertical-align: bottom;
+}
+
+.ConfiguredLevelIcon {
+    width: 60px;
+    height: 32px;
+}
+
+.LevelIcon {
+    width: 55px;
+    height: 26px;
+}

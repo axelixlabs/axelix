@@ -1,0 +1,44 @@
+= Core Values
+
+These are our core values during development of the Axile product as a whole. These are our
+decision-making compass that we employ on a daily basis:
+
+== No Dogmas
+
+Although, most of the time the principles described below *can and should* server as a guideline for
+making the decisions, *any principle outline here, including this, can be challenged*. In particular,
+it means that we, do *_not_* disregard the solution only because it goes against principles.
+
+== Developer Experience is the Key
+
+Any feature that is ever designed, must be either directly or indirectly enhance the developer experience
+either now, or in the future. Every time we're making a decision we should ask ourselves:
+
+Do we, as developers that used that particular technology in the past, would want this change to happen, or we don't
+
+== Respected Hierarchy
+
+Even the most Junior person should be able to disagree with the most Senior one if the data is in place.
+
+It is the most Senior person that is responsible for making sure that the team's objective is generally agreed uponed,
+and the positions of the Junior's area heard of.
+
+== Tell the Truth
+
+We, as humans, are social creatures. And as social creatures, it is generally more convenient for us to be
+accepted by the public, rather than saying the things that we think are right. Especially if those
+
+*Even knowing that it is uncomfortable, telling the truth is essential for healthy teams and healthy organization to make right decisions.*
+
+The given person should always be able to express his/her opinion politely, and this position must be heard.
+
+== Acting in Unknown
+
+*It is absolutely, positively Okay to not know something*. That is totally fine.
+
+What is not okay is to use it as excuse.
+
+What is required from us as a team is to be able to admit the fact that we do not know something. And then
+the question is that we're going to do about it.
+
+

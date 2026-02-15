@@ -1,0 +1,47 @@
+= Axile Project
+
+This document explains the Axile project overall, explains what problems it tries to solve conceptually.
+
+== What is This Project Even About?
+
+Axile is a tool that basically achieves two distinct purposes:
+
+- It helps in debugging Spring Boot applications in runtime.
+- It helps in monitoring the ecosystem of Spring Applications inside the organization.
+
+Let's review each of these topics in a bit more detail.
+
+=== Axile as the Debugging Tool
+
+We think nobody would really argue that the local environment is very different from sandbox/development environment, let alone the production. The infamous statement:
+
+> It works on my machine!
+
+exists for a reason. Because it is really often the case that something that used to work locally, that used to pass all the tests just all of a sudden breaks on a particular environment. Spring Boot applications are not exception.
+
+And we want to be clear - we love Spring Boot. Not only love, but our developers contribute to Spring Boot as well. *It is by all means an amazing framework*. It occupies the leading positions and remains the top choice for Java developers for a reason - it is indeed incredibly helpful.
+
+Still, experienced Spring Developers would probably agree that sometimes debugging Spring might be far from easy, especially when it comes to debugging the remote environment. When Spring Boot application does not behave as expected, we tend to ask question like:
+
+- Are we 100% sure that the property `spring.datasource.whatever` has exactly this value?
+- This bean, right here, does it use exactly the `JmsTemplate`/`JmsClient` that _I think_ it is using?
+- Are we 100% sure that the Spring's Cache even being used?
+- Why we have two `KafkaListenerContainer` beans there? I have created only one! From _where exactly_ another bean comes from? Who creates it?
+
+And much more. Well, Axile is there to help. It answers all these questions and much more. The more concrete, down-to-earth example of what Axile actually solves  xref:axile_as_debuggin_tool.adoc[can be found here].
+
+=== Axile as the Spring Boot Monitoring Solution
+
+Second, Axile can also be used as the organization's monitoring solution for Java Spring Boot applications. It basically tries to bring-in some order into the  corporate chaos. For instance, among other things, with Axile it is
+possible:
+
+- To control hhe migration of the entire ecosystem from Spring Framework/Java/JDK Vendor version X to Y
+- To monitor the state of the particular Spring Boot application, i.e. the connection pool, transactions, the served RPS etc.
+- To download all the necessary debugging information - the state of the Spring Boot's Environment, the sanitized heap dump etc.
+
+The list above is not exhaustive of course and there is much more.
+
+=== About the Authors
+
+As a final merit: *the authors of this tool are Spring Framework contributors, as well as regular Spring users*. We deeply understand how difficult it might be to debug exactly what went wrong with Spring Boot properties, Spring Boot autoconfiguration etc. *We feel your pain, mate. We are here to help*.
+
