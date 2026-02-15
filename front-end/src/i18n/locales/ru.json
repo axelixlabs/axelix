@@ -93,7 +93,7 @@
         "mappings": "Сопоставления",
         "caches": "Кэши",
         "threadDump": "Дамп потоков",
-        "transactionControl" : "Transaction Control",
+        "transactionControl" : "Мониторинг транзакций",
         "garbageCollector": "Сборщик Мусора"
     },
     "Caches": {
@@ -256,5 +256,12 @@
             "lessThanOrEqual": "Меньше или равно",
             "greaterThanOrEqual": "Больше или равно"
         }
+    },
+    "Transactional": {
+        "median": "Медиана",
+        "max": "Макс",
+        "average": "Среднее",
+        "duration": "Продолжительность",
+        "durationTooltip": "Аггрегированная инфомрация по исоплнению транзакций в рамках данного метода"
     }
 }

@@ -1,0 +1,58 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 1fr repeat(3, min-content);
+    gap: 8px 20px;
+    grid-template-areas:
+    ".      item1  item2 item3"
+    ".      .      .     .    "
+    "item4  item5  item6 item7";
+}
+
+.Max {
+    font-weight: 600;
+    text-align: center;
+    grid-area: item1;
+}
+
+.Average {
+    font-weight: 600;
+    text-align: center;
+    grid-area: item2;
+}
+
+.Median {
+    font-weight: 600;
+    text-align: center;
+    grid-area: item3;
+}
+
+.Duration {
+    grid-area: item4;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.HeaderLine {
+    border-bottom: 1px solid var(--axelix-medium-grey);
+    grid-column: 1 / 5;
+}
+
+.MaxValue {
+    text-align: center;
+    grid-area: item5;
+    white-space: nowrap;
+}
+
+.AvgValue {
+    text-align: center;
+    grid-area: item6;
+    white-space: nowrap;
+}
+
+.MeanValue {
+    text-align: center;
+    grid-area: item7;
+    white-space: nowrap;
+}

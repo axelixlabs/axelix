@@ -15,34 +15,35 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useEffect, useState } from "react";
-
-import { generateTimeSlots } from "helpers";
-import { THREAD_DUMP_SLIDING_WINDOW_MS } from "utils";
+import { Copy } from "components";
+import type { ITransactionalEntryPoint } from "models";
 
 import styles from "./styles.module.css";
 
-export const GlobalSlidingTimeLine = () => {
-    const [timeSlots, setTimeSlots] = useState<Date[]>([]);
+interface IProps {
+    /**
+     * Single transactional data
+     */
+    transactional: ITransactionalEntryPoint;
+}
 
-    useEffect(() => {
-        setTimeSlots(generateTimeSlots());
-
-        const intervalId = setInterval(() => {
-            setTimeSlots(generateTimeSlots());
-        }, THREAD_DUMP_SLIDING_WINDOW_MS);
-
-        return () => clearInterval(intervalId);
-    }, []);
+export const TransactionalAccordionHeader = ({ transactional }: IProps) => {
+    const { className, methodName } = transactional;
 
     return (
         <div className={styles.MainWrapper}>
-            {timeSlots.map((timeSlot, index) => (
-                <div className={styles.TimeSlot} key={index}>
-                    {/* TODO: Consider the option of correct time display */}
-                    {timeSlot.toLocaleTimeString([], { hour12: false })}
+            <div className={styles.HeaderWrapper}>
+                <div className={styles.LabelWrapper}>
+                    <span className={styles.Label}>Class:</span>
+                    <span>{className}</span>
+                    <Copy text={className} />
                 </div>
-            ))}
+                <div className={styles.LabelWrapper}>
+                    <span className={styles.Label}>Method:</span>
+                    <span>{methodName}</span>
+                    <Copy text={methodName} />
+                </div>
+            </div>
         </div>
     );
 };

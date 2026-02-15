@@ -23,6 +23,7 @@ import { MainLayout } from "layout";
 
 const GarbageCollector = Loadable(lazy(() => import("pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("pages/ScheduledTasks")));
+const Transactional = Loadable(lazy(() => import("pages/Transactional")));
 const Environment = Loadable(lazy(() => import("pages/Environment")));
 const ConfigProps = Loadable(lazy(() => import("pages/ConfigProps")));
 const Conditions = Loadable(lazy(() => import("pages/Conditions")));
@@ -57,7 +58,7 @@ export const MainRoutes = () => {
                 <Route path="/instance/:instanceId/conditions" element={<Conditions />} />
                 <Route path="/instance/:instanceId/thread-dump" element={<ThreadDump />} />
                 <Route path="/instance/:instanceId/garbage-collector" element={<GarbageCollector />} />
-                <Route path="/instance/:instanceId/transactional" element={<>Transactional placeholder</>} />
+                <Route path="/instance/:instanceId/transactional" element={<Transactional />} />
             </Route>
         </Routes>
     );

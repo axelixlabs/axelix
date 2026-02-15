@@ -257,5 +257,12 @@
             "lessThanOrEqual": "Less than or equal",
             "greaterThanOrEqual": "Greater than or equal"
         }
+    },
+    "Transactional": {
+        "median": "Median",
+        "max": "Max",
+        "average": "Average",
+        "duration": "Duration",
+        "durationTooltip": "Aggregated information about the duration of this transactional method execution"
     }
 }
