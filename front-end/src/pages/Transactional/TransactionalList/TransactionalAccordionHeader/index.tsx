@@ -15,9 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Tag } from "antd";
-import { useTranslation } from "react-i18next";
-
 import { Copy } from "components";
 import type { ITransactionalEntryPoint } from "models";
 
@@ -31,33 +28,21 @@ interface IProps {
 }
 
 export const TransactionalAccordionHeader = ({ transactional }: IProps) => {
-    const { t } = useTranslation();
     const { className, methodName } = transactional;
 
     return (
         <div className={styles.MainWrapper}>
-            <div>
+            <div className={styles.HeaderWrapper}>
                 <div className={styles.LabelWrapper}>
                     <span className={styles.Label}>Class:</span>
-                    {className}
+                    <span>{className}</span>
                     <Copy text={className} />
                 </div>
                 <div className={styles.LabelWrapper}>
                     <span className={styles.Label}>Method:</span>
-                    {methodName}
+                    <span>{methodName}</span>
                     <Copy text={methodName} />
                 </div>
-            </div>
-            <div className={styles.TagsWrapper}>
-                <Tag variant="solid" color="geekblue">
-                    {t("Transactional.maxTime")}: 10000
-                </Tag>
-                <Tag variant="solid" color="geekblue">
-                    {t("Transactional.averageTime")}: 1000
-                </Tag>
-                <Tag variant="solid" color="geekblue">
-                    {t("Transactional.medianTime")}: 1000.3
-                </Tag>
             </div>
         </div>
     );

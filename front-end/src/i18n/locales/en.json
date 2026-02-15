@@ -259,8 +259,10 @@
         }
     },
     "Transactional": {
-        "maxTime": "Max time",
-        "averageTime": "Average time",
-        "medianTime": "Median time"
+        "median": "Median",
+        "max": "Max",
+        "average": "Average",
+        "duration": "Duration",
+        "durationTooltip": "Aggregated information about the duration of this transactional method execution"
     }
 }

@@ -15,10 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from "recharts";
 
-import { formatTransactionalDuration, toFormattedTime } from "helpers";
+import { formatTransactionDuration, toFormattedTime } from "helpers";
 import type { ITransactionalEntryPoint } from "models";
+
+import { TransactionalMethodExecutionStats } from "../TransactionalMethodExecutionStats";
 
 import styles from "./styles.module.css";
 
@@ -33,32 +35,27 @@ export const TransactionalAccordionBody = ({ transactional }: IProps) => {
     const data = transactional.executions;
 
     return (
-        <BarChart data={data} responsive className={styles.MainWrapper}>
-            <defs>
-                <linearGradient id="gradient" x1="0" y1="300" x2="0" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#73BF69" />
-                    <stop offset="50%" stopColor="#FF9830" />
-                    <stop offset="90%" stopColor="#F2495C" />
-                </linearGradient>
-            </defs>
+        <div>
+            <ScatterChart data={data} responsive className={styles.MainWrapper}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="timestamp" tickFormatter={toFormattedTime} />
+                <YAxis width="auto" tickFormatter={formatTransactionDuration} />
+                <Tooltip
+                    labelFormatter={toFormattedTime}
+                    itemStyle={{ color: "green" }}
+                    formatter={(value, name) => {
+                        const valueAsNum = Number(value);
 
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="timestamp" tickFormatter={toFormattedTime} />
-            <YAxis width="auto" />
-            <Tooltip
-                labelFormatter={toFormattedTime}
-                itemStyle={{ color: "green" }}
-                formatter={(value) => {
-                    let formattedValue = value;
-
-                    if (typeof value === "number") {
-                        formattedValue = value < 1000 ? `${value} ms` : formatTransactionalDuration(value);
-                    }
-
-                    return [formattedValue, "Duration"];
-                }}
-            />
-            <Bar dataKey="durationMs" fill="url(#gradient)" />
-        </BarChart>
+                        if (name == "timestamp") {
+                            return [toFormattedTime(valueAsNum), "Timestamp"];
+                        } else {
+                            return [formatTransactionDuration(valueAsNum), "Duration"];
+                        }
+                    }}
+                />
+                <Scatter dataKey="durationMs" fill="#00AB55FF" line lineType="joint" />
+            </ScatterChart>
+            <TransactionalMethodExecutionStats stats={transactional.executionStats} />
+        </div>
     );
 };

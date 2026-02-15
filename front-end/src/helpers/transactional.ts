@@ -36,9 +36,13 @@ export const filterTransactionalData = (
     });
 };
 
-export const formatTransactionalDuration = (value: number): string => {
+const formatTransactionalDuration = (value: number): string => {
     const seconds = value / 1000;
     const formatted = Number.isInteger(seconds) ? seconds.toString() : seconds.toFixed(1);
 
     return `${formatted}s`;
+};
+
+export const formatTransactionDuration = (value: number) => {
+    return value < 1000 ? `${value} ms` : formatTransactionalDuration(value);
 };

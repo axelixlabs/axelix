@@ -59,4 +59,14 @@ export interface ITransactionalEntryPoint {
      * Transactions executions list.
      */
     executions: ITransactionalExecution[];
+
+    executionStats: IExecutionStats;
+}
+
+export interface IExecutionStats {
+    averageDurationMs: number;
+
+    maxDurationMs: number;
+
+    medianDurationMs: number;
 }
