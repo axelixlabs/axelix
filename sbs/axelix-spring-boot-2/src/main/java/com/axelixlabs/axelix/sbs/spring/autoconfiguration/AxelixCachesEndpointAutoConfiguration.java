@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.util.Map;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -33,13 +34,28 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheOperationsDispatc
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
 
 /**
- * Auto-configuration for the {@link AxelixCachesEndpoint}.
+ * {@code CacheDispatcherAutoConfiguration} provides auto-configuration
+ * for cache dispatching and exposing cache-related operations via a custom Actuator endpoint.
+ *
+ * <p>This configuration registers the following beans if they are not already defined in the context:
+ * <ul>
+ *     <li>{@link DefaultCacheOperationsDispatcher} — dispatcher that coordinates cache operations across
+ *  *     all registered {@link CacheManager} beans,</li>
+ *     <li>{@link AxelixCachesEndpoint} — a custom Spring Boot Actuator endpoint for cache management.</li>
+ * </ul>
+ * <p>Auto-configuration is only activated if a {@link CacheManager}
+ * bean is available in the application context.
+ *
+ * <p>This class is intended to be registered via Spring Boot's auto-configuration mechanism,
+ * {@code META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports}
+ * (for Spring Boot 3.x+).
  *
  * @since 24.06.2025
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
  */
 @AutoConfiguration(after = {CacheAutoConfiguration.class})
+@ConditionalOnAvailableEndpoint(endpoint = AxelixCachesEndpoint.class)
 public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
@@ -59,8 +75,8 @@ public class AxelixCachesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxelixCachesEndpoint axelixCachesEndpoint(CacheOperationsDispatcher cacheOperationsDispatcher) {
-        return new AxelixCachesEndpoint(cacheOperationsDispatcher);
+    public AxelixCachesEndpoint axelixCachesEndpoint(CacheOperationsDispatcher dispatcher) {
+        return new AxelixCachesEndpoint(dispatcher);
     }
 
     @Bean

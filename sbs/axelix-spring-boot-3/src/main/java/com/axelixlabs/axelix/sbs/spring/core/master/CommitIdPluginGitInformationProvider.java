@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import java.util.Optional;
 
 import org.springframework.boot.info.GitProperties;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
@@ -33,7 +32,7 @@ import com.axelixlabs.axelix.common.api.registration.GitInfo.CommitAuthor;
  *
  * @author Mikhail Polivakha
  */
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order
 public class CommitIdPluginGitInformationProvider implements GitInformationProvider {
 
     private final GitProperties gitProperties;

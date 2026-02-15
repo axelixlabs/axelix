@@ -44,21 +44,22 @@ public class ConditionFeedConverter implements Converter<ConditionsFeed, Conditi
     @Override
     public @NonNull ConditionsFeedResponse convertInternal(@NonNull ConditionsFeed source) {
 
-        List<PositiveCondition> positiveConditions = source.positiveConditions().stream()
+        List<PositiveCondition> positiveConditions = source.getPositiveConditions().stream()
                 .map(it -> {
-                    UnwrappedTarget result = unwrap(it.target());
-                    return new PositiveCondition(result.className(), result.methodName(), convertMatches(it.matches()));
+                    UnwrappedTarget result = unwrap(it.getTarget());
+                    return new PositiveCondition(
+                            result.className(), result.methodName(), convertMatches(it.getMatches()));
                 })
                 .toList();
 
-        List<NegativeCondition> negativeConditions = source.negativeConditions().stream()
+        List<NegativeCondition> negativeConditions = source.getNegativeConditions().stream()
                 .map(it -> {
-                    UnwrappedTarget unwrap = unwrap(it.target());
+                    UnwrappedTarget unwrap = unwrap(it.getTarget());
                     return new NegativeCondition(
                             unwrap.className(),
                             unwrap.methodName(),
-                            convertMatches(it.notMatched()),
-                            convertMatches(it.matched()));
+                            convertMatches(it.getNotMatched()),
+                            convertMatches(it.getMatched()));
                 })
                 .toList();
 
@@ -70,7 +71,7 @@ public class ConditionFeedConverter implements Converter<ConditionsFeed, Conditi
             return Collections.emptyList();
         }
         return matches.stream()
-                .map(m -> new ConditionMatch(m.condition(), m.message()))
+                .map(m -> new ConditionMatch(m.getCondition(), m.getMessage()))
                 .toList();
     }
 

@@ -18,8 +18,10 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -43,7 +45,9 @@ import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostPr
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@AutoConfiguration(after = {AxelixConfigurationsPropertiesEndpointAutoConfiguration.class})
+@AutoConfiguration
+@ConditionalOnAvailableEndpoint(endpoint = AxelixEnvironmentEndpoint.class)
+@EnableConfigurationProperties(EndpointsConfigurationProperties.class)
 public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean
@@ -73,11 +77,15 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     public EnvPropertyEnricher envPropertyEnricher(
             Environment environment,
             PropertyNameNormalizer propertyNameNormalizer,
-            ObjectProvider<ConfigurationPropertiesCache> cache,
+            ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache,
             PropertyMetadataExtractor propertyMetadataExtractor,
             ValueInjectionTrackerBeanPostProcessor injectionTracker) {
         return new DefaultEnvPropertyEnricher(
-                environment, propertyNameNormalizer, cache, propertyMetadataExtractor, injectionTracker);
+                environment,
+                propertyNameNormalizer,
+                configurationPropertiesCache,
+                propertyMetadataExtractor,
+                injectionTracker);
     }
 
     @Bean

@@ -43,11 +43,11 @@ public final class ConditionsFeed {
         this.negativeConditions = negativeConditions != null ? negativeConditions : Collections.emptyList();
     }
 
-    public List<PositiveCondition> positiveConditions() {
+    public List<PositiveCondition> getPositiveConditions() {
         return positiveConditions;
     }
 
-    public List<NegativeCondition> negativeConditions() {
+    public List<NegativeCondition> getNegativeConditions() {
         return negativeConditions;
     }
 
@@ -91,11 +91,11 @@ public final class ConditionsFeed {
             this.matches = matches != null ? matches : Collections.emptyList();
         }
 
-        public String target() {
+        public String getTarget() {
             return target;
         }
 
-        public List<ConditionMatch> matches() {
+        public List<ConditionMatch> getMatches() {
             return matches;
         }
 
@@ -138,15 +138,15 @@ public final class ConditionsFeed {
             this.matched = matched != null ? matched : Collections.emptyList();
         }
 
-        public String target() {
+        public String getTarget() {
             return target;
         }
 
-        public List<ConditionMatch> notMatched() {
+        public List<ConditionMatch> getNotMatched() {
             return notMatched;
         }
 
-        public List<ConditionMatch> matched() {
+        public List<ConditionMatch> getMatched() {
             return matched;
         }
 
@@ -194,11 +194,11 @@ public final class ConditionsFeed {
             this.message = message;
         }
 
-        public String condition() {
+        public String getCondition() {
             return condition;
         }
 
-        public String message() {
+        public String getMessage() {
             return message;
         }
 

@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.util.Objects;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 /**
  * Configuration properties for transaction monitoring feature.
@@ -28,6 +29,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @since 26.01.2026
  * @author Nikita Kirillov
  */
+@ConstructorBinding
 @ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
 public final class TransactionMonitoringConfigurationProperties {
 

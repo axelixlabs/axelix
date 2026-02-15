@@ -20,12 +20,11 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 import java.util.Optional;
 
 import org.springframework.boot.info.GitProperties;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order
 public class CommitIdPluginShortBuildInfoProvider implements ShortBuildInfoProvider {
 
     private static final String BUILD_TIME = "build.time";

@@ -89,7 +89,7 @@ public class ScheduledTaskManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxelixScheduledTasksEndpoint scheduledTasksEndpointExtension(
+    public AxelixScheduledTasksEndpoint axelixScheduledTasksEndpoint(
             ScheduledTaskService service, ScheduledTasksAssembler scheduledTasksAssembler) {
         return new AxelixScheduledTasksEndpoint(service, scheduledTasksAssembler);
     }

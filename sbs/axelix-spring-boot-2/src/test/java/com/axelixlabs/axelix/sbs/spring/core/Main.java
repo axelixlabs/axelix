@@ -26,14 +26,21 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixBeansEndpointAut
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixCachesEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConditionsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertiesEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixDetailsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixEnvironmentEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ContextRestarterAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.PropertyManagementAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.KafkaIntegrationAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryDiscovererAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SpringCloudFeignIntegrationAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
 
 /**
  * Minimal Spring Boot application used exclusively for testing this application.
@@ -50,14 +57,21 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEn
             AxelixCachesEndpointAutoConfiguration.class,
             AxelixConditionsEndpointAutoConfiguration.class,
             AxelixConfigurationsPropertiesEndpointAutoConfiguration.class,
+            AxelixDetailsEndpointAutoConfiguration.class,
             AxelixEnvironmentEndpointAutoConfiguration.class,
             AxelixHeapDumpEndpointAutoConfiguration.class,
+            AxelixMetadataEndpointConfiguration.class,
             AxelixMetricsAutoConfiguration.class,
-            ContextRestarterAutoConfiguration.class,
             AxelixGcEndpointAutoConfiguration.class,
+            GitInformationProviderAutoConfiguration.class,
             JwtAuthAutoConfiguration.class,
-            PropertyManagementAutoConfiguration.class,
-            ThreadDumpManagementEndpointAutoConfiguration.class
+            KafkaIntegrationAutoConfiguration.class,
+            LibraryDiscovererAutoConfiguration.class,
+            ScheduledTaskManagementAutoConfiguration.class,
+            ShortBuildInfoProviderAutoConfiguration.class,
+            SpringCloudFeignIntegrationAutoConfiguration.class,
+            ThreadDumpManagementEndpointAutoConfiguration.class,
+            TransactionMonitoringAutoConfiguration.class
         })
 @EnableCaching
 @EnableFeignClients

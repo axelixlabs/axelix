@@ -96,38 +96,38 @@ class ConditionsJacksonMessageDeserializationStrategyTest {
 
         ConditionsFeed conditionsFeed = subject.deserialize(response.getBytes(StandardCharsets.UTF_8));
 
-        assertThat(conditionsFeed.positiveConditions()).hasSize(2);
+        assertThat(conditionsFeed.getPositiveConditions()).hasSize(2);
 
-        var positive1 = conditionsFeed.positiveConditions().get(0);
-        assertThat(positive1.target()).isEqualTo("EndpointAutoConfiguration#propertiesEndpointAccessResolver");
-        assertThat(positive1.matches()).hasSize(1);
-        assertThat(positive1.matches().get(0).condition()).isEqualTo("OnBeanCondition");
-        assertThat(positive1.matches().get(0).message()).contains("@ConditionalOnMissingBean");
+        var positive1 = conditionsFeed.getPositiveConditions().get(0);
+        assertThat(positive1.getTarget()).isEqualTo("EndpointAutoConfiguration#propertiesEndpointAccessResolver");
+        assertThat(positive1.getMatches()).hasSize(1);
+        assertThat(positive1.getMatches().get(0).getCondition()).isEqualTo("OnBeanCondition");
+        assertThat(positive1.getMatches().get(0).getMessage()).contains("@ConditionalOnMissingBean");
 
-        var positive2 = conditionsFeed.positiveConditions().get(1);
-        assertThat(positive2.target()).isEqualTo("EndpointAutoConfiguration#endpointCachingOperationInvokerAdvisor");
-        assertThat(positive2.matches()).hasSize(1);
-        assertThat(positive2.matches().get(0).condition()).isEqualTo("OnBeanCondition");
-        assertThat(positive2.matches().get(0).message()).contains("CachingOperationInvokerAdvisor");
+        var positive2 = conditionsFeed.getPositiveConditions().get(1);
+        assertThat(positive2.getTarget()).isEqualTo("EndpointAutoConfiguration#endpointCachingOperationInvokerAdvisor");
+        assertThat(positive2.getMatches()).hasSize(1);
+        assertThat(positive2.getMatches().get(0).getCondition()).isEqualTo("OnBeanCondition");
+        assertThat(positive2.getMatches().get(0).getMessage()).contains("CachingOperationInvokerAdvisor");
 
-        assertThat(conditionsFeed.negativeConditions()).hasSize(2);
+        assertThat(conditionsFeed.getNegativeConditions()).hasSize(2);
 
-        var negative1 = conditionsFeed.negativeConditions().get(0);
-        assertThat(negative1.target()).isEqualTo("WebFluxEndpointManagementContextConfiguration");
-        assertThat(negative1.notMatched()).hasSize(1);
-        assertThat(negative1.notMatched().get(0).condition()).isEqualTo("OnWebApplicationCondition");
-        assertThat(negative1.notMatched().get(0).message()).isEqualTo("not a reactive web application");
-        assertThat(negative1.matched()).hasSize(1);
-        assertThat(negative1.matched().get(0).condition()).isEqualTo("OnClassCondition");
-        assertThat(negative1.matched().get(0).message()).contains("DispatcherHandler");
+        var negative1 = conditionsFeed.getNegativeConditions().get(0);
+        assertThat(negative1.getTarget()).isEqualTo("WebFluxEndpointManagementContextConfiguration");
+        assertThat(negative1.getNotMatched()).hasSize(1);
+        assertThat(negative1.getNotMatched().get(0).getCondition()).isEqualTo("OnWebApplicationCondition");
+        assertThat(negative1.getNotMatched().get(0).getMessage()).isEqualTo("not a reactive web application");
+        assertThat(negative1.getMatched()).hasSize(1);
+        assertThat(negative1.getMatched().get(0).getCondition()).isEqualTo("OnClassCondition");
+        assertThat(negative1.getMatched().get(0).getMessage()).contains("DispatcherHandler");
 
-        var negative2 = conditionsFeed.negativeConditions().get(1);
-        assertThat(negative2.target())
+        var negative2 = conditionsFeed.getNegativeConditions().get(1);
+        assertThat(negative2.getTarget())
                 .isEqualTo("GsonHttpMessageConvertersConfiguration.GsonHttpMessageConverterConfiguration");
-        assertThat(negative2.notMatched()).hasSize(1);
-        assertThat(negative2.notMatched().get(0).condition())
+        assertThat(negative2.getNotMatched()).hasSize(1);
+        assertThat(negative2.getNotMatched().get(0).getCondition())
                 .isEqualTo("GsonHttpMessageConvertersConfiguration.PreferGsonOrJacksonAndJsonbUnavailableCondition");
-        assertThat(negative2.notMatched().get(0).message()).contains("AnyNestedCondition");
-        assertThat(negative2.matched()).isEmpty();
+        assertThat(negative2.getNotMatched().get(0).getMessage()).contains("AnyNestedCondition");
+        assertThat(negative2.getMatched()).isEmpty();
     }
 }

@@ -89,11 +89,11 @@ public class AxelixConditionsEndpoint {
             this.negativeConditions = negativeConditions;
         }
 
-        public List<PositiveCondition> positiveConditions() {
+        public List<PositiveCondition> getPositiveConditions() {
             return positiveConditions;
         }
 
-        public List<NegativeCondition> negativeConditions() {
+        public List<NegativeCondition> getNegativeConditions() {
             return negativeConditions;
         }
 
@@ -132,11 +132,11 @@ public class AxelixConditionsEndpoint {
             this.matches = matches;
         }
 
-        public String target() {
+        public String getTarget() {
             return target;
         }
 
-        public List<ConditionMatch> matches() {
+        public List<ConditionMatch> getMatches() {
             return matches;
         }
 
@@ -174,15 +174,15 @@ public class AxelixConditionsEndpoint {
             this.matched = matched;
         }
 
-        public String target() {
+        public String getTarget() {
             return target;
         }
 
-        public List<ConditionMatch> notMatched() {
+        public List<ConditionMatch> getNotMatched() {
             return notMatched;
         }
 
-        public List<ConditionMatch> matched() {
+        public List<ConditionMatch> getMatched() {
             return matched;
         }
 
@@ -223,11 +223,11 @@ public class AxelixConditionsEndpoint {
             this.message = message;
         }
 
-        public String condition() {
+        public String getCondition() {
             return condition;
         }
 
-        public String message() {
+        public String getMessage() {
             return message;
         }
 

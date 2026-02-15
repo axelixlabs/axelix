@@ -1,2 +1,2 @@
-org.springframework.context.ApplicationListener=\
-com.axelixlabs.axelix.sbs.spring.core.context.RestartListener
+#org.springframework.context.ApplicationListener=\
+#com.axelixlabs.axelix.sbs.spring.core.context.RestartListener

@@ -95,8 +95,7 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
     private ProxyType analyzeProxyType(Class<?> beanType) {
         if (Proxy.isProxyClass(beanType)) {
             return ProxyType.JDK_PROXY;
-            // TODO: beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)  && !beanType.isHidden()
-        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
+        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR) && !beanType.isSynthetic()) {
             return ProxyType.CGLIB;
         }
         return ProxyType.NO_PROXYING;

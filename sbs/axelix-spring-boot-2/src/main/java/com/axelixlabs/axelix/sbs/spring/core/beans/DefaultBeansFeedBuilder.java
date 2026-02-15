@@ -159,8 +159,7 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
     private String resolveBeanTypeName(BeansEndpoint.BeanDescriptor beanDescriptor, BeansFeed.BeanSource beanSource) {
         Class<?> clazz = beanDescriptor.getType();
 
-        // TODO: clazz.isHidden() && beanSource instanceof BeansFeed.BeanMethod && clazz.getInterfaces().length > 0
-        if (beanSource instanceof BeansFeed.BeanMethod && clazz.getInterfaces().length > 0) {
+        if (clazz.isSynthetic() && beanSource instanceof BeansFeed.BeanMethod && clazz.getInterfaces().length > 0) {
             return clazz.getInterfaces()[0].getName();
         }
 
