@@ -14,10 +14,44 @@ The Axelix as a product consists of:
 
 ### Repository Structure
 
-Other important directories in this project include (not limited to):
+The Gradle multi-project layout is defined in `settings.gradle.kts`. The included modules are: `:master`, `:sbs`, `:sbs:axelix-spring-boot-2`, `:sbs:axelix-spring-boot-3`, `:common`, `:common:api`, `:common:auth`, `:common:domain`, `:common:utils`.
 
-- `buildSrc`: this is the `buildSrc` gradle module, that contains convention plugins (like `common`, `sbs` and `shared` convention plugins) and various common settings that are global for the Axelix Java.
-- `common`: contains the common modules - that are the modules that are supposed to be used by both the Axelix Master and, possibly, by ANY of the Spring Boot Axelix Starters (for Spring Boot 2 or Spring Boot 3, regardless).
+Below is the full directory overview:
+
+- `master/`: The Axelix Master backend application (Java 17, Spring Boot). Contains a single `src/` directory with its source code and a `build.gradle.kts`.
+- `sbs/`: Parent directory for the Spring Boot Starter modules.
+  - `sbs/axelix-spring-boot-2/`: Starter library for Spring Boot 2 applications.
+  - `sbs/axelix-spring-boot-3/`: Starter library for Spring Boot 3 applications.
+- `common/`: Shared modules used by both the Axelix Master and any of the Spring Boot Starters.
+  - `common/api/`: Shared API definitions (DTOs, contracts) between master and starters.
+  - `common/auth/`: Shared authentication-related code.
+  - `common/domain/`: Shared domain model classes.
+  - `common/utils/`: Shared utility classes.
+- `front-end/`: The React/TypeScript UI application, built with Vite.
+  - `front-end/src/`: Application source code organized into `api/`, `components/`, `helpers/`, `hooks/`, `i18n/`, `layout/`, `models/`, `pages/`, `routes/`, `services/`, `store/`, `tests/`, and `utils/` subdirectories.
+  - `front-end/cypress/`: Cypress end-to-end tests (`e2e/` and `support/` subdirectories).
+- `buildSrc/`: The Gradle `buildSrc` module containing convention plugins and shared build logic.
+  - Convention plugins: `common.gradle.kts`, `sbs.gradle.kts`, `shared.gradle.kts`.
+  - `Dependencies.kt`: Centralized dependency version declarations.
+  - `binary/AxelixPropertiesPlugin.kt` and `binary/AxelixPropertiesGenerationTask.kt`: Custom Gradle plugin for generating Axelix properties at build time.
+- `docs/`: Project documentation site built with Docusaurus. Contains `docs/` (user-facing documentation), `blog/`, `legacydocs/`, and `src/` subdirectories.
+- `infra/`: Infrastructure-as-code configuration.
+  - `infra/cloud/terraform/`: Terraform definitions for cloud deployments.
+- `gradle/`: Contains the Gradle wrapper files.
+- `.github/`: GitHub-specific configuration.
+  - `.github/workflows/`: CI/CD workflow definitions (`backend_pull_requests.yaml`, `frontend_pull_requests.yaml`, `release.yaml`, `deploy-test.yaml`).
+  - `.github/actions/`: Reusable composite actions (`build-backend/`, `build-frontend/`).
+  - `.github/ISSUE_TEMPLATE/`: Issue templates.
+
+Notable root-level files:
+
+- `build.gradle.kts`: Root Gradle build script. Applies Spotless (code formatting), PMD (static analysis), Error Prone with NullAway (null-safety checks) to all subprojects. Also configures Maven publishing (Nexus and GitHub Packages) and PGP artifact signing.
+- `settings.gradle.kts`: Gradle settings defining the multi-project structure.
+- `gradle.properties`: Gradle properties (including `axelixVersion`).
+- `pmd.ruleset.xml`: PMD static analysis ruleset.
+- `LICENSE_HEADER`: License header text applied to all Java and TypeScript source files by Spotless.
+- `Dockerfile`: Multi-stage Docker build that packages the master JAR and front-end dist into an Alpine JRE image.
+- `CONTRIBUTING.adoc`: Contribution guidelines.
 
 ### Building
 
