@@ -293,8 +293,12 @@ class AxelixEnvironmentEndpointTest {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
             var that = (AxelixPropTest) obj;
             return Objects.equals(this.tags, that.tags)
                     && Objects.equals(this.enabledContexts, that.enabledContexts)
@@ -328,8 +332,12 @@ class AxelixEnvironmentEndpointTest {
 
             @Override
             public boolean equals(Object obj) {
-                if (obj == this) return true;
-                if (obj == null || obj.getClass() != this.getClass()) return false;
+                if (obj == this) {
+                    return true;
+                }
+                if (obj == null || obj.getClass() != this.getClass()) {
+                    return false;
+                }
                 var that = (HttpClient) obj;
                 return Objects.equals(this.requests, that.requests);
             }
@@ -371,8 +379,12 @@ class AxelixEnvironmentEndpointTest {
 
             @Override
             public boolean equals(Object obj) {
-                if (obj == this) return true;
-                if (obj == null || obj.getClass() != this.getClass()) return false;
+                if (obj == this) {
+                    return true;
+                }
+                if (obj == null || obj.getClass() != this.getClass()) {
+                    return false;
+                }
                 var that = (Request) obj;
                 return Objects.equals(this.name, that.name)
                         && Objects.equals(this.baseUrl, that.baseUrl)
@@ -410,8 +422,12 @@ class AxelixEnvironmentEndpointTest {
 
             @Override
             public boolean equals(Object obj) {
-                if (obj == this) return true;
-                if (obj == null || obj.getClass() != this.getClass()) return false;
+                if (obj == this) {
+                    return true;
+                }
+                if (obj == null || obj.getClass() != this.getClass()) {
+                    return false;
+                }
                 var that = (Method) obj;
                 return Objects.equals(this.type, that.type) && Objects.equals(this.retries, that.retries);
             }
@@ -447,8 +463,12 @@ class AxelixEnvironmentEndpointTest {
 
             @Override
             public boolean equals(Object obj) {
-                if (obj == this) return true;
-                if (obj == null || obj.getClass() != this.getClass()) return false;
+                if (obj == this) {
+                    return true;
+                }
+                if (obj == null || obj.getClass() != this.getClass()) {
+                    return false;
+                }
                 var that = (Retry) obj;
                 return Objects.equals(this.count, that.count) && Objects.equals(this.parameters, that.parameters);
             }
