@@ -6,7 +6,7 @@ import {LoggersTableReset} from './LoggersTableReset';
 import {TargetThemeIcon} from './TargetThemeIcon';
 import { INFO, DEBUG, WARN, TRACE } from './StatePaletteForLoggingLevel';
 
-# Loggers
+# Loggers{#main}
 
 The **Loggers** page provides access to all configured logging mechanisms in a Spring Boot application, 
 logger groups, and allows changing their logging levels.
@@ -14,32 +14,28 @@ logger groups, and allows changing their logging levels.
 ![beans main page](../../../static/img/feature/loggers/loggers-main-page.png)
 ***Loggers page as presented in Axelix UI***
 
-### Loggers List
-A scrollable list displaying all active loggers in the application, with an indicator of their logging levels, 
+---
+
+## TAB: Loggers{#loggers}
+A scrollable list displaying all active loggers in the application, with an indicator of their logging levels,
 a search function for easy navigation, and a counter of active loggers.
 
-![beans main page](../../../static/img/feature/loggers/logger-group-main-page.png)
-***Logger groups page as presented in Axelix UI***
+- **Name**:                 The name of the logger.
+- **Logging level**:        The logger's current level. (See **Interactive Features**)
+- **Reset**                 Resets the logging level to its initial value. (See **Interactive Features**)
 
-### Logger group List
-A scrollable list displaying all logger groups, with an indicator of their logging levels, 
+## TAB: Logger groups{#loggers-groups}
+A scrollable list displaying all logger groups, with an indicator of their logging levels,
 a search function for groups and loggers for easy navigation, and a counter of groups.
 
----
-
-### TAB: Loggers
-- **Name**:                 The name of the logger.
-- **Logging level**:        The logger's current level. (**Interactive Features**)
-- **Reset**                 Resets the logging level to its initial value. (**Interactive Features**)
-
-### TAB: Logger groups
 - **Name**:                 The name of the logger group.
 - **Logging group level**:  The current logging level of the logger group. If no level is highlighted by a color indicator, 
-                            the loggers within the group have different logging levels. (**Interactive Features**)
+                            the loggers within the group have different logging levels. (See **Interactive Features**)
 
 ---
 
-:::note Interactive Features
+## Interactive Features{#interactive}
+
 We provide the ability to change the logging level of an individual logger as well as a logger group.
 
 ### Loggers
@@ -66,5 +62,3 @@ We also provide the ability to reset the logging level for a specific logger:
 - When changing the logging level, for example, of the `web` group to <WARN />, all loggers belonging to this group
   will have the <WARN /> logging level.
 - Unfortunately, as of today, logger groups do not have the ability to reset the logging level.
-
-:::

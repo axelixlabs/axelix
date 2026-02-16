@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Metrics
+# Metrics{#main}
 
 The Metrics page provides comprehensive monitoring and performance insights for your Spring Boot applications.
 It displays real-time metrics.
@@ -17,28 +17,28 @@ to the same functional area.
 
 ---
 
-# Metric Details
+## Metric Details{#details}
 
 The Metric Details page provides in-depth analysis of individual metrics with interactive charts, real-time values,
 and intelligent tag filtering capabilities.
 
 ![metric details page](../../static/img/feature/metrics/metric-details-page.png)
-***JVM Memory Metric details as presented in Axile UI***
+***JVM Memory Metric details as presented in Axelix UI***
 
 ## Page Layout
 
-### **Dropdown Header**
+### Dropdown Header
 - **Metric Name**: Full metric identifier (e.g., `jvm.memory.max`)
 - **Description**: Hover your cursor over the icon ![metric details page](../../static/img/feature/icons/question-icon.png)
   to see what this metric measures.
 
-### **Left Panel: Current Metric Information**
+### Left Panel: Current Metric Information
 Displays real-time information about the selected metric:
 - **Value**: Latest measurement
 - **Base Unit**: Measurement unit (bytes, milliseconds, percentage, scalar quantity etc.)
 - **Tag Combinations**: Dropdown selectors for filtering metrics by tags
 
-### **Right Panel: Time Series Chart**
+### Right Panel: Time Series Chart
 Shows the metric value changes over time:
 - Simple line chart displaying metric values vs. time
 
@@ -48,12 +48,12 @@ Shows the metric value changes over time:
 
 [**Official Spring Boot documentation: Drilling Down**](https://docs.spring.io/spring-boot/api/rest/actuator/metrics.html)
 
-### **How It Works**
+### How It Works
 The tag filtering system uses **valid tag combinations** to ensure you only select meaningful dimension combinations.
 When you select a tag value, the system automatically updates available options for other tags based 
 on architectural constraints.
 
-### **Example: JVM Memory Metrics**
+### Example: JVM Memory Metrics
 For metric `jvm.memory.used` with tags `area` and `id`:
 
 **Valid Tag Combinations:**

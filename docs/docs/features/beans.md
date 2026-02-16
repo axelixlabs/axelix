@@ -2,20 +2,17 @@
 sidebar_position: 5
 ---
 
-# Beans
+# Beans{#main}
 
-## **Beans main page**
-The Beans page provides comprehensive visibility into all Spring beans within your managed applications.
-![beans main page](../../static/img/feature/beans/beans%20main%20page.png)
-***Spring Petclinic Beans page as presented in Axile UI***
+The **Beans** page provides comprehensive visibility into all Spring beans within your managed applications.
+![beans main page](../../static/img/feature/beans/beans-main-page.png)
+***Beans page as presented in Axelix UI***
 
 This page displays every active bean with its metadata in an interactive.
-
-### **Beans List**
 A scrollable list displaying all active beans in the application, organized with expandable dropdowns
 and a search function for easy navigation.
 
-### **Bean Scope Color Indicator (Right side)**
+## Bean Scope Color Indicator (Right side){#scope}
 A prominent, framed section on the right side that displays the scope of the currently selected bean, such as:
 - **Singleton**
 - **Prototype**
@@ -27,10 +24,10 @@ A prominent, framed section on the right side that displays the scope of the cur
 - **Custom scopes** (User custom scopes)
 ---
 
-## **Bean Details Dropdown**
+## Bean Details Dropdown{#details}
 When you expand any bean in the list, a detailed dropdown reveals extended information about that specific bean.
-![beans dropdown page](../../static/img/feature/beans/beans%20dropdown%20page.png)
-***Bean dropdown page as presented in Axile UI***
+![beans dropdown page](../../static/img/feature/beans/beans-dropdown-page.png)
+***Bean dropdown page as presented in Axelix UI***
 
 The dropdown displays the following information:
 - **Bean Name**: The unique identifier of the bean within the Spring context
@@ -69,40 +66,42 @@ is located under the name Bean)
         - Usually beans registered programmatically via `BeanDefinitionRegistry`
 ---
 
-## **Interactive Features**
+## Interactive Features{#interactive}
 
-### **Navigation Icons & Quick Actions**
+### Navigation Icons & Quick Actions{#navigation}
 The Beans page includes interactive icons that provide quick access to related functionality.\
 
-Example: redirect icon - ![redirect icon](../../static/img/feature/beans/redirect%20icon.png)
+Example: redirect icon - ![redirect icon](../../static/img/feature/icons/redirect-icon.png)
 
 #### **Redirect Icon Location**
-The redirect icon ![redirect icon](../../static/img/feature/beans/redirect%20icon.png) can appear in multiple locations:
+The redirect icon ![redirect icon](../../static/img/feature/icons/redirect-icon.png) can appear in multiple locations:
 
 **1. Next to Bean Name**
 When a bean itself is a Configuration Properties bean:
-![redirect bean name](../../static/img/feature/beans/redirect%20bean%20name.png)
+![redirect bean name](../../static/img/feature/beans/redirect-bean-name.png)
+
 *Example: Bean with @ConfigurationProperties annotation*
 
 **2. Next to Dependency Name**
 When a bean has a dependency that is a Configuration Properties bean:
-![redirect dependency](../../static/img/feature/beans/redirect%20dependency.png)
+![redirect dependency](../../static/img/feature/beans/redirect-dependency.png)
 *Example: Bean depending on @ConfigurationProperties bean*
 
-**Clicking this icon ![redirect icon](../../static/img/feature/beans/redirect%20icon.png):**
+**Clicking this icon 
+![redirect icon](../../static/img/feature/icons/redirect-icon.png):**
 - Navigates to the **Configuration Properties** page
 - Automatically selects the corresponding configuration properties entry
 
 **Example workflow:**
-1. Identify a bean name with the ![redirect image](../../static/img/feature/beans/redirect%20icon.png) icon (Configuration Properties bean)
+1. Identify a bean name with the ![redirect image](../../static/img/feature/icons/redirect-icon.png) icon (Configuration Properties bean)
 2. Click the redirect icon next to the bean name
 3. You're taken to the Configuration Properties page
 4. The specific configuration properties for that bean are automatically expanded and highlighted
 
-![redirect bean gif](../../static/img/feature/beans/redirect%20bean%20name.gif)
+![redirect bean gif](../../static/img/feature/beans/redirect-bean-name.gif)
 
 **Same for dependencies:**
 1. Expand a bean to see its dependencies
-2. Find a dependency marked with ![redirect image](../../static/img/feature/beans/redirect%20icon.png) icon
+2. Find a dependency marked with ![redirect image](../../static/img/feature/icons/redirect-icon.png) icon
 3. Click the icon to navigate to that dependency's Configuration Properties
 4. View the configuration properties being injected

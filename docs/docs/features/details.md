@@ -2,25 +2,23 @@
 sidebar_position: 1
 ---
 
-# Details
+# Details{#main}
 
 The Application Details page provides information about a managed Spring Boot application instance.
 This page displays technical metadata, runtime information, and build details in an organized, easy-to-read format.
 
 ![details main page](../../static/img/feature/details/details-main-page.png)
-***Spring Petclinic Details page as presented in Axile UI***
+***Details page as presented in Axile UI***
 
 ---
 
-## Page Sections
-
-### **Service Information Inner Header**
+## Service Information Inner Header{#details}
 - **Instance Name**: The name of the application instance. The postfix may vary depending on the runtime 
 and discovery environment of axile-master.
 - **Download state** Export application state as a ZIP archive containing selected diagnostic components.
 The export includes various application state snapshots that can be used for debugging, analysis, or compliance purposes.
 
-#### **Download state Components**
+### Download state Components{#download}
 The download dialog allows you to select which components to include in the export:
 
 ![details download state](../../static/img/feature/details/details-download-state.gif)
@@ -38,7 +36,7 @@ The download dialog allows you to select which components to include in the expo
 
 ---
 
-### **Git Information**
+## Git Information{#git}
 Displays source control metadata (when available):
 
 | Field                | Description              | Example                |
@@ -51,7 +49,7 @@ Displays source control metadata (when available):
 
 ---
 
-### **Build Information**
+## Build Information{#build}
 Shows details about the application build (when available):
 
 | Field          | Description                    | Example                       |
@@ -63,7 +61,7 @@ Shows details about the application build (when available):
 
 ---
 
-### **Runtime Environment Information**
+## Runtime Environment Information{#runtime}
 Detailed Java and runtime information:
 
 | Field                 | Description                                        | Example                                    |
@@ -75,7 +73,7 @@ Detailed Java and runtime information:
 
 ---
 
-### **Spring Framework Details**
+## Spring Framework Details{#spring}
 Spring ecosystem versions:
 
 | Field                        | Description                    | Example    |
@@ -86,7 +84,7 @@ Spring ecosystem versions:
 
 ---
 
-### **Operating System Information**
+## Operating System Information{#os}
 System-level details:
 
 | Field            | Description              | Example                   |

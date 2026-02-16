@@ -14,7 +14,7 @@ and setting <img src="/img/feature/icons/settings-icon.png" alt="settings-icon" 
 
 ---
 
-### Thread Dump Details {#thred-dump-details}
+## Thread Dump Details {#thred-dump-details}
 ![thread dump details page](../../static/img/feature/thread-dump/thread-dump-details-page.png)
 ***Thread Dump details page as presented in Axelix UI***
 
