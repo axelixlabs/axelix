@@ -44,6 +44,8 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("com.h2database:h2")
     testImplementation("com.github.ben-manes.caffeine:caffeine")
+    testImplementation("com.squareup.okhttp3:mockwebserver")
+    testImplementation("com.squareup.okhttp3:okhttp")
 }
 
 tasks.withType<JavaCompile> {

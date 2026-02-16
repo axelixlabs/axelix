@@ -42,7 +42,7 @@ public class SelfRegistrationConfigurationProperties {
 
     private final String instanceUrl;
 
-    private Duration heartbeatInterval = Duration.of(60, ChronoUnit.SECONDS);
+    private Duration heartbeatInterval = Duration.of(15, ChronoUnit.SECONDS);
 
     public SelfRegistrationConfigurationProperties(
             String masterUrl, String instanceUrl, String instanceName, @Nullable Duration heartbeatInterval) {
@@ -79,7 +79,8 @@ public class SelfRegistrationConfigurationProperties {
     }
 
     private void validateRequiredProperty(Object value, String propertyName) {
-        Assert.notNull(value, String.format("Property '%s' must be set when auto-discovery is enabled", propertyName));
+        Assert.notNull(
+                value, String.format("Property '%s' must be set when self-registartion is enabled", propertyName));
     }
 
     private void validateUrl(String url, String propertyName) {

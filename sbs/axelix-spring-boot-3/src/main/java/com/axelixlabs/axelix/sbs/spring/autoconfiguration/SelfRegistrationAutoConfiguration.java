@@ -27,9 +27,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationHttpClient;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationMetadataAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationHttpClient;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationService;
 import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
@@ -48,12 +46,6 @@ public class SelfRegistrationAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public SelfRegistrationHttpClient selfRegistrationHttpClient() {
-        return new DefaultSelfRegistrationHttpClient();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
             SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
@@ -66,8 +58,7 @@ public class SelfRegistrationAutoConfiguration {
     @ConditionalOnMissingBean
     public SelfRegistrationService selfRegistrationService(
             SelfRegistrationConfigurationProperties properties,
-            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler,
-            DefaultSelfRegistrationHttpClient selfRegistrationHttpClient) {
-        return new SelfRegistrationService(properties, selfRegistrationMetadataAssembler, selfRegistrationHttpClient);
+            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler) {
+        return new SelfRegistrationService(properties, selfRegistrationMetadataAssembler);
     }
 }
