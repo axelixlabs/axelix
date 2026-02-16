@@ -29,7 +29,8 @@ import com.axelixlabs.axelix.common.api.BeansFeed.ProxyType;
  * Additional bean metadata.
  *
  * @author Mikhail Polivakha
- * @author Sergey  Cherkasov
+ * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 public final class BeanMetaInfo {
 

@@ -55,14 +55,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtDecoderService jwtDecoderService;
 
-    private final AuthorityResolver defaultAuthorityResolver;
+    private final AuthorityResolver authorityResolver;
 
     private final Authorizer authorizer;
 
     public JwtAuthorizationFilter(
-            JwtDecoderService jwtDecoderService, AuthorityResolver defaultAuthorityResolver, Authorizer authorizer) {
+            JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
         this.jwtDecoderService = jwtDecoderService;
-        this.defaultAuthorityResolver = defaultAuthorityResolver;
+        this.authorityResolver = authorityResolver;
         this.authorizer = authorizer;
     }
 
@@ -84,7 +84,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         try {
             DecodedUser user = jwtDecoderService.decodeTokenToUser(token);
-            Optional<Authority> requiredAuthority = defaultAuthorityResolver.resolve(requestPath);
+            Optional<Authority> requiredAuthority = authorityResolver.resolve(requestPath);
 
             AuthorizationRequest authorizationRequest =
                     new AuthorizationRequest(requiredAuthority.map(Set::of).orElse(Collections.emptySet()));
