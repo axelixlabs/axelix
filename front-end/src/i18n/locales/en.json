@@ -109,7 +109,7 @@
         "estimatedEntrySize": "Entries count"
     },
     "Authentication": {
-        "login": "Login",
+        "login": "Welcome to <green>A</green>xelix",
         "logout": "Logout",
         "username": "Username",
         "enterUsername": "Enter username",
@@ -173,7 +173,7 @@
             "UNKNOWN_ERROR": "Unknown error. Please refresh the page or try again later.",
             "INTERNAL_SERVER_ERROR": "Unexpected server error. Please, re-try request later.",
             "INSTANCE_NOT_FOUND": "Requested application instance is not found. The most likely reason is that the instance got redeployed since the last request from your browser to the server. Visit the Wallboard",
-            "INVALID_CREDENTIALS" : "The provided combination of username/password is not found"
+            "INVALID_CREDENTIALS" : "Invalid username or password"
         }
     },
     "Metrics": {

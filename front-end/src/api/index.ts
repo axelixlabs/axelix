@@ -18,7 +18,7 @@
 import axios, { AxiosError } from "axios";
 
 import { extractErrorCode, showErrorNotification } from "helpers";
-import type { IErrorResponse } from "models";
+import { EIgnoredErrors, type IErrorResponse } from "models";
 import { IS_AUTH } from "utils";
 
 /**
@@ -41,7 +41,12 @@ apiFetch.interceptors.response.use(
     (error: AxiosError<IErrorResponse>) => {
         const errorCode: string | undefined = extractErrorCode(error?.response?.data);
 
-        if (errorCode !== "INVALID_JWT_EXCEPTION") {
+        const IGNORED_ERRORS = Object.values(EIgnoredErrors);
+
+        // TODO: Fix type in future
+        const shouldShowNotification = errorCode && !IGNORED_ERRORS.includes(errorCode as any);
+
+        if (shouldShowNotification) {
             showErrorNotification(errorCode);
         }
 
