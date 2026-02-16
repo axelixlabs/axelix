@@ -12,10 +12,7 @@ val springCloudVersion = "2022.0.4"
 
 dependencies {
     // Self
-    api(project(":common:auth"))
-    api(project(":common:api"))
-    api(project(":common:domain"))
-    api(project(":common:utils"))
+    api(project(":sbs:starter-domain"))
 
     // Impl
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))

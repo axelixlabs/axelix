@@ -95,10 +95,10 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.qualifiers()).isEmpty();
-            assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
-            assertThat(it.autoConfigurationRef()).isNull();
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getQualifiers()).isEmpty();
+            assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
         });
     }
 
@@ -109,10 +109,10 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.qualifiers()).isEmpty();
-            assertThat(it.autoConfigurationRef()).isEqualTo("CacheAutoConfiguration");
-            assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getQualifiers()).isEmpty();
+            assertThat(it.getAutoConfigurationRef()).isEqualTo("CacheAutoConfiguration");
+            assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
         });
     }
 
@@ -123,11 +123,11 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.qualifiers()).isEmpty();
-            assertThat(it.autoConfigurationRef()).isEqualTo("CacheAutoConfiguration#cacheManagerCustomizers");
-            assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
-            assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(beanMethod -> {
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getQualifiers()).isEmpty();
+            assertThat(it.getAutoConfigurationRef()).isEqualTo("CacheAutoConfiguration#cacheManagerCustomizers");
+            assertThat(it.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat((BeansFeed.BeanMethod) it.getBeanSource()).satisfies(beanMethod -> {
                 assertThat(beanMethod.getEnclosingClassFullName()).isEqualTo(CacheAutoConfiguration.class.getName());
                 assertThat(beanMethod.getMethodName()).isEqualTo("cacheManagerCustomizers");
             });
@@ -142,10 +142,10 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isTrue();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.qualifiers()).isEmpty();
-            assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
-            assertThat(it.autoConfigurationRef()).isNull();
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getQualifiers()).isEmpty();
+            assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
         });
     }
 
@@ -157,10 +157,10 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isTrue();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.qualifiers()).isEmpty();
-            assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
-            assertThat(it.autoConfigurationRef()).isNull();
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getQualifiers()).isEmpty();
+            assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
         });
     }
 
@@ -172,10 +172,10 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
-            assertThat(it.qualifiers()).contains(DefaultBeanAnalyzerTestConfig.QUALIFIED_COMPONENT);
-            assertThat(it.autoConfigurationRef()).isNull();
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getQualifiers()).contains(DefaultBeanAnalyzerTestConfig.QUALIFIED_COMPONENT);
+            assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
         });
     }
 
@@ -187,11 +187,11 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isTrue();
             assertThat(it.isPrimary()).isTrue();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.qualifiers()).isEmpty();
-            assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
-            assertThat(it.autoConfigurationRef()).isNull();
-            assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(bs -> {
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getQualifiers()).isEmpty();
+            assertThat(it.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
+            assertThat((BeansFeed.BeanMethod) it.getBeanSource()).satisfies(bs -> {
                 assertThat(bs.getEnclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
                 assertThat(bs.getEnclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
                 assertThat(bs.getMethodName()).isEqualTo("lazyPrimaryBean");
@@ -207,11 +207,11 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.qualifiers()).contains(DefaultBeanAnalyzerTestConfig.QUALIFIED_BEAN_METHOD);
-            assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
-            assertThat(it.autoConfigurationRef()).isNull();
-            assertThat((BeansFeed.BeanMethod) it.beanSource()).satisfies(bs -> {
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getQualifiers()).contains(DefaultBeanAnalyzerTestConfig.QUALIFIED_BEAN_METHOD);
+            assertThat(it.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
+            assertThat((BeansFeed.BeanMethod) it.getBeanSource()).satisfies(bs -> {
                 assertThat(bs.getEnclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
                 assertThat(bs.getEnclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
                 assertThat(bs.getMethodName()).isEqualTo(DefaultBeanAnalyzerTestConfig.QUALIFIED_BEAN_METHOD);
@@ -227,11 +227,11 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.JDK_PROXY);
-            assertThat(it.qualifiers()).isEmpty();
-            assertThat(it.beanSource()).isInstanceOf(BeansFeed.FactoryBean.class);
-            assertThat(it.autoConfigurationRef()).isNull();
-            assertThat((BeansFeed.FactoryBean) it.beanSource()).satisfies(bs -> {
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.JDK_PROXY);
+            assertThat(it.getQualifiers()).isEmpty();
+            assertThat(it.getBeanSource()).isInstanceOf(BeansFeed.FactoryBean.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
+            assertThat((BeansFeed.FactoryBean) it.getBeanSource()).satisfies(bs -> {
                 assertThat(bs.getFactoryBeanName()).isEqualTo(JpaRepositoryFactoryBean.class.getName());
             });
         });
@@ -245,10 +245,10 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.qualifiers()).contains(DefaultBeanAnalyzerTestConfig.CUSTOM_DATABASE_QUALIFIER_BEAN);
-            assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
-            assertThat(it.autoConfigurationRef()).isNull();
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getQualifiers()).contains(DefaultBeanAnalyzerTestConfig.CUSTOM_DATABASE_QUALIFIER_BEAN);
+            assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
         });
     }
 
@@ -260,9 +260,9 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.CGLIB);
-            assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
-            assertThat(it.autoConfigurationRef()).isNull();
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.CGLIB);
+            assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
         });
     }
 
@@ -274,9 +274,9 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.CGLIB);
-            assertThat(it.beanSource()).isInstanceOf(ComponentVariant.class);
-            assertThat(it.autoConfigurationRef()).isNull();
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.CGLIB);
+            assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
         });
     }
 
@@ -288,11 +288,11 @@ class DefaultBeanMetaInfoExtractorTest {
         assertThat(beanMetaInfo).satisfies(it -> {
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-            assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
-            assertThat(it.autoConfigurationRef()).isNull();
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
 
-            BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
+            BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.getBeanSource();
             assertThat(source.getEnclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
             assertThat(source.getEnclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
             assertThat(source.getMethodName()).isEqualTo(DefaultBeanAnalyzerTestConfig.ANONYMOUS_BEAN);
@@ -305,13 +305,13 @@ class DefaultBeanMetaInfoExtractorTest {
                 metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.STATIC_BFPP_BEAN, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.beanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
-            assertThat(it.autoConfigurationRef()).isNull();
+            assertThat(it.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
 
-            BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.beanSource();
+            BeansFeed.BeanMethod source = (BeansFeed.BeanMethod) it.getBeanSource();
             assertThat(source.getEnclosingClassName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getSimpleName());
             assertThat(source.getEnclosingClassFullName()).isEqualTo(DefaultBeanAnalyzerTestConfig.class.getName());
             assertThat(source.getMethodName()).isEqualTo(DefaultBeanAnalyzerTestConfig.STATIC_BFPP_BEAN);
@@ -324,11 +324,11 @@ class DefaultBeanMetaInfoExtractorTest {
                 metaInfoExtractor.extract(DefaultBeanAnalyzerTestConfig.SYNTHETIC_BEAN_DEFINITION, testBeanFactory);
 
         assertThat(beanMetaInfo).satisfies(it -> {
-            assertThat(it.proxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
+            assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.isLazyInit()).isFalse();
             assertThat(it.isPrimary()).isFalse();
-            assertThat(it.beanSource()).isInstanceOf(BeansFeed.SyntheticBean.class);
-            assertThat(it.autoConfigurationRef()).isNull();
+            assertThat(it.getBeanSource()).isInstanceOf(BeansFeed.SyntheticBean.class);
+            assertThat(it.getAutoConfigurationRef()).isNull();
         });
     }
 

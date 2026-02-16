@@ -75,24 +75,24 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                     BeanMetaInfo metaInfo = enricher.extract(beanName, targetContext.getBeanFactory());
 
                     Set<BeansFeed.BeanDependency> enrichedDependencies = resolveDependencies(
-                            beanDescriptor.getDependencies(), configPropsBeanMap, metaInfo.beanSource());
+                            beanDescriptor.getDependencies(), configPropsBeanMap, metaInfo.getBeanSource());
 
-                    String beanType = resolveBeanTypeName(beanDescriptor, metaInfo.beanSource());
+                    String beanType = resolveBeanTypeName(beanDescriptor, metaInfo.getBeanSource());
 
                     beans.put(
                             beanName,
                             new BeansFeed.Bean(
                                     beanDescriptor.getScope(),
                                     beanType,
-                                    metaInfo.proxyType(),
+                                    metaInfo.getProxyType(),
                                     toSet(beanDescriptor.getAliases()),
-                                    metaInfo.autoConfigurationRef(),
+                                    metaInfo.getAutoConfigurationRef(),
                                     enrichedDependencies,
                                     metaInfo.isLazyInit(),
                                     metaInfo.isPrimary(),
                                     configPropsBeanMap.containsKey(beanName),
-                                    metaInfo.qualifiers(),
-                                    metaInfo.beanSource()));
+                                    metaInfo.getQualifiers(),
+                                    metaInfo.getBeanSource()));
                 });
             }
 
