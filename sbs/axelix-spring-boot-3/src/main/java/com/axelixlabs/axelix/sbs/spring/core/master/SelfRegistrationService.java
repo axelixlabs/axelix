@@ -96,7 +96,7 @@ public class SelfRegistrationService implements ApplicationListener<ApplicationR
             if (statusCode >= 200 && statusCode < 300) {
                 log.trace("Heartbeat successful. Master URL: {}", properties.getMasterUrl());
             } else {
-                log.info("Master rejected heartbeat, HTTP status: {}\"", statusCode);
+                log.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
             }
         } catch (IOException | InterruptedException e) {
             log.info("Error sending registration request or heartbeat to master: {}", e.getMessage());
