@@ -38,6 +38,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.common.domain.http.HttpHeader;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
@@ -123,10 +124,11 @@ public class SelfRegistrationService implements ApplicationListener<ApplicationR
                 .uri(URI.create(url));
 
         if (httpPayload.hasHeaders()) {
-            for (var header : httpPayload.headers()) {
+            for (HttpHeader header : httpPayload.headers()) {
                 builder.header(header.name(), header.valueAsString());
             }
         }
+
         return builder.build();
     }
 

@@ -38,8 +38,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
@@ -64,13 +62,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(
         properties = {
             "axelix.sbs.discovery.instance-name=testApp",
-            "axelix.sbs.discovery.master-url=http://localhost:8080/",
             "axelix.sbs.discovery.instance-url=http://localhost:8089/"
         })
 @EnableConfigurationProperties({SelfRegistrationConfigurationProperties.class, WebEndpointProperties.class})
 class SelfRegistrationServiceTest {
-
-    private static String MASTER_URL;
 
     private static MockWebServer mockWebServer;
 
@@ -125,20 +120,15 @@ class SelfRegistrationServiceTest {
     static void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        MASTER_URL = "http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort() + "/service/register";
-        System.setProperty("axelix.sbs.discovery.master-url", MASTER_URL);
+        String masterUrl =
+                "http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort() + "/service/register";
+        System.setProperty("axelix.sbs.discovery.master-url", masterUrl);
     }
 
     @AfterAll
     static void tearDown() throws IOException {
         mockWebServer.shutdown();
         System.clearProperty("axelix.sbs.discovery.master-url");
-    }
-
-    // Override property after start mockWebServer
-    @DynamicPropertySource
-    static void dynamicProperties(DynamicPropertyRegistry registry) {
-        registry.add("axelix.sbs.discovery.master-url", () -> MASTER_URL);
     }
 
     @Test
