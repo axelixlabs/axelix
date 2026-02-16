@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.logging.LoggersEndpoint;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggerGroups;
 import org.springframework.boot.logging.LoggingSystem;
@@ -125,7 +124,7 @@ public class AxelixLoggersEndpointTest {
     @Test
     void shouldResetLogLevel_WhenLogLevelDoesNotAffectOtherLoggers() {
         loggingSystem.setLogLevel("a.b", LogLevel.WARN);
-        loggingSystem.setLogLevel("a.b.c", null);
+        loggingSystem.setLogLevel("a.b.c", null); // Inherits WARN from parent
         loggingSystem.setLogLevel("a.b.c.d", LogLevel.DEBUG);
 
         // language=json
@@ -163,8 +162,7 @@ public class AxelixLoggersEndpointTest {
         @Bean
         public AxelixLoggersEndpoint axelixLoggersEndpoint(
                 LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
-            return new AxelixLoggersEndpoint(
-                    loggingSystem, new LoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new)));
+            return new AxelixLoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new));
         }
     }
 }

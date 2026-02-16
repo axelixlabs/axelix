@@ -27,6 +27,7 @@ import org.springframework.boot.actuate.logging.LoggersEndpoint;
 import org.springframework.boot.actuate.logging.LoggersEndpoint.LoggerLevelsDescriptor;
 import org.springframework.boot.actuate.logging.LoggersEndpoint.LoggersDescriptor;
 import org.springframework.boot.logging.LogLevel;
+import org.springframework.boot.logging.LoggerGroups;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,12 +49,12 @@ public class AxelixLoggersEndpoint {
     private final LoggersEndpoint delegate;
     private final ConcurrentMap<String, LogLevel> cacheLoggers;
 
-    public AxelixLoggersEndpoint(LoggingSystem loggingSystem, LoggersEndpoint delegate) {
+    public AxelixLoggersEndpoint(LoggingSystem loggingSystem, LoggerGroups loggerGroups) {
         this.loggingSystem = loggingSystem;
-        this.delegate = delegate;
+        this.delegate = new LoggersEndpoint(loggingSystem, loggerGroups);
 
         Map<String, LoggerLevelsDescriptor> loggers = delegate.loggers().getLoggers();
-        this.cacheLoggers = new ConcurrentHashMap<>(loggers.size());
+        this.cacheLoggers = new ConcurrentHashMap<>(loggers.size(), 1.1f);
 
         loggers.forEach((name, levels) -> cacheLoggers.put(
                 name, loggingSystem.getLoggerConfiguration(name).getEffectiveLevel()));
