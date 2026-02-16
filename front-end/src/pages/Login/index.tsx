@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button, Form, Input } from "antd";
+import { Alert, Button, Form, Input } from "antd";
 import type { AxiosError } from "axios";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 import { extractErrorCode } from "helpers";
-import { type IErrorResponse, type ILoginSubmitRequestData, StatelessRequest } from "models";
+import { EIgnoredErrors, type IErrorResponse, type ILoginSubmitRequestData, StatelessRequest } from "models";
 import { login } from "services";
 import { IS_AUTH } from "utils";
 
@@ -47,7 +47,6 @@ const Login = () => {
                 localStorage.setItem(IS_AUTH, "true");
                 window.location.href = "/";
             })
-            // TODO: We need to decide whether we need the code below, since our errors are already being handled through Axios interceptors, and basically the code below isn’t used at all.
             .catch((error: AxiosError<IErrorResponse>) => {
                 setLoginData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
             });
@@ -55,7 +54,13 @@ const Login = () => {
 
     return (
         <div className={styles.LoginFormWrapper}>
-            <h1 className={`TextMedium ${styles.LoginTitle}`}>{t("Authentication.login")}</h1>
+            <h1 className={`TextMedium ${styles.LoginTitle}`}>
+                <Trans
+                    t={t}
+                    i18nKey={"Authentication.login"}
+                    components={{ green: <span className={styles.GreenLetter} /> }}
+                />
+            </h1>
             <Form layout="vertical" onFinish={onFinish} autoComplete="off">
                 <Form.Item
                     key="username"
@@ -75,6 +80,16 @@ const Login = () => {
                 >
                     <Input.Password className={styles.LoginInput} />
                 </Form.Item>
+
+                {loginData.error === EIgnoredErrors.INVALID_CREDENTIALS && (
+                    <Alert
+                        title={t(`Error.codes.${loginData.error}`)}
+                        type="error"
+                        showIcon
+                        className={styles.ErrorAlert}
+                    />
+                )}
+
                 <Button type="primary" htmlType="submit" loading={loginData.loading} className={styles.SubmitButton}>
                     {t("Authentication.loginButtonText")}
                 </Button>
