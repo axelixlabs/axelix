@@ -46,7 +46,7 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
             Map.entry("/actuator/axelix-conditions", ExternalAuthority.CONDITIONS),
             Map.entry("/actuator/axelix-configprops", ExternalAuthority.CONFIGPROPS),
             Map.entry("/actuator/axelix-details", ExternalAuthority.DETAILS),
-            Map.entry("/actuator/axelix-env/**", ExternalAuthority.ENV),
+            Map.entry("/actuator/axelix-env", ExternalAuthority.ENV),
             Map.entry("/actuator/heapdump", ExternalAuthority.HEAP_DUMP),
             Map.entry("/actuator/axelix-thread-dump/**", ExternalAuthority.THREAD_DUMP),
             Map.entry("/actuator/axelix-metrics/**", ExternalAuthority.METRICS),
