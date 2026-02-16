@@ -15,33 +15,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.transactions;
+package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
 
 /**
- * Simple {@link Entity} for test.
+ * Assembles {@link SelfRegistrationMetadata} about this particular instance.
  *
- * @since 26.01.2026
+ * @since 04.02.2026
  * @author Nikita Kirillov
  */
-@Entity
-public class Owner {
+public interface SelfRegistrationMetadataAssembler {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String lastName;
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
+    SelfRegistrationMetadata assemble();
 }

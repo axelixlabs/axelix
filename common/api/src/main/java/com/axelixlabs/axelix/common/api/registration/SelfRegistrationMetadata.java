@@ -52,7 +52,7 @@ public class SelfRegistrationMetadata {
             @JsonProperty("basicDiscoveryMetadata") BasicDiscoveryMetadata basicDiscoveryMetadata,
             @JsonProperty("instanceId") String instanceId,
             @JsonProperty("instanceName") String instanceName,
-            @JsonProperty("instanceUrl") String instanceActuatorUrl,
+            @JsonProperty("instanceActuatorUrl") String instanceActuatorUrl,
             @JsonProperty("deploymentAt") String deploymentAt) {
         this.basicDiscoveryMetadata = basicDiscoveryMetadata;
         this.instanceId = instanceId;
@@ -73,7 +73,7 @@ public class SelfRegistrationMetadata {
         return instanceName;
     }
 
-    public String getInstanceUrl() {
+    public String getInstanceActuatorUrl() {
         return instanceActuatorUrl;
     }
 
@@ -110,7 +110,7 @@ public class SelfRegistrationMetadata {
                 + ", instanceName='"
                 + instanceName
                 + '\''
-                + ", instanceUrl='"
+                + ", instanceActuatorUrl='"
                 + instanceActuatorUrl
                 + '\''
                 + ", deploymentAt='"

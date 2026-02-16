@@ -18,6 +18,12 @@
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
 import java.time.Duration;
+import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -33,11 +39,14 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -138,8 +147,7 @@ class TransactionMonitoringEndpointTest {
         @Bean
         public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
                 TransactionMonitoringService transactionMonitoringService) {
-            return new TransactionMonitoringEndpoint(
-                    (DefaultTransactionMonitoringService) transactionMonitoringService);
+            return new TransactionMonitoringEndpoint(transactionMonitoringService);
         }
 
         @Bean
@@ -164,11 +172,52 @@ class TransactionMonitoringEndpointTest {
                 OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
             return new PropagationTestHelper(ownerRepository, self);
         }
+    }
 
-        @Bean
-        public PropagationTestService propagationTestService(
-                OwnerRepository ownerRepository, PropagationTestHelper helper) {
-            return new PropagationTestService(ownerRepository, helper);
+    @Entity
+    static class Owner {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String lastName;
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+    }
+
+    interface OwnerRepository extends JpaRepository<Owner, Long> {
+
+        @Transactional
+        default Owner findByLastName(String lastName) {
+            return new Owner();
+        }
+
+        @Transactional(propagation = Propagation.SUPPORTS)
+        default List<Owner> findAll() {
+            return List.of(new Owner());
+        }
+    }
+
+    static class PropagationTestHelper {
+
+        private final OwnerRepository ownerRepository;
+        private final PropagationTestHelper self;
+
+        public PropagationTestHelper(OwnerRepository ownerRepository, PropagationTestHelper self) {
+            this.ownerRepository = ownerRepository;
+            this.self = self;
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testRequiresNew(String lastName) {
+            ownerRepository.findByLastName(lastName);
         }
     }
 }

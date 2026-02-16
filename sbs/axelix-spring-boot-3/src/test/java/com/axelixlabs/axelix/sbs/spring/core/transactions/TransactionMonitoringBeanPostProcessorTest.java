@@ -23,6 +23,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +41,11 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -140,6 +147,80 @@ class TransactionMonitoringBeanPostProcessorTest {
         public PropagationTestService propagationTestService(
                 OwnerRepository ownerRepository, PropagationTestHelper helper) {
             return new PropagationTestService(ownerRepository, helper);
+        }
+    }
+
+    @Entity
+    static class Owner {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String lastName;
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+    }
+
+    interface OwnerRepository extends JpaRepository<Owner, Long> {
+
+        @Transactional
+        default Owner findByLastName(String lastName) {
+            return new Owner();
+        }
+
+        @Transactional(propagation = Propagation.SUPPORTS)
+        default List<Owner> findAll() {
+            return List.of(new Owner());
+        }
+    }
+
+    static class PropagationTestHelper {
+
+        private final OwnerRepository ownerRepository;
+        private final PropagationTestHelper self;
+
+        public PropagationTestHelper(OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
+            this.ownerRepository = ownerRepository;
+            this.self = self;
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testRequiresNew(String lastName) {
+            ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testNestedRequiresNew() {
+            ownerRepository.findByLastName("Franklin");
+        }
+
+        @Transactional(propagation = Propagation.MANDATORY)
+        public void testMandatory(String lastName) {
+            ownerRepository.findByLastName(lastName);
+        }
+    }
+
+    static class PropagationTestService {
+
+        private final OwnerRepository ownerRepository;
+        private final PropagationTestHelper helperService;
+
+        public PropagationTestService(OwnerRepository ownerRepository, PropagationTestHelper helperService) {
+            this.ownerRepository = ownerRepository;
+            this.helperService = helperService;
+        }
+
+        @Transactional(propagation = Propagation.REQUIRED)
+        void testRequired(String lastName) {
+            ownerRepository.findByLastName(lastName);
+            helperService.testNestedRequiresNew();
         }
     }
 }
