@@ -40,6 +40,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryDiscovererAutoC
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ProfileManagementAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.PropertyManagementAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SelfRegistrationAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SpringCloudFeignIntegrationAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
@@ -70,6 +71,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
             LibraryDiscovererAutoConfiguration.class,
             ProfileManagementAutoConfiguration.class,
             PropertyManagementAutoConfiguration.class,
+            SelfRegistrationAutoConfiguration.class,
             ScheduledTaskManagementAutoConfiguration.class,
             ShortBuildInfoProviderAutoConfiguration.class,
             SpringCloudFeignIntegrationAutoConfiguration.class,

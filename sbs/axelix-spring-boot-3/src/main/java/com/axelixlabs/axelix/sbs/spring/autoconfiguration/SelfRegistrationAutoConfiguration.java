@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -38,7 +37,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
  * @since 04.02.2026
  * @author Nikita Kirillov
  */
-@AutoConfiguration(after = {AxelixMetadataEndpointConfiguration.class, WebEndpointAutoConfiguration.class})
+@AutoConfiguration
 @ConditionalOnClass(WebEndpointProperties.class)
 @EnableConfigurationProperties(SelfRegistrationConfigurationProperties.class)
 @ConditionalOnProperty(value = "axelix.sbs.discovery.auto", havingValue = "true")
