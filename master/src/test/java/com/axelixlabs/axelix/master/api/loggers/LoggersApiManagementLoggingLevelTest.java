@@ -39,9 +39,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.LoggersApi;
-import com.axelixlabs.axelix.master.api.external.request.LogLevelChangeRequest;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
@@ -92,7 +92,7 @@ public class LoggersApiManagementLoggingLevelTest {
                     return new MockResponse();
                 } else if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger.name")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/axelix-loggers/clear.logger.name")) {
+                } else if (path.equals("/" + activeInstanceId + "/axelix-loggers/reset/reset.logger.name")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -148,21 +148,21 @@ public class LoggersApiManagementLoggingLevelTest {
     }
 
     @Test
-    void shouldClearLoggingLevelByLoggerName() {
-        String loggerName = "clear.logger.name";
+    void shouldResetLoggingLevelByLoggerName() {
+        String loggerName = "reset.logger.name";
 
         // when
         ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
                         null,
                         String.class,
                         activeInstanceId,
                         loggerName);
 
         // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -211,16 +211,16 @@ public class LoggersApiManagementLoggingLevelTest {
 
     @Test
     @DisplayName("Should return 500 on EndpointInvocationError")
-    void shouldReturnInternalServerError_OnClearLoggingLevelByLoggerName() {
+    void shouldReturnInternalServerError_OnResetLoggingLevelByLoggerName() {
         String instanceId = UUID.randomUUID().toString();
-        String loggerName = "clear.logger.name";
+        String loggerName = "reset.logger.name";
         registry.register(createInstance(instanceId));
 
         // when.
         ResponseEntity<?> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
                         null,
                         Void.class,
                         instanceId,
@@ -271,15 +271,15 @@ public class LoggersApiManagementLoggingLevelTest {
     }
 
     @Test
-    void shouldReturnBadRequestForUnregisteredInstance_OnClearLoggingLevelByLoggerName() {
+    void shouldReturnBadRequestForUnregisteredInstance_OnResetLoggingLevelByLoggerName() {
         String instanceId = "unregistered-logger-instance";
-        String loggerName = "clear.logger.name";
+        String loggerName = "reset.logger.name";
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
-                        "/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
+                        "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
                         null,
                         EndpointInvocationException.class,
                         instanceId,

@@ -167,9 +167,9 @@ public final class ApiPaths {
          */
         public static final String GROUP_NAME = "/{instanceId}/group/{groupName}";
         /**
-         * Endpoint to clear the logging level of a logger by its name from an instance.
+         * Endpoint to reset the logging level of a logger by its name from an instance.
          */
-        public static final String CLEAR_FOR_LOGGER = "/{instanceId}/logger/{loggerName}/clear";
+        public static final String RESET_FOR_LOGGER = "/{instanceId}/logger/{loggerName}/reset";
     }
 
     public static final class GcLogFileApi {
