@@ -17,6 +17,7 @@
  */
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 
 import { EmptyHandler, Loader } from "components";
 import { fetchData, filterWallboardInstances } from "helpers";
@@ -29,14 +30,41 @@ import styles from "./styles.module.css";
 
 const Wallboard = () => {
     const { t } = useTranslation();
-    const [search, setSearch] = useState<string>("");
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const [filters, setFilters] = useState<IWallboardSingleOperandFilter[]>([]);
+    const [search, setSearch] = useState<string>("");
     const [wallboard, setWallboard] = useState(StatefulRequest.loading<IServiceCardsResponseBody>());
+
+    const [filters, setFilters] = useState<IWallboardSingleOperandFilter[]>(() => {
+        const filtersFromUrl = searchParams.getAll("f");
+
+        if (filtersFromUrl.length === 0) {
+            return [];
+        }
+
+        return filtersFromUrl.map((filter) => {
+            const [key, operator, operand] = filter.split(":");
+            const filterId = `${key}${operator}${operand}`;
+            return { id: filterId, key, operator, operand } as IWallboardSingleOperandFilter;
+        });
+    });
 
     useEffect(() => {
         fetchData(setWallboard, () => getWallboardData());
     }, []);
+
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams);
+
+        params.delete("f");
+
+        filters.forEach((filter) => {
+            const filterString = `${filter.key}:${filter.operator}:${filter.operand}`;
+            params.append("f", filterString);
+        });
+
+        setSearchParams(params, { replace: true });
+    }, [filters]);
 
     if (wallboard.loading) {
         return <Loader />;

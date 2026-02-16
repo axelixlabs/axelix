@@ -20,7 +20,7 @@
  * Possibles filtering options available on the wallboard.
  */
 export enum EWallboardFilterKey {
-    SPRING_BOOT = "Spring boot",
+    SPRING_BOOT = "SpringBoot",
     JAVA = "Java",
 }
 

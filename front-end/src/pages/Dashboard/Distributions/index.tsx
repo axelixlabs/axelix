@@ -17,10 +17,11 @@
  */
 import type { JSX } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { Cell, Legend, Pie, PieChart, type PieLabelRenderProps, ResponsiveContainer, Tooltip } from "recharts";
 
 import { calculateInnerValueCoordinates, prepareDistributionDataPerChart } from "helpers";
-import type { IDistribution } from "models";
+import { EWallboardFilterKey, EWallboardFilterOperator, type IDistribution } from "models";
 
 import styles from "./styles.module.css";
 
@@ -33,6 +34,7 @@ interface IProps {
 
 export function Distributions({ distributions }: IProps) {
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const components = prepareDistributionDataPerChart(distributions);
 
@@ -47,6 +49,20 @@ export function Distributions({ distributions }: IProps) {
                 {value}
             </text>
         );
+    };
+
+    const clickHandler = (softwareComponentName: string, version: string): void => {
+        const availableComponentsForNavigate = Object.values(EWallboardFilterKey);
+
+        // TODO: Fix type in the future
+        const isAvailableComponentForNavigate = availableComponentsForNavigate.includes(softwareComponentName as any);
+        if (!isAvailableComponentForNavigate) {
+            return;
+        }
+
+        const filterString = `${softwareComponentName}:${EWallboardFilterOperator.EQUAL}:${version}`;
+
+        navigate(`/wallboard?f=${filterString}`);
     };
 
     return (
@@ -78,8 +94,12 @@ export function Distributions({ distributions }: IProps) {
                                     labelLine={false}
                                     stroke={versions.length > 1 ? "#fff" : "none"}
                                 >
-                                    {versions.map(({ versionColor }) => (
-                                        <Cell key={versionColor} fill={versionColor} />
+                                    {versions.map(({ name, versionColor }) => (
+                                        <Cell
+                                            key={versionColor}
+                                            fill={versionColor}
+                                            onClick={() => clickHandler(softwareComponentName, name)}
+                                        />
                                     ))}
                                 </Pie>
                                 <Tooltip />
