@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.sbs.spring.core.details;
 import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.info.BuildProperties;
@@ -45,6 +47,9 @@ import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNul
  * @author Nikita Kirillov
  */
 public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
+
+    private static final Logger log = LoggerFactory.getLogger(DefaultServiceDetailsAssembler.class);
+
     private final GitInformationProvider gitInformationProvider;
     private final @Nullable BuildProperties buildProperties;
     private final LibraryDiscoverer libraryDiscoverer;
@@ -120,5 +125,15 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
                 emptyIfNull(System.getProperty("os.name")),
                 emptyIfNull(System.getProperty("os.version")),
                 emptyIfNull(System.getProperty("os.arch")));
+    }
+
+    private String getGarbageCollectorInfo() {
+
+        String garbageCollectorInfo = GarbageCollectorInfoAssembler.getGarbageCollectorInfo();
+        if (garbageCollectorInfo.equals(GarageCollector.UNKNOWN.name())) {
+            log.warn("Unable to determine the GC used inside the given application. Falling back to UNKNOWN");
+        }
+
+        return garbageCollectorInfo;
     }
 }
