@@ -31,7 +31,6 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
 
     // Test
-    testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
@@ -42,6 +41,8 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("com.h2database:h2")
     testImplementation("com.github.ben-manes.caffeine:caffeine")
+    testImplementation("com.squareup.okhttp3:mockwebserver")
+    testImplementation("com.squareup.okhttp3:okhttp")
 }
 
 tasks.withType<JavaCompile> {
