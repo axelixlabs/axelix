@@ -17,11 +17,11 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
-
 import java.time.Instant;
 import java.util.UUID;
+
+import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
 
 /**
  * Default implementation of {@link SelfRegistrationMetadataAssembler}.
