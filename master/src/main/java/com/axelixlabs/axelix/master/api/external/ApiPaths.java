@@ -323,6 +323,10 @@ public final class ApiPaths {
          */
         public static final String MODIFY_CRON_EXPRESSION = "/{instanceId}/modify/cron-expression";
         /**
+         * Endpoint validates cron expression syntax.
+         */
+        public static final String VALIDATE_CRON_EXPRESSION = "/validate-cron-expression";
+        /**
          * Endpoint allows modification of the interval for a scheduled task.
          */
         public static final String MODIFY_INTERVAL = "/{instanceId}/modify/interval";

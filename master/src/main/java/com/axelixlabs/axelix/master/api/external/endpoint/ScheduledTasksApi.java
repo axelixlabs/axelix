@@ -43,6 +43,8 @@ import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
+import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
+import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
@@ -110,8 +112,24 @@ public class ScheduledTasksApi {
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.DISABLE_SCHEDULED_TASK, payload);
     }
 
+    @DefaultApiResponse(summary = "Endpoint to validate cron expression")
+    @ApiResponse(
+            description = "OK",
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ScheduledTaskCronExpressionValidationResponse.class)))
+    @PostMapping(path = ApiPaths.ScheduledTasksApi.VALIDATE_CRON_EXPRESSION)
+    public ScheduledTaskCronExpressionValidationResponse validateCronExpression(
+            @RequestBody ScheduledTaskCronExpressionValidationRequest request) {
+        return new ScheduledTaskCronExpressionValidationResponse(
+                CronExpression.isValidExpression(request.cronExpression()));
+    }
+
     @DefaultApiResponse(summary = "Endpoint allows modification of the cron expression for a scheduled task.")
-    @ApiResponse(description = "No Content", responseCode = "204")
+    @ApiResponse(description = "Cron expression successfully modified", responseCode = "204")
+    @ApiResponse(description = "Cron expression is invalid", responseCode = "400")
     @InstanceIdParameter
     @PostMapping(path = ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION)
     public ResponseEntity<?> modifyCronExpression(

@@ -51,6 +51,8 @@ import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi;
+import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
+import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
@@ -375,6 +377,45 @@ public class ScheduledTasksApiTest {
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void shouldReturnValidResponse_OnValidateCronExpressionWithValidExpression() {
+        // given.
+        var requestBody = new ScheduledTaskCronExpressionValidationRequest("*/5 * * * * *");
+
+        // when.
+        ResponseEntity<ScheduledTaskCronExpressionValidationResponse> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/external/scheduled-tasks/validate-cron-expression",
+                        requestBody,
+                        ScheduledTaskCronExpressionValidationResponse.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().valid()).isTrue();
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidCronExpressions")
+    void shouldReturnInvalidResponse_OnValidateCronExpressionWithInvalidExpression(String invalidCronExpression) {
+        // given.
+        var requestBody = new ScheduledTaskCronExpressionValidationRequest(invalidCronExpression);
+
+        // when.
+        ResponseEntity<ScheduledTaskCronExpressionValidationResponse> response = restTemplate
+                .withoutAuthorities()
+                .postForEntity(
+                        "/api/external/scheduled-tasks/validate-cron-expression",
+                        requestBody,
+                        ScheduledTaskCronExpressionValidationResponse.class);
+
+        // then.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().valid()).isFalse();
     }
 
     @ParameterizedTest
