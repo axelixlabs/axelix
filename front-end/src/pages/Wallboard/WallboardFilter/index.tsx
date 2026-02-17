@@ -18,9 +18,11 @@
 import { Button, Select } from "antd";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { SetURLSearchParams } from "react-router-dom";
 
+import { createWallboardFilterId, createWallboardFilterSearchParam } from "helpers";
 import type { IInstanceCard, IWallboardLocalFilterBuilder, IWallboardSingleOperandFilter } from "models";
-import { filteringKeys, getWallboardFilterDefinitions } from "utils";
+import { SEARCH_PARAMS_FILTER, filteringKeys, getWallboardFilterDefinitions } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -38,12 +40,17 @@ interface IProps {
     /**
      * All filters data
      */
-    filters: IWallboardSingleOperandFilter[];
+    parsedFilters: IWallboardSingleOperandFilter[];
 
     /**
-     * SetState to update filters
+     * Function to update the current URL search parameters.
      */
-    setFilters: Dispatch<SetStateAction<IWallboardSingleOperandFilter[]>>;
+    setSearchParams: SetURLSearchParams;
+
+    /**
+     * Current URL search parameters object.
+     */
+    searchParams: URLSearchParams;
 }
 
 const emptyBuilder: IWallboardLocalFilterBuilder = {
@@ -52,7 +59,13 @@ const emptyBuilder: IWallboardLocalFilterBuilder = {
     operand: null,
 };
 
-export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setFilters }: IProps) => {
+export const WallboardFilter = ({
+    instanceCards,
+    setIsPopoverOpen,
+    parsedFilters,
+    searchParams,
+    setSearchParams,
+}: IProps) => {
     const { t } = useTranslation();
 
     const [filterBuilder, setFilterBuilder] = useState<IWallboardLocalFilterBuilder>(emptyBuilder);
@@ -64,24 +77,19 @@ export const WallboardFilter = ({ instanceCards, setIsPopoverOpen, filters, setF
             return;
         }
 
-        const filterId = `${key}${operator}${operand}`;
+        const filterId = createWallboardFilterId(key, operator, operand);
 
-        const isFilterExist = filters.some(({ id }) => id === filterId);
+        const isFilterExist = parsedFilters.some(({ id }) => id === filterId);
 
         if (isFilterExist) {
             // TODO: In the future, a validation error or another case will be shown
             return;
         }
 
-        setFilters((prev) => [
-            ...prev,
-            {
-                id: filterId,
-                key: key,
-                operator: operator,
-                operand: operand,
-            },
-        ]);
+        const filterSearchParam = createWallboardFilterSearchParam(key, operator, operand);
+        searchParams.append(SEARCH_PARAMS_FILTER, filterSearchParam);
+
+        setSearchParams(searchParams, { replace: true });
 
         setIsPopoverOpen(false);
 

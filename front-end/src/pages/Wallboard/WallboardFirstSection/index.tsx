@@ -18,9 +18,12 @@
 import { Button, Popover, Tag } from "antd";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { SetURLSearchParams } from "react-router-dom";
 
 import { PageSearch } from "components";
-import type { IInstanceCard, IWallboardSingleOperandFilter } from "models";
+import { createWallboardFilterId } from "helpers";
+import type { IInstanceCard, IWallboardSingleOperandFilter, WallboardParsedFilter } from "models";
+import { SEARCH_PARAMS_FILTER } from "utils";
 
 import { WallboardFilter } from "../WallboardFilter";
 
@@ -45,15 +48,27 @@ interface IProps {
     /**
      * All filters data
      */
-    filters: IWallboardSingleOperandFilter[];
+    parsedFilters: IWallboardSingleOperandFilter[];
 
     /**
-     * SetState to update filters
+     * Function to update the current URL search parameters.
      */
-    setFilters: Dispatch<SetStateAction<IWallboardSingleOperandFilter[]>>;
+    setSearchParams: SetURLSearchParams;
+
+    /**
+     * Current URL search parameters object.
+     */
+    searchParams: URLSearchParams;
 }
 
-export const WallboardFirstSection = ({ addonAfter, setSearch, instanceCards, filters, setFilters }: IProps) => {
+export const WallboardFirstSection = ({
+    addonAfter,
+    setSearch,
+    instanceCards,
+    parsedFilters,
+    searchParams,
+    setSearchParams,
+}: IProps) => {
     const { t } = useTranslation();
 
     const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
@@ -62,8 +77,23 @@ export const WallboardFirstSection = ({ addonAfter, setSearch, instanceCards, fi
         setIsPopoverOpen(newOpen);
     };
 
-    const removeWallboardFilter = (filterId: string): void => {
-        setFilters((prevFilters) => prevFilters.filter((filter) => filter.id !== filterId));
+    const removeFilter = (id: string): void => {
+        const remainingFilters = searchParams.getAll(SEARCH_PARAMS_FILTER).filter((filter) => {
+            const [key, operator, operand] = filter.split(":") as WallboardParsedFilter;
+
+            if (!key || !operator || !operand) {
+                return;
+            }
+
+            const filterId = createWallboardFilterId(key, operator, operand);
+
+            return filterId !== id;
+        });
+
+        searchParams.delete(SEARCH_PARAMS_FILTER);
+        remainingFilters.forEach((filter) => searchParams.append(SEARCH_PARAMS_FILTER, filter));
+
+        setSearchParams(searchParams, { replace: true });
     };
 
     return (
@@ -71,14 +101,8 @@ export const WallboardFirstSection = ({ addonAfter, setSearch, instanceCards, fi
             <div className={styles.MainWrapper}>
                 <PageSearch addonAfter={addonAfter} setSearch={setSearch} removeBottomGutter />
                 <div className={styles.FiltersWrapper}>
-                    {filters.map(({ key, operator, operand, id }) => (
-                        <Tag
-                            closeIcon
-                            color="#838383"
-                            variant="outlined"
-                            onClose={() => removeWallboardFilter(id)}
-                            key={id}
-                        >
+                    {parsedFilters.map(({ key, operator, operand, id }) => (
+                        <Tag closeIcon color="#838383" variant="outlined" onClose={() => removeFilter(id)} key={id}>
                             {key} {operator} {operand}
                         </Tag>
                     ))}
@@ -88,8 +112,9 @@ export const WallboardFirstSection = ({ addonAfter, setSearch, instanceCards, fi
                             <WallboardFilter
                                 instanceCards={instanceCards}
                                 setIsPopoverOpen={setIsPopoverOpen}
-                                filters={filters}
-                                setFilters={setFilters}
+                                parsedFilters={parsedFilters}
+                                searchParams={searchParams}
+                                setSearchParams={setSearchParams}
                             />
                         }
                         trigger="click"

@@ -20,8 +20,13 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Cell, Legend, Pie, PieChart, type PieLabelRenderProps, ResponsiveContainer, Tooltip } from "recharts";
 
-import { calculateInnerValueCoordinates, prepareDistributionDataPerChart } from "helpers";
-import { EWallboardFilterKey, EWallboardFilterOperator, type IDistribution } from "models";
+import {
+    calculateInnerValueCoordinates,
+    createWallboardFilterSearchParam,
+    prepareDistributionDataPerChart,
+} from "helpers";
+import { EWallboardFilterOperator, type IDistribution } from "models";
+import { SEARCH_PARAMS_FILTER, componentsForWallboardFilter } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -52,17 +57,24 @@ export function Distributions({ distributions }: IProps) {
     };
 
     const clickHandler = (softwareComponentName: string, version: string): void => {
-        const availableComponentsForNavigate = Object.values(EWallboardFilterKey);
-
-        // TODO: Fix type in the future
-        const isAvailableComponentForNavigate = availableComponentsForNavigate.includes(softwareComponentName as any);
-        if (!isAvailableComponentForNavigate) {
+        const wallboardFilterComponent = componentsForWallboardFilter[softwareComponentName];
+        if (!wallboardFilterComponent) {
             return;
         }
 
-        const filterString = `${softwareComponentName}:${EWallboardFilterOperator.EQUAL}:${version}`;
+        const wallboardFilterSearchParam = createWallboardFilterSearchParam(
+            wallboardFilterComponent,
+            EWallboardFilterOperator.EQUAL,
+            version,
+        );
 
-        navigate(`/wallboard?f=${filterString}`);
+        const filterParams = new URLSearchParams();
+        filterParams.set(SEARCH_PARAMS_FILTER, wallboardFilterSearchParam);
+
+        navigate({
+            pathname: "/wallboard",
+            search: `?${filterParams}`,
+        });
     };
 
     return (

@@ -57,3 +57,8 @@ export const getWallboardFilterDefinitions = (
         },
     };
 };
+
+export const componentsForWallboardFilter: Record<string, EWallboardFilterKey> = {
+    SpringBoot: EWallboardFilterKey.SPRING_BOOT,
+    Java: EWallboardFilterKey.JAVA,
+};

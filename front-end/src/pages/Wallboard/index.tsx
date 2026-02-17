@@ -20,8 +20,8 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 import { EmptyHandler, Loader } from "components";
-import { fetchData, filterWallboardInstances } from "helpers";
-import { type IServiceCardsResponseBody, type IWallboardSingleOperandFilter, StatefulRequest } from "models";
+import { fetchData, filterWallboardInstances, parseWallboardFilters } from "helpers";
+import { type IServiceCardsResponseBody, StatefulRequest } from "models";
 import { getWallboardData } from "services";
 
 import { WallboardCard } from "./WallboardCard";
@@ -35,36 +35,11 @@ const Wallboard = () => {
     const [search, setSearch] = useState<string>("");
     const [wallboard, setWallboard] = useState(StatefulRequest.loading<IServiceCardsResponseBody>());
 
-    const [filters, setFilters] = useState<IWallboardSingleOperandFilter[]>(() => {
-        const filtersFromUrl = searchParams.getAll("f");
-
-        if (filtersFromUrl.length === 0) {
-            return [];
-        }
-
-        return filtersFromUrl.map((filter) => {
-            const [key, operator, operand] = filter.split(":");
-            const filterId = `${key}${operator}${operand}`;
-            return { id: filterId, key, operator, operand } as IWallboardSingleOperandFilter;
-        });
-    });
+    const parsedFilters = parseWallboardFilters(searchParams);
 
     useEffect(() => {
         fetchData(setWallboard, () => getWallboardData());
     }, []);
-
-    useEffect(() => {
-        const params = new URLSearchParams(searchParams);
-
-        params.delete("f");
-
-        filters.forEach((filter) => {
-            const filterString = `${filter.key}:${filter.operator}:${filter.operand}`;
-            params.append("f", filterString);
-        });
-
-        setSearchParams(params, { replace: true });
-    }, [filters]);
 
     if (wallboard.loading) {
         return <Loader />;
@@ -76,12 +51,10 @@ const Wallboard = () => {
 
     const instanceCards = wallboard.response!.instances;
 
-    /* eslint-disable */
-    const effectiveInstanceCards =
-        (filters.length > 0 || search)
-            ? filterWallboardInstances(instanceCards, search, filters, t)
-            : instanceCards;
-    /* eslint-enable */
+    const hasSearchOrFilters = parsedFilters.length > 0 || search;
+    const effectiveInstanceCards = hasSearchOrFilters
+        ? filterWallboardInstances(instanceCards, search, parsedFilters, t)
+        : instanceCards;
 
     const addonAfter = `${effectiveInstanceCards.length} / ${instanceCards.length}`;
 
@@ -91,8 +64,9 @@ const Wallboard = () => {
                 addonAfter={addonAfter}
                 setSearch={setSearch}
                 instanceCards={instanceCards}
-                filters={filters}
-                setFilters={setFilters}
+                parsedFilters={parsedFilters}
+                searchParams={searchParams}
+                setSearchParams={setSearchParams}
             />
 
             <EmptyHandler isEmpty={effectiveInstanceCards.length === 0}>
