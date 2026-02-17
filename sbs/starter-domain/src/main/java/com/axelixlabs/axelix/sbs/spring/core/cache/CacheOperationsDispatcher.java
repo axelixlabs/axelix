@@ -17,14 +17,11 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
-
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
 
 /**
- * Dispatcher interface for executing cache operations across different {@link CacheManager CacheManagers}.
+ * Dispatcher interface for executing cache operations across different CacheManagers.
  * Serves as the entrypoint for all cache-related operations in Axelix.
  *
  * @since 26.06.2025
@@ -102,9 +99,9 @@ public interface CacheOperationsDispatcher {
      * This deactivates caching operations for all caches in the given cache manager.
      * <p>
      * Please note, that this API disabled all the caches inside the given cache manager
-     * that are only known by the time of this exact invocation. Some underlying {@link CacheManager}
-     * implementations (such as {@link ConcurrentMapCacheManager} for instance) support the dynamic
-     * addition of {@link org.springframework.cache.Cache caches}. The caches that are going to be added
+     * that are only known by the time of this exact invocation. Some underlying CacheManager
+     * implementations (such as ConcurrentMapCacheManager for instance) support the dynamic
+     * addition of org.springframework.cache.Cache caches. The caches that are going to be added
      * dynamically later after the given invocation of this method will not be disabled.
      *
      * @param cacheManagerName the name of the cache manager to disable.

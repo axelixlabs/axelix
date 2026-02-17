@@ -30,8 +30,6 @@ import org.springframework.cache.CacheManager;
 
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
-import com.axelixlabs.axelix.sbs.spring.core.cache.exception.CacheManagerNotFoundException;
-import com.axelixlabs.axelix.sbs.spring.core.cache.exception.CacheNotFoundException;
 
 /**
  * Default implementation of {@link CacheOperationsDispatcher}.
