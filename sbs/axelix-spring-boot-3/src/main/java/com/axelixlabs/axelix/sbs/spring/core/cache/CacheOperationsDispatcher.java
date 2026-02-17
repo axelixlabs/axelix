@@ -22,8 +22,6 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
-import com.axelixlabs.axelix.sbs.spring.core.cache.exception.CacheManagerNotFoundException;
-import com.axelixlabs.axelix.sbs.spring.core.cache.exception.CacheNotFoundException;
 
 /**
  * Dispatcher interface for executing cache operations across different {@link CacheManager CacheManagers}.

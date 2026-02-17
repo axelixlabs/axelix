@@ -28,7 +28,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
-import com.axelixlabs.axelix.sbs.spring.core.cache.exception.CacheManagerNotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
