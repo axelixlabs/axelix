@@ -28,3 +28,20 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+.header-github-link::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-color: var(--ifm-navbar-link-color);
+  mask-image: url('/icons/github.svg');
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  transition-duration: 0.3s;
+}
+
+.header-github-link:hover::before {
+  background-color: var(--ifm-color-primary);
+}
