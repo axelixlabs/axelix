@@ -7,7 +7,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.release = 11
 }
 
-val springBootTestPlatformVersion = "3.5.10"
+val springBootTestPlatformVersion = "2.7.18"
 
 dependencies {
     // Self
@@ -18,10 +18,7 @@ dependencies {
 
 
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootTestPlatformVersion"))
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testImplementation("org.assertj:assertj-core")
-    testImplementation("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.withType<JavaCompile> {

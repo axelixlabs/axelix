@@ -131,7 +131,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                             isPrimary,
                             configPropsBeanName,
                             Optional.ofNullable(metadata)
-                                    .map(PropertyMetadata::description)
+                                    .map(PropertyMetadata::getDescription)
                                     .orElse(null),
                             buildFromMetadata(metadata),
                             injectionPoints);
@@ -145,11 +145,11 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
     @Nullable
     private Deprecation buildFromMetadata(@Nullable PropertyMetadata propertyMetadata) {
-        if (propertyMetadata == null || propertyMetadata.deprecation() == null) {
+        if (propertyMetadata == null || propertyMetadata.getDeprecation() == null) {
             return null;
         }
 
-        return new Deprecation(propertyMetadata.deprecation().message());
+        return new Deprecation(propertyMetadata.getDeprecation().getMessage());
     }
 
     private Map<String, String> buildConfigPropsMappingMap() {
