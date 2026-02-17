@@ -85,10 +85,13 @@ const config: Config = {
         },
         { to: '/blog', label: 'Blog', position: 'left' },
         {
-          // TODO: Pass in future
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
+          href: 'https://github.com/axelixlabs/axelix',
           position: 'right',
+          className: 'header-github-link',
+          htmlAttributes: {
+            rel: 'noopener noreferrer',
+          },
+          'aria-label': 'GitHub repository',
         },
       ],
     },
