@@ -16,11 +16,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { App } from "antd";
-import CopyIcon from "assets/icons/copy.svg?react";
 import { type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
+
+import { CopyIcon } from "assets";
 
 interface IProps {
     /**

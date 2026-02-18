@@ -16,7 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Button, List, Switch } from "antd";
-import DownloadIcon from "assets/icons/download.svg?react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -27,6 +26,8 @@ import { EExportableComponent } from "models";
 import { exportStateData } from "services";
 
 import styles from "./styles.module.css";
+
+import { DownloadIcon } from "assets";
 
 interface IProps {
     /**

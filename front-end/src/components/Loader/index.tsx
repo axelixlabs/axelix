@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import LoaderSpin from "assets/icons/loader.svg?react";
-
 import styles from "./styles.module.css";
+
+import { LoaderIcon } from "assets";
 
 export const Loader = () => {
     return (
         <div className={styles.MainWrapper}>
-            <LoaderSpin className={styles.LoaderSpin} />
+            <LoaderIcon className={styles.LoaderSpin} />
         </div>
     );
 };

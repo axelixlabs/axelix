@@ -16,8 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Button } from "antd";
-import InfoIcon from "assets/icons/info.svg?react";
-import OnOffIcon from "assets/icons/onOf.svg?react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -26,6 +24,8 @@ import type { IGCLoggingStatusResponseBody } from "models";
 import { GCLogEnableSettings } from "../GCLogEnableSettings";
 
 import styles from "./styles.module.css";
+
+import { InfoIcon, OnOffIcon } from "assets";
 
 interface IProps {
     /**

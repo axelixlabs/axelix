@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import InfoIcon from "assets/icons/info.svg?react";
-
 import { Accordion, Copy, EmptyHandler, InfoTooltip } from "components";
 import { splitProperties } from "helpers";
 import type { IEnvironmentPropertySource } from "models";
@@ -26,6 +24,8 @@ import { EnvironmentAccordionHeader } from "../EnvironmentAccordionHeader";
 import { EnvironmentPropertyValue } from "../EnvironmentPropertyValue";
 
 import styles from "./styles.module.css";
+
+import { InfoIcon } from "assets";
 
 interface IProps {
     /**

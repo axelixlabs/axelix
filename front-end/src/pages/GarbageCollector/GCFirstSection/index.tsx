@@ -16,9 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { App, Button, Tooltip } from "antd";
-import DownloadIcon from "assets/icons/download.svg?react";
-import OnOffIcon from "assets/icons/onOf.svg?react";
-import RunIcon from "assets/icons/run.svg?react";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -29,6 +26,8 @@ import { type IErrorResponse, StatelessRequest } from "models";
 import { disableGCLogging, getGCLogFile, triggerGC } from "services";
 
 import styles from "./styles.module.css";
+
+import { DownloadIcon, OnOffIcon, RunIcon } from "assets";
 
 export interface IProps {
     /**

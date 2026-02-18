@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import LinkIcon from "assets/icons/link.svg?react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 
@@ -24,6 +23,8 @@ import { normalizeHtmlElementId, uniqueInjectionPointsBeanNames } from "helpers"
 import type { IEnvProperty } from "models";
 
 import styles from "./styles.module.css";
+
+import { LinkIcon } from "assets";
 
 interface IProps {
     /**

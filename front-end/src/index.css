@@ -21,7 +21,6 @@
     --axelix-primary-light-blue: #69c0ff;
     --axelix-border-radius-large: 8px;
     --axelix-border-radius-small: 4px;
-    --axelix-scroll-margin-top: 150px;
     --axelix-box-shadow-bold: 4px 6px 14px rgb(15 23 42 / 25%);
     --axelix-box-shadow-light: 0 4px 20px rgb(0 0 0 / 10%);
 }
@@ -36,6 +35,7 @@
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: 200px;
 }
 
 body {

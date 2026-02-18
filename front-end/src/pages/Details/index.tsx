@@ -15,9 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import BuildIcon from "assets/icons/build.svg?react";
-import GitIcon from "assets/icons/git.svg?react";
-import SpringIcon from "assets/icons/spring.svg?react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -35,6 +32,8 @@ import { VALUE_TRANSFORMERS } from "utils";
 import { DetailsCard } from "./DetailsCard";
 import { DetailsHeader } from "./DetailsFirstSection";
 import styles from "./styles.module.css";
+
+import { BuildIcon, GitIcon, SpringIcon } from "assets";
 
 const Details = () => {
     const { instanceId } = useParams();

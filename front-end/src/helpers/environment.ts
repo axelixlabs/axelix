@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IEnvProperty, IEnvironmentPropertySource, IInjectionPoint } from "models";
+import type { IAutocompletionOption, IEnvProperty, IEnvironmentPropertySource, IInjectionPoint } from "models";
 
 import { canonicalize } from "./globals";
 
@@ -78,7 +78,7 @@ export const splitProperties = (properties: IEnvProperty[]): [IEnvProperty[], IE
 /**
  * Applies deduplication in case the property name is present in multiple property sources with the same name
  */
-export const buildAutoCompleteOptions = (propertySources: IEnvironmentPropertySource[]) => {
+export const buildAutoCompleteOptions = (propertySources: IEnvironmentPropertySource[]): IAutocompletionOption[] => {
     return [...new Set(propertySources.flatMap(({ properties }) => properties).map((p) => p.name))].map((value) => {
         return {
             value: value,

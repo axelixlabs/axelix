@@ -15,13 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import CheckmarkIcon from "assets/icons/checkmark.svg?react";
-import CloseIcon from "assets/icons/close.svg?react";
-
 import { Accordion } from "components";
 import { EConditionStatus, type ICondition } from "models";
 
 import styles from "./styles.module.css";
+
+import { CheckmarkIcon, CloseIcon } from "assets";
 
 interface IStatusAwareCondition extends ICondition {
     status: EConditionStatus;
