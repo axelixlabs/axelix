@@ -26,7 +26,7 @@ import {
     prepareDistributionDataPerChart,
 } from "helpers";
 import { EWallboardFilterOperator, type IDistribution } from "models";
-import { SEARCH_PARAMS_FILTER, componentsForWallboardFilter } from "utils";
+import { SEARCH_PARAMS_FILTER, mapSoftwareComponentToFilterKey } from "utils";
 
 import styles from "./styles.module.css";
 
@@ -57,7 +57,7 @@ export function Distributions({ distributions }: IProps) {
     };
 
     const clickHandler = (softwareComponentName: string, version: string): void => {
-        const wallboardFilterComponent = componentsForWallboardFilter[softwareComponentName];
+        const wallboardFilterComponent = mapSoftwareComponentToFilterKey(softwareComponentName);
         if (!wallboardFilterComponent) {
             return;
         }

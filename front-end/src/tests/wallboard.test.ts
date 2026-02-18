@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
-import { semVerMatch } from "helpers";
+import { createWallboardFilterId, getFilteredWallboardFilters, semVerMatch } from "helpers";
 import { EWallboardFilterKey, EWallboardFilterOperator, type IWallboardSingleOperandFilter } from "models";
+import { SEARCH_PARAMS_FILTER } from "utils";
 
 const createFilter = (operator: EWallboardFilterOperator, operand: string): IWallboardSingleOperandFilter => ({
     id: "test-filter",
@@ -560,5 +561,57 @@ describe("semVerMatch: unknown operator", () => {
 
         // then.
         expect(result).toBe(true);
+    });
+});
+
+describe("getFilteredWallboardFilters", () => {
+    const javaFilter = `${EWallboardFilterKey.JAVA}:${EWallboardFilterOperator.EQUAL}:17`;
+    const springBootFilter = `${EWallboardFilterKey.SPRING_BOOT}:${EWallboardFilterOperator.GREATER_THAN_EQUAL}:2.7`;
+
+    let searchParams: URLSearchParams;
+
+    beforeEach(() => {
+        searchParams = new URLSearchParams();
+    });
+
+    it("Remove filter by id", () => {
+        searchParams.append(SEARCH_PARAMS_FILTER, javaFilter);
+        searchParams.append(SEARCH_PARAMS_FILTER, springBootFilter);
+
+        const filterIdForRemove = createWallboardFilterId(
+            EWallboardFilterKey.JAVA,
+            EWallboardFilterOperator.EQUAL,
+            "17",
+        );
+
+        const remainingFilters = getFilteredWallboardFilters(searchParams, filterIdForRemove);
+
+        expect(remainingFilters).toEqual([springBootFilter]);
+    });
+
+    it("Return all filters if id dont match", () => {
+        searchParams.append(SEARCH_PARAMS_FILTER, javaFilter);
+        searchParams.append(SEARCH_PARAMS_FILTER, springBootFilter);
+
+        const remainingFilters = getFilteredWallboardFilters(searchParams, "random_id");
+
+        expect(remainingFilters).toEqual([javaFilter, springBootFilter]);
+    });
+
+    it("Ignore, when entered incorrect id", () => {
+        searchParams.append(SEARCH_PARAMS_FILTER, `${EWallboardFilterKey.JAVA}_${EWallboardFilterOperator.EQUAL}_17`);
+        searchParams.append(SEARCH_PARAMS_FILTER, springBootFilter);
+
+        const remainingFilters = getFilteredWallboardFilters(searchParams, "random_id");
+
+        expect(remainingFilters).toEqual([springBootFilter]);
+    });
+
+    it("Return empty array if no filters found", () => {
+        searchParams.append("random_filter", "random_value");
+
+        const remainingFilters = getFilteredWallboardFilters(searchParams, "random_id");
+
+        expect(remainingFilters).toEqual([]);
     });
 });

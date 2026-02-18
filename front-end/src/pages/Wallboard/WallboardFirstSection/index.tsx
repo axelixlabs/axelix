@@ -21,8 +21,8 @@ import { useTranslation } from "react-i18next";
 import type { SetURLSearchParams } from "react-router-dom";
 
 import { PageSearch } from "components";
-import { createWallboardFilterId } from "helpers";
-import type { IInstanceCard, IWallboardSingleOperandFilter, WallboardParsedFilter } from "models";
+import { getFilteredWallboardFilters } from "helpers";
+import type { IInstanceCard, IWallboardSingleOperandFilter } from "models";
 import { SEARCH_PARAMS_FILTER } from "utils";
 
 import { WallboardFilter } from "../WallboardFilter";
@@ -78,17 +78,7 @@ export const WallboardFirstSection = ({
     };
 
     const removeFilter = (id: string): void => {
-        const remainingFilters = searchParams.getAll(SEARCH_PARAMS_FILTER).filter((filter) => {
-            const [key, operator, operand] = filter.split(":") as WallboardParsedFilter;
-
-            if (!key || !operator || !operand) {
-                return;
-            }
-
-            const filterId = createWallboardFilterId(key, operator, operand);
-
-            return filterId !== id;
-        });
+        const remainingFilters = getFilteredWallboardFilters(searchParams, id);
 
         searchParams.delete(SEARCH_PARAMS_FILTER);
         remainingFilters.forEach((filter) => searchParams.append(SEARCH_PARAMS_FILTER, filter));

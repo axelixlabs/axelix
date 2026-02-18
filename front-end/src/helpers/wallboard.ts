@@ -193,3 +193,17 @@ export const parseWallboardFilters = (searchParams: URLSearchParams): IWallboard
 
     return parsedFilters;
 };
+
+export const getFilteredWallboardFilters = (searchParams: URLSearchParams, id: string): string[] => {
+    return searchParams.getAll(SEARCH_PARAMS_FILTER).filter((filter) => {
+        const [key, operator, operand] = filter.split(":") as WallboardParsedFilter;
+
+        if (!key || !operator || !operand) {
+            return;
+        }
+
+        const filterId = createWallboardFilterId(key, operator, operand);
+
+        return filterId !== id;
+    });
+};

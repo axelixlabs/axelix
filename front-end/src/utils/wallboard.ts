@@ -58,7 +58,13 @@ export const getWallboardFilterDefinitions = (
     };
 };
 
-export const componentsForWallboardFilter: Record<string, EWallboardFilterKey> = {
-    SpringBoot: EWallboardFilterKey.SPRING_BOOT,
-    Java: EWallboardFilterKey.JAVA,
+export const mapSoftwareComponentToFilterKey = (name: string): EWallboardFilterKey | undefined => {
+    switch (name) {
+        case "SpringBoot":
+            return EWallboardFilterKey.SPRING_BOOT;
+        case "Java":
+            return EWallboardFilterKey.JAVA;
+        default:
+            return;
+    }
 };
