@@ -16,11 +16,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Outlet } from "react-router-dom";
-import LogoIcon from "src/assets/icons/logo.svg?react";
 
 import { LanguageSwitcher } from "components";
 
 import styles from "./styles.module.css";
+
+import { LogoIcon } from "assets";
 
 export const MinimalLayout = () => {
     return (

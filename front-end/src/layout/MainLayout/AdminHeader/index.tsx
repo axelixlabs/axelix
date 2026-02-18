@@ -15,7 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import LogoIcon from "assets/icons/logo.svg?react";
 import { useNavigate } from "react-router-dom";
 
 import { LanguageSwitcher } from "components";
@@ -24,6 +23,8 @@ import { Help } from "./Help";
 import { NavigationBar } from "./NavigationBar";
 import { ProfileMenu } from "./ProfileMenu";
 import styles from "./styles.module.css";
+
+import { LogoIcon } from "assets";
 
 export const AdminHeader = () => {
     const navigate = useNavigate();

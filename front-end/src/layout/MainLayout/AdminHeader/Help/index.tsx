@@ -18,14 +18,14 @@
 import { BookOutlined, CommentOutlined } from "@ant-design/icons";
 
 import { Dropdown, type MenuProps } from "antd";
-import ArrowIcon from "assets/icons/arrow.svg?react";
-import AboutIcon from "assets/icons/info.svg?react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { AboutModal } from "components";
 
 import styles from "./styles.module.css";
+
+import { ArrowIcon, InfoIcon } from "assets";
 
 export const Help = () => {
     const { t } = useTranslation();
@@ -55,7 +55,7 @@ export const Help = () => {
         },
         {
             key: "3",
-            icon: <AboutIcon />,
+            icon: <InfoIcon />,
             label: <a onClick={() => setOpen(true)}>{t("Header.Help.about")}</a>,
         },
         {

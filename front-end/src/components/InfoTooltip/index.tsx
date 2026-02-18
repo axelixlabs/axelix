@@ -17,11 +17,11 @@
  */
 import { Tooltip } from "antd";
 import type { TooltipPlacement } from "antd/es/tooltip";
-import InfoIcon from "assets/icons/info.svg?react";
-import QuestionIcon from "assets/icons/question.svg?react";
 import type { PropsWithChildren } from "react";
 
 import styles from "./styles.module.css";
+
+import { InfoIcon, QuestionIcon } from "assets";
 
 interface IProps {
     /**

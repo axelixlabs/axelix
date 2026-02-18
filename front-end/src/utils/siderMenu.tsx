@@ -15,25 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import BeansIcon from "assets/icons/beans.svg?react";
-import CachesIcon from "assets/icons/caches.svg?react";
-import ConditionsIcon from "assets/icons/conditions.svg?react";
-import ConfigPropsIcon from "assets/icons/configProps.svg?react";
-import DetailsIcon from "assets/icons/details.svg?react";
-import EnvironmentIcon from "assets/icons/environment.svg?react";
-import GarbageCollectorIcon from "assets/icons/gc.svg?react";
-import InsightsIcon from "assets/icons/insights.svg?react";
-import JvmIcon from "assets/icons/jvm.svg?react";
-import LoggersIcon from "assets/icons/loggers.svg?react";
-import MetricsIcon from "assets/icons/metrics.svg?react";
-import ScheduledTasksIcon from "assets/icons/scheduledTasks.svg?react";
-import SpringIcon from "assets/icons/spring.svg?react";
-import ThreadDumpIcon from "assets/icons/threadDump.svg?react";
-import TransactionIcon from "assets/icons/transaction.svg?react";
 import type { TFunction } from "i18next";
 import { Link } from "react-router-dom";
 
 import type { MenuItem as AntdMenuItem, IMenuItem } from "models";
+
+import {
+    BeansIcon,
+    CachesIcon,
+    ConditionsIcon,
+    ConfigPropsIcon,
+    DetailsIcon,
+    EnvironmentIcon,
+    GCIcon,
+    InsightsIcon,
+    JVMIcon,
+    LoggersIcon,
+    MetricsIcon,
+    ScheduledTasksIcon,
+    SpringIcon,
+    ThreadDumpIcon,
+    TransactionIcon,
+} from "assets";
 
 const createMenuItems = (items: IMenuItem[]): AntdMenuItem[] => {
     return items.map(({ path, icon, label }) => ({
@@ -110,7 +113,7 @@ export const getItems = (instanceId: string, t: TFunction): AntdMenuItem[] => {
         },
         {
             path: `${basePath}/garbage-collector`,
-            icon: <GarbageCollectorIcon />,
+            icon: <GCIcon />,
             label: t("Sider.garbageCollector"),
         },
     ];
@@ -130,7 +133,7 @@ export const getItems = (instanceId: string, t: TFunction): AntdMenuItem[] => {
         },
         {
             key: "JVM",
-            icon: <JvmIcon />,
+            icon: <JVMIcon />,
             label: "JVM",
             children: createMenuItems(jvmMenuItemsData),
         },

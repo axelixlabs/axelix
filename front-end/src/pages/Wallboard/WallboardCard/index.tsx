@@ -16,13 +16,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Badge, Tooltip } from "antd";
-import QuestionIcon from "assets/icons/question.svg?react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { EInstanceStatus, type IInstanceCard } from "models";
 
 import styles from "./styles.module.css";
+
+import { QuestionIcon } from "assets";
 
 interface IProps {
     /**

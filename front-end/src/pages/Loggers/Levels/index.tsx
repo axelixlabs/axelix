@@ -16,12 +16,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Tooltip } from "antd";
-import TargetIcon from "assets/icons/target.svg?react";
 import { useTranslation } from "react-i18next";
 
 import { loggersColors } from "utils";
 
 import styles from "./styles.module.css";
+
+import { TargetIcon } from "assets";
 
 interface IProps {
     /**
@@ -83,7 +84,9 @@ export const Levels = ({ levels, checkedLevel, configuredLevel, handleChange }: 
                     );
                 })}
             </div>
-            <button className={styles.Reset}>{t("Loggers.reset")}</button>
+            <button type="button" className={styles.Reset}>
+                {t("Loggers.reset")}
+            </button>
         </div>
     );
 };

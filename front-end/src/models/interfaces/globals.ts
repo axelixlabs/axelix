@@ -172,3 +172,10 @@ export interface ISelectOptionData {
      */
     label: string;
 }
+
+export interface IAutocompletionOption {
+    /**
+     *  The text value for the autocompletion entry
+     *  */
+    value: string;
+}

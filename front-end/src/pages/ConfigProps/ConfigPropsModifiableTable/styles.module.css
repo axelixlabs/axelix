@@ -1,7 +1,3 @@
-.MainWrapper {
-    scroll-margin-top: var(--axelix-scroll-margin-top);
-}
-
 .AccordionWrapper {
     margin-bottom: 40px;
 }

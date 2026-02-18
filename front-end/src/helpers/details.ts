@@ -15,14 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import FreeBSD from "assets/icons/freeBSD.svg?react";
-import JavaIcon from "assets/icons/java.svg?react";
-import KotlinIcon from "assets/icons/kotlin.svg?react";
-import LinuxIcon from "assets/icons/linux.svg?react";
-import WindowsIcon from "assets/icons/windows.svg?react";
 import type { FC, SVGProps } from "react";
 
 import { ECopyableField, type IDetailsRuntime } from "models";
+
+import { FreeBSDIcon, JavaIcon, KotlinIcon, LinuxIcon, WindowsIcon } from "assets";
 
 /**
  * Resolve the Icon to be used on the details card for the given Operating System.
@@ -34,7 +31,7 @@ export function resolveOsIcon(osName: string): FC<SVGProps<SVGSVGElement>> {
         case "windows":
             return WindowsIcon;
         case "freebsd":
-            return FreeBSD;
+            return FreeBSDIcon;
         default:
             return LinuxIcon;
     }

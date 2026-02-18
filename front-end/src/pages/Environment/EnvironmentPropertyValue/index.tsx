@@ -16,7 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Tooltip } from "antd";
-import CrownIcon from "assets/icons/crown.svg?react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
@@ -26,6 +25,8 @@ import type { IEnvProperty } from "models";
 import { updatePropertyThunk } from "store/thunks";
 
 import styles from "./styles.module.css";
+
+import { CrownIcon } from "assets";
 
 interface IProps {
     /**

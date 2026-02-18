@@ -16,7 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { App, Button } from "antd";
-import RunIcon from "assets/icons/run.svg?react";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -25,6 +24,8 @@ import { useParams } from "react-router-dom";
 import { extractErrorCode } from "helpers";
 import { type IErrorResponse, StatelessRequest } from "models";
 import { forceRunTask } from "services";
+
+import { RunIcon } from "assets";
 
 interface IProps {
     /**

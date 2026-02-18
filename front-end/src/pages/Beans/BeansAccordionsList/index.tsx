@@ -24,8 +24,6 @@ import type { IBean } from "models";
 
 import { BeanAccordionChildren } from "../BeanAccordionChildren";
 
-import styles from "./styles.module.css";
-
 interface IProps {
     /**
      * The list of beans
@@ -44,7 +42,7 @@ export const BeansAccordionsList = ({ effectiveBeans }: IProps) => {
                 const accordionExpanded = id === activeId;
 
                 return (
-                    <div id={id} key={id} className={styles.MainWrapper}>
+                    <div id={id} key={id}>
                         <Accordion header={<BeanAccordionLabels bean={bean} />} accordionExpanded={accordionExpanded}>
                             <BeanAccordionChildren bean={bean} />
                         </Accordion>

@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Accordion, EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData, filterMetrics, findMetricsCount } from "helpers";
+import { fetchData, filterMetrics, findMetricsCount, metricsAutocompleteOptions } from "helpers";
 import { type IMetricsResponseBody, StatefulRequest } from "models";
 import { getMetricsData } from "services";
 
@@ -54,11 +54,7 @@ const Metrics = () => {
 
     const addonAfter = `${filteredMetricsCount} / ${totalMetricsCount}`;
 
-    const autocompleteOptions = effectiveMetricsGroups
-        .flatMap((metrics) => metrics.metrics)
-        .map(({ metricName }) => ({
-            value: metricName,
-        }));
+    const autocompleteOptions = metricsAutocompleteOptions(effectiveMetricsGroups);
 
     return (
         <>

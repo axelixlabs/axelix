@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import LinkIcon from "assets/icons/link.svg?react";
 import type { PropsWithChildren } from "react";
 import { Link } from "react-router-dom";
 
 import styles from "./styles.module.css";
+
+import { LinkIcon } from "assets";
 
 interface IProps {
     /**

@@ -39,7 +39,7 @@ interface IProps {
 
 export const ConfigPropsModifiableTable = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
     return (
-        <div id={normalizeHtmlElementId(headerName)} className={styles.MainWrapper}>
+        <div id={normalizeHtmlElementId(headerName)}>
             <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
                 <Accordion
                     header={

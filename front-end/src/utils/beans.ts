@@ -19,7 +19,7 @@ import styles from "components/Accordion/styles.module.css";
 
 import { ESearchSubject } from "models";
 
-function openAndScrollToAccordion(element: HTMLElement) {
+const openAndScrollToAccordion = (element: HTMLElement): void => {
     const accordion = element.closest<HTMLElement>(`.${styles.MainWrapper}`) ?? element;
     const isOpen = accordion.classList.contains(styles.Open);
 
@@ -29,9 +29,7 @@ function openAndScrollToAccordion(element: HTMLElement) {
     }
 
     element.scrollIntoView();
-
-    return;
-}
+};
 
 export function scrollToAccordionById(query: string, searchSubject: ESearchSubject): void {
     if (!query) {

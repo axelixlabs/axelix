@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import type {
+    IAutocompletionOption,
     IMeasurement,
     IMeasurementsWithTimestamp,
     IMetricsGroup,
@@ -199,4 +200,12 @@ export const createMeasurementsWithTimestamp = (measurements: IMeasurement[]): I
         value: value,
         timestamp: Date.now(),
     }));
+};
+
+export const metricsAutocompleteOptions = (effectiveMetricsGroups: IMetricsGroup[]): IAutocompletionOption[] => {
+    return effectiveMetricsGroups
+        .flatMap((metrics) => metrics.metrics)
+        .map(({ metricName }) => ({
+            value: metricName,
+        }));
 };
