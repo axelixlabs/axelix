@@ -166,7 +166,6 @@
         "runSuccess": "Запланированная задача была принудительно запущена",
         "fixedTaskIntervalChangeSuccess": "Интервал был изменён",
         "cronExpressionChangeSuccess": "Cron-выражение было изменено",
-        "cronExpressionValidationError": "Неверное CRON выражение",
         "enterNewCron": "Введите новый Cron",
         "enterNewInterval": "Введите новый интервал"
     },

@@ -43,6 +43,7 @@ export const FixedTasksEditableValue = ({ task }: IProps) => {
     const [tempValue, setTempValue] = useState<string>(task.interval.toString());
     const [loading, setLoading] = useState<boolean>(false);
     const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
+    const [isValidInterval, setIsValidInterval] = useState<boolean>(true);
 
     const handleUpdate = async (): Promise<void> => {
         setLoading(true);
@@ -69,6 +70,16 @@ export const FixedTasksEditableValue = ({ task }: IProps) => {
         setIsPopoverOpen(false);
     };
 
+    const handleInputChange = (newVal: string): void => {
+        if (isNaN(Number(newVal)) || newVal.trim().length == 0) {
+            setIsValidInterval(false);
+        } else {
+            setIsValidInterval(true);
+        }
+
+        setTempValue(newVal);
+    };
+
     return (
         <div className={styles.IntervalPreviewWrapper}>
             {actualValue}
@@ -81,7 +92,12 @@ export const FixedTasksEditableValue = ({ task }: IProps) => {
                 }}
                 content={
                     <div className={styles.EditWrapper}>
-                        <Input value={tempValue} onChange={(e) => setTempValue(e.target.value)} disabled={loading} />
+                        <Input
+                            value={tempValue}
+                            onChange={(e) => handleInputChange(e.target.value)}
+                            status={isValidInterval ? "success" : "error"}
+                            disabled={loading}
+                        />
 
                         <Button
                             icon={<CloseOutlined />}
@@ -93,6 +109,7 @@ export const FixedTasksEditableValue = ({ task }: IProps) => {
                         <Button
                             icon={<CheckOutlined />}
                             type="primary"
+                            disabled={!isValidInterval}
                             onClick={handleUpdate}
                             loading={loading}
                             className={styles.EditActionButtons}
