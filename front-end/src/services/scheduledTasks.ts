@@ -61,3 +61,9 @@ export const changeScheduledTaskInterval = (data: IChangeScheduledTaskIntervalRe
         trigger: trigger,
     });
 };
+
+export const checkCronExpressionValidation = (cronExpression: string) => {
+    return apiFetch.post(`scheduled-tasks/validate-cron-expression`, {
+        cronExpression: cronExpression,
+    });
+};

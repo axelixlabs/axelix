@@ -15,15 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
-
 import { TooltipWithCopy } from "components";
 import type { IFixedTasks } from "models";
-import { changeScheduledTaskInterval } from "services";
 
+import { FixedTasksEditableValue } from "../../FixedTasksEditableValue";
 import { ForceRunTask } from "../../ForceRunTask";
-import { ScheduledTasksEditableValue } from "../../ScheduledTasksEditableValue";
 import { ScheduledTasksStatusSwitch } from "../../ScheduledTasksStatusSwitch";
 import styles from "../../styles.module.css";
 
@@ -35,9 +31,6 @@ interface IProps {
 }
 
 export const FixedTaskTableRow = ({ task }: IProps) => {
-    const { instanceId } = useParams();
-    const { t } = useTranslation();
-
     return (
         <div className={styles.RowChunksWrapper}>
             <div className={styles.BodyRowChunk}>
@@ -45,17 +38,7 @@ export const FixedTaskTableRow = ({ task }: IProps) => {
             </div>
             <div className={styles.BodyRowChunk}>{task.initialDelay}</div>
             <div className={styles.BodyRowChunk}>
-                <ScheduledTasksEditableValue
-                    initialValue={task.interval.toString()}
-                    onNewValue={(newValue) => {
-                        return changeScheduledTaskInterval({
-                            instanceId: instanceId!,
-                            interval: +newValue,
-                            trigger: task.runnable.target,
-                        });
-                    }}
-                    successMessage={t("ScheduledTasks.fixedTaskIntervalChangeSuccess")}
-                />
+                <FixedTasksEditableValue task={task} />
             </div>
             <div className={styles.BodyRowChunk}>
                 <ScheduledTasksStatusSwitch runnable={task} />

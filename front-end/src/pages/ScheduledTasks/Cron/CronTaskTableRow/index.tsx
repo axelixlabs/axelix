@@ -15,15 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ScheduledTasksEditableValue } from "../..//ScheduledTasksEditableValue";
-import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
-
 import { TooltipWithCopy } from "components";
-import { getCronDescription } from "helpers";
 import { type ICron } from "models";
-import { changeCronExpression } from "services";
 
+import { CronExpressionEditableValue } from "../../CronExpressionEditableValue";
 import { ForceRunTask } from "../../ForceRunTask";
 import { ScheduledTasksStatusSwitch } from "../../ScheduledTasksStatusSwitch";
 import styles from "../../styles.module.css";
@@ -36,27 +31,13 @@ interface IProps {
 }
 
 export const CronTaskTableRow = ({ task }: IProps) => {
-    const { instanceId } = useParams();
-    const { t } = useTranslation();
-
     return (
         <div className={styles.RowChunksWrapper}>
             <div className={styles.BodyRowChunk}>
                 <TooltipWithCopy text={task.runnable.target} />
             </div>
             <div className={styles.BodyRowChunk}>
-                <ScheduledTasksEditableValue
-                    initialValue={task.expression}
-                    onNewValue={(newValue) => {
-                        return changeCronExpression({
-                            instanceId: instanceId!,
-                            newCronExpression: newValue,
-                            trigger: task.runnable.target,
-                        });
-                    }}
-                    tooltipFormatter={getCronDescription}
-                    successMessage={t("ScheduledTasks.cronExpressionChangeSuccess")}
-                />
+                <CronExpressionEditableValue task={task} />
             </div>
             <div className={styles.BodyRowChunk}>
                 <ScheduledTasksStatusSwitch runnable={task} />

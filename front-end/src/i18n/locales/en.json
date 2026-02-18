@@ -166,7 +166,9 @@
         "runSuccess": "Scheduled task was forcefully executed",
         "fixedTaskIntervalChangeSuccess": "The interval has been changed",
         "cronExpressionChangeSuccess": "Cron expression has been changed",
-        "cronExpressionValidationError": "Invalid CRON expression"
+        "cronExpressionValidationError": "Invalid CRON expression",
+        "enterNewCron": "Enter New Cron",
+        "enterNewInterval": "Enter new Interval"
     },
     "Error": {
         "title": "Error",
