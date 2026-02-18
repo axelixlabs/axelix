@@ -76,6 +76,9 @@ export function Distributions({ distributions }: IProps) {
 
         const targetPath = `/wallboard?${filterParams}`;
 
+        // Unfortunately, we have to handle the browser hotkeys manually below.
+        // See the reasoning the comment.
+        // https://github.com/axelixlabs/axelix/pull/721/changes#r2823263592
         const isModifiedEvent = e && (e.ctrlKey || e.metaKey || e.shiftKey);
 
         if (isModifiedEvent) {
