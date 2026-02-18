@@ -644,8 +644,6 @@ describe("parseWallboardFilters", () => {
     });
 
     it("Should return an empty array when there are no filters", () => {
-        // empty given.
-
         // when.
         const result = parseWallboardFilters(searchParams);
 
