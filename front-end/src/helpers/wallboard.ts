@@ -194,9 +194,20 @@ export const parseWallboardFilters = (searchParams: URLSearchParams): IWallboard
     return parsedFilters;
 };
 
-export const getFilteredWallboardFilters = (searchParams: URLSearchParams, id: string): string[] => {
-    return searchParams.getAll(SEARCH_PARAMS_FILTER).filter((filter) => {
+/**
+ * Removes the {@link EWallboardFilterKey} by provided targetId from passed {@link URLSearchParams}.
+ * Performs a noop if provided {@link URLSearchParams} does not contain the requested filter.
+ *
+ * @param searchParams to remove filter from
+ * @param targetId id of filter to remove
+ */
+export const removeFilterById = (searchParams: URLSearchParams, targetId: string) => {
+    const remainingFilters = searchParams.getAll(SEARCH_PARAMS_FILTER).filter((filter) => {
+        console.log(`Evaluating ${filter}`);
+
         const [key, operator, operand] = filter.split(":") as WallboardParsedFilter;
+
+        console.log(`Got ${key}, ${operator}, ${operand}`);
 
         if (!key || !operator || !operand) {
             return;
@@ -204,6 +215,11 @@ export const getFilteredWallboardFilters = (searchParams: URLSearchParams, id: s
 
         const filterId = createWallboardFilterId(key, operator, operand);
 
-        return filterId !== id;
+        console.log(`Got ${filterId}`);
+
+        return filterId !== targetId;
     });
+
+    searchParams.delete(SEARCH_PARAMS_FILTER);
+    remainingFilters.forEach((filter) => searchParams.append(SEARCH_PARAMS_FILTER, filter));
 };

@@ -58,6 +58,12 @@ export const getWallboardFilterDefinitions = (
     };
 };
 
+/**
+ * Map software component name to its corresponding {@link EWallboardFilterKey}.
+ *
+ * @param name the name of the software component (see {@link IDistribution})
+ * @returns EWallboardFilterKey the filter key on the wallboard that corresponds to this software component.
+ */
 export const mapSoftwareComponentToFilterKey = (name: string): EWallboardFilterKey | undefined => {
     switch (name) {
         case "SpringBoot":
