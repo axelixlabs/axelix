@@ -18,95 +18,109 @@
 import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 
 import { App, Button, Input, Popover } from "antd";
-import type { AxiosResponse } from "axios";
-import { OptionalTooltip } from "pages/ScheduledTasks/OptionalTooltip";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+
+import { type IFixedTasks } from "models";
+import { changeScheduledTaskInterval } from "services";
 
 import styles from "./styles.module.css";
 
 interface IProps {
     /**
-     * Initial value.
+     * Task body for scheduled task types
      */
-    initialValue: string;
-
-    /**
-     * Callback to invoke when the value chane accepted.
-     * @param value the new value after change.
-     */
-    onNewValue: (value: string) => Promise<AxiosResponse<any>>; // TODO: Fix the type in future
-
-    /**
-     * Function to generate a tooltip for the value.
-     * Receives the current value and returns a string to display.
-     */
-    tooltipFormatter?: (value: string) => string;
-
-    /**
-     * Message to show when the update succeeds.
-     */
-    successMessage: string;
+    task: IFixedTasks;
 }
 
-export const ScheduledTasksEditableValue = ({ initialValue, successMessage, tooltipFormatter, onNewValue }: IProps) => {
+export const FixedTasksEditableValue = ({ task }: IProps) => {
+    const { instanceId } = useParams();
     const { message } = App.useApp();
+    const { t } = useTranslation();
 
-    const [actualValue, setActualValue] = useState<string>(initialValue);
-    const [tempValue, setTempValue] = useState<string>(initialValue);
+    const [actualValue, setActualValue] = useState<string>(task.interval.toString());
+    const [tempValue, setTempValue] = useState<string>(task.interval.toString());
     const [loading, setLoading] = useState<boolean>(false);
     const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
+    const [isValidInterval, setIsValidInterval] = useState<boolean>(true);
 
     const handleUpdate = async (): Promise<void> => {
         setLoading(true);
-        onNewValue(actualValue)
+
+        const normalizedTempValue = tempValue.trim();
+
+        changeScheduledTaskInterval({
+            instanceId: instanceId!,
+            interval: +normalizedTempValue,
+            trigger: task.runnable.target,
+        })
             .then(() => {
-                message.success(successMessage);
-                setActualValue(tempValue);
+                message.success(t("ScheduledTasks.fixedTaskIntervalChangeSuccess"));
+                setActualValue(normalizedTempValue);
                 setIsPopoverOpen(false);
             })
-            // TODO: Add bad request handling from backend
             .finally(() => {
                 setLoading(false);
             });
     };
 
+    const handleCancel = (): void => {
+        setTempValue(actualValue);
+        setIsPopoverOpen(false);
+    };
+
+    const handleInputChange = (newVal: string): void => {
+        if (isNaN(Number(newVal)) || newVal.trim().length == 0) {
+            setIsValidInterval(false);
+        } else {
+            setIsValidInterval(true);
+        }
+
+        setTempValue(newVal);
+    };
+
     return (
         <div className={styles.IntervalPreviewWrapper}>
-            <OptionalTooltip value={tempValue} tooltipFormatter={isPopoverOpen ? undefined : tooltipFormatter}>
-                {actualValue}
-            </OptionalTooltip>
+            {actualValue}
             <Popover
+                title={t("ScheduledTasks.enterNewInterval")}
                 open={isPopoverOpen}
-                onOpenChange={(newOpen) => setIsPopoverOpen(newOpen)}
+                onOpenChange={(newOpen) => {
+                    setIsPopoverOpen(newOpen);
+                    setTempValue(actualValue);
+                }}
                 content={
                     <div className={styles.EditWrapper}>
-                        <OptionalTooltip value={tempValue} tooltipFormatter={tooltipFormatter}>
-                            <Input
-                                value={tempValue}
-                                onChange={(e) => setTempValue(e.target.value)}
-                                disabled={loading}
-                            />
-                        </OptionalTooltip>
+                        <Input
+                            value={tempValue}
+                            onChange={(e) => handleInputChange(e.target.value)}
+                            status={isValidInterval ? "success" : "error"}
+                            disabled={loading}
+                        />
 
                         <Button
                             icon={<CloseOutlined />}
                             type="primary"
-                            onClick={() => {
-                                setTempValue(initialValue);
-                                setIsPopoverOpen(false);
-                            }}
+                            onClick={handleCancel}
                             className={styles.EditActionButtons}
                         />
 
                         <Button
                             icon={<CheckOutlined />}
                             type="primary"
+                            disabled={!isValidInterval}
                             onClick={handleUpdate}
                             loading={loading}
                             className={styles.EditActionButtons}
                         />
                     </div>
                 }
+                styles={{
+                    container: {
+                        minWidth: "300px",
+                    },
+                }}
                 trigger="click"
             >
                 <Button icon={<EditOutlined />} type="primary" />

@@ -1,0 +1,28 @@
+.MainWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 8px;
+    width: 100%;
+}
+
+.EditWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+}
+
+.EditActionsButtonsWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    flex-shrink: 0;
+}
+
+.AlertWithActionsWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 8px;
+}
