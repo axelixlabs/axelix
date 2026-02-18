@@ -39,8 +39,8 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
-import com.axelixlabs.axelix.sbs.spring.core.integrations.AbstractIntegration;
-import com.axelixlabs.axelix.sbs.spring.core.integrations.IntegrationComponentDiscoverer;
+import com.axelixlabs.axelix.common.api.integrations.AbstractIntegration;
+import com.axelixlabs.axelix.sbs.spring.core.integration.IntegrationComponentDiscoverer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

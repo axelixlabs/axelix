@@ -33,7 +33,7 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
-import com.axelixlabs.axelix.sbs.spring.core.integrations.IntegrationComponentDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.integration.IntegrationComponentDiscoverer;
 
 /**
  * {@link IntegrationComponentDiscoverer} for discovering Kafka consumer integrations

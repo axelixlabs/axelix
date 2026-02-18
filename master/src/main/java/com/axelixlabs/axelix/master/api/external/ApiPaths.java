@@ -376,4 +376,16 @@ public final class ApiPaths {
          */
         public static final String DISABLE_CONTENTION_MONITORING = "/{instanceId}/thread-contention-monitoring/disable";
     }
+
+    public static final class FeignClientApi {
+
+        /**
+         * Base path for feign client APIs.
+         */
+        public static final String MAIN = "/feign";
+        /**
+         * Feign Client endpoint with instance ID.
+         */
+        public static final String INSTANCE_ID = "/{instanceId}";
+    }
 }

@@ -17,18 +17,22 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import java.util.List;
+
 import feign.Feign;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.sbs.spring.core.integrations.IntegrationComponentDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.integrations.http.AxelixFeignEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.integrations.http.FeignClientIntegrationDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.integrations.http.HttpIntegration;
 
 /**
  * Auto-configuration for discovering HTTP integrations based on Spring Cloud OpenFeign.
@@ -36,17 +40,40 @@ import com.axelixlabs.axelix.sbs.spring.core.integrations.http.HttpIntegration;
  * Registers a {@link FeignClientIntegrationDiscoverer} if Feign is present on the classpath.
  * </p>
  *
- * @author Nikita Kirillov
- * @since 09.07.2025
+ * @author Sergey Cherkasov
  */
 @AutoConfiguration
 @ConditionalOnClass({Feign.class, FeignClient.class})
-public class SpringCloudFeignIntegrationAutoConfiguration {
+public class AxelixFeignEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public IntegrationComponentDiscoverer<HttpIntegration> feignClientIntegrationDiscoverer(
-            ApplicationContext context) {
-        return new FeignClientIntegrationDiscoverer(context);
+    public FeignClientIntegrationDiscoverer feignCClientIntegrationDiscoverer(
+            ApplicationContext applicationContext, ObjectProvider<DiscoveryClient> discoveryClientProvider) {
+        DiscoveryClient discoveryClient = discoveryClientProvider.getIfAvailable(NoOpDiscoveryClient::new);
+        return new FeignClientIntegrationDiscoverer(applicationContext, discoveryClient);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AxelixFeignEndpoint axelixFeignEndpoint(FeignClientIntegrationDiscoverer extractor) {
+        return new AxelixFeignEndpoint(extractor);
+    }
+
+    private static final class NoOpDiscoveryClient implements DiscoveryClient {
+        @Override
+        public String description() {
+            return "No discovery client configured";
+        }
+
+        @Override
+        public List<ServiceInstance> getInstances(String serviceId) {
+            return List.of();
+        }
+
+        @Override
+        public List<String> getServices() {
+            return List.of();
+        }
     }
 }

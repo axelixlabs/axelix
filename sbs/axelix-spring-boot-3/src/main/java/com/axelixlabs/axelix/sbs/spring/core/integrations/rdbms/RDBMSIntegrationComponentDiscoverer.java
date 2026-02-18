@@ -32,7 +32,9 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.axelixlabs.axelix.sbs.spring.core.integrations.IntegrationComponentDiscoverer;
+import com.axelixlabs.axelix.common.api.integrations.rdbms.RDBMSIntegration;
+import com.axelixlabs.axelix.common.api.integrations.rdbms.RDBMSType;
+import com.axelixlabs.axelix.sbs.spring.core.integration.IntegrationComponentDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils;
 
 /**

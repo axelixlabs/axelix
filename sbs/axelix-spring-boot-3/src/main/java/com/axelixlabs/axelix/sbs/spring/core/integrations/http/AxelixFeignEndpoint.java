@@ -17,21 +17,24 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.integrations.http;
 
-import com.axelixlabs.axelix.sbs.spring.core.integrations.AbstractIntegration;
+import java.util.Set;
 
-/**
- * Represents an HTTP-based integration with an external service.
- *
- * @since 05.07.2025
- * @author Mikhail Polivakha
- */
-public final class HttpIntegration extends AbstractIntegration {
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-    public HttpIntegration(String networkAddress, HttpVersion httpVersion) {
-        this(networkAddress, httpVersion, "External HTTP Service");
+import com.axelixlabs.axelix.common.api.integrations.http.FeignClientIntegration;
+
+@Endpoint(id = "axelix-feign")
+public class AxelixFeignEndpoint {
+
+    private final FeignClientIntegrationDiscoverer extractor;
+
+    public AxelixFeignEndpoint(FeignClientIntegrationDiscoverer extractor) {
+        this.extractor = extractor;
     }
 
-    public HttpIntegration(String networkAddress, HttpVersion httpVersion, String serviceName) {
-        super(networkAddress, httpVersion.getDisplay(), serviceName);
+    @ReadOperation
+    public Set<FeignClientIntegration> feignClient() {
+        return extractor.discoverIntegrations();
     }
 }

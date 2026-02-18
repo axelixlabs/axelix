@@ -15,21 +15,53 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations;
+package com.axelixlabs.axelix.sbs.spring.core.integration;
+
+import java.util.Objects;
 
 /**
  * Abstraction over tcp socket.
  *
- * @param host peer connection host
- * @param port peer connection port
- *
  * @since 08.07.25
  * @author Mikhail Polivakha
  */
-public record TCPSocket(String host, int port) {
+public class TCPSocket {
+
+    private final String host;
+    private final int port;
+
+    /**
+     * Create new TCPSocket
+     *
+     * @param host peer connection host
+     * @param port peer connection port
+     *
+     * @since 08.07.25
+     * @author Mikhail Polivakha
+     */
+    public TCPSocket(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        TCPSocket tcpSocket = (TCPSocket) o;
+        return port == tcpSocket.port && Objects.equals(host, tcpSocket.host);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(host, port);
+    }
 
     @Override
     public String toString() {
-        return "%s:%d".formatted(host, port);
+        return host + ":" + port;
     }
 }

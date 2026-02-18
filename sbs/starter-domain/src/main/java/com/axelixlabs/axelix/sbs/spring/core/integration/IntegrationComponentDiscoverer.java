@@ -15,20 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations.rdbms;
+package com.axelixlabs.axelix.sbs.spring.core.integration;
 
-import com.axelixlabs.axelix.sbs.spring.core.integrations.AbstractIntegration;
+import java.util.Set;
+
+import com.axelixlabs.axelix.common.api.integrations.Integration;
 
 /**
- * Represents an integration with a relational database management system (RDBMS)
- * using the JDBC protocol.
+ * Implementations of this interface are capable to discover specific {@link Integration integrations}.
  *
- * @since 09.07.2025
+ * @since 05.07.25
  * @author Mikhail Polivakha
  */
-public class RDBMSIntegration extends AbstractIntegration {
+public interface IntegrationComponentDiscoverer<T extends Integration> {
 
-    public RDBMSIntegration(String networkAddress, RDBMSType entityType) {
-        super(networkAddress, "JDBC", entityType.getDisplayName());
-    }
+    Set<T> discoverIntegrations();
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations;
+package com.axelixlabs.axelix.common.api.integrations;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ import java.util.Map;
  * @since 05.07.25
  * @author Mikhail Polivakha
  */
-public sealed interface Integration permits AbstractIntegration {
+public interface Integration {
 
     /**
      * @return abstract term that defines the type of entity with which the integration takes place

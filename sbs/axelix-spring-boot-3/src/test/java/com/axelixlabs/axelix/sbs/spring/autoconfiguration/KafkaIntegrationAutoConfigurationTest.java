@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.listener.MessageListenerContainer;
 
-import com.axelixlabs.axelix.sbs.spring.core.integrations.IntegrationComponentDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.integration.IntegrationComponentDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.integrations.kafka.KafkaConsumerIntegration;
 import com.axelixlabs.axelix.sbs.spring.core.integrations.kafka.KafkaConsumerIntegrationDiscoverer;
 

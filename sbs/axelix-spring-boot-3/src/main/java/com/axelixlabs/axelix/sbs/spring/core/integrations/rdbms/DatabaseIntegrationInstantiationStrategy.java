@@ -19,6 +19,9 @@ package com.axelixlabs.axelix.sbs.spring.core.integrations.rdbms;
 
 import java.sql.Connection;
 
+import com.axelixlabs.axelix.common.api.integrations.rdbms.RDBMSIntegration;
+import com.axelixlabs.axelix.common.api.integrations.rdbms.RDBMSType;
+
 /**
  * Strategy interface for creating an {@link RDBMSIntegration} instance
  * from a {@link Connection}. Implementations of this interface
