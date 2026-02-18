@@ -203,19 +203,13 @@ export const parseWallboardFilters = (searchParams: URLSearchParams): IWallboard
  */
 export const removeFilterById = (searchParams: URLSearchParams, targetId: string) => {
     const remainingFilters = searchParams.getAll(SEARCH_PARAMS_FILTER).filter((filter) => {
-        console.log(`Evaluating ${filter}`);
-
         const [key, operator, operand] = filter.split(":") as WallboardParsedFilter;
-
-        console.log(`Got ${key}, ${operator}, ${operand}`);
 
         if (!key || !operator || !operand) {
             return;
         }
 
         const filterId = createWallboardFilterId(key, operator, operand);
-
-        console.log(`Got ${filterId}`);
 
         return filterId !== targetId;
     });

@@ -17,7 +17,7 @@
  */
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { createWallboardFilterId, removeFilterById, semVerMatch } from "helpers";
+import { createWallboardFilterId, parseWallboardFilters, removeFilterById, semVerMatch } from "helpers";
 import { EWallboardFilterKey, EWallboardFilterOperator, type IWallboardSingleOperandFilter } from "models";
 import { SEARCH_PARAMS_FILTER } from "utils";
 
@@ -628,5 +628,66 @@ describe("removeFilterById", () => {
 
         // then.
         expect(searchParams.getAll(SEARCH_PARAMS_FILTER)).toEqual([]);
+    });
+});
+
+describe("parseWallboardFilters", () => {
+    const javaFilterOperand = "17";
+    const javaFilter = `${EWallboardFilterKey.JAVA}:${EWallboardFilterOperator.EQUAL}:${javaFilterOperand}`;
+    const springBootFilterOperand = "2.7";
+    const springBootFilter = `${EWallboardFilterKey.SPRING_BOOT}:${EWallboardFilterOperator.GREATER_THAN_EQUAL}:${springBootFilterOperand}`;
+
+    let searchParams: URLSearchParams;
+
+    beforeEach(() => {
+        searchParams = new URLSearchParams();
+    });
+
+    it("Should return an empty array when there are no filters", () => {
+        // empty given.
+
+        // when.
+        const result = parseWallboardFilters(searchParams);
+
+        // then.
+        expect(result).toEqual([]);
+    });
+
+    it("Should return empty array if filters exists, but they are not valid", () => {
+        // given.
+        searchParams.append(SEARCH_PARAMS_FILTER, `${EWallboardFilterKey.JAVA}:${EWallboardFilterOperator.EQUAL}`); // The operand isnt added.
+        searchParams.append(SEARCH_PARAMS_FILTER, `${EWallboardFilterOperator.EQUAL}:${javaFilterOperand}`); // The key isnt added.
+        searchParams.append(SEARCH_PARAMS_FILTER, `${EWallboardFilterOperator.EQUAL}`); // The key and the operand arent added.
+
+        // when.
+        const result = parseWallboardFilters(searchParams);
+
+        // then.
+        expect(result).toEqual([]);
+    });
+
+    it("Should return array of filters", () => {
+        // given.
+        searchParams.append(SEARCH_PARAMS_FILTER, javaFilter);
+        searchParams.append(SEARCH_PARAMS_FILTER, springBootFilter);
+
+        // when.
+        const result = parseWallboardFilters(searchParams);
+
+        // then.
+        expect(result).toEqual([
+            {
+                id: `${EWallboardFilterKey.JAVA}-${EWallboardFilterOperator.EQUAL}-${javaFilterOperand}`,
+                key: EWallboardFilterKey.JAVA,
+                operand: javaFilterOperand,
+                operator: EWallboardFilterOperator.EQUAL,
+            },
+            {
+                id: `${EWallboardFilterKey.SPRING_BOOT}-${EWallboardFilterOperator.GREATER_THAN_EQUAL}-${springBootFilterOperand}`,
+                key: EWallboardFilterKey.SPRING_BOOT,
+                operand: springBootFilterOperand,
+                operator: EWallboardFilterOperator.GREATER_THAN_EQUAL,
+            },
+        ]);
     });
 });
