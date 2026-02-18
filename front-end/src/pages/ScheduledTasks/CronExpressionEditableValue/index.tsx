@@ -24,7 +24,7 @@ import { useParams } from "react-router-dom";
 
 import { getCronDescription } from "helpers";
 import { type ICron } from "models";
-import { changeCronExpression, checkCronExpressionValidation } from "services";
+import { changeCronExpression, checkCronExpressionValid } from "services";
 
 import styles from "./styles.module.css";
 
@@ -73,12 +73,14 @@ export const CronExpressionEditableValue = ({ task }: IProps) => {
         setIsCronExpressionValid(true);
     };
 
-    const handleOnChange = (e: ChangeEvent<HTMLInputElement>): void => {
-        setTempValue(e.target.value);
+    const handleOnInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        if (e.target.value.trim() !== tempValue.trim()) {
+            checkCronExpressionValid(e.target.value).then((response) => {
+                setIsCronExpressionValid(response.data.valid);
+            });
+        }
 
-        checkCronExpressionValidation(e.target.value).then((response) => {
-            setIsCronExpressionValid(response.data.valid);
-        });
+        setTempValue(e.target.value);
     };
 
     return (
@@ -97,7 +99,7 @@ export const CronExpressionEditableValue = ({ task }: IProps) => {
                         <Tooltip title={getCronDescription(tempValue)}>
                             <Input
                                 value={tempValue}
-                                onChange={handleOnChange}
+                                onChange={handleOnInputChange}
                                 disabled={expressionUpdateLoading}
                                 status={!isCronExpressionValid ? "error" : undefined}
                             />
