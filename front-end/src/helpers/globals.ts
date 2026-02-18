@@ -21,6 +21,8 @@ import { t } from "i18next";
 
 import {
     EMimeTypes,
+    EWallboardFilterKey,
+    EWallboardFilterOperator,
     type IConfigPropsBean,
     type IEnvironmentPropertySource,
     type SetRequestState,
@@ -112,4 +114,12 @@ export const toFormattedTime = (value: number): string => {
         minute: "2-digit",
         second: "2-digit",
     });
+};
+
+export const createWallboardFilterSearchParam = (
+    key: EWallboardFilterKey,
+    operator: EWallboardFilterOperator,
+    operand: string,
+): string => {
+    return `${key}:${operator}:${operand}`;
 };

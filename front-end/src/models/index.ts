@@ -34,6 +34,7 @@ export * from "./interfaces/auth";
 export * from "./interfaces/gc";
 
 export * from "./types/conditions";
+export * from "./types/wallboard";
 export * from "./types/globals";
 export * from "./types/details";
 export * from "./types/antd";

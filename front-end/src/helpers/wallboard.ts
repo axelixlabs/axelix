@@ -17,8 +17,14 @@
  */
 import type { TFunction } from "i18next";
 
-import { EWallboardFilterOperator, type IInstanceCard, type IWallboardSingleOperandFilter } from "models";
-import { getWallboardFilterDefinitions } from "utils";
+import {
+    EWallboardFilterKey,
+    EWallboardFilterOperator,
+    type IInstanceCard,
+    type IWallboardSingleOperandFilter,
+    type WallboardParsedFilter,
+} from "models";
+import { SEARCH_PARAMS_FILTER, getWallboardFilterDefinitions } from "utils";
 
 export const getAllJavaVersions = (instances: IInstanceCard[]): string[] => {
     const allVersions = new Set<string>();
@@ -129,28 +135,85 @@ export const semVerMatch = (candidateSemVer: string, filter: IWallboardSingleOpe
     return true;
 };
 
-/* eslint-disable */
 export const filterWallboardInstances = (
     instances: IInstanceCard[],
     searchQuery: string,
     filters: IWallboardSingleOperandFilter[],
     t: TFunction,
 ): IInstanceCard[] => {
-
     const normalizedQuery = searchQuery.toLowerCase().trim();
 
     return instances
-        .filter(value => value.name.toLowerCase().includes(normalizedQuery.toLowerCase()))
+        .filter((value) => value.name.toLowerCase().includes(normalizedQuery.toLowerCase()))
         .filter((instance) =>
-                Object.values(filters).every((filter) => {
-                    const definition = getWallboardFilterDefinitions(t)[filter.key];
+            Object.values(filters).every((filter) => {
+                const definition = getWallboardFilterDefinitions(t)[filter.key];
 
-                    if (!definition) {
-                        return true;
-                    }
+                if (!definition) {
+                    return true;
+                }
 
-                    return definition.match(instance, filter);
-                }),
-    );
+                return definition.match(instance, filter);
+            }),
+        );
 };
-/* eslint-enable */
+
+export const createWallboardFilterId = (
+    key: EWallboardFilterKey,
+    operator: EWallboardFilterOperator,
+    operand: string,
+): string => {
+    return `${key}-${operator}-${operand}`;
+};
+
+export const parseWallboardFilters = (searchParams: URLSearchParams): IWallboardSingleOperandFilter[] => {
+    const filtersFromUrl = searchParams.getAll(SEARCH_PARAMS_FILTER);
+
+    if (filtersFromUrl.length === 0) {
+        return [];
+    }
+
+    const parsedFilters: IWallboardSingleOperandFilter[] = [];
+
+    filtersFromUrl.forEach((filter) => {
+        const [key, operator, operand] = filter.split(":") as WallboardParsedFilter;
+
+        if (!key || !operator || !operand) {
+            return;
+        }
+
+        const filterId = createWallboardFilterId(key, operator, operand);
+        parsedFilters.push({
+            id: filterId,
+            key: key,
+            operator: operator,
+            operand: operand,
+        });
+    });
+
+    return parsedFilters;
+};
+
+/**
+ * Removes the {@link EWallboardFilterKey} by provided targetId from passed {@link URLSearchParams}.
+ * Performs a noop if provided {@link URLSearchParams} does not contain the requested filter.
+ *
+ * @param searchParams to remove filter from
+ * @param targetId id of filter to remove
+ */
+export const removeFilterById = (searchParams: URLSearchParams, targetId: string) => {
+    const remainingFilters = searchParams.getAll(SEARCH_PARAMS_FILTER).filter((filter) => {
+        const [key, operator, operand] = filter.split(":") as WallboardParsedFilter;
+
+        if (!key || !operator || !operand) {
+            return;
+        }
+
+        const filterId = createWallboardFilterId(key, operator, operand);
+
+        return filterId !== targetId;
+    });
+
+    searchParams.delete(SEARCH_PARAMS_FILTER);
+    remainingFilters.forEach((filter) => searchParams.append(SEARCH_PARAMS_FILTER, filter));
+};
