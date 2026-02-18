@@ -1,13 +1,10 @@
 .IntervalPreviewWrapper,
 .EditWrapper {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     column-gap: 8px;
-}
-
-.IntervalPreviewWrapper {
     width: 100%;
-    justify-content: flex-end;
 }
 
 .EditActionButtons {
