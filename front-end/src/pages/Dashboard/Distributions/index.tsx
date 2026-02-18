@@ -25,7 +25,7 @@ import {
     createWallboardFilterSearchParam,
     prepareDistributionDataPerChart,
 } from "helpers";
-import { EWallboardFilterOperator, type IDistribution } from "models";
+import { EWallboardFilterKey, EWallboardFilterOperator, type IDistribution } from "models";
 import { SEARCH_PARAMS_FILTER, mapSoftwareComponentToFilterKey } from "utils";
 
 import styles from "./styles.module.css";
@@ -56,8 +56,11 @@ export function Distributions({ distributions }: IProps) {
         );
     };
 
-    const clickHandler = (softwareComponentName: string, version: string): void => {
-        const wallboardFilterComponent = mapSoftwareComponentToFilterKey(softwareComponentName);
+    const clickHandler = (
+        e: React.MouseEvent | undefined,
+        wallboardFilterComponent: EWallboardFilterKey | undefined,
+        version: string,
+    ): void => {
         if (!wallboardFilterComponent) {
             return;
         }
@@ -71,55 +74,68 @@ export function Distributions({ distributions }: IProps) {
         const filterParams = new URLSearchParams();
         filterParams.set(SEARCH_PARAMS_FILTER, wallboardFilterSearchParam);
 
-        navigate({
-            pathname: "/wallboard",
-            search: `?${filterParams}`,
-        });
+        const targetPath = `/wallboard?${filterParams}`;
+
+        const isModifiedEvent = e && (e.ctrlKey || e.metaKey || e.shiftKey);
+
+        if (isModifiedEvent) {
+            window.open(targetPath, "_blank");
+        } else {
+            navigate(targetPath);
+        }
     };
 
     return (
         <div className={styles.MainWrapper}>
             <div className={`TextMedium ${styles.Title}`}>{t("Dashboard.distributions")}</div>
             <div className={styles.ChartsWrapper}>
-                {components.map(({ softwareComponentName, versions }) => (
-                    <div className={styles.SingleChartWrapper} key={softwareComponentName}>
-                        <div className={styles.CardTitle}>{t(`Dashboard.components.${softwareComponentName}`)}</div>
+                {components.map(({ softwareComponentName, versions }) => {
+                    const wallboardFilterComponent = mapSoftwareComponentToFilterKey(softwareComponentName);
+                    const isClickable = Boolean(wallboardFilterComponent);
 
-                        <ResponsiveContainer height={330} width="100%">
-                            <PieChart>
-                                <Pie
-                                    data={versions}
-                                    nameKey="name"
-                                    dataKey="value"
-                                    cx="50%"
-                                    cy="50%"
-                                    outerRadius={100}
-                                    label={(props: PieLabelRenderProps) => {
-                                        let sum = 0;
+                    return (
+                        <div className={styles.SingleChartWrapper} key={softwareComponentName}>
+                            <div className={styles.CardTitle}>{t(`Dashboard.components.${softwareComponentName}`)}</div>
 
-                                        for (const version of versions) {
-                                            sum += version.value;
-                                        }
+                            <ResponsiveContainer height={330} width="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={versions}
+                                        nameKey="name"
+                                        dataKey="value"
+                                        cx="50%"
+                                        cy="50%"
+                                        outerRadius={100}
+                                        label={(props: PieLabelRenderProps) => {
+                                            let sum = 0;
 
-                                        return renderInnerLabel(props, sum);
-                                    }}
-                                    labelLine={false}
-                                    stroke={versions.length > 1 ? "#fff" : "none"}
-                                >
-                                    {versions.map(({ name, versionColor }) => (
-                                        <Cell
-                                            key={versionColor}
-                                            fill={versionColor}
-                                            onClick={() => clickHandler(softwareComponentName, name)}
-                                        />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                ))}
+                                            for (const version of versions) {
+                                                sum += version.value;
+                                            }
+
+                                            return renderInnerLabel(props, sum);
+                                        }}
+                                        labelLine={false}
+                                        stroke={versions.length > 1 ? "#fff" : "none"}
+                                        onClick={(entry, _index, e) => {
+                                            clickHandler(e, wallboardFilterComponent, entry.name);
+                                        }}
+                                    >
+                                        {versions.map(({ versionColor }) => (
+                                            <Cell
+                                                key={versionColor}
+                                                fill={versionColor}
+                                                className={isClickable ? styles.ClickableCell : ""}
+                                            />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
