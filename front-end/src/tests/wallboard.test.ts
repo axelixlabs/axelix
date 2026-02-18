@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
-import { semVerMatch } from "helpers";
+import { createWallboardFilterId, parseWallboardFilters, removeFilterById, semVerMatch } from "helpers";
 import { EWallboardFilterKey, EWallboardFilterOperator, type IWallboardSingleOperandFilter } from "models";
+import { SEARCH_PARAMS_FILTER } from "utils";
 
 const createFilter = (operator: EWallboardFilterOperator, operand: string): IWallboardSingleOperandFilter => ({
     id: "test-filter",
@@ -560,5 +561,131 @@ describe("semVerMatch: unknown operator", () => {
 
         // then.
         expect(result).toBe(true);
+    });
+});
+
+describe("removeFilterById", () => {
+    const javaFilter = `${EWallboardFilterKey.JAVA}:${EWallboardFilterOperator.EQUAL}:17`;
+    const springBootFilter = `${EWallboardFilterKey.SPRING_BOOT}:${EWallboardFilterOperator.GREATER_THAN_EQUAL}:2.7`;
+
+    let searchParams: URLSearchParams;
+
+    beforeEach(() => {
+        searchParams = new URLSearchParams();
+    });
+
+    it("Should remove filter by id - happy path", () => {
+        // given.
+        searchParams.append(SEARCH_PARAMS_FILTER, javaFilter);
+        searchParams.append(SEARCH_PARAMS_FILTER, springBootFilter);
+
+        const filterIdForRemove = createWallboardFilterId(
+            EWallboardFilterKey.JAVA,
+            EWallboardFilterOperator.EQUAL,
+            "17",
+        );
+
+        // when.
+        removeFilterById(searchParams, filterIdForRemove);
+
+        // then.
+        expect(searchParams.getAll(SEARCH_PARAMS_FILTER)).toEqual([springBootFilter]);
+    });
+
+    it("Should handle invalid filter id", () => {
+        // given.
+        searchParams.append(SEARCH_PARAMS_FILTER, javaFilter);
+        searchParams.append(SEARCH_PARAMS_FILTER, springBootFilter);
+
+        // when.
+        removeFilterById(searchParams, "random_id");
+
+        // then.
+        expect(searchParams.getAll(SEARCH_PARAMS_FILTER)).toEqual([javaFilter, springBootFilter]);
+    });
+
+    it("Should handle if absent filter id removal requested", () => {
+        // given.
+        searchParams.append(SEARCH_PARAMS_FILTER, javaFilter);
+        searchParams.append(SEARCH_PARAMS_FILTER, springBootFilter);
+
+        // and.
+        const java21FilterId = createWallboardFilterId(EWallboardFilterKey.JAVA, EWallboardFilterOperator.EQUAL, "21");
+
+        // when.
+        removeFilterById(searchParams, java21FilterId);
+
+        // then.
+        expect(searchParams.getAll(SEARCH_PARAMS_FILTER)).toEqual([javaFilter, springBootFilter]);
+    });
+
+    it("Should return empty array if no filters found", () => {
+        // given.
+        searchParams.append("random_filter", "random_value");
+
+        // when.
+        removeFilterById(searchParams, "random_id");
+
+        // then.
+        expect(searchParams.getAll(SEARCH_PARAMS_FILTER)).toEqual([]);
+    });
+});
+
+describe("parseWallboardFilters", () => {
+    const javaFilterOperand = "17";
+    const javaFilter = `${EWallboardFilterKey.JAVA}:${EWallboardFilterOperator.EQUAL}:${javaFilterOperand}`;
+    const springBootFilterOperand = "2.7";
+    const springBootFilter = `${EWallboardFilterKey.SPRING_BOOT}:${EWallboardFilterOperator.GREATER_THAN_EQUAL}:${springBootFilterOperand}`;
+
+    let searchParams: URLSearchParams;
+
+    beforeEach(() => {
+        searchParams = new URLSearchParams();
+    });
+
+    it("Should return an empty array when there are no filters", () => {
+        // when.
+        const result = parseWallboardFilters(searchParams);
+
+        // then.
+        expect(result).toEqual([]);
+    });
+
+    it("Should return empty array if filters exists, but they are not valid", () => {
+        // given.
+        searchParams.append(SEARCH_PARAMS_FILTER, `${EWallboardFilterKey.JAVA}:${EWallboardFilterOperator.EQUAL}`); // The operand isnt added.
+        searchParams.append(SEARCH_PARAMS_FILTER, `${EWallboardFilterOperator.EQUAL}:${javaFilterOperand}`); // The key isnt added.
+        searchParams.append(SEARCH_PARAMS_FILTER, `${EWallboardFilterOperator.EQUAL}`); // The key and the operand arent added.
+
+        // when.
+        const result = parseWallboardFilters(searchParams);
+
+        // then.
+        expect(result).toEqual([]);
+    });
+
+    it("Should return array of filters", () => {
+        // given.
+        searchParams.append(SEARCH_PARAMS_FILTER, javaFilter);
+        searchParams.append(SEARCH_PARAMS_FILTER, springBootFilter);
+
+        // when.
+        const result = parseWallboardFilters(searchParams);
+
+        // then.
+        expect(result).toEqual([
+            {
+                id: `${EWallboardFilterKey.JAVA}-${EWallboardFilterOperator.EQUAL}-${javaFilterOperand}`,
+                key: EWallboardFilterKey.JAVA,
+                operand: javaFilterOperand,
+                operator: EWallboardFilterOperator.EQUAL,
+            },
+            {
+                id: `${EWallboardFilterKey.SPRING_BOOT}-${EWallboardFilterOperator.GREATER_THAN_EQUAL}-${springBootFilterOperand}`,
+                key: EWallboardFilterKey.SPRING_BOOT,
+                operand: springBootFilterOperand,
+                operator: EWallboardFilterOperator.GREATER_THAN_EQUAL,
+            },
+        ]);
     });
 });
