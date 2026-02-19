@@ -63,7 +63,7 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     // Caches
     public static final ActuatorEndpoint CLEAR_SINGLE_CACHE =
-            of("/axelix-caches/{cacheManagerName}/{cacheName}", HttpMethod.DELETE);
+            of("/axelix-caches/{cacheManagerName}/{cacheName}/clear", HttpMethod.DELETE);
     public static final ActuatorEndpoint CLEAR_ALL_CACHES = of("/axelix-caches", HttpMethod.DELETE);
 
     public static final ActuatorEndpoint GET_ALL_CACHES = of("/axelix-caches", HttpMethod.GET);
