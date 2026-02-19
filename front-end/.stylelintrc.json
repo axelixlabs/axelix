@@ -7,9 +7,9 @@
         "@stylistic/selector-combinator-space-after": "always",
         "@stylistic/declaration-block-trailing-semicolon": "always",
         "selector-class-pattern": [
-            "^([A-Z][a-zA-Z0-9]+|ant(-[a-z0-9]+)*)$",
+            "^([A-Z][a-zA-Z0-9]+|ant(-[a-z0-9]+)*|recharts(-[a-z0-9]+)+)$",
             {
-                "message": "Class names must be PascalCase, unless they are AntD classes (.ant-...)"
+                "message": "Class names must be PascalCase, unless they are AntD or Recharts classes (.ant-..., .recharts-...)"
             }
         ],
         "selector-pseudo-class-no-unknown": [
