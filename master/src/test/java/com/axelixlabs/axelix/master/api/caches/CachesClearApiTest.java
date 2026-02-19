@@ -85,7 +85,8 @@ public class CachesClearApiTest {
 
                 if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches")) {
                     return new MockResponse();
-                } else if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/testCacheManager/cities")) {
+                } else if (path.equals(
+                        "/" + activeInstanceId + "/actuator/axelix-caches/testCacheManager/cities/clear")) {
                     return new MockResponse();
                 } else {
                     return new MockResponse().setResponseCode(404);
@@ -126,6 +127,7 @@ public class CachesClearApiTest {
         RecordedRequest recordedRequest = mockWebServer.takeRequest(10, TimeUnit.SECONDS);
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
         assertThat(recordedRequest.getPath())
-                .isEqualTo("/" + activeInstanceId + "/actuator/axelix-caches/testCacheManager/%s".formatted(cacheName));
+                .isEqualTo("/" + activeInstanceId
+                        + "/actuator/axelix-caches/testCacheManager/%s/clear".formatted(cacheName));
     }
 }
