@@ -76,3 +76,10 @@ a {
 .ant-switch-handle {
     transition: all 0.15s ease !important;
 }
+
+/*
+ * .recharts-wrapper is a built-in class in the Recharts library used for all its components.
+ */
+.recharts-wrapper :focus {
+    outline: none;
+}
