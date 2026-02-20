@@ -182,7 +182,7 @@ class BeansApiTest {
             "application": {
               "parentId": null,
               "beans": {
-                "management.prefix-jmxEndpointProperties": {
+                "jmxEndpointProperties": {
                   "scope": "singleton",
                   "type": "JmxEndpointProperties",
                   "proxyType" : "CGLIB",
@@ -205,11 +205,11 @@ class BeansApiTest {
                   "autoConfigurationRef" : "HibernateJpaConfiguration#entityManagerFactoryBuilder",
                   "dependencies": [
                     {
-                      "name": "some.prefix-JacksonObjectMapperBuilderConfiguration",
+                      "name": "JacksonObjectMapperBuilderConfiguration",
                       "isConfigPropsDependency": true
                     },
                     {
-                     "name": "prefix-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
+                     "name": "org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
                      "isConfigPropsDependency": true
                    }
                  ],

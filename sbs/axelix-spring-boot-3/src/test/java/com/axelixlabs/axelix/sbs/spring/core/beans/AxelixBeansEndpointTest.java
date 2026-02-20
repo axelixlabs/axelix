@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -33,6 +35,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
@@ -49,6 +52,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
 @SpringBootTest(
         classes = AxelixBeansEndpointTest.CurrentConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = {"axelix.prop.test.name=axelix-beans"})
 @Import({BeansEndpoint.class, AxelixBeansEndpoint.class, ConditionsReportEndpoint.class})
 class AxelixBeansEndpointTest {
 
@@ -56,6 +60,7 @@ class AxelixBeansEndpointTest {
     private TestRestTemplate testRestTemplate;
 
     @TestConfiguration(value = "testCurrentConfiguration")
+    @EnableConfigurationProperties(AxelixPropTest.class)
     static class CurrentConfiguration {
 
         static final String QUALIFIERS_PERSISTENCE_POST_PROCESSOR = "qualifiersPersistencePostProcessor";
@@ -92,6 +97,20 @@ class AxelixBeansEndpointTest {
         }
     }
 
+    @ConfigurationProperties(prefix = "axelix.prop.test")
+    static class AxelixPropTest {
+
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
     @Test
     void shouldReturnEnrichedBeansFeed() {
 
@@ -106,6 +125,7 @@ class AxelixBeansEndpointTest {
         assertQualifiersPostProcessorBean(beanNameToBeanProfile);
         assertBeanMetaInfoExtractor(beanNameToBeanProfile);
         assertCustomBeanSupplier(beanNameToBeanProfile);
+        assertConfigPropsBeanName(beanNameToBeanProfile);
     }
 
     private static void assertQualifiersPostProcessorBean(List<Entry<String, BeansFeed.Bean>> beanNameToBeanProfile) {
@@ -171,6 +191,21 @@ class AxelixBeansEndpointTest {
         assertThat(bean.getQualifiers()).isEmpty();
         assertThat(bean.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
         assertThat(bean.getType()).isEqualTo(Supplier.class.getName());
+    }
+
+    private static void assertConfigPropsBeanName(List<Entry<String, BeansFeed.Bean>> beanNameToBeanProfile) {
+        BeansFeed.Bean bean = getBean(beanNameToBeanProfile, AxelixPropTest.class.getName());
+
+        assertThat(bean.getType()).isEqualTo(AxelixPropTest.class.getName());
+        assertThat(bean.getBeanSource()).isNotNull();
+        assertThat(bean.isConfigPropsBean()).isTrue();
+        assertThat(bean.getAutoConfigurationRef()).isNull();
+        assertThat(bean.getAliases()).isEmpty();
+        assertThat(bean.getDependencies()).isEmpty();
+        assertThat(bean.isLazyInit()).isFalse();
+        assertThat(bean.isPrimary()).isFalse();
+        assertThat(bean.getQualifiers()).isEmpty();
+        assertThat(bean.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
     }
 
     private static BeansFeed.Bean getBean(List<Entry<String, BeansFeed.Bean>> beanNameToBeanProfile, String beanName) {
