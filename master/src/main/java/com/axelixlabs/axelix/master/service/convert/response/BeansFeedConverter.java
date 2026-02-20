@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.api.BeansFeed.BeanDependency;
-import com.axelixlabs.axelix.common.utils.BeanNameUtils;
 import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile;
 import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile.BeanDependencyProfile;
 import com.axelixlabs.axelix.master.api.external.response.BeanShortProfile.BeanMethod;
@@ -53,12 +52,8 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
         source.getContexts().values().forEach(context -> {
             if (context != null && context.getBeans() != null) {
                 context.getBeans().forEach((beanName, bean) -> {
-                    boolean isConfigPropsBean = bean.isConfigPropsBean();
-                    String processedBeanName =
-                            isConfigPropsBean ? BeanNameUtils.stripConfigPropsPrefix(beanName) : beanName;
-
                     BeanShortProfile profile = new BeanShortProfile(
-                            processedBeanName,
+                            beanName,
                             bean.getScope(),
                             bean.getType(),
                             ProxyType.valueOf(bean.getProxyType().name()),
@@ -67,7 +62,7 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
                             convertDependencies(bean.getDependencies()),
                             bean.isPrimary(),
                             bean.isLazyInit(),
-                            isConfigPropsBean,
+                            bean.isConfigPropsBean(),
                             bean.getQualifiers(),
                             covertBeanSource(bean));
                     beansFeedResponse.addBean(profile);
@@ -80,13 +75,7 @@ public class BeansFeedConverter implements Converter<BeansFeed, BeansFeedRespons
 
     private Set<BeanDependencyProfile> convertDependencies(Set<BeanDependency> dependencies) {
         return dependencies.stream()
-                .map(dep -> {
-                    boolean isConfigPropsDep = dep.isConfigPropsDependency();
-                    String processedDepName =
-                            isConfigPropsDep ? BeanNameUtils.stripConfigPropsPrefix(dep.getName()) : dep.getName();
-
-                    return new BeanDependencyProfile(processedDepName, isConfigPropsDep);
-                })
+                .map(dep -> new BeanDependencyProfile(dep.getName(), dep.isConfigPropsDependency()))
                 .collect(Collectors.toSet());
     }
 

@@ -156,7 +156,7 @@ class BeansFeedConverterTest {
         return Map.of(
 
                 // first bean
-                "some.prefix-bean1",
+                "bean1",
                 new BeansFeed.Bean(
                         "singleton",
                         "java.lang.String",
@@ -179,7 +179,7 @@ class BeansFeedConverterTest {
                         Set.of(),
                         "bean2",
                         Set.of(new BeanDependency(
-                                "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties", true)),
+                                "org.springframework.boot.autoconfigure.orm.jpa.JpaProperties", true)),
                         false,
                         true,
                         false,
@@ -196,8 +196,7 @@ class BeansFeedConverterTest {
                         "enclosingClass#factoryMethod",
                         Set.of(
                                 new BeanDependency(
-                                        "spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
-                                        true),
+                                        "org.springframework.boot.autoconfigure.orm.jpa.JpaProperties", true),
                                 new BeanDependency(
                                         "org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration",
                                         false)),

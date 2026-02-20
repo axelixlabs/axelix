@@ -125,9 +125,16 @@ public final class BeansFeed {
         private final String autoConfigurationRef;
 
         private final Set<BeanDependency> dependencies;
+
+        @JsonProperty("isLazyInit")
         private final boolean isLazyInit;
+
+        @JsonProperty("isPrimary")
         private final boolean isPrimary;
+
+        @JsonProperty("isConfigPropsBean")
         private final boolean isConfigPropsBean;
+
         private final List<String> qualifiers;
         private final BeanSource beanSource;
 
@@ -276,6 +283,8 @@ public final class BeansFeed {
     public static final class BeanDependency {
 
         private final String name;
+
+        @JsonProperty("isConfigPropsDependency")
         private final boolean isConfigPropsDependency;
 
         @JsonCreator

@@ -35,6 +35,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.ClassUtils;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
+import com.axelixlabs.axelix.common.utils.BeanNameUtils;
 
 /**
  * Class that is capable to assemble the {@link BeansFeed}.
@@ -79,8 +80,12 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
 
                     String beanType = resolveBeanTypeName(beanDescriptor, metaInfo.getBeanSource());
 
+                    boolean isConfigPropsBean = configPropsBeanMap.containsKey(beanName);
+                    String processedBeanName =
+                            isConfigPropsBean ? BeanNameUtils.stripConfigPropsPrefix(beanName) : beanName;
+
                     beans.put(
-                            beanName,
+                            processedBeanName,
                             new BeansFeed.Bean(
                                     beanDescriptor.getScope(),
                                     beanType,
@@ -90,7 +95,7 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                                     enrichedDependencies,
                                     metaInfo.isLazyInit(),
                                     metaInfo.isPrimary(),
-                                    configPropsBeanMap.containsKey(beanName),
+                                    isConfigPropsBean,
                                     metaInfo.getQualifiers(),
                                     metaInfo.getBeanSource()));
                 });
@@ -150,7 +155,11 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                         return true;
                     }
                 })
-                .map(depName -> new BeansFeed.BeanDependency(depName, configPropsBeanMap.containsKey(depName)))
+                .map(depName -> {
+                    boolean isConfigPropsBean = configPropsBeanMap.containsKey(depName);
+                    String beanName = isConfigPropsBean ? BeanNameUtils.stripConfigPropsPrefix(depName) : depName;
+                    return new BeansFeed.BeanDependency(beanName, isConfigPropsBean);
+                })
                 .collect(Collectors.toSet());
     }
 
