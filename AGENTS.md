@@ -82,6 +82,8 @@ When you're writing tests, please, make sure to follow the principles:
 - // when.
 - // then.
 
+3. It is often the case that within the Junit test class some test methods are related, and some do not. For instance, some test methods test the same method of the public API just under different conditions. When you notice this pattern it is generally a good idea to organize those tests inside dedicated `@Nested` inner classes.
+
 In a very rare occasions the principles above MAY be violated, but you should always ask before attempting to do so and explain your reasoning. 
 
 ### Overall Behavioral Guidelines
