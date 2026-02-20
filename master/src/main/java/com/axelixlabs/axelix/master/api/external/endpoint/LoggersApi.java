@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -186,10 +185,10 @@ public class LoggersApi {
     public ResponseEntity<Void> resetLoggingLevelByLoggerName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
 
-        HttpPayload payload = HttpPayload.json(
-                Map.of("logger.name", loggerName),
-                jacksonMessageSerializationStrategy.serialize(Collections.emptyMap()));
-        endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.RESET_FOR_LOGGER, payload);
+        endpointInvoker.invokeNoValue(
+                InstanceId.of(instanceId),
+                ActuatorEndpoints.RESET_FOR_LOGGER,
+                new DefaultHttpPayload(Map.of("logger.name", loggerName)));
 
         return ResponseEntity.noContent().build();
     }
