@@ -39,7 +39,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.utils.BeanNameUtils;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
 
@@ -97,14 +96,9 @@ class AxelixBeansEndpointTest {
         public Supplier<String> customSupplier() {
             return () -> "value";
         }
-
-        @Bean
-        @ConfigurationProperties(prefix = "axelix.prop.test")
-        AxelixPropTest axelixPropTest() {
-            return new AxelixPropTest();
-        }
     }
 
+    @ConfigurationProperties(prefix = "axelix.prop.test")
     static class AxelixPropTest {
 
         private String name;
@@ -201,8 +195,7 @@ class AxelixBeansEndpointTest {
     }
 
     private static void assertConfigPropsBeanName(List<Entry<String, BeansFeed.Bean>> beanNameToBeanProfile) {
-        BeansFeed.Bean bean =
-                getBean(beanNameToBeanProfile, BeanNameUtils.stripConfigPropsPrefix(AxelixPropTest.class.getName()));
+        BeansFeed.Bean bean = getBean(beanNameToBeanProfile, AxelixPropTest.class.getName());
 
         assertThat(bean.getType()).isEqualTo(AxelixPropTest.class.getName());
         assertThat(bean.getBeanSource()).isNotNull();
