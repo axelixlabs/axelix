@@ -158,19 +158,4 @@ public class EnhancedCacheManager implements CacheManager {
 
         return false;
     }
-
-    public long getHitsCount(String cacheName) {
-        EnhancedCache cache = caches.get(cacheName);
-        return cache != null ? cache.getHitsCount() : 0;
-    }
-
-    public long getMissesCount(String cacheName) {
-        EnhancedCache cache = caches.get(cacheName);
-        return cache != null ? cache.getMissesCount() : 0;
-    }
-
-    public @Nullable Object getNativeCache(String cacheName) {
-        EnhancedCache enhanced = caches.get(cacheName);
-        return enhanced != null ? enhanced.getNativeCache() : null;
-    }
 }

@@ -295,28 +295,36 @@ class DefaultCacheOperationsDispatcherTest {
 
     @Test
     void shouldReturnCacheInformation_FromDifferentManagers() {
-        cacheManager1.getCache(TEST_CACHE_2).put("key1", "value");
-        cacheManager1.getCache(TEST_CACHE_2).put("key2", "value");
-        cacheManager1.getCache(TEST_CACHE_2).get("key1");
-        cacheManager1.getCache(TEST_CACHE_2).get("key2");
-        cacheManager1.getCache(TEST_CACHE_2).get("notCache");
-        cacheManager1.getCache(TEST_CACHE_2).get("notCache");
+        // given.
+        Cache cache1 = cacheManager1.getCache(TEST_CACHE_2);
+        cache1.put("key1", "value");
+        cache1.put("key2", "value");
+        cache1.get("key1");
+        cache1.get("key2");
+        cache1.get("notCache");
+        cache1.get("notCache");
 
+        // when.
         SingleCache first = dispatcher.get(TEST_CACHE_MANAGER_1, TEST_CACHE_2);
 
-        assertThat(first.getMissesCount()).isEqualTo(2L);
+        // then.
+        assertThat(first.getMisses()).hasSize(2);
         assertThat(first.getEstimatedEntrySize()).isEqualTo(2L);
-        assertThat(first.getHitsCount()).isEqualTo(2L);
+        assertThat(first.getHits()).hasSize(2);
 
-        cacheManager2.getCache(TEST_CACHE_2).put("key3", "value");
-        cacheManager2.getCache(TEST_CACHE_2).get("key3");
-        cacheManager2.getCache(TEST_CACHE_2).get("notCache2");
+        // given.
+        Cache cache2 = cacheManager2.getCache(TEST_CACHE_2);
+        cache2.put("key3", "value");
+        cache2.get("key3");
+        cache2.get("notCache2");
 
+        // when.
         SingleCache second = dispatcher.get(TEST_CACHE_MANAGER_2, TEST_CACHE_2);
 
-        assertThat(second.getMissesCount()).isEqualTo(1L);
+        // then.
+        assertThat(second.getMisses()).hasSize(1);
         assertThat(second.getEstimatedEntrySize()).isEqualTo(1L);
-        assertThat(second.getHitsCount()).isEqualTo(1L);
+        assertThat(second.getHits()).hasSize(1);
     }
 
     @Test

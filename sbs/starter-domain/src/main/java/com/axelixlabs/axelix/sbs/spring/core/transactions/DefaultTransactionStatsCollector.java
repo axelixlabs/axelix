@@ -19,9 +19,8 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
 import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 
 /**
  * Default implementation {@link TransactionStatsCollector}.
@@ -30,37 +29,33 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 22.01.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public class DefaultTransactionStatsCollector implements TransactionStatsCollector {
 
-    private final ConcurrentHashMap<MethodClassKey, TransactionStats> statsMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<MethodClassKey, SlidingWindow<TransactionRecord>> statsMap =
+            new ConcurrentHashMap<>();
     private final int maxTransactionsPerMethod;
-    private final ScheduledExecutorService executor;
+    private final Duration cleanupInterval;
 
     public DefaultTransactionStatsCollector(int maxTransactionsPerMethod, Duration cleanupInterval) {
         this.maxTransactionsPerMethod = maxTransactionsPerMethod;
-        this.executor = Executors.newSingleThreadScheduledExecutor();
-        // TODO: allow configuring the end-user scheduled executor service
-        this.executor.scheduleWithFixedDelay(
-                () -> this.statsMap.values().forEach(TransactionStats::clear),
-                0L,
-                cleanupInterval.toSeconds(),
-                TimeUnit.SECONDS);
+        this.cleanupInterval = cleanupInterval;
     }
 
     @Override
     public void recordTransaction(MethodClassKey key, TransactionRecord transactionRecord) {
         statsMap.compute(key, (k, stats) -> {
             if (stats == null) {
-                stats = new TransactionStats(maxTransactionsPerMethod);
+                stats = new SlidingWindow<>(maxTransactionsPerMethod, cleanupInterval);
             }
-            stats.addTransactionRecord(transactionRecord);
+            stats.put(transactionRecord);
             return stats;
         });
     }
 
     @Override
-    public ConcurrentHashMap<MethodClassKey, TransactionStats> getAllStats() {
+    public ConcurrentHashMap<MethodClassKey, SlidingWindow<TransactionRecord>> getAllStats() {
         return statsMap;
     }
 

@@ -115,8 +115,8 @@ class AxelixCachesEndpointTest {
                     "target" : "java.util.concurrent.ConcurrentHashMap",
                     "enabled" : true,
                     "estimatedEntrySize" : 0,
-                    "hitsCount" : 0,
-                    "missesCount":0
+                    "misses" : [],
+                    "hits" : []
                 }
                 """);
     }
@@ -292,8 +292,6 @@ class AxelixCachesEndpointTest {
                 .orElseThrow();
         assertThat(cache1Info.isEnabled()).isTrue();
         assertThat(cache1Info.getTarget()).isNotNull();
-        assertThat(cache1Info.getMissesCount()).isEqualTo(0);
-        assertThat(cache1Info.getHitsCount()).isEqualTo(0);
         assertThat(cache1Info.getEstimatedEntrySize()).isEqualTo(0);
 
         Cache cache2Info = cacheManager.getCaches().stream()
@@ -302,8 +300,6 @@ class AxelixCachesEndpointTest {
                 .orElseThrow();
         assertThat(cache2Info.isEnabled()).isTrue();
         assertThat(cache2Info.getTarget()).isNotNull();
-        assertThat(cache2Info.getMissesCount()).isEqualTo(0);
-        assertThat(cache2Info.getHitsCount()).isEqualTo(0);
         assertThat(cache2Info.getEstimatedEntrySize()).isEqualTo(0);
     }
 
@@ -337,8 +333,6 @@ class AxelixCachesEndpointTest {
                 .orElseThrow();
         assertThat(cache1Info.isEnabled()).isTrue();
         assertThat(cache1Info.getTarget()).isNotNull();
-        assertThat(cache1Info.getMissesCount()).isEqualTo(0L);
-        assertThat(cache1Info.getHitsCount()).isEqualTo(2L);
         assertThat(cache1Info.getEstimatedEntrySize()).isEqualTo(3L);
 
         Cache cache2Info = cacheManager.getCaches().stream()
@@ -347,8 +341,6 @@ class AxelixCachesEndpointTest {
                 .orElseThrow();
         assertThat(cache2Info.isEnabled()).isTrue();
         assertThat(cache2Info.getTarget()).isNotNull();
-        assertThat(cache2Info.getMissesCount()).isEqualTo(2L);
-        assertThat(cache2Info.getHitsCount()).isEqualTo(1L);
         assertThat(cache2Info.getEstimatedEntrySize()).isEqualTo(1L);
     }
 
