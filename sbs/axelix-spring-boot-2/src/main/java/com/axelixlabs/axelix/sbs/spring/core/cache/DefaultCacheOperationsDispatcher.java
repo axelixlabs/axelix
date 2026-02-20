@@ -72,8 +72,8 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
                     cache.getName(),
                     cache.getNativeCache().getClass().getName(),
                     cacheManager.getUnderlyingCacheManagerBeanName(),
-                    cache.getHitsCount(),
-                    cache.getMissesCount(),
+                    toApiCacheLookups(cache.getHits()),
+                    toApiCacheLookups(cache.getMisses()),
                     cacheSizeProvider.getEstimatedCacheSize(cache.getNativeCache()),
                     cache.isEnabled());
         });
@@ -90,8 +90,6 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
                             .map(enhancedCache -> new CachesFeed.Cache(
                                     enhancedCache.getName(),
                                     enhancedCache.getNativeCache().getClass().getName(),
-                                    enhancedCache.getHitsCount(),
-                                    enhancedCache.getMissesCount(),
                                     cacheSizeProvider.getEstimatedCacheSize(enhancedCache.getNativeCache()),
                                     enhancedCache.isEnabled()))
                             .collect(Collectors.toList())));
@@ -160,5 +158,11 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
         }
 
         return enhancedCacheManager;
+    }
+
+    private static List<SingleCache.CacheLookup> toApiCacheLookups(List<CacheLookup> cache) {
+        return cache.stream()
+                .map(it -> new SingleCache.CacheLookup(it.timestamp().toEpochMilli()))
+                .collect(Collectors.toList());
     }
 }

@@ -25,6 +25,7 @@ import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.ExecutionStats;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.TransactionExecution;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.TransactionalEntrypoint;
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 
 /**
  * Service providing access to transaction monitoring data and statistics.
@@ -44,13 +45,13 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
 
     @Override
     public TransactionMonitoringFeed getMonitoringFeed() {
-        Map<MethodClassKey, TransactionStats> statsMap = transactionStatsCollector.getAllStats();
+        Map<MethodClassKey, SlidingWindow<TransactionRecord>> statsMap = transactionStatsCollector.getAllStats();
 
         List<TransactionalEntrypoint> methodStats = statsMap.entrySet().stream()
                 .map(entry -> createTransactionalEntrypoint(
                         entry.getKey().getTargetClass().getName(),
                         entry.getKey().getMethod().getName(),
-                        entry.getValue().getRecordedTransactions()))
+                        entry.getValue().get()))
                 .collect(Collectors.toList());
 
         return new TransactionMonitoringFeed(methodStats);

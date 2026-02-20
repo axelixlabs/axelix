@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
+import java.util.List;
+
 import org.springframework.cache.Cache;
 
 /**
@@ -56,10 +58,10 @@ public interface EnhancedCache extends Cache {
     /**
      * @return the estimated number of cache hits.
      */
-    long getHitsCount();
+    List<CacheLookup> getHits();
 
     /**
      * @return the estimated number of cache misses.
      */
-    long getMissesCount();
+    List<CacheLookup> getMisses();
 }

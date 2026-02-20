@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
+
 /**
  * This interface defines the contract for collecting and retrieving transaction monitoring data
  * from @Transactional method executions.
@@ -40,7 +42,7 @@ public interface TransactionStatsCollector {
      *
      * @return map of method keys to their transaction statistics
      */
-    ConcurrentHashMap<MethodClassKey, TransactionStats> getAllStats();
+    ConcurrentHashMap<MethodClassKey, SlidingWindow<TransactionRecord>> getAllStats();
 
     /**
      * Clears all collected transaction statistics.

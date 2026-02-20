@@ -61,7 +61,7 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
 
     @Override
     public SingleCache get(String cacheManagerName, String cacheName) {
-        return get(cacheManagerName, cacheManager -> {
+        return extractFromCacheManager(cacheManagerName, cacheManager -> {
             EnhancedCache cache = cacheManager.getCache(cacheName);
 
             if (cache == null) {
@@ -72,11 +72,17 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
                     cache.getName(),
                     cache.getNativeCache().getClass().getName(),
                     cacheManager.getUnderlyingCacheManagerBeanName(),
-                    cache.getHitsCount(),
-                    cache.getMissesCount(),
+                    toApiCacheLookups(cache.getHits()),
+                    toApiCacheLookups(cache.getMisses()),
                     cacheSizeProvider.getEstimatedCacheSize(cache.getNativeCache()),
                     cache.isEnabled());
         });
+    }
+
+    private static List<SingleCache.CacheLookup> toApiCacheLookups(List<CacheLookup> cache) {
+        return cache.stream()
+                .map(it -> new SingleCache.CacheLookup(it.timestamp().toEpochMilli()))
+                .toList();
     }
 
     @Override
@@ -90,8 +96,6 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
                             .map(enhancedCache -> new CachesFeed.Cache(
                                     enhancedCache.getName(),
                                     enhancedCache.getNativeCache().getClass().getName(),
-                                    enhancedCache.getHitsCount(),
-                                    enhancedCache.getMissesCount(),
                                     cacheSizeProvider.getEstimatedCacheSize(enhancedCache.getNativeCache()),
                                     enhancedCache.isEnabled()))
                             .collect(Collectors.toList())));
@@ -140,7 +144,8 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
         execute(cacheManagerName, adapter -> adapter.disable(cacheName));
     }
 
-    public <T> T get(String cacheManagerName, Function<EnhancedCacheManager, @Nullable T> providerFunction) {
+    public <T> T extractFromCacheManager(
+            String cacheManagerName, Function<EnhancedCacheManager, @Nullable T> providerFunction) {
         EnhancedCacheManager enhancedCacheManager = findCacheManager(cacheManagerName);
 
         return providerFunction.apply(enhancedCacheManager);
