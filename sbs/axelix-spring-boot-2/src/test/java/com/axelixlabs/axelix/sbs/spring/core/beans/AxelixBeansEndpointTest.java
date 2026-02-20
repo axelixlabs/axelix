@@ -105,8 +105,8 @@ class AxelixBeansEndpointTest {
         }
     }
 
-    @ConfigurationProperties(prefix = "axelix.prop.test")
     static class AxelixPropTest {
+
         private String name;
 
         public String getName() {
