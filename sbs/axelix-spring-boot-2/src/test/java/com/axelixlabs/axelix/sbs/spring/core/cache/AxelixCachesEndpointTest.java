@@ -48,11 +48,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for {@link AxelixCachesEndpoint}.
  * <p>
- * TODO:
- *  Gosh, we need to refactor this test to use String Templates if
- *  the Java Language designers team will descend to us finally and
- *  deliver this. Come on Brian, I know you can do this! Push, push,
- *  push, push! We're praying for you and the team!
+ * // TODO: the structure of this test needs to be revisited. The tests for
+ * particular methods and cases within the API should be moved to static @Nested classes
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha

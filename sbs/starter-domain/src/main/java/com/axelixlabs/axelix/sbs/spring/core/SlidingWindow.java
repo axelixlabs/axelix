@@ -25,12 +25,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The sliding window implementation.
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
+@NullMarked
 public class SlidingWindow<E> {
 
     private final ConcurrentLinkedDeque<E> deque;

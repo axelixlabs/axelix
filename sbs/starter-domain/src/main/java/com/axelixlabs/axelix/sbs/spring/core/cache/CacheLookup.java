@@ -39,7 +39,7 @@ public class CacheLookup {
     }
 
     public static CacheLookup hit() {
-        return new CacheLookup(Outcome.MISS, Instant.now());
+        return new CacheLookup(Outcome.HIT, Instant.now());
     }
 
     public enum Outcome {
