@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.common.api.caches;
 
+import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -34,12 +35,8 @@ public final class SingleCache {
     private final String name;
     private final String target;
     private final String cacheManager;
-
-    @Nullable
-    private final Long hitsCount;
-
-    @Nullable
-    private final Long missesCount;
+    private final List<CacheLookup> hits;
+    private final List<CacheLookup> misses;
 
     @Nullable
     private final Long estimatedEntrySize;
@@ -52,8 +49,8 @@ public final class SingleCache {
      * @param name               The cache name.
      * @param target             The fully qualified name of the native cache.
      * @param cacheManager       The name of the cache manager that manages current cache.
-     * @param hitsCount          The estimated number of cache hits, or {@code null} if unknown.
-     * @param missesCount        The estimated number of cache misses, or {@code null} if unknown.
+     * @param hits               The array of all recorded cache hits, or empty if unknown.
+     * @param misses             The array of all recorded cache misses, or empty if unknown.
      * @param estimatedEntrySize The estimated number of entries in the cache, or {@code null} if unknown.
      * @param enabled            Whether the cache is enabled ({@code true}) or disabled ({@code false}).
      */
@@ -62,15 +59,15 @@ public final class SingleCache {
             @JsonProperty("name") String name,
             @JsonProperty("target") String target,
             @JsonProperty("cacheManager") String cacheManager,
-            @JsonProperty("hitsCount") @Nullable Long hitsCount,
-            @JsonProperty("missesCount") @Nullable Long missesCount,
+            @JsonProperty("hits") List<CacheLookup> hits,
+            @JsonProperty("misses") List<CacheLookup> misses,
             @JsonProperty("estimatedEntrySize") @Nullable Long estimatedEntrySize,
             @JsonProperty("enabled") boolean enabled) {
         this.name = name;
         this.target = target;
         this.cacheManager = cacheManager;
-        this.hitsCount = hitsCount;
-        this.missesCount = missesCount;
+        this.hits = hits;
+        this.misses = misses;
         this.estimatedEntrySize = estimatedEntrySize;
         this.enabled = enabled;
     }
@@ -87,14 +84,12 @@ public final class SingleCache {
         return cacheManager;
     }
 
-    @Nullable
-    public Long getHitsCount() {
-        return hitsCount;
+    public List<CacheLookup> getHits() {
+        return hits;
     }
 
-    @Nullable
-    public Long getMissesCount() {
-        return missesCount;
+    public List<CacheLookup> getMisses() {
+        return misses;
     }
 
     @Nullable
@@ -119,14 +114,14 @@ public final class SingleCache {
                 && Objects.equals(name, that.name)
                 && Objects.equals(target, that.target)
                 && Objects.equals(cacheManager, that.cacheManager)
-                && Objects.equals(hitsCount, that.hitsCount)
-                && Objects.equals(missesCount, that.missesCount)
+                && Objects.equals(hits, that.hits)
+                && Objects.equals(misses, that.misses)
                 && Objects.equals(estimatedEntrySize, that.estimatedEntrySize);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, target, cacheManager, hitsCount, missesCount, estimatedEntrySize, enabled);
+        return Objects.hash(name, target, cacheManager, hits, misses, estimatedEntrySize, enabled);
     }
 
     @Override
@@ -142,13 +137,29 @@ public final class SingleCache {
                 + cacheManager
                 + '\''
                 + ", hitsCount="
-                + hitsCount
+                + hits
                 + ", missesCount="
-                + missesCount
+                + misses
                 + ", estimatedEntrySize="
                 + estimatedEntrySize
                 + ", enabled="
                 + enabled
                 + '}';
+    }
+
+    public static class CacheLookup {
+
+        /**
+         * Timestamp when the cache operation occurred, in milliseconds from unix epoch
+         */
+        private final long timestamp;
+
+        public CacheLookup(long timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public long timestamp() {
+            return timestamp;
+        }
     }
 }

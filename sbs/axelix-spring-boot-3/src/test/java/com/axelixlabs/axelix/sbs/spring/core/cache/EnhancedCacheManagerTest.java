@@ -302,21 +302,4 @@ class EnhancedCacheManagerTest {
         assertThat(subject.isEnabled("cache2")).isFalse();
         assertThat(subject.isEnabled("cache3")).isTrue();
     }
-
-    @Test
-    void shouldReturnCacheMetaInfo() {
-        String cacheName = "cache";
-        String key = "key";
-
-        Cache cache = subject.getCache(cacheName);
-
-        cache.put(key, "value");
-        cache.get(key);
-        cache.get("notCache");
-        cache.get("notCache");
-
-        assertThat(subject.getHitsCount(cacheName)).isEqualTo(1L);
-        assertThat(subject.getMissesCount(cacheName)).isEqualTo(2L);
-        assertThat(subject.getNativeCache(cacheName)).isEqualTo(cache.getNativeCache());
-    }
 }

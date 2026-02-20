@@ -17,15 +17,18 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BooleanSupplier;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.cache.Cache;
+
+import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
 
 /**
  * Cache implementation that can be dynamically enabled or disabled at runtime.
@@ -39,14 +42,13 @@ public class DefaultEnhancedCache implements EnhancedCache {
 
     private final Cache delegate;
     private final AtomicBoolean enabled;
-    private final LongAdder hitsCount;
-    private final LongAdder missesCount;
+    private final SlidingWindow<CacheLookup> cacheLookupHistory;
 
     public DefaultEnhancedCache(@NonNull Cache delegate) {
         this.delegate = delegate;
         this.enabled = new AtomicBoolean(true);
-        this.hitsCount = new LongAdder();
-        this.missesCount = new LongAdder();
+        // TODO: We need to find a way to allow for configuring those values
+        this.cacheLookupHistory = new SlidingWindow<>(200, Duration.ofSeconds(1));
     }
 
     @Override
@@ -86,9 +88,9 @@ public class DefaultEnhancedCache implements EnhancedCache {
         ValueWrapper result = delegate.get(key);
 
         if (result == null) {
-            missesCount.increment();
+            cacheLookupHistory.put(CacheLookup.miss());
         } else {
-            hitsCount.increment();
+            cacheLookupHistory.put(CacheLookup.hit());
         }
         return result;
     }
@@ -116,7 +118,7 @@ public class DefaultEnhancedCache implements EnhancedCache {
                 return valueLoader.call();
             });
 
-            (miss.get() ? missesCount : hitsCount).increment();
+            cacheLookupHistory.put(miss.get() ? CacheLookup.miss() : CacheLookup.hit());
         }
 
         return value;
@@ -148,13 +150,17 @@ public class DefaultEnhancedCache implements EnhancedCache {
     }
 
     @Override
-    public long getHitsCount() {
-        return hitsCount.sum();
+    public List<CacheLookup> getHits() {
+        return cacheLookupHistory.get().stream()
+                .filter(cacheLookup -> cacheLookup.outcome() == CacheLookup.Outcome.HIT)
+                .toList();
     }
 
     @Override
-    public long getMissesCount() {
-        return missesCount.sum();
+    public List<CacheLookup> getMisses() {
+        return cacheLookupHistory.get().stream()
+                .filter(cacheLookup -> cacheLookup.outcome() == CacheLookup.Outcome.MISS)
+                .toList();
     }
 
     private boolean executeIfEnabledOrElseFalse(BooleanSupplier supplier) {

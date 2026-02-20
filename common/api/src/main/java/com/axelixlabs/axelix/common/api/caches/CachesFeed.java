@@ -131,12 +131,6 @@ public final class CachesFeed {
         private final String target;
 
         @Nullable
-        private final Long hitsCount;
-
-        @Nullable
-        private final Long missesCount;
-
-        @Nullable
         private final Long estimatedEntrySize;
 
         private final boolean enabled;
@@ -146,8 +140,6 @@ public final class CachesFeed {
          *
          * @param name               The cache name.
          * @param target             The fully qualified name of the native cache.
-         * @param hitsCount          The number of cache hits, or {@code null} if unknown.
-         * @param missesCount        The number of cache misses, or {@code null} if unknown.
          * @param estimatedEntrySize The estimated number of entries in the cache, or {@code null} if unknown.
          * @param enabled            Whether the cache is enabled ({@code true}) or disabled ({@code false}).
          */
@@ -155,14 +147,10 @@ public final class CachesFeed {
         public Cache(
                 @JsonProperty("name") String name,
                 @JsonProperty("target") String target,
-                @JsonProperty("hitsCount") @Nullable Long hitsCount,
-                @JsonProperty("missesCount") @Nullable Long missesCount,
                 @JsonProperty("estimatedEntrySize") @Nullable Long estimatedEntrySize,
                 @JsonProperty("enabled") boolean enabled) {
             this.name = name;
             this.target = target;
-            this.hitsCount = hitsCount;
-            this.missesCount = missesCount;
             this.estimatedEntrySize = estimatedEntrySize;
             this.enabled = enabled;
         }
@@ -173,16 +161,6 @@ public final class CachesFeed {
 
         public String getTarget() {
             return target;
-        }
-
-        @Nullable
-        public Long getHitsCount() {
-            return hitsCount;
-        }
-
-        @Nullable
-        public Long getMissesCount() {
-            return missesCount;
         }
 
         @Nullable
@@ -206,14 +184,12 @@ public final class CachesFeed {
             return enabled == cache.enabled
                     && Objects.equals(name, cache.name)
                     && Objects.equals(target, cache.target)
-                    && Objects.equals(hitsCount, cache.hitsCount)
-                    && Objects.equals(missesCount, cache.missesCount)
                     && Objects.equals(estimatedEntrySize, cache.estimatedEntrySize);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(name, target, hitsCount, missesCount, estimatedEntrySize, enabled);
+            return Objects.hash(name, target, estimatedEntrySize, enabled);
         }
 
         @Override
@@ -225,10 +201,6 @@ public final class CachesFeed {
                     + ", target='"
                     + target
                     + '\''
-                    + ", hitsCount="
-                    + hitsCount
-                    + ", missesCount="
-                    + missesCount
                     + ", estimatedEntrySize="
                     + estimatedEntrySize
                     + ", enabled="

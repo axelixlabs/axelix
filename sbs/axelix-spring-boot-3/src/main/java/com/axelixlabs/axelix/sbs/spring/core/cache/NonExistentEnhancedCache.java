@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -89,12 +90,12 @@ class NonExistentEnhancedCache implements EnhancedCache {
     }
 
     @Override
-    public long getHitsCount() {
-        return 0;
+    public List<CacheLookup> getHits() {
+        return List.of();
     }
 
     @Override
-    public long getMissesCount() {
-        return 0;
+    public List<CacheLookup> getMisses() {
+        return List.of();
     }
 }
