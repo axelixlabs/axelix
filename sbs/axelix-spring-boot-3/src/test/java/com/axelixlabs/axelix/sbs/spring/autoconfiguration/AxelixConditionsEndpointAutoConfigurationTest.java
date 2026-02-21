@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.conditions.AxelixConditionsEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalFeedBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -86,15 +86,14 @@ class AxelixConditionsEndpointAutoConfigurationTest {
     @TestConfiguration
     static class CustomAxelixConditionsEndpointConfig {
         @Bean
-        public AxelixConditionsEndpoint axelixConditionsEndpoint(
-                ConfigurableApplicationContext configurableApplicationContext) {
-            return new CustomAxelixConditionsEndpoint(configurableApplicationContext);
+        public AxelixConditionsEndpoint axelixConditionsEndpoint(ConditionalFeedBuilder conditionalFeedBuilder) {
+            return new CustomAxelixConditionsEndpoint(conditionalFeedBuilder);
         }
     }
 
     static class CustomAxelixConditionsEndpoint extends AxelixConditionsEndpoint {
-        public CustomAxelixConditionsEndpoint(ConfigurableApplicationContext configurableApplicationContext) {
-            super(configurableApplicationContext);
+        public CustomAxelixConditionsEndpoint(ConditionalFeedBuilder conditionalFeedBuilder) {
+            super(conditionalFeedBuilder);
         }
     }
 }

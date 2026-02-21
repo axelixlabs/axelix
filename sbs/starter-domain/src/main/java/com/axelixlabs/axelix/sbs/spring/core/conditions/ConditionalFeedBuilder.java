@@ -17,29 +17,20 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
-import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.jspecify.annotations.NonNull;
 
 import com.axelixlabs.axelix.common.api.ConditionsFeed;
 
 /**
- * Custom endpoint to expose Conditions information.
+ * Interface that is capable to assemble the {@link ConditionsFeed}.
  *
- * @author Nikita Kirilov
- * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-@RestControllerEndpoint(id = "axelix-conditions")
-public class AxelixConditionsEndpoint {
+public interface ConditionalFeedBuilder {
 
-    private final ConditionalFeedBuilder builder;
-
-    public AxelixConditionsEndpoint(ConditionalFeedBuilder builder) {
-        this.builder = builder;
-    }
-
-    @GetMapping
-    public ConditionsFeed conditions() {
-        return builder.buildConditionsFeed();
-    }
+    /**
+     * @return feed of conditions inside the given application.
+     */
+    @NonNull
+    ConditionsFeed buildConditionsFeed();
 }

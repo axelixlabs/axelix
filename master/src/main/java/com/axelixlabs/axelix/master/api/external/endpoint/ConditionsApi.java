@@ -17,13 +17,13 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.Objects;
-
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,12 +32,10 @@ import com.axelixlabs.axelix.common.api.ConditionsFeed;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.ConditionsFeedResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -55,26 +53,21 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class ConditionsApi {
 
     private final EndpointInvoker endpointInvoker;
-    private final Converter<ConditionsFeed, ConditionsFeedResponse> converter;
 
-    public ConditionsApi(EndpointInvoker endpointInvoker, Converter<ConditionsFeed, ConditionsFeedResponse> converter) {
+    public ConditionsApi(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
-        this.converter = converter;
     }
 
     @DefaultApiResponse(summary = "Returns conditions feed for the given instance")
     @ApiResponse(
             description = "OK",
             responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ConditionsFeedResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ConditionsFeed.class)))
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.ConditionsApi.FEED)
-    public ConditionsFeedResponse getConditionsFeed(@PathVariable("instanceId") String instanceId) {
-        ConditionsFeed result = endpointInvoker.invoke(
+    public ResponseEntity<byte[]> getConditionsFeed(@PathVariable("instanceId") String instanceId) {
+        byte[] body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_CONDITIONS, NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(converter.convert(result));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 }

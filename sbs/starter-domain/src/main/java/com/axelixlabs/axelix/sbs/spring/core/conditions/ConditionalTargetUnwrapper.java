@@ -15,31 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.serde;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jspecify.annotations.NonNull;
-
-import org.springframework.stereotype.Component;
-
-import com.axelixlabs.axelix.common.api.ConditionsFeed;
+package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for {@link ConditionsFeed}.
+ * Interface that unwraps the class name and method name from a target condition.
  *
- * @since 16.10.2025
+ * @author Sergey Cherkasov
  * @author Nikita Kirillov
  */
-@Component
-public class ConditionsJacksonMessageDeserializationStrategy
-        extends JacksonMessageDeserializationStrategy<ConditionsFeed> {
+public interface ConditionalTargetUnwrapper {
 
-    public ConditionsJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
-        super(objectMapper);
-    }
-
-    @Override
-    public @NonNull Class<ConditionsFeed> supported() {
-        return ConditionsFeed.class;
-    }
+    /**
+     * @param target the target condition.
+     *
+     * @return object containing the class name and optional method name.
+     */
+    UnwrappedTarget unwrap(String target);
 }

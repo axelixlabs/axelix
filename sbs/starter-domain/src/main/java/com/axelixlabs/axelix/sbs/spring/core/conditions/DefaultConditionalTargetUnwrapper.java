@@ -17,29 +17,23 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
-import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import com.axelixlabs.axelix.common.api.ConditionsFeed;
-
 /**
- * Custom endpoint to expose Conditions information.
+ * Default implementation {@link ConditionalTargetUnwrapper}.
  *
- * @author Nikita Kirilov
- * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
-@RestControllerEndpoint(id = "axelix-conditions")
-public class AxelixConditionsEndpoint {
+public class DefaultConditionalTargetUnwrapper implements ConditionalTargetUnwrapper {
 
-    private final ConditionalFeedBuilder builder;
-
-    public AxelixConditionsEndpoint(ConditionalFeedBuilder builder) {
-        this.builder = builder;
-    }
-
-    @GetMapping
-    public ConditionsFeed conditions() {
-        return builder.buildConditionsFeed();
+    // See SpringBootCondition.getClassOrMethodName method in order to understand why we're doing this.
+    // https://github.com/spring-projects/spring-boot/blob/main/core/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/condition/SpringBootCondition.java#L74
+    @Override
+    public UnwrappedTarget unwrap(String target) {
+        if (target.contains("#")) {
+            String[] pair = target.split("#");
+            return new UnwrappedTarget(pair[0], pair[1]);
+        } else {
+            return new UnwrappedTarget(target, null);
+        }
     }
 }

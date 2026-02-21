@@ -24,6 +24,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.conditions.AxelixConditionsEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalFeedBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalTargetUnwrapper;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalFeedBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalTargetUnwrapper;
 
 /**
  * Auto-configuration for the {@link AxelixConditionsEndpoint}.
@@ -31,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.AxelixConditionsEndpoint
  * @since 20.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @AutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = AxelixConditionsEndpoint.class)
@@ -38,8 +43,21 @@ public class AxelixConditionsEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AxelixConditionsEndpoint axelixConditionsEndpoint(
-            ConfigurableApplicationContext configurableApplicationContext) {
-        return new AxelixConditionsEndpoint(configurableApplicationContext);
+    public ConditionalTargetUnwrapper conditionalTargetUnwrapper() {
+        return new DefaultConditionalTargetUnwrapper();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConditionalFeedBuilder conditionalFeedBuilder(
+            ConfigurableApplicationContext configurableApplicationContext,
+            ConditionalTargetUnwrapper conditionalTargetUnwrapper) {
+        return new DefaultConditionalFeedBuilder(configurableApplicationContext, conditionalTargetUnwrapper);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AxelixConditionsEndpoint axelixConditionsEndpoint(ConditionalFeedBuilder conditionalFeedBuilder) {
+        return new AxelixConditionsEndpoint(conditionalFeedBuilder);
     }
 }
