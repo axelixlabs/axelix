@@ -1,3 +1,15 @@
 .HeaderStyles {
     background-color: var(--axelix-primary-light-green);
 }
+
+.ContentStyles {
+    border: 1px solid var(--axelix-medium-grey);
+}
+
+.AccordionWrapperStyles {
+    border-bottom: none;
+}
+
+.TransactionEntry {
+    margin-bottom: 30px;
+}

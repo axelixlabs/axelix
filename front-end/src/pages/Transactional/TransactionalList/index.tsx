@@ -31,14 +31,18 @@ export interface IProps {
 
 export const TransactionalList = ({ transactionEntryPoints }: IProps) => {
     return (
-        <div className="AccordionsWrapper">
+        <div>
             {transactionEntryPoints.map((transactional) => (
-                <Accordion
-                    header={<TransactionalAccordionHeader transactional={transactional} />}
-                    children={<TransactionalAccordionBody transactional={transactional} />}
-                    key={transactional.className + transactional.methodName}
-                    headerStyles={styles.HeaderStyles}
-                />
+                <div className={`AccordionsWrapper ${styles.TransactionEntry}`}>
+                    <Accordion
+                        header={<TransactionalAccordionHeader transactional={transactional} />}
+                        children={<TransactionalAccordionBody transactional={transactional} />}
+                        key={transactional.className + transactional.methodName}
+                        wrapperStyles={styles.AccordionWrapperStyles}
+                        headerStyles={styles.HeaderStyles}
+                        contentStyles={styles.ContentStyles}
+                    />
+                </div>
             ))}
         </div>
     );

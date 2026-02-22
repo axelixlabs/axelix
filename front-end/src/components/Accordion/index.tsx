@@ -38,6 +38,11 @@ interface IProps {
     contentStyles?: string;
 
     /**
+     * CSS classes for the main accordion wrapper.
+     */
+    wrapperStyles?: string;
+
+    /**
      * Indicates whether the accordion is expanded
      */
     accordionExpanded?: boolean;
@@ -56,6 +61,7 @@ interface IProps {
 export const Accordion = ({
     header,
     children,
+    wrapperStyles,
     headerStyles,
     contentStyles,
     accordionExpanded = false,
@@ -73,7 +79,7 @@ export const Accordion = ({
     };
 
     return (
-        <div className={`${styles.MainWrapper} ${open ? styles.Open : ""}`}>
+        <div className={`${styles.MainWrapper} ${wrapperStyles} ${open ? styles.Open : ""}`}>
             <div className={`${styles.HeaderWrapper} ${headerStyles}`} onClick={handlerClick}>
                 {!hideArrowIcon && <ArrowIcon className={styles.Icon} />}
                 <div className={styles.Header}>{header}</div>
