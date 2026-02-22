@@ -48,13 +48,15 @@ export const PositiveConditions = ({ positiveMatches }: IProps) => {
                         <div id={id} className={styles.ScrollableWrapper} key={id}>
                             <div className={styles.ConditionHeaderWrapper}>
                                 <div className={styles.ConditionHeaderSection}>
-                                    <span style={{ fontWeight: 300 }}>Class:</span> {className}
+                                    <div>Class:</div>
+                                    <div className={styles.Value}>{className}</div>
                                     <Copy text={className} />
                                 </div>
                                 {methodName && (
                                     <>
                                         <div className={styles.ConditionHeaderSection}>
-                                            <span style={{ fontWeight: 300 }}>Method:</span> {methodName}
+                                            <div>Method:</div>
+                                            <div className={styles.Value}>{methodName}</div>
                                             <Copy text={className} />
                                         </div>
                                     </>

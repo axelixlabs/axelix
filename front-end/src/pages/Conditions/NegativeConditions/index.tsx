@@ -43,13 +43,15 @@ export const NegativeConditions = ({ negativeMatches }: IProps) => {
                     <Fragment key={className + methodName}>
                         <div className={styles.ConditionHeaderWrapper}>
                             <div className={styles.ConditionHeaderSection}>
-                                <span style={{ fontWeight: 300 }}>Class:</span> {className}
+                                <div>Class:</div>
+                                <div className={styles.Value}>{className}</div>
                                 <Copy text={className} />
                             </div>
                             {methodName && (
                                 <>
                                     <div className={styles.ConditionHeaderSection}>
-                                        <span style={{ fontWeight: 300 }}>Method:</span> {methodName}
+                                        <div>Method:</div>
+                                        <div className={styles.Value}>{methodName}</div>
                                         <Copy text={methodName} />
                                     </div>
                                 </>
