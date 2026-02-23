@@ -16,10 +16,20 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { apiFetch } from "api";
-import type { IClearCacheRequestData, IUpdateCacheStatusRequestData } from "models";
+import type { IClearCacheRequestData, IGetSingleCacheData, IUpdateCacheStatusRequestData } from "models";
 
 export const getCachesData = (instanceId: string) => {
     return apiFetch.get(`caches/${instanceId}`);
+};
+
+export const getSingleCacheData = (data: IGetSingleCacheData) => {
+    const { instanceId, cacheName, cacheManagerName } = data;
+
+    return apiFetch.get(`caches/${instanceId}/cache/${cacheName}`, {
+        params: {
+            cacheManager: cacheManagerName,
+        },
+    });
 };
 
 export const clearAllCachesData = (instanceId: string) => {

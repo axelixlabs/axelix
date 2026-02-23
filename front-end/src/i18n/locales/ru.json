@@ -104,8 +104,8 @@
         "clear": "Очистить",
         "enabled": "Кэш включён",
         "disabled": "Кэш выключен",
-        "hitsCount": "Попадания",
-        "missesCount": "Промахи",
+        "hits": "Попадания",
+        "misses": "Промахи",
         "estimatedEntrySize": "Количество записей"
     },
     "Authentication": {

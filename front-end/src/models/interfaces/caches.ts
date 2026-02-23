@@ -32,16 +32,6 @@ export interface ICacheData {
     enabled: boolean;
 
     /**
-     * Number of cache hits
-     */
-    hitsCount: number;
-
-    /**
-     * Number of cache misses
-     */
-    missesCount: number;
-
-    /**
      * Estimated amount of entries inside the cache. May be absent.
      */
     estimatedEntrySize?: number;
@@ -98,4 +88,82 @@ export interface IUpdateCacheStatusRequestData {
      * Name of the cache
      */
     cacheName: string;
+}
+
+export interface IGetSingleCacheData {
+    /**
+     * Instance id of service
+     */
+    instanceId: string;
+
+    /**
+     * Name of the cache
+     */
+    cacheName: string;
+
+    /**
+     * Name of the cache manager
+     */
+    cacheManagerName: string;
+}
+
+interface ITimestamp {
+    /**
+     * Timestamp entry.
+     */
+    timestamp: number;
+}
+
+export interface IGetSingleCacheResponseBody {
+    /**
+     * Name of the cache
+     */
+    name: string;
+
+    /**
+     * Target of the cache
+     */
+    target: string;
+
+    /**
+     * Name of the cache manager associated with the cache
+     */
+    cacheManager: string;
+
+    /**
+     * List of hit timestamps.
+     */
+    hits: ITimestamp[];
+
+    /**
+     * List of miss timestamps.
+     */
+    misses: ITimestamp[];
+
+    /**
+     * Estimated amount of entries inside the cache. May be absent.
+     */
+    estimatedEntrySize?: number;
+
+    /**
+     * When true, caching is active; when false, caching is inactive
+     */
+    enabled: boolean;
+}
+
+export interface ISingleCacheChartEntity {
+    /**
+     * Timestamp entry.
+     */
+    timestamp: number;
+
+    /**
+     * List of hit timestamps.
+     */
+    hits: number;
+
+    /**
+     * List of miss timestamps.
+     */
+    misses: number;
 }

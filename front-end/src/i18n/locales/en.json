@@ -104,8 +104,8 @@
         "clear": "Clear",
         "enabled": "Cache is enabled at runtime",
         "disabled": "Cache is disabled at runtime",
-        "hitsCount": "Hits",
-        "missesCount": "Misses",
+        "hits": "Hits",
+        "misses": "Misses",
         "estimatedEntrySize": "Entries count"
     },
     "Authentication": {

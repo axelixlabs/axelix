@@ -15,9 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
 
-import type { ICacheData } from "models";
+import { EmptyHandler, Loader } from "components";
+import { fetchData } from "helpers";
+import { type ICacheData, type IGetSingleCacheResponseBody, StatefulRequest } from "models";
+import { getSingleCacheData } from "services";
 
 import { CacheChart } from "./CacheChart";
 import styles from "./styles.module.css";
@@ -27,21 +32,49 @@ interface IProps {
      * Single cache data
      */
     cache: ICacheData;
+
+    /**
+     * Name of the cache manager
+     */
+    cacheManagerName: string;
 }
 
-export const CacheAccordionBody = ({ cache }: IProps) => {
+export const CacheAccordionBody = ({ cache, cacheManagerName }: IProps) => {
+    const { instanceId } = useParams();
+
     const { t } = useTranslation();
+
+    const [singleCache, setSingleCache] = useState(StatefulRequest.loading<IGetSingleCacheResponseBody>());
+
+    useEffect(() => {
+        fetchData(setSingleCache, () =>
+            getSingleCacheData({
+                instanceId: instanceId!,
+                cacheName: cache.name,
+                cacheManagerName: cacheManagerName,
+            }),
+        );
+    }, []);
+
+    if (singleCache.loading) {
+        return <Loader />;
+    }
+
+    if (singleCache.error) {
+        return <EmptyHandler isEmpty />;
+    }
+
+    const singleCacheData = singleCache.response!;
 
     return (
         <>
             <div className={styles.MainWrapper}>
                 <div className={styles.CacheDataWrapper}>
-                    <div>{t("Caches.hitsCount")}:</div>
-                    <div>{cache.hitsCount}</div>
+                    <div>{t("Caches.hits")}:</div>
+                    <div>{singleCacheData.hits.length}</div>
 
-                    <div>{t("Caches.missesCount")}:</div>
-                    <div>{cache.missesCount}</div>
-
+                    <div>{t("Caches.misses")}:</div>
+                    <div>{singleCacheData.misses.length}</div>
                     {!!cache.estimatedEntrySize && (
                         <>
                             <div>{t("Caches.estimatedEntrySize")}:</div>
@@ -50,7 +83,7 @@ export const CacheAccordionBody = ({ cache }: IProps) => {
                     )}
                 </div>
 
-                <CacheChart cache={cache} />
+                <CacheChart singleCacheData={singleCacheData} />
             </div>
         </>
     );

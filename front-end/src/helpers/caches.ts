@@ -15,7 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ICachesManager } from "models";
+import type { ICachesManager, IGetSingleCacheResponseBody, ISingleCacheChartEntity } from "models";
+
+import { SINGLE_CACHE_CHART_TIMELINE_STEP } from "../utils";
 
 export const filterCacheManagers = (cacheManager: ICachesManager[], search: string): ICachesManager[] => {
     const formattedSearch = search.toLowerCase().trim();
@@ -28,4 +30,89 @@ export const filterCacheManagers = (cacheManager: ICachesManager[], search: stri
 
         return caches.some(({ name: cacheName }) => cacheName.toLowerCase().includes(formattedSearch));
     });
+};
+
+const floorTimestamp = (timestamp: number, interval: number): number => {
+    return Math.floor(timestamp / interval) * interval;
+};
+
+export const createHitsAndMissesGroup = (data: IGetSingleCacheResponseBody): ISingleCacheChartEntity[] => {
+    const groupHitsAndMisses: Record<number, ISingleCacheChartEntity> = {};
+
+    for (const { timestamp } of data.hits) {
+        if (!groupHitsAndMisses[timestamp]) {
+            groupHitsAndMisses[timestamp] = {
+                timestamp: timestamp,
+                hits: 0,
+                misses: 0,
+            };
+        }
+        groupHitsAndMisses[timestamp].hits++;
+    }
+
+    for (const { timestamp } of data.misses) {
+        if (!groupHitsAndMisses[timestamp]) {
+            groupHitsAndMisses[timestamp] = {
+                timestamp: timestamp,
+                hits: 0,
+                misses: 0,
+            };
+        }
+        groupHitsAndMisses[timestamp].misses++;
+    }
+
+    return Object.values(groupHitsAndMisses);
+};
+
+const normalizeChartData = (data: ISingleCacheChartEntity[]): ISingleCacheChartEntity[] => {
+    const groupedData: Record<number, ISingleCacheChartEntity> = {};
+
+    for (const item of data) {
+        const normalizedData = floorTimestamp(item.timestamp, SINGLE_CACHE_CHART_TIMELINE_STEP);
+
+        if (!groupedData[normalizedData]) {
+            groupedData[normalizedData] = {
+                timestamp: normalizedData,
+                hits: 0,
+                misses: 0,
+            };
+        }
+
+        groupedData[normalizedData].hits += item.hits;
+        groupedData[normalizedData].misses += item.misses;
+    }
+
+    return Object.values(groupedData).sort((a, b) => a.timestamp - b.timestamp);
+};
+
+const buildContinuousTimeline = (normalizedData: ISingleCacheChartEntity[]): ISingleCacheChartEntity[] => {
+    if (!normalizedData.length) {
+        return [];
+    }
+
+    const firstTimestamp = normalizedData[0].timestamp;
+    const lastTimestamp = normalizedData[normalizedData.length - 1].timestamp;
+
+    const timelineMap: Record<number, ISingleCacheChartEntity> = {};
+    for (const item of normalizedData) {
+        timelineMap[item.timestamp] = item;
+    }
+
+    const chartData: ISingleCacheChartEntity[] = [];
+
+    for (let timestamp = firstTimestamp; timestamp <= lastTimestamp; timestamp += SINGLE_CACHE_CHART_TIMELINE_STEP) {
+        const defaultChartData = {
+            timestamp: timestamp,
+            hits: 0,
+            misses: 0,
+        };
+        chartData.push(timelineMap[timestamp] ?? defaultChartData);
+    }
+
+    return chartData;
+};
+
+export const getChartdata = (data: ISingleCacheChartEntity[]): ISingleCacheChartEntity[] => {
+    const normalized = normalizeChartData(data);
+    return buildContinuousTimeline(normalized);
 };
