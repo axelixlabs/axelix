@@ -154,12 +154,32 @@ public final class SingleCache {
          */
         private final long timestamp;
 
-        public CacheLookup(long timestamp) {
+        @JsonCreator
+        public CacheLookup(@JsonProperty("timestamp") long timestamp) {
             this.timestamp = timestamp;
         }
 
-        public long timestamp() {
+        public long getTimestamp() {
             return timestamp;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            CacheLookup that = (CacheLookup) o;
+            return timestamp == that.timestamp;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(timestamp);
+        }
+
+        @Override
+        public String toString() {
+            return "CacheLookup{" + "timestamp=" + timestamp + '}';
         }
     }
 }
