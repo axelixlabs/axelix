@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.api.integrations.http;
+package com.axelixlabs.axelix.common.domain.http;
 
 /**
  * Version of an HTTP protocol in use.
@@ -24,11 +24,10 @@ package com.axelixlabs.axelix.common.api.integrations.http;
  * @author Mikhail Polivakha
  */
 public enum HttpVersion {
-    V1_0("HTTP 1/0"),
-    V1_1("HTTP 1/1"),
-    V2_0("HTTP 2/0"),
-    V3_0("HTTP 3/0"),
-    ;
+    V1_0("HTTP/1.0"),
+    V1_1("HTTP/1.1"),
+    V2_0("HTTP/2.0"),
+    V3_0("HTTP/3.0");
 
     private final String display;
 

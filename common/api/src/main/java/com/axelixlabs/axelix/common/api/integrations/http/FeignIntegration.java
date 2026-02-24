@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.api.integrations.http;
+package com.axelixlabs.axelix.common.api.integrations.feign;
 
 import java.util.List;
 import java.util.Objects;
@@ -23,29 +23,39 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.axelixlabs.axelix.common.api.integrations.AbstractIntegration;
-
-public class FeignClientIntegration extends AbstractIntegration {
-    private final String entityType;
-    private final String protocol;
+/**
+ * DTO that describes a discovered Feign integration exposed by Axelix endpoints.
+ *
+ * @author Sergey Cherkasov
+ */
+public class FeignIntegration {
+    private final String serviceName;
     private final List<String> networkAddresses;
-    private final List<HttpMethod> methodMappings;
+    private final String protocol;
+    private final List<FeignHttpMethod> httpMethods;
 
+    /**
+     * Creates a new FeignIntegration.
+     *
+     * @param serviceName       logical service name from {@code @FeignClient}
+     * @param networkAddresses  resolved target addresses (or empty if unresolved)
+     * @param protocol          HTTP protocol display name (for example, {@code HTTP/1.1})
+     * @param httpMethods       methods declared on the Feign client interface
+     */
     @JsonCreator
-    public FeignClientIntegration(
+    public FeignIntegration(
+            @JsonProperty("serviceName") String serviceName,
             @JsonProperty("networkAddresses") List<String> networkAddresses,
             @JsonProperty("protocol") String protocol,
-            @JsonProperty("entityType") String entityType,
-            @JsonProperty("methodMappings") List<HttpMethod> methodMappings) {
-        super("", protocol, entityType);
-        this.entityType = entityType;
-        this.protocol = protocol;
+            @JsonProperty("httpMethods") List<FeignHttpMethod> httpMethods) {
+        this.serviceName = serviceName;
         this.networkAddresses = networkAddresses;
-        this.methodMappings = methodMappings;
+        this.protocol = protocol;
+        this.httpMethods = httpMethods;
     }
 
-    public String getEntityType() {
-        return entityType;
+    public String getServiceName() {
+        return serviceName;
     }
 
     public String getProtocol() {
@@ -56,8 +66,8 @@ public class FeignClientIntegration extends AbstractIntegration {
         return networkAddresses;
     }
 
-    public List<HttpMethod> getMethodMappings() {
-        return methodMappings;
+    public List<FeignHttpMethod> getHttpMethods() {
+        return httpMethods;
     }
 
     @Override
@@ -66,33 +76,43 @@ public class FeignClientIntegration extends AbstractIntegration {
             return false;
         }
         ;
-        FeignClientIntegration that = (FeignClientIntegration) o;
-        return Objects.equals(entityType, that.entityType)
+        FeignIntegration that = (FeignIntegration) o;
+        return Objects.equals(serviceName, that.serviceName)
                 && Objects.equals(protocol, that.protocol)
                 && Objects.equals(networkAddresses, that.networkAddresses)
-                && Objects.equals(methodMappings, that.methodMappings);
+                && Objects.equals(httpMethods, that.httpMethods);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(entityType, protocol, networkAddresses, methodMappings);
+        return Objects.hash(serviceName, protocol, networkAddresses, httpMethods);
     }
 
     @Override
     public String toString() {
-        return "FeignClientIntegration{" + "entityType='"
-                + entityType + '\'' + ", protocol='"
+        return "FeignClientIntegration{" + "serviceName='"
+                + serviceName + '\'' + ", protocol='"
                 + protocol + '\'' + ", networkAddresses="
-                + networkAddresses + ", methodMappings="
-                + methodMappings + '}';
+                + networkAddresses + ", httpMethods="
+                + httpMethods + '}';
     }
 
-    public static class HttpMethod {
+    /**
+     * DTO that describes a single HTTP method declared on a Feign client.
+     */
+    public static class FeignHttpMethod {
         private final String httpMethod;
         private final String path;
 
+        /**
+         * Creates a new FeignHttpMethod.
+         *
+         * @param httpMethod    HTTP method name (for example, {@code GET}, {@code POST}),
+         *                      or {@code UNKNOWN} if the method is not specified.
+         * @param path          mapping path associated with the method
+         */
         @JsonCreator
-        public HttpMethod(@JsonProperty("httpMethod") String httpMethod, @JsonProperty("path") String path) {
+        public FeignHttpMethod(@JsonProperty("httpMethod") String httpMethod, @JsonProperty("path") String path) {
             this.httpMethod = httpMethod;
             this.path = path;
         }
@@ -111,7 +131,7 @@ public class FeignClientIntegration extends AbstractIntegration {
                 return false;
             }
             ;
-            HttpMethod that = (HttpMethod) o;
+            FeignHttpMethod that = (FeignHttpMethod) o;
             return Objects.equals(httpMethod, that.httpMethod) && Objects.equals(path, that.path);
         }
 
@@ -122,7 +142,7 @@ public class FeignClientIntegration extends AbstractIntegration {
 
         @Override
         public String toString() {
-            return "FeignClientMethodMapping{" + "httpMethod='" + httpMethod + '\'' + ", path='" + path + '\'' + '}';
+            return "{" + "httpMethod='" + httpMethod + '\'' + ", path='" + path + '\'' + '}';
         }
     }
 }

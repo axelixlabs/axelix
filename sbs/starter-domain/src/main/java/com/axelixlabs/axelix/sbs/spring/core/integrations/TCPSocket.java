@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integration;
+package com.axelixlabs.axelix.sbs.spring.core.integrations;
 
 import java.util.Objects;
 
@@ -50,7 +50,10 @@ public class TCPSocket {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         TCPSocket tcpSocket = (TCPSocket) o;
         return port == tcpSocket.port && Objects.equals(host, tcpSocket.host);
     }

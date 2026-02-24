@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.axelixlabs.axelix.common.api.integrations.http.FeignClientIntegration;
+import com.axelixlabs.axelix.common.api.integrations.feign.FeignIntegration;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
@@ -62,9 +62,7 @@ public class FeignClientApi {
             description = "OK",
             responseCode = "200",
             content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = FeignClientIntegration.class)))
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = FeignIntegration.class)))
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.DetailsApi.INSTANCE_ID)
     public ResponseEntity<byte[]> getFeignClientFeed(@PathVariable("instanceId") String instanceId) {
