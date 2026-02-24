@@ -17,7 +17,16 @@
  */
 import type { ICachesManager, IGetSingleCacheResponseBody, ISingleCacheChartEntity } from "models";
 
-import { SINGLE_CACHE_CHART_TIMELINE_STEP } from "../utils";
+import {
+    SINGLE_CACHE_CHART_TIMELINE_STEP_5M,
+    SINGLE_CACHE_CHART_TIMELINE_STEP_5S,
+    SINGLE_CACHE_CHART_TIMELINE_STEP_15M,
+    SINGLE_CACHE_CHART_TIMELINE_STEP_30D,
+    SINGLE_CACHE_CHART_TIMELINE_STEP_D,
+    SINGLE_CACHE_CHART_TIMELINE_STEP_H,
+    SINGLE_CACHE_CHART_TIMELINE_STEP_M,
+    SINGLE_CACHE_CHART_TIMELINE_STEP_MS,
+} from "../utils";
 
 export const filterCacheManagers = (cacheManager: ICachesManager[], search: string): ICachesManager[] => {
     const formattedSearch = search.toLowerCase().trim();
@@ -30,6 +39,45 @@ export const filterCacheManagers = (cacheManager: ICachesManager[], search: stri
 
         return caches.some(({ name: cacheName }) => cacheName.toLowerCase().includes(formattedSearch));
     });
+};
+
+export const getOptimalTimelineInterval = (data: IGetSingleCacheResponseBody): number => {
+    const allTimestamps = [
+        ...data.hits.map(({ timestamp }) => timestamp),
+        ...data.misses.map(({ timestamp }) => timestamp),
+    ];
+
+    if (allTimestamps.length === 0) {
+        return SINGLE_CACHE_CHART_TIMELINE_STEP_MS;
+    }
+
+    const range = Math.max(...allTimestamps) - Math.min(...allTimestamps);
+
+    if (range <= 10 * SINGLE_CACHE_CHART_TIMELINE_STEP_M) {
+        return SINGLE_CACHE_CHART_TIMELINE_STEP_5S;
+    }
+
+    if (range <= SINGLE_CACHE_CHART_TIMELINE_STEP_H) {
+        return SINGLE_CACHE_CHART_TIMELINE_STEP_M;
+    }
+
+    if (range <= 6 * SINGLE_CACHE_CHART_TIMELINE_STEP_H) {
+        return SINGLE_CACHE_CHART_TIMELINE_STEP_5M;
+    }
+
+    if (range <= SINGLE_CACHE_CHART_TIMELINE_STEP_D) {
+        return SINGLE_CACHE_CHART_TIMELINE_STEP_15M;
+    }
+
+    if (range <= 7 * SINGLE_CACHE_CHART_TIMELINE_STEP_D) {
+        return SINGLE_CACHE_CHART_TIMELINE_STEP_H;
+    }
+
+    if (range <= 30 * SINGLE_CACHE_CHART_TIMELINE_STEP_D) {
+        return SINGLE_CACHE_CHART_TIMELINE_STEP_D;
+    }
+
+    return SINGLE_CACHE_CHART_TIMELINE_STEP_30D;
 };
 
 const floorTimestamp = (timestamp: number, interval: number): number => {
@@ -64,11 +112,11 @@ export const createHitsAndMissesGroup = (data: IGetSingleCacheResponseBody): ISi
     return Object.values(groupHitsAndMisses);
 };
 
-const normalizeChartData = (data: ISingleCacheChartEntity[]): ISingleCacheChartEntity[] => {
+const normalizeChartData = (data: ISingleCacheChartEntity[], interval: number): ISingleCacheChartEntity[] => {
     const groupedData: Record<number, ISingleCacheChartEntity> = {};
 
     for (const item of data) {
-        const normalizedData = floorTimestamp(item.timestamp, SINGLE_CACHE_CHART_TIMELINE_STEP);
+        const normalizedData = floorTimestamp(item.timestamp, interval);
 
         if (!groupedData[normalizedData]) {
             groupedData[normalizedData] = {
@@ -85,7 +133,10 @@ const normalizeChartData = (data: ISingleCacheChartEntity[]): ISingleCacheChartE
     return Object.values(groupedData).sort((a, b) => a.timestamp - b.timestamp);
 };
 
-const buildContinuousTimeline = (normalizedData: ISingleCacheChartEntity[]): ISingleCacheChartEntity[] => {
+const buildContinuousTimeline = (
+    normalizedData: ISingleCacheChartEntity[],
+    interval: number,
+): ISingleCacheChartEntity[] => {
     if (!normalizedData.length) {
         return [];
     }
@@ -100,7 +151,7 @@ const buildContinuousTimeline = (normalizedData: ISingleCacheChartEntity[]): ISi
 
     const chartData: ISingleCacheChartEntity[] = [];
 
-    for (let timestamp = firstTimestamp; timestamp <= lastTimestamp; timestamp += SINGLE_CACHE_CHART_TIMELINE_STEP) {
+    for (let timestamp = firstTimestamp; timestamp <= lastTimestamp; timestamp += interval) {
         const defaultChartData = {
             timestamp: timestamp,
             hits: 0,
@@ -112,7 +163,7 @@ const buildContinuousTimeline = (normalizedData: ISingleCacheChartEntity[]): ISi
     return chartData;
 };
 
-export const getChartdata = (data: ISingleCacheChartEntity[]): ISingleCacheChartEntity[] => {
-    const normalized = normalizeChartData(data);
-    return buildContinuousTimeline(normalized);
+export const getChartData = (data: ISingleCacheChartEntity[], interval: number): ISingleCacheChartEntity[] => {
+    const normalized = normalizeChartData(data, interval);
+    return buildContinuousTimeline(normalized, interval);
 };

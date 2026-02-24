@@ -16,10 +16,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useTranslation } from "react-i18next";
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
-import { createHitsAndMissesGroup, getChartdata, toFormattedTime } from "helpers";
+import { createHitsAndMissesGroup, getChartData, getOptimalTimelineInterval, toFormattedTime } from "helpers";
 import type { IGetSingleCacheResponseBody } from "models";
+
+import { CacheChartStats } from "../../CacheChartStats";
 
 interface IProps {
     /**
@@ -30,14 +32,15 @@ interface IProps {
 
 export const CacheChart = ({ singleCacheData }: IProps) => {
     const { t } = useTranslation();
+    const interval = getOptimalTimelineInterval(singleCacheData);
     const hitsAndMissesGroup = createHitsAndMissesGroup(singleCacheData);
-    const data = getChartdata(hitsAndMissesGroup);
+    const data = getChartData(hitsAndMissesGroup, interval);
 
     return (
         <>
             <ResponsiveContainer width="100%" height={330}>
                 <LineChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
                     <XAxis
                         dataKey="timestamp"
@@ -49,13 +52,11 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
 
                     <YAxis allowDecimals={false} width="auto" />
 
-                    <Legend />
-
                     <Line
                         type="monotone"
                         dataKey="hits"
                         name={t("Caches.hits")}
-                        stroke="#00ab55"
+                        stroke="#95de64"
                         strokeWidth={3}
                         dot={false}
                         activeDot={false}
@@ -65,13 +66,14 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
                         type="monotone"
                         dataKey="misses"
                         name={t("Caches.misses")}
-                        stroke="#ff000a"
+                        stroke="#69c0ff"
                         strokeWidth={3}
                         dot={false}
                         activeDot={false}
                     />
                 </LineChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer >
+            <CacheChartStats singleCacheData={singleCacheData} />
         </>
     );
 };

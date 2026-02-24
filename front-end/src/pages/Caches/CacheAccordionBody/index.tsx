@@ -16,7 +16,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader } from "components";
@@ -25,7 +24,6 @@ import { type ICacheData, type IGetSingleCacheResponseBody, StatefulRequest } fr
 import { getSingleCacheData } from "services";
 
 import { CacheChart } from "./CacheChart";
-import styles from "./styles.module.css";
 
 interface IProps {
     /**
@@ -41,8 +39,6 @@ interface IProps {
 
 export const CacheAccordionBody = ({ cache, cacheManagerName }: IProps) => {
     const { instanceId } = useParams();
-
-    const { t } = useTranslation();
 
     const [singleCache, setSingleCache] = useState(StatefulRequest.loading<IGetSingleCacheResponseBody>());
 
@@ -66,25 +62,5 @@ export const CacheAccordionBody = ({ cache, cacheManagerName }: IProps) => {
 
     const singleCacheData = singleCache.response!;
 
-    return (
-        <>
-            <div className={styles.MainWrapper}>
-                <div className={styles.CacheDataWrapper}>
-                    <div>{t("Caches.hits")}:</div>
-                    <div>{singleCacheData.hits.length}</div>
-
-                    <div>{t("Caches.misses")}:</div>
-                    <div>{singleCacheData.misses.length}</div>
-                    {!!cache.estimatedEntrySize && (
-                        <>
-                            <div>{t("Caches.estimatedEntrySize")}:</div>
-                            <div>{cache.estimatedEntrySize}</div>
-                        </>
-                    )}
-                </div>
-
-                <CacheChart singleCacheData={singleCacheData} />
-            </div>
-        </>
-    );
+    return <CacheChart singleCacheData={singleCacheData} />;
 };

@@ -1,0 +1,52 @@
+.MainWrapper {
+    display: grid;
+    grid-template-columns: 1fr repeat(3, min-content);
+    grid-column: 1 /-1;
+    gap: 8px 20px;
+    grid-template-areas:
+        ".      item1  item2   item3"
+        ".      .      .       .    "
+        ".      item4  item5   item6";
+}
+
+.Percentage {
+    font-weight: 600;
+    text-align: center;
+    grid-area: item1;
+}
+
+.Count {
+    font-weight: 600;
+    text-align: center;
+    grid-area: item2;
+}
+
+.EstimatedEntrySize {
+    font-weight: 600;
+    text-align: center;
+    grid-area: item3;
+    white-space: nowrap;
+}
+
+.HeaderLine {
+    border-bottom: 1px solid var(--axelix-medium-grey);
+    grid-column: 1 / 5;
+}
+
+.PercentageValue {
+    text-align: center;
+    grid-area: item4;
+    white-space: nowrap;
+}
+
+.CountValue {
+    text-align: center;
+    grid-area: item5;
+    white-space: nowrap;
+}
+
+.EstimatedEntrySizeValue {
+    text-align: center;
+    grid-area: item6;
+    white-space: nowrap;
+}
