@@ -49,7 +49,7 @@ public class StaticAdminUserProvider implements UserProvider {
     public User load(String username) throws UserNotFoundException {
         if (Objects.equals(staticCredentialsConfig.getUsername(), username)) {
             return new DefaultUser(
-                    username,
+                    staticCredentialsConfig.getUsername(),
                     staticCredentialsConfig.getPassword(),
                     Set.of(new DefaultRole(
                             ADMIN_ROLE,

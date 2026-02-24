@@ -17,12 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import io.jsonwebtoken.JwtParser;
-
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -31,9 +27,11 @@ import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.Authorizer;
-import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorizer;
+import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultSecurityManager;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
+import com.axelixlabs.axelix.sbs.spring.core.auth.PassthroughAuthorityResolver;
+import com.axelixlabs.axelix.sbs.spring.core.auth.SecurityManager;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthConfigurationProperties;
 
 /**
@@ -44,8 +42,6 @@ import com.axelixlabs.axelix.sbs.spring.core.config.AuthConfigurationProperties;
  * @since 22.07.2025
  */
 @AutoConfiguration
-@ConditionalOnProperty(name = "axelix.sbs.auth.jwt")
-@ConditionalOnClass({JwtDecoderService.class, JwtParser.class})
 @EnableConfigurationProperties(AuthConfigurationProperties.class)
 public class JwtAuthAutoConfiguration {
 
@@ -59,8 +55,9 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @SuppressWarnings("removal") // TODO: https://github.com/axelixlabs/axelix/issues/757
     public AuthorityResolver authorityResolver() {
-        return new DefaultAuthorityResolver();
+        return new PassthroughAuthorityResolver();
     }
 
     @Bean
@@ -71,18 +68,17 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public JwtAuthorizationFilter jwtAuthorizationFilter(
+    public SecurityManager securityManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
-        return new JwtAuthorizationFilter(jwtDecoderService, authorityResolver, authorizer);
+        return new DefaultSecurityManager(jwtDecoderService, authorityResolver, authorizer);
     }
 
     @Bean
     public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-            JwtAuthorizationFilter filter) {
-        FilterRegistrationBean<JwtAuthorizationFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(filter);
+            SecurityManager securityManager) {
+        var jwtAuthorizationFilter = new JwtAuthorizationFilter(securityManager);
+        var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
         registration.setName("jwtAuthorizationFilter");
-        registration.addUrlPatterns("/actuator/*");
         return registration;
     }
 }

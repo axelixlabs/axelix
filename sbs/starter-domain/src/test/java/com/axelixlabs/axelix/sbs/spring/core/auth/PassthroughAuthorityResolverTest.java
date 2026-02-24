@@ -17,18 +17,37 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Result of the {@link Authorizer} analysis of the given {@link AuthorizationRequest}.
+ * Unit tests for {@link PassthroughAuthorityResolver}.
  *
- * @since 16.07.25
  * @author Mikhail Polivakha
  */
-public interface AuthorizationResult {
+@SuppressWarnings("removal")
+class PassthroughAuthorityResolverTest {
 
-    /**
-     * @return whether the access is authorized
-     */
-    boolean accessAuthorized();
+    private final PassthroughAuthorityResolver resolver = new PassthroughAuthorityResolver();
+
+    @Test
+    void resolve_returnsEmpty_forAnyPath() {
+        // given.
+        String path = "/actuator/axelix-beans";
+        // when.
+        var result = resolver.resolve(path);
+        // then.
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void resolve_returnsEmpty_forActuatorEnvPath() {
+        // given.
+        String path = "/actuator/axelix-env";
+        // when.
+        var result = resolver.resolve(path);
+        // then.
+        assertThat(result).isEmpty();
+    }
 }

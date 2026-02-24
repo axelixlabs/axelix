@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.util.Map;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
@@ -102,9 +102,6 @@ class JwtAuthorizationFilterTest {
     @Value("${test-tokens.token-with-null-name-roles}")
     private String tokenWithNullNameRoles;
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
     @Test
     void shouldAllowAccess_UserHasSingleRoleWithRequiredAuthorities() {
         HttpEntity<Void> entity = defaultEntity(tokenUserWithTwoRole);
@@ -113,11 +110,6 @@ class JwtAuthorizationFilterTest {
                 restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, entity, String.class);
 
         assertThat(responseBeans.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        ResponseEntity<String> responseMetrics =
-                restTemplate.exchange("/actuator/health", HttpMethod.GET, entity, String.class);
-
-        assertThat(responseMetrics.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
@@ -125,7 +117,7 @@ class JwtAuthorizationFilterTest {
         HttpEntity<Void> entity = defaultEntity(tokenUserWithAdminRoleHierarchy);
 
         ResponseEntity<String> responseEnv =
-                restTemplate.exchange("/actuator/env", HttpMethod.GET, entity, String.class);
+                restTemplate.exchange("/actuator/axelix-env", HttpMethod.GET, entity, String.class);
 
         assertThat(responseEnv.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -136,6 +128,7 @@ class JwtAuthorizationFilterTest {
     }
 
     @Test
+    @Disabled // TODO: https://github.com/axelixlabs/axelix/issues/757
     void shouldReturnForbidden_UserWithEmptyRoles() {
         ResponseEntity<String> response = restTemplate.exchange(
                 "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(tokenWithEmptyRoles), String.class);
@@ -145,6 +138,7 @@ class JwtAuthorizationFilterTest {
     }
 
     @Test
+    @Disabled // TODO: https://github.com/axelixlabs/axelix/issues/757
     void shouldReturnForbidden_UserWithoutRequiredAuthority() {
         ResponseEntity<String> response = restTemplate.exchange(
                 "/actuator/axelix-env", HttpMethod.GET, defaultEntity(tokenWithoutAuthorities), String.class);
@@ -152,16 +146,6 @@ class JwtAuthorizationFilterTest {
         assertThat(response)
                 .returns(HttpStatus.FORBIDDEN, ResponseEntity::getStatusCode)
                 .returns("Access denied: missing required authorities [ENV]", ResponseEntity::getBody);
-    }
-
-    @Test
-    void shouldReturnForbidden_UserHasRoleWithInvalidAuthority() {
-        ResponseEntity<String> response = restTemplate.exchange(
-                "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(tokenWithInvalidAuthority), String.class);
-
-        assertThat(response)
-                .returns(HttpStatus.FORBIDDEN, ResponseEntity::getStatusCode)
-                .returns("Access denied: missing required authorities [BEANS]", ResponseEntity::getBody);
     }
 
     @Test
@@ -175,6 +159,17 @@ class JwtAuthorizationFilterTest {
                 restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, entity, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    @Disabled // TODO: https://github.com/axelixlabs/axelix/issues/757
+    void shouldReturnForbidden_UserHasRoleWithInvalidAuthority() {
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(tokenWithInvalidAuthority), String.class);
+
+        assertThat(response)
+                .returns(HttpStatus.FORBIDDEN, ResponseEntity::getStatusCode)
+                .returns("Access denied: missing required authorities [BEANS]", ResponseEntity::getBody);
     }
 
     @Test
@@ -210,23 +205,20 @@ class JwtAuthorizationFilterTest {
     @Test
     void shouldReturnUnauthorized_TokenIsMissing() {
         ResponseEntity<String> response =
-                restTemplate.exchange("/actuator/health", HttpMethod.GET, defaultEntity(""), String.class);
+                restTemplate.exchange("/actuator/axelix-beans", HttpMethod.GET, defaultEntity(""), String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
-    void shouldReturnUnauthorized_AuthorizationHeaderIsMissing() {
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+    void shouldReturnAllowNonAxelixActuatorEndpointToBeInvokedWithoutToken() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/health", String.class);
 
-        ResponseEntity<String> response =
-                restTemplate.exchange("/actuator/health", HttpMethod.GET, entity, String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
+    @Disabled // TODO: https://github.com/axelixlabs/axelix/issues/757
     void shouldReturnForbidden_TokenWithNullNameRoles() {
         ResponseEntity<String> response = restTemplate.exchange(
                 "/actuator/axelix-beans", HttpMethod.GET, defaultEntity(tokenWithNullNameRoles), String.class);
@@ -277,19 +269,14 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
+        @SuppressWarnings("removal") // TODO: https://github.com/axelixlabs/axelix/issues/757
         public AuthorityResolver authorityResolver() {
-            return new DefaultAuthorityResolver();
+            return new PassthroughAuthorityResolver();
         }
 
         @Bean
         public Authorizer authorizer() {
             return new DefaultAuthorizer();
-        }
-
-        @Bean
-        public JwtAuthorizationFilter jwtAuthorizationFilter(
-                JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
-            return new JwtAuthorizationFilter(jwtDecoderService, authorityResolver, authorizer);
         }
 
         @Bean
@@ -303,12 +290,16 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
+        public SecurityManager securityManager(
+                JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
+            return new DefaultSecurityManager(jwtDecoderService, authorityResolver, authorizer);
+        }
+
+        @Bean
         public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-                JwtAuthorizationFilter filter) {
-            FilterRegistrationBean<JwtAuthorizationFilter> registration = new FilterRegistrationBean<>();
-            registration.setFilter(filter);
+                SecurityManager securityManager) {
+            var registration = new FilterRegistrationBean<>(new JwtAuthorizationFilter(securityManager));
             registration.setName("jwtAuthorizationFilter");
-            registration.addUrlPatterns("/actuator/*");
             return registration;
         }
     }

@@ -15,27 +15,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth.exception;
+package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import com.axelixlabs.axelix.common.auth.JwtDecoderService;
+import java.util.Optional;
+
+import com.axelixlabs.axelix.common.auth.core.Authority;
 
 /**
- * Indicates that a provided JWT token is invalid.
+ * The passthrough {@link AuthorityResolver} - no authorities are required to access the given emdpoint.
  *
- * <p>This may occur due to tampering, incorrect signature, or structural issues in the token.</p>
- *
- * @see JwtDecoderService
- * @since 23.07.2025
- * @author Nikita Kirillov
+ * @deprecated That class should not be used or relied upon. It is a temporary solution until
+ *             we came up with the reasonable authorization configuration for master --> starter
+ *             communication
  * @author Mikhail Polivakha
  */
-public class InvalidJwtTokenException extends JwtProcessingException {
+@Deprecated(forRemoval = true)
+public class PassthroughAuthorityResolver implements AuthorityResolver {
 
-    public InvalidJwtTokenException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
-
-    public InvalidJwtTokenException(final String message) {
-        super(message);
+    @Override
+    public Optional<Authority> resolve(String path) {
+        return Optional.empty();
     }
 }

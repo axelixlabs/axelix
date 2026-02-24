@@ -18,9 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -33,10 +30,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
-import com.axelixlabs.axelix.common.auth.core.DecodedUser;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
@@ -48,22 +42,16 @@ import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
  * Rejects unauthorized requests before they reach the application logic.
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  * @since 29.07.2025
  */
 @SuppressWarnings("NullAway") // TODO: Pending issue GH-42 – introduce exception translator and refactor this filter
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final JwtDecoderService jwtDecoderService;
+    private final SecurityManager securityManager;
 
-    private final AuthorityResolver authorityResolver;
-
-    private final Authorizer authorizer;
-
-    public JwtAuthorizationFilter(
-            JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
-        this.jwtDecoderService = jwtDecoderService;
-        this.authorityResolver = authorityResolver;
-        this.authorizer = authorizer;
+    public JwtAuthorizationFilter(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
 
     @Override
@@ -73,23 +61,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = resolveToken(request);
-
-        if (token == null) {
-            respondWith(response, HttpServletResponse.SC_UNAUTHORIZED, "Authorization token is missing");
-            return;
-        }
-
-        String requestPath = request.getRequestURI();
-
         try {
-            DecodedUser user = jwtDecoderService.decodeTokenToUser(token);
-            Optional<Authority> requiredAuthority = authorityResolver.resolve(requestPath);
+            String token = resolveToken(request);
+            String requestPath = request.getRequestURI();
 
-            AuthorizationRequest authorizationRequest =
-                    new AuthorizationRequest(requiredAuthority.map(Set::of).orElse(Collections.emptySet()));
-
-            authorizer.authorize(user, authorizationRequest);
+            securityManager.authorize(requestPath, token);
 
             filterChain.doFilter(request, response);
 

@@ -15,27 +15,29 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth.exception;
+package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import com.axelixlabs.axelix.common.auth.JwtDecoderService;
+import org.jspecify.annotations.Nullable;
+
+import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 
 /**
- * Indicates that a provided JWT token is invalid.
+ * The main entrypoint for evaluating the possibility of processing the request (both Authentication
+ * and Authorization).
  *
- * <p>This may occur due to tampering, incorrect signature, or structural issues in the token.</p>
- *
- * @see JwtDecoderService
- * @since 23.07.2025
- * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public class InvalidJwtTokenException extends JwtProcessingException {
+public interface SecurityManager {
 
-    public InvalidJwtTokenException(final String message, final Throwable cause) {
-        super(message, cause);
+    boolean shouldAuthorize(String requestPath);
+
+    default void authorize(String requestPath, @Nullable String token)
+            throws AuthorizationException, JwtProcessingException {
+        if (shouldAuthorize(requestPath)) {
+            authorizeInternal(requestPath, token);
+        }
     }
 
-    public InvalidJwtTokenException(final String message) {
-        super(message);
-    }
+    void authorizeInternal(String requestPath, @Nullable String token)
+            throws AuthorizationException, JwtProcessingException;
 }
