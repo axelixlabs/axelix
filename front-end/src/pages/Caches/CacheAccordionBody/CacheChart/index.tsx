@@ -16,9 +16,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useTranslation } from "react-i18next";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
-import { createHitsAndMissesGroup, getChartData, getOptimalTimelineInterval, toFormattedTime } from "helpers";
+import {
+    cacheHitsMissesChartToFormattedTime,
+    createHitsAndMissesGroup,
+    getChartData,
+    getOptimalTimelineInterval,
+} from "helpers";
 import type { IGetSingleCacheResponseBody } from "models";
 
 import { CacheChartStats } from "../../CacheChartStats";
@@ -46,7 +51,7 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
                         dataKey="timestamp"
                         type="number"
                         domain={["dataMin", "dataMax"]}
-                        tickFormatter={toFormattedTime}
+                        tickFormatter={(value: number) => cacheHitsMissesChartToFormattedTime(value, interval)}
                         interval="preserveStartEnd"
                     />
 
@@ -71,6 +76,8 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
                         dot={false}
                         activeDot={false}
                     />
+
+                    <Legend verticalAlign="top" align="right" />
                 </LineChart>
             </ResponsiveContainer >
             <CacheChartStats singleCacheData={singleCacheData} />

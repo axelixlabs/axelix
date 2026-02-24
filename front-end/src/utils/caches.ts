@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export const SINGLE_CACHE_CHART_TIMELINE_STEP_MS = 1;
+export const SINGLE_CACHE_CHART_TIMELINE_STEP_S = 1000;
 export const SINGLE_CACHE_CHART_TIMELINE_STEP_5S = 5000;
 export const SINGLE_CACHE_CHART_TIMELINE_STEP_M = 60000;
 export const SINGLE_CACHE_CHART_TIMELINE_STEP_5M = 300000;

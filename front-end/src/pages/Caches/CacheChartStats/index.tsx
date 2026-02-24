@@ -17,6 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
+import { InfoTooltip } from "components";
 import type { IGetSingleCacheResponseBody } from "models";
 
 import styles from "./styles.module.css";
@@ -47,6 +48,10 @@ export const CacheChartStats = ({ singleCacheData }: IProps) => {
                     <div className={styles.EstimatedEntrySize}>{t("Caches.estimatedEntrySize")}</div>
                 )}
                 <div className={styles.HeaderLine} />
+                <div className={styles.Statistics}>
+                    <div>{t("Caches.statistics")}:</div>
+                    <InfoTooltip text={"TextPlaceholder"} />
+                </div>
                 <div className={styles.PercentageValue}>
                     {hitsCount} ({Number(hitsPercentage.toFixed(1))}%)
                 </div>

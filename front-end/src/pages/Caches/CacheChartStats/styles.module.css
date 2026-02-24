@@ -4,9 +4,9 @@
     grid-column: 1 /-1;
     gap: 8px 20px;
     grid-template-areas:
-        ".      item1  item2   item3"
-        ".      .      .       .    "
-        ".      item4  item5   item6";
+        ".      item1  item2 item3"
+        ".      .      .     .    "
+        "item4  item5  item6 item7";
 }
 
 .Percentage {
@@ -33,20 +33,28 @@
     grid-column: 1 / 5;
 }
 
-.PercentageValue {
-    text-align: center;
+.Statistics {
     grid-area: item4;
-    white-space: nowrap;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.CountValue {
+.PercentageValue {
     text-align: center;
     grid-area: item5;
     white-space: nowrap;
 }
 
-.EstimatedEntrySizeValue {
+.CountValue {
     text-align: center;
     grid-area: item6;
+    white-space: nowrap;
+}
+
+.EstimatedEntrySizeValue {
+    text-align: center;
+    grid-area: item7;
     white-space: nowrap;
 }

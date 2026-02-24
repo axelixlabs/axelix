@@ -25,7 +25,7 @@ import {
     SINGLE_CACHE_CHART_TIMELINE_STEP_D,
     SINGLE_CACHE_CHART_TIMELINE_STEP_H,
     SINGLE_CACHE_CHART_TIMELINE_STEP_M,
-    SINGLE_CACHE_CHART_TIMELINE_STEP_MS,
+    SINGLE_CACHE_CHART_TIMELINE_STEP_S,
 } from "../utils";
 
 export const filterCacheManagers = (cacheManager: ICachesManager[], search: string): ICachesManager[] => {
@@ -48,10 +48,14 @@ export const getOptimalTimelineInterval = (data: IGetSingleCacheResponseBody): n
     ];
 
     if (allTimestamps.length === 0) {
-        return SINGLE_CACHE_CHART_TIMELINE_STEP_MS;
+        return SINGLE_CACHE_CHART_TIMELINE_STEP_S;
     }
 
     const range = Math.max(...allTimestamps) - Math.min(...allTimestamps);
+
+    if (range <= SINGLE_CACHE_CHART_TIMELINE_STEP_M) {
+        return SINGLE_CACHE_CHART_TIMELINE_STEP_S;
+    }
 
     if (range <= 10 * SINGLE_CACHE_CHART_TIMELINE_STEP_M) {
         return SINGLE_CACHE_CHART_TIMELINE_STEP_5S;
@@ -166,4 +170,44 @@ const buildContinuousTimeline = (
 export const getChartData = (data: ISingleCacheChartEntity[], interval: number): ISingleCacheChartEntity[] => {
     const normalized = normalizeChartData(data, interval);
     return buildContinuousTimeline(normalized, interval);
+};
+
+export const cacheHitsMissesChartToFormattedTime = (value: number, interval: number): string => {
+    const date = new Date(value);
+
+    if (interval <= SINGLE_CACHE_CHART_TIMELINE_STEP_5S) {
+        return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        });
+    }
+
+    if (interval <= SINGLE_CACHE_CHART_TIMELINE_STEP_15M) {
+        return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    }
+
+    if (interval === SINGLE_CACHE_CHART_TIMELINE_STEP_H) {
+        return date.toLocaleString([], {
+            day: "2-digit",
+            month: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    }
+
+    if (interval === SINGLE_CACHE_CHART_TIMELINE_STEP_D) {
+        return date.toLocaleDateString([], {
+            day: "2-digit",
+            month: "2-digit",
+        });
+    }
+
+    return date.toLocaleDateString([], {
+        month: "2-digit",
+        year: "2-digit",
+    });
 };

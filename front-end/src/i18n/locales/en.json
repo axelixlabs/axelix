@@ -106,7 +106,8 @@
         "disabled": "Cache is disabled at runtime",
         "hits": "Hits",
         "misses": "Misses",
-        "estimatedEntrySize": "Entries count"
+        "estimatedEntrySize": "Entries count",
+        "statistics": "Statistics"
     },
     "Authentication": {
         "login": "Welcome to <green>A</green>xelix",
