@@ -31,8 +31,8 @@ interface IProps {
 
 export const ConfigPropsTables = ({ effectiveConfigProps }: IProps) => {
     return (
-        <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
-            <>
+        <>
+            <EmptyHandler isEmpty={effectiveConfigProps.length === 0}>
                 {effectiveConfigProps.map(({ beanName, prefix, properties }) => (
                     <ConfigPropsModifiableTable
                         headerName={beanName}
@@ -52,7 +52,7 @@ export const ConfigPropsTables = ({ effectiveConfigProps }: IProps) => {
                         )}
                     </ConfigPropsModifiableTable>
                 ))}
-            </>
-        </EmptyHandler>
+            </EmptyHandler>
+        </>
     );
 };

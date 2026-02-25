@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import type { AxiosError } from "axios";
-import type { Dispatch, SetStateAction } from "react";
+import type { Dispatch, MouseEvent, SetStateAction } from "react";
 import { useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
@@ -35,10 +35,12 @@ interface IProps {
      * All possible logging levels that are supported by the logging system inside the instance
      */
     levels: string[];
+
     /**
      * Single logger
      */
     logger: ILogger;
+
     /**
      * setState to update the logger level
      */
@@ -47,7 +49,7 @@ interface IProps {
     /**
      * The function to handle the reset of this given logger
      */
-    handleReset: (mouseEvent: any, loggerName: string) => void;
+    handleReset: (_: MouseEvent, loggerName: string) => void;
 }
 
 export const Logger = ({ levels, logger, setUpdateLoggerLevel, handleReset }: IProps) => {
@@ -74,18 +76,20 @@ export const Logger = ({ levels, logger, setUpdateLoggerLevel, handleReset }: IP
     };
 
     return (
-        <div className={styles.MainWrapper}>
-            <TooltipWithCopy text={logger.name} />
+        <>
+            <div className={styles.MainWrapper}>
+                <TooltipWithCopy text={logger.name} />
 
-            <div className={styles.LevelsWrapper}>
-                <Levels
-                    checkedLevel={effectiveLevel}
-                    configuredLevel={configuredLevel}
-                    levels={levels}
-                    handleChange={handleChange}
-                />
-                <Reset className={styles.Reset} onClick={(e) => handleReset(e, logger.name)} color="#FF000AFF" />
+                <div className={styles.LevelsWrapper}>
+                    <Levels
+                        checkedLevel={effectiveLevel}
+                        configuredLevel={configuredLevel}
+                        levels={levels}
+                        handleChange={handleChange}
+                    />
+                    <Reset className={styles.Reset} onClick={(e) => handleReset(e, logger.name)} color="#FF000AFF" />
+                </div>
             </div>
-        </div>
+        </>
     );
 };

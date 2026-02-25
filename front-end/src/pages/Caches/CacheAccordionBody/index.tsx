@@ -33,23 +33,25 @@ export const CacheAccordionBody = ({ cache }: IProps) => {
     const { t } = useTranslation();
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.CacheDataWrapper}>
-                <div>{t("Caches.hitsCount")}:</div>
-                <div>{cache.hitsCount}</div>
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={styles.CacheDataWrapper}>
+                    <div>{t("Caches.hitsCount")}:</div>
+                    <div>{cache.hitsCount}</div>
 
-                <div>{t("Caches.missesCount")}:</div>
-                <div>{cache.missesCount}</div>
+                    <div>{t("Caches.missesCount")}:</div>
+                    <div>{cache.missesCount}</div>
 
-                {!!cache.estimatedEntrySize && (
-                    <>
-                        <div>{t("Caches.estimatedEntrySize")}:</div>
-                        <div>{cache.estimatedEntrySize}</div>
-                    </>
-                )}
+                    {!!cache.estimatedEntrySize && (
+                        <>
+                            <div>{t("Caches.estimatedEntrySize")}:</div>
+                            <div>{cache.estimatedEntrySize}</div>
+                        </>
+                    )}
+                </div>
+
+                <CacheChart cache={cache} />
             </div>
-
-            <CacheChart cache={cache} />
-        </div>
+        </>
     );
 };

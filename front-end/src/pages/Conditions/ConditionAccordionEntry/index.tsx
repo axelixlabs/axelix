@@ -40,21 +40,23 @@ export const ConditionsAccordionEntry = ({ items }: IProps) => {
     };
 
     return (
-        <div className={`AccordionsWrapper ${styles.AccordionsWrapper}`}>
-            {items.map(({ message, condition, status }) => (
-                <Accordion
-                    wrapperStyles={styles.AccordionWrapperStyles}
-                    header={
-                        <div className={styles.LabelWrapper}>
-                            {findNeededIcon(status)}
-                            {condition}
-                        </div>
-                    }
-                    key={`${message} ${condition}`}
-                >
-                    <div className={styles.Message}>{message}</div>
-                </Accordion>
-            ))}
-        </div>
+        <>
+            <div className={`AccordionsWrapper ${styles.AccordionsWrapper}`}>
+                {items.map(({ message, condition, status }) => (
+                    <Accordion
+                        wrapperStyles={styles.AccordionWrapperStyles}
+                        header={
+                            <div className={styles.LabelWrapper}>
+                                {findNeededIcon(status)}
+                                {condition}
+                            </div>
+                        }
+                        key={`${message} ${condition}`}
+                    >
+                        <div className={styles.Message}>{message}</div>
+                    </Accordion>
+                ))}
+            </div>
+        </>
     );
 };

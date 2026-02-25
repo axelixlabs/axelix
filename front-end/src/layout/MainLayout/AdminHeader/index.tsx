@@ -30,14 +30,16 @@ export const AdminHeader = () => {
     const navigate = useNavigate();
 
     return (
-        <div className={styles.Header}>
-            <LogoIcon onClick={() => navigate("/wallboard")} className={styles.Logo} />
-            <div className={styles.LinksAndAvatarWrapper}>
-                <NavigationBar />
-                <Help />
-                <ProfileMenu />
-                <LanguageSwitcher />
+        <>
+            <div className={styles.Header}>
+                <LogoIcon onClick={() => navigate("/wallboard")} className={styles.Logo} />
+                <div className={styles.LinksAndAvatarWrapper}>
+                    <NavigationBar />
+                    <Help />
+                    <ProfileMenu />
+                    <LanguageSwitcher />
+                </div>
             </div>
-        </div>
+        </>
     );
 };

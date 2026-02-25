@@ -37,19 +37,21 @@ interface IProps {
 
 export const InfoTooltip = ({ children, text, placement = "right" }: PropsWithChildren<IProps>) => {
     return (
-        <Tooltip
-            title={
-                <div className={styles.TooltipContentWrapper}>
-                    <div>
-                        <InfoIcon color="#fff" className={styles.InfoIcon} />
+        <>
+            <Tooltip
+                title={
+                    <div className={styles.TooltipContentWrapper}>
+                        <div>
+                            <InfoIcon color="#fff" className={styles.InfoIcon} />
+                        </div>
+                        {text}
                     </div>
-                    {text}
-                </div>
-            }
-            placement={placement}
-            color="#1890ff"
-        >
-            {children || <QuestionIcon color="#00ab55" className={styles.QuestionIcon} />}
-        </Tooltip>
+                }
+                placement={placement}
+                color="#1890ff"
+            >
+                {children || <QuestionIcon color="#00ab55" className={styles.QuestionIcon} />}
+            </Tooltip>
+        </>
     );
 };

@@ -53,62 +53,72 @@ export function AboutModal({ open, setOpen }: IProps) {
     };
 
     return (
-        <UniversalModal open={open} onOk={onClose} onClose={onClose} displayCancel={false}>
-            <div className={styles.HeaderWrapper}>
-                <p className="TextMedium">{t("About.title")}</p>
-                <p className={styles.Version}>
-                    {t("About.version")}: {version}
-                </p>
-            </div>
+        <>
+            <UniversalModal open={open} onOk={onClose} onClose={onClose} displayCancel={false}>
+                <div className={`TextSmall ${styles.HeaderWrapper}`}>
+                    <p className="TextLarge">{t("About.title")}</p>
+                    <p className={styles.Version}>
+                        {t("About.version")}: {version}
+                    </p>
+                </div>
 
-            <div>
-                <p className={styles.ParagraphGutter}>
-                    <Trans t={t} i18nKey={"About.intro"} components={[<b key="0" />]} />
-                </p>
+                <div>
+                    <p className={styles.ParagraphGutter}>
+                        <Trans t={t} i18nKey={"About.intro"} components={[<b key="0" />]} />
+                    </p>
 
-                <p className={styles.ParagraphGutter}>
-                    <Trans
-                        t={t}
-                        i18nKey={"About.licensing"}
-                        components={[
-                            <b key="0" />,
-                            <a key="1" href={licenseLink} target="_blank" rel="noopener noreferrer" />,
-                            <a key="2" href={sourceCodeLink} target="_blank" rel="noopener noreferrer" />,
-                        ]}
-                    />
-                </p>
+                    <p className={styles.ParagraphGutter}>
+                        <Trans
+                            t={t}
+                            i18nKey={"About.licensing"}
+                            components={[
+                                <b key="0" />,
+                                <a key="1" href={licenseLink} target="_blank" rel="noopener noreferrer" />,
+                                <a key="2" href={sourceCodeLink} target="_blank" rel="noopener noreferrer" />,
+                            ]}
+                        />
+                    </p>
 
-                <p className={styles.ParagraphGutter}>
-                    <Trans
-                        t={t}
-                        i18nKey={"About.contact"}
-                        components={[<a key="0" href={referenceGuideLink} target="_blank" rel="noopener noreferrer" />]}
-                    />
-                </p>
+                    <p className={styles.ParagraphGutter}>
+                        <Trans
+                            t={t}
+                            i18nKey={"About.contact"}
+                            components={[
+                                <a key="0" href={referenceGuideLink} target="_blank" rel="noopener noreferrer" />,
+                            ]}
+                        />
+                    </p>
 
-                <p className={styles.ParagraphGutter}>{t("About.bug")}</p>
-            </div>
+                    <p className={styles.ParagraphGutter}>{t("About.bug")}</p>
+                </div>
 
-            <div className={styles.ActionsWrapper}>
-                <Button
-                    size="small"
-                    shape="round"
-                    icon={<GithubOutlined />}
-                    href={sourceCodeLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    {t("About.githubSource")}
-                </Button>
+                <div className={styles.ActionsWrapper}>
+                    <Button
+                        size="small"
+                        shape="round"
+                        icon={<GithubOutlined />}
+                        href={sourceCodeLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {t("About.githubSource")}
+                    </Button>
 
-                <Button size="small" shape="round" icon={<ReadOutlined />} href={referenceGuideLink} target="_blank">
-                    {t("documentation")}
-                </Button>
+                    <Button
+                        size="small"
+                        shape="round"
+                        icon={<ReadOutlined />}
+                        href={referenceGuideLink}
+                        target="_blank"
+                    >
+                        {t("documentation")}
+                    </Button>
 
-                <Button icon={<FileTextOutlined />} size="small" shape="round" href={blogLink} target="_blank">
-                    {t("About.blog")}
-                </Button>
-            </div>
-        </UniversalModal>
+                    <Button icon={<FileTextOutlined />} size="small" shape="round" href={blogLink} target="_blank">
+                        {t("About.blog")}
+                    </Button>
+                </div>
+            </UniversalModal>
+        </>
     );
 }

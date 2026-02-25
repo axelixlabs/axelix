@@ -56,18 +56,20 @@ export const SingleThreadAccordionHeader = ({
     const { colorPrimary } = getThreadStateColor(currentThreadSnapshot);
 
     return (
-        <div className={styles.MainWrapper}>
-            <div
-                className={styles.ThreadNameAvatar}
-                style={{
-                    backgroundColor: colorPrimary,
-                }}
-            >
-                {threadDumpStateLetters[currentThreadSnapshot.threadState]}
-            </div>
-            <div>{currentThreadSnapshot.threadName}</div>
+        <>
+            <div className={styles.MainWrapper}>
+                <div
+                    className={styles.ThreadNameAvatar}
+                    style={{
+                        backgroundColor: colorPrimary,
+                    }}
+                >
+                    {threadDumpStateLetters[currentThreadSnapshot.threadState]}
+                </div>
+                <div>{currentThreadSnapshot.threadName}</div>
 
-            <ThreadTimeLine history={history} selectedGroup={selectedGroup} setSelectedGroups={setSelectedGroups} />
-        </div>
+                <ThreadTimeLine history={history} selectedGroup={selectedGroup} setSelectedGroups={setSelectedGroups} />
+            </div>
+        </>
     );
 };

@@ -93,42 +93,44 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
     };
 
     return (
-        <div className={styles.FirstSection}>
-            <div className="TextMedium">{t("GC.mainTitle")}</div>
-            <div className={styles.ActionButtonsWrapper}>
-                {isLoggingStatusEnabled && (
-                    <>
-                        <Tooltip title={t("GC.download")}>
-                            <Button
-                                icon={<DownloadIcon />}
-                                type="primary"
-                                loading={downloadFileLoading}
-                                onClick={downloadFileHandler}
-                                className={styles.ActionButton}
-                            />
-                        </Tooltip>
-                        <Tooltip title={t("GC.disable")}>
-                            <Button
-                                icon={<OnOffIcon />}
-                                type="primary"
-                                loading={disableGCData.loading}
-                                onClick={disableGCHandler}
-                                danger
-                                className={styles.ActionButton}
-                            />
-                        </Tooltip>
-                    </>
-                )}
-                <Tooltip title={t("GC.triggerButtonText")}>
-                    <Button
-                        icon={<RunIcon />}
-                        type="primary"
-                        loading={triggerGBData.loading}
-                        onClick={triggerGBHandler}
-                        className={styles.ActionButton}
-                    />
-                </Tooltip>
+        <>
+            <div className={styles.FirstSection}>
+                <div className="TextLarge">{t("GC.mainTitle")}</div>
+                <div className={styles.ActionButtonsWrapper}>
+                    {isLoggingStatusEnabled && (
+                        <>
+                            <Tooltip title={t("GC.download")}>
+                                <Button
+                                    icon={<DownloadIcon />}
+                                    type="primary"
+                                    loading={downloadFileLoading}
+                                    onClick={downloadFileHandler}
+                                    className={styles.ActionButton}
+                                />
+                            </Tooltip>
+                            <Tooltip title={t("GC.disable")}>
+                                <Button
+                                    icon={<OnOffIcon />}
+                                    type="primary"
+                                    loading={disableGCData.loading}
+                                    onClick={disableGCHandler}
+                                    danger
+                                    className={styles.ActionButton}
+                                />
+                            </Tooltip>
+                        </>
+                    )}
+                    <Tooltip title={t("GC.triggerButtonText")}>
+                        <Button
+                            icon={<RunIcon />}
+                            type="primary"
+                            loading={triggerGBData.loading}
+                            onClick={triggerGBHandler}
+                            className={styles.ActionButton}
+                        />
+                    </Tooltip>
+                </div>
             </div>
-        </div>
+        </>
     );
 };

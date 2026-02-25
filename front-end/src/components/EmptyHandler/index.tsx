@@ -30,8 +30,12 @@ export const EmptyHandler = ({ isEmpty, children }: PropsWithChildren<IProps>) =
     const { t } = useTranslation();
 
     if (isEmpty) {
-        return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<p>{t("noData")}</p>} />;
+        return (
+            <>
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<p>{t("noData")}</p>} />
+            </>
+        );
     }
 
-    return children;
+    return <>{children}</>;
 };

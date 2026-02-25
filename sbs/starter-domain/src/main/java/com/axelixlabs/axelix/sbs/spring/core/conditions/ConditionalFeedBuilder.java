@@ -15,30 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.serde;
+package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.NonNull;
 
-import org.springframework.stereotype.Component;
-
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
+import com.axelixlabs.axelix.common.api.ConditionsFeed;
 
 /**
- * {@link JacksonMessageDeserializationStrategy} for {@link ConfigPropsFeed}.
+ * Interface that is capable to assemble the {@link ConditionsFeed}.
  *
  * @author Sergey Cherkasov
  */
-@Component
-public class ConfigPropsJacksonMessageDeserializationStrategy
-        extends JacksonMessageDeserializationStrategy<ConfigPropsFeed> {
+public interface ConditionalFeedBuilder {
 
-    public ConfigPropsJacksonMessageDeserializationStrategy(ObjectMapper objectMapper) {
-        super(objectMapper);
-    }
-
-    @Override
-    public @NonNull Class<ConfigPropsFeed> supported() {
-        return ConfigPropsFeed.class;
-    }
+    /**
+     * @return feed of conditions inside the given application.
+     */
+    @NonNull
+    ConditionsFeed buildConditionsFeed();
 }

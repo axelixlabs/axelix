@@ -35,14 +35,16 @@ export const BeanAccordionChildren = ({ bean }: IProps) => {
     const { dependencies, aliases, qualifiers, isLazyInit, isPrimary } = bean;
 
     return (
-        <div className={styles.AccordionBody}>
-            {dependencies.length > 0 && <BeanDependencies dependencies={dependencies} />}
-            {aliases.length > 0 && <BeanSimpleList valuesTag="aliases" values={aliases} />}
-            {qualifiers.length > 0 && <BeanSimpleList valuesTag="qualifiers" values={qualifiers} />}
-            <BeanProxyType proxyType={bean.proxyType} />
-            <BeanBooleanFlag valueTag={"isLazyInitBean"} value={isLazyInit} />
-            <BeanBooleanFlag valueTag={"isPrimaryBean"} value={isPrimary} />
-            <BeanSource bean={bean} />
-        </div>
+        <>
+            <div className={styles.AccordionBody}>
+                {dependencies.length > 0 && <BeanDependencies dependencies={dependencies} />}
+                {aliases.length > 0 && <BeanSimpleList valuesTag="aliases" values={aliases} />}
+                {qualifiers.length > 0 && <BeanSimpleList valuesTag="qualifiers" values={qualifiers} />}
+                <BeanProxyType proxyType={bean.proxyType} />
+                <BeanBooleanFlag valueTag={"isLazyInitBean"} value={isLazyInit} />
+                <BeanBooleanFlag valueTag={"isPrimaryBean"} value={isPrimary} />
+                <BeanSource bean={bean} />
+            </div>
+        </>
     );
 };

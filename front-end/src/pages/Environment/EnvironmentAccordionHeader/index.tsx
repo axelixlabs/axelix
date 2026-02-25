@@ -33,13 +33,15 @@ export const EnvironmentAccordionHeader = ({ property }: IProps) => {
     const { name } = property;
 
     return (
-        <div key={name} className={styles.MainWrapper}>
-            <div className={styles.KeyChunk}>
-                {name} <Copy text={name} />
+        <>
+            <div key={name} className={styles.MainWrapper}>
+                <div className={styles.KeyChunk}>
+                    {name} <Copy text={name} />
+                </div>
+                <div className={styles.ValueChunk}>
+                    <EnvironmentPropertyValue property={property} />
+                </div>
             </div>
-            <div className={styles.ValueChunk}>
-                <EnvironmentPropertyValue property={property} />
-            </div>
-        </div>
+        </>
     );
 };

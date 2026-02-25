@@ -37,7 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
+import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
@@ -78,12 +78,11 @@ public class AxelixConfigurationPropertiesEndpointTest {
     @ParameterizedTest
     @MethodSource("propertyName")
     void shouldReturnPropertiesNameAndValue(String propertyName, String expectedValue) {
-        ResponseEntity<ConfigPropsFeed> response =
-                restTemplate.getForEntity("/actuator/axelix-configprops", ConfigPropsFeed.class);
+        ResponseEntity<ConfigurationPropertiesFeed> response =
+                restTemplate.getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
 
-        List<KeyValue> properties = response.getBody().getContexts().values().stream()
-                .flatMap(ctx -> ctx.getBeans().values().stream())
-                .filter(e -> e.getPrefix().equals("axelix.prop.test"))
+        List<KeyValue> properties = response.getBody().getBeans().stream()
+                .filter(beans -> beans.getPrefix().equals("axelix.prop.test"))
                 .flatMap(bean -> bean.getProperties().stream())
                 .toList();
 
@@ -132,8 +131,14 @@ public class AxelixConfigurationPropertiesEndpointTest {
     static class AxelixConfigurationPropertiesTestConfiguration {
 
         @Bean
-        public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-            return new FlatteningConfigurationPropertiesConverter();
+        public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
+            return new DefaultConfigurationPropertiesFlattener();
+        }
+
+        @Bean
+        public ConfigurationPropertiesConverter configurationPropertiesConverter(
+                ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
+            return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
         }
 
         @Bean

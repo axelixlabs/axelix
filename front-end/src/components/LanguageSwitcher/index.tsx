@@ -28,14 +28,16 @@ export const LanguageSwitcher = () => {
     };
 
     return (
-        <Select
-            defaultValue={i18n.language}
-            onChange={handleChange}
-            options={[
-                { value: "en", label: "English" },
-                { value: "ru", label: "Русский" },
-            ]}
-            className={styles.LanguageSwitcherSelect}
-        />
+        <>
+            <Select
+                defaultValue={i18n.language}
+                onChange={handleChange}
+                options={[
+                    { value: "en", label: "English" },
+                    { value: "ru", label: "Русский" },
+                ]}
+                className={styles.LanguageSwitcherSelect}
+            />
+        </>
     );
 };

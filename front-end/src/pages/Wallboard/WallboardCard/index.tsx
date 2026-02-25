@@ -62,52 +62,54 @@ export const WallboardCard = ({ data }: IProps) => {
     }, []);
 
     return (
-        <Link
-            to={`/instance/${data.instanceId}/details`}
-            className={`${styles.Card} ${!isUp ? styles[data.status] : ""}`}
-        >
-            <div className={styles.Header}>
-                <Tooltip title={isEllipsis ? data.name : undefined}>
-                    <div ref={textRef} className={styles.Title}>
-                        {data.name}
+        <>
+            <Link
+                to={`/instance/${data.instanceId}/details`}
+                className={`${styles.Card} ${!isUp ? styles[data.status] : ""}`}
+            >
+                <div className={styles.Header}>
+                    <Tooltip title={isEllipsis ? data.name : undefined}>
+                        <div ref={textRef} className={styles.Title}>
+                            {data.name}
+                        </div>
+                    </Tooltip>
+                    {!isUnknown ? (
+                        <Badge
+                            status={isDown ? "processing" : undefined}
+                            color={isDown ? "#ff000a" : "#00ab55"}
+                            styles={{
+                                indicator: {
+                                    width: "8px",
+                                    height: "8px",
+                                },
+                            }}
+                        />
+                    ) : (
+                        <QuestionIcon className={styles.QuestionIcon} />
+                    )}
+                </div>
+                <div className={`TextSmall ${styles.Body}`}>
+                    <div className={styles.BodyChunk}>
+                        <div className={styles.Label}>Version</div>
+                        <div className={styles.Value}>{data.serviceVersion}</div>
                     </div>
-                </Tooltip>
-                {!isUnknown ? (
-                    <Badge
-                        status={isDown ? "processing" : undefined}
-                        color={isDown ? "#ff000a" : "#00ab55"}
-                        styles={{
-                            indicator: {
-                                width: "8px",
-                                height: "8px",
-                            },
-                        }}
-                    />
-                ) : (
-                    <QuestionIcon className={styles.QuestionIcon} />
-                )}
-            </div>
-            <div className={styles.Body}>
-                <div className={styles.BodyChunk}>
-                    <div className={styles.Label}>Version</div>
-                    <div className={styles.Value}>{data.serviceVersion}</div>
-                </div>
 
-                <div className={styles.BodyChunk}>
-                    <div className={styles.Label}>Spring Boot</div>
-                    <div className={styles.Value}>{data.springBootVersion}</div>
-                </div>
+                    <div className={styles.BodyChunk}>
+                        <div className={styles.Label}>Spring Boot</div>
+                        <div className={styles.Value}>{data.springBootVersion}</div>
+                    </div>
 
-                <div className={styles.BodyChunk}>
-                    <div className={styles.Label}>Java</div>
-                    <div className={styles.Value}>{data.javaVersion}</div>
-                </div>
+                    <div className={styles.BodyChunk}>
+                        <div className={styles.Label}>Java</div>
+                        <div className={styles.Value}>{data.javaVersion}</div>
+                    </div>
 
-                <div className={styles.Footer}>
-                    <div className={styles.Label}>Commit: {data.commitShaShort}</div>
-                    <div className={styles.Value}>{data.deployedFor}</div>
+                    <div className={styles.Footer}>
+                        <div className={styles.Label}>Commit: {data.commitShaShort}</div>
+                        <div className={styles.Value}>{data.deployedFor}</div>
+                    </div>
                 </div>
-            </div>
-        </Link>
+            </Link>
+        </>
     );
 };

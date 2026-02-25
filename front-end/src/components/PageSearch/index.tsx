@@ -58,26 +58,32 @@ export const PageSearch = ({ setSearch, addonAfter, autocompleteOptions, removeB
 
     if (autocompleteOptions) {
         return (
-            <Space.Compact
-                className={`${styles.SearchWrapper} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}
-            >
-                <AutoComplete
-                    options={autocompleteOptions}
-                    onChange={(value) => scheduleSetSearch(value)}
-                    onSelect={(value) => setSearch(value)}
-                    className={`${styles.Search}`}
+            <>
+                <Space.Compact
+                    className={`${styles.SearchWrapper} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}
                 >
-                    <Input placeholder={t("search")} />
-                </AutoComplete>
-                {addonAfter && <Space.Addon className={styles.AddonAfter}>{addonAfter}</Space.Addon>}
-            </Space.Compact>
+                    <AutoComplete
+                        options={autocompleteOptions}
+                        onChange={(value) => scheduleSetSearch(value)}
+                        onSelect={(value) => setSearch(value)}
+                        className={`${styles.Search}`}
+                    >
+                        <Input placeholder={t("search")} />
+                    </AutoComplete>
+                    {addonAfter && <Space.Addon className={styles.AddonAfter}>{addonAfter}</Space.Addon>}
+                </Space.Compact>
+            </>
         );
     }
 
     return (
-        <Space.Compact className={`${styles.SearchWrapper} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}>
-            <Input placeholder={t("search")} onChange={(e) => scheduleSetSearch(e.target.value)} />
-            {addonAfter && <Space.Addon className={styles.AddonAfter}>{addonAfter}</Space.Addon>}
-        </Space.Compact>
+        <>
+            <Space.Compact
+                className={`${styles.SearchWrapper} ${removeBottomGutter ? styles.RemovedBottomGutter : ""} `}
+            >
+                <Input placeholder={t("search")} onChange={(e) => scheduleSetSearch(e.target.value)} />
+                {addonAfter && <Space.Addon className={styles.AddonAfter}>{addonAfter}</Space.Addon>}
+            </Space.Compact>
+        </>
     );
 };

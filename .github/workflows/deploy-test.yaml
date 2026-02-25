@@ -28,6 +28,10 @@ jobs:
       # Use branch from workflow_dispatch input if provided, otherwise default to 'main'
       HELM_CHART_BRANCH: ${{ github.event.inputs.helm_chart_branch || 'main' }}
 
+      # The JWT signing key used for test environment by both starter and master
+      # TODO: YET ANOTHER REASON FOR THE TRUE MONOREPO
+      JWT_SIGNING_KEY: ${{ secrets.JWT_SIGNING_KEY }}
+
       # We need Nexus so that the playground repos have the place to pull the dependency from
       # These are needed in order to publish the final build artifacts into Nexus package registry
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
@@ -102,6 +106,8 @@ jobs:
             --set image.pullPolicy=Always \
             --set image.name=$IMAGE_REPOSITORY/$IMAGE_NAME \
             --set image.ref=${{ steps.gradleProperties.outputs.value }} \
+            --set app.auth.jwt.signingKey=${{ env.JWT_SIGNING_KEY }} \
+            --set app.auth.jwt.algorithm=HMAC512 \
             --install axelix-master . \
             -f values.yaml
 

@@ -17,13 +17,15 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
+import org.jspecify.annotations.NonNull;
+
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ApplicationConfigurationProperties;
 
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
+import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 
 /**
  * Interface that is capable to convert values from type {@code ConfigurationPropertiesDescriptor}
- * to type {@link ConfigPropsFeed}.
+ * to type {@link ConfigurationPropertiesFeed}.
  *
  * @author Sergey Cherkasov
  */
@@ -31,10 +33,11 @@ public interface ConfigurationPropertiesConverter {
 
     /**
      * Converts the original configprops response of type {@code ConfigurationPropertiesDescriptor}
-     * to type {@link ConfigPropsFeed}.
+     * to type {@link ConfigurationPropertiesFeed}.
      *
      * @param originalDescriptor the original {@code @ConfigurationProperties} descriptor from Spring Boot
      * @return converted {@code @ConfigurationProperties} descriptor
      */
-    ConfigPropsFeed convert(ApplicationConfigurationProperties originalDescriptor);
+    @NonNull
+    ConfigurationPropertiesFeed convert(ApplicationConfigurationProperties originalDescriptor);
 }

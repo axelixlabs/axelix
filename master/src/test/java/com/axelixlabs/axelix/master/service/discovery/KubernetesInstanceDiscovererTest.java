@@ -39,11 +39,11 @@ import org.mockito.Mockito;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
@@ -74,7 +74,7 @@ class KubernetesInstanceDiscovererTest {
 
     private static MockWebServer mockWebServer;
 
-    @MockBean
+    @MockitoBean
     private DiscoveryClient discoveryClient;
 
     @Autowired

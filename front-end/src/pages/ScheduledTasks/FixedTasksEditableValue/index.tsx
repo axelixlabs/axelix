@@ -81,50 +81,52 @@ export const FixedTasksEditableValue = ({ task }: IProps) => {
     };
 
     return (
-        <div className={styles.IntervalPreviewWrapper}>
-            {actualValue}
-            <Popover
-                title={t("ScheduledTasks.enterNewInterval")}
-                open={isPopoverOpen}
-                onOpenChange={(newOpen) => {
-                    setIsPopoverOpen(newOpen);
-                    setTempValue(actualValue);
-                }}
-                content={
-                    <div className={styles.EditWrapper}>
-                        <Input
-                            value={tempValue}
-                            onChange={(e) => handleInputChange(e.target.value)}
-                            status={isValidInterval ? "success" : "error"}
-                            disabled={loading}
-                        />
+        <>
+            <div className={styles.IntervalPreviewWrapper}>
+                {actualValue}
+                <Popover
+                    title={t("ScheduledTasks.enterNewInterval")}
+                    open={isPopoverOpen}
+                    onOpenChange={(newOpen) => {
+                        setIsPopoverOpen(newOpen);
+                        setTempValue(actualValue);
+                    }}
+                    content={
+                        <div className={styles.EditWrapper}>
+                            <Input
+                                value={tempValue}
+                                onChange={(e) => handleInputChange(e.target.value)}
+                                status={isValidInterval ? "success" : "error"}
+                                disabled={loading}
+                            />
 
-                        <Button
-                            icon={<CloseOutlined />}
-                            type="primary"
-                            onClick={handleCancel}
-                            className={styles.EditActionButtons}
-                        />
+                            <Button
+                                icon={<CloseOutlined />}
+                                type="primary"
+                                onClick={handleCancel}
+                                className={styles.EditActionButtons}
+                            />
 
-                        <Button
-                            icon={<CheckOutlined />}
-                            type="primary"
-                            disabled={!isValidInterval}
-                            onClick={handleUpdate}
-                            loading={loading}
-                            className={styles.EditActionButtons}
-                        />
-                    </div>
-                }
-                styles={{
-                    container: {
-                        minWidth: "300px",
-                    },
-                }}
-                trigger="click"
-            >
-                <Button icon={<EditOutlined />} type="primary" />
-            </Popover>
-        </div>
+                            <Button
+                                icon={<CheckOutlined />}
+                                type="primary"
+                                disabled={!isValidInterval}
+                                onClick={handleUpdate}
+                                loading={loading}
+                                className={styles.EditActionButtons}
+                            />
+                        </div>
+                    }
+                    styles={{
+                        container: {
+                            minWidth: "300px",
+                        },
+                    }}
+                    trigger="click"
+                >
+                    <Button icon={<EditOutlined />} type="primary" />
+                </Popover>
+            </div>
+        </>
     );
 };

@@ -50,13 +50,15 @@ export const ConfigPropsPropertyValue = ({ propertyName, propertyValue }: IProps
     };
 
     return (
-        <div className={styles.MainWrapper}>
-            <EditableValue
-                className={styles.PropertyValueWrapper}
-                editClassName={styles.EditPropertyWrapper}
-                initialValue={propertyValue || "null"}
-                onNewValue={updatePropertyClickHandler}
-            />
-        </div>
+        <>
+            <div className={styles.MainWrapper}>
+                <EditableValue
+                    className={styles.PropertyValueWrapper}
+                    editClassName={styles.EditPropertyWrapper}
+                    initialValue={propertyValue || "null"}
+                    onNewValue={updatePropertyClickHandler}
+                />
+            </div>
+        </>
     );
 };

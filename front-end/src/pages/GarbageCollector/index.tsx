@@ -53,17 +53,19 @@ const GarbageCollector = () => {
     const isLoggingStatusEnabled = gcStatus.enabled;
 
     return (
-        <div className={styles.MainWrapper}>
-            <GCFirstSection isLoggingStatusEnabled={isLoggingStatusEnabled} loadGCStatus={loadGCStatus} />
+        <>
+            <div className={styles.MainWrapper}>
+                <GCFirstSection isLoggingStatusEnabled={isLoggingStatusEnabled} loadGCStatus={loadGCStatus} />
 
-            <div className={styles.ContentWrapper}>
-                {isLoggingStatusEnabled ? (
-                    <GCLogFeed />
-                ) : (
-                    <GCDisabledMessage loggingStatusData={gcStatus} loadGCStatus={loadGCStatus} />
-                )}
+                <div className={styles.ContentWrapper}>
+                    {isLoggingStatusEnabled ? (
+                        <GCLogFeed />
+                    ) : (
+                        <GCDisabledMessage loggingStatusData={gcStatus} loadGCStatus={loadGCStatus} />
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

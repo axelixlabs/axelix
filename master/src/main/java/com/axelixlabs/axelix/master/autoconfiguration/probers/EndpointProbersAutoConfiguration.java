@@ -22,8 +22,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.api.ConditionsFeed;
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
 import com.axelixlabs.axelix.common.api.InstanceDetails;
 import com.axelixlabs.axelix.common.api.ProfileMutationResult;
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
@@ -31,8 +29,6 @@ import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
 import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.service.serde.BeansJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.ConditionsJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.ConfigPropsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
@@ -276,17 +272,14 @@ public class EndpointProbersAutoConfiguration {
 
     // Conditions
     @Bean
-    public DefaultEndpointProber<ConditionsFeed> getConditionsProber(
-            ConditionsJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_CONDITIONS);
+    public ProxyingEndpointProber getConditionsProber() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_CONDITIONS);
     }
 
-    // ConfigurationProperties
+    // Configuration Properties
     @Bean
-    public DefaultEndpointProber<ConfigPropsFeed> getConfigPropsProber(
-            ConfigPropsJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.GET_CONFIG_PROPS);
+    public ProxyingEndpointProber getConfigPropsProber() {
+        return new ProxyingEndpointProber(instanceRegistry, ActuatorEndpoints.GET_CONFIG_PROPS);
     }
 
     // @Transaction monitoring

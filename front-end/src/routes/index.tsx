@@ -25,5 +25,9 @@ import { MainRoutes } from "./MainRoutes";
 export const AppRoutes = () => {
     const isAuth = localStorage.getItem(IS_AUTH);
 
-    return <BrowserRouter>{isAuth ? <MainRoutes /> : <AuthRoutes />}</BrowserRouter>;
+    return (
+        <>
+            <BrowserRouter>{isAuth ? <MainRoutes /> : <AuthRoutes />}</BrowserRouter>
+        </>
+    );
 };

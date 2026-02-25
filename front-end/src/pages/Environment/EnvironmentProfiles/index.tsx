@@ -30,13 +30,15 @@ export const EnvironmentProfiles = ({ activeProfiles }: IProps) => {
     const { t } = useTranslation();
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.ProfilesWrapper}>
-                <div className={styles.ProfileTitle}>{t("Environments.activeProfiles")}</div>
-                {activeProfiles.map((activeProfile) => (
-                    <div className={styles.ProfileValue}>{activeProfile}</div>
-                ))}
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={styles.ProfilesWrapper}>
+                    <div className={styles.ProfileTitle}>{t("Environments.activeProfiles")}</div>
+                    {activeProfiles.map((activeProfile) => (
+                        <div className={styles.ProfileValue}>{activeProfile}</div>
+                    ))}
+                </div>
             </div>
-        </div>
+        </>
     );
 };

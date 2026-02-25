@@ -45,5 +45,9 @@ export const Copy = ({ text }: IProps) => {
         }
     };
 
-    return <CopyIcon onClick={handleCopy} className={styles.CopyIcon} />;
+    return (
+        <>
+            <CopyIcon onClick={handleCopy} className={styles.CopyIcon} />
+        </>
+    );
 };

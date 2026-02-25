@@ -20,47 +20,18 @@ package com.axelixlabs.axelix.sbs.spring.core.configprops;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesBeanDescriptor;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor;
-import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint.ContextConfigurationPropertiesDescriptor;
-
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
-import com.axelixlabs.axelix.common.utils.BeanNameUtils;
 
 /**
- * {@link ConfigurationPropertiesConverter} that flattens out the configuration properties feed as it is returned from the
- * Spring Boot native actuator endpoint.
+ * Default implementation {@link ConfigurationPropertiesFlattener}.
  *
  * @author Sergey Cherkasov
  */
-public class FlatteningConfigurationPropertiesConverter implements ConfigurationPropertiesConverter {
+public class DefaultConfigurationPropertiesFlattener implements ConfigurationPropertiesFlattener {
 
     @Override
-    public ConfigPropsFeed convert(ConfigurationPropertiesDescriptor originalDescriptor) {
-        Map<String, ConfigPropsFeed.Context> context = originalDescriptor.getContexts().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> convertContext(e.getValue())));
-
-        return new ConfigPropsFeed(context);
-    }
-
-    private ConfigPropsFeed.Context convertContext(ContextConfigurationPropertiesDescriptor source) {
-
-        Map<String, ConfigPropsFeed.Bean> beans = source.getBeans().entrySet().stream()
-                .collect(Collectors.toMap(
-                        b -> BeanNameUtils.stripConfigPropsPrefix(b.getKey()), e -> convertBean(e.getValue())));
-
-        return new ConfigPropsFeed.Context(beans, source.getParentId());
-    }
-
-    private ConfigPropsFeed.Bean convertBean(ConfigurationPropertiesBeanDescriptor src) {
-        return new ConfigPropsFeed.Bean(
-                src.getPrefix(), flatten("", src.getProperties()), flatten("", src.getInputs()));
-    }
-
-    private List<KeyValue> flatten(String key, Map<String, Object> map) {
+    public List<KeyValue> flatten(String key, Map<String, Object> map) {
         if (map == null || map.isEmpty()) {
             return List.of();
         }
@@ -74,13 +45,18 @@ public class FlatteningConfigurationPropertiesConverter implements Configuration
 
     @SuppressWarnings("unchecked")
     private List<KeyValue> flattenEntry(String key, Object value) {
-        if (value instanceof Map<?, ?> map) {
+
+        if (value instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) value;
             return flattenMap(key, (Map<String, Object>) map);
         }
-        if (value instanceof List<?> list) {
+
+        if (value instanceof List) {
+            List<?> list = (List<?>) value;
             return flattenList(key, list);
         }
-        return List.of(new KeyValue(key, value.toString()));
+
+        return List.of(new KeyValue(key, String.valueOf(value)));
     }
 
     private List<KeyValue> flattenMap(String key, Map<String, Object> map) {

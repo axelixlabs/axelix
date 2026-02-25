@@ -41,5 +41,9 @@ export const GCLogFeed = () => {
 
     const content = logsData.response;
 
-    return <pre>{content}</pre>;
+    return (
+        <>
+            <pre>{content}</pre>
+        </>
+    );
 };

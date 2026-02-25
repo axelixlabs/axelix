@@ -79,40 +79,42 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
     const modalTitle = isLoading ? t("Details.exportConfigurationLoading") : t("Details.exportConfigurationOptions");
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.MainTitle}>{instanceName}</div>
-            <Button
-                type="primary"
-                icon={<DownloadIcon />}
-                onClick={() => setIsModalOpen(true)}
-                className={styles.Download}
-            >
-                {t("Details.downloadState")}
-            </Button>
-            <UniversalModal
-                title={modalTitle}
-                open={isModalOpen}
-                onOk={handleOk}
-                onClose={() => setIsModalOpen(false)}
-                loading={isLoading}
-            >
-                {isLoading ? (
-                    <div className={styles.LoaderWrapper}>
-                        <Loader />
-                    </div>
-                ) : (
-                    <List
-                        bordered
-                        dataSource={Object.values(EExportableComponent)}
-                        renderItem={(component) => (
-                            <List.Item actions={[<Switch onChange={() => handleChange(component)} />]}>
-                                {t(`Details.Components.${component}`)}
-                            </List.Item>
-                        )}
-                        className={styles.List}
-                    />
-                )}
-            </UniversalModal>
-        </div>
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={`TextLarge ${styles.MainTitle}`}>{instanceName}</div>
+                <Button
+                    type="primary"
+                    icon={<DownloadIcon />}
+                    onClick={() => setIsModalOpen(true)}
+                    className={styles.Download}
+                >
+                    {t("Details.downloadState")}
+                </Button>
+                <UniversalModal
+                    title={modalTitle}
+                    open={isModalOpen}
+                    onOk={handleOk}
+                    onClose={() => setIsModalOpen(false)}
+                    loading={isLoading}
+                >
+                    {isLoading ? (
+                        <div className={styles.LoaderWrapper}>
+                            <Loader />
+                        </div>
+                    ) : (
+                        <List
+                            bordered
+                            dataSource={Object.values(EExportableComponent)}
+                            renderItem={(component) => (
+                                <List.Item actions={[<Switch onChange={() => handleChange(component)} />]}>
+                                    {t(`Details.Components.${component}`)}
+                                </List.Item>
+                            )}
+                            className={styles.List}
+                        />
+                    )}
+                </UniversalModal>
+            </div>
+        </>
     );
 };

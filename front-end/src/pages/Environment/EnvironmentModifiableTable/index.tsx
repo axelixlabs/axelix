@@ -39,47 +39,51 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
     const [withDropDown, withoutDropDown] = splitProperties(properties);
 
     return (
-        <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
-            <Accordion
-                header={
-                    <div className={styles.AccordionHeader}>
-                        {name}
-                        {description && (
-                            <InfoTooltip text={description}>
-                                <InfoIcon color="#1890ff" />
-                            </InfoTooltip>
-                        )}
+        <>
+            <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
+                <Accordion
+                    header={
+                        <div className={styles.AccordionHeader}>
+                            {name}
+                            {description && (
+                                <InfoTooltip text={description}>
+                                    <InfoIcon color="#1890ff" />
+                                </InfoTooltip>
+                            )}
+                        </div>
+                    }
+                    headerStyles={styles.MainAccordionHeaderStyles}
+                    accordionExpanded
+                >
+                    <div className="AccordionsWrapper">
+                        <EmptyHandler isEmpty={!properties.length}>
+                            {[
+                                ...withDropDown.map((property) => (
+                                    <Accordion
+                                        header={<EnvironmentAccordionHeader property={property} />}
+                                        headerStyles={
+                                            property.deprecation ? styles.DeprecatedPropertyAccordionsHeader : ""
+                                        }
+                                        key={property.name}
+                                    >
+                                        <EnvironmentAccordionBody property={property} />
+                                    </Accordion>
+                                )),
+                                ...withoutDropDown.map((property) => (
+                                    <div className={styles.CommonPropertyWrapper} key={property.name}>
+                                        <div className={styles.KeyChunk}>
+                                            {property.name} <Copy text={property.name} />
+                                        </div>
+                                        <div className={styles.ValueChunk}>
+                                            <EnvironmentPropertyValue property={property} />
+                                        </div>
+                                    </div>
+                                )),
+                            ]}
+                        </EmptyHandler>
                     </div>
-                }
-                headerStyles={styles.MainAccordionHeaderStyles}
-                accordionExpanded
-            >
-                <div className="AccordionsWrapper">
-                    <EmptyHandler isEmpty={!properties.length}>
-                        {[
-                            ...withDropDown.map((property) => (
-                                <Accordion
-                                    header={<EnvironmentAccordionHeader property={property} />}
-                                    headerStyles={property.deprecation ? styles.DeprecatedPropertyAccordionsHeader : ""}
-                                    key={property.name}
-                                >
-                                    <EnvironmentAccordionBody property={property} />
-                                </Accordion>
-                            )),
-                            ...withoutDropDown.map((property) => (
-                                <div className={styles.CommonPropertyWrapper} key={property.name}>
-                                    <div className={styles.KeyChunk}>
-                                        {property.name} <Copy text={property.name} />
-                                    </div>
-                                    <div className={styles.ValueChunk}>
-                                        <EnvironmentPropertyValue property={property} />
-                                    </div>
-                                </div>
-                            )),
-                        ]}
-                    </EmptyHandler>
-                </div>
-            </Accordion>
-        </div>
+                </Accordion>
+            </div>
+        </>
     );
 };

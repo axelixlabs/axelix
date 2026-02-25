@@ -58,8 +58,10 @@ export const ProfileMenu = () => {
     ];
 
     return (
-        <Dropdown menu={{ items }}>
-            <Avatar size={32} icon={<UserOutlined />} className={styles.Avatar} />
-        </Dropdown>
+        <>
+            <Dropdown menu={{ items }}>
+                <Avatar size={32} icon={<UserOutlined />} className={styles.Avatar} />
+            </Dropdown>
+        </>
     );
 };

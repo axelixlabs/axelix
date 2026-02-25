@@ -21,6 +21,7 @@ export interface ILoginSubmitRequestData {
      * Used to identify the user during the login process.
      */
     username: string;
+
     /**
      * The password of the user.
      * Used to authenticate the user during the login process.

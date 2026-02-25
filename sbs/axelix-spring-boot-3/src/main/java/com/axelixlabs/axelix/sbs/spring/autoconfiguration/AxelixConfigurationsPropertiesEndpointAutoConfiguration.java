@@ -28,7 +28,9 @@ import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProper
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.FlatteningConfigurationPropertiesConverter;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
@@ -46,8 +48,15 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-        return new FlatteningConfigurationPropertiesConverter();
+    public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
+        return new DefaultConfigurationPropertiesFlattener();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConfigurationPropertiesConverter configurationPropertiesConverter(
+            ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
+        return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
     }
 
     @Bean

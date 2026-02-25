@@ -69,28 +69,30 @@ export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
     };
 
     return (
-        <div className={styles.AccordionHeader}>
-            <div className={styles.ContentRowChunkWrapper}>
-                <div className={styles.ContentWrapper}>
-                    <span>{t("Caches.name")}: </span>
-                    <span className={styles.CacheName}>{cache.name}</span>
-                    <div className={styles.TargetWrapper}>
-                        <div className={styles.Target}>{t("Caches.target")}:</div>
-                        <TooltipWithCopy text={cache.target} />
+        <>
+            <div className={styles.AccordionHeader}>
+                <div className={styles.ContentRowChunkWrapper}>
+                    <div className={styles.ContentWrapper}>
+                        <span>{t("Caches.name")}: </span>
+                        <span className={styles.CacheName}>{cache.name}</span>
+                        <div className={styles.TargetWrapper}>
+                            <div className={styles.Target}>{t("Caches.target")}:</div>
+                            <TooltipWithCopy text={cache.target} />
+                        </div>
                     </div>
                 </div>
+                <div className={styles.RowChunk}>
+                    <Button
+                        icon={<ReloadOutlined />}
+                        type="primary"
+                        loading={clearSingleCache.loading}
+                        onClick={clearCacheClickHandler}
+                    />
+                </div>
+                <div className={styles.RowChunk}>
+                    <CacheStatusSwitch cacheManagerName={cacheManagerName} cache={cache} />
+                </div>
             </div>
-            <div className={styles.RowChunk}>
-                <Button
-                    icon={<ReloadOutlined />}
-                    type="primary"
-                    loading={clearSingleCache.loading}
-                    onClick={clearCacheClickHandler}
-                />
-            </div>
-            <div className={styles.RowChunk}>
-                <CacheStatusSwitch cacheManagerName={cacheManagerName} cache={cache} />
-            </div>
-        </div>
+        </>
     );
 };

@@ -29,10 +29,12 @@ interface IProps {
 
 export const MetricHeader = ({ metric }: IProps) => {
     return (
-        <div className={styles.MainWrapper}>
-            <div>{metric.metricName}</div>
+        <>
+            <div className={styles.MainWrapper}>
+                <div>{metric.metricName}</div>
 
-            {metric.description && <InfoTooltip text={metric.description} />}
-        </div>
+                {metric.description && <InfoTooltip text={metric.description} />}
+            </div>
+        </>
     );
 };

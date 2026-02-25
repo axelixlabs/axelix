@@ -84,58 +84,60 @@ export const CronExpressionEditableValue = ({ task }: IProps) => {
     };
 
     return (
-        <div className={styles.MainWrapper}>
-            <Tooltip title={getCronDescription(actualValue)}>{actualValue}</Tooltip>
-            <Popover
-                title={t("ScheduledTasks.enterNewCron")}
-                open={isPopoverOpen}
-                onOpenChange={(newOpen) => {
-                    setIsPopoverOpen(newOpen);
-                    setTempValue(actualValue);
-                    setIsCronExpressionValid(true);
-                }}
-                content={
-                    <div className={styles.EditWrapper}>
-                        <Tooltip title={getCronDescription(tempValue)}>
-                            <Input
-                                value={tempValue}
-                                onChange={handleOnInputChange}
-                                disabled={expressionUpdateLoading}
-                                status={!isCronExpressionValid ? "error" : undefined}
-                            />
-                        </Tooltip>
-
-                        <div className={styles.AlertWithActionsWrapper}>
-                            <Alert
-                                title={isCronExpressionValid ? "Valid" : "Invalid"}
-                                type={isCronExpressionValid ? "success" : "error"}
-                                showIcon
-                                styles={{ root: { paddingBlock: "4px" } }}
-                            />
-
-                            <div className={styles.EditActionsButtonsWrapper}>
-                                <Button icon={<CloseOutlined />} type="primary" onClick={handleCancel} />
-
-                                <Button
-                                    icon={<CheckOutlined />}
-                                    type="primary"
-                                    disabled={!isCronExpressionValid}
-                                    onClick={handleUpdate}
-                                    loading={expressionUpdateLoading}
+        <>
+            <div className={styles.MainWrapper}>
+                <Tooltip title={getCronDescription(actualValue)}>{actualValue}</Tooltip>
+                <Popover
+                    title={t("ScheduledTasks.enterNewCron")}
+                    open={isPopoverOpen}
+                    onOpenChange={(newOpen) => {
+                        setIsPopoverOpen(newOpen);
+                        setTempValue(actualValue);
+                        setIsCronExpressionValid(true);
+                    }}
+                    content={
+                        <div className={styles.EditWrapper}>
+                            <Tooltip title={getCronDescription(tempValue)}>
+                                <Input
+                                    value={tempValue}
+                                    onChange={handleOnInputChange}
+                                    disabled={expressionUpdateLoading}
+                                    status={!isCronExpressionValid ? "error" : undefined}
                                 />
+                            </Tooltip>
+
+                            <div className={styles.AlertWithActionsWrapper}>
+                                <Alert
+                                    title={isCronExpressionValid ? "Valid" : "Invalid"}
+                                    type={isCronExpressionValid ? "success" : "error"}
+                                    showIcon
+                                    styles={{ root: { paddingBlock: "4px" } }}
+                                />
+
+                                <div className={styles.EditActionsButtonsWrapper}>
+                                    <Button icon={<CloseOutlined />} type="primary" onClick={handleCancel} />
+
+                                    <Button
+                                        icon={<CheckOutlined />}
+                                        type="primary"
+                                        disabled={!isCronExpressionValid}
+                                        onClick={handleUpdate}
+                                        loading={expressionUpdateLoading}
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                }
-                styles={{
-                    container: {
-                        minWidth: "300px",
-                    },
-                }}
-                trigger="click"
-            >
-                <Button icon={<EditOutlined />} type="primary" />
-            </Popover>
-        </div>
+                    }
+                    styles={{
+                        container: {
+                            minWidth: "300px",
+                        },
+                    }}
+                    trigger="click"
+                >
+                    <Button icon={<EditOutlined />} type="primary" />
+                </Popover>
+            </div>
+        </>
     );
 };

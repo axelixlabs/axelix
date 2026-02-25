@@ -124,6 +124,7 @@ export interface IBeanSource {
      * is equal to {@link BeanOrigin.BEAN_METHOD}
      */
     enclosingClassName?: string;
+
     /**
      * Full name of the enclosing class’s name
      */

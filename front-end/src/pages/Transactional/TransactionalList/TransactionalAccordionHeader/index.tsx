@@ -31,19 +31,21 @@ export const TransactionalAccordionHeader = ({ transactional }: IProps) => {
     const { className, methodName } = transactional;
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.HeaderWrapper}>
-                <div className={styles.LabelWrapper}>
-                    <span className={styles.Label}>Class:</span>
-                    <span>{className}</span>
-                    <Copy text={className} />
-                </div>
-                <div className={styles.LabelWrapper}>
-                    <span className={styles.Label}>Method:</span>
-                    <span>{methodName}</span>
-                    <Copy text={methodName} />
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={styles.HeaderWrapper}>
+                    <div className={styles.LabelWrapper}>
+                        <span className={styles.Label}>Class:</span>
+                        <span>{className}</span>
+                        <Copy text={className} />
+                    </div>
+                    <div className={styles.LabelWrapper}>
+                        <span className={styles.Label}>Method:</span>
+                        <span>{methodName}</span>
+                        <Copy text={methodName} />
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };

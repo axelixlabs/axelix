@@ -40,50 +40,52 @@ export const EnvironmentAccordionBody = ({ property }: IProps) => {
     const { deprecation, description, configPropsBeanName, injectionPoints } = property;
 
     return (
-        <div className={styles.AccordionBody}>
-            {deprecation && (
-                <>
-                    <div>{t(`Environments.deprecated`)}:</div>
-                    <div className={styles.Value}>{deprecation.message}</div>
-                </>
-            )}
+        <>
+            <div className={styles.AccordionBody}>
+                {deprecation && (
+                    <>
+                        <div>{t(`Environments.deprecated`)}:</div>
+                        <div className={styles.Value}>{deprecation.message}</div>
+                    </>
+                )}
 
-            {description && (
-                <>
-                    <div>{t(`Environments.description`)}:</div>
-                    <div className={styles.Value}>{description}</div>
-                </>
-            )}
+                {description && (
+                    <>
+                        <div>{t(`Environments.description`)}:</div>
+                        <div className={styles.Value}>{description}</div>
+                    </>
+                )}
 
-            {configPropsBeanName && (
-                <>
-                    <div>{t(`Environments.configProps`)}:</div>
-                    <StyledLink
-                        href={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
-                    >
-                        {configPropsBeanName}
-                    </StyledLink>
-                </>
-            )}
+                {configPropsBeanName && (
+                    <>
+                        <div>{t(`Environments.configProps`)}:</div>
+                        <StyledLink
+                            href={`/instance/${instanceId}/config-props#${normalizeHtmlElementId(configPropsBeanName)}`}
+                        >
+                            {configPropsBeanName}
+                        </StyledLink>
+                    </>
+                )}
 
-            {injectionPoints && (
-                <>
-                    <div>{t(`Environments.injectedIn`)}:</div>
-                    <div>
-                        {uniqueInjectionPointsBeanNames(injectionPoints).map((beanName) => (
-                            <div className={`${styles.Value} ${styles.InjectionPointWrapper}`} key={beanName}>
-                                {beanName}
-                                <Link
-                                    to={`/instance/${instanceId}/beans#${normalizeHtmlElementId(beanName)}`}
-                                    className={styles.LinkIcon}
-                                >
-                                    <LinkIcon />
-                                </Link>
-                            </div>
-                        ))}
-                    </div>
-                </>
-            )}
-        </div>
+                {injectionPoints && (
+                    <>
+                        <div>{t(`Environments.injectedIn`)}:</div>
+                        <div>
+                            {uniqueInjectionPointsBeanNames(injectionPoints).map((beanName) => (
+                                <div className={`${styles.Value} ${styles.InjectionPointWrapper}`} key={beanName}>
+                                    {beanName}
+                                    <Link
+                                        to={`/instance/${instanceId}/beans#${normalizeHtmlElementId(beanName)}`}
+                                        className={styles.LinkIcon}
+                                    >
+                                        <LinkIcon />
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>
+        </>
     );
 };

@@ -17,27 +17,25 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.Objects;
-
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
+import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.ConfigPropsFeedResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -55,13 +53,9 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class ConfigPropsApi {
 
     private final EndpointInvoker endpointInvoker;
-    private final Converter<ConfigPropsFeed, ConfigPropsFeedResponse> configpropsFeedConverter;
 
-    public ConfigPropsApi(
-            EndpointInvoker endpointInvoker,
-            Converter<ConfigPropsFeed, ConfigPropsFeedResponse> configpropsFeedConverter) {
+    public ConfigPropsApi(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
-        this.configpropsFeedConverter = configpropsFeedConverter;
     }
 
     @DefaultApiResponse(summary = "Returns all @ConfigurationProperties beans of the application.")
@@ -71,12 +65,12 @@ public class ConfigPropsApi {
             content =
                     @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ConfigPropsFeedResponse.class)))
+                            schema = @Schema(implementation = ConfigurationPropertiesFeed.class)))
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.ConfigPropsApi.FEED)
-    public ConfigPropsFeedResponse getConfigpropsFeed(@PathVariable("instanceId") String instanceId) {
-        ConfigPropsFeed result = endpointInvoker.invoke(
+    public ResponseEntity<byte[]> getConfigpropsFeed(@PathVariable("instanceId") String instanceId) {
+        byte[] body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(configpropsFeedConverter.convert(result));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 }

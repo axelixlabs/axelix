@@ -32,19 +32,21 @@ interface IProps {
 
 export const CronTaskTableRow = ({ task }: IProps) => {
     return (
-        <div className={styles.RowChunksWrapper}>
-            <div className={styles.BodyRowChunk}>
-                <TooltipWithCopy text={task.runnable.target} />
+        <>
+            <div className={styles.RowChunksWrapper}>
+                <div className={styles.BodyRowChunk}>
+                    <TooltipWithCopy text={task.runnable.target} />
+                </div>
+                <div className={styles.BodyRowChunk}>
+                    <CronExpressionEditableValue task={task} />
+                </div>
+                <div className={styles.BodyRowChunk}>
+                    <ScheduledTasksStatusSwitch runnable={task} />
+                </div>
+                <div className={styles.BodyRowChunk}>
+                    <ForceRunTask trigger={task.runnable.target} />
+                </div>
             </div>
-            <div className={styles.BodyRowChunk}>
-                <CronExpressionEditableValue task={task} />
-            </div>
-            <div className={styles.BodyRowChunk}>
-                <ScheduledTasksStatusSwitch runnable={task} />
-            </div>
-            <div className={styles.BodyRowChunk}>
-                <ForceRunTask trigger={task.runnable.target} />
-            </div>
-        </div>
+        </>
     );
 };

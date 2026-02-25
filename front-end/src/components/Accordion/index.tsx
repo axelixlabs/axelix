@@ -79,16 +79,18 @@ export const Accordion = ({
     };
 
     return (
-        <div className={`${styles.MainWrapper} ${wrapperStyles} ${open ? styles.Open : ""}`}>
-            <div className={`${styles.HeaderWrapper} ${headerStyles}`} onClick={handlerClick}>
-                {!hideArrowIcon && <ArrowIcon className={styles.Icon} />}
-                <div className={styles.Header}>{header}</div>
-            </div>
-            {open && (
-                <div className={styles.ContentWrapper}>
-                    <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
+        <>
+            <div className={`${styles.MainWrapper} ${wrapperStyles} ${open ? styles.Open : ""}`}>
+                <div className={`${styles.HeaderWrapper} ${headerStyles}`} onClick={handlerClick}>
+                    {!hideArrowIcon && <ArrowIcon className={styles.Icon} />}
+                    <div className={styles.Header}>{header}</div>
                 </div>
-            )}
-        </div>
+                {open && (
+                    <div className={styles.ContentWrapper}>
+                        <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
+                    </div>
+                )}
+            </div>
+        </>
     );
 };

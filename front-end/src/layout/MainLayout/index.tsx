@@ -33,20 +33,22 @@ interface IProps {
 
 export const MainLayout = ({ hideSider }: IProps) => {
     return (
-        <Layout className={styles.MainWrapper}>
-            <AdminHeader />
+        <>
+            <Layout className={styles.MainWrapper}>
+                <AdminHeader />
 
-            <Sider width={270} className={`${styles.Sider} ${hideSider ? styles.HideSider : ""}`}>
-                <div className={styles.SiderScrollContainer}>
-                    <SiderMenu />
-                </div>
-            </Sider>
+                <Sider width={270} className={`${styles.Sider} ${hideSider ? styles.HideSider : ""}`}>
+                    <div className={styles.SiderScrollContainer}>
+                        <SiderMenu />
+                    </div>
+                </Sider>
 
-            <Layout className={styles.ContentLayout}>
-                <Content className={`${styles.Content} ${!hideSider ? styles.WithSider : ""}`}>
-                    <Outlet />
-                </Content>
+                <Layout className={styles.ContentLayout}>
+                    <Content className={`${styles.Content} ${!hideSider ? styles.WithSider : ""}`}>
+                        <Outlet />
+                    </Content>
+                </Layout>
             </Layout>
-        </Layout>
+        </>
     );
 };

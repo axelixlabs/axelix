@@ -59,6 +59,13 @@ export const ForceRunTask = ({ trigger }: IProps) => {
     };
 
     return (
-        <Button icon={<RunIcon />} type="primary" onClick={forceRunClickHandler} loading={forceRunTaskData.loading} />
+        <>
+            <Button
+                icon={<RunIcon />}
+                type="primary"
+                onClick={forceRunClickHandler}
+                loading={forceRunTaskData.loading}
+            />
+        </>
     );
 };

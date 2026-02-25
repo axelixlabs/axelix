@@ -34,13 +34,13 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
+import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link FlatteningConfigurationPropertiesConverter}.
+ * Integration tests for {@link DefaultConfigurationPropertiesConverter}.
  *
  * @author Sergey Cherkasov
  */
@@ -59,8 +59,8 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout=5000",
             "axelix.prop.test.http-client.requests[0].methods[1].type=POST"
         })
-@EnableConfigurationProperties(FlatteningConfigurationPropertiesConverterTest.AxelixConfigurationProperties.class)
-public class FlatteningConfigurationPropertiesConverterTest {
+@EnableConfigurationProperties(DefaultConfigurationPropertiesConverterTest.AxelixConfigurationProperties.class)
+public class DefaultConfigurationPropertiesConverterTest {
 
     @Autowired
     private ConfigurationPropertiesReportEndpoint endpoint;
@@ -69,58 +69,47 @@ public class FlatteningConfigurationPropertiesConverterTest {
     private ConfigurationPropertiesConverter enricher;
 
     @Test
-    void getConfigPropsDescriptor() {
+    void shouldReturnConfigurationPropertiesFeed() {
         ApplicationConfigurationProperties defaultDescriptor = endpoint.configurationProperties();
 
-        ConfigPropsFeed axelixConfPropDescriptor = enricher.convert(defaultDescriptor);
+        ConfigurationPropertiesFeed axelixConfPropDescriptor = enricher.convert(defaultDescriptor);
 
         assertThat(axelixConfPropDescriptor).isNotNull();
 
-        assertThat(axelixConfPropDescriptor.getContexts()).isNotEmpty();
+        assertThat(axelixConfPropDescriptor.getBeans()).isNotEmpty();
 
-        assertThat(axelixConfPropDescriptor.getContexts().entrySet()).allSatisfy(entry -> {
-            var beans = entry.getValue().getBeans().entrySet();
+        assertThat(axelixConfPropDescriptor.getBeans())
+                .filteredOn(bean -> bean.getPrefix().equals("axelix.prop.test"))
+                .singleElement()
+                .satisfies(bean -> {
+                    // Bean Name
+                    assertThat(bean.getBeanName()).isEqualTo(AxelixConfigurationProperties.class.getName());
 
-            assertThat(beans)
-                    .filteredOn(e -> e.getValue().getPrefix().equals("axelix.prop.test"))
-                    .singleElement()
-                    .satisfies(bean -> {
-                        var key = bean.getKey();
-                        var value = bean.getValue();
+                    // prefix
+                    assertThat(bean.getPrefix()).isEqualTo("axelix.prop.test");
 
-                        // Bean
-                        assertThat(key).isEqualTo(AxelixConfigurationProperties.class.getName());
+                    // properties
+                    assertThat(bean.getProperties())
+                            .containsOnly(
+                                    new KeyValue("tags.environment", "test"),
+                                    new KeyValue("tags.version", "1.0.0"),
+                                    new KeyValue("enabledContexts[0]", "user-service"),
+                                    new KeyValue("enabledContexts[1]", "payment-service"),
+                                    new KeyValue("httpClient.requests[0].name", "user-api"),
+                                    new KeyValue("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1"),
+                                    new KeyValue("httpClient.requests[0].methods[0].type", "GET"),
+                                    new KeyValue("httpClient.requests[0].methods[0].retries[0].count", "3"),
+                                    new KeyValue(
+                                            "httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000"),
+                                    new KeyValue("httpClient.requests[0].methods[1].type", "POST"));
 
-                        // prefix
-                        assertThat(value.getPrefix()).isEqualTo("axelix.prop.test");
-
-                        // properties
-                        assertThat(value.getProperties())
-                                .containsOnly(
-                                        new KeyValue("tags.environment", "test"),
-                                        new KeyValue("tags.version", "1.0.0"),
-                                        new KeyValue("enabledContexts[0]", "user-service"),
-                                        new KeyValue("enabledContexts[1]", "payment-service"),
-                                        new KeyValue("httpClient.requests[0].name", "user-api"),
-                                        new KeyValue(
-                                                "httpClient.requests[0].baseUrl", "https://api.users.example.com/v1"),
-                                        new KeyValue("httpClient.requests[0].methods[0].type", "GET"),
-                                        new KeyValue("httpClient.requests[0].methods[0].retries[0].count", "3"),
-                                        new KeyValue(
-                                                "httpClient.requests[0].methods[0].retries[0].parameters.timeout",
-                                                "5000"),
-                                        new KeyValue("httpClient.requests[0].methods[1].type", "POST"));
-
-                        // inputs
-                        assertThat(value.getInputs())
-                                .hasSize(20)
-                                .anyMatch(
-                                        p -> p.getKey()
-                                                .equals(
-                                                        "httpClient.requests[0].methods[0].retries[0].parameters.timeout.value"))
-                                .anyMatch(p -> p.getKey().equals("httpClient.requests[0].baseUrl.origin"));
-                    });
-        });
+                    // inputs
+                    assertThat(bean.getInputs())
+                            .hasSize(20)
+                            .anyMatch(input -> input.getKey()
+                                    .equals("httpClient.requests[0].methods[0].retries[0].parameters.timeout.value"))
+                            .anyMatch(p -> p.getKey().equals("httpClient.requests[0].baseUrl.origin"));
+                });
     }
 
     @ConstructorBinding
@@ -347,8 +336,14 @@ public class FlatteningConfigurationPropertiesConverterTest {
     static class DefaultDefaultConfigurationPropertiesTestConfiguration {
 
         @Bean
-        public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-            return new FlatteningConfigurationPropertiesConverter();
+        public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
+            return new DefaultConfigurationPropertiesFlattener();
+        }
+
+        @Bean
+        public ConfigurationPropertiesConverter configurationPropertiesConverter(
+                ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
+            return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
         }
     }
 }

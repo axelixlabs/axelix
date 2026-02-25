@@ -26,7 +26,9 @@ import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.FlatteningConfigurationPropertiesConverter;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 /**
@@ -39,8 +41,14 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
 public class EnvironmentTestConfig {
 
     @Bean
-    public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-        return new FlatteningConfigurationPropertiesConverter();
+    public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
+        return new DefaultConfigurationPropertiesFlattener();
+    }
+
+    @Bean
+    public ConfigurationPropertiesConverter configurationPropertiesConverter(
+            ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
+        return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
     }
 
     @Bean

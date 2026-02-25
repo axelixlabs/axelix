@@ -31,9 +31,11 @@ interface IProps {
 
 export const StyledLink = ({ children, href }: PropsWithChildren<IProps>) => {
     return (
-        <Link to={href} className={styles.MainWrapper}>
-            {children}
-            <LinkIcon className={styles.LinkIcon} />
-        </Link>
+        <>
+            <Link to={href} className={styles.MainWrapper}>
+                {children}
+                <LinkIcon className={styles.LinkIcon} />
+            </Link>
+        </>
     );
 };

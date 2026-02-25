@@ -56,7 +56,6 @@
     display: flex;
     justify-content: space-between;
     column-gap: 8px;
-    font-size: 14px;
 }
 
 .Label {
@@ -73,7 +72,6 @@
     border-top: 1px dashed var(--axelix-medium-grey);
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
 }
 
 @keyframes pulse {

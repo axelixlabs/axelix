@@ -29,7 +29,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
+import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
@@ -164,7 +164,7 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
 
     static class CustomConfigurationPropertiesConverter implements ConfigurationPropertiesConverter {
         @Override
-        public ConfigPropsFeed convert(
+        public ConfigurationPropertiesFeed convert(
                 ConfigurationPropertiesReportEndpoint.ConfigurationPropertiesDescriptor originalDescriptor) {
             return null;
         }

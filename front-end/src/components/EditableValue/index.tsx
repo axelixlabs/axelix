@@ -60,49 +60,53 @@ export const EditableValue = ({
 
     if (!editingValue) {
         return (
-            <div className={className}>
-                {actualValue}
+            <>
+                <div className={className}>
+                    {actualValue}
 
-                <Button
-                    icon={<EditOutlined />}
-                    type="primary"
-                    onClick={() => setEditingValue(true)}
-                    className={styles.EditButton}
-                />
-            </div>
+                    <Button
+                        icon={<EditOutlined />}
+                        type="primary"
+                        onClick={() => setEditingValue(true)}
+                        className={styles.EditButton}
+                    />
+                </div>
+            </>
         );
     }
 
     return (
-        <div className={editClassName}>
-            <Input
-                value={actualValue}
-                onChange={(e) => setActualValue(e.target.value)}
-                className={styles.EditPropertyField}
-            />
+        <>
+            <div className={editClassName}>
+                <Input
+                    value={actualValue}
+                    onChange={(e) => setActualValue(e.target.value)}
+                    className={styles.EditPropertyField}
+                />
 
-            <Button
-                icon={<CloseOutlined />}
-                type="primary"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setEditingValue(false);
-                    setActualValue(initialValue);
-                }}
-                className={styles.CloseButton}
-            />
+                <Button
+                    icon={<CloseOutlined />}
+                    type="primary"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingValue(false);
+                        setActualValue(initialValue);
+                    }}
+                    className={styles.CloseButton}
+                />
 
-            <Button
-                icon={<CheckOutlined />}
-                type="primary"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setEditingValue(false);
-                    setActualValue(actualValue);
-                    onNewValue(actualValue);
-                }}
-                className={styles.UpdateButton}
-            />
-        </div>
+                <Button
+                    icon={<CheckOutlined />}
+                    type="primary"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingValue(false);
+                        setActualValue(actualValue);
+                        onNewValue(actualValue);
+                    }}
+                    className={styles.UpdateButton}
+                />
+            </div>
+        </>
     );
 };

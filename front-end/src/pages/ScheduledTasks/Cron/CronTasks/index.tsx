@@ -37,7 +37,7 @@ export const CronTasks = ({ cronTasks }: IProps) => {
     return (
         <>
             <div className={styles.SectionWrapper}>
-                <div className={`TextMedium ${styles.TaskType}`}>{t("ScheduledTasks.cron")}</div>
+                <div className={`TextLarge ${styles.TaskType}`}>{t("ScheduledTasks.cron")}</div>
 
                 <div className={styles.CronTaskTable}>
                     <CronTableHeader />

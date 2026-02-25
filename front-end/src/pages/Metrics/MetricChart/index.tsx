@@ -39,28 +39,30 @@ export const MetricChart = ({ measurements, startTime }: IProps) => {
     const endTime = startTime + METRIC_SLIDING_WINDOW_MS;
 
     return (
-        <ResponsiveContainer className={styles.MainWrapper}>
-            <LineChart data={measurements} margin={{ top: 10, right: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                    dataKey="timestamp"
-                    type="number"
-                    scale="time"
-                    domain={[startTime, endTime]}
-                    tickFormatter={toFormattedTime}
-                    ticks={getMetricsChartTicks(startTime, endTime)}
-                />
-                <YAxis tickFormatter={reduceDisplayedNumber} type="number" domain={["auto", "auto"]} />
-                <Tooltip labelFormatter={toFormattedTime} />
-                <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#00ab55"
-                    strokeWidth={3}
-                    activeDot={{ r: 5 }}
-                    isAnimationActive={false}
-                />
-            </LineChart>
-        </ResponsiveContainer>
+        <>
+            <ResponsiveContainer className={styles.MainWrapper}>
+                <LineChart data={measurements} margin={{ top: 10, right: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                        dataKey="timestamp"
+                        type="number"
+                        scale="time"
+                        domain={[startTime, endTime]}
+                        tickFormatter={toFormattedTime}
+                        ticks={getMetricsChartTicks(startTime, endTime)}
+                    />
+                    <YAxis tickFormatter={reduceDisplayedNumber} type="number" domain={["auto", "auto"]} />
+                    <Tooltip labelFormatter={toFormattedTime} />
+                    <Line
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#00ab55"
+                        strokeWidth={3}
+                        activeDot={{ r: 5 }}
+                        isAnimationActive={false}
+                    />
+                </LineChart>
+            </ResponsiveContainer>
+        </>
     );
 };

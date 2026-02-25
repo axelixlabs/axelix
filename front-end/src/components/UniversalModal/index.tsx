@@ -57,27 +57,29 @@ export const UniversalModal = ({
     const { t } = useTranslation();
 
     return (
-        <Modal
-            title={title}
-            open={open}
-            onOk={onOk}
-            onCancel={onClose}
-            centered
-            width={550}
-            okText={okText}
-            cancelText={t("cancel")}
-            loading={loading}
-            cancelButtonProps={
-                !displayCancel
-                    ? {
-                          style: {
-                              display: "none",
-                          },
-                      }
-                    : {}
-            }
-        >
-            {children}
-        </Modal>
+        <>
+            <Modal
+                title={title}
+                open={open}
+                onOk={onOk}
+                onCancel={onClose}
+                centered
+                width={550}
+                okText={okText}
+                cancelText={t("cancel")}
+                loading={loading}
+                cancelButtonProps={
+                    !displayCancel
+                        ? {
+                              style: {
+                                  display: "none",
+                              },
+                          }
+                        : {}
+                }
+            >
+                {children}
+            </Modal>
+        </>
     );
 };

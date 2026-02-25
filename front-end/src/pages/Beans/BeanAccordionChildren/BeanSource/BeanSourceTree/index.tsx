@@ -138,5 +138,9 @@ export const BeanSourceTree = ({ bean }: IProps) => {
         }
     };
 
-    return <Tree expandAction="click" showLine treeData={resolveTreeChildren()} className={styles.Tree} />;
+    return (
+        <>
+            <Tree expandAction="click" showLine treeData={resolveTreeChildren()} className={styles.Tree} />
+        </>
+    );
 };

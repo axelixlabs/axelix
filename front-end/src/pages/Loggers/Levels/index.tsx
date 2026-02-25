@@ -50,38 +50,40 @@ export const Levels = ({ levels, checkedLevel, configuredLevel, handleChange }: 
     const { t } = useTranslation();
 
     return (
-        <div className={styles.MainWrapper}>
-            {levels.map((level) => {
-                const color = loggersColors[level] || loggersColors.DEFAULT;
+        <>
+            <div className={styles.MainWrapper}>
+                {levels.map((level) => {
+                    const color = loggersColors[level] || loggersColors.DEFAULT;
 
-                return (
-                    <div className={styles.RadioGroupWrapper} key={level}>
-                        <label
-                            className={`${styles.RadioButton} ${checkedLevel === level ? styles.Selected : ""}`}
-                            style={
-                                {
-                                    "--color-primary": color.colorPrimary,
-                                    "--color-primary-hover": color.colorPrimaryHover,
-                                    "--color-primary-active": color.colorPrimaryActive,
-                                } as React.CSSProperties
-                            }
-                        >
-                            <input
-                                type="radio"
-                                value={level}
-                                checked={checkedLevel === level}
-                                onChange={() => handleChange(level)}
-                            />
-                            {level}
-                        </label>
-                        {configuredLevel === level && (
-                            <Tooltip title={t("Loggers.configuredExplicitly")} className={styles.Tooltip}>
-                                <TargetIcon className={styles.TargetIcon} />
-                            </Tooltip>
-                        )}
-                    </div>
-                );
-            })}
-        </div>
+                    return (
+                        <div className={styles.RadioGroupWrapper} key={level}>
+                            <label
+                                className={`${styles.RadioButton} ${checkedLevel === level ? styles.Selected : ""}`}
+                                style={
+                                    {
+                                        "--color-primary": color.colorPrimary,
+                                        "--color-primary-hover": color.colorPrimaryHover,
+                                        "--color-primary-active": color.colorPrimaryActive,
+                                    } as React.CSSProperties
+                                }
+                            >
+                                <input
+                                    type="radio"
+                                    value={level}
+                                    checked={checkedLevel === level}
+                                    onChange={() => handleChange(level)}
+                                />
+                                {level}
+                            </label>
+                            {configuredLevel === level && (
+                                <Tooltip title={t("Loggers.configuredExplicitly")} className={styles.Tooltip}>
+                                    <TargetIcon className={styles.TargetIcon} />
+                                </Tooltip>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </>
     );
 };

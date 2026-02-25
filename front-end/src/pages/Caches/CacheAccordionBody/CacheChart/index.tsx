@@ -63,33 +63,37 @@ export const CacheChart = ({ cache }: IProps) => {
         const calculatedY = Number(y) + Number(height) / 2;
 
         return (
-            <text x={calculatedX} y={calculatedY} textAnchor="middle" dominantBaseline="middle" fill="#000">
-                {percent}%
-            </text>
+            <>
+                <text x={calculatedX} y={calculatedY} textAnchor="middle" dominantBaseline="middle" fill="#000">
+                    {percent}%
+                </text>
+            </>
         );
     };
 
     return (
-        <ResponsiveContainer
-            height={100}
-            // Only inlined styles are permitted here
-            style={{
-                marginTop: -8,
-            }}
-        >
-            <BarChart data={data} layout="vertical" margin={{ left: 40, right: 90 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis type="category" dataKey="name" />
-                <Tooltip />
-                <Bar dataKey="value" radius={[0, 6, 6, 0]} label={(props) => renderLabel(props)}>
-                    {data.map(({ name }) => {
-                        const fill = name === t("Caches.hitsCount") ? "#00ab55" : "#b37feb";
+        <>
+            <ResponsiveContainer
+                height={100}
+                // Only inlined styles are permitted here
+                style={{
+                    marginTop: -8,
+                }}
+            >
+                <BarChart data={data} layout="vertical" margin={{ left: 40, right: 90 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="name" />
+                    <Tooltip />
+                    <Bar dataKey="value" radius={[0, 6, 6, 0]} label={(props) => renderLabel(props)}>
+                        {data.map(({ name }) => {
+                            const fill = name === t("Caches.hitsCount") ? "#00ab55" : "#b37feb";
 
-                        return <Cell key={name} fill={fill} />;
-                    })}
-                </Bar>
-            </BarChart>
-        </ResponsiveContainer>
+                            return <Cell key={name} fill={fill} />;
+                        })}
+                    </Bar>
+                </BarChart>
+            </ResponsiveContainer>
+        </>
     );
 };

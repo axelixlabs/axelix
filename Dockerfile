@@ -45,4 +45,4 @@ ENTRYPOINT exec java \
     $JAVA_ON_OUT_OF_MEMORY_OPTS \
     $JAVA_ERROR_FILE_OPTS \
     $JAVA_GC_LOG_OPTS \
-    org.springframework.boot.loader.JarLauncher
+    org.springframework.boot.loader.launch.JarLauncher

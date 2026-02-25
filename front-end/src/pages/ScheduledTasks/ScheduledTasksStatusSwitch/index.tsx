@@ -59,12 +59,14 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
     };
 
     return (
-        <Switch
-            checkedChildren={t("on")}
-            unCheckedChildren={t("off")}
-            onChange={() => switchTaskStatus()}
-            loading={mutationRequest.loading}
-            checked={runnable.enabled}
-        />
+        <>
+            <Switch
+                checkedChildren={t("on")}
+                unCheckedChildren={t("off")}
+                onChange={() => switchTaskStatus()}
+                loading={mutationRequest.loading}
+                checked={runnable.enabled}
+            />
+        </>
     );
 };

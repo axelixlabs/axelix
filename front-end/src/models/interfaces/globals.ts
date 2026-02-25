@@ -127,10 +127,12 @@ export interface IUpdatePropertyRequestData {
      * Instance id of service
      */
     instanceId: string;
+
     /**
      * Property name
      */
     propertyName: string;
+
     /**
      * New property value
      */

@@ -58,12 +58,14 @@ export const ContentionMonitoringStatusSwitch = ({ contentionMonitoring }: IProp
     };
 
     return (
-        <Switch
-            checkedChildren={t("on")}
-            unCheckedChildren={t("off")}
-            onChange={(_, event) => switchTaskStatus(event)}
-            loading={mutationRequest.loading}
-            checked={contentionMonitoring}
-        />
+        <>
+            <Switch
+                checkedChildren={t("on")}
+                unCheckedChildren={t("off")}
+                onChange={(_, event) => switchTaskStatus(event)}
+                loading={mutationRequest.loading}
+                checked={contentionMonitoring}
+            />
+        </>
     );
 };

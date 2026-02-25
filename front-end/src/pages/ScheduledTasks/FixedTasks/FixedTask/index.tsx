@@ -38,18 +38,20 @@ interface IProps {
 
 export const FixedTasks = ({ taskTitle, fixedTasks }: IProps) => {
     return (
-        <div className={styles.SectionWrapper}>
-            <div className={`TextMedium ${styles.TaskType}`}>{taskTitle}</div>
+        <>
+            <div className={styles.SectionWrapper}>
+                <div className={`TextLarge ${styles.TaskType}`}>{taskTitle}</div>
 
-            <div className={styles.FixedTaskTable}>
-                <FixedTaskTableHeader />
+                <div className={styles.FixedTaskTable}>
+                    <FixedTaskTableHeader />
 
-                <EmptyHandler isEmpty={fixedTasks.length === 0}>
-                    {fixedTasks.map((task, index) => (
-                        <FixedTaskTableRow task={task} key={index} />
-                    ))}
-                </EmptyHandler>
+                    <EmptyHandler isEmpty={fixedTasks.length === 0}>
+                        {fixedTasks.map((task, index) => (
+                            <FixedTaskTableRow task={task} key={index} />
+                        ))}
+                    </EmptyHandler>
+                </div>
             </div>
-        </div>
+        </>
     );
 };

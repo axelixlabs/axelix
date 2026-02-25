@@ -12,7 +12,7 @@
 .Scope {
   display: inline-block;
   padding: 8px;
-  font-size: 15px;
+  font-size: inherit;
   font-weight: 500;
 }
 

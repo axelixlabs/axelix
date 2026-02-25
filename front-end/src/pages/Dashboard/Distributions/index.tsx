@@ -89,57 +89,61 @@ export function Distributions({ distributions }: IProps) {
     };
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={`TextMedium ${styles.Title}`}>{t("Dashboard.distributions")}</div>
-            <div className={styles.ChartsWrapper}>
-                {components.map(({ softwareComponentName, versions }) => {
-                    const wallboardFilterComponent = mapSoftwareComponentToFilterKey(softwareComponentName);
-                    const isClickable = Boolean(wallboardFilterComponent);
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={`TextLarge ${styles.Title}`}>{t("Dashboard.distributions")}</div>
+                <div className={styles.ChartsWrapper}>
+                    {components.map(({ softwareComponentName, versions }) => {
+                        const wallboardFilterComponent = mapSoftwareComponentToFilterKey(softwareComponentName);
+                        const isClickable = Boolean(wallboardFilterComponent);
 
-                    return (
-                        <div className={styles.SingleChartWrapper} key={softwareComponentName}>
-                            <div className={styles.CardTitle}>{t(`Dashboard.components.${softwareComponentName}`)}</div>
+                        return (
+                            <div className={styles.SingleChartWrapper} key={softwareComponentName}>
+                                <div className={styles.CardTitle}>
+                                    {t(`Dashboard.components.${softwareComponentName}`)}
+                                </div>
 
-                            <ResponsiveContainer height={330} width="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={versions}
-                                        nameKey="name"
-                                        dataKey="value"
-                                        cx="50%"
-                                        cy="50%"
-                                        outerRadius={100}
-                                        label={(props: PieLabelRenderProps) => {
-                                            let sum = 0;
+                                <ResponsiveContainer height={330} width="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={versions}
+                                            nameKey="name"
+                                            dataKey="value"
+                                            cx="50%"
+                                            cy="50%"
+                                            outerRadius={100}
+                                            label={(props: PieLabelRenderProps) => {
+                                                let sum = 0;
 
-                                            for (const version of versions) {
-                                                sum += version.value;
-                                            }
+                                                for (const version of versions) {
+                                                    sum += version.value;
+                                                }
 
-                                            return renderInnerLabel(props, sum);
-                                        }}
-                                        labelLine={false}
-                                        stroke={versions.length > 1 ? "#fff" : "none"}
-                                        onClick={(entry, _index, e) => {
-                                            clickHandler(e, wallboardFilterComponent, entry.name);
-                                        }}
-                                    >
-                                        {versions.map(({ versionColor }) => (
-                                            <Cell
-                                                key={versionColor}
-                                                fill={versionColor}
-                                                className={isClickable ? styles.ClickableCell : ""}
-                                            />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip />
-                                    <Legend />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-                    );
-                })}
+                                                return renderInnerLabel(props, sum);
+                                            }}
+                                            labelLine={false}
+                                            stroke={versions.length > 1 ? "#fff" : "none"}
+                                            onClick={(entry, _index, e) => {
+                                                clickHandler(e, wallboardFilterComponent, entry.name);
+                                            }}
+                                        >
+                                            {versions.map(({ versionColor }) => (
+                                                <Cell
+                                                    key={versionColor}
+                                                    fill={versionColor}
+                                                    className={isClickable ? styles.ClickableCell : ""}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
-        </div>
+        </>
     );
 }

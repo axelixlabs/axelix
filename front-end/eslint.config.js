@@ -19,6 +19,7 @@ import js from "@eslint/js";
 
 import eslintConfigPrettier from "eslint-config-prettier";
 import licenseHeader from "eslint-plugin-header";
+import jsdoc from "eslint-plugin-jsdoc";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import eslintPluginPrettier from "eslint-plugin-prettier";
 import react from "eslint-plugin-react";
@@ -43,6 +44,7 @@ export default [
             prettier: eslintPluginPrettier,
             jsonc: eslintPluginJsonc,
             header: licenseHeader,
+            jsdoc: jsdoc,
         },
     },
     js.configs.recommended,
@@ -73,6 +75,7 @@ export default [
             // TODO: Remove this rule later on, once the error handling logic is resolved
             "@typescript-eslint/no-explicit-any": ["off"],
             "prettier/prettier": "error",
+            "jsdoc/lines-before-block": ["error", { lines: 1 }],
             "@typescript-eslint/naming-convention": [
                 "error",
                 {

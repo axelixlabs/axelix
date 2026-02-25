@@ -23,12 +23,14 @@ export const FixedTaskTableHeader = () => {
     const { t } = useTranslation();
 
     return (
-        <div className={styles.RowChunksWrapper}>
-            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.runnable")}</div>
-            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.initialDelay")}</div>
-            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.interval")}</div>
-            <div className={styles.HeaderRowChunk}>{t("status")}</div>
-            <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.run")}</div>
-        </div>
+        <>
+            <div className={styles.RowChunksWrapper}>
+                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.runnable")}</div>
+                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.initialDelay")}</div>
+                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.interval")}</div>
+                <div className={styles.HeaderRowChunk}>{t("status")}</div>
+                <div className={styles.HeaderRowChunk}>{t("ScheduledTasks.run")}</div>
+            </div>
+        </>
     );
 };

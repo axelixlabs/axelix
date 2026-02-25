@@ -35,27 +35,29 @@ export const TransactionalAccordionBody = ({ transactional }: IProps) => {
     const data = transactional.executions;
 
     return (
-        <div>
-            <ScatterChart data={data} responsive className={styles.MainWrapper}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="timestamp" tickFormatter={toFormattedTime} />
-                <YAxis width="auto" tickFormatter={formatTransactionDuration} />
-                <Tooltip
-                    labelFormatter={toFormattedTime}
-                    itemStyle={{ color: "green" }}
-                    formatter={(value, name) => {
-                        const valueAsNum = Number(value);
+        <>
+            <div>
+                <ScatterChart data={data} responsive className={styles.MainWrapper}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="timestamp" tickFormatter={toFormattedTime} />
+                    <YAxis width="auto" tickFormatter={formatTransactionDuration} />
+                    <Tooltip
+                        labelFormatter={toFormattedTime}
+                        itemStyle={{ color: "green" }}
+                        formatter={(value, name) => {
+                            const valueAsNum = Number(value);
 
-                        if (name == "timestamp") {
-                            return [toFormattedTime(valueAsNum), "Timestamp"];
-                        } else {
-                            return [formatTransactionDuration(valueAsNum), "Duration"];
-                        }
-                    }}
-                />
-                <Scatter dataKey="durationMs" fill="#00AB55FF" line lineType="joint" />
-            </ScatterChart>
-            <TransactionalMethodExecutionStats stats={transactional.executionStats} />
-        </div>
+                            if (name == "timestamp") {
+                                return [toFormattedTime(valueAsNum), "Timestamp"];
+                            } else {
+                                return [formatTransactionDuration(valueAsNum), "Duration"];
+                            }
+                        }}
+                    />
+                    <Scatter dataKey="durationMs" fill="#00AB55FF" line lineType="joint" />
+                </ScatterChart>
+                <TransactionalMethodExecutionStats stats={transactional.executionStats} />
+            </div>
+        </>
     );
 };

@@ -48,19 +48,21 @@ export const ThreadDumpSettingsModal = ({ isModalOpen, setIsModalOpen, contentio
     };
 
     return (
-        <UniversalModal
-            title={t("ThreadDump.Settings.title")}
-            open={isModalOpen}
-            onOk={onClose}
-            displayCancel={false}
-            onClose={onClose}
-        >
-            <div className={styles.ModalContentWrapper}>
-                <div className={styles.SettingsItemWrapper}>
-                    <div>{t("ThreadDump.Settings.contentionMonitoring")}</div>
-                    <ContentionMonitoringStatusSwitch contentionMonitoring={contentionMonitoring} />
+        <>
+            <UniversalModal
+                title={t("ThreadDump.Settings.title")}
+                open={isModalOpen}
+                onOk={onClose}
+                displayCancel={false}
+                onClose={onClose}
+            >
+                <div className={styles.ModalContentWrapper}>
+                    <div className={styles.SettingsItemWrapper}>
+                        <div>{t("ThreadDump.Settings.contentionMonitoring")}</div>
+                        <ContentionMonitoringStatusSwitch contentionMonitoring={contentionMonitoring} />
+                    </div>
                 </div>
-            </div>
-        </UniversalModal>
+            </UniversalModal>
+        </>
     );
 };

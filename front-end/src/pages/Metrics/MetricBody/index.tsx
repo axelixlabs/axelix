@@ -99,26 +99,28 @@ export const MetricBody = ({ metric }: IProps) => {
     const measurementLastValue = measurementsHistory.at(-1)?.value;
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.MetricDataWrapper}>
-                <div>{t("value")}:</div>
-                <div>{measurementLastValue}</div>
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={styles.MetricDataWrapper}>
+                    <div>{t("value")}:</div>
+                    <div>{measurementLastValue}</div>
 
-                {singleMetricFeed.baseUnit && (
-                    <>
-                        <div>{t("Metrics.baseUnit")}:</div>
-                        <div>{singleMetricFeed.baseUnit}</div>
-                    </>
-                )}
+                    {singleMetricFeed.baseUnit && (
+                        <>
+                            <div>{t("Metrics.baseUnit")}:</div>
+                            <div>{singleMetricFeed.baseUnit}</div>
+                        </>
+                    )}
 
-                <ValidTagCombinations
-                    selectedTags={selectedTags}
-                    validTagCombinations={singleMetricFeed.validTagCombinations}
-                    setSelectedTags={setSelectedTags}
-                />
+                    <ValidTagCombinations
+                        selectedTags={selectedTags}
+                        validTagCombinations={singleMetricFeed.validTagCombinations}
+                        setSelectedTags={setSelectedTags}
+                    />
+                </div>
+
+                <MetricChart measurements={measurementsHistory} startTime={startTime} />
             </div>
-
-            <MetricChart measurements={measurementsHistory} startTime={startTime} />
-        </div>
+        </>
     );
 };

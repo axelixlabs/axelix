@@ -21,8 +21,10 @@ import { LoaderIcon } from "assets";
 
 export const Loader = () => {
     return (
-        <div className={styles.MainWrapper}>
-            <LoaderIcon className={styles.LoaderSpin} />
-        </div>
+        <>
+            <div className={styles.MainWrapper}>
+                <LoaderIcon className={styles.LoaderSpin} />
+            </div>
+        </>
     );
 };

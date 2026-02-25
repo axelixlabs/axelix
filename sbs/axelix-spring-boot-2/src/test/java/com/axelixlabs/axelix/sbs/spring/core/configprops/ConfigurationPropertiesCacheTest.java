@@ -30,7 +30,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
+import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
@@ -55,11 +55,10 @@ public class ConfigurationPropertiesCacheTest {
     @Test
     void shouldReturnConfigurationProperties() {
         // when.
-        ConfigPropsFeed configProps = configurationPropertiesCache.getConfigProps();
+        ConfigurationPropertiesFeed configProps = configurationPropertiesCache.getConfigProps();
 
         // then.
-        Set<@Nullable String> values = configProps.getContexts().values().stream()
-                .flatMap(it -> it.getBeans().values().stream())
+        Set<@Nullable String> values = configProps.getBeans().stream()
                 .flatMap(bean -> bean.getProperties().stream())
                 .map(KeyValue::getValue)
                 .collect(Collectors.toSet());
@@ -69,15 +68,21 @@ public class ConfigurationPropertiesCacheTest {
         // that it makes sense to sanitize them as well, but currently it is not possible due
         // to internal implementation of the Spring Boot Actuator native config props endpoint.
         assertThat(values).containsOnly(null, "******");
-        assertThat(configProps).isNotNull().isInstanceOf(ConfigPropsFeed.class);
+        assertThat(configProps).isNotNull().isInstanceOf(ConfigurationPropertiesFeed.class);
     }
 
     @TestConfiguration
     static class ConfigurationPropertiesCacheTestConfiguration {
 
         @Bean
-        public ConfigurationPropertiesConverter configurationPropertiesConverter() {
-            return new FlatteningConfigurationPropertiesConverter();
+        public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
+            return new DefaultConfigurationPropertiesFlattener();
+        }
+
+        @Bean
+        public ConfigurationPropertiesConverter configurationPropertiesConverter(
+                ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
+            return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
         }
 
         @Bean

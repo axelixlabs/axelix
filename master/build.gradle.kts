@@ -1,12 +1,12 @@
-import Dependencies.springBootVersion
-import Dependencies.springCloudDependenciesVersion
-
 plugins {
     id("shared")
-    id("org.springframework.boot") version Dependencies.springBootVersion
+    id("org.springframework.boot") version "3.5.10"
     id("com.axelixlabs.axelix-internal")
 }
 
+val springBootVersion = "3.5.10"
+val springCloudVersion = "2025.0.1"
+val springAiVersion = "1.1.2"
 val testcontainersVersion = "1.21.3"
 val springDocSwaggerVersion = "2.0.4"
 val heapDumpToolVersion = "1.3.3"
@@ -20,11 +20,13 @@ dependencies {
 
     // Impl
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
-    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudDependenciesVersion}"))
+    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"))
+    implementation(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
     implementation("org.springframework:spring-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-kubernetes-fabric8-discovery")
+    implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.paypal:heap-dump-tool:${heapDumpToolVersion}")
@@ -35,7 +37,7 @@ dependencies {
 
     // Test
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))
-    testImplementation(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudDependenciesVersion"))
+    testImplementation(platform("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")

@@ -30,26 +30,29 @@ export const App = () => {
             colorPrimary: "#00ab55",
             fontFamily: "Golos, Helvetica, Arial, sans-serif",
             fontSize: 15,
+            lineHeight: 1.5,
         },
     };
 
     return (
-        <ConfigProvider
-            theme={theme}
-            tooltip={{
-                styles: {
-                    root: {
-                        maxWidth: "600px",
-                        whiteSpace: "normal",
+        <>
+            <ConfigProvider
+                theme={theme}
+                tooltip={{
+                    styles: {
+                        root: {
+                            maxWidth: "600px",
+                            whiteSpace: "normal",
+                        },
                     },
-                },
-            }}
-        >
-            <AntdApp>
-                <Provider store={store}>
-                    <AppRoutes />
-                </Provider>
-            </AntdApp>
-        </ConfigProvider>
+                }}
+            >
+                <AntdApp>
+                    <Provider store={store}>
+                        <AppRoutes />
+                    </Provider>
+                </AntdApp>
+            </ConfigProvider>
+        </>
     );
 };

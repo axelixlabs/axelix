@@ -45,25 +45,27 @@ export const GCDisabledMessage = ({ loggingStatusData, loadGCStatus }: IProps) =
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.ContentWrapper}>
-                <div className={styles.WarningIconWrapper}>
-                    <InfoIcon color="#1890ff" className={styles.InfoIcon} />
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={styles.ContentWrapper}>
+                    <div className={styles.WarningIconWrapper}>
+                        <InfoIcon color="#1890ff" className={styles.InfoIcon} />
+                    </div>
+                    <div className={`TextLarge ${styles.Title}`}>{t("GC.disableTitle")}</div>
+                    <div className={styles.SubTitle}>{t("GC.disableSubtitle")}</div>
+                    <Button icon={<OnOffIcon />} type="primary" onClick={() => setIsModalOpen(true)}>
+                        {t("GC.enableButtonText")}
+                    </Button>
                 </div>
-                <div className={`TextMedium ${styles.Title}`}>{t("GC.disableTitle")}</div>
-                <div className={styles.SubTitle}>{t("GC.disableSubtitle")}</div>
-                <Button icon={<OnOffIcon />} type="primary" onClick={() => setIsModalOpen(true)}>
-                    {t("GC.enableButtonText")}
-                </Button>
+                {isModalOpen && (
+                    <GCLogEnableSettings
+                        isModalOpen={isModalOpen}
+                        setIsModalOpen={setIsModalOpen}
+                        logginsStatus={loggingStatusData}
+                        loadGCStatus={loadGCStatus}
+                    />
+                )}
             </div>
-            {isModalOpen && (
-                <GCLogEnableSettings
-                    isModalOpen={isModalOpen}
-                    setIsModalOpen={setIsModalOpen}
-                    logginsStatus={loggingStatusData}
-                    loadGCStatus={loadGCStatus}
-                />
-            )}
-        </div>
+        </>
     );
 };

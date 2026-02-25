@@ -37,17 +37,19 @@ const ThreadDumpTrackableValue = ({ value, parameterName }: IProps) => {
     const { t } = useTranslation();
 
     if (value != -1) {
-        return value;
+        return <>{value}</>;
     } else {
         return (
-            <div className={styles.ValueWrapper}>
-                <div>{t("ThreadDump.notAvailable")}</div>
-                <InfoTooltip
-                    text={`JVM does not track '${parameterName}' by default. 
+            <>
+                <div className={styles.ValueWrapper}>
+                    <div>{t("ThreadDump.notAvailable")}</div>
+                    <InfoTooltip
+                        text={`JVM does not track '${parameterName}' by default. 
             To track the '${parameterName}', you need to explicitly enable 
             thread contention monitoring`}
-                />
-            </div>
+                    />
+                </div>
+            </>
         );
     }
 };

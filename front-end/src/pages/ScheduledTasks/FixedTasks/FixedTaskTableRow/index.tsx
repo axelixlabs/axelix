@@ -32,20 +32,22 @@ interface IProps {
 
 export const FixedTaskTableRow = ({ task }: IProps) => {
     return (
-        <div className={styles.RowChunksWrapper}>
-            <div className={styles.BodyRowChunk}>
-                <TooltipWithCopy text={task.runnable.target} />
+        <>
+            <div className={styles.RowChunksWrapper}>
+                <div className={styles.BodyRowChunk}>
+                    <TooltipWithCopy text={task.runnable.target} />
+                </div>
+                <div className={styles.BodyRowChunk}>{task.initialDelay}</div>
+                <div className={styles.BodyRowChunk}>
+                    <FixedTasksEditableValue task={task} />
+                </div>
+                <div className={styles.BodyRowChunk}>
+                    <ScheduledTasksStatusSwitch runnable={task} />
+                </div>
+                <div className={styles.BodyRowChunk}>
+                    <ForceRunTask trigger={task.runnable.target} />
+                </div>
             </div>
-            <div className={styles.BodyRowChunk}>{task.initialDelay}</div>
-            <div className={styles.BodyRowChunk}>
-                <FixedTasksEditableValue task={task} />
-            </div>
-            <div className={styles.BodyRowChunk}>
-                <ScheduledTasksStatusSwitch runnable={task} />
-            </div>
-            <div className={styles.BodyRowChunk}>
-                <ForceRunTask trigger={task.runnable.target} />
-            </div>
-        </div>
+        </>
     );
 };

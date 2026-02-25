@@ -159,10 +159,11 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
         Map<String, String> configPropsMapping = new HashMap<>();
 
-        configurationPropertiesCache.getConfigProps().getContexts().values().forEach(context -> context.getBeans()
-                .forEach((beanName, bean) -> {
-                    applyPrefixAndProperty(bean.getPrefix(), bean.getProperties(), configPropsMapping, beanName);
-                }));
+        configurationPropertiesCache
+                .getConfigProps()
+                .getBeans()
+                .forEach((bean) -> applyPrefixAndProperty(
+                        bean.getPrefix(), bean.getProperties(), configPropsMapping, bean.getBeanName()));
 
         return configPropsMapping;
     }

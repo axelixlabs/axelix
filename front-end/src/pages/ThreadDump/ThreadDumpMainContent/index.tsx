@@ -60,30 +60,32 @@ export const ThreadDumpMainContent = ({ sortedThreadDump }: IProps) => {
     };
 
     return (
-        <div className={`AccordionsWrapper ${styles.AccordionsWrapper}`}>
-            {sortedThreadDump.map((threadDump) => {
-                const history = threadsHistory[threadDump.threadId] || [];
-                const currentSelectedGroup = selectedGroups[threadDump.threadId];
+        <>
+            <div className={`AccordionsWrapper ${styles.AccordionsWrapper}`}>
+                {sortedThreadDump.map((threadDump) => {
+                    const history = threadsHistory[threadDump.threadId] || [];
+                    const currentSelectedGroup = selectedGroups[threadDump.threadId];
 
-                return (
-                    <Accordion
-                        header={
-                            <SingleThreadAccordionHeader
-                                currentThreadSnapshot={threadDump}
-                                selectedGroup={currentSelectedGroup}
-                                setSelectedGroups={setSelectedGroups}
-                                history={history}
-                            />
-                        }
-                        key={threadDump.threadId}
-                        onClose={() => onAccordionClose(threadDump)}
-                        hideArrowIcon
-                        accordionExpanded={!!currentSelectedGroup}
-                    >
-                        <ThreadDumpAccordionBody thread={getDisplayedThreadDump(threadDump, selectedGroups)} />
-                    </Accordion>
-                );
-            })}
-        </div>
+                    return (
+                        <Accordion
+                            header={
+                                <SingleThreadAccordionHeader
+                                    currentThreadSnapshot={threadDump}
+                                    selectedGroup={currentSelectedGroup}
+                                    setSelectedGroups={setSelectedGroups}
+                                    history={history}
+                                />
+                            }
+                            key={threadDump.threadId}
+                            onClose={() => onAccordionClose(threadDump)}
+                            hideArrowIcon
+                            accordionExpanded={!!currentSelectedGroup}
+                        >
+                            <ThreadDumpAccordionBody thread={getDisplayedThreadDump(threadDump, selectedGroups)} />
+                        </Accordion>
+                    );
+                })}
+            </div>
+        </>
     );
 };

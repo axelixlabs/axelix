@@ -35,20 +35,25 @@ export const BeansAccordionsList = ({ effectiveBeans }: IProps) => {
     const { hash } = useLocation();
 
     return (
-        <div className="AccordionsWrapper">
-            {effectiveBeans.map((bean) => {
-                const activeId = hash ? hash.replace("#", "") : null;
-                const id = normalizeHtmlElementId(bean.beanName);
-                const accordionExpanded = id === activeId;
+        <>
+            <div className="AccordionsWrapper">
+                {effectiveBeans.map((bean) => {
+                    const activeId = hash ? hash.replace("#", "") : null;
+                    const id = normalizeHtmlElementId(bean.beanName);
+                    const accordionExpanded = id === activeId;
 
-                return (
-                    <div id={id} key={id}>
-                        <Accordion header={<BeanAccordionLabels bean={bean} />} accordionExpanded={accordionExpanded}>
-                            <BeanAccordionChildren bean={bean} />
-                        </Accordion>
-                    </div>
-                );
-            })}
-        </div>
+                    return (
+                        <div id={id} key={id}>
+                            <Accordion
+                                header={<BeanAccordionLabels bean={bean} />}
+                                accordionExpanded={accordionExpanded}
+                            >
+                                <BeanAccordionChildren bean={bean} />
+                            </Accordion>
+                        </div>
+                    );
+                })}
+            </div>
+        </>
     );
 };

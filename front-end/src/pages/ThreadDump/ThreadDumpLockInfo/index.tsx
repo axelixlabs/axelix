@@ -71,10 +71,15 @@ export const ThreadDumpLockInfo = ({ threadDump }: IProps) => {
     ];
 
     return children.length ? (
-        <Tree expandAction="click" showLine treeData={treeData} className={styles.Tree} />
+        <>
+            <Tree expandAction="click" showLine treeData={treeData} className={styles.Tree} />
+        </>
     ) : (
-        <div className={styles.ContentWrapper}>
-            <div className={styles.ContentLabel}>{t("ThreadDump.lock")}:</div>
-        </div>
+        <>
+            {" "}
+            <div className={styles.ContentWrapper}>
+                <div className={styles.ContentLabel}>{t("ThreadDump.lock")}:</div>
+            </div>
+        </>
     );
 };

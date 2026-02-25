@@ -43,38 +43,40 @@ export const ThreadTimeLine = ({ history, selectedGroup, setSelectedGroups }: IP
     const threadGroups = partitionToThreadGroups(history);
 
     return (
-        <div className={styles.MainWrapper}>
-            {threadGroups.map((threadGroup) => {
-                const { id, count, thread } = threadGroup;
+        <>
+            <div className={styles.MainWrapper}>
+                {threadGroups.map((threadGroup) => {
+                    const { id, count, thread } = threadGroup;
 
-                const isGroupSelected = selectedGroup?.id === id;
+                    const isGroupSelected = selectedGroup?.id === id;
 
-                const color = getThreadStateColor(thread);
+                    const color = getThreadStateColor(thread);
 
-                return (
-                    <div
-                        key={id}
-                        className={`${styles.ThreadGroup} ${isGroupSelected ? styles.SelectedThreadGroup : ""}`}
-                        style={
-                            {
-                                width: `${5 * count}px`,
-                                "--color-primary": color.colorPrimary,
-                                "--color-primary-hover": color.colorPrimaryHover,
-                                "--color-primary-active": color.colorPrimaryActive,
-                            } as React.CSSProperties
-                        }
-                        onClick={(e) => {
-                            stopPropagationOnAccordionExpand(e);
+                    return (
+                        <div
+                            key={id}
+                            className={`${styles.ThreadGroup} ${isGroupSelected ? styles.SelectedThreadGroup : ""}`}
+                            style={
+                                {
+                                    width: `${5 * count}px`,
+                                    "--color-primary": color.colorPrimary,
+                                    "--color-primary-hover": color.colorPrimaryHover,
+                                    "--color-primary-active": color.colorPrimaryActive,
+                                } as React.CSSProperties
+                            }
+                            onClick={(e) => {
+                                stopPropagationOnAccordionExpand(e);
 
-                            // overwriting the previous selected group for this thread.
-                            setSelectedGroups((prev) => ({
-                                ...prev,
-                                [String(thread.threadId)]: threadGroup,
-                            }));
-                        }}
-                    />
-                );
-            })}
-        </div>
+                                // overwriting the previous selected group for this thread.
+                                setSelectedGroups((prev) => ({
+                                    ...prev,
+                                    [String(thread.threadId)]: threadGroup,
+                                }));
+                            }}
+                        />
+                    );
+                })}
+            </div>
+        </>
     );
 };

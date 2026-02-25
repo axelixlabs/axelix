@@ -53,48 +53,55 @@ const Login = () => {
     };
 
     return (
-        <div className={styles.LoginFormWrapper}>
-            <h1 className={`TextMedium ${styles.LoginTitle}`}>
-                <Trans
-                    t={t}
-                    i18nKey={"Authentication.login"}
-                    components={{ green: <span className={styles.GreenLetter} /> }}
-                />
-            </h1>
-            <Form layout="vertical" onFinish={onFinish} autoComplete="off">
-                <Form.Item
-                    key="username"
-                    label={t("Authentication.username")}
-                    name="username"
-                    required={false}
-                    rules={[{ required: true, message: t("Authentication.enterUsername") }]}
-                >
-                    <Input className={styles.LoginInput} />
-                </Form.Item>
-                <Form.Item
-                    key="password"
-                    label={t("Authentication.password")}
-                    name="password"
-                    required={false}
-                    rules={[{ required: true, message: t("Authentication.enterPassword") }]}
-                >
-                    <Input.Password className={styles.LoginInput} />
-                </Form.Item>
-
-                {loginData.error === EIgnoredErrors.INVALID_CREDENTIALS && (
-                    <Alert
-                        title={t(`Error.codes.${loginData.error}`)}
-                        type="error"
-                        showIcon
-                        className={styles.ErrorAlert}
+        <>
+            <div className={styles.LoginFormWrapper}>
+                <h1 className={`TextLarge ${styles.LoginTitle}`}>
+                    <Trans
+                        t={t}
+                        i18nKey={"Authentication.login"}
+                        components={{ green: <span className={styles.GreenLetter} /> }}
                     />
-                )}
+                </h1>
+                <Form layout="vertical" onFinish={onFinish} autoComplete="off">
+                    <Form.Item
+                        key="username"
+                        label={t("Authentication.username")}
+                        name="username"
+                        required={false}
+                        rules={[{ required: true, message: t("Authentication.enterUsername") }]}
+                    >
+                        <Input className={styles.LoginInput} />
+                    </Form.Item>
+                    <Form.Item
+                        key="password"
+                        label={t("Authentication.password")}
+                        name="password"
+                        required={false}
+                        rules={[{ required: true, message: t("Authentication.enterPassword") }]}
+                    >
+                        <Input.Password className={styles.LoginInput} />
+                    </Form.Item>
 
-                <Button type="primary" htmlType="submit" loading={loginData.loading} className={styles.SubmitButton}>
-                    {t("Authentication.loginButtonText")}
-                </Button>
-            </Form>
-        </div>
+                    {loginData.error === EIgnoredErrors.INVALID_CREDENTIALS && (
+                        <Alert
+                            title={t(`Error.codes.${loginData.error}`)}
+                            type="error"
+                            showIcon
+                            className={styles.ErrorAlert}
+                        />
+                    )}
+
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loginData.loading}
+                        className={styles.SubmitButton}
+                    >
+                        {t("Authentication.loginButtonText")}
+                    </Button>
+                </Form>
+            </div>
+        </>
     );
 };
 

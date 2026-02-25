@@ -37,11 +37,13 @@ export const EnvironmentPropertyValue = ({ property }: IProps) => {
     const { t } = useTranslation();
 
     return (
-        <div className={styles.MainWrapper}>
-            {value}
-            <Tooltip title={t("Environments.primaryProperty")}>
-                <CrownIcon className={`${styles.PrimaryIcon} ${!isPrimary ? styles.IconPlaceholder : ""}`} />
-            </Tooltip>
-        </div>
+        <>
+            <div className={styles.MainWrapper}>
+                {value}
+                <Tooltip title={t("Environments.primaryProperty")}>
+                    <CrownIcon className={`${styles.PrimaryIcon} ${!isPrimary ? styles.IconPlaceholder : ""}`} />
+                </Tooltip>
+            </div>
+        </>
     );
 };

@@ -25,18 +25,20 @@ import { LogoIcon } from "assets";
 
 export const MinimalLayout = () => {
     return (
-        <div className={styles.MainWrapper}>
-            <div className={styles.Header}>
-                <div className="MainContainer">
-                    <div className={styles.LanguageSwitcherWrapper}>
-                        <LogoIcon className={styles.Logo} />
-                        <LanguageSwitcher />
+        <>
+            <div className={styles.MainWrapper}>
+                <div className={styles.Header}>
+                    <div className="MainContainer">
+                        <div className={styles.LanguageSwitcherWrapper}>
+                            <LogoIcon className={styles.Logo} />
+                            <LanguageSwitcher />
+                        </div>
                     </div>
                 </div>
+                <div className={styles.ContentWrapper}>
+                    <Outlet />
+                </div>
             </div>
-            <div className={styles.ContentWrapper}>
-                <Outlet />
-            </div>
-        </div>
+        </>
     );
 };

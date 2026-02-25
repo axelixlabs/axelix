@@ -27,10 +27,12 @@ interface IProps {
      * Details card title
      */
     title: string;
+
     /**
      * Prefix to be used when translating {@link records} via i18n.
      */
     i18nPropertiesPrefix: string;
+
     /**
      * Details card records
      */
@@ -41,22 +43,24 @@ export const DetailsCard = ({ children, i18nPropertiesPrefix, title, records }: 
     const { t } = useTranslation();
 
     return (
-        <div className={`CustomizedTable ${styles.Card}`}>
-            <div className="TableHeader">
-                <div className={`RowChunk ${styles.TableHeaderRowChunk}`}>
-                    {children}
-                    {t(title)}
-                </div>
-            </div>
-
-            {records.map(({ key, value }) => (
-                <div className="TableRow" key={key}>
-                    <div className="RowChunk">{t(`${i18nPropertiesPrefix}.${key}`)}</div>
-                    <div className={`RowChunk ${styles.ValueChunk}`}>
-                        <div className={styles.ValueWrapper}>{value}</div>
+        <>
+            <div className={`CustomizedTable ${styles.Card}`}>
+                <div className="TableHeader">
+                    <div className={`RowChunk ${styles.TableHeaderRowChunk}`}>
+                        {children}
+                        {t(title)}
                     </div>
                 </div>
-            ))}
-        </div>
+
+                {records.map(({ key, value }) => (
+                    <div className="TableRow" key={key}>
+                        <div className="RowChunk">{t(`${i18nPropertiesPrefix}.${key}`)}</div>
+                        <div className={`RowChunk ${styles.ValueChunk}`}>
+                            <div className={styles.ValueWrapper}>{value}</div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </>
     );
 };

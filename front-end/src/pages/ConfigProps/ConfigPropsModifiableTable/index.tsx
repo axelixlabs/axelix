@@ -39,33 +39,35 @@ interface IProps {
 
 export const ConfigPropsModifiableTable = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
     return (
-        <div id={normalizeHtmlElementId(headerName)}>
-            <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
-                <Accordion
-                    header={
-                        <div className={styles.AccordionHeader}>
-                            <div>{headerName}</div>
-                            {children}
-                        </div>
-                    }
-                    headerStyles={styles.HeaderStyles}
-                    contentStyles={styles.ContentStyles}
-                    accordionExpanded
-                >
-                    <EmptyHandler isEmpty={!properties.length}>
-                        {properties.map(({ key, displayKey, displayValue }) => (
-                            <div key={key} className="TableRow">
-                                <div className={`RowChunk ${styles.KeyChunk}`}>
-                                    {displayKey} <Copy text={displayKey} />
-                                </div>
-                                <div className={`RowChunk ${styles.ValueChunk}`}>
-                                    <ConfigPropsPropertyValue propertyName={key} propertyValue={displayValue} />
-                                </div>
+        <>
+            <div id={normalizeHtmlElementId(headerName)}>
+                <div className={`AccordionsWrapper ${styles.AccordionWrapper}`}>
+                    <Accordion
+                        header={
+                            <div className={styles.AccordionHeader}>
+                                <div>{headerName}</div>
+                                {children}
                             </div>
-                        ))}
-                    </EmptyHandler>
-                </Accordion>
+                        }
+                        headerStyles={styles.HeaderStyles}
+                        contentStyles={styles.ContentStyles}
+                        accordionExpanded
+                    >
+                        <EmptyHandler isEmpty={!properties.length}>
+                            {properties.map(({ key, displayKey, displayValue }) => (
+                                <div key={key} className="TableRow">
+                                    <div className={`RowChunk ${styles.KeyChunk}`}>
+                                        {displayKey} <Copy text={displayKey} />
+                                    </div>
+                                    <div className={`RowChunk ${styles.ValueChunk}`}>
+                                        <ConfigPropsPropertyValue propertyName={key} propertyValue={displayValue} />
+                                    </div>
+                                </div>
+                            ))}
+                        </EmptyHandler>
+                    </Accordion>
+                </div>
             </div>
-        </div>
+        </>
     );
 };

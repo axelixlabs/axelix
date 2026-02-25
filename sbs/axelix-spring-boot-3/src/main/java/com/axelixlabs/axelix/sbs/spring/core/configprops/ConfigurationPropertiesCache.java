@@ -25,7 +25,7 @@ import org.springframework.boot.actuate.context.properties.ConfigurationProperti
 import org.springframework.boot.actuate.endpoint.Show;
 import org.springframework.context.ApplicationContext;
 
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
+import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 
 /**
  * Service caching the application's {@code @ConfigurationProperties}
@@ -41,7 +41,7 @@ public class ConfigurationPropertiesCache {
     private final ConfigurationPropertiesConverter configurationPropertiesConverter;
 
     @Nullable
-    private volatile ConfigPropsFeed cachedResult;
+    private volatile ConfigurationPropertiesFeed cachedResult;
 
     public ConfigurationPropertiesCache(
             SmartSanitizingFunction smartSanitizingFunction,
@@ -53,7 +53,7 @@ public class ConfigurationPropertiesCache {
         this.configurationPropertiesConverter = configurationPropertiesConverter;
     }
 
-    public ConfigPropsFeed getConfigProps() {
+    public ConfigurationPropertiesFeed getConfigProps() {
         if (cachedResult == null) {
             synchronized (this) {
                 if (cachedResult == null) {

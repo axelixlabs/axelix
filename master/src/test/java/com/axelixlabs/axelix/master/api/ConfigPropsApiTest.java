@@ -61,7 +61,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ConfigPropsApiFeedTest {
+public class ConfigPropsApiTest {
     // language=json
     private static final String EXPECTED_BEANS_FEED_JSON =
             """
@@ -192,110 +192,106 @@ public class ConfigPropsApiFeedTest {
         // language=json
         String jsonBeansFeedResponse =
                 """
-                {
-              "contexts" : {
-                "application1" : {
-                  "beans" : {
-                    "org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties" : {
-                      "prefix" : "management.endpoints.web.cors",
-                      "properties": [
-                        { "key": "allowedOrigins", "value": null },
-                        { "key": "maxAge", "value": "PT30M" },
-                        { "key": "exposedHeaders", "value": null },
-                        { "key": "allowedOriginPatterns", "value": null },
-                        { "key": "allowedHeaders", "value": null },
-                        { "key": "allowedMethods", "value": null }
-                      ],
-                      "inputs": [
-                        { "key": "allowedOrigins", "value": null },
-                        { "key": "maxAge", "value": null },
-                        { "key": "exposedHeaders", "value": null },
-                        { "key": "allowedOriginPatterns", "value": null },
-                        { "key": "allowedHeaders", "value": null },
-                        { "key": "allowedMethods", "value": null }
-                      ]
-                    },
-                    "org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties" : {
-                      "prefix" : "management.endpoints.web",
-                      "properties": [
-                        { "key": "pathMapping", "value": null },
-                        { "key": "exposure.include[0]", "value": "*" },
-                        { "key": "exposure.exclude", "value": null },
-                        { "key": "basePath", "value": "/actuator" },
-                        { "key": "discovery.enabled", "value": "true" }
-                      ],
-                      "inputs": [
-                        { "key": "pathMapping", "value": null },
-                        { "key": "exposure.include[0].value", "value": "*" },
-                        { "key": "exposure.include[0].origin", "value": "\\"management.endpoints.web.exposure.include\\" from property source \\"Inlined Test Properties\\"" },
-                        { "key": "exposure.exclude", "value": null },
-                        { "key": "basePath", "value": null },
-                        { "key": "discovery.enabled", "value": null }
-                      ]
-                    },
-                    "org.springframework.boot.autoconfigure.web.WebProperties" : {
-                      "prefix" : "spring.web",
-                      "properties": [
-                        { "key": "localeResolver", "value": "ACCEPT_HEADER" },
-                        { "key": "resources.staticLocations[0]", "value": "classpath:/META-INF/resources/" },
-                        { "key": "resources.staticLocations[1]", "value": "classpath:/resources/" },
-                        { "key": "resources.staticLocations[2]", "value": "classpath:/static/" },
-                        { "key": "resources.staticLocations[3]", "value": "classpath:/public/" },
-                        { "key": "resources.addMappings", "value": "true" },
-                        { "key": "resources.chain.cache", "value": "true" },
-                        { "key": "resources.chain.compressed", "value": "false" },
-                        { "key": "resources.chain.strategy.fixed.enabled", "value": "false" },
-                        { "key": "resources.chain.strategy.fixed.paths[0]", "value": "/**" },
-                        { "key": "resources.chain.strategy.content.enabled", "value": "false" },
-                        { "key": "resources.chain.strategy.content.paths[0]", "value": "/**" },
-                        { "key": "resources.cache.cachecontrol", "value": null },
-                        { "key": "resources.cache.useLastModified", "value": "true" }
-                      ],
-                      "inputs": [
-                        { "key": "localeResolver", "value": null },
-                        { "key": "resources.staticLocations[0]", "value": null },
-                        { "key": "resources.staticLocations[1]", "value": null },
-                        { "key": "resources.staticLocations[2]", "value": null },
-                        { "key": "resources.staticLocations[3]", "value": null },
-                        { "key": "resources.addMappings", "value": null },
-                        { "key": "resources.chain.cache", "value": null },
-                        { "key": "resources.chain.compressed", "value": null },
-                        { "key": "resources.chain.strategy.fixed.enabled", "value": null },
-                        { "key": "resources.chain.strategy.fixed.paths[0]", "value": null },
-                        { "key": "resources.chain.strategy.content.enabled", "value": null },
-                        { "key": "resources.chain.strategy.content.paths[0]", "value": null },
-                        { "key": "resources.cache.cachecontrol", "value": null },
-                        { "key": "resources.cache.useLastModified", "value": null }
-                      ]
-                    }
-                  }
-                },
-                "application2" : {
-                  "beans" : {
-                    "org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties" : {
-                      "prefix" : "management.endpoints.web.cors",
-                      "properties": [
-                        { "key": "allowedOrigins", "value": null },
-                        { "key": "maxAge", "value": "PT30M" },
-                        { "key": "exposedHeaders", "value": null },
-                        { "key": "allowedOriginPatterns", "value": null },
-                        { "key": "allowedHeaders", "value": null },
-                        { "key": "allowedMethods", "value": null }
-                      ],
-                      "inputs": [
-                        { "key": "allowedOrigins", "value": null },
-                        { "key": "maxAge", "value": null },
-                        { "key": "exposedHeaders", "value": null },
-                        { "key": "allowedOriginPatterns", "value": null },
-                        { "key": "allowedHeaders", "value": null },
-                        { "key": "allowedMethods", "value": null }
-                      ]
-                    }
-                  }
-                }
+              {
+            "beans": [
+              {
+                "beanName": "org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
+                "prefix": "management.endpoints.web.cors",
+                "properties": [
+                  { "key": "allowedOrigins", "value": null },
+                  { "key": "maxAge", "value": "PT30M" },
+                  { "key": "exposedHeaders", "value": null },
+                  { "key": "allowedOriginPatterns", "value": null },
+                  { "key": "allowedHeaders", "value": null },
+                  { "key": "allowedMethods", "value": null }
+                ],
+                "inputs": [
+                  { "key": "allowedOrigins", "value": null },
+                  { "key": "maxAge", "value": null },
+                  { "key": "exposedHeaders", "value": null },
+                  { "key": "allowedOriginPatterns", "value": null },
+                  { "key": "allowedHeaders", "value": null },
+                  { "key": "allowedMethods", "value": null }
+                ]
+              },
+              {
+                "beanName": "org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties",
+                "prefix": "management.endpoints.web.cors",
+                "properties": [
+                  { "key": "allowedOrigins", "value": null },
+                  { "key": "maxAge", "value": "PT30M" },
+                  { "key": "exposedHeaders", "value": null },
+                  { "key": "allowedOriginPatterns", "value": null },
+                  { "key": "allowedHeaders", "value": null },
+                  { "key": "allowedMethods", "value": null }
+                ],
+                "inputs": [
+                  { "key": "allowedOrigins", "value": null },
+                  { "key": "maxAge", "value": null },
+                  { "key": "exposedHeaders", "value": null },
+                  { "key": "allowedOriginPatterns", "value": null },
+                  { "key": "allowedHeaders", "value": null },
+                  { "key": "allowedMethods", "value": null }
+                ]
+              },
+              {
+                "beanName": "org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties",
+                "prefix": "management.endpoints.web",
+                "properties": [
+                  { "key": "pathMapping", "value": null },
+                  { "key": "exposure.include[0]", "value": "*" },
+                  { "key": "exposure.exclude", "value": null },
+                  { "key": "basePath", "value": "/actuator" },
+                  { "key": "discovery.enabled", "value": "true" }
+                ],
+                "inputs": [
+                  { "key": "pathMapping", "value": null },
+                  { "key": "exposure.include[0].value", "value": "*" },
+                  { "key": "exposure.include[0].origin", "value": "\\"management.endpoints.web.exposure.include\\" from property source \\"Inlined Test Properties\\"" },
+                  { "key": "exposure.exclude", "value": null },
+                  { "key": "basePath", "value": null },
+                  { "key": "discovery.enabled", "value": null }
+                ]
+              },
+              {
+                "beanName": "org.springframework.boot.autoconfigure.web.WebProperties",
+                "prefix": "spring.web",
+                "properties": [
+                  { "key": "localeResolver", "value": "ACCEPT_HEADER" },
+                  { "key": "resources.staticLocations[0]", "value": "classpath:/META-INF/resources/" },
+                  { "key": "resources.staticLocations[1]", "value": "classpath:/resources/" },
+                  { "key": "resources.staticLocations[2]", "value": "classpath:/static/" },
+                  { "key": "resources.staticLocations[3]", "value": "classpath:/public/" },
+                  { "key": "resources.addMappings", "value": "true" },
+                  { "key": "resources.chain.cache", "value": "true" },
+                  { "key": "resources.chain.compressed", "value": "false" },
+                  { "key": "resources.chain.strategy.fixed.enabled", "value": "false" },
+                  { "key": "resources.chain.strategy.fixed.paths[0]", "value": "/**" },
+                  { "key": "resources.chain.strategy.content.enabled", "value": "false" },
+                  { "key": "resources.chain.strategy.content.paths[0]", "value": "/**" },
+                  { "key": "resources.cache.cachecontrol", "value": null },
+                  { "key": "resources.cache.useLastModified", "value": "true" }
+                ],
+                "inputs": [
+                  { "key": "localeResolver", "value": null },
+                  { "key": "resources.staticLocations[0]", "value": null },
+                  { "key": "resources.staticLocations[1]", "value": null },
+                  { "key": "resources.staticLocations[2]", "value": null },
+                  { "key": "resources.staticLocations[3]", "value": null },
+                  { "key": "resources.addMappings", "value": null },
+                  { "key": "resources.chain.cache", "value": null },
+                  { "key": "resources.chain.compressed", "value": null },
+                  { "key": "resources.chain.strategy.fixed.enabled", "value": null },
+                  { "key": "resources.chain.strategy.fixed.paths[0]", "value": null },
+                  { "key": "resources.chain.strategy.content.enabled", "value": null },
+                  { "key": "resources.chain.strategy.content.paths[0]", "value": null },
+                  { "key": "resources.cache.cachecontrol", "value": null },
+                  { "key": "resources.cache.useLastModified", "value": null }
+                ]
               }
-            }
-        """;
+            ]
+          }
+          """;
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override

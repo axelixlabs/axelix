@@ -38,22 +38,24 @@ export const ThreadDumpStackTrace = ({ threadDump }: IProps) => {
     }
 
     return (
-        <div>
-            <div className={styles.Title}>{t("ThreadDump.stacktrace")}</div>
+        <>
             <div>
-                {stackTrace.map((trace, index) => {
-                    const { moduleName, className, methodName, fileName, lineNumber } = trace;
+                <div className={styles.Title}>{t("ThreadDump.stacktrace")}</div>
+                <div>
+                    {stackTrace.map((trace, index) => {
+                        const { moduleName, className, methodName, fileName, lineNumber } = trace;
 
-                    const traceLine = `${moduleName ?? "unknown module"}:${className}.${methodName}(${fileName}: ${lineNumber})`;
+                        const traceLine = `${moduleName ?? "unknown module"}:${className}.${methodName}(${fileName}: ${lineNumber})`;
 
-                    return (
-                        <div key={`${traceLine}${index}`} className={styles.TraceLine}>
-                            <p>{traceLine}</p>
-                            {trace.nativeMethod && <Tag className={styles.NativeTag}>NATIVE</Tag>}
-                        </div>
-                    );
-                })}
+                        return (
+                            <div key={`${traceLine}${index}`} className={styles.TraceLine}>
+                                <p>{traceLine}</p>
+                                {trace.nativeMethod && <Tag className={styles.NativeTag}>NATIVE</Tag>}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
-        </div>
+        </>
     );
 };

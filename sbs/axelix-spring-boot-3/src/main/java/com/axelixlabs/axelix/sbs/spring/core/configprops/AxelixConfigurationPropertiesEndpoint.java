@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.configprops;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-import com.axelixlabs.axelix.common.api.ConfigPropsFeed;
+import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 
 /**
  * Custom Actuator endpoint exposing the application's {@code @ConfigurationProperties}
@@ -39,7 +39,7 @@ public class AxelixConfigurationPropertiesEndpoint {
     }
 
     @ReadOperation
-    public ConfigPropsFeed configurationProperties() {
+    public ConfigurationPropertiesFeed configurationProperties() {
         return configurationPropertiesCache.getConfigProps();
     }
 }

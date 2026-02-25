@@ -38,28 +38,30 @@ const Beans = Loadable(lazy(() => import("pages/Beans")));
 
 export const MainRoutes = () => {
     return (
-        <Routes>
-            <Route path="/" element={<MainLayout hideSider />}>
-                <Route index element={<Navigate to="/wallboard" replace />} />
-                <Route path="/wallboard" element={<Wallboard />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="*" element={<Navigate to="/wallboard" replace />} />
-            </Route>
+        <>
+            <Routes>
+                <Route path="/" element={<MainLayout hideSider />}>
+                    <Route index element={<Navigate to="/wallboard" replace />} />
+                    <Route path="/wallboard" element={<Wallboard />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="*" element={<Navigate to="/wallboard" replace />} />
+                </Route>
 
-            <Route element={<MainLayout />}>
-                <Route path="/instance/:instanceId/details" element={<Details />} />
-                <Route path="/instance/:instanceId/metrics" element={<Metrics />} />
-                <Route path="/instance/:instanceId/environment" element={<Environment />} />
-                <Route path="/instance/:instanceId/beans" element={<Beans />} />
-                <Route path="/instance/:instanceId/config-props" element={<ConfigProps />} />
-                <Route path="/instance/:instanceId/loggers" element={<Loggers />} />
-                <Route path="/instance/:instanceId/caches" element={<Caches />} />
-                <Route path="/instance/:instanceId/scheduled-tasks" element={<ScheduledTasks />} />
-                <Route path="/instance/:instanceId/conditions" element={<Conditions />} />
-                <Route path="/instance/:instanceId/thread-dump" element={<ThreadDump />} />
-                <Route path="/instance/:instanceId/garbage-collector" element={<GarbageCollector />} />
-                <Route path="/instance/:instanceId/transactional" element={<Transactional />} />
-            </Route>
-        </Routes>
+                <Route element={<MainLayout />}>
+                    <Route path="/instance/:instanceId/details" element={<Details />} />
+                    <Route path="/instance/:instanceId/metrics" element={<Metrics />} />
+                    <Route path="/instance/:instanceId/environment" element={<Environment />} />
+                    <Route path="/instance/:instanceId/beans" element={<Beans />} />
+                    <Route path="/instance/:instanceId/config-props" element={<ConfigProps />} />
+                    <Route path="/instance/:instanceId/loggers" element={<Loggers />} />
+                    <Route path="/instance/:instanceId/caches" element={<Caches />} />
+                    <Route path="/instance/:instanceId/scheduled-tasks" element={<ScheduledTasks />} />
+                    <Route path="/instance/:instanceId/conditions" element={<Conditions />} />
+                    <Route path="/instance/:instanceId/thread-dump" element={<ThreadDump />} />
+                    <Route path="/instance/:instanceId/garbage-collector" element={<GarbageCollector />} />
+                    <Route path="/instance/:instanceId/transactional" element={<Transactional />} />
+                </Route>
+            </Routes>
+        </>
     );
 };

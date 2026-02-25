@@ -31,6 +31,7 @@ interface IProps {
      * Name of the cache manager
      */
     cacheManagerName: string;
+
     /**
      * Single cache data
      */
@@ -65,12 +66,14 @@ export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
     };
 
     return (
-        <Switch
-            checkedChildren={t("on")}
-            unCheckedChildren={t("off")}
-            onChange={(checked, event) => switchTaskStatus(event)}
-            loading={mutationRequest.loading}
-            checked={cache.enabled}
-        />
+        <>
+            <Switch
+                checkedChildren={t("on")}
+                unCheckedChildren={t("off")}
+                onChange={(checked, event) => switchTaskStatus(event)}
+                loading={mutationRequest.loading}
+                checked={cache.enabled}
+            />
+        </>
     );
 };

@@ -82,25 +82,27 @@ export const GCLogEnableSettings = ({ isModalOpen, setIsModalOpen, logginsStatus
     };
 
     return (
-        <UniversalModal
-            title={t("GC.modalWindow.title")}
-            open={isModalOpen}
-            onOk={onOk}
-            displayCancel={false}
-            onClose={onClose}
-            okText={t("GC.modalWindow.submit")}
-            loading={enableGCLoggingData.loading}
-        >
-            <div className={styles.ContentWrapper}>
-                <div>{t("GC.modalWindow.selectLoggingLevel")}:</div>
-                <Select
-                    placeholder="Level"
-                    defaultValue={selectedLevel}
-                    onChange={(level) => setSelectedLevel(level)}
-                    options={getLevelsSelectData(availableLevels)}
-                    className={styles.LoggingLevelSelect}
-                />
-            </div>
-        </UniversalModal>
+        <>
+            <UniversalModal
+                title={t("GC.modalWindow.title")}
+                open={isModalOpen}
+                onOk={onOk}
+                displayCancel={false}
+                onClose={onClose}
+                okText={t("GC.modalWindow.submit")}
+                loading={enableGCLoggingData.loading}
+            >
+                <div className={styles.ContentWrapper}>
+                    <div>{t("GC.modalWindow.selectLoggingLevel")}:</div>
+                    <Select
+                        placeholder="Level"
+                        defaultValue={selectedLevel}
+                        onChange={(level) => setSelectedLevel(level)}
+                        options={getLevelsSelectData(availableLevels)}
+                        className={styles.LoggingLevelSelect}
+                    />
+                </div>
+            </UniversalModal>
+        </>
     );
 };

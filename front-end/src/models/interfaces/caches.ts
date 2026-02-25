@@ -20,22 +20,27 @@ export interface ICacheData {
      * Name of the cache
      */
     name: string;
+
     /**
      * Target of the cache
      */
     target: string;
+
     /**
      * When true, caching is active; when false, caching is inactive
      */
     enabled: boolean;
+
     /**
      * Number of cache hits
      */
     hitsCount: number;
+
     /**
      * Number of cache misses
      */
     missesCount: number;
+
     /**
      * Estimated amount of entries inside the cache. May be absent.
      */
@@ -47,6 +52,7 @@ export interface ICachesManager {
      * Name of the cache manager
      */
     name: string;
+
     /**
      * List of caches associated with the cache manager
      */
@@ -65,10 +71,12 @@ export interface IClearCacheRequestData {
      * Instance ID of the service
      */
     instanceId: string;
+
     /**
      * Name of the cache
      */
     cacheName: string;
+
     /**
      * Name of the cache manager associated with the cache
      */
