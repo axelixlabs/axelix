@@ -31,11 +31,6 @@ import com.axelixlabs.axelix.common.api.KeyValue;
 public class DefaultConfigurationPropertiesFlattener implements ConfigurationPropertiesFlattener {
 
     @Override
-    public List<KeyValue> flatten(Map<String, Object> map) {
-        return ConfigurationPropertiesFlattener.super.flatten(map);
-    }
-
-    @Override
     public List<KeyValue> flatten(String key, Map<String, Object> map) {
         if (map == null || map.isEmpty()) {
             return List.of();
