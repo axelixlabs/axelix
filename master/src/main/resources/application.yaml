@@ -46,6 +46,3 @@ axelix:
       cookie:
         name: auth_token
         secure: false
-    web:
-      static-resources:
-        location: file:/frontend/dist/

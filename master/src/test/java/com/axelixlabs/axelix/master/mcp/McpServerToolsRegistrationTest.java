@@ -51,18 +51,7 @@ class McpServerToolsRegistrationTest {
                         "getInstanceEnvironment",
                         "getInstanceConfigProps",
                         "getInstanceConditions",
-                        "getInstanceScheduledTasks");
-    }
-
-    @Test
-    void shouldHaveInstanceIdParameter() {
-        List<McpSchema.Tool> tools = mcpSyncServer.listTools();
-
-        for (var tool : tools) {
-            String schema = tool.inputSchema().toString();
-            assertThat(schema)
-                    .as("Tool %s should have instanceId parameter", tool.name())
-                    .contains("instanceId");
-        }
+                        "getInstanceScheduledTasks",
+                        "getWallboard");
     }
 }

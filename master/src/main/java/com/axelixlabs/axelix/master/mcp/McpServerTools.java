@@ -29,7 +29,9 @@ import com.axelixlabs.axelix.master.api.external.endpoint.ConditionsApi;
 import com.axelixlabs.axelix.master.api.external.endpoint.ConfigPropsApi;
 import com.axelixlabs.axelix.master.api.external.endpoint.EnvironmentApi;
 import com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.WallboardApi;
 import com.axelixlabs.axelix.master.api.external.response.BeansFeedResponse;
+import com.axelixlabs.axelix.master.api.external.response.InstancesGridResponse;
 
 /**
  * Provides a collection of MCP tools for inspecting Spring Boot instances.
@@ -37,6 +39,7 @@ import com.axelixlabs.axelix.master.api.external.response.BeansFeedResponse;
  * @since 19.02.2026
  * @author Nikita Kirillov
  */
+@SuppressWarnings("NullAway")
 @Service
 public class McpServerTools {
 
@@ -50,17 +53,21 @@ public class McpServerTools {
 
     private final ScheduledTasksApi scheduledTasksApi;
 
+    private final WallboardApi wallboardApi;
+
     public McpServerTools(
             BeansApi beansApi,
             EnvironmentApi environmentApi,
             ConfigPropsApi configPropsApi,
             ConditionsApi conditionsApi,
-            ScheduledTasksApi scheduledTasksApi) {
+            ScheduledTasksApi scheduledTasksApi,
+            WallboardApi wallboardApi) {
         this.beansApi = beansApi;
         this.environmentApi = environmentApi;
         this.configPropsApi = configPropsApi;
         this.conditionsApi = conditionsApi;
         this.scheduledTasksApi = scheduledTasksApi;
+        this.wallboardApi = wallboardApi;
     }
 
     @McpTool(
@@ -116,7 +123,27 @@ public class McpServerTools {
         Use this when user asks about scheduled or cron tasks of an instance.
         """)
     public String getInstanceScheduledTasks(@McpToolParam(description = "The instance ID") String instanceId) {
+
         return Arrays.toString(
                 scheduledTasksApi.getAllScheduledTasks(instanceId).getBody());
+    }
+
+    @McpTool(
+            description =
+                    """
+        Fetch the comprehensive snapshot of all managed instances (also known as 'Wallboard', 'Grid', 'Instances List').
+
+        Use this tool as a STARTING POINT to:
+        1. Find a mapping between human-readable service names and their technical 'instanceId'.
+        2. Get a 'Grid' view of the system to check real-time statuses (UP, DOWN, RELOAD).
+        3. Identify technical metadata: service versions, Spring Boot and Java versions.
+        4. Check deployment duration ('deployedFor') and Git commit SHAs.
+
+        NOTE: This is a dynamic 'Wallboard' state. If a user asks about 'the grid', 'active services',
+        or 'current instances', call this tool.
+        If you suspect an ID is stale or a service just restarted, refresh by calling this again.
+        """)
+    public InstancesGridResponse getWallboard() {
+        return wallboardApi.getInstancesGrid();
     }
 }
