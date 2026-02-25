@@ -27,6 +27,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
+import com.axelixlabs.axelix.common.api.caches.CachesFeed;
 import com.axelixlabs.axelix.common.api.caches.SingleCache;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -325,6 +326,54 @@ class DefaultCacheOperationsDispatcherTest {
         assertThat(second.getMisses()).hasSize(1);
         assertThat(second.getEstimatedEntrySize()).isEqualTo(1L);
         assertThat(second.getHits()).hasSize(1);
+    }
+
+    @Test
+    void shouldIsTrueContainsStats() {
+        // given.
+        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
+        cache1.put("key1", "value");
+        cache1.get("key1");
+        cache1.get("notCache");
+
+        // when.
+        CachesFeed cachesFeed = dispatcher.getAll();
+
+        // then.
+        CachesFeed.Cache cache = cachesFeed.getCacheManagers().stream()
+                .filter(cacheManager -> TEST_CACHE_MANAGER_1.equals(cacheManager.getName()))
+                .findFirst()
+                .orElseThrow()
+                .getCaches()
+                .stream()
+                .filter(it -> TEST_CACHE_1.equals(it.getName()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(cache.isContainsStats()).isTrue();
+    }
+
+    @Test
+    void shouldIsFalseContainsStats() {
+        // given.
+        Cache cache1 = cacheManager1.getCache(TEST_CACHE_1);
+        cache1.put("key1", "value");
+
+        // when.
+        CachesFeed cachesFeed = dispatcher.getAll();
+
+        // then.
+        CachesFeed.Cache cache = cachesFeed.getCacheManagers().stream()
+                .filter(cacheManager -> TEST_CACHE_MANAGER_1.equals(cacheManager.getName()))
+                .findFirst()
+                .orElseThrow()
+                .getCaches()
+                .stream()
+                .filter(it -> TEST_CACHE_1.equals(it.getName()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(cache.isContainsStats()).isFalse();
     }
 
     @Test

@@ -22,7 +22,6 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.jspecify.annotations.Nullable;
 
 /**
  * The response of the caches actuator endpoint contains a map of all cache managers in the application.
@@ -129,30 +128,27 @@ public final class CachesFeed {
 
         private final String name;
         private final String target;
-
-        @Nullable
-        private final Long estimatedEntrySize;
-
         private final boolean enabled;
+        private final boolean containsStats;
 
         /**
          * Creates a new Cache.
          *
          * @param name               The cache name.
          * @param target             The fully qualified name of the native cache.
-         * @param estimatedEntrySize The estimated number of entries in the cache, or {@code null} if unknown.
          * @param enabled            Whether the cache is enabled ({@code true}) or disabled ({@code false}).
+         * @param containsStats      The value will be {@code true} if the cache contains either hits or misses, otherwise it will be {@code false}.
          */
         @JsonCreator
         public Cache(
                 @JsonProperty("name") String name,
                 @JsonProperty("target") String target,
-                @JsonProperty("estimatedEntrySize") @Nullable Long estimatedEntrySize,
-                @JsonProperty("enabled") boolean enabled) {
+                @JsonProperty("enabled") boolean enabled,
+                @JsonProperty("containsStats") boolean containsStats) {
             this.name = name;
             this.target = target;
-            this.estimatedEntrySize = estimatedEntrySize;
             this.enabled = enabled;
+            this.containsStats = containsStats;
         }
 
         public String getName() {
@@ -163,49 +159,38 @@ public final class CachesFeed {
             return target;
         }
 
-        @Nullable
-        public Long getEstimatedEntrySize() {
-            return estimatedEntrySize;
-        }
-
         public boolean isEnabled() {
             return enabled;
         }
 
+        public boolean isContainsStats() {
+            return containsStats;
+        }
+
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
             Cache cache = (Cache) o;
             return enabled == cache.enabled
+                    && containsStats == cache.containsStats
                     && Objects.equals(name, cache.name)
-                    && Objects.equals(target, cache.target)
-                    && Objects.equals(estimatedEntrySize, cache.estimatedEntrySize);
+                    && Objects.equals(target, cache.target);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(name, target, estimatedEntrySize, enabled);
+            return Objects.hash(name, target, enabled, containsStats);
         }
 
         @Override
         public String toString() {
-            return "Cache{"
-                    + "name='"
-                    + name
-                    + '\''
-                    + ", target='"
-                    + target
-                    + '\''
-                    + ", estimatedEntrySize="
-                    + estimatedEntrySize
-                    + ", enabled="
-                    + enabled
-                    + '}';
+            return "Cache{" + "name='"
+                    + name + '\'' + ", target='"
+                    + target + '\'' + ", enabled="
+                    + enabled + ", containsStats="
+                    + containsStats + '}';
         }
     }
 }

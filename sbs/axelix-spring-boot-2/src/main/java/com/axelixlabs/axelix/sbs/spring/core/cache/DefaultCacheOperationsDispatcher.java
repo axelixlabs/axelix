@@ -87,11 +87,18 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
             feed.add(new CachesFeed.CacheManager(
                     cacheManagerName,
                     enhancedCacheManager.getAll().stream()
-                            .map(enhancedCache -> new CachesFeed.Cache(
-                                    enhancedCache.getName(),
-                                    enhancedCache.getNativeCache().getClass().getName(),
-                                    cacheSizeProvider.getEstimatedCacheSize(enhancedCache.getNativeCache()),
-                                    enhancedCache.isEnabled()))
+                            .map(enhancedCache -> {
+                                boolean containsStats = !enhancedCache.getHits().isEmpty()
+                                        || !enhancedCache.getMisses().isEmpty();
+                                return new CachesFeed.Cache(
+                                        enhancedCache.getName(),
+                                        enhancedCache
+                                                .getNativeCache()
+                                                .getClass()
+                                                .getName(),
+                                        enhancedCache.isEnabled(),
+                                        containsStats);
+                            })
                             .collect(Collectors.toList())));
         });
 
