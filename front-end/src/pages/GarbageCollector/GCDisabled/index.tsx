@@ -50,7 +50,7 @@ export const GCDisabledMessage = ({ loggingStatusData, loadGCStatus }: IProps) =
                 <div className={styles.WarningIconWrapper}>
                     <InfoIcon color="#1890ff" className={styles.InfoIcon} />
                 </div>
-                <div className={`TextMedium ${styles.Title}`}>{t("GC.disableTitle")}</div>
+                <div className={`TextLarge ${styles.Title}`}>{t("GC.disableTitle")}</div>
                 <div className={styles.SubTitle}>{t("GC.disableSubtitle")}</div>
                 <Button icon={<OnOffIcon />} type="primary" onClick={() => setIsModalOpen(true)}>
                     {t("GC.enableButtonText")}

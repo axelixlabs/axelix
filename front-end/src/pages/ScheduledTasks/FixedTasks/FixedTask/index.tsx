@@ -39,7 +39,7 @@ interface IProps {
 export const FixedTasks = ({ taskTitle, fixedTasks }: IProps) => {
     return (
         <div className={styles.SectionWrapper}>
-            <div className={`TextMedium ${styles.TaskType}`}>{taskTitle}</div>
+            <div className={`TextLarge ${styles.TaskType}`}>{taskTitle}</div>
 
             <div className={styles.FixedTaskTable}>
                 <FixedTaskTableHeader />

@@ -38,21 +38,21 @@ export const MemoryCards = ({ memoryUsage, statusesTotalCount }: IProps) => {
 
     return (
         <div className={styles.MainWrapper}>
-            <div className={`TextMedium ${styles.Title}`}>{t("Dashboard.statistics")}</div>
+            <div className={`TextLarge ${styles.Title}`}>{t("Dashboard.statistics")}</div>
             <div className={styles.CardsWrapper}>
                 <div className={styles.CardWrapper}>
                     <div className={styles.CardTitle}>{t("Dashboard.totalServicesCount")}</div>
-                    <div className={`TextMedium ${styles.CardValue}`}>{statusesTotalCount}</div>
+                    <div className={`TextLarge ${styles.CardValue}`}>{statusesTotalCount}</div>
                 </div>
                 <div className={styles.CardWrapper}>
                     <div className={styles.CardTitle}>Average Heap Size</div>
-                    <div className={`TextMedium ${styles.CardValue}`}>
+                    <div className={`TextLarge ${styles.CardValue}`}>
                         {memoryUsage.averageHeapSize.value} {memoryUsage.averageHeapSize.unit}
                     </div>
                 </div>
                 <div className={styles.CardWrapper}>
                     <div className={styles.CardTitle}>Total Heap Size</div>
-                    <div className={`TextMedium ${styles.CardValue}`}>
+                    <div className={`TextLarge ${styles.CardValue}`}>
                         {memoryUsage.totalHeapSize.value} {memoryUsage.totalHeapSize.unit}
                     </div>
                 </div>

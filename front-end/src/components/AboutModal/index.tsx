@@ -54,8 +54,8 @@ export function AboutModal({ open, setOpen }: IProps) {
 
     return (
         <UniversalModal open={open} onOk={onClose} onClose={onClose} displayCancel={false}>
-            <div className={styles.HeaderWrapper}>
-                <p className="TextMedium">{t("About.title")}</p>
+            <div className={`TextSmall ${styles.HeaderWrapper}`}>
+                <p className="TextLarge">{t("About.title")}</p>
                 <p className={styles.Version}>
                     {t("About.version")}: {version}
                 </p>

@@ -54,7 +54,7 @@ const Login = () => {
 
     return (
         <div className={styles.LoginFormWrapper}>
-            <h1 className={`TextMedium ${styles.LoginTitle}`}>
+            <h1 className={`TextLarge ${styles.LoginTitle}`}>
                 <Trans
                     t={t}
                     i18nKey={"Authentication.login"}

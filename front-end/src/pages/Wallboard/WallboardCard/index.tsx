@@ -87,7 +87,7 @@ export const WallboardCard = ({ data }: IProps) => {
                     <QuestionIcon className={styles.QuestionIcon} />
                 )}
             </div>
-            <div className={styles.Body}>
+            <div className={`TextSmall ${styles.Body}`}>
                 <div className={styles.BodyChunk}>
                     <div className={styles.Label}>Version</div>
                     <div className={styles.Value}>{data.serviceVersion}</div>

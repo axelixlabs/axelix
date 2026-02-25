@@ -90,7 +90,7 @@ export function Distributions({ distributions }: IProps) {
 
     return (
         <div className={styles.MainWrapper}>
-            <div className={`TextMedium ${styles.Title}`}>{t("Dashboard.distributions")}</div>
+            <div className={`TextLarge ${styles.Title}`}>{t("Dashboard.distributions")}</div>
             <div className={styles.ChartsWrapper}>
                 {components.map(({ softwareComponentName, versions }) => {
                     const wallboardFilterComponent = mapSoftwareComponentToFilterKey(softwareComponentName);

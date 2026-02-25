@@ -30,6 +30,7 @@ export const App = () => {
             colorPrimary: "#00ab55",
             fontFamily: "Golos, Helvetica, Arial, sans-serif",
             fontSize: 15,
+            lineHeight: 1.5,
         },
     };
 

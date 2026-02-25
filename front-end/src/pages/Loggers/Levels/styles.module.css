@@ -12,10 +12,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 15px;
+    padding-inline: 15px;
     height: 32px;
-    font-size: 15px;
-    line-height: 32px;
     border-radius: 2px;
     cursor: pointer;
     user-select: none;
@@ -56,14 +54,4 @@
     top: -7px;
     right: -7px;
     z-index: 500;
-}
-
-.Reset {
-    color: var(--axelix-primary-red);
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 22px;
 }

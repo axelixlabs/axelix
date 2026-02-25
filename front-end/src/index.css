@@ -60,10 +60,21 @@ a {
     margin: 0 auto;
 }
 
-.TextMedium {
+.TextLarge {
     font-size: 32px;
     line-height: 1.2;
     font-weight: bold;
+}
+
+.TextMedium {
+    font-size: 22px;
+    line-height: 1.3;
+    font-weight: 500;
+}
+
+.TextSmall {
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 .AccordionsWrapper {

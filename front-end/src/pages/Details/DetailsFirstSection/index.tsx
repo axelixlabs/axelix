@@ -80,7 +80,7 @@ export const DetailsHeader = ({ instanceName }: IProps) => {
 
     return (
         <div className={styles.MainWrapper}>
-            <div className={styles.MainTitle}>{instanceName}</div>
+            <div className={`TextLarge ${styles.MainTitle}`}>{instanceName}</div>
             <Button
                 type="primary"
                 icon={<DownloadIcon />}

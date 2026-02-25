@@ -109,7 +109,7 @@ export const WallboardFilter = ({
         <>
             <div className={styles.FieldAndComparisonWrapper}>
                 <div className={styles.SelectWrapper}>
-                    <label className={styles.Label}>{t("Wallboard.filter.field")}</label>
+                    <label className={`TextSmall ${styles.Label}`}>{t("Wallboard.filter.field")}</label>
                     <Select
                         placeholder={t("Wallboard.filter.field")}
                         value={key}

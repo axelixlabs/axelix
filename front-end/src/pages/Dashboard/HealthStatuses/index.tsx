@@ -41,7 +41,7 @@ export const HealthStatuses = ({ statuses, statusesTotalCount }: IProps) => {
 
     return (
         <div className={styles.MainWrapper}>
-            <div className={`TextMedium ${styles.Title}`}>{t("Dashboard.healthStatus")}</div>
+            <div className={`TextLarge ${styles.Title}`}>{t("Dashboard.healthStatus")}</div>
             <PieChart height={300} width={350}>
                 <Pie data={pieData} nameKey="name" dataKey="value" outerRadius={120} innerRadius={70} label>
                     {pieData.map(({ statusColor }) => (
