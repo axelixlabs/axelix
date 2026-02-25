@@ -23,32 +23,40 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The flattened version of conditions response from the actuator endpoint.
  *
  * @since 16.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public final class ConditionsFeed {
 
-    private final List<PositiveCondition> positiveConditions;
-    private final List<NegativeCondition> negativeConditions;
+    private final List<PositiveCondition> positiveMatches;
+    private final List<NegativeCondition> negativeMatches;
 
+    /**
+     * Create new ConditionsFeed.
+     *
+     * @param positiveMatches list of configuration classes where all conditions matched successfully
+     * @param negativeMatches list of configuration classes where some conditions did not match
+     */
     @JsonCreator
     public ConditionsFeed(
-            @JsonProperty("positiveConditions") List<PositiveCondition> positiveConditions,
-            @JsonProperty("negativeConditions") List<NegativeCondition> negativeConditions) {
-        this.positiveConditions = positiveConditions != null ? positiveConditions : Collections.emptyList();
-        this.negativeConditions = negativeConditions != null ? negativeConditions : Collections.emptyList();
+            @JsonProperty("positiveMatches") List<PositiveCondition> positiveMatches,
+            @JsonProperty("negativeMatches") List<NegativeCondition> negativeMatches) {
+        this.positiveMatches = positiveMatches != null ? positiveMatches : Collections.emptyList();
+        this.negativeMatches = negativeMatches != null ? negativeMatches : Collections.emptyList();
     }
 
-    public List<PositiveCondition> getPositiveConditions() {
-        return positiveConditions;
+    public List<PositiveCondition> getPositiveMatches() {
+        return positiveMatches;
     }
 
-    public List<NegativeCondition> getNegativeConditions() {
-        return negativeConditions;
+    public List<NegativeCondition> getNegativeMatches() {
+        return negativeMatches;
     }
 
     @Override
@@ -60,86 +68,129 @@ public final class ConditionsFeed {
             return false;
         }
         ConditionsFeed that = (ConditionsFeed) o;
-        return Objects.equals(positiveConditions, that.positiveConditions)
-                && Objects.equals(negativeConditions, that.negativeConditions);
+        return Objects.equals(positiveMatches, that.positiveMatches)
+                && Objects.equals(negativeMatches, that.negativeMatches);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(positiveConditions, negativeConditions);
+        return Objects.hash(positiveMatches, negativeMatches);
     }
 
     @Override
     public String toString() {
-        return "ConditionsFeed{"
-                + "positiveConditions="
-                + positiveConditions
-                + ", negativeConditions="
-                + negativeConditions
-                + '}';
+        return "ConditionsFeed{" + "positiveMatches=" + positiveMatches + ", negativeMatches=" + negativeMatches + '}';
     }
 
+    /**
+     * Represents a configuration class where all conditions matched successfully.
+     */
     public static final class PositiveCondition {
 
-        private final String target;
-        private final List<ConditionMatch> matches;
+        private final String className;
 
+        @Nullable
+        private final String methodName;
+
+        private final List<ConditionMatch> matched;
+
+        /**
+         * Create new PositiveCondition
+         *
+         * @param className  the class name of the class on which either the conditional annotation resided, or
+         *                   that contained the {@link #methodName} on which the conditional annotation resided.
+         *                   Guaranteed to be present.
+         * @param methodName the name of the method on which the conditional annotation was put.
+         * @param matched    list of conditions that were evaluated and matched
+         */
         @JsonCreator
         public PositiveCondition(
-                @JsonProperty("target") String target, @JsonProperty("matches") List<ConditionMatch> matches) {
-            this.target = target;
-            this.matches = matches != null ? matches : Collections.emptyList();
+                @JsonProperty("className") String className,
+                @JsonProperty("methodName") @Nullable String methodName,
+                @JsonProperty("matched") List<ConditionMatch> matched) {
+            this.className = className;
+            this.methodName = methodName;
+            this.matched = matched;
         }
 
-        public String getTarget() {
-            return target;
+        public String getClassName() {
+            return className;
         }
 
-        public List<ConditionMatch> getMatches() {
-            return matches;
+        public @Nullable String getMethodName() {
+            return methodName;
+        }
+
+        public List<ConditionMatch> getMatched() {
+            return matched;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
             PositiveCondition that = (PositiveCondition) o;
-            return Objects.equals(target, that.target) && Objects.equals(matches, that.matches);
+            return Objects.equals(className, that.className)
+                    && Objects.equals(methodName, that.methodName)
+                    && Objects.equals(matched, that.matched);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(target, matches);
+            return Objects.hash(className, methodName, matched);
         }
 
         @Override
         public String toString() {
-            return "PositiveCondition{" + "target='" + target + '\'' + ", matches=" + matches + '}';
+            return "PositiveCondition{" + "className='"
+                    + className + '\'' + ", methodName='"
+                    + methodName + '\'' + ", matched="
+                    + matched + '}';
         }
     }
 
+    /**
+     * Represents a configuration class where some conditions did not match.
+     */
     public static final class NegativeCondition {
 
-        private final String target;
+        private final String className;
+
+        @Nullable
+        private final String methodName;
+
         private final List<ConditionMatch> notMatched;
         private final List<ConditionMatch> matched;
 
+        /**
+         * Create new NegativeCondition.
+         *
+         * @param className  the class name of the class on which either the conditional annotation resided, or
+         *                   that contained the {@link #methodName} on which the conditional annotation resided.
+         *                   Guaranteed to be present.
+         * @param methodName the name of the method on which the conditional annotation was put.
+         * @param notMatched list of conditions that were not matched
+         * @param matched list of conditions that were matched
+         */
         @JsonCreator
         public NegativeCondition(
-                @JsonProperty("target") String target,
+                @JsonProperty("className") String className,
+                @JsonProperty("methodName") @Nullable String methodName,
                 @JsonProperty("notMatched") List<ConditionMatch> notMatched,
                 @JsonProperty("matched") List<ConditionMatch> matched) {
-            this.target = target;
-            this.notMatched = notMatched != null ? notMatched : Collections.emptyList();
-            this.matched = matched != null ? matched : Collections.emptyList();
+            this.className = className;
+            this.methodName = methodName;
+            this.notMatched = notMatched;
+            this.matched = matched;
         }
 
-        public String getTarget() {
-            return target;
+        public String getClassName() {
+            return className;
+        }
+
+        public @Nullable String getMethodName() {
+            return methodName;
         }
 
         public List<ConditionMatch> getNotMatched() {
@@ -152,42 +203,45 @@ public final class ConditionsFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
             NegativeCondition that = (NegativeCondition) o;
-            return Objects.equals(target, that.target)
+            return Objects.equals(className, that.className)
+                    && Objects.equals(methodName, that.methodName)
                     && Objects.equals(notMatched, that.notMatched)
                     && Objects.equals(matched, that.matched);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(target, notMatched, matched);
+            return Objects.hash(className, methodName, notMatched, matched);
         }
 
         @Override
         public String toString() {
-            return "NegativeCondition{"
-                    + "target='"
-                    + target
-                    + '\''
-                    + ", notMatched="
-                    + notMatched
-                    + ", matched="
-                    + matched
-                    + '}';
+            return "NegativeCondition{" + "className='"
+                    + className + '\'' + ", methodName='"
+                    + methodName + '\'' + ", notMatched="
+                    + notMatched + ", matched="
+                    + matched + '}';
         }
     }
 
+    /**
+     * Represents the result of evaluating a single condition.
+     */
     public static final class ConditionMatch {
 
         private final String condition;
         private final String message;
 
+        /**
+         * Create new ConditionMatch.
+         *
+         * @param condition the simple name of the condition class that was evaluated
+         * @param message descriptive message explaining why the condition matched or did not match
+         */
         @JsonCreator
         public ConditionMatch(@JsonProperty("condition") String condition, @JsonProperty("message") String message) {
             this.condition = condition;

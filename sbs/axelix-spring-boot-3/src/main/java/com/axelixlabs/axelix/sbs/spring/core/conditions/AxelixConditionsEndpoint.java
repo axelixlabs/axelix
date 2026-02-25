@@ -17,72 +17,29 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import com.axelixlabs.axelix.common.api.ConditionsFeed;
 
 /**
  * Custom endpoint to expose Conditions information.
  *
  * @author Nikita Kirilov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @RestControllerEndpoint(id = "axelix-conditions")
 public class AxelixConditionsEndpoint {
 
-    private final ConditionsReportEndpoint delegate;
+    private final ConditionalFeedBuilder builder;
 
-    public AxelixConditionsEndpoint(ConfigurableApplicationContext configurableApplicationContext) {
-        this.delegate = new ConditionsReportEndpoint(configurableApplicationContext);
+    public AxelixConditionsEndpoint(ConditionalFeedBuilder builder) {
+        this.builder = builder;
     }
 
     @GetMapping
-    public FlattenedConditionsDescriptor conditions() {
-        ConditionsReportEndpoint.ConditionsDescriptor original = delegate.conditions();
-
-        List<PositiveCondition> positiveConditions = new ArrayList<>();
-        List<NegativeCondition> negativeConditions = new ArrayList<>();
-
-        original.getContexts().values().forEach(context -> {
-            if (context.getPositiveMatches() != null) {
-                for (var entry : context.getPositiveMatches().entrySet()) {
-                    positiveConditions.add(new PositiveCondition(entry.getKey(), convertMatches(entry.getValue())));
-                }
-            }
-
-            if (context.getNegativeMatches() != null) {
-                for (var entry : context.getNegativeMatches().entrySet()) {
-                    negativeConditions.add(new NegativeCondition(
-                            entry.getKey(),
-                            convertMatches(entry.getValue().getNotMatched()),
-                            convertMatches(entry.getValue().getMatched())));
-                }
-            }
-        });
-
-        return new FlattenedConditionsDescriptor(positiveConditions, negativeConditions);
+    public ConditionsFeed conditions() {
+        return builder.buildConditionsFeed();
     }
-
-    private List<ConditionMatch> convertMatches(List<ConditionsReportEndpoint.MessageAndConditionDescriptor> matches) {
-        if (matches == null) {
-            return Collections.emptyList();
-        }
-        return matches.stream()
-                .map(m -> new ConditionMatch(m.getCondition(), m.getMessage()))
-                .toList();
-    }
-
-    public record FlattenedConditionsDescriptor(
-            List<PositiveCondition> positiveConditions, List<NegativeCondition> negativeConditions) {}
-
-    public record PositiveCondition(String target, List<ConditionMatch> matches) {}
-
-    public record NegativeCondition(String target, List<ConditionMatch> notMatched, List<ConditionMatch> matched) {}
-
-    public record ConditionMatch(String condition, String message) {}
 }

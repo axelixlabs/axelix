@@ -65,8 +65,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ConditionsApiTest {
 
+    // language=json
     private static final String EXPECTED_CONDITIONS_JSON =
-            // language=json
             """
     {
       "positiveMatches": [
@@ -149,56 +149,60 @@ class ConditionsApiTest {
         // language=json
         String jsonResponse =
                 """
-    {
-      "positiveConditions": [
         {
-          "target": "EndpointAutoConfiguration#propertiesEndpointAccessResolver",
-          "matches": [
+          "positiveMatches": [
             {
-              "condition": "OnBeanCondition",
-              "message": "@ConditionalOnMissingBean (types: org.springframework.boot.actuate.endpoint.EndpointAccessResolver; SearchStrategy: all) did not find any beans"
+              "className" : "EndpointAutoConfiguration",
+              "methodName" : "propertiesEndpointAccessResolver",
+              "matched": [
+                {
+                  "condition": "OnBeanCondition",
+                  "message": "@ConditionalOnMissingBean (types: org.springframework.boot.actuate.endpoint.EndpointAccessResolver; SearchStrategy: all) did not find any beans"
+                }
+              ]
+            },
+            {
+              "className" : "EndpointAutoConfiguration",
+              "methodName" : "endpointCachingOperationInvokerAdvisor",
+              "matched": [
+                {
+                  "condition": "OnBeanCondition",
+                   "message": "@ConditionalOnMissingBean (types: org.springframework.boot.actuate.endpoint.invoker.cache.CachingOperationInvokerAdvisor; SearchStrategy: all) did not find any beans"
+                }
+              ]
             }
-          ]
-        },
-        {
-          "target": "EndpointAutoConfiguration#endpointCachingOperationInvokerAdvisor",
-          "matches": [
+          ],
+          "negativeMatches": [
             {
-              "condition": "OnBeanCondition",
-              "message": "@ConditionalOnMissingBean (types: org.springframework.boot.actuate.endpoint.invoker.cache.CachingOperationInvokerAdvisor; SearchStrategy: all) did not find any beans"
+              "className": "WebFluxEndpointManagementContextConfiguration",
+              "methodName": null,
+              "notMatched": [
+                {
+                  "condition": "OnWebApplicationCondition",
+                  "message": "not a reactive web application"
+                }
+              ],
+              "matched": [
+                {
+                  "condition": "OnClassCondition",
+                  "message": "@ConditionalOnClass found required classes 'org.springframework.web.reactive.DispatcherHandler', 'org.springframework.http.server.reactive.HttpHandler'"
+                }
+              ]
+            },
+            {
+              "className": "GsonHttpMessageConvertersConfiguration.GsonHttpMessageConverterConfiguration",
+              "methodName": null,
+              "notMatched": [
+                {
+                  "condition": "GsonHttpMessageConvertersConfiguration.PreferGsonOrJacksonAndJsonbUnavailableCondition",
+                  "message": "AnyNestedCondition 0 matched 1 did not; NestedCondition on GsonHttpMessageConvertersConfiguration.PreferGsonOrJacksonAndJsonbUnavailableCondition.JacksonJsonbUnavailable NoneNestedConditions"
+                }
+              ],
+              "matched": []
             }
           ]
         }
-      ],
-      "negativeConditions": [
-        {
-          "target": "WebFluxEndpointManagementContextConfiguration",
-          "notMatched": [
-            {
-              "condition": "OnWebApplicationCondition",
-              "message": "not a reactive web application"
-            }
-          ],
-          "matched": [
-            {
-              "condition": "OnClassCondition",
-              "message": "@ConditionalOnClass found required classes 'org.springframework.web.reactive.DispatcherHandler', 'org.springframework.http.server.reactive.HttpHandler'"
-            }
-          ]
-        },
-        {
-          "target": "GsonHttpMessageConvertersConfiguration.GsonHttpMessageConverterConfiguration",
-          "notMatched": [
-            {
-              "condition": "GsonHttpMessageConvertersConfiguration.PreferGsonOrJacksonAndJsonbUnavailableCondition",
-              "message": "AnyNestedCondition 0 matched 1 did not; NestedCondition on GsonHttpMessageConvertersConfiguration.PreferGsonOrJacksonAndJsonbUnavailableCondition.JacksonJsonbUnavailable NoneNestedConditions"
-            }
-          ],
-          "matched": []
-        }
-      ]
-    }
-    """;
+        """;
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
