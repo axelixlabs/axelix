@@ -1,0 +1,51 @@
+== Axile SBS Actuator Endpoints Configuration
+
+This document describes how to configure both default and custom Spring Boot Actuator endpoints
+when using the **Axile SBS Starter**.
+
+Depending on your use case, you may need to enable the following custom endpoints:
+
+* `property-management`
+* `cache-dispatcher`
+* `profile-management`
+
+In addition, the following endpoint **must always be enabled** when automatic discovery is used:
+
+* `axile-metadata`
+
+== Spring Actuator Endpoints Configuration
+=== Enabling Information in default endpoint `/actuator/info`
+
+In order for detailed system and environment information to be exposed in the standard Spring Boot Actuator `/actuator/info` endpoint, the following properties must be enabled:
+
+```properties
+management.info.env.enabled=true
+management.info.os.enabled=true
+management.info.java.enabled=true
+management.info.ssl.enabled=true
+management.info.process.enabled=true
+```
+
+By default, the following properties are already enabled:
+```properties
+management.info.build.enabled=true
+management.info.git.enabled=true
+```
+Make sure that you have not manually disabled them in your configuration files if you want build and Git information to appear.
+
+
+=== Build information
+To provide build information (management.info.build.enabled) you must configure the appropriate build plugins:
+
+* Maven: `spring-boot-maven-plugin`
+* Gradle: `org.springframework.boot` (Spring Boot Gradle Plugin)
+
+=== Git information
+To provide git commit and branch details (management.info.git.enabled) you need to configure additional plugins (or generate the properties manually).
+
+For example:
+
+* Maven: `git-commit-id-maven-plugin`
+* Gradle: `com.gorylenko.gradle-git-properties`
+
+These plugins generate a git.properties file, which is automatically consumed by Spring Boot Actuator.
