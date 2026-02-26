@@ -13,28 +13,38 @@
   height: 0%;
 }
 
-.Icon {
-    margin-right: 12px;
-}
-
-.MainWrapper.Open > .HeaderWrapper > .Icon {
-  transform: rotate(180deg);
-  transition: transform 0.3s;
-}
-
 .HeaderWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  position: relative;
   cursor: pointer;
   padding: 12px 16px;
   background-color: #fafafa;
-  width: 100%;
 }
 
-.Header {
-  width: 100%;
-  min-width: 0;
+.HeaderWrapper:not(.HideArrow) {
+  padding-left: 45px;
+}
+
+.HeaderWrapper::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%) rotate(0deg);
+  height: 16px;
+  width: 16px;
+  background-image: url("../../assets/icons/arrow.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  transition: transform 0.3s ease;
+}
+
+.MainWrapper.Open > .HeaderWrapper::before {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.HideArrow::before {
+  display: none;
 }
 
 .Content {

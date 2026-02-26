@@ -37,24 +37,23 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
 
     return (
         <>
-            <div className={styles.CacheManagerWrapper}>
-                <div className="CustomizedTable">
-                    <div className={`TextMedium TableHeader ${styles.CacheManagerHeader}`}>
-                        <div className={`RowChunk ${styles.CacheManagerName}`}>
-                            {t("Caches.name")}: {cacheManager.name}
-                        </div>
-                        <div className={`RowChunk ${styles.RowChunk}`}>{t("Caches.clear")}</div>
-                        <div className={`RowChunk ${styles.RowChunk}`}>{t("status")}</div>
+            <div className={styles.Table}>
+                <div className={`TextMedium ${styles.TableHeader}`}>
+                    <div className={styles.CacheManagerName}>
+                        {t("Caches.name")}: {cacheManager.name}
                     </div>
-                    {cacheManager.caches.map((cache) => (
-                        <Accordion
-                            header={<CacheAccordionHeader cacheManagerName={cacheManager.name} cache={cache} />}
-                            children={<CacheAccordionBody cache={cache} />}
-                            key={cache.name}
-                            headerStyles={styles.HeaderStyles}
-                        />
-                    ))}
+                    <div>{t("Caches.clear")}</div>
+                    <div>{t("status")}</div>
                 </div>
+                {cacheManager.caches.map((cache) => (
+                    <Accordion
+                        header={<CacheAccordionHeader cacheManagerName={cacheManager.name} cache={cache} />}
+                        children={<CacheAccordionBody cache={cache} />}
+                        key={cache.name}
+                        wrapperStyles={styles.WrapperStyles}
+                        headerStyles={styles.HeaderStyles}
+                    />
+                ))}
             </div>
         </>
     );

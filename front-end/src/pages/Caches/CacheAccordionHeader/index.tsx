@@ -76,12 +76,12 @@ export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
                         <span>{t("Caches.name")}: </span>
                         <span className={styles.CacheName}>{cache.name}</span>
                         <div className={styles.TargetWrapper}>
-                            <div className={styles.Target}>{t("Caches.target")}:</div>
+                            <div>{t("Caches.target")}:</div>
                             <TooltipWithCopy text={cache.target} />
                         </div>
                     </div>
                 </div>
-                <div className={styles.RowChunk}>
+                <div>
                     <Button
                         icon={<ReloadOutlined />}
                         type="primary"
@@ -89,7 +89,7 @@ export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
                         onClick={clearCacheClickHandler}
                     />
                 </div>
-                <div className={styles.RowChunk}>
+                <div>
                     <CacheStatusSwitch cacheManagerName={cacheManagerName} cache={cache} />
                 </div>
             </div>

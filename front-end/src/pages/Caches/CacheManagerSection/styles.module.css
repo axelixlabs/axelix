@@ -1,30 +1,43 @@
-.CacheManagerWrapper {
+.Table {
+    display: grid;
+    grid-template-columns: 1fr repeat(2, min-content);
+    border-radius: var(--axelix-border-radius-large);
+    border: 1px solid var(--axelix-light-grey);
+    overflow: hidden;
     margin-bottom: 40px;
 }
 
-.CacheManagerHeader {
-    display: grid;
-    grid-template-columns: 1fr 150px 110px;
-    align-items: center;
-    column-gap: 8px;
-    letter-spacing: 0;
-
-    /* TODO: Remove in future */
-    font-weight: 500;
+.Table:last-child {
+    margin-bottom: 0;
 }
 
-.RowChunk {
-    justify-content: center;
+.TableHeader,
+.WrapperStyles,
+.HeaderStyles {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+}
+
+.TableHeader,
+.HeaderStyles {
+    column-gap: 30px;
+}
+
+.TableHeader {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    align-items: center;
+    background-color: var(--axelix-primary-light-green);
+    border-bottom: 1px solid var(--axelix-light-grey);
+    border-top-left-radius: var(--axelix-border-radius-large);
+    border-top-right-radius: var(--axelix-border-radius-large);
+    padding: 16px;
+    text-align: center;
 }
 
 .CacheManagerName {
     word-break: break-all;
-}
-
-.ClearCachesButton {
-    flex-shrink: 0;
-}
-
-.HeaderStyles {
-    padding-right: 0;
+    text-align: left;
 }

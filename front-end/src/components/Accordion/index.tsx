@@ -19,8 +19,6 @@ import { type PropsWithChildren, type ReactNode, useState } from "react";
 
 import styles from "./styles.module.css";
 
-import { ArrowIcon } from "assets";
-
 interface IProps {
     /**
      * Header of the accordion
@@ -81,9 +79,11 @@ export const Accordion = ({
     return (
         <>
             <div className={`${styles.MainWrapper} ${wrapperStyles} ${open ? styles.Open : ""}`}>
-                <div className={`${styles.HeaderWrapper} ${headerStyles}`} onClick={handlerClick}>
-                    {!hideArrowIcon && <ArrowIcon className={styles.Icon} />}
-                    <div className={styles.Header}>{header}</div>
+                <div
+                    className={`${styles.HeaderWrapper} ${headerStyles} ${hideArrowIcon ? styles.HideArrow : ""}`}
+                    onClick={handlerClick}
+                >
+                    {header}
                 </div>
                 {open && (
                     <div className={styles.ContentWrapper}>
