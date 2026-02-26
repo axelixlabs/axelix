@@ -48,10 +48,11 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                 {cacheManager.caches.map((cache) => (
                     <Accordion
                         header={<CacheAccordionHeader cacheManagerName={cacheManager.name} cache={cache} />}
-                        children={<CacheAccordionBody cache={cache} />}
+                        children={<CacheAccordionBody cache={cache} cacheManagerName={cacheManager.name} />}
                         key={cache.name}
                         wrapperStyles={styles.WrapperStyles}
                         headerStyles={styles.HeaderStyles}
+                        contentWrapperStyles={styles.ContentStyles}
                     />
                 ))}
             </div>

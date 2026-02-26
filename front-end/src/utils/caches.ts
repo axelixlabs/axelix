@@ -15,15 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./scheduledTasks";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./dashboard";
-export * from "./wallboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./caches";
-export * from "./beans";
-export * from "./gc";
+export const SINGLE_CACHE_CHART_TIMELINE_STEP_S = 1000;
+export const SINGLE_CACHE_CHART_TIMELINE_STEP_5S = 5000;
+export const SINGLE_CACHE_CHART_TIMELINE_STEP_M = 60000;
+export const SINGLE_CACHE_CHART_TIMELINE_STEP_5M = 300000;
+export const SINGLE_CACHE_CHART_TIMELINE_STEP_15M = 900000;
+export const SINGLE_CACHE_CHART_TIMELINE_STEP_H = 3600000;
+export const SINGLE_CACHE_CHART_TIMELINE_STEP_D = 86400000;
+export const SINGLE_CACHE_CHART_TIMELINE_STEP_30D = 2592000000;

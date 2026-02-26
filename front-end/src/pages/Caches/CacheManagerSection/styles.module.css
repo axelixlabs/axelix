@@ -41,3 +41,7 @@
     word-break: break-all;
     text-align: left;
 }
+
+.ContentStyles {
+    grid-column: 1 / -1;
+}

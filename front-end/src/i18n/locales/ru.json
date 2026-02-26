@@ -104,9 +104,10 @@
         "clear": "Очистить",
         "enabled": "Кэш включён",
         "disabled": "Кэш выключен",
-        "hitsCount": "Попадания",
-        "missesCount": "Промахи",
-        "estimatedEntrySize": "Количество записей"
+        "hits": "Попадания",
+        "misses": "Промахи",
+        "estimatedEntrySize": "Количество записей",
+        "statistics": "Статистика"
     },
     "Authentication": {
         "login": "Добро пожаловать в <green>A</green>xelix",
