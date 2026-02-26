@@ -67,8 +67,8 @@ const Loggers = () => {
     const effectiveLoggerGroups = isLoggerGroupsTab && search ? filterLoggerGroups(loggerGroups, search) : loggerGroups;
 
     const loggersAddonAfter = `${effectiveLoggers.length} / ${loggers.length}`;
-    const loggerGroupsAddonAffter = `${effectiveLoggerGroups.length} / ${loggerGroups.length}`;
-    const addonAfter = isLoggersTab ? loggersAddonAfter : loggerGroupsAddonAffter;
+    const loggerGroupsAddonAfter = `${effectiveLoggerGroups.length} / ${loggerGroups.length}`;
+    const addonAfter = isLoggersTab ? loggersAddonAfter : loggerGroupsAddonAfter;
 
     const handleTabChange = (activeKey: string): void => {
         setSearch("");
