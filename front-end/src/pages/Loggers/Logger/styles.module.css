@@ -4,11 +4,6 @@
     align-items: center;
     column-gap: 20px;
     padding-block: 12px;
-    border-bottom: 1px solid var(--axelix-medium-grey);
-}
-
-.MainWrapper:last-child {
-    border-bottom: none;
 }
 
 .LevelsWrapper {
