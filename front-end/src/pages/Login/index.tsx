@@ -44,8 +44,8 @@ const Login = () => {
         login(loginResponseBody)
             .then(() => {
                 setLoginData(StatelessRequest.success());
-                localStorage.setItem(IS_AUTH, "true");
-                window.location.href = "/";
+                // localStorage.setItem(IS_AUTH, "true");
+                // window.location.href = "/";
             })
             .catch((error: AxiosError<IErrorResponse>) => {
                 setLoginData(StatelessRequest.error(extractErrorCode(error?.response?.data)));

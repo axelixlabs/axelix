@@ -51,7 +51,7 @@ apiFetch.interceptors.response.use(
         }
 
         if (error.response?.status === 401 && window.location.pathname !== "/login") {
-            localStorage.removeItem(IS_AUTH);
+            // localStorage.removeItem(IS_AUTH);
             // window.location.href = "/login";
         }
 
