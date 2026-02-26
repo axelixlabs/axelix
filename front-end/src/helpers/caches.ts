@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ICachesManager, IGetSingleCacheResponseBody, ISingleCacheChartEntity } from "models";
+import type { ICacheData, ICachesManager, IGetSingleCacheResponseBody, ISingleCacheChartEntity } from "models";
 
 import {
     SINGLE_CACHE_CHART_TIMELINE_STEP_5M,
@@ -212,4 +212,22 @@ export const cacheHitsMissesChartToFormattedTime = (value: number, interval: num
         month: "2-digit",
         year: "2-digit",
     });
+};
+
+/**
+ * Split passed caches into two parts - caches that are supposed to have the drop-down and those that do not.
+ */
+export const splitCaches = (caches: ICacheData[]): [ICacheData[], ICacheData[]] => {
+    const withDropDown: ICacheData[] = [];
+    const withoutDropDown: ICacheData[] = [];
+
+    caches.forEach((cache) => {
+        if (cache.containsStats) {
+            withDropDown.push(cache);
+        } else {
+            withoutDropDown.push(cache);
+        }
+    });
+
+    return [withDropDown, withoutDropDown];
 };

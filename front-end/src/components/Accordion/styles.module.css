@@ -17,7 +17,7 @@
   position: relative;
   cursor: pointer;
   padding: 12px 16px;
-  background-color: #fafafa;
+  background-color: var(--axelix-extra-light-grey);
 }
 
 .HeaderWrapper:not(.HideArrow) {

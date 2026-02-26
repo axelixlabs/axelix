@@ -44,7 +44,7 @@ interface IProps {
     cache: ICacheData;
 }
 
-export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
+export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
     const { instanceId } = useParams();
     const { t } = useTranslation();
     const { message } = App.useApp();
@@ -70,7 +70,7 @@ export const CacheAccordionHeader = ({ cacheManagerName, cache }: IProps) => {
 
     return (
         <>
-            <div className={styles.AccordionHeader}>
+            <div className={styles.MainWrapper}>
                 <div className={styles.ContentRowChunkWrapper}>
                     <div className={styles.ContentWrapper}>
                         <span>{t("Caches.name")}: </span>

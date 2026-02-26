@@ -17,7 +17,6 @@
  */
 import { useTranslation } from "react-i18next";
 
-import { InfoTooltip } from "components";
 import type { IGetSingleCacheResponseBody } from "models";
 
 import styles from "./styles.module.css";
