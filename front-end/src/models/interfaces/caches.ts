@@ -35,6 +35,11 @@ export interface ICacheData {
      * Estimated amount of entries inside the cache. May be absent.
      */
     estimatedEntrySize?: number;
+
+    /**
+     * When true, the dropdown should be displayed.
+     */
+    containsStats: boolean;
 }
 
 export interface ICachesManager {

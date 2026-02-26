@@ -11,6 +11,7 @@
     margin-bottom: 0;
 }
 
+.SingleCacheSimpleDataWrapper,
 .TableHeader,
 .WrapperStyles,
 .HeaderStyles {
@@ -19,6 +20,7 @@
     grid-column: 1 / -1;
 }
 
+.SingleCacheSimpleDataWrapper,
 .TableHeader,
 .HeaderStyles {
     column-gap: 30px;
@@ -44,4 +46,15 @@
 
 .ContentStyles {
     grid-column: 1 / -1;
+}
+
+.SingleCacheSimpleDataWrapper {
+    padding: 12px 16px 12px 45px;
+    background-color: var(--axelix-extra-light-grey);
+    border-bottom: 1px solid var(--axelix-medium-grey);
+
+}
+
+.SingleCacheSimpleDataWrapper:last-child {
+    border-bottom: none;
 }

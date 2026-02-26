@@ -18,10 +18,11 @@
 import { useTranslation } from "react-i18next";
 
 import { Accordion } from "components";
+import { splitCaches } from "helpers";
 import type { ICachesManager } from "models";
 
 import { CacheAccordionBody } from "../CacheAccordionBody";
-import { CacheAccordionHeader } from "../CacheAccordionHeader";
+import { SingleCacheHeader } from "../SingleCacheHeader";
 
 import styles from "./styles.module.css";
 
@@ -35,6 +36,8 @@ interface IProps {
 export const CacheManagerSection = ({ cacheManager }: IProps) => {
     const { t } = useTranslation();
 
+    const [withDropDown, withoutDropDown] = splitCaches(cacheManager.caches);
+
     return (
         <>
             <div className={styles.Table}>
@@ -45,16 +48,24 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                     <div>{t("Caches.clear")}</div>
                     <div>{t("status")}</div>
                 </div>
-                {cacheManager.caches.map((cache) => (
-                    <Accordion
-                        header={<CacheAccordionHeader cacheManagerName={cacheManager.name} cache={cache} />}
-                        children={<CacheAccordionBody cache={cache} cacheManagerName={cacheManager.name} />}
-                        key={cache.name}
-                        wrapperStyles={styles.WrapperStyles}
-                        headerStyles={styles.HeaderStyles}
-                        contentWrapperStyles={styles.ContentStyles}
-                    />
-                ))}
+
+                {[
+                    ...withDropDown.map((cache) => (
+                        <Accordion
+                            header={<SingleCacheHeader cacheManagerName={cacheManager.name} cache={cache} />}
+                            children={<CacheAccordionBody cache={cache} cacheManagerName={cacheManager.name} />}
+                            key={cache.name}
+                            wrapperStyles={styles.WrapperStyles}
+                            headerStyles={styles.HeaderStyles}
+                            contentWrapperStyles={styles.ContentStyles}
+                        />
+                    )),
+                    ...withoutDropDown.map((cache) => (
+                        <div className={styles.SingleCacheSimpleDataWrapper}>
+                            <SingleCacheHeader cacheManagerName={cacheManager.name} cache={cache} />
+                        </div>
+                    )),
+                ]}
             </div>
         </>
     );
