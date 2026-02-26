@@ -52,6 +52,7 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                         key={cache.name}
                         wrapperStyles={styles.WrapperStyles}
                         headerStyles={styles.HeaderStyles}
+                        contentWrapperStyles={styles.ContentStyles}
                     />
                 ))}
             </div>

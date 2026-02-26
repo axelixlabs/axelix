@@ -54,6 +54,8 @@ interface IProps {
      * Function triggered when the accordion is closed.
      */
     onClose?: () => void;
+
+    contentWrapperStyles?: string; 
 }
 
 export const Accordion = ({
@@ -62,10 +64,12 @@ export const Accordion = ({
     wrapperStyles,
     headerStyles,
     contentStyles,
+    contentWrapperStyles,
     accordionExpanded = false,
     hideArrowIcon = false,
     onClose,
 }: PropsWithChildren<IProps>) => {
+    /* TODO: Remove contentWrapperStyles in future */
     const [open, setOpen] = useState<boolean>(accordionExpanded);
 
     const handlerClick = (): void => {
@@ -86,7 +90,7 @@ export const Accordion = ({
                     {header}
                 </div>
                 {open && (
-                    <div className={styles.ContentWrapper}>
+                    <div className={`${styles.ContentWrapper} ${contentWrapperStyles}`}>
                         <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
                     </div>
                 )}
