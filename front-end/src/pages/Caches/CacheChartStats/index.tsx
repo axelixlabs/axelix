@@ -50,7 +50,6 @@ export const CacheChartStats = ({ singleCacheData }: IProps) => {
                 <div className={styles.HeaderLine} />
                 <div className={styles.Statistics}>
                     <div>{t("Caches.statistics")}:</div>
-                    <InfoTooltip text={"TextPlaceholder"} />
                 </div>
                 <div className={styles.PercentageValue}>
                     {hitsCount} ({Number(hitsPercentage.toFixed(1))}%)
