@@ -63,7 +63,7 @@ public final class ConfigurationPropertiesFeed {
 
     @Override
     public String toString() {
-        return "ConfigPropsFeed{" + "beans=" + beans + '}';
+        return "ConfigurationPropertiesFeed{" + "beans=" + beans + '}';
     }
 
     /**
@@ -134,7 +134,7 @@ public final class ConfigurationPropertiesFeed {
 
         @Override
         public String toString() {
-            return "ConfigProps{" + "beanName='"
+            return "ConfigurationProperties{" + "beanName='"
                     + beanName + '\'' + ", prefix='"
                     + prefix + '\'' + ", properties="
                     + properties + ", inputs="
