@@ -30,7 +30,7 @@ jobs:
           host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
           username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
-          source: "build/,public/,Dockerfile"
+          source: "./build/,./public/,./Dockerfile"
           target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website"
           strip_components: 1
     
