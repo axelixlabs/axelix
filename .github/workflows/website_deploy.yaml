@@ -1,10 +1,10 @@
 name: Deploy Website
 
 on:
-  push:
-    branches: [feature/GH-778]
-    # paths:
-    #   - 'website/**'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'website/**'
 
 jobs:
   deploy:
@@ -52,20 +52,3 @@ jobs:
             sudo docker stop axelix-website || true
             sudo docker rm axelix-website || true
             sudo docker run -d --name axelix-website -p 80:3000 --restart unless-stopped axelix-website:latest
-
-
-
-
-
-
-
-
-
-
-
-
-# on:
-#   pull_request:
-#     paths:
-#       - 'website/**'
-#     branches: [ master ]
