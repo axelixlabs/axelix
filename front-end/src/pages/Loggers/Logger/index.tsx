@@ -15,14 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { AxiosError } from "axios";
-import type { Dispatch, MouseEvent, SetStateAction } from "react";
+import { App } from "antd";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { TooltipWithCopy } from "components";
-import { extractErrorCode } from "helpers";
-import { type IErrorResponse, type ILogger, StatelessRequest } from "models";
-import { setLoggerLevel } from "services";
+import { type ILogger } from "models";
+import { resetLogger, setLoggerLevel } from "services";
 
 import { Levels } from "../Levels";
 
@@ -42,37 +41,42 @@ interface IProps {
     logger: ILogger;
 
     /**
-     * setState to update the logger level
+     * Fetches loggers data.
      */
-    setUpdateLoggerLevel: Dispatch<SetStateAction<StatelessRequest>>;
-
-    /**
-     * The function to handle the reset of this given logger
-     */
-    handleReset: (_: MouseEvent, loggerName: string) => void;
+    fetchLoggersData: () => void;
 }
 
-export const Logger = ({ levels, logger, setUpdateLoggerLevel, handleReset }: IProps) => {
+export const Logger = ({ levels, logger, fetchLoggersData }: IProps) => {
+    // TODO: Add loading handler in future after fetchData and StatefulRequest refactoring
+    const { t } = useTranslation();
     const { effectiveLevel, configuredLevel } = logger;
     const { instanceId } = useParams();
+
+    const { message } = App.useApp();
 
     const handleChange = (level: string): void => {
         if (configuredLevel === level) {
             return;
         }
 
-        setUpdateLoggerLevel(StatelessRequest.loading());
         setLoggerLevel({
             instanceId: instanceId!,
             loggerName: logger.name,
             loggingLevel: level,
-        })
-            .then(() => {
-                setUpdateLoggerLevel(StatelessRequest.success());
-            })
-            .catch((error: AxiosError<IErrorResponse>) => {
-                setUpdateLoggerLevel(StatelessRequest.error(extractErrorCode(error?.response?.data)));
-            });
+        }).then(() => {
+            message.success(t("Loggers.loggerLevelUpdated"));
+            fetchLoggersData();
+        });
+    };
+
+    const handleLoggerReset = (loggerName: string): void => {
+        resetLogger({
+            instanceId: instanceId!,
+            loggerName: loggerName,
+        }).then(() => {
+            message.success(t("Loggers.reset"));
+            fetchLoggersData();
+        });
     };
 
     return (
@@ -87,7 +91,7 @@ export const Logger = ({ levels, logger, setUpdateLoggerLevel, handleReset }: IP
                         levels={levels}
                         handleChange={handleChange}
                     />
-                    <Reset className={styles.Reset} onClick={(e) => handleReset(e, logger.name)} color="#FF000AFF" />
+                    <Reset className={styles.Reset} onClick={() => handleLoggerReset(logger.name)} />
                 </div>
             </div>
         </>

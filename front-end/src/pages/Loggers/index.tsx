@@ -15,15 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { App, Tabs, type TabsProps } from "antd";
-import { type MouseEvent, useEffect, useState } from "react";
+import { Tabs } from "antd";
+import { Activity, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterLoggerGroups, filterLoggers } from "helpers";
-import { ELoggersTabs, type ILoggersResponseBody, StatefulRequest, StatelessRequest } from "models";
-import { getLoggersData, resetLogger } from "services";
+import { ELoggersTabs, type ILoggersResponseBody, StatefulRequest } from "models";
+import { getLoggersData } from "services";
+import { loggersTabs } from "utils";
 
 import { LoggerGroups } from "./LoggerGroups";
 import { LoggersList } from "./LoggersList";
@@ -32,33 +33,22 @@ import styles from "./styles.module.css";
 const Loggers = () => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
-    const { message } = App.useApp();
 
     const [activeTab, setActiveTab] = useState<ELoggersTabs>(ELoggersTabs.LOGGERS);
     const [loggersData, setLoggersData] = useState(StatefulRequest.loading<ILoggersResponseBody>());
     const [search, setSearch] = useState<string>("");
-    const [updateLoggerLevel, setUpdateLoggerLevel] = useState(StatelessRequest.inactive());
-    const [updateLoggerGroupLevel, setUpdateLoggerGroupLevel] = useState(StatelessRequest.inactive());
 
-    const fetchLoggersData = (instanceId: string) => fetchData(setLoggersData, () => getLoggersData(instanceId));
-
-    const isLoggerLevelUpdated = updateLoggerLevel.completedSuccessfully();
-    const isLoggerGroupLevelUpdated = updateLoggerGroupLevel.completedSuccessfully();
+    const fetchLoggersData = (): void => {
+        // TODO: Remove this after refactoring fetchData and StatefulRequest
+        setLoggersData(StatefulRequest.loading());
+        fetchData(setLoggersData, () => getLoggersData(instanceId!));
+    };
 
     useEffect(() => {
-        fetchLoggersData(instanceId!);
+        fetchLoggersData();
     }, []);
 
-    useEffect(() => {
-        if (isLoggerLevelUpdated || isLoggerGroupLevelUpdated) {
-            message.success(t("Loggers.loggerLevelUpdated"));
-            fetchLoggersData(instanceId!);
-            setUpdateLoggerLevel(StatelessRequest.inactive());
-            setUpdateLoggerGroupLevel(StatelessRequest.inactive());
-        }
-    }, [isLoggerLevelUpdated, isLoggerGroupLevelUpdated]);
-
-    if (loggersData.loading || updateLoggerLevel.loading || updateLoggerGroupLevel.loading) {
+    if (loggersData.loading) {
         return <Loader />;
     }
 
@@ -77,48 +67,8 @@ const Loggers = () => {
     const effectiveLoggerGroups = isLoggerGroupsTab && search ? filterLoggerGroups(loggerGroups, search) : loggerGroups;
 
     const loggersAddonAfter = `${effectiveLoggers.length} / ${loggers.length}`;
-    const loggerGroupsAddonAffter = `${effectiveLoggerGroups.length} / ${loggerGroups.length}`;
-    const addonAfter = isLoggersTab ? loggersAddonAfter : loggerGroupsAddonAffter;
-
-    const handleLoggerReset = (_: MouseEvent, loggerName: string): void => {
-        resetLogger({
-            instanceId: instanceId!,
-            loggerName: loggerName,
-        }).then(() => {
-            message.success(t("Loggers.reset"));
-            fetchLoggersData(instanceId!);
-        });
-    };
-
-    const tabs: TabsProps["items"] = [
-        {
-            key: ELoggersTabs.LOGGERS,
-            label: t("Loggers.loggers"),
-            children: (
-                <EmptyHandler isEmpty={effectiveLoggers.length === 0}>
-                    <LoggersList
-                        effectiveLoggers={effectiveLoggers}
-                        levels={levels}
-                        setUpdateLoggerLevel={setUpdateLoggerLevel}
-                        handleReset={handleLoggerReset}
-                    />
-                </EmptyHandler>
-            ),
-        },
-        {
-            key: ELoggersTabs.LOGGER_GROUPS,
-            label: t("Loggers.loggerGroups"),
-            children: (
-                <EmptyHandler isEmpty={effectiveLoggerGroups.length === 0}>
-                    <LoggerGroups
-                        loggerGroups={effectiveLoggerGroups}
-                        levels={levels}
-                        setUpdateLoggerGroupLevel={setUpdateLoggerGroupLevel}
-                    />
-                </EmptyHandler>
-            ),
-        },
-    ];
+    const loggerGroupsAddonAfter = `${effectiveLoggerGroups.length} / ${loggerGroups.length}`;
+    const addonAfter = isLoggersTab ? loggersAddonAfter : loggerGroupsAddonAfter;
 
     const handleTabChange = (activeKey: string): void => {
         setSearch("");
@@ -129,15 +79,28 @@ const Loggers = () => {
         <>
             <div className={styles.FirstSection}>
                 <PageSearch addonAfter={addonAfter} setSearch={setSearch} key={activeTab} />
-                <Tabs
-                    activeKey={activeTab}
-                    onChange={handleTabChange}
-                    size="small"
-                    items={tabs.map((tab) => ({ key: tab.key, label: tab.label }))}
-                />
+                <Tabs activeKey={activeTab} onChange={handleTabChange} size="small" items={loggersTabs(t)} />
             </div>
 
-            {tabs.find((tab) => tab.key === activeTab)!.children}
+            <Activity mode={activeTab === ELoggersTabs.LOGGERS ? "visible" : "hidden"}>
+                <EmptyHandler isEmpty={effectiveLoggers.length === 0}>
+                    <LoggersList
+                        effectiveLoggers={effectiveLoggers}
+                        levels={levels}
+                        fetchLoggersData={fetchLoggersData}
+                    />
+                </EmptyHandler>
+            </Activity>
+
+            <Activity mode={activeTab === ELoggersTabs.LOGGER_GROUPS ? "visible" : "hidden"}>
+                <EmptyHandler isEmpty={effectiveLoggerGroups.length === 0}>
+                    <LoggerGroups
+                        loggerGroups={effectiveLoggerGroups}
+                        levels={levels}
+                        fetchLoggersData={fetchLoggersData}
+                    />
+                </EmptyHandler>
+            </Activity>
         </>
     );
 };

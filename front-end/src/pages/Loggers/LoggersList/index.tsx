@@ -17,9 +17,9 @@
  */
 import { useVirtualizer } from "@tanstack/react-virtual";
 
-import { type Dispatch, type MouseEvent, type SetStateAction, useRef } from "react";
+import { useRef } from "react";
 
-import type { ILogger, StatelessRequest } from "models";
+import type { ILogger } from "models";
 
 import { Logger } from "../Logger";
 
@@ -37,17 +37,12 @@ interface IProps {
     effectiveLoggers: ILogger[];
 
     /**
-     * setState to update the logger level
+     * Fetches loggers data.
      */
-    setUpdateLoggerLevel: Dispatch<SetStateAction<StatelessRequest>>;
-
-    /**
-     * The function to handle the reset of this given logger
-     */
-    handleReset: (_: MouseEvent, loggerName: string) => void;
+    fetchLoggersData: () => void;
 }
 
-export const LoggersList = ({ effectiveLoggers, levels, setUpdateLoggerLevel, handleReset }: IProps) => {
+export const LoggersList = ({ effectiveLoggers, levels, fetchLoggersData }: IProps) => {
     const parentRef = useRef<HTMLDivElement>(null);
 
     const rowVirtualizer = useVirtualizer({
@@ -77,12 +72,7 @@ export const LoggersList = ({ effectiveLoggers, levels, setUpdateLoggerLevel, ha
                                 }}
                                 key={key}
                             >
-                                <Logger
-                                    logger={logger}
-                                    levels={levels}
-                                    setUpdateLoggerLevel={setUpdateLoggerLevel}
-                                    handleReset={handleReset}
-                                />
+                                <Logger logger={logger} levels={levels} fetchLoggersData={fetchLoggersData} />
                             </div>
                         );
                     })}

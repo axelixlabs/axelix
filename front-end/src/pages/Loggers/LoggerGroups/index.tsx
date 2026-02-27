@@ -15,13 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { AxiosError } from "axios";
-import type { Dispatch, SetStateAction } from "react";
+import { App } from "antd";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { Accordion, TooltipWithCopy } from "components";
-import { extractErrorCode } from "helpers";
-import { type IErrorResponse, type ILoggerGroup, StatelessRequest } from "models";
+import type { ILoggerGroup } from "models";
 import { changeLoggerGroupLevel } from "services";
 
 import { Levels } from "../Levels";
@@ -40,65 +39,54 @@ interface IProps {
     levels: string[];
 
     /**
-     * State responsible for updating the group logger level
+     * Fetches loggers data.
      */
-    setUpdateLoggerGroupLevel: Dispatch<SetStateAction<StatelessRequest>>;
+    fetchLoggersData: () => void;
 }
 
-export const LoggerGroups = ({ loggerGroups, levels, setUpdateLoggerGroupLevel }: IProps) => {
+export const LoggerGroups = ({ loggerGroups, levels, fetchLoggersData }: IProps) => {
+    // TODO: Add loading handler in future after fetchData and StatefulRequest refactoring
+    const { t } = useTranslation();
+    const { message } = App.useApp();
+
     const { instanceId } = useParams();
+
+    const handleChange = (level: string, groupName: string): void => {
+        changeLoggerGroupLevel({
+            instanceId: instanceId!,
+            configuredLevel: level,
+            groupName: groupName,
+        }).then(() => {
+            message.success(t("Loggers.loggerLevelUpdated"));
+            fetchLoggersData();
+        });
+    };
 
     return (
         <>
             <div className="AccordionsWrapper">
                 {loggerGroups.map(({ name, members, configuredLevel }) => {
-                    const handleChange = (selectedLevel: string): void => {
-                        setUpdateLoggerGroupLevel(StatelessRequest.loading());
-
-                        changeLoggerGroupLevel({
-                            instanceId: instanceId!,
-                            configuredLevel: selectedLevel,
-                            groupName: name,
-                        })
-                            .then((value) => {
-                                if (value.status === 200) {
-                                    setUpdateLoggerGroupLevel(StatelessRequest.success());
-                                } else {
-                                    setUpdateLoggerGroupLevel(StatelessRequest.error(""));
-                                }
-                            })
-                            .catch((error: AxiosError<IErrorResponse>) => {
-                                setUpdateLoggerGroupLevel(
-                                    StatelessRequest.error(extractErrorCode(error?.response?.data)),
-                                );
-                            });
-                    };
-
                     return (
-                        <>
-                            <Accordion
-                                header={
-                                    <div className={styles.AccordionHeader}>
-                                        <TooltipWithCopy text={name} />
-                                        <Levels
-                                            levels={levels}
-                                            configuredLevel={configuredLevel}
-                                            checkedLevel={configuredLevel}
-                                            handleChange={handleChange}
-                                        />
-                                    </div>
-                                }
-                                key={name}
-                            >
-                                <>
-                                    {members.map((member) => (
-                                        <div className={styles.Member} key={member}>
-                                            {member}
-                                        </div>
-                                    ))}
-                                </>
-                            </Accordion>
-                        </>
+                        <Accordion
+                            header={
+                                <div className={styles.AccordionHeader}>
+                                    <TooltipWithCopy text={name} />
+                                    <Levels
+                                        levels={levels}
+                                        configuredLevel={configuredLevel}
+                                        checkedLevel={configuredLevel}
+                                        handleChange={(level) => handleChange(level, name)}
+                                    />
+                                </div>
+                            }
+                            key={name}
+                        >
+                            {members.map((member) => (
+                                <div className={styles.Member} key={member}>
+                                    {member}
+                                </div>
+                            ))}
+                        </Accordion>
                     );
                 })}
             </div>
