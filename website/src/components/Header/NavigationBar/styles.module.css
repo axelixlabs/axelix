@@ -1,0 +1,32 @@
+.LinksWrapper {
+    display: flex;
+    padding-left: 32px;
+    gap: 20px;
+}
+
+.Link {
+    transition: all 0.3s;
+    align-self: center;
+    padding: 8px 12px;
+    margin-right: 8px;
+}
+
+.Link:last-child {
+    margin-right: 0;
+}
+
+.Link:hover {
+    color: var(--axelix-primary-green);
+}
+
+@media (width <=768px) {
+    .LinksWrapper {
+        flex-direction: column;
+        padding-left: 0;
+        gap: 20px;
+    }
+
+    .Link {
+        margin-right: 0;
+    }
+}

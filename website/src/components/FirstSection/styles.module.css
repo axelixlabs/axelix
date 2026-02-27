@@ -1,0 +1,26 @@
+.MainWrapper {
+    margin-bottom: var(--axelix-section-margin-bottom);
+    height: calc(100vh - var(--axelix-header-height));
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+}
+
+.HeroWrapper {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+}
+
+.HeroBackground {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.HeroContentWrapper {
+    position: relative;
+    z-index: 2;
+}

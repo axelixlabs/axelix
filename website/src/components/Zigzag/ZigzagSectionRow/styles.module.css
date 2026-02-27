@@ -1,0 +1,63 @@
+.MainWrapper {
+    display: flex;
+    gap: 50px;
+}
+
+.MainWrapper:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+.Title {
+    margin-bottom: 20px;
+}
+
+.Description {
+    font-size: 20px;
+    line-height: 2;
+    margin-bottom: 20px;
+}
+
+.ArrowIcon {
+    rotate: -90deg;
+    vertical-align: middle;
+    margin-left: 4px;
+}
+
+.Link {
+    transition-duration: 0.3s;
+}
+
+.Link:hover {
+    color: var(--axelix-primary-green);
+}
+
+.ContentWrapper,
+.SectionImageWrapper {
+    flex-basis: 50%;
+}
+
+.SectionImage {
+    height: auto;
+    width: 100%;
+}
+
+@media (width <= 870px) {
+    .MainWrapper,
+    .MainWrapper:nth-child(even) {
+        flex-direction: column;
+    }
+
+    .MainWrapper {
+        max-width: 550px;
+    }
+
+    .Description {
+        font-size: 18px;
+        line-height: 1.6;
+    }
+
+    .ContentWrapper,
+    .SectionImageWrapper {
+        flex-basis: 100%;
+    }
+}

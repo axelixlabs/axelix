@@ -1,0 +1,85 @@
+.CardWrapper,
+.CardWrapper>* {
+    height: 100%;
+}
+
+.HeaderWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.Card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    row-gap: 20px;
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    color: var(--axelix-primary-white);
+    border-radius: var(--axelix-border-radius-large);
+    padding: 24px;
+    padding-top: 45px;
+    height: 100%;
+    transition: border-color 0.3s, translate 0.3s;
+}
+
+.Card:hover {
+    border-color: #484f58;
+    translate: 0 -15px;
+}
+
+.CardTitle code {
+    color: var(--axelix-primary-green);
+}
+
+.CardDescription {
+    line-height: 1.5;
+    font-size: 16px;
+}
+
+.CardDescription code {
+    color: var(--axelix-primary-green);
+}
+
+.ImageWrapper {
+    border-radius: var(--axelix-border-radius-large);
+    aspect-ratio: 4 / 3;
+}
+
+.Image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.ReadDocumentationWrapper {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.ReadDocumentation {
+    color: var(--axelix-primary-white);
+}
+
+.ReadDocumentation::after {
+    content: "→";
+    margin-left: 8px;
+    transition-duration: 0.3s;
+}
+
+.Card:hover .ReadDocumentation {
+    color: var(--axelix-primary-green);
+}
+
+.Card:hover .ReadDocumentation::after {
+    margin-left: 12px;
+    color: var(--axelix-primary-green);
+}
+
+/*.ReadDocumentation:hover::after {*/
+/*    margin-left: 12px;*/
+/*    color: var(--axelix-primary-green);*/
+/*}*/

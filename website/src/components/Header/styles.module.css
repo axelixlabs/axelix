@@ -1,0 +1,138 @@
+.MainWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  height: var(--axelix-header-height);
+  background-color: var(--axelix-primary-black);
+}
+
+.InnerWrapper {
+  position: relative;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 20px;
+}
+
+.Logo {
+  width: 150px;
+}
+
+.LinksAndSigninWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 20px;
+  color: var(--axelix-primary-white);
+  width: 100%;
+}
+
+.GitHubWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 8px;
+  border-radius: var(--axelix-border-radius-large);
+  transition-duration: 0.3s;
+}
+
+.GitHubWrapper:hover {
+  color: var(--axelix-primary-green);
+}
+
+.Burger {
+  display: none;
+}
+
+.MobileMenuWrapper {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: calc(100% - 50px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+}
+
+@media (width <=768px) {
+  .DesktopMenuWrapper {
+    display: none;
+  }
+
+  .Burger {
+    position: relative;
+    display: block;
+    width: 40px;
+    height: 20px;
+  }
+
+  .Burger:before,
+  .Burger:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--axelix-primary-white);
+  }
+
+  .Burger:before {
+    top: 0;
+    transition: all 0.3s;
+  }
+
+  .Burger:after {
+    bottom: 0;
+    transition: all 0.3s;
+  }
+
+  .BurgerCenterLine {
+    position: absolute;
+    background-color: var(--axelix-primary-white);
+    left: 0;
+    right: 0;
+    height: 3px;
+    top: 9px
+  }
+
+  .MobileMenuWrapper {
+    display: block;
+    background-color: #0C1116;
+  }
+
+  .MobileMenuOpened {
+    opacity: 1;
+    pointer-events: all;
+    transform: translate(-50%, calc(var(--axelix-header-height) + 10px));
+    padding: 16px;
+    border-radius: var(--axelix-border-radius-large);
+    border: 1px solid #30363d;
+  }
+
+  .GitHubWrapper {
+    margin-left: auto;
+  }
+
+  .OpenedBurger {
+    transition: all 0.3s;
+  }
+
+  .OpenedBurger:before {
+    transform: rotate(45deg);
+    top: 9px;
+  }
+
+  .OpenedBurger:after {
+    transform: rotate(-45deg);
+    bottom: 9px;
+  }
+
+  .OpenedBurger>.BurgerCenterLine {
+    transform: scale(0);
+  }
+}

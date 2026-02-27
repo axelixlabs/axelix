@@ -1,0 +1,47 @@
+"use client"
+import { NavigationBar } from "./NavigationBar";
+import styles from "./styles.module.css";
+
+import LogoIcon from "@/assets/icons/logo.svg";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+
+export const Header = () => {
+  const [isBurgerOpen, setIsBurgerOpen] = useState<boolean>(false)
+
+  return (
+    <header className={styles.MainWrapper}>
+      <div className={`MainContainer ${styles.InnerWrapper}`}>
+        <Image src={LogoIcon} alt="Axelix logo" className={styles.Logo} />
+        <div className={styles.LinksAndSigninWrapper}>
+          <div className={styles.DesktopMenuWrapper}>
+            <NavigationBar />
+          </div>
+
+          <Link href="https://github.com/axelixlabs/axelix" target="_blank" rel="noopener noreferrer" className={styles.GitHubWrapper}>
+            {/*TODO: Replace via svgr in future */}
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2.25C6.475 2.25 2 6.7275 2 12.25C2 16.6692 4.865 20.4167 8.8375 21.7375C9.3375 21.8317 9.52083 21.5225 9.52083 21.2567C9.52083 21.0192 9.5125 20.39 9.50833 19.5567C6.72667 20.16 6.14 18.215 6.14 18.215C5.685 17.0608 5.0275 16.7525 5.0275 16.7525C4.12167 16.1325 5.0975 16.145 5.0975 16.145C6.10167 16.215 6.62917 17.175 6.62917 17.175C7.52083 18.7042 8.97 18.2625 9.54167 18.0067C9.63167 17.36 9.88917 16.9192 10.175 16.6692C7.95417 16.4192 5.62 15.5592 5.62 11.7275C5.62 10.6358 6.0075 9.74417 6.64917 9.04417C6.53667 8.79167 6.19917 7.775 6.73667 6.3975C6.73667 6.3975 7.57417 6.12917 9.48667 7.4225C10.2867 7.2 11.1367 7.09 11.9867 7.085C12.8367 7.09 13.6867 7.2 14.4867 7.4225C16.3867 6.12917 17.2242 6.3975 17.2242 6.3975C17.7617 7.775 17.4242 8.79167 17.3242 9.04417C17.9617 9.74417 18.3492 10.6358 18.3492 11.7275C18.3492 15.5692 16.0117 16.415 13.7867 16.6608C14.1367 16.9608 14.4617 17.5742 14.4617 18.5108C14.4617 19.8492 14.4492 20.9242 14.4492 21.2492C14.4492 21.5117 14.6242 21.8242 15.1367 21.7242C19.1375 20.4125 22 16.6625 22 12.25C22 6.7275 17.5225 2.25 12 2.25Z"
+                fill="currentColor"
+              />
+            </svg>
+            GitHub
+          </Link>
+        </div>
+        <div className={`MainContainer ${styles.MobileMenuWrapper} ${isBurgerOpen ? styles.MobileMenuOpened : ""}`}>
+          <NavigationBar />
+        </div>
+        <div className={`${styles.Burger} ${isBurgerOpen ? styles.OpenedBurger : ""}`} onClick={() => setIsBurgerOpen(!isBurgerOpen)}>
+          <span className={styles.BurgerCenterLine} />
+        </div>
+      </div>
+    </header>
+  );
+};

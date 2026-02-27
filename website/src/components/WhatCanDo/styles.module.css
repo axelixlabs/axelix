@@ -1,0 +1,20 @@
+.MainWrapper {
+    margin-bottom: var(--axelix-section-margin-bottom);
+}
+
+.Title {
+    margin-bottom: 40px;
+}
+
+.CardsWrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    justify-content: center;
+    gap: 30px;
+}
+
+@media (width <=720px) {
+    .CardsWrapper {
+        grid-template-columns: minmax(0, 550px);
+    }
+}

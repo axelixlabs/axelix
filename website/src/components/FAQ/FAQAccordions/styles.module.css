@@ -1,0 +1,87 @@
+.MainWrapper {
+    margin-bottom: var(--axelix-section-margin-bottom);
+}
+
+.InnerWrapper {
+    max-width: 1200px;
+}
+
+.Title {
+    margin-bottom: 40px;
+}
+
+.SingleAccordionWrapper {
+    border-top: 1px solid var(--axelix-bold-grey);
+    border-bottom: 1px solid var(--axelix-bold-grey)
+}
+
+.InteractiveHeader {
+    width: 100%;
+    color: var(--axelix-primary-white);
+    padding-block: 28px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 20px;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.Icon {
+    font-size: 30px;
+    transition: transform 0.3s;
+}
+
+.ActiveHeader,
+.InteractiveHeader:hover {
+    color: var(--axelix-primary-green);
+}
+
+.ActiveIcon {
+    transform: rotate(180deg);
+}
+
+.ContentWrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.2s linear;
+    overflow: hidden;
+    padding: 0 20px;
+}
+
+.ActiveContentWrapper {
+    grid-template-rows: 1fr;
+    padding: 0 20px 28px;
+}
+
+.Content {
+    min-height: 0;
+    line-height: 1.6;
+}
+
+.ContentWrapper :is(p, ul):not(:last-child) {
+    margin-bottom: 20px;
+}
+
+.ContentWrapper ul {
+    padding-left: 30px;
+}
+
+.ContentWrapper li:not(:first-child) {
+    margin-top: 8px;
+}
+
+.ContentWrapper a {
+    color: var(--axelix-primary-green);
+    transition-duration: 0.3s;
+}
+
+.ContentWrapper a:hover {
+    color: var(--axelix-primary-hover-green);
+}
+
+.ContentWrapper code {
+    color: var(--axelix-primary-green);
+}

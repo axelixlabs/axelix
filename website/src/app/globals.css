@@ -1,0 +1,117 @@
+:root {
+    --axelix-header-height: 65px;
+    --axelix-primary-green: #00ab55;
+    --axelix-primary-light-green: #00ab551a;
+    --axelix-primary-hover-green: #4dc488;
+    --axelix-light-grey: #f0f0f0;
+    --axelix-medium-grey: #d9d9d9;
+    --axelix-bold-grey: #838383;
+    --axelix-primary-black: #000;
+    --axelix-primary-white: #fff;
+    --axelix-section-margin-bottom: 140px;
+    --axelix-border-radius-large: 8px;
+    --axelix-border-radius-small: 4px;
+    --axelix-scroll-margin-top: 165px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    /* TODO: Fix this in the future */
+    scroll-padding-top: calc(var(--axelix-scroll-margin-top) - var(--axelix-header-height));
+}
+
+body {
+    font-size: 18px;
+    line-height: 1.4;
+    background-color: #0C1116;
+    color: var(--axelix-primary-white);
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    background-color: transparent;
+    border: none;
+}
+
+.MainContainer {
+    margin: 0 auto;
+    max-width: 1330px;
+    padding-inline: 25px;
+}
+
+.TextLarge {
+    font-weight: 700;
+    font-size: 50px;
+    line-height: 1.25;
+}
+
+.TextMedium {
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 1.5;
+}
+
+.TextSmall {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 1.25;
+}
+
+.VisuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    border: 0;
+    padding: 0;
+    white-space: nowrap;
+    clip-path: inset(100%);
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+}
+
+@media (max-width: 650px) {
+    :root {
+        --axelix-section-margin-bottom: 80px;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    .MainContainer {
+        padding-inline: 15px;
+    }
+
+    .TextLarge {
+        font-size: 28px;
+        line-height: 1.3;
+    }
+
+    .TextMedium {
+        font-size: 24px;
+        line-height: 1.5;
+    }
+
+    .TextSmall {
+        font-size: 20px;
+        line-height: 1.3;
+    }
+}

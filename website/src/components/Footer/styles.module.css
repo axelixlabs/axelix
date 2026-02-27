@@ -1,0 +1,20 @@
+.MainWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 20px;
+    color: var(--axelix-primary-white);
+}
+
+.SocialMediaWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+}
+
+@media (width <=460px) {
+    .MainWrapper {
+        flex-direction: column;
+        row-gap: 20px;
+    }
+}
