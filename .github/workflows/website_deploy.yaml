@@ -35,19 +35,23 @@ jobs:
           host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
           username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
-          source: "website/.next/standalone,website/Dockerfile"
+          source: ".next/standalone,Dockerfile"
           target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website"
           strip_components: 1
     
-      - name: Build Docker image on server
+      - name: Build Docker image on server and restart container
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
           username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
           script: |
-            cd /home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website
-            echo "Test"
+            # set -eux
+            # cd /home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website
+            # sudo docker build -t axelix-website:latest .
+            # sudo docker stop axelix-website || true
+            # sudo docker rm axelix-website || true
+            # sudo docker run -d --name axelix-website -p 80:3000 --restart unless-stopped axelix-website:latest
 
 
 
@@ -57,11 +61,6 @@ jobs:
 
 
 
-
-# sudo docker build -t axelix-website:latest .
-# sudo docker stop axelix-website || true
-# sudo docker rm axelix-website || true
-# sudo docker run -d --name axelix-website -p 80:3000 axelix-website:latest
 
 
 
