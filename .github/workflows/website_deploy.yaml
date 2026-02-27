@@ -28,20 +28,20 @@ jobs:
         uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
-          username: ${{ secrets.PRODUCTION_VM_USER }}
-          key: ${{ secrets.PRODUCTION_VM_PRIVATE_KEY }}
+          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+          key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
           source: "build/,public/,Dockerfile"
-          target: "/home/${{ secrets.PRODUCTION_VM_USER }}/axelix-website"
+          target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website"
           strip_components: 1
     
       - name: Build Docker image on server
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
-          username: ${{ secrets.PRODUCTION_VM_USER }}
-          key: ${{ secrets.PRODUCTION_VM_PRIVATE_KEY }}
+          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+          key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
           script: |
-            cd /home/${{ secrets.PRODUCTION_VM_USER }}/axelix-website
+            cd /home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website
             echo "Test"
 
 
