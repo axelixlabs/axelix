@@ -19,14 +19,9 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
-import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.ConfigPropsApi;
-import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.ConfigPropsStateComponentSettings;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Collects Spring Configuration Properties information for application state export.
@@ -34,14 +29,16 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @see ConfigPropsApi
  * @since 27.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Component
-public class ConfigpropsContributorJsonInstance implements InstanceStateCollector<ConfigPropsStateComponentSettings> {
+public class ConfigpropsContributorByteInstance
+        extends AbstractByteInstanceStateCollector<ConfigPropsStateComponentSettings> {
 
-    private final EndpointInvoker endpointInvoker;
+    private final ConfigPropsApi configpropsApi;
 
-    public ConfigpropsContributorJsonInstance(EndpointInvoker endpointInvoker) {
-        this.endpointInvoker = endpointInvoker;
+    public ConfigpropsContributorByteInstance(ConfigPropsApi configpropsApi) {
+        this.configpropsApi = configpropsApi;
     }
 
     @Override
@@ -50,8 +47,7 @@ public class ConfigpropsContributorJsonInstance implements InstanceStateCollecto
     }
 
     @Override
-    public byte[] collect(String instanceId, ConfigPropsStateComponentSettings settings) throws StateExportException {
-        return endpointInvoker.invoke(
-                InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE);
+    protected byte[] collectByte(String instanceId, ConfigPropsStateComponentSettings settings) {
+        return configpropsApi.getConfigpropsFeed(instanceId);
     }
 }
