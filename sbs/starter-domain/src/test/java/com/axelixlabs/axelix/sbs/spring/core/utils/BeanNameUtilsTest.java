@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.utils;
+package com.axelixlabs.axelix.sbs.spring.core.utils;
 
 import java.util.stream.Stream;
 
@@ -50,5 +50,23 @@ class BeanNameUtilsTest {
                 of("prefix-com.example.MyConfigProps", "com.example.MyConfigProps"),
                 of("prefix-$com.example.MyConfigProps", "$com.example.MyConfigProps"),
                 of("com.example.MyConfigProps", "com.example.MyConfigProps"));
+    }
+
+    @MethodSource("withoutConfigPropsPrefix")
+    @ParameterizedTest
+    void shouldResolveBeanNameWithoutConfigPropsPrefix(String beanName, boolean isConfigPropsBean, String expected) {
+        // when.
+        String result = BeanNameUtils.withoutConfigPropsPrefix(beanName, isConfigPropsBean);
+
+        // then.
+        assertThat(result).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> withoutConfigPropsPrefix() {
+        return Stream.of(
+                of("-com.example.MyConfigProps", true, "com.example.MyConfigProps"),
+                of("prefix-com.example.MyConfigProps", true, "com.example.MyConfigProps"),
+                of("prefix-com.example.MyConfigProps", false, "prefix-com.example.MyConfigProps"),
+                of("com.example.MyConfigProps", false, "com.example.MyConfigProps"));
     }
 }

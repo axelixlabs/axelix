@@ -17,10 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.beans;
 
-import java.util.List;
-import java.util.Map.Entry;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
@@ -121,7 +118,7 @@ class AxelixBeansEndpointTest {
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
 
-        var beanNameToBeanProfile = extractBeansFeed(response.getBody());
+        BeansFeed beanNameToBeanProfile = response.getBody();
 
         assertQualifiersPostProcessorBean(beanNameToBeanProfile);
         assertBeanMetaInfoExtractor(beanNameToBeanProfile);
@@ -129,9 +126,9 @@ class AxelixBeansEndpointTest {
         assertConfigPropsBeanName(beanNameToBeanProfile);
     }
 
-    private static void assertQualifiersPostProcessorBean(List<Entry<String, BeansFeed.Bean>> beanNameToBeanProfile) {
-        BeansFeed.Bean bean =
-                getBean(beanNameToBeanProfile, CurrentConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
+    private static void assertQualifiersPostProcessorBean(BeansFeed beanNameToBeanFeed) {
+        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CurrentConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);
+
         assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
         assertThat(bean.getBeanSource())
                 .asInstanceOf(type(BeansFeed.BeanMethod.class))
@@ -148,11 +145,12 @@ class AxelixBeansEndpointTest {
         assertThat(bean.isPrimary()).isFalse();
         assertThat(bean.getQualifiers()).isEmpty();
         assertThat(bean.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-        assertThat(bean.getType()).isEqualTo(QualifiersPersistencePostProcessor.class.getName());
+        assertThat(bean.getClassName()).isEqualTo(QualifiersPersistencePostProcessor.class.getName());
     }
 
-    private static void assertBeanMetaInfoExtractor(List<Entry<String, BeansFeed.Bean>> beanNameToBeanProfile) {
-        BeansFeed.Bean bean = getBean(beanNameToBeanProfile, CurrentConfiguration.BEAN_META_INFO_EXTRACTOR);
+    private static void assertBeanMetaInfoExtractor(BeansFeed beanNameToBeanFeed) {
+        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CurrentConfiguration.BEAN_META_INFO_EXTRACTOR);
+
         assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
         assertThat(bean.getBeanSource())
                 .asInstanceOf(type(BeansFeed.BeanMethod.class))
@@ -171,11 +169,12 @@ class AxelixBeansEndpointTest {
         assertThat(bean.isPrimary()).isFalse();
         assertThat(bean.getQualifiers()).isEmpty();
         assertThat(bean.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-        assertThat(bean.getType()).isEqualTo(DefaultBeanMetaInfoExtractor.class.getName());
+        assertThat(bean.getClassName()).isEqualTo(DefaultBeanMetaInfoExtractor.class.getName());
     }
 
-    private static void assertCustomBeanSupplier(List<Entry<String, BeansFeed.Bean>> beanNameToBeanProfile) {
-        BeansFeed.Bean bean = getBean(beanNameToBeanProfile, CurrentConfiguration.CUSTOM_SUPPLIER);
+    private static void assertCustomBeanSupplier(BeansFeed beanNameToBeanFeed) {
+        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CurrentConfiguration.CUSTOM_SUPPLIER);
+
         assertThat(bean.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
         assertThat(bean.getBeanSource())
                 .asInstanceOf(type(BeansFeed.BeanMethod.class))
@@ -191,13 +190,13 @@ class AxelixBeansEndpointTest {
         assertThat(bean.isPrimary()).isFalse();
         assertThat(bean.getQualifiers()).isEmpty();
         assertThat(bean.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
-        assertThat(bean.getType()).isEqualTo(Supplier.class.getName());
+        assertThat(bean.getClassName()).isEqualTo(Supplier.class.getName());
     }
 
-    private static void assertConfigPropsBeanName(List<Entry<String, BeansFeed.Bean>> beanNameToBeanProfile) {
-        BeansFeed.Bean bean = getBean(beanNameToBeanProfile, AxelixPropTest.class.getName());
+    private static void assertConfigPropsBeanName(BeansFeed beanNameToBeanFeed) {
+        BeansFeed.Bean bean = getBean(beanNameToBeanFeed, AxelixPropTest.class.getName());
 
-        assertThat(bean.getType()).isEqualTo(AxelixPropTest.class.getName());
+        assertThat(bean.getClassName()).isEqualTo(AxelixPropTest.class.getName());
         assertThat(bean.getBeanSource()).isNotNull();
         assertThat(bean.isConfigPropsBean()).isTrue();
         assertThat(bean.getAutoConfigurationRef()).isNull();
@@ -209,17 +208,10 @@ class AxelixBeansEndpointTest {
         assertThat(bean.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
     }
 
-    private static BeansFeed.Bean getBean(List<Entry<String, BeansFeed.Bean>> beanNameToBeanProfile, String beanName) {
-        return beanNameToBeanProfile.stream()
-                .filter(e -> e.getKey().equals(beanName))
-                .map(Entry::getValue)
+    private static BeansFeed.Bean getBean(BeansFeed beanNameToBeanFeed, String beanName) {
+        return beanNameToBeanFeed.getBeans().stream()
+                .filter(bean -> bean.getBeanName().equals(beanName))
                 .findFirst()
                 .orElseThrow();
-    }
-
-    private static List<Entry<String, BeansFeed.Bean>> extractBeansFeed(BeansFeed body) {
-        return body.getContexts().values().stream()
-                .flatMap(context -> context.getBeans().entrySet().stream())
-                .collect(Collectors.toList());
     }
 }

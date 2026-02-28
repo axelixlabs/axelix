@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.common.api;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -39,85 +38,48 @@ import org.jspecify.annotations.Nullable;
  */
 public final class BeansFeed {
 
-    private final Map<String, Context> contexts;
+    private final List<Bean> beans;
 
+    /**
+     * Create new BeansFeed.
+     *
+     * @param beans  The unified list of beans that contains beans from one or more contexts.
+     */
     @JsonCreator
-    public BeansFeed(@JsonProperty("contexts") Map<String, Context> contexts) {
-        this.contexts = contexts;
+    public BeansFeed(@JsonProperty("beans") List<Bean> beans) {
+        this.beans = beans;
     }
 
-    public Map<String, Context> getContexts() {
-        return contexts;
+    public List<Bean> getBeans() {
+        return beans;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BeansFeed beansFeed = (BeansFeed) o;
-        return Objects.equals(contexts, beansFeed.contexts);
+        BeansFeed that = (BeansFeed) o;
+        return Objects.equals(beans, that.beans);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(contexts);
+        return Objects.hashCode(beans);
     }
 
     @Override
     public String toString() {
-        return "BeansFeed{" + "contexts=" + contexts + '}';
+        return "BeansFeed{" + "beans=" + beans + '}';
     }
 
-    public static final class Context {
-
-        private final String parentId;
-        private final Map<String, Bean> beans;
-
-        @JsonCreator
-        public Context(@JsonProperty("parentId") String parentId, @JsonProperty("beans") Map<String, Bean> beans) {
-            this.parentId = parentId;
-            this.beans = beans;
-        }
-
-        public String getParentId() {
-            return parentId;
-        }
-
-        public Map<String, Bean> getBeans() {
-            return beans;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Context context = (Context) o;
-            return Objects.equals(parentId, context.parentId) && Objects.equals(beans, context.beans);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(parentId, beans);
-        }
-
-        @Override
-        public String toString() {
-            return "Context{" + "parentId='" + parentId + '\'' + ", beans=" + beans + '}';
-        }
-    }
-
+    /**
+     * The profile of a given bean.
+     */
     public static final class Bean {
-
+        private final String beanName;
+        private final String className;
         private final String scope;
-        private final String type;
         private final ProxyType proxyType;
         private final Set<String> aliases;
 
@@ -126,11 +88,11 @@ public final class BeansFeed {
 
         private final Set<BeanDependency> dependencies;
 
-        @JsonProperty("isLazyInit")
-        private final boolean isLazyInit;
-
         @JsonProperty("isPrimary")
         private final boolean isPrimary;
+
+        @JsonProperty("isLazyInit")
+        private final boolean isLazyInit;
 
         @JsonProperty("isConfigPropsBean")
         private final boolean isConfigPropsBean;
@@ -138,39 +100,62 @@ public final class BeansFeed {
         private final List<String> qualifiers;
         private final BeanSource beanSource;
 
+        /**
+         * Create a new Bean.
+         *
+         * @param beanName              The name of the bean.
+         * @param scope                 The scope of the bean.
+         * @param className             The fully qualified class name of the bean.
+         * @param aliases               The aliases of the given bean.
+         * @param autoConfigurationRef  The reference to an @AutoConfiguration class if it is annotated with conditions
+         *                              {@code className}, or, if it contains a method annotated with conditions,
+         *                              a reference to the class with the method specified {@code className#methodName}.
+         * @param dependencies          The list of dependencies of this bean (i.e. other beans that this bean depends on).
+         * @param isLazyInit            Whether the bean is lazily instantiated or eagerly.
+         * @param isPrimary             Whether the bean is marked with BeanDefinition#isPrimary() primary marker.
+         * @param isConfigPropsBean     Whether the bean is a configuration properties bean ConfigurationProperties.
+         * @param qualifiers            The list of AutowireCandidateQualifier qualifiers that are assigned to this bean.
+         * @param beanSource            The source information describing how this bean was created and its origin type.
+         */
         @JsonCreator
         public Bean(
+                @JsonProperty("beanName") String beanName,
+                @JsonProperty("className") String className,
                 @JsonProperty("scope") String scope,
-                @JsonProperty("type") String type,
-                @JsonProperty("proxyType") ProxyType proxyType,
+                @JsonProperty("proxyType") ProxyType proxyType, // Нужно поменять на String
                 @JsonProperty("aliases") Set<String> aliases,
                 @JsonProperty("autoConfigurationRef") @Nullable String autoConfigurationRef,
                 @JsonProperty("dependencies") Set<BeanDependency> dependencies,
-                @JsonProperty("isLazyInit") boolean isLazyInit,
                 @JsonProperty("isPrimary") boolean isPrimary,
+                @JsonProperty("isLazyInit") boolean isLazyInit,
                 @JsonProperty("isConfigPropsBean") boolean isConfigPropsBean,
                 @JsonProperty("qualifiers") List<String> qualifiers,
                 @JsonProperty("beanSource") @JsonDeserialize(using = BeanSourceDeserializer.class)
                         BeanSource beanSource) {
+            this.beanName = beanName;
+            this.className = className;
             this.scope = scope;
-            this.type = type;
             this.proxyType = proxyType;
             this.aliases = aliases != null ? aliases : Collections.emptySet();
             this.autoConfigurationRef = autoConfigurationRef;
             this.dependencies = dependencies != null ? dependencies : Collections.emptySet();
-            this.isLazyInit = isLazyInit;
             this.isPrimary = isPrimary;
+            this.isLazyInit = isLazyInit;
             this.isConfigPropsBean = isConfigPropsBean;
             this.qualifiers = qualifiers != null ? qualifiers : Collections.emptyList();
             this.beanSource = beanSource;
         }
 
-        public String getScope() {
-            return scope;
+        public String getBeanName() {
+            return beanName;
         }
 
-        public String getType() {
-            return type;
+        public String getClassName() {
+            return className;
+        }
+
+        public String getScope() {
+            return scope;
         }
 
         public ProxyType getProxyType() {
@@ -190,14 +175,17 @@ public final class BeansFeed {
             return dependencies;
         }
 
+        @JsonProperty("isLazyInit")
         public boolean isLazyInit() {
             return isLazyInit;
         }
 
+        @JsonProperty("isPrimary")
         public boolean isPrimary() {
             return isPrimary;
         }
 
+        @JsonProperty("isConfigPropsBean")
         public boolean isConfigPropsBean() {
             return isConfigPropsBean;
         }
@@ -212,18 +200,16 @@ public final class BeansFeed {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
             Bean bean = (Bean) o;
-            return isLazyInit == bean.isLazyInit
-                    && isPrimary == bean.isPrimary
+            return isPrimary == bean.isPrimary
+                    && isLazyInit == bean.isLazyInit
                     && isConfigPropsBean == bean.isConfigPropsBean
+                    && Objects.equals(beanName, bean.beanName)
+                    && Objects.equals(className, bean.className)
                     && Objects.equals(scope, bean.scope)
-                    && Objects.equals(type, bean.type)
                     && proxyType == bean.proxyType
                     && Objects.equals(aliases, bean.aliases)
                     && Objects.equals(autoConfigurationRef, bean.autoConfigurationRef)
@@ -235,14 +221,15 @@ public final class BeansFeed {
         @Override
         public int hashCode() {
             return Objects.hash(
+                    beanName,
+                    className,
                     scope,
-                    type,
                     proxyType,
                     aliases,
                     autoConfigurationRef,
                     dependencies,
-                    isLazyInit,
                     isPrimary,
+                    isLazyInit,
                     isConfigPropsBean,
                     qualifiers,
                     beanSource);
@@ -250,36 +237,25 @@ public final class BeansFeed {
 
         @Override
         public String toString() {
-            return "Bean{"
-                    + "scope='"
-                    + scope
-                    + '\''
-                    + ", type='"
-                    + type
-                    + '\''
-                    + ", proxyType="
-                    + proxyType
-                    + ", aliases="
-                    + aliases
-                    + ", autoConfigurationRef='"
-                    + autoConfigurationRef
-                    + '\''
-                    + ", dependencies="
-                    + dependencies
-                    + ", isLazyInit="
-                    + isLazyInit
-                    + ", isPrimary="
-                    + isPrimary
-                    + ", isConfigPropsBean="
-                    + isConfigPropsBean
-                    + ", qualifiers="
-                    + qualifiers
-                    + ", beanSource="
-                    + beanSource
-                    + '}';
+            return "Bean{" + "beanName='"
+                    + beanName + '\'' + ", className='"
+                    + className + '\'' + ", scope='"
+                    + scope + '\'' + ", proxyType="
+                    + proxyType + ", aliases="
+                    + aliases + ", autoConfigurationRef='"
+                    + autoConfigurationRef + '\'' + ", dependencies="
+                    + dependencies + ", isPrimary="
+                    + isPrimary + ", isLazyInit="
+                    + isLazyInit + ", isConfigPropsBean="
+                    + isConfigPropsBean + ", qualifiers="
+                    + qualifiers + ", beanSource="
+                    + beanSource + '}';
         }
     }
 
+    /**
+     * The profile of a given bean dependency.
+     */
     public static final class BeanDependency {
 
         private final String name;
@@ -287,6 +263,12 @@ public final class BeansFeed {
         @JsonProperty("isConfigPropsDependency")
         private final boolean isConfigPropsDependency;
 
+        /**
+         * Create a new BeanDependency.
+         *
+         * @param name The name of the dependency bean.
+         * @param isConfigPropsDependency Whether the dependency is a configuration properties dependency.
+         */
         @JsonCreator
         public BeanDependency(
                 @JsonProperty("name") String name,
@@ -299,6 +281,7 @@ public final class BeansFeed {
             return name;
         }
 
+        @JsonProperty("isConfigPropsDependency")
         public boolean isConfigPropsDependency() {
             return isConfigPropsDependency;
         }
@@ -328,10 +311,32 @@ public final class BeansFeed {
     }
 
     public enum BeanOrigin {
+        /**
+         * Bean originated from some variant of a @Component annotation.
+         */
         COMPONENT_ANNOTATION,
+
+        /**
+         * Bean was produced as a result of the @Bean method invocation
+         */
         BEAN_METHOD,
+
+        /**
+         * Bean was created by another bean, {@link FactoryBean "factory bean"}, for example Spring Data repositories are
+         * typically registered in this way.
+         */
         FACTORY_BEAN,
+
+        /**
+         * This is the "synthetic" bean. It means that, most likely, this Bean was created programmatically inside the
+         * Spring Framework, but it might be also created programmatically by some library that uses Spring as well.
+         */
         SYNTHETIC_BEAN,
+
+        /**
+         * We do not know the origin of this bean. As of now, beans registered programmatically via {BeanDefinitionRegistry
+         * or anything similar are going to reside here. It is going to be fixed in the future versions.
+         */
         UNKNOWN,
     }
 
@@ -345,9 +350,17 @@ public final class BeansFeed {
         BeanOrigin origin();
     }
 
+    /**
+     * The {@link BeanSource} for the {@link BeanOrigin#UNKNOWN}. Does not hold
+     * any fields since the actual origin if unknown.
+     */
     @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
     public static final class UnknownBean implements BeanSource {
 
+        /**
+         * Create a new UnknownBean.
+         */
+        @JsonCreator
         public UnknownBean() {}
 
         @Override
@@ -375,11 +388,20 @@ public final class BeansFeed {
         }
     }
 
+    /**
+     * The {@link BeanSource} for the {@link BeanOrigin#FACTORY_BEAN}. Holds the
+     * reference to the {@link #factoryBeanName factory bean} that produced this bean.
+     */
     @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
     public static final class FactoryBean implements BeanSource {
 
         private final String factoryBeanName;
 
+        /**
+         * Create a new UnknownBean.
+         *
+         * @param factoryBeanName the reference to the {@link #factoryBeanName factory bean}.
+         */
         @JsonCreator
         public FactoryBean(@JsonProperty("factoryBeanName") String factoryBeanName) {
             this.factoryBeanName = factoryBeanName;
@@ -418,9 +440,17 @@ public final class BeansFeed {
         }
     }
 
+    /**
+     * This is the "synthetic" bean. It means that, most likely, this Bean was created programmatically inside the
+     * Spring Framework, but it might be also created programmatically by some library that uses Spring as well.
+     */
     @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
     public static final class SyntheticBean implements BeanSource {
 
+        /**
+         * Create a new SyntheticBean.
+         */
+        @JsonCreator
         public SyntheticBean() {}
 
         @Override
@@ -448,6 +478,12 @@ public final class BeansFeed {
         }
     }
 
+    /**
+     * The {@link BeanSource} for the {@link BeanOrigin#BEAN_METHOD}. Has an additional
+     * {@link String} fields for {@link #methodName name of the method} that produced the
+     * actual bean, and the name of the class, where this {@link #methodName method}
+     * resides.
+     */
     @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
     public static final class BeanMethod implements BeanSource {
 
@@ -459,6 +495,13 @@ public final class BeansFeed {
 
         private final String methodName;
 
+        /**
+         * Create a new BeanMethod.
+         *
+         * @param enclosingClassName        the class name where the bean is created.
+         * @param enclosingClassFullName    the full class name where the bean is created.
+         * @param methodName                the method name that creates a bean.
+         */
         @JsonCreator
         public BeanMethod(
                 @JsonProperty("enclosingClassName") @Nullable String enclosingClassName,
@@ -524,9 +567,18 @@ public final class BeansFeed {
         }
     }
 
+    /**
+     * The {@link BeanSource} for the {@link BeanOrigin#COMPONENT_ANNOTATION}. Does not have
+     * any additional fields since it is quite obvious by the #className bean class name
+     * from where the class actually originated.
+     */
     @JsonIgnoreProperties(value = BeanSourceDeserializer.ORIGIN_FIELD, allowGetters = true)
     public static final class ComponentVariant implements BeanSource {
 
+        /**
+         * Create a new ComponentVariant.
+         */
+        @JsonCreator
         public ComponentVariant() {}
 
         @Override
@@ -556,12 +608,15 @@ public final class BeansFeed {
 
     /**
      * The proxying approach that has been applied for the given bean.
-     *
-     * @author Nikita Kirillov
      */
     public enum ProxyType {
+        /** Bean is proxied using JDK dynamic proxy */
         JDK_PROXY,
+
+        /** Bean is proxied using CGLIB */
         CGLIB,
+
+        /** Bean is not proxied */
         NO_PROXYING
     }
 }

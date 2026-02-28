@@ -42,6 +42,7 @@ import org.springframework.util.ClassUtils;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyUtils;
 
 import static com.axelixlabs.axelix.common.api.BeansFeed.BeanMethod;
 import static com.axelixlabs.axelix.common.api.BeansFeed.BeanSource;
@@ -80,7 +81,10 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
         Object bean = beanFactory.getBean(beanName);
         Set<String> positiveConditionsKeys = conditionsKeys();
-        ProxyType beanProxyingType = analyzeProxyType(bean.getClass());
+
+        Class<?> beanType = bean.getClass();
+        ProxyType beanProxyingType = ProxyUtils.analyzeProxyType(beanType, beanType.isSynthetic());
+
         BeanSource beanSource = analyzeBeanSource(beanDefinition, beanName);
 
         return new BeanMetaInfo(
@@ -90,15 +94,6 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
                 beanDefinition.isPrimary(),
                 qualifiersRegistry.getQualifiers(beanName),
                 beanSource);
-    }
-
-    private ProxyType analyzeProxyType(Class<?> beanType) {
-        if (Proxy.isProxyClass(beanType)) {
-            return ProxyType.JDK_PROXY;
-        } else if (beanType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR) && !beanType.isSynthetic()) {
-            return ProxyType.CGLIB;
-        }
-        return ProxyType.NO_PROXYING;
     }
 
     private BeanSource analyzeBeanSource(BeanDefinition beanDefinition, String beanName) {

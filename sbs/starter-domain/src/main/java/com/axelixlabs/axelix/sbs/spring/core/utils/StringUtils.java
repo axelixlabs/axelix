@@ -17,6 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.utils;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -65,5 +69,9 @@ public class StringUtils {
 
     public static String emptyIfNull(String target) {
         return target != null ? target : "";
+    }
+
+    public static Set<String> toSet(String... strings) {
+        return Arrays.stream(strings).collect(Collectors.toSet());
     }
 }

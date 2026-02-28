@@ -17,9 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.beans;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -32,10 +33,10 @@ import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.util.ClassUtils;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.utils.BeanNameUtils;
+import com.axelixlabs.axelix.sbs.spring.core.utils.BeanNameUtils;
+import com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils;
 
 /**
  * Class that is capable to assemble the {@link BeansFeed}.
@@ -59,11 +60,9 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
     @NonNull
     public BeansFeed buildBeansFeed() {
         BeansEndpoint.ApplicationBeans actuatorResponse = delegate.beans();
-
-        Map<String, BeansFeed.Context> contexts = new HashMap<>();
+        List<BeansFeed.Bean> beans = new ArrayList<>();
 
         actuatorResponse.getContexts().forEach((contextId, contextDescriptor) -> {
-            Map<String, BeansFeed.Bean> beans = new HashMap<>();
             ConfigurableApplicationContext targetContext = findConfigurableContextForBean(contextId);
 
             if (targetContext != null) {
@@ -78,37 +77,30 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                     Set<BeansFeed.BeanDependency> enrichedDependencies = resolveDependencies(
                             beanDescriptor.getDependencies(), configPropsBeanMap, metaInfo.getBeanSource());
 
-                    String beanType = resolveBeanTypeName(beanDescriptor, metaInfo.getBeanSource());
+                    Class<?> clazz = beanDescriptor.getType();
+                    String beanType =
+                            BeanNameUtils.resolveBeanTypeName(clazz, metaInfo.getBeanSource(), clazz.isSynthetic());
 
                     boolean isConfigPropsBean = configPropsBeanMap.containsKey(beanName);
-                    String processedBeanName =
-                            isConfigPropsBean ? BeanNameUtils.stripConfigPropsPrefix(beanName) : beanName;
 
-                    beans.put(
-                            processedBeanName,
-                            new BeansFeed.Bean(
-                                    beanDescriptor.getScope(),
-                                    beanType,
-                                    metaInfo.getProxyType(),
-                                    toSet(beanDescriptor.getAliases()),
-                                    metaInfo.getAutoConfigurationRef(),
-                                    enrichedDependencies,
-                                    metaInfo.isLazyInit(),
-                                    metaInfo.isPrimary(),
-                                    isConfigPropsBean,
-                                    metaInfo.getQualifiers(),
-                                    metaInfo.getBeanSource()));
+                    beans.add(new BeansFeed.Bean(
+                            BeanNameUtils.withoutConfigPropsPrefix(beanName, isConfigPropsBean),
+                            beanType,
+                            beanDescriptor.getScope(),
+                            metaInfo.getProxyType(),
+                            StringUtils.toSet(beanDescriptor.getAliases()),
+                            metaInfo.getAutoConfigurationRef(),
+                            enrichedDependencies,
+                            metaInfo.isPrimary(),
+                            metaInfo.isLazyInit(),
+                            isConfigPropsBean,
+                            metaInfo.getQualifiers(),
+                            metaInfo.getBeanSource()));
                 });
             }
-
-            contexts.put(contextId, new BeansFeed.Context(contextDescriptor.getParentId(), beans));
         });
 
-        return new BeansFeed(contexts);
-    }
-
-    private static Set<String> toSet(String... strings) {
-        return Arrays.stream(strings).collect(Collectors.toSet());
+        return new BeansFeed(beans);
     }
 
     @Nullable
@@ -159,19 +151,9 @@ public class DefaultBeansFeedBuilder implements BeansFeedBuilder {
                 })
                 .map(depName -> {
                     boolean isConfigPropsBean = configPropsBeanMap.containsKey(depName);
-                    String beanName = isConfigPropsBean ? BeanNameUtils.stripConfigPropsPrefix(depName) : depName;
-                    return new BeansFeed.BeanDependency(beanName, isConfigPropsBean);
+                    return new BeansFeed.BeanDependency(
+                            BeanNameUtils.withoutConfigPropsPrefix(depName, isConfigPropsBean), isConfigPropsBean);
                 })
                 .collect(Collectors.toSet());
-    }
-
-    private String resolveBeanTypeName(BeansEndpoint.BeanDescriptor beanDescriptor, BeansFeed.BeanSource beanSource) {
-        Class<?> clazz = beanDescriptor.getType();
-
-        if (clazz.isSynthetic() && beanSource instanceof BeansFeed.BeanMethod && clazz.getInterfaces().length > 0) {
-            return clazz.getInterfaces()[0].getName();
-        }
-
-        return ClassUtils.getUserClass(clazz).getName();
     }
 }

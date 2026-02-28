@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import java.util.Map;
+import java.util.List;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -272,7 +272,7 @@ class JwtAuthorizationFilterTest {
 
         @Bean
         public BeansFeedBuilder noOpBeanFeedBuilder() {
-            return () -> new BeansFeed(Map.of());
+            return () -> new BeansFeed(List.of());
         }
 
         @Bean

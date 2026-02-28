@@ -17,13 +17,13 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.Objects;
-
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,12 +32,10 @@ import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.BeansFeedResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -51,26 +49,21 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 public class BeansApi {
 
     private final EndpointInvoker endpointInvoker;
-    private final Converter<BeansFeed, BeansFeedResponse> converter;
 
-    public BeansApi(EndpointInvoker endpointInvoker, Converter<BeansFeed, BeansFeedResponse> converter) {
+    public BeansApi(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
-        this.converter = converter;
     }
 
     @DefaultApiResponse(summary = "Returns beans feed for the given instance")
     @ApiResponse(
             description = "OK",
             responseCode = "200",
-            content =
-                    @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = BeansFeedResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BeansFeed.class)))
     @InstanceIdParameter
     @GetMapping(path = ApiPaths.BeansApi.FEED)
-    public BeansFeedResponse getBeansProfile(@PathVariable("instanceId") String instanceId) {
-        BeansFeed result =
+    public ResponseEntity<byte[]> getBeansFeed(@PathVariable("instanceId") String instanceId) {
+        byte[] body =
                 endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
-        return Objects.requireNonNull(converter.convert(result));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 }

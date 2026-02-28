@@ -46,6 +46,6 @@ public class BeansContributorJsonInstance extends AbstractJsonInstanceStateColle
 
     @Override
     protected Object collectInternal(String instanceId, BeansStateComponentSettings settings) {
-        return beansApi.getBeansProfile(instanceId);
+        return beansApi.getBeansFeed(instanceId);
     }
 }

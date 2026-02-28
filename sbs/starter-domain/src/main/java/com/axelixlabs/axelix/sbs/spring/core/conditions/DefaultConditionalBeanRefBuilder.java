@@ -17,11 +17,10 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.conditions;
 
-import java.lang.reflect.Proxy;
-
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.sbs.spring.core.utils.ClassUtils;
+import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyUtils;
 
 /**
  * Default implementation {@link ConditionalBeanRefBuilder}.
@@ -33,7 +32,7 @@ public class DefaultConditionalBeanRefBuilder implements ConditionalBeanRefBuild
 
     public String buildBeanRefInternal(Class<?> beanClass, @Nullable String beanFactoryMethodName) {
 
-        Class<?> userClass = resolveUserClass(beanClass);
+        Class<?> userClass = ProxyUtils.resolveUserClass(beanClass);
 
         // By calling this method spring-boot replaces the nested class '$' with package separator - the dot.
         // https://github.com/spring-projects/spring-boot/blob/main/module/spring-boot-actuator-autoconfigure/src/main/java/org/springframework/boot/actuate/autoconfigure/condition/ConditionsReportEndpoint.java#L128
@@ -46,17 +45,5 @@ public class DefaultConditionalBeanRefBuilder implements ConditionalBeanRefBuild
         }
 
         return result.toString();
-    }
-
-    // TODO:
-    //  We have this logic  of determining the end user class spread
-    //  across the project, especially in beans endpoint. Need to unify it.
-    private static Class<?> resolveUserClass(Class<?> beanClass) {
-        Class<?> userClass = ClassUtils.getUserClass(beanClass);
-
-        if (userClass == beanClass && Proxy.isProxyClass(userClass)) {
-            userClass = userClass.getInterfaces()[0];
-        }
-        return userClass;
     }
 }

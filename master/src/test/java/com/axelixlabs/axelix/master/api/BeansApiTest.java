@@ -65,8 +65,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BeansApiTest {
 
+    // language=json
     private static final String EXPECTED_BEANS_JSON =
-            // language=json
             """
         {
           "beans": [
@@ -177,44 +177,43 @@ class BeansApiTest {
         // language=json
         String jsonResponse =
                 """
-        {
-          "contexts": {
-            "application": {
-              "parentId": null,
-              "beans": {
-                "jmxEndpointProperties": {
+            {
+              "beans": [
+                {
+                  "beanName": "jmxEndpointProperties",
                   "scope": "singleton",
-                  "type": "JmxEndpointProperties",
-                  "proxyType" : "CGLIB",
+                  "className": "JmxEndpointProperties",
                   "aliases": [],
                   "autoConfigurationRef" : null,
+                  "proxyType" : "CGLIB",
                   "dependencies": [],
-                  "isLazyInit": false,
                   "isPrimary": false,
+                  "isLazyInit": false,
                   "isConfigPropsBean": true,
                   "qualifiers": [],
                   "beanSource": {
-                     "origin": "COMPONENT_ANNOTATION"
-                  }
+                      "origin": "COMPONENT_ANNOTATION"
+                   }
                 },
-                "jacksonObjectMapperBuilder": {
+                {
+                  "beanName": "jacksonObjectMapperBuilder",
                   "scope": "prototype",
-                  "type": "Jackson2ObjectMapperBuilder",
-                  "proxyType" : "JDK_PROXY",
+                  "className": "Jackson2ObjectMapperBuilder",
                   "aliases": [],
-                  "autoConfigurationRef" : "HibernateJpaConfiguration#entityManagerFactoryBuilder",
+                  "autoConfigurationRef" :"HibernateJpaConfiguration#entityManagerFactoryBuilder",
+                  "proxyType" : "JDK_PROXY",
                   "dependencies": [
                     {
                       "name": "JacksonObjectMapperBuilderConfiguration",
                       "isConfigPropsDependency": true
                     },
                     {
-                     "name": "org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
-                     "isConfigPropsDependency": true
-                   }
-                 ],
-                  "isLazyInit": true,
+                      "name": "org.springframework.boot.autoconfigure.orm.jpa.JpaProperties",
+                      "isConfigPropsDependency": true
+                    }
+                  ],
                   "isPrimary": true,
+                  "isLazyInit": true,
                   "isConfigPropsBean": true,
                   "qualifiers": ["primaryMapper"],
                   "beanSource": {
@@ -224,15 +223,16 @@ class BeansApiTest {
                     "origin": "BEAN_METHOD"
                   }
                 },
-                "testSessionBean": {
+                {
+                  "beanName": "testSessionBean",
                   "scope": "session",
-                  "type": "TestSessionBean",
+                  "className": "TestSessionBean",
                   "proxyType" : "NO_PROXYING",
                   "aliases": ["sessionBeanForProberTest"],
                   "autoConfigurationRef" : null,
                   "dependencies": [],
-                  "isLazyInit": false,
                   "isPrimary": false,
+                  "isLazyInit": false,
                   "isConfigPropsBean": false,
                   "qualifiers": [],
                   "beanSource": {
@@ -240,12 +240,13 @@ class BeansApiTest {
                     "origin": "FACTORY_BEAN"
                   }
                 },
-                "syntheticBeanDefinition" : {
+                {
+                  "beanName": "syntheticBeanDefinition",
                   "scope": "singleton",
-                  "type": "SomeClass",
-                  "proxyType" : "NO_PROXYING",
+                  "className": "SomeClass",
                   "aliases": [],
                   "autoConfigurationRef" : null,
+                  "proxyType" : "NO_PROXYING",
                   "dependencies": [],
                   "isPrimary": false,
                   "isLazyInit": false,
@@ -255,11 +256,9 @@ class BeansApiTest {
                       "origin": "SYNTHETIC_BEAN"
                    }
                 }
-              }
+              ]
             }
-          }
-        }
-        """;
+            """;
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override

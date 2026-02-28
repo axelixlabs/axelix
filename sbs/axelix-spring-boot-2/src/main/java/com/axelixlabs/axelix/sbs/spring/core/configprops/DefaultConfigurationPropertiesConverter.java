@@ -26,7 +26,7 @@ import org.springframework.boot.actuate.context.properties.ConfigurationProperti
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed.ConfigurationProperties;
-import com.axelixlabs.axelix.common.utils.BeanNameUtils;
+import com.axelixlabs.axelix.sbs.spring.core.utils.BeanNameUtils;
 
 /**
  * {@link ConfigurationPropertiesConverter} that flattens out the configuration properties feed as it is returned from the

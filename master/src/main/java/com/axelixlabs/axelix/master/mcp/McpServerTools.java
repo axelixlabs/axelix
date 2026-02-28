@@ -30,7 +30,6 @@ import com.axelixlabs.axelix.master.api.external.endpoint.ConfigPropsApi;
 import com.axelixlabs.axelix.master.api.external.endpoint.EnvironmentApi;
 import com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi;
 import com.axelixlabs.axelix.master.api.external.endpoint.WallboardApi;
-import com.axelixlabs.axelix.master.api.external.response.BeansFeedResponse;
 import com.axelixlabs.axelix.master.api.external.response.InstancesGridResponse;
 
 /**
@@ -73,13 +72,13 @@ public class McpServerTools {
     @McpTool(
             description =
                     """
-        Get all Spring beans information for a specific instance.
-        Returns details about bean names, types, and dependencies.
-        Use this when the user asks about application context, specific beans,
-        dependencies, or services of an instance.
-        """)
-    public BeansFeedResponse getInstanceBeans(@McpToolParam(description = "The instance ID") String instanceId) {
-        return beansApi.getBeansProfile(instanceId);
+            Get all Spring beans information for a specific instance.
+            Returns details about bean names, types, and dependencies.
+            Use this when the user asks about application context, specific beans,
+            dependencies, or services of an instance.
+            """)
+    public String getInstanceBeans(@McpToolParam(description = "The instance ID") String instanceId) {
+        return String.valueOf(beansApi.getBeansFeed(instanceId));
     }
 
     @McpTool(
