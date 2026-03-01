@@ -31,11 +31,11 @@ import com.axelixlabs.axelix.master.service.export.settings.BeansStateComponentS
  * @author Nikita Kirillov
  */
 @Component
-public class BeansContributorJsonInstance extends AbstractJsonInstanceStateCollector<BeansStateComponentSettings> {
+public class BeansContributorByteInstance extends AbstractByteInstanceStateCollector<BeansStateComponentSettings> {
 
     private final BeansApi beansApi;
 
-    public BeansContributorJsonInstance(BeansApi beansApi) {
+    public BeansContributorByteInstance(BeansApi beansApi) {
         this.beansApi = beansApi;
     }
 
@@ -45,7 +45,7 @@ public class BeansContributorJsonInstance extends AbstractJsonInstanceStateColle
     }
 
     @Override
-    protected Object collectInternal(String instanceId, BeansStateComponentSettings settings) {
+    protected byte[] collectByte(String instanceId, BeansStateComponentSettings settings) {
         return beansApi.getBeansFeed(instanceId);
     }
 }

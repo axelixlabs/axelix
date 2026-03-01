@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.mcp;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Objects;
 
 import org.springaicommunity.mcp.annotation.McpTool;
@@ -80,8 +79,7 @@ public class McpServerTools {
             dependencies, or services of an instance.
             """)
     public String getInstanceBeans(@McpToolParam(description = "The instance ID") String instanceId) {
-        return new String(
-                Objects.requireNonNull(beansApi.getBeansFeed(instanceId).getBody()), StandardCharsets.UTF_8);
+        return new String(Objects.requireNonNull(beansApi.getBeansFeed(instanceId)), StandardCharsets.UTF_8);
     }
 
     @McpTool(
@@ -92,7 +90,8 @@ public class McpServerTools {
     Use this when user asks about configuration, properties or environment of an instance.
     """)
     public String getInstanceEnvironment(@McpToolParam(description = "The instance ID") String instanceId) {
-        return Arrays.toString(environmentApi.getAllEnvironmentProperties(instanceId));
+        return new String(
+                Objects.requireNonNull(environmentApi.getAllEnvironmentProperties(instanceId)), StandardCharsets.UTF_8);
     }
 
     @McpTool(
@@ -103,7 +102,8 @@ public class McpServerTools {
     Use this when user asks about configuration properties or settings of an instance.
     """)
     public String getInstanceConfigProps(@McpToolParam(description = "The instance ID") String instanceId) {
-        return Arrays.toString(configPropsApi.getConfigpropsFeed(instanceId));
+        return new String(
+                Objects.requireNonNull(configPropsApi.getConfigpropsFeed(instanceId)), StandardCharsets.UTF_8);
     }
 
     @McpTool(
@@ -114,7 +114,7 @@ public class McpServerTools {
     Use this when user asks about auto-configuration, conditions or why a bean is missing.
     """)
     public String getInstanceConditions(@McpToolParam(description = "The instance ID") String instanceId) {
-        return Arrays.toString(conditionsApi.getConditionsFeed(instanceId));
+        return new String(Objects.requireNonNull(conditionsApi.getConditionsFeed(instanceId)), StandardCharsets.UTF_8);
     }
 
     @McpTool(
@@ -125,8 +125,8 @@ public class McpServerTools {
         Use this when user asks about scheduled or cron tasks of an instance.
         """)
     public String getInstanceScheduledTasks(@McpToolParam(description = "The instance ID") String instanceId) {
-
-        return Arrays.toString(scheduledTasksApi.getAllScheduledTasks(instanceId));
+        return new String(
+                Objects.requireNonNull(scheduledTasksApi.getAllScheduledTasks(instanceId)), StandardCharsets.UTF_8);
     }
 
     @McpTool(
