@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -64,9 +65,10 @@ public class ConfigPropsApi {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ConfigurationPropertiesFeed.class)))
     @InstanceIdParameter
-    @GetMapping(path = ApiPaths.ConfigPropsApi.FEED, produces = MediaType.APPLICATION_JSON_VALUE)
-    public byte[] getConfigpropsFeed(@PathVariable("instanceId") String instanceId) {
-        return endpointInvoker.invoke(
+    @GetMapping(path = ApiPaths.ConfigPropsApi.FEED)
+    public ResponseEntity<byte[]> getConfigpropsFeed(@PathVariable("instanceId") String instanceId) {
+        byte[] body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 }
