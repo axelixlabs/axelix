@@ -97,8 +97,8 @@ public class AxelixFeignEndpointTest {
                 new FeignIntegration.FeignHttpMethod("DELETE", "/delete"),
                 new FeignIntegration.FeignHttpMethod("UNKNOWN", "/request"));
         return Stream.of(
-                Arguments.of("Service1", List.of("http://service1-api"), httpMethods),
-                Arguments.of("Service2", List.of(), httpMethods),
+                Arguments.of("Service-1", List.of("http://service1-api"), httpMethods),
+                Arguments.of("Service-2", List.of(), httpMethods),
                 Arguments.of(
                         "ServiceDiscovery", List.of("http://localhost:8081", "http://localhost:8082"), httpMethods));
     }
@@ -144,7 +144,7 @@ public class AxelixFeignEndpointTest {
         }
     }
 
-    @FeignClient(contextId = "axelixFeignEndpointTestService1", name = "Service1", url = "http://service1-api")
+    @FeignClient(contextId = "context-1", name = "Service-1", url = "http://service1-api")
     interface TestFeignClient1 {
         @PostMapping("/post")
         void post();
@@ -162,7 +162,7 @@ public class AxelixFeignEndpointTest {
         void request();
     }
 
-    @FeignClient(contextId = "axelixFeignEndpointTestService2", name = "Service2")
+    @FeignClient(contextId = "context-2", name = "Service-2")
     interface TestFeignClient2 {
         @PostMapping("/post")
         void post();
@@ -180,7 +180,7 @@ public class AxelixFeignEndpointTest {
         void request();
     }
 
-    @FeignClient(contextId = "axelixFeignEndpointTestServiceDiscovery", name = "ServiceDiscovery")
+    @FeignClient(contextId = "context-discovery", name = "ServiceDiscovery")
     interface TestFeignClientDiscovery {
         @PostMapping("/post")
         void post();

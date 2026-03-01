@@ -127,10 +127,8 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
         if (!feignClient.name().isBlank()) {
             return feignClient.name();
         }
-        if (!feignClient.value().isBlank()) {
-            return feignClient.value();
-        }
-        return UNKNOWN;
+
+        return feignClient.value();
     }
 
     private List<String> extractNetworkAddresses(FeignClient feignClient, String serviceId) {
@@ -138,6 +136,8 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
             return List.of(feignClient.url());
         }
 
+        // Retrieving the network address from the DiscoveryClient can be significantly delayed,
+        // as it depends on the service registration mechanism, which is outside of our control.
         List<ServiceInstance> instances = discoveryClient.getInstances(serviceId);
 
         List<String> discovered = instances.stream()

@@ -35,6 +35,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.AxelixFeignEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.FeignClientIntegrationDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.integrations.feign.NoOpDiscoveryClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -66,7 +67,7 @@ class AxelixFeignEndpointAutoConfigurationTest {
                     (DiscoveryClient) ReflectionTestUtils.getField(discoverer, "discoveryClient");
 
             assertThat(discoveryClient).isNotNull();
-            assertThat(discoveryClient.description()).isEqualTo("No discovery client configured");
+            assertThat(discoveryClient.getClass().getName()).isEqualTo(NoOpDiscoveryClient.class.getName());
             assertThat(context).doesNotHaveBean(DiscoveryClient.class);
         });
     }
