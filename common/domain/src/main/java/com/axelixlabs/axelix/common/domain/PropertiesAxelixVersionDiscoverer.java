@@ -28,7 +28,6 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Mikhail Polivakha
  */
-// TODO: introduce the caching decorator for this class.
 public class PropertiesAxelixVersionDiscoverer implements AxelixVersionDiscoverer {
 
     private static final String VERSION_KEY = "version";

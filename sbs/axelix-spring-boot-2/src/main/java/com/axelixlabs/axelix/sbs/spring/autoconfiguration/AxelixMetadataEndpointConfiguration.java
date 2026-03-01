@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Bean;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.PropertiesAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.master.CachingAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginGitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginShortBuildInfoProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultServiceMetadataAssembler;
@@ -56,7 +57,7 @@ public class AxelixMetadataEndpointConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AxelixVersionDiscoverer axelixVersionDiscoverer() {
-        return new PropertiesAxelixVersionDiscoverer("META-INF/axelix.properties");
+        return new CachingAxelixVersionDiscoverer(new PropertiesAxelixVersionDiscoverer("META-INF/axelix.properties"));
     }
 
     @Bean
