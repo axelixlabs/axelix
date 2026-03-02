@@ -17,21 +17,31 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.Trigger;
+import org.springframework.scheduling.config.CronTask;
+import org.springframework.scheduling.config.FixedDelayTask;
+import org.springframework.scheduling.config.FixedRateTask;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.scheduling.config.Task;
+import org.springframework.scheduling.config.TriggerTask;
+import org.springframework.scheduling.support.CronTrigger;
 
 /**
  * Registry for managing and tracking scheduled tasks within the application.
@@ -40,6 +50,7 @@ import org.springframework.scheduling.config.Task;
  * @since 14.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Aleksei Ermakov
  */
 public class ScheduledTasksRegistry implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -49,8 +60,16 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
 
     private final Collection<ScheduledTaskHolder> scheduledTaskHolders;
 
+    private final @Nullable TaskScheduler taskScheduler;
+
     public ScheduledTasksRegistry(Collection<ScheduledTaskHolder> scheduledTaskHolders) {
+        this(scheduledTaskHolders, null);
+    }
+
+    public ScheduledTasksRegistry(
+            Collection<ScheduledTaskHolder> scheduledTaskHolders, @Nullable TaskScheduler taskScheduler) {
         this.scheduledTaskHolders = scheduledTaskHolders;
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -58,7 +77,12 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
         for (ScheduledTaskHolder scheduledTaskHolder : scheduledTaskHolders) {
             Set<ScheduledTask> allTasks = scheduledTaskHolder.getScheduledTasks();
             for (ScheduledTask task : allTasks) {
-                tasks.computeIfAbsent(resolveId(task), taskId -> new ManagedScheduledTask(taskId, task));
+                String taskId = resolveId(task);
+                ManagedScheduledTask managed = new ManagedScheduledTask(taskId, task);
+                ManagedScheduledTask existing = tasks.putIfAbsent(taskId, managed);
+                if (existing == null && taskScheduler != null) {
+                    wrapAndReschedule(managed, taskScheduler);
+                }
             }
         }
         log.info("Registered {} managed scheduled tasks", tasks.size());
@@ -75,6 +99,50 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
     public ManagedScheduledTask findRequired(String id) {
         return Optional.ofNullable(tasks.get(id))
                 .orElseThrow(() -> new ScheduledTaskNotFoundException("Task not found: " + id));
+    }
+
+    private void wrapAndReschedule(ManagedScheduledTask managed, TaskScheduler scheduler) {
+        Runnable originalRunnable = managed.getRunnable();
+        TrackingRunnable tracking = new TrackingRunnable(originalRunnable);
+        Task originalTask = managed.getTask();
+        Task newTask;
+        ScheduledFuture<?> newFuture;
+
+        if (originalTask instanceof CronTask cronTask) {
+            managed.getScheduledTask().cancel(false);
+            Trigger trigger = cronTask.getTrigger();
+            if (trigger instanceof CronTrigger cronTrigger) {
+                newTask = new CronTask(tracking, cronTrigger);
+                newFuture = scheduler.schedule(tracking, cronTrigger);
+            } else {
+                newTask = new CronTask(tracking, cronTask.getExpression());
+                newFuture = scheduler.schedule(tracking, new CronTrigger(cronTask.getExpression()));
+            }
+        } else if (originalTask instanceof FixedRateTask fixedRateTask) {
+            managed.getScheduledTask().cancel(false);
+            newTask = new FixedRateTask(
+                    tracking, fixedRateTask.getIntervalDuration(), fixedRateTask.getInitialDelayDuration());
+            newFuture = scheduler.scheduleAtFixedRate(
+                    tracking,
+                    Instant.now().plus(fixedRateTask.getInitialDelayDuration()),
+                    fixedRateTask.getIntervalDuration());
+        } else if (originalTask instanceof FixedDelayTask fixedDelayTask) {
+            managed.getScheduledTask().cancel(false);
+            newTask = new FixedDelayTask(
+                    tracking, fixedDelayTask.getIntervalDuration(), fixedDelayTask.getInitialDelayDuration());
+            newFuture = scheduler.scheduleWithFixedDelay(
+                    tracking,
+                    Instant.now().plus(fixedDelayTask.getInitialDelayDuration()),
+                    fixedDelayTask.getIntervalDuration());
+        } else if (originalTask instanceof TriggerTask triggerTask) {
+            managed.getScheduledTask().cancel(false);
+            newTask = new TriggerTask(tracking, triggerTask.getTrigger());
+            newFuture = scheduler.schedule(tracking, triggerTask.getTrigger());
+        } else {
+            return;
+        }
+
+        managed.replaceScheduledState(newFuture, newTask);
     }
 
     private String resolveId(ScheduledTask task) {

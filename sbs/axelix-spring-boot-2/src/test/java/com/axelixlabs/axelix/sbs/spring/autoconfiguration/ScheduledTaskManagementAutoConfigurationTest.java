@@ -113,12 +113,34 @@ class ScheduledTaskManagementAutoConfigurationTest {
                 });
     }
 
+    @Test
+    void shouldCreateRegistryWhenMultipleTaskSchedulersPresent() {
+        contextRunner.withUserConfiguration(MultipleTaskSchedulersConfig.class).run(context -> {
+            assertThat(context).hasNotFailed();
+            assertThat(context).hasSingleBean(ScheduledTasksRegistry.class);
+        });
+    }
+
     @TestConfiguration
     @EnableScheduling
     static class EnableSchedulingConfig {
 
         @Bean
         public TaskScheduler taskScheduler() {
+            return new ThreadPoolTaskScheduler();
+        }
+    }
+
+    @TestConfiguration
+    static class MultipleTaskSchedulersConfig {
+
+        @Bean
+        public TaskScheduler firstTaskScheduler() {
+            return new ThreadPoolTaskScheduler();
+        }
+
+        @Bean
+        public TaskScheduler secondTaskScheduler() {
             return new ThreadPoolTaskScheduler();
         }
     }

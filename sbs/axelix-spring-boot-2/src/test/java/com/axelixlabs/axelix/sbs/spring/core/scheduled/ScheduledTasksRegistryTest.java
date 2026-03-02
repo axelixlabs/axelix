@@ -108,6 +108,14 @@ class ScheduledTasksRegistryTest {
                         task -> assertThat(task).isInstanceOf(TriggerTask.class).isNotInstanceOf(CronTask.class));
     }
 
+    @Test
+    void shouldNotWrapTasksWhenNoTaskSchedulerProvided() {
+        Collection<ManagedScheduledTask> tasks = taskRegistry.getAll();
+
+        assertThat(tasks).isNotEmpty().allSatisfy(task -> assertThat(task.getRunnable())
+                .isNotInstanceOf(TrackingRunnable.class));
+    }
+
     @TestConfiguration
     @EnableScheduling
     static class ScheduledTaskRegistryTestConfiguration implements SchedulingConfigurer {
