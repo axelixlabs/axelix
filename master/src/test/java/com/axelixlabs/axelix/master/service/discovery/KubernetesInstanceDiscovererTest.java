@@ -23,6 +23,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.service.transport.DefaultEndpointProber;
+import com.axelixlabs.axelix.master.service.transport.EndpointProber;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -101,12 +106,12 @@ class KubernetesInstanceDiscovererTest {
         }
 
         @Bean
-        public ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber(
+        public EndpointProber<BasicDiscoveryMetadata> managedServiceMetadataEndpointProber(
                 InstanceRegistry instanceRegistry,
                 MetadataJacksonMessageDeserializationStrategy deserializationStrategy,
                 SecurityContextExecutor securityContextExecutor) {
-            return new ManagedServiceMetadataEndpointProber(
-                    instanceRegistry, deserializationStrategy, securityContextExecutor);
+            return new DefaultEndpointProber<>(
+                    instanceRegistry, deserializationStrategy, securityContextExecutor, ActuatorEndpoints.METADATA);
         }
 
         @Bean
