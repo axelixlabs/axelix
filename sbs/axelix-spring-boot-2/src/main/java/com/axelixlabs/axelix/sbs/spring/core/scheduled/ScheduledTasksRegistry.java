@@ -104,50 +104,72 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
     }
 
     private void wrapAndReschedule(ManagedScheduledTask managed, TaskScheduler scheduler) {
-        Runnable originalRunnable = managed.getRunnable();
-        TrackingRunnable tracking = new TrackingRunnable(originalRunnable);
-        Task originalTask = managed.getTask();
-        Task newTask;
-        ScheduledFuture<?> newFuture;
-
-        if (originalTask instanceof CronTask) {
-            CronTask cronTask = (CronTask) originalTask;
-            managed.getScheduledTask().cancel(false);
-            Trigger trigger = cronTask.getTrigger();
-            if (trigger instanceof CronTrigger) {
-                CronTrigger cronTrigger = (CronTrigger) trigger;
-                newTask = new CronTask(tracking, cronTrigger);
-                newFuture = scheduler.schedule(tracking, cronTrigger);
-            } else {
-                newTask = new CronTask(tracking, cronTask.getExpression());
-                newFuture = scheduler.schedule(tracking, new CronTrigger(cronTask.getExpression()));
-            }
-        } else if (originalTask instanceof FixedRateTask) {
-            FixedRateTask fixedRateTask = (FixedRateTask) originalTask;
-            managed.getScheduledTask().cancel(false);
-            newTask = new FixedRateTask(tracking, fixedRateTask.getInterval(), fixedRateTask.getInitialDelay());
-            newFuture = scheduler.scheduleAtFixedRate(
-                    tracking,
-                    Instant.now().plus(fixedRateTask.getInitialDelay(), ChronoUnit.MILLIS),
-                    Duration.of(fixedRateTask.getInterval(), ChronoUnit.MILLIS));
-        } else if (originalTask instanceof FixedDelayTask) {
-            FixedDelayTask fixedDelayTask = (FixedDelayTask) originalTask;
-            managed.getScheduledTask().cancel(false);
-            newTask = new FixedDelayTask(tracking, fixedDelayTask.getInterval(), fixedDelayTask.getInitialDelay());
-            newFuture = scheduler.scheduleWithFixedDelay(
-                    tracking,
-                    Instant.now().plus(fixedDelayTask.getInitialDelay(), ChronoUnit.MILLIS),
-                    Duration.of(fixedDelayTask.getInterval(), ChronoUnit.MILLIS));
-        } else if (originalTask instanceof TriggerTask) {
-            TriggerTask triggerTask = (TriggerTask) originalTask;
-            managed.getScheduledTask().cancel(false);
-            newTask = new TriggerTask(tracking, triggerTask.getTrigger());
-            newFuture = scheduler.schedule(tracking, triggerTask.getTrigger());
-        } else {
+        TrackingRunnable tracking = new TrackingRunnable(managed.getRunnable());
+        RescheduledState rescheduledState = reschedule(managed.getTask(), tracking, scheduler);
+        if (rescheduledState == null) {
             return;
         }
 
-        managed.replaceScheduledState(newFuture, newTask);
+        managed.getScheduledTask().cancel(false);
+        managed.replaceScheduledState(rescheduledState.getFuture(), rescheduledState.getTask());
+    }
+
+    private @Nullable RescheduledState reschedule(
+            Task originalTask, TrackingRunnable tracking, TaskScheduler scheduler) {
+        if (originalTask instanceof CronTask) {
+            return rescheduleCron((CronTask) originalTask, tracking, scheduler);
+        }
+        if (originalTask instanceof FixedRateTask) {
+            return rescheduleFixedRate((FixedRateTask) originalTask, tracking, scheduler);
+        }
+        if (originalTask instanceof FixedDelayTask) {
+            return rescheduleFixedDelay((FixedDelayTask) originalTask, tracking, scheduler);
+        }
+        if (originalTask instanceof TriggerTask) {
+            return rescheduleTrigger((TriggerTask) originalTask, tracking, scheduler);
+        }
+        return null;
+    }
+
+    private RescheduledState rescheduleCron(CronTask originalTask, TrackingRunnable tracking, TaskScheduler scheduler) {
+        Trigger trigger = originalTask.getTrigger();
+        if (trigger instanceof CronTrigger) {
+            CronTrigger cronTrigger = (CronTrigger) trigger;
+            Task newTask = new CronTask(tracking, cronTrigger);
+            ScheduledFuture<?> newFuture = scheduler.schedule(tracking, cronTrigger);
+            return new RescheduledState(newTask, newFuture);
+        }
+
+        Task newTask = new CronTask(tracking, originalTask.getExpression());
+        ScheduledFuture<?> newFuture = scheduler.schedule(tracking, new CronTrigger(originalTask.getExpression()));
+        return new RescheduledState(newTask, newFuture);
+    }
+
+    private RescheduledState rescheduleFixedRate(
+            FixedRateTask originalTask, TrackingRunnable tracking, TaskScheduler scheduler) {
+        Task newTask = new FixedRateTask(tracking, originalTask.getInterval(), originalTask.getInitialDelay());
+        ScheduledFuture<?> newFuture = scheduler.scheduleAtFixedRate(
+                tracking,
+                Instant.now().plus(originalTask.getInitialDelay(), ChronoUnit.MILLIS),
+                Duration.of(originalTask.getInterval(), ChronoUnit.MILLIS));
+        return new RescheduledState(newTask, newFuture);
+    }
+
+    private RescheduledState rescheduleFixedDelay(
+            FixedDelayTask originalTask, TrackingRunnable tracking, TaskScheduler scheduler) {
+        Task newTask = new FixedDelayTask(tracking, originalTask.getInterval(), originalTask.getInitialDelay());
+        ScheduledFuture<?> newFuture = scheduler.scheduleWithFixedDelay(
+                tracking,
+                Instant.now().plus(originalTask.getInitialDelay(), ChronoUnit.MILLIS),
+                Duration.of(originalTask.getInterval(), ChronoUnit.MILLIS));
+        return new RescheduledState(newTask, newFuture);
+    }
+
+    private RescheduledState rescheduleTrigger(
+            TriggerTask originalTask, TrackingRunnable tracking, TaskScheduler scheduler) {
+        Task newTask = new TriggerTask(tracking, originalTask.getTrigger());
+        ScheduledFuture<?> newFuture = scheduler.schedule(tracking, originalTask.getTrigger());
+        return new RescheduledState(newTask, newFuture);
     }
 
     private String resolveId(ScheduledTask task) {
