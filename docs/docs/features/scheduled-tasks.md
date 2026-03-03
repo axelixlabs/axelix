@@ -2,7 +2,7 @@
 sidebar_position: 7
 ---
 
-# Scheduled Tasks{#main}
+# Scheduled Tasks
 The “Scheduled Tasks” page provides access to all tasks annotated with `@Scheduled` within a Spring Boot application.
 You can also update the task status, modify its schedule, and trigger it manually when required.
 

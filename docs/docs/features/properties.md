@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 
-# Properties{#main}
+# Properties
 The Properties page provides complete visibility into all configuration properties and their sources within 
 Spring Boot application. It shows the current values, where each value came from and the priority hierarchy 
 of property sources.

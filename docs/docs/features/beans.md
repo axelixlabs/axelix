@@ -2,7 +2,7 @@
 sidebar_position: 5
 ---
 
-# Beans{#main}
+# Beans
 
 The **Beans** page provides comprehensive visibility into all Spring beans within your managed applications.
 ![beans main page](../../static/img/feature/beans/beans-main-page.png)

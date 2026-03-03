@@ -2,7 +2,7 @@
 sidebar_position: 11
 ---
 
-# Thread Dump {#thread-dump}
+# Thread Dump
 The **Thread Dump** page provides a convenient interface for analyzing all threads present in the Spring Boot application.
 
 ![thread dump main page](../../static/img/feature/thread-dump/thread-dump-main-page.png)

@@ -2,7 +2,7 @@
 sidebar_position: 9
 ---
 
-# Caches{#main}
+# Caches
 
 The **Caches** page provides access to all configured caches in the Spring Boot application. It displays cache 
 metrics such as hits and misses rates, estimated entry size, allows status management, and supports clearing individual 

@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Metrics{#main}
+# Metrics
 
 The Metrics page provides comprehensive monitoring and performance insights for your Spring Boot applications.
 It displays real-time metrics.

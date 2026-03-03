@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Details{#main}
+# Details
 
 The Application Details page provides information about a managed Spring Boot application instance.
 This page displays technical metadata, runtime information, and build details in an organized, easy-to-read format.

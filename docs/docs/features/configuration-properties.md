@@ -2,7 +2,7 @@
 sidebar_position: 6
 ---
 
-# Configuration Properties{#main}
+# Configuration Properties
 
 The **Configuration Properties** page provides full visibility into all properties in the Spring Boot application,
 that are annotated with `@ConfigurationProperties`.

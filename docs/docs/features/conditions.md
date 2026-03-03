@@ -2,7 +2,7 @@
 sidebar_position: 8
 ---
 
-# Conditions{#main}
+# Conditions
 
 The **Conditions** page provides information about the configured conditions in the Spring Boot application.
 
