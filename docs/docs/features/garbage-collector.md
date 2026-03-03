@@ -7,6 +7,7 @@ sidebar_position: 12
 We provide convenient access to `Garbage Collector` logs in the Spring Boot application.
 
 ![garbage collector main page](../../static/img/feature/garbage-collector/gc-main-page.png)
+***Garbage Collector as presented in Axelix UI***
 
 In most cases, Garbage Collector logging is disabled by default. To view the logs, it must be enabled. 
 The “Enable GC Logging” option allows you to do this.

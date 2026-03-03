@@ -13,7 +13,7 @@ HTTP, or JDBC. This organization helps you quickly find and analyze metrics that
 to the same functional area.
 
 ![metrics main page](../../static/img/feature/metrics/metrics-main-page.png)
-***Metrics as presented in Axile UI***
+***Metrics as presented in Axelix UI***
 
 ---
 

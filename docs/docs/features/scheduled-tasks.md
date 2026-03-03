@@ -7,7 +7,7 @@ The “Scheduled Tasks” page provides access to all tasks annotated with `@Sch
 You can also update the task status, modify its schedule, and trigger it manually when required.
 
 ![scheduled tasks main page](../../static/img/feature/scheduled-tasks/scheduled-tasks-main-page.png)
-***Scheduled Tasks as presented in Axile UI***
+***Scheduled Tasks as presented in Axelix UI***
 
 A scrollable list displaying all configured `Scheduled Tasks` in the application, grouped by property types:
 **fixed delay**, **fixed rate** and **cron**, with a search function for scheduled tasks to enable easy navigation.
@@ -18,7 +18,7 @@ A scrollable list displaying all configured `Scheduled Tasks` in the application
 
 ### Cron{#cron}    
 ![cron expression page details](../../static/img/feature/scheduled-tasks/cron-expression-page-details.png)
-***Scheduled Tasks as presented in Axile UI***
+***Scheduled Tasks as presented in Axelix UI***
 
 *A scheduled task with an exact execution configuration.*
 - **Runnable**:                 The *target* that will be executed.
@@ -30,7 +30,7 @@ A scrollable list displaying all configured `Scheduled Tasks` in the application
 
 ### Fixed delay{#fixed-delay} 
 ![fixed rate page details](../../static/img/feature/scheduled-tasks/fixed-rate-page-details.png)
-***Scheduled Tasks as presented in Axile UI***
+***Scheduled Tasks as presented in Axelix UI***
 
 *Schedules Tasks with the interval between completing tasks, counted from the end of the previous task.*
 - **Runnable**:                 The *target* that will be executed.
@@ -43,7 +43,7 @@ A scrollable list displaying all configured `Scheduled Tasks` in the application
 
 ### Fixed rate{#fixed-rate}  
 ![fixed delay page details](../../static/img/feature/scheduled-tasks/fixed-delay-page-details.png)
-***Scheduled Tasks as presented in Axile UI***
+***Scheduled Tasks as presented in Axelix UI***
 
 *Schedules Tasks with the interval between completing tasks, counted from the start of the previous task.*
 - **Runnable**:                 The *target* that will be executed.

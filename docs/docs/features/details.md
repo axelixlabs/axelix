@@ -8,13 +8,13 @@ The Application Details page provides information about a managed Spring Boot ap
 This page displays technical metadata, runtime information, and build details in an organized, easy-to-read format.
 
 ![details main page](../../static/img/feature/details/details-main-page.png)
-***Details page as presented in Axile UI***
+***Details page as presented in Axelix UI***
 
 ---
 
 ## Service Information Inner Header{#details}
 - **Instance Name**: The name of the application instance. The postfix may vary depending on the runtime 
-and discovery environment of axile-master.
+and discovery environment of axelix-master.
 - **Download state** Export application state as a ZIP archive containing selected diagnostic components.
 The export includes various application state snapshots that can be used for debugging, analysis, or compliance purposes.
 
