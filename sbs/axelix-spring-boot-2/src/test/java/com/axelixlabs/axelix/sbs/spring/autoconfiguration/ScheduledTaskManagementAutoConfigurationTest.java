@@ -148,8 +148,10 @@ class ScheduledTaskManagementAutoConfigurationTest {
     @TestConfiguration
     static class CustomScheduledTasksRegistryConfig {
         @Bean
-        public ScheduledTasksRegistry scheduledTasksRegistry(ObjectProvider<ScheduledTaskHolder> taskHolders) {
-            return new CustomScheduledTasksRegistry(taskHolders.orderedStream().collect(Collectors.toList()));
+        public ScheduledTasksRegistry scheduledTasksRegistry(
+                ObjectProvider<ScheduledTaskHolder> taskHolders, TaskScheduler taskScheduler) {
+            return new CustomScheduledTasksRegistry(
+                    taskHolders.orderedStream().collect(Collectors.toList()), taskScheduler);
         }
     }
 
@@ -171,8 +173,8 @@ class ScheduledTaskManagementAutoConfigurationTest {
     }
 
     static class CustomScheduledTasksRegistry extends ScheduledTasksRegistry {
-        public CustomScheduledTasksRegistry(List<ScheduledTaskHolder> taskHolders) {
-            super(taskHolders);
+        public CustomScheduledTasksRegistry(List<ScheduledTaskHolder> taskHolders, TaskScheduler taskScheduler) {
+            super(taskHolders, taskScheduler);
         }
     }
 

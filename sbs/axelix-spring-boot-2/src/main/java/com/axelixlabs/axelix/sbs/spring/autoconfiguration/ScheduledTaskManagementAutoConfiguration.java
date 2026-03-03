@@ -63,7 +63,7 @@ public class ScheduledTaskManagementAutoConfiguration {
     public ScheduledTasksRegistry scheduledTasksRegistry(
             ObjectProvider<ScheduledTaskHolder> taskHolders, ObjectProvider<TaskScheduler> taskScheduler) {
         return new ScheduledTasksRegistry(
-                taskHolders.orderedStream().collect(Collectors.toList()), resolveTaskScheduler(taskScheduler));
+                taskHolders.orderedStream().collect(Collectors.toList()), requireTaskScheduler(taskScheduler));
     }
 
     @Bean

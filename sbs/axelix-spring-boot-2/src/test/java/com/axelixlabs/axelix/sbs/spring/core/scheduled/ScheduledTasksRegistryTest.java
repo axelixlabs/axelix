@@ -31,12 +31,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.FixedDelayTask;
 import org.springframework.scheduling.config.FixedRateTask;
@@ -109,11 +111,17 @@ class ScheduledTasksRegistryTest {
     }
 
     @Test
-    void shouldNotWrapTasksWhenNoTaskSchedulerProvided() {
+    void shouldWrapTasksWhenTaskSchedulerProvided() {
+        // given.
         Collection<ManagedScheduledTask> tasks = taskRegistry.getAll();
 
-        assertThat(tasks).isNotEmpty().allSatisfy(task -> assertThat(task.getRunnable())
-                .isNotInstanceOf(TrackingRunnable.class));
+        // when.
+        Collection<Runnable> runnables =
+                tasks.stream().map(ManagedScheduledTask::getRunnable).collect(Collectors.toList());
+
+        // then.
+        assertThat(tasks).isNotEmpty();
+        assertThat(runnables).allSatisfy(runnable -> assertThat(runnable).isInstanceOf(TrackingRunnable.class));
     }
 
     @TestConfiguration
@@ -121,8 +129,14 @@ class ScheduledTasksRegistryTest {
     static class ScheduledTaskRegistryTestConfiguration implements SchedulingConfigurer {
 
         @Bean
-        public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-            return new ScheduledTasksRegistry(List.of(processor));
+        public TaskScheduler registryTestTaskScheduler() {
+            return new ConcurrentTaskScheduler();
+        }
+
+        @Bean
+        public ScheduledTasksRegistry registryTestScheduledTasksRegistry(
+                ScheduledAnnotationBeanPostProcessor processor, TaskScheduler registryTestTaskScheduler) {
+            return new ScheduledTasksRegistry(List.of(processor), registryTestTaskScheduler);
         }
 
         @Scheduled(cron = "*/2 * * * * *")

@@ -61,7 +61,7 @@ public class ScheduledTaskManagementAutoConfiguration {
     @ConditionalOnMissingBean
     public ScheduledTasksRegistry scheduledTasksRegistry(
             ObjectProvider<ScheduledTaskHolder> taskHolders, ObjectProvider<TaskScheduler> taskScheduler) {
-        return new ScheduledTasksRegistry(taskHolders.orderedStream().toList(), resolveTaskScheduler(taskScheduler));
+        return new ScheduledTasksRegistry(taskHolders.orderedStream().toList(), requireTaskScheduler(taskScheduler));
     }
 
     @Bean

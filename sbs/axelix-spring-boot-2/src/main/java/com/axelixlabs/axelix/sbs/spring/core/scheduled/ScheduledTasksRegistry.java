@@ -62,14 +62,9 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
 
     private final Collection<ScheduledTaskHolder> scheduledTaskHolders;
 
-    private final @Nullable TaskScheduler taskScheduler;
+    private final TaskScheduler taskScheduler;
 
-    public ScheduledTasksRegistry(Collection<ScheduledTaskHolder> scheduledTaskHolders) {
-        this(scheduledTaskHolders, null);
-    }
-
-    public ScheduledTasksRegistry(
-            Collection<ScheduledTaskHolder> scheduledTaskHolders, @Nullable TaskScheduler taskScheduler) {
+    public ScheduledTasksRegistry(Collection<ScheduledTaskHolder> scheduledTaskHolders, TaskScheduler taskScheduler) {
         this.scheduledTaskHolders = scheduledTaskHolders;
         this.taskScheduler = taskScheduler;
     }
@@ -82,7 +77,7 @@ public class ScheduledTasksRegistry implements ApplicationListener<ContextRefres
                 String taskId = resolveId(task);
                 ManagedScheduledTask managed = new ManagedScheduledTask(taskId, task);
                 ManagedScheduledTask existing = tasks.putIfAbsent(taskId, managed);
-                if (existing == null && taskScheduler != null) {
+                if (existing == null) {
                     wrapAndReschedule(managed, taskScheduler);
                 }
             }
