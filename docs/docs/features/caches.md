@@ -18,16 +18,23 @@ A scrollable list of all configured `Caches` in the application, grouped by thei
 ---
 
 ## The Cache Details{#details}
-![caches page details](../../static/img/feature/caches/cache-page-details.png)
-***Cache page details as presented in Axelix UI***
+![caches details page](../../static/img/feature/caches/caches-details-page.png)
+***Cache details page as presented in Axelix UI***
 
-- **Name**            The name of the cache.
-- **Target**          The fully qualified name of the native cache.
-- **Hits**            The number of cache hits.
-- **Misses**          The number of cache misses.
-- **Entries Size**    The estimated number of entries in the cache (Currently, we only support Caffeine Cache and ConcurrentMapCache)
-- **Clear**           Clears the cache. (See **Interactive Features**)
-- **Status**          Displays the status and allows you to enable or disable a specific cache manually. (See **Interactive Features**)
+Detailed Cache Information:
+- **Name**:            The name of the cache.
+- **Target**:          The fully qualified name of the native cache.
+- **Timestamp**:       Timestamp when the cache operation occurred.
+- **Count**:           The number of cache hits and misses during the specified time interval.
+
+Overall Cache Statistics:
+- **Hits**:            The number of cache hits.
+- **Misses**:          The number of cache misses.
+- **Entries Size**:    The estimated number of entries in the cache (Currently, we only support Caffeine Cache and ConcurrentMapCache)
+
+Operations on Caches:
+- **Clear**:           Clears the cache. (See **Interactive Features**)
+- **Status**:          Displays the status and allows you to enable or disable a specific cache manually. (See **Interactive Features**)
 
 ---
 
