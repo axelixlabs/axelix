@@ -116,7 +116,12 @@ public class ScheduledTaskManagementAutoConfiguration {
         return taskScheduler;
     }
 
-    private static @Nullable TaskScheduler resolveTaskScheduler(ObjectProvider<TaskScheduler> scheduler) {
+    // We intentionally avoid getIfAvailable() here. Since Axelix is a library, users may legitimately
+    // have multiple TaskScheduler beans (e.g. one added by Spring Batch, another by their own config).
+    // getIfUnique() lets @Primary and @Order guide the selection without failing the context.
+    // If no unique bean exists, we fall back to the highest-priority bean from the ordered stream.
+    @Nullable
+    private static TaskScheduler resolveTaskScheduler(ObjectProvider<TaskScheduler> scheduler) {
         TaskScheduler taskScheduler = scheduler.getIfUnique();
         if (taskScheduler != null) {
             return taskScheduler;
