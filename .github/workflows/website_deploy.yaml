@@ -33,21 +33,21 @@ jobs:
           source: "docker-compose.yml,infra/nginx"
           target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}"
 
-#      - name: Prepare Standalone Folder
-#        run: |
-#          cd website
-#          cp -r public .next/standalone/
-#          cp -r .next/static .next/standalone/.next/
+      - name: Prepare Standalone Folder
+        run: |
+          cd website
+          cp -r public .next/standalone/
+          cp -r .next/static .next/standalone/.next/
 
-#      - name: Copy build to VM via SCP
-#        uses: appleboy/scp-action@v1.0.0
-#        with:
-#          host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
-#          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
-#          key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
-#          source: "website/.next/static,website/.next/standalone,website/Dockerfile"
-#          target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website"
-#          strip_components: 1
+      - name: Copy build to VM via SCP
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
+          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+          key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
+          source: "website/.next/static,website/.next/standalone,website/Dockerfile"
+          target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website"
+          strip_components: 1
 #
 #      - name: Build Docker image on server and restart container
 #        uses: appleboy/ssh-action@v1.2.5
