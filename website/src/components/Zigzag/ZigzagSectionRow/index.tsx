@@ -1,10 +1,11 @@
 "use client"
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react"
 
 import { IZigzagSectionData } from "@/models";
 import styles from "./styles.module.css"
+import {Image} from "antd";
+import {EyeOutlined} from "@ant-design/icons";
 
 export interface IProps {
     section: IZigzagSectionData;
@@ -48,7 +49,9 @@ export const ZigzagSectionRow = ({ section, index }: IProps) => {
             </div>
 
             <div className={styles.SectionImageWrapper}>
-                <Image height="513" width="605" src={image} alt="Mock image" className={styles.SectionImage} />
+                <Image height="513" width="605" src={image.src} preview={{
+                    cover: <EyeOutlined/>
+                }} alt="Mock image" className={styles.SectionImage} />
             </div>
         </motion.article>
     )

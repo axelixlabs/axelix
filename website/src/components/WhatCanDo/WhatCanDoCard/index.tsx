@@ -25,6 +25,9 @@ export const WhatCanDoCard = ({ cardData }: IProps) => {
                                 <Image
                                     src={cardData.image}
                                     alt={cardData.title}
+                                    style={{
+                                        borderRadius: 5
+                                    }}
                                     preview={{
                                         cover: <EyeOutlined />,
                                     }}

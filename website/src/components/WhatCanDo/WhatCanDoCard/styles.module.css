@@ -1,20 +1,13 @@
 .CardWrapper,
 .CardWrapper>* {
-    height: 100%;
-}
-
-.HeaderWrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
+    /*height: 100%;*/
 }
 
 .Card {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    row-gap: 20px;
+    row-gap: 25px;
     background-color: #161b22;
     border: 1px solid #30363d;
     color: var(--axelix-primary-white);
@@ -23,6 +16,13 @@
     padding-top: 45px;
     height: 100%;
     transition: border-color 0.3s, translate 0.3s;
+}
+
+.HeaderWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 25px;
 }
 
 .Card:hover {
@@ -45,7 +45,7 @@
 
 .ImageWrapper {
     border-radius: var(--axelix-border-radius-large);
-    aspect-ratio: 4 / 3;
+    /*aspect-ratio: 4 / 3;*/
 }
 
 .Image {
@@ -60,26 +60,6 @@
     margin-top: 20px;
 }
 
-.ReadDocumentation {
-    color: var(--axelix-primary-white);
-}
-
-.ReadDocumentation::after {
-    content: "→";
-    margin-left: 8px;
-    transition-duration: 0.3s;
-}
-
 .Card:hover .ReadDocumentation {
     color: var(--axelix-primary-green);
 }
-
-.Card:hover .ReadDocumentation::after {
-    margin-left: 12px;
-    color: var(--axelix-primary-green);
-}
-
-/*.ReadDocumentation:hover::after {*/
-/*    margin-left: 12px;*/
-/*    color: var(--axelix-primary-green);*/
-/*}*/

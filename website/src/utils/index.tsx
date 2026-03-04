@@ -5,33 +5,42 @@ import {
     IZigzagSectionData
 } from "@/models";
 
+// Feature cards
 import MockImage from "@/assets/images/mockImage.png"
+import BeansFeed from "@/assets/images/beans_feed.png"
+import TransactionalFeed from "@/assets/images/transactions_feed.png"
+import PropertiesFeed from "@/assets/images/properties_feed.png"
+import ScheduledTasksFeed from "@/assets/images/scheduled_task_feed.png"
+import ConditionsFeed from "@/assets/images/conditions_feed.png"
+
+// ZigZag layout
+import LoggersPage from "@/assets/images/loggers.png"
 
 // TODO: revisit the links here
 export const whatCanDoCardsData: IWhatCanDoCardData[] = [
     {
-        image: MockImage.src,
+        image: BeansFeed.src,
         title: "Explore Application Context Beans",
         description: "Gain deep insights into Application Context beans, including their origins and details on why certain beans were excluded.",
         category: "@Bean",
         documentationLink: "https://spring.io",
     },
     {
-        image: MockImage.src,
+        image: TransactionalFeed.src,
         title: "Reveal <code>@Transactional</code> bottlenecks",
         description: "Gain visibility into <code>@Transactional</code> execution timelines and identify potential performance pitfalls before they escalate",
         category: "@Transactional",
         documentationLink: "https://spring.io",
     },
     {
-        image: MockImage.src,
+        image: PropertiesFeed.src,
         title: "Uncover Property Origins and Sources",
         description: "Trace Spring Boot property values to their origins and identify which configuration source or override is currently in effect",
         category: "@Value",
         documentationLink: "https://spring.io",
     },
     {
-        image: MockImage.src,
+        image: ScheduledTasksFeed.src,
         title: "Orchestrate <code>@Scheduled</code> Tasks",
         description: "Take command of background jobs by toggling tasks, redefining cron expressions, and triggering manual executions with a click",
         category: "@Scheduled",
@@ -45,7 +54,7 @@ export const whatCanDoCardsData: IWhatCanDoCardData[] = [
         documentationLink: "https://spring.io",
     },
     {
-        image: MockImage.src,
+        image: ConditionsFeed.src,
         title: "Discover the <code>@Conditional</code> Outcomes",
         description: "Analyze the results of <code>@Conditional</code> evaluations and explore the specific reasons behind each outcome",
         category: "@Conditional",
@@ -119,7 +128,7 @@ export const zigzagSectionsData: IZigzagSectionData[] = [
             "and modify @ConfigurationProperties without the need for a re-deploy."
         ].join(),
         href: "",
-        image: MockImage
+        image: LoggersPage
     },
 ]
 
@@ -234,6 +243,9 @@ export const installationOptions: IInstallationInstructions[] = [
                                     docker run \\ 
                                         --publish 8080:8080 \\
                                         -e AXELIX_MASTER_DISCOVERY_AUTO=false \\ 
+                                        # Important: Please, change the algorithm and the key for production use
+                                        -e AXELIX_AUTH_JWT_ALGORITHM=HMAC256 \\
+                                        -e AXELIX_AUTH_JWT_SIGNING_KEY=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn \\
                                         --name axelix \\ 
                                         --detach \\
                                         ghcr.io/axelixlabs/axelix:${axelixVersion}`
