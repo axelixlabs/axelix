@@ -30,12 +30,11 @@ jobs:
           ref: ${{ env.RELEASE_TAG }}
           fetch-depth: 0
 
-      # TODO: Change to java 25 later on
-      - name: Set up JDK 17
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
           distribution: 'liberica'
-          java-version: '17'
+          java-version: '25'
 
       # Intentionally leaving the setup-gradle action for release pipeline to not introduce any cached behavior
       # and to create the release build from scratch.
