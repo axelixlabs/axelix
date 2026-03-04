@@ -48,4 +48,4 @@ jobs:
             set -eux
             cd /home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
             sudo docker compose -p axelix-docs down || true
-            sudo docker compose -p axelix-docs up --build -d
+            sudo docker compose -p axelix-docs up --build -d docs
