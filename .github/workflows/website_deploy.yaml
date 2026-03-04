@@ -2,30 +2,41 @@ name: Deploy Website
 
 on:
   push:
-    branches: [master]
-    paths:
-      - 'website/**'
+    branches: [feature/GH-794]
+#    paths:
+#      - 'website/**'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: website
+#    defaults:
+#      run:
+#        working-directory: website
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Install dependencies
-        run: npm ci
+        run: cd website && npm ci
 
       - name: Build
-        run:  npm run build
+        run: cd website && npm run build
+
+      - name: Copy global resources to VM via SCP
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
+          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+          key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
+          source: "docker-compose.yml,infra/nginx"
+          target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/"
+          strip_components: 0
 
       - name: Prepare Standalone Folder
         run: |
+          cd website
           cp -r public .next/standalone/
           cp -r .next/static .next/standalone/.next/
 
@@ -35,10 +46,10 @@ jobs:
           host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
           username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
-          source: "website/.next/static,website/.next/standalone,website/Dockerfile,website/docker-compose.yml,website/nginx"
+          source: "website/.next/static,website/.next/standalone,website/Dockerfile"
           target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website"
           strip_components: 1
-    
+
       - name: Build Docker image on server and restart container
         uses: appleboy/ssh-action@v1.2.5
         with:
@@ -46,8 +57,9 @@ jobs:
           username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
           script: |
-            set -eux
-            cd /home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website
-            sudo docker compose -p axelix-website down || true
-            sudo docker compose -p axelix-website up --build -d
+#            set -eux
+#            cd /home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website
+#            sudo docker compose -p axelix-website down || true
+#            sudo docker compose -p axelix-website up --build -d
+             echo test
             
