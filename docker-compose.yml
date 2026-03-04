@@ -29,6 +29,15 @@ services:
     networks:
       - webnet
 
+  docs:
+    build: axelix-docs
+    container_name: axelix-docs
+    restart: unless-stopped
+    expose:
+      - "3000"
+    networks:
+      - webnet
+
 networks:
   webnet:
     driver: bridge
