@@ -76,7 +76,7 @@ subprojects {
             val nexusUrl = project.findProperty("nexus.url") as String? ?: System.getenv("NEXUS_URL")
 
             // It may be null in case of launches in the PRs
-            if (nexusUrl != null) {
+            if (!nexusUrl.isNullOrBlank()) {
                 maven {
                     name = "NexusAxelix"
                     url = uri(nexusUrl)
