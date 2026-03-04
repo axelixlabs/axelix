@@ -27,3 +27,13 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Copy build to VM via SCP
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
+          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+          key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
+          source: "docs/build"
+          target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-docs"
+          strip_components: 1
