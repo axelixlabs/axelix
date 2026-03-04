@@ -8,7 +8,6 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 COPY .next/standalone ./
-# COPY .next/standalone/public ./public
 COPY .next/static ./.next/static
 
 RUN adduser --system --uid 1001 nextjs
