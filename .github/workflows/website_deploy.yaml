@@ -48,15 +48,15 @@ jobs:
           source: "website/.next/static,website/.next/standalone,website/Dockerfile"
           target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website"
           strip_components: 1
-#
-#      - name: Build Docker image on server and restart container
-#        uses: appleboy/ssh-action@v1.2.5
-#        with:
-#          host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
-#          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
-#          key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
-#          script: |
-#            set -eux
-#            cd /home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
-#            sudo docker compose -p axelix-website down || true
-#            sudo docker compose -p axelix-website up --build -d
+
+      - name: Build Docker image on server and restart container
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
+          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+          key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
+          script: |
+            set -eux
+            cd /home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+            sudo docker compose -p axelix-website down || true
+            sudo docker compose -p axelix-website up --build -d

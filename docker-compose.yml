@@ -18,10 +18,10 @@ services:
       - "443:443"
 
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./certificate.crt:/etc/nginx/ssl/certificate.crt:ro
-      - ./certificate.key:/etc/nginx/ssl/certificate.key:ro
-      - ./certificate_ca.crt:/etc/nginx/ssl/certificate_ca.crt:ro
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl/certificate.crt:/etc/nginx/ssl/certificate.crt:ro
+      - ./ssl/certificate.key:/etc/nginx/ssl/certificate.key:ro
+      - ./ssl/certificate_ca.crt:/etc/nginx/ssl/certificate_ca.crt:ro
 
     depends_on:
       - website
