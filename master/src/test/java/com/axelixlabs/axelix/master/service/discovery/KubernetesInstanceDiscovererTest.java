@@ -149,8 +149,7 @@ class KubernetesInstanceDiscovererTest {
         String activeInstanceId = UUID.randomUUID().toString();
 
         // language=json
-        String response =
-                """
+        String response = """
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
@@ -232,8 +231,7 @@ class KubernetesInstanceDiscovererTest {
         String secondServiceInstanceGoodVersionId = UUID.randomUUID().toString();
 
         // language=json
-        String badVersionResponse =
-                """
+        String badVersionResponse = """
             {
               "version": "2.0.0-BAD-VERSION",
               "serviceVersion" : "3.5.0-SNAPSHOT",
@@ -259,8 +257,7 @@ class KubernetesInstanceDiscovererTest {
             }
             """;
         // language=json
-        String goodVersionResponse =
-                """
+        String goodVersionResponse = """
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
@@ -365,8 +362,7 @@ class KubernetesInstanceDiscovererTest {
         String timeoutInstanceId = UUID.randomUUID().toString();
 
         // language=json
-        String response =
-                """
+        String response = """
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
@@ -451,8 +447,7 @@ class KubernetesInstanceDiscovererTest {
         String testServiceId = "test-service";
 
         // language=json
-        String response =
-                """
+        String response = """
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",

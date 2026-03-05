@@ -58,8 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DashboardApiTest {
 
     // language=json
-    private static final String EXPECTED_DASHBOARD_JSON_WITH_INSTANCES =
-            """
+    private static final String EXPECTED_DASHBOARD_JSON_WITH_INSTANCES = """
         {
           "distributions": [
             {
@@ -110,8 +109,7 @@ public class DashboardApiTest {
         """;
 
     // language=json
-    private static final String EXPECTED_DASHBOARD_JSON_EMPTY =
-            """
+    private static final String EXPECTED_DASHBOARD_JSON_EMPTY = """
         {
           "distributions": [
             {

@@ -26,4 +26,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author Mikhail Polivakha
  */
 public record ScheduledTaskCronExpressionValidationResponse(
-        @Schema(description = "Indicates whether cron expression is valid", example = "true") boolean valid) {}
+        @Schema(description = "Indicates whether cron expression is valid", example = "true")
+        boolean valid) {}

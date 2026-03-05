@@ -72,8 +72,7 @@ class BasicDiscoveryMetadataEndpointProberTest {
     @BeforeEach
     void setUp() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",

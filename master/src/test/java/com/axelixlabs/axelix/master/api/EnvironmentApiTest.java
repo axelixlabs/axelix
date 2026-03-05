@@ -168,8 +168,7 @@ class EnvironmentApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonEnvResponse =
-                """
+        String jsonEnvResponse = """
 
                     {
           "activeProfiles": ["production"],

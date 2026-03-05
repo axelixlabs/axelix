@@ -47,8 +47,7 @@ public class InfoJacksonMessageDeserializationStrategyTest {
     void shouldDeserializeServiceInfo() {
         // when.
         // language=json
-        String response =
-                """
+        String response = """
         {
           "git" : {
             "branch" : "main",

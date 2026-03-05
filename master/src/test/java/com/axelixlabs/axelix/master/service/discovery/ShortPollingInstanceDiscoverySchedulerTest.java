@@ -124,8 +124,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         String instance2Id = UUID.randomUUID().toString();
 
         // language=json
-        String response =
-                """
+        String response = """
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
@@ -193,8 +192,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         String instanceId = UUID.randomUUID().toString();
 
         // language=json
-        String firstResponse =
-                """
+        String firstResponse = """
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
@@ -221,8 +219,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             """;
 
         // language=json
-        String secondResponse =
-                """
+        String secondResponse = """
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",
@@ -286,8 +283,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         String instanceId = UUID.randomUUID().toString();
 
         // language=json
-        String response =
-                """
+        String response = """
             {
               "version": "1.0.0-SNAPSHOT",
               "serviceVersion" : "3.5.0-SNAPSHOT",

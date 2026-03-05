@@ -64,8 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MetricsApiTest {
 
     // language=json
-    private static final String EXPECTED_GROUPS_METRICS_JSON =
-            """
+    private static final String EXPECTED_GROUPS_METRICS_JSON = """
         {
           "metricsGroups": [
             {
@@ -143,8 +142,7 @@ public class MetricsApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
             {
               "metricsGroups": [
                 {

@@ -66,8 +66,7 @@ public class CachesReadApiTest {
     private static final String activeInstanceIdEmptyCaches = UUID.randomUUID().toString();
 
     // language=json
-    String EXPECTED_ALL_CACHES_JSON =
-            """
+    String EXPECTED_ALL_CACHES_JSON = """
     {
       "cacheManagers": [
         {
@@ -130,8 +129,7 @@ public class CachesReadApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponseAllCaches =
-                """
+        String jsonResponseAllCaches = """
         {
           "cacheManagers" : [
             {
@@ -173,8 +171,7 @@ public class CachesReadApiTest {
         """;
 
         // language=json
-        String jsonResponseSingleCache =
-                """
+        String jsonResponseSingleCache = """
         {
           "target" : "java.util.concurrent.ConcurrentHashMap",
           "name" : "cities",
@@ -245,15 +242,13 @@ public class CachesReadApiTest {
         String requestedCacheManagerName = "cacheManager";
 
         // language=json
-        String expectedResponseFromMaster =
-                """
+        String expectedResponseFromMaster = """
         {
           "name": "%s",
           "target": "java.util.concurrent.ConcurrentHashMap",
           "cacheManager": "%s"
         }
-        """
-                        .formatted(requestedCacheName, requestedCacheManagerName);
+        """.formatted(requestedCacheName, requestedCacheManagerName);
 
         // when.
         ResponseEntity<String> response = restTemplate

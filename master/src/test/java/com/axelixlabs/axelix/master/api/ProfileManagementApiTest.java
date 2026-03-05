@@ -103,8 +103,7 @@ class ProfileManagementApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
             {
               "updated": true,
               "reason": "New profiles have been activated"

@@ -33,9 +33,10 @@ import com.axelixlabs.axelix.common.api.ProfileMutationResult;
  */
 public record ProfileUpdateResponse(
         @Schema(description = "Indicates whether the profiles were successfully updated", example = "true")
-                boolean updated,
+        boolean updated,
+
         @Schema(
-                        description = "The reason describing why the update was applied or skipped (may be null)",
-                        nullable = true,
-                        example = "Profiles replaced successfully")
-                String reason) {}
+                description = "The reason describing why the update was applied or skipped (may be null)",
+                nullable = true,
+                example = "Profiles replaced successfully")
+        String reason) {}

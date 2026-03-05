@@ -78,7 +78,9 @@ public record InstanceDetailsResponse(
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record SpringProfile(
-            String springBootVersion, String springFrameworkVersion, @Nullable String springCloudVersion) {}
+            String springBootVersion,
+            String springFrameworkVersion,
+            @Nullable String springCloudVersion) {}
 
     /**
      * The profile of a given build.

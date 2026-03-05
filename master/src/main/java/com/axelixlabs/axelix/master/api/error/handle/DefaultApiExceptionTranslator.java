@@ -81,12 +81,10 @@ public class DefaultApiExceptionTranslator implements ApiExceptionTranslator {
         }
 
         if (candidates.isEmpty()) {
-            log.info(
-                    """
+            log.info("""
                 Did not found any specific exception handler for exception {}.
                 It may be fine, but most probably it is not. Consider reporting this to maintainers
-                """,
-                    targetClass.getSimpleName());
+                """, targetClass.getSimpleName());
             return DefaultExceptionHandler.INSTANCE;
         }
 

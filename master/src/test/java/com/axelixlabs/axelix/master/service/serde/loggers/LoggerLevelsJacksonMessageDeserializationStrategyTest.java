@@ -38,8 +38,7 @@ public class LoggerLevelsJacksonMessageDeserializationStrategyTest {
     @Test
     void shouldDeserializeLoggerLoggers() {
         // language=json
-        String responseLoggerExample =
-                """
+        String responseLoggerExample = """
             {
               "configuredLevel" : "DEBUG",
               "effectiveLevel" : "DEBUG"
@@ -47,8 +46,7 @@ public class LoggerLevelsJacksonMessageDeserializationStrategyTest {
         """;
 
         // language=json
-        String responseLoggerOrg =
-                """
+        String responseLoggerOrg = """
             {
               "effectiveLevel" : "INFO"
             }

@@ -52,14 +52,11 @@ public class ShortBuildInfoProviderAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(ShortBuildInfoProvider.class)
     public ShortBuildInfoProvider noOpShortBuildInfoProvider() {
-        log.warn(
-                """
+        log.warn("""
             The {} is active. It practically means that the build information (the version of the build,
             the timestamp when app was build) will not be determined. If you see this message,
             then we were not able to find any valid {} that is going to work in your setup.
-            """,
-                NoOpGitInformationProvider.class.getSimpleName(),
-                GitInformationProvider.class.getSimpleName());
+            """, NoOpGitInformationProvider.class.getSimpleName(), GitInformationProvider.class.getSimpleName());
         return new NoOpShortBuildInfoProvider();
     }
 }

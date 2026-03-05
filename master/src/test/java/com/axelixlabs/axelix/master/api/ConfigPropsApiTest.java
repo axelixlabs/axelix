@@ -63,8 +63,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ConfigPropsApiTest {
     // language=json
-    private static final String EXPECTED_BEANS_FEED_JSON =
-            """
+    private static final String EXPECTED_BEANS_FEED_JSON = """
             {
           "beans": [
             {
@@ -190,8 +189,7 @@ public class ConfigPropsApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonBeansFeedResponse =
-                """
+        String jsonBeansFeedResponse = """
               {
             "beans": [
               {

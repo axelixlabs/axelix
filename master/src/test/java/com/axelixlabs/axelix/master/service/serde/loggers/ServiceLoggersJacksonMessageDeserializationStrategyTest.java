@@ -41,8 +41,7 @@ public class ServiceLoggersJacksonMessageDeserializationStrategyTest {
     @Test
     void shouldDeserializeServiceLoggers() {
         // language=json
-        String response =
-                """
+        String response = """
 
             {
           "levels" : [ "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" ],
