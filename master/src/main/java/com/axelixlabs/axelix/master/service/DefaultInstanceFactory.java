@@ -90,14 +90,10 @@ public class DefaultInstanceFactory implements InstanceFactory {
             return OffsetDateTime.parse(deploymentAt, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
                     .toInstant();
         } catch (DateTimeParseException e) {
-            logger.warn(
-                    """
+            logger.warn("""
             Unable to parse the deployment timestamp of the Service : {} with name {}.
             That will affect the corresponding service on the wallboard UI
-            """,
-                    instanceId,
-                    instanceName,
-                    e);
+            """, instanceId, instanceName, e);
             return null;
         }
     }

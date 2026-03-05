@@ -104,8 +104,7 @@ public class JdbcUserProvider implements UserProvider {
             FROM role_hierarchy rh
             LEFT JOIN %s ra ON rh.role_id = ra.role_id
             LEFT JOIN %s a ON ra.authority_id = a.authority_id
-            """
-                .formatted(
+            """.formatted(
                         jdbcAuthConfig.getUserRoleTable(),
                         jdbcAuthConfig.getRoleTable(),
                         jdbcAuthConfig.getUserTable(),

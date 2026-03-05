@@ -293,14 +293,12 @@ class AxelixScheduledTasksEndpointTest {
     @Test
     void shouldReturnBadRequest_modifyCronExpressionForCronTask() {
         // language=json
-        String request =
-                """
+        String request = """
             {
               "trigger" : "%s",
               "cronExpression": "invalid value"
             }
-            """
-                        .formatted(CRON_TASK_ID_FOR_MODIFY);
+            """.formatted(CRON_TASK_ID_FOR_MODIFY);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
                 "/actuator/axelix-scheduled-tasks/modify/cron-expression", defaultJsonEntity(request), Void.class);
@@ -328,14 +326,12 @@ class AxelixScheduledTasksEndpointTest {
     @Test
     void shouldReturnBadRequest_modifyIntervalForFixedDelay() {
         // language=json
-        String request =
-                """
+        String request = """
                 {
                   "trigger" : "%s",
                   "cronExpression": "invalid value"
                 }
-                """
-                        .formatted(FIXED_DELAY_TASK_ID_FOR_MODIFY);
+                """.formatted(FIXED_DELAY_TASK_ID_FOR_MODIFY);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
                 "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
@@ -363,14 +359,12 @@ class AxelixScheduledTasksEndpointTest {
     @Test
     void shouldReturnBadRequest_modifyIntervalForFixedRate() {
         // language=json
-        String request =
-                """
+        String request = """
                 {
                   "trigger" : "%s",
                   "cronExpression": "invalid value"
                 }
-                """
-                        .formatted(FIXED_RATE_TASK_ID_FOR_MODIFY);
+                """.formatted(FIXED_RATE_TASK_ID_FOR_MODIFY);
 
         ResponseEntity<Void> response = restTemplate.postForEntity(
                 "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);

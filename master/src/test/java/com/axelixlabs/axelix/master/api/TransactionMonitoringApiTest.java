@@ -131,8 +131,7 @@ class TransactionMonitoringApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
     {
         "entrypoints": [
             {

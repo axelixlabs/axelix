@@ -190,8 +190,7 @@ public class DetailsApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
         {
              "git": {
                  "commitShaShort": "7a663cb",
@@ -228,8 +227,7 @@ public class DetailsApiTest {
         """;
 
         // language=json
-        String jsonResponseWithoutPlugin =
-                """
+        String jsonResponseWithoutPlugin = """
             {
               "git": {
                  "commitShaShort": "",

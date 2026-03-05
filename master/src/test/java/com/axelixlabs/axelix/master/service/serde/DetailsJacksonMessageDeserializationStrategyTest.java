@@ -44,8 +44,7 @@ public class DetailsJacksonMessageDeserializationStrategyTest {
     @Test
     void shouldDeserializeAxelixDetails() {
         // language=json
-        String response =
-                """
+        String response = """
             {
              "git": {
                  "commitShaShort": "7a663cb",

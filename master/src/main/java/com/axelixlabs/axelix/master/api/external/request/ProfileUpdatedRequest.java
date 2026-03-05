@@ -34,9 +34,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 public record ProfileUpdatedRequest(
         @ArraySchema(
-                        schema = @Schema(example = "[\"profile1\", \"profile2\"]", type = "array"),
-                        arraySchema =
-                                @Schema(
-                                        description =
-                                                "Array of effective profiles. To remove all active profiles in instance, the array must be empty"))
-                List<String> effectiveProfiles) {}
+                schema = @Schema(example = "[\"profile1\", \"profile2\"]", type = "array"),
+                arraySchema =
+                        @Schema(
+                                description =
+                                        "Array of effective profiles. To remove all active profiles in instance, the array must be empty"))
+        List<String> effectiveProfiles) {}

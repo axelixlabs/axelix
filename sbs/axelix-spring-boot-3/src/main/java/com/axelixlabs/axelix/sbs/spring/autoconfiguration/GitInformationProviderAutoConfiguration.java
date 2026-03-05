@@ -50,14 +50,11 @@ public class GitInformationProviderAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(GitInformationProvider.class)
     public GitInformationProvider noOpGitInformationProvider() {
-        log.warn(
-                """
+        log.warn("""
             The {} is active. It practically means that the git information (sha of last commit,
             the author of the last commit etc.) will not be determined. If you see this message,
             then we were not able to find any valid {} that is going to work in your setup.
-            """,
-                NoOpGitInformationProvider.class.getSimpleName(),
-                GitInformationProvider.class.getSimpleName());
+            """, NoOpGitInformationProvider.class.getSimpleName(), GitInformationProvider.class.getSimpleName());
         return new NoOpGitInformationProvider();
     }
 }

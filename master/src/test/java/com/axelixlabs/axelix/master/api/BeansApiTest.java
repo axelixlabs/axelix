@@ -66,8 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class BeansApiTest {
 
     // language=json
-    private static final String EXPECTED_BEANS_JSON =
-            """
+    private static final String EXPECTED_BEANS_JSON = """
         {
           "beans": [
             {
@@ -175,8 +174,7 @@ class BeansApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
             {
               "beans": [
                 {

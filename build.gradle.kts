@@ -36,6 +36,10 @@ subprojects {
     }
 
     plugins.withType<JavaPlugin> {
+        dependencies {
+            "testRuntimeOnly"("org.junit.platform:junit-platform-launcher")
+        }
+
         tasks.withType<Test>().configureEach {
             useJUnitPlatform()
         }
@@ -43,7 +47,7 @@ subprojects {
 
     spotless {
         java {
-            palantirJavaFormat("2.69.0")
+            palantirJavaFormat("2.87.0")
             target("src/**/*.java")
             importOrder(
                 "java",

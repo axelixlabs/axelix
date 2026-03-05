@@ -100,8 +100,7 @@ public class DefaultEndpointInvokerTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
         {
           "cacheManagers" : [
             {

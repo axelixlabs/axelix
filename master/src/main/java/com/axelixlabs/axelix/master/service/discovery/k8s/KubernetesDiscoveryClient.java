@@ -209,13 +209,11 @@ public class KubernetesDiscoveryClient implements DiscoveryClient {
         Integer targetPort = servicePort.getTargetPort().getIntVal();
 
         if (targetPort == null) {
-            throw new IllegalArgumentException(
-                    """
+            throw new IllegalArgumentException("""
                 As of now, we do not support named K8S ports. \s
                 The targetPort of the K8S '%s' is supposed to be an integer, \s
                 but it is not. So, as of now, the service will not get registered. \s
-                """
-                            .formatted(serviceId));
+                """.formatted(serviceId));
         }
     }
 }

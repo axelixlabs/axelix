@@ -76,8 +76,7 @@ class GcLogFileApiTest {
         }
         """;
 
-    private static final String GC_LOG_FILE_CONTENT =
-            """
+    private static final String GC_LOG_FILE_CONTENT = """
             [2026-01-11T23:20:50.868+0500][info][gc] GC(348) Concurrent Mark Cycle
             [2026-01-11T23:20:50.878+0500][info][gc] GC(350) Pause Young (Normal) (G1 Evacuation Pause) 32M->31M(42M) 0.532ms
             [2026-01-11T23:20:50.883+0500][info][gc] GC(348) Pause Remark 33M->33M(42M) 2.256ms

@@ -26,7 +26,10 @@ import org.jspecify.annotations.Nullable;
  * @author Mikhail Polivakha
  */
 public record PropertySourceDescription(
-        String name, PropertySourceOrigin origin, Class<?> clazz, @Nullable String fileName) {
+        String name,
+        PropertySourceOrigin origin,
+        Class<?> clazz,
+        @Nullable String fileName) {
 
     enum PropertySourceOrigin {
         PROPERTIES_FILE,

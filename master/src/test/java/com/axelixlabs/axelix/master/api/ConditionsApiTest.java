@@ -66,8 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ConditionsApiTest {
 
     // language=json
-    private static final String EXPECTED_CONDITIONS_JSON =
-            """
+    private static final String EXPECTED_CONDITIONS_JSON = """
     {
       "positiveMatches": [
         {
@@ -147,8 +146,7 @@ class ConditionsApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
         {
           "positiveMatches": [
             {

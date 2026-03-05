@@ -88,8 +88,7 @@ class StateExportApiTest {
     private InstanceRegistry registry;
 
     // language=json
-    private static final String HTTP_REQUEST_BODY =
-            """
+    private static final String HTTP_REQUEST_BODY = """
             {
                 "components" : [
                     {
@@ -139,8 +138,7 @@ class StateExportApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String beansJsonResponse =
-                """
+        String beansJsonResponse = """
         {
           "contexts": {
             "application": {
@@ -166,8 +164,7 @@ class StateExportApiTest {
         """;
 
         // language=json
-        String envJsonResponse =
-                """
+        String envJsonResponse = """
         {
           "activeProfiles": ["production"],
           "defaultProfiles": ["default", "development"],
@@ -189,8 +186,7 @@ class StateExportApiTest {
         """;
 
         // language=json
-        String jsonConditionsResponse =
-                """
+        String jsonConditionsResponse = """
     {
       "positiveConditions": [
         {
@@ -240,8 +236,7 @@ class StateExportApiTest {
     """;
 
         // language=json
-        String jsonConfigpropsResponse =
-                """
+        String jsonConfigpropsResponse = """
             {
           "contexts" : {
             "application1" : {
@@ -264,8 +259,7 @@ class StateExportApiTest {
     """;
 
         // language=json
-        String jsonSchedulesTasksResponse =
-                """
+        String jsonSchedulesTasksResponse = """
         {
           "cron": [
             {
@@ -291,8 +285,7 @@ class StateExportApiTest {
         """;
 
         // language=json
-        String jsonThreadDumpResponse =
-                """
+        String jsonThreadDumpResponse = """
     {
        "threads" : [ {
          "threadName" : "Test worker",
@@ -330,8 +323,7 @@ class StateExportApiTest {
     }
     """;
 
-        String mockGcLogFileResponse =
-                """
+        String mockGcLogFileResponse = """
          [2026-01-11T23:20:50.868+0500][info][gc] GC(348) Concurrent Mark Cycle
          [2026-01-11T23:20:50.878+0500][info][gc] GC(350) Pause Young (Normal) (G1 Evacuation Pause) 32M->31M(42M) 0.532ms
          [2026-01-11T23:20:50.883+0500][info][gc] GC(348) Pause Remark 33M->33M(42M) 2.256ms

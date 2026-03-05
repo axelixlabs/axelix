@@ -71,9 +71,7 @@ public class McpServerTools {
         this.wallboardApi = wallboardApi;
     }
 
-    @McpTool(
-            description =
-                    """
+    @McpTool(description = """
             Get all Spring beans information for a specific instance.
             Returns details about bean names, types, and dependencies.
             Use this when the user asks about application context, specific beans,
@@ -84,9 +82,7 @@ public class McpServerTools {
                 Objects.requireNonNull(beansApi.getBeansFeed(instanceId).getBody()), StandardCharsets.UTF_8);
     }
 
-    @McpTool(
-            description =
-                    """
+    @McpTool(description = """
     Get all environment properties for a specific instance.
     Returns application properties, system properties and environment variables.
     Use this when user asks about configuration, properties or environment of an instance.
@@ -95,9 +91,7 @@ public class McpServerTools {
         return String.valueOf(environmentApi.getAllEnvironmentProperties(instanceId));
     }
 
-    @McpTool(
-            description =
-                    """
+    @McpTool(description = """
     Get all configuration properties for a specific instance.
     Returns @ConfigurationProperties beans with their values.
     Use this when user asks about configuration properties or settings of an instance.
@@ -106,9 +100,7 @@ public class McpServerTools {
         return String.valueOf(configPropsApi.getConfigpropsFeed(instanceId));
     }
 
-    @McpTool(
-            description =
-                    """
+    @McpTool(description = """
     Get conditions evaluation report for a specific instance.
     Returns which auto-configurations were applied or skipped and why.
     Use this when user asks about auto-configuration, conditions or why a bean is missing.
@@ -117,9 +109,7 @@ public class McpServerTools {
         return String.valueOf(conditionsApi.getConditionsFeed(instanceId));
     }
 
-    @McpTool(
-            description =
-                    """
+    @McpTool(description = """
         Get all scheduled tasks for a specific instance registered in master.
         Returns cron tasks, fixed-rate tasks, fixed-delay tasks and custom tasks.
         Use this when user asks about scheduled or cron tasks of an instance.
@@ -130,9 +120,7 @@ public class McpServerTools {
                 scheduledTasksApi.getAllScheduledTasks(instanceId).getBody());
     }
 
-    @McpTool(
-            description =
-                    """
+    @McpTool(description = """
         Fetch the comprehensive snapshot of all managed instances (also known as 'Wallboard', 'Grid', 'Instances List').
 
         Use this tool as a STARTING POINT to:
