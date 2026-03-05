@@ -1,3 +1,4 @@
+import Dependencies.junitPlatformLauncherVersion
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import java.nio.charset.StandardCharsets
@@ -37,7 +38,7 @@ subprojects {
 
     plugins.withType<JavaPlugin> {
         dependencies {
-            "testRuntimeOnly"("org.junit.platform:junit-platform-launcher")
+            "testRuntimeOnly"("org.junit.platform:junit-platform-launcher:$junitPlatformLauncherVersion")
         }
 
         tasks.withType<Test>().configureEach {
