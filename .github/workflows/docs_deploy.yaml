@@ -5,7 +5,7 @@ name: Deploy Docs and Blog
 #    branches: [master]
 #    paths:
 #      - 'docs/**'
- 
+
 on:
   push:
     branches: [feature/GH-794]
