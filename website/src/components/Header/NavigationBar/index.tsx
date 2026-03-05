@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import styles from "./styles.module.css";
 
 export const NavigationBar = () => {
@@ -7,10 +5,10 @@ export const NavigationBar = () => {
         <nav>
             <ul className={styles.LinksWrapper}>
                 <li>
-                    <Link href="https://docs.axelix.io" className={styles.Link}>Docs</Link>
+                    <a href="https://axelix.io/docs/introduction" target="_blank" rel="noopener noreferrer" className={styles.Link}>Docs</a>
                 </li>
                 <li>
-                    <Link href="https://blog.axelix.io" className={styles.Link}>Blog</Link>
+                    <a href="https://axelix.io/blog" target="_blank" rel="noopener noreferrer" className={styles.Link}>Blog</a>
                 </li>
                 <li>
                     <a href="#faq-title" className={styles.Link}>FAQ</a>
