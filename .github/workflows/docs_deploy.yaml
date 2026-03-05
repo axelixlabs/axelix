@@ -1,14 +1,10 @@
 name: Deploy Docs and Blog
 
-#on:
-#  push:
-#    branches: [master]
-#    paths:
-#      - 'docs/**'
-
 on:
   push:
-    branches: [feature/GH-794]
+    branches: [master]
+    paths:
+      - 'docs/**'
 
 jobs:
   deploy:
