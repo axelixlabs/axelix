@@ -23,42 +23,42 @@ export const whatCanDoCardsData: IWhatCanDoCardData[] = [
         title: "Explore Application Context Beans",
         description: "Gain deep insights into Application Context beans, including their origins and details on why certain beans were excluded.",
         category: "@Bean",
-        documentationLink: "https://spring.io",
+        documentationLink: "https://axelix.io/docs/features/beans",
     },
     {
         image: TransactionalFeed.src,
         title: "Reveal <code>@Transactional</code> bottlenecks",
         description: "Gain visibility into <code>@Transactional</code> execution timelines and identify potential performance pitfalls before they escalate",
         category: "@Transactional",
-        documentationLink: "https://spring.io",
+        documentationLink: "https://axelix.io/docs/features/transaction-control",
     },
     {
         image: PropertiesFeed.src,
         title: "Uncover Property Origins and Sources",
         description: "Trace Spring Boot property values to their origins and identify which configuration source or override is currently in effect",
         category: "@Value",
-        documentationLink: "https://spring.io",
+        documentationLink: "https://axelix.io/docs/features/properties",
     },
     {
         image: ScheduledTasksFeed.src,
         title: "Orchestrate <code>@Scheduled</code> Tasks",
         description: "Take command of background jobs by toggling tasks, redefining cron expressions, and triggering manual executions with a click",
         category: "@Scheduled",
-        documentationLink: "https://spring.io",
+        documentationLink: "https://axelix.io/docs/features/scheduled-tasks",
     },
     {
         image: MockImage.src,
         title: "Control Runtime Caching Behavior",
         description: "Manage your data layer by monitoring real-time cache efficiency and hit/miss ratios while clearing or toggling caches instantly",
         category: "@Cacheable",
-        documentationLink: "https://spring.io",
+        documentationLink: "https://axelix.io/docs/features/caches",
     },
     {
         image: ConditionsFeed.src,
         title: "Discover the <code>@Conditional</code> Outcomes",
         description: "Analyze the results of <code>@Conditional</code> evaluations and explore the specific reasons behind each outcome",
         category: "@Conditional",
-        documentationLink: "https://spring.io",
+        documentationLink: "https://axelix.io/docs/features/conditions",
     },
 ]
 
@@ -116,7 +116,7 @@ export const zigzagSectionsData: IZigzagSectionData[] = [
             "their origins, discovering available properties and their actual values, determining " +
             "long-executing @Transactional methods, @Cacheable caches usage statistics and much more"
         ].join(),
-        href: "",
+        href: "https://axelix.io/docs/category/features",
         image: MockImage
     },
     {
@@ -127,7 +127,7 @@ export const zigzagSectionsData: IZigzagSectionData[] = [
             "needed at runtime. Furthermore, you can clear or disable Spring caches instantly " +
             "and modify @ConfigurationProperties without the need for a re-deploy."
         ].join(),
-        href: "",
+        href: "https://axelix.io/docs/category/features",
         image: LoggersPage
     },
 ]

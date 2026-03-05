@@ -7,6 +7,9 @@ ENV PORT=3000
 
 COPY build ./build
 
+RUN adduser --system --uid 1001 docs
+USER docs
+
 RUN npm install serve -g
 
 EXPOSE 3000

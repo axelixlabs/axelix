@@ -1,5 +1,4 @@
 "use client"
-import Link from "next/link";
 import { motion } from "motion/react"
 
 import { IZigzagSectionData } from "@/models";
@@ -27,7 +26,7 @@ export const ZigzagSectionRow = ({ section, index }: IProps) => {
             <div className={styles.ContentWrapper}>
                 <h3 className={`TextMedium ${styles.Title}`}>{title}</h3>
                 <p className={styles.Description}>{description}</p>
-                <Link href={href} className={styles.Link}>
+                <a href={href} target="_blank" rel="noreferrer noopener" className={styles.Link}>
                     See Docs
                     {/*TODO: Replace via svgr in future */}
                     <svg
@@ -45,7 +44,7 @@ export const ZigzagSectionRow = ({ section, index }: IProps) => {
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <polyline points="6 9 12 15 18 9" />
                     </svg>
-                </Link>
+                </a>
             </div>
 
             <div className={styles.SectionImageWrapper}>

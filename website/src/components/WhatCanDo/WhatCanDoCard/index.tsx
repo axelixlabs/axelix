@@ -4,7 +4,6 @@ import { IWhatCanDoCardData } from "@/models";
 import { whatCanDoCardVariants } from "@/utils";
 import { Badge, Image } from "antd";
 import { EyeOutlined } from '@ant-design/icons';
-import Link from "next/link";
 
 interface IProps {
     cardData: IWhatCanDoCardData
@@ -14,7 +13,7 @@ export const WhatCanDoCard = ({ cardData }: IProps) => {
     return (
         <motion.article className={styles.CardWrapper} variants={whatCanDoCardVariants}>
             <Badge.Ribbon text={cardData.category} color="#00ab55">
-                <Link href={cardData.documentationLink} className={styles.ReadDocumentation}>
+                <a href={cardData.documentationLink} target="_blank" rel="noopener noreferrer" className={styles.ReadDocumentation}>
                     <div className={styles.Card}>
                         <header className={styles.HeaderWrapper}>
                             <h3 className={`TextSmall ${styles.CardTitle}`} dangerouslySetInnerHTML={{ __html: cardData.title }}/>
@@ -40,14 +39,13 @@ export const WhatCanDoCard = ({ cardData }: IProps) => {
                             </div>
 
                             <footer className={styles.ReadDocumentationWrapper}>
-                                {/* TODO: Add target="_blank" and rel="noopener noreferrer" in the future if needed */}
                                 <div className={styles.ReadDocumentation}>
                                     Docs
                                 </div>
                             </footer>
                         </div>
                     </div>
-                </Link>
+                </a>
             </Badge.Ribbon>
         </motion.article >
     )

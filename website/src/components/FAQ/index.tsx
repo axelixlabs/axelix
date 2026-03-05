@@ -84,7 +84,7 @@ const faqItems: IFAQItem[] = [
                     <b>So, The goal of the Axelix Project is to provide an easy to install solution for common problems and fill all those gaps left by SBA.</b>
                 </p>
                 <p>
-                    To see the detailed comparison of Axelix vs SBA, please, examine <a href='https://docs.axelix.io'>this docs page</a>
+                    To see the detailed comparison of Axelix vs SBA, please, examine <a href="https://axelix.io/docs/introduction" target="_blank" rel="noopener noreferrer">this docs page</a>
                 </p>
             </>
         )
@@ -100,8 +100,8 @@ const faqItems: IFAQItem[] = [
 
                 <p>
                     The source code of the Axelix Project is Open Source and available under
-                    <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html" rel="noopener noreferrer">LGPL V3.0</a>.
-                    You can find it over <a href="https://github.com/axelixlabs/axelix">on GitHub</a>.
+                    <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html" target="_blank" rel="noopener noreferrer">LGPL V3.0</a>.
+                    You can find it over <a href="https://github.com/axelixlabs/axelix" target="_blank" rel="noopener noreferrer">on GitHub</a>.
                 </p>
             </>
         ),
