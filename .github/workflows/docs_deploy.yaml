@@ -10,7 +10,7 @@ on:
   push:
     branches: [feature/GH-794]
 
-jobs:
+jobs: 
   deploy:
     runs-on: ubuntu-latest
 
