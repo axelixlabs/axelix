@@ -2,17 +2,13 @@ name: Deploy Website
 
 on:
   push:
-    branches: [master]
-    paths:
-      - 'website/**'
+    branches: [feature/GH-794]
+#    paths:
+#      - 'website/**'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-#    defaults:
-#      run:
-#        working-directory: website
 
     steps:
       - name: Checkout code
