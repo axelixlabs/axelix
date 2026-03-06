@@ -46,13 +46,11 @@ const config: Config = {
           routeBasePath: 'blog',
           showReadingTime: true,
 
-          // TODO: Determine whether we need this.
           feedOptions: {
             type: ['rss', 'atom'],
             xslt: true,
           },
           // Useful options to enforce blogging best practices
-          // TODO: Determine whether we need this.
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',

@@ -1,19 +1,67 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+test:
+  label: Test
+  permalink: /test
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+bean:
+  label: Bean
+  permalink: /bean
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+sheduledtask:
+  label: Scheduled Task
+  permalink: /scheduled-task
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+cache:
+  label: Cache
+  permalink: /cache
+
+conditions:
+  label: Conditions
+  permalink: /conditions
+
+logger:
+  label: Logger
+  permalink: /logger
+
+setting:
+  label: Setting
+  permalink: /setting
+
+installation:
+  label: Installation
+  permalink: /installation
+
+transaction:
+  label: Transaction
+  permalink: /transaction
+
+metric:
+  label: Metric
+  permalink: /metric
+
+property:
+  label: Property
+  permalink: /property
+
+configuraionproperty:
+  label: Configuration Property
+  permalink: /configuration-property
+
+threaddump:
+  label: Thread Dump
+  permalink: /thread-dump
+
+gc:
+  label: Garbage Collector
+  permalink: /garbage-collector
+
+experience:
+  label: Experience
+  permalink: /experience
+
+debug:
+  label: Debug
+  permalink: /debug
+
+mcp:
+  label: MCP
+  permalink: /mcp
