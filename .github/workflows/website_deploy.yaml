@@ -3,9 +3,9 @@ name: Deploy Website
 on:
   workflow_dispatch:
   push:
-    branches: [master]
-    paths:
-      - 'website/**'
+    branches: [feature/GH-799]
+#    paths:
+#      - 'website/**'
 
 jobs:
   deploy:
