@@ -1,7 +1,7 @@
 services:
 
   website:
-    build: .
+    build: axelix-website
     container_name: axelix-website
     restart: unless-stopped
     expose:
@@ -10,22 +10,29 @@ services:
       - webnet
 
   nginx:
+    # nginx:mainline-trixie
     image: nginx@sha256:0236ee02dcbce00b9bd83e0f5fbc51069e7e1161bd59d99885b3ae1734f3392e
     container_name: axelix-nginx
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
-
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./certificate.crt:/etc/nginx/ssl/certificate.crt:ro
-      - ./certificate.key:/etc/nginx/ssl/certificate.key:ro
-      - ./certificate_ca.crt:/etc/nginx/ssl/certificate_ca.crt:ro
-
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl/certificate.crt:/etc/nginx/ssl/certificate.crt:ro
+      - ./ssl/certificate.key:/etc/nginx/ssl/certificate.key:ro
+      - ./ssl/certificate_ca.crt:/etc/nginx/ssl/certificate_ca.crt:ro
     depends_on:
       - website
+    networks:
+      - webnet
 
+  docs:
+    build: axelix-docs
+    container_name: axelix-docs
+    restart: unless-stopped
+    expose:
+      - "3000"
     networks:
       - webnet
 

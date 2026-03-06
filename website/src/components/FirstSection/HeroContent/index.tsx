@@ -1,7 +1,6 @@
 import { TypeAnimation } from 'react-type-animation';
 
 import styles from "./styles.module.css"
-import Link from 'next/link';
 import { enSequence } from '@/utils';
 import { createSeoKeywordsFromSequence } from '@/helpers';
 
@@ -22,12 +21,14 @@ export const HeroContent = () => {
             </div>
 
             <div className={styles.LinksWrapper}>
-                <Link
-                    href="#"
+                <a
+                    href="https://axelix.io/docs/introduction"
+                    target='_blank'
+                    rel='noopener noreferrer'
                     className={styles.LinkPrimary}
                 >
                     Get Started
-                </Link>
+                </a>
                 <a
                     href="#installation"
                     className={styles.LinkSecondary}

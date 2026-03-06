@@ -1,11 +1,11 @@
-name: Deploy Website
+name: Deploy Docs and Blog
 
 on:
   workflow_dispatch:
   push:
     branches: [master]
     paths:
-      - 'website/**'
+      - 'docs/**'
 
 jobs:
   deploy:
@@ -16,27 +16,30 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install dependencies
+        working-directory: docs
         run: npm ci
-        working-directory: website
 
       - name: Build
+        working-directory: docs
         run: npm run build
-        working-directory: website
 
-      - name: Prepare Standalone Folder
-        working-directory: website
-        run: |
-          cp -r public .next/standalone/
-          cp -r .next/static .next/standalone/.next/
-
-      - name: Copy build resources to VM via SCP
+      - name: Copy global resources to VM via SCP
         uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
           username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
           key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
-          source: "website/.next/static,website/.next/standalone,website/Dockerfile,docker-compose.yml,infra/nginx"
-          target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-website"
+          source: "docker-compose.yml,infra/nginx"
+          target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}"
+
+      - name: Copy build to VM via SCP
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.WEBSITE_PRODUCTION_VM_HOST }}
+          username: ${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
+          key: ${{ secrets.WEBSITE_PRODUCTION_VM_PRIVATE_KEY }}
+          source: "docs/build,docs/Dockerfile"
+          target: "/home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}/axelix-docs"
           strip_components: 1
 
       - name: Build Docker image on server and restart container
