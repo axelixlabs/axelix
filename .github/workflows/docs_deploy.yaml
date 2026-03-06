@@ -51,4 +51,5 @@ jobs:
           script: |
             set -eux
             cd /home/${{ secrets.WEBSITE_PRODUCTION_VM_USER }}
-            sudo docker compose up --build -d
+            sudo docker compose rm -f -s docs
+            sudo docker compose up --build -d docs
