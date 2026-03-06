@@ -1,25 +1,27 @@
-yangshun:
-  name: Yangshun Tay
-  title: Ex-Meta Staff Engineer, Co-founder GreatFrontEnd
-  url: https://linkedin.com/in/yangshun
-  image_url: https://github.com/yangshun.png
+mikhail:
+  name: Mikhail Polivakha
+  title: Axelix Founder, Software Engineer
+  image_url: https://github.com/mipo256.png
   page: true
   socials:
-    x: yangshunz
-    linkedin: yangshun
-    github: yangshun
-    newsletter: https://www.greatfrontend.com
+    x: mpolivaha
+    linkedin: mikhail-polivakha-7995571ab
+    github: mipo256
+    newsletter: https://mpolivaha.com
 
-slorber:
-  name: Sébastien Lorber
-  title: Docusaurus maintainer
-  url: https://sebastienlorber.com
-  image_url: https://github.com/slorber.png
-  page:
-    # customize the url of the author page at /blog/authors/<permalink>
-    permalink: '/all-sebastien-lorber-articles'
+sergey:
+  name: Sergey Cherkasov
+  title: Axelix Team Member, Backend Developer
+  image_url: https://github.com/sergeycherkasovv.png
+  page: true
   socials:
-    x: sebastienlorber
-    linkedin: sebastienlorber
-    github: slorber
-    newsletter: https://thisweekinreact.com
+    linkedin: sergei-cherkasov-968721210
+    github: sergeycherkasovv
+
+nikita:
+  name: Nikita Kirillov
+  title: Axelix Team Member, Backend Developer
+  image_url: https://github.com/NikitaKirilloff.png
+  page: true
+  socials:
+    github: NikitaKirilloff
