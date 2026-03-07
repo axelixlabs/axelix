@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 /**
  * DTO that describes a discovered Feign integration exposed by Axelix endpoints.
@@ -37,10 +38,14 @@ public class FeignIntegration {
     /**
      * Creates a new FeignIntegration.
      *
-     * @param serviceName       logical service name from {@code @FeignClient}
-     * @param networkAddresses  resolved target addresses (or empty if unresolved)
-     * @param protocol          HTTP protocol display name (for example, {@code HTTP/1.1})
-     * @param httpMethods       methods declared on the Feign client interface
+     * @param serviceName       service name from {@code @FeignClient}.
+     * @param networkAddresses  may contain one or more URLs (for example, when obtained from a Discovery Client with
+     *                          multiple registered service replicas). The value may also be empty if the FeignClient
+     *                          cannot resolve the URL or if it was intentionally not provided in the @FeignClient
+     *                          annotation. URLs follow the format{@code protocol://host:port}
+     *                          (for example, {@code http://localhost:8080}).
+     * @param protocol          HTTP protocol display name (for example, {@code HTTP/1.1}).
+     * @param httpMethods       methods declared on the Feign client interface.
      */
     @JsonCreator
     public FeignIntegration(
@@ -75,7 +80,7 @@ public class FeignIntegration {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ;
+
         FeignIntegration that = (FeignIntegration) o;
         return Objects.equals(serviceName, that.serviceName)
                 && Objects.equals(protocol, that.protocol)
@@ -102,6 +107,8 @@ public class FeignIntegration {
      */
     public static class FeignHttpMethod {
         private final String httpMethod;
+
+        @Nullable
         private final String path;
 
         /**
@@ -109,10 +116,11 @@ public class FeignIntegration {
          *
          * @param httpMethod    HTTP method name (for example, {@code GET}, {@code POST}),
          *                      or {@code UNKNOWN} if the method is not specified.
-         * @param path          mapping path associated with the method
+         * @param path          mapping path associated with the method, or {@code null} if none is defined.
          */
         @JsonCreator
-        public FeignHttpMethod(@JsonProperty("httpMethod") String httpMethod, @JsonProperty("path") String path) {
+        public FeignHttpMethod(
+                @JsonProperty("httpMethod") String httpMethod, @JsonProperty("path") @Nullable String path) {
             this.httpMethod = httpMethod;
             this.path = path;
         }
@@ -121,7 +129,7 @@ public class FeignIntegration {
             return httpMethod;
         }
 
-        public String getPath() {
+        public @Nullable String getPath() {
             return path;
         }
 
@@ -130,7 +138,6 @@ public class FeignIntegration {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            ;
             FeignHttpMethod that = (FeignHttpMethod) o;
             return Objects.equals(httpMethod, that.httpMethod) && Objects.equals(path, that.path);
         }
@@ -142,7 +149,7 @@ public class FeignIntegration {
 
         @Override
         public String toString() {
-            return "{" + "httpMethod='" + httpMethod + '\'' + ", path='" + path + '\'' + '}';
+            return "FeignHttpMethod{" + "httpMethod='" + httpMethod + '\'' + ", path='" + path + '\'' + '}';
         }
     }
 }
