@@ -41,8 +41,7 @@ class EnvironmentPropertyJacksonMessageDeserializationStrategyTest {
     @Test
     void shouldDeserializeEnvironmentProperty() {
         // language=json
-        String response =
-                """
+        String response = """
             {
               "property": {
                 "source":"systemProperties",

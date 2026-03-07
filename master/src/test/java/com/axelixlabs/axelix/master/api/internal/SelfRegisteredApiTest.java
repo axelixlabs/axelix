@@ -46,8 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SelfRegisteredApiTest {
 
     // language=json
-    private static final String JSON_REQUEST =
-            """
+    private static final String JSON_REQUEST = """
         {
        "basicDiscoveryMetadata" : {
          "version": "1.0.0-SNAPSHOT",

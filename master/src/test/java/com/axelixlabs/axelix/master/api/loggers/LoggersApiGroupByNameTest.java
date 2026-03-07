@@ -86,8 +86,7 @@ public class LoggersApiGroupByNameTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonLoggerGroupsWithConfiguredLevelResponse =
-                """
+        String jsonLoggerGroupsWithConfiguredLevelResponse = """
             {
                 "configuredLevel" : "INFO",
                 "members" : [ "test.member1", "test.member2" ]
@@ -95,8 +94,7 @@ public class LoggersApiGroupByNameTest {
             """;
 
         // language=json
-        String jsonLoggerGroupsResponse =
-                """
+        String jsonLoggerGroupsResponse = """
             {
                 "members" : [ "web.member1"]
             }
@@ -134,8 +132,7 @@ public class LoggersApiGroupByNameTest {
     @Test
     void shouldReturnJSONLoggerGroupsWithConfiguredLevel() {
         // language=json
-        String expectedJson =
-                """
+        String expectedJson = """
             {
                 "configuredLevel" : "INFO",
                 "members" : [ "test.member1", "test.member2" ]
@@ -163,8 +160,7 @@ public class LoggersApiGroupByNameTest {
     @Test
     void shouldReturnJSONLoggerGroups() {
         // language=json
-        String expectedJson =
-                """
+        String expectedJson = """
             {
                 "members" : [ "web.member1"]
             }

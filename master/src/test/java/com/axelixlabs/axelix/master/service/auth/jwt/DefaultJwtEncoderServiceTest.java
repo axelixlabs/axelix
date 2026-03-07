@@ -95,8 +95,7 @@ class DefaultJwtEncoderServiceTest {
         String responsePayload = getPayload(token);
 
         // language=json
-        String expectedPayload =
-                """
+        String expectedPayload = """
             {
               "sub": "testUser",
               "roles": [{
@@ -125,8 +124,7 @@ class DefaultJwtEncoderServiceTest {
         String responsePayload = getPayload(token);
 
         // language=json
-        String expectedPayload =
-                """
+        String expectedPayload = """
             {
               "sub": "multiRoleUser",
               "roles": [
@@ -160,8 +158,7 @@ class DefaultJwtEncoderServiceTest {
         String responsePayload = getPayload(token);
 
         // language=json
-        String expectedPayload =
-                """
+        String expectedPayload = """
             {
               "sub": "multiRoleUser",
               "roles": [
@@ -243,8 +240,7 @@ class DefaultJwtEncoderServiceTest {
         String responsePayload = getPayload(token);
 
         // language=json
-        String expectedPayload =
-                """
+        String expectedPayload = """
             {
               "sub": "userWithoutRoles",
               "roles": []
@@ -264,8 +260,7 @@ class DefaultJwtEncoderServiceTest {
         String responsePayload = getPayload(token);
 
         // language=json
-        String expectedPayload =
-                """
+        String expectedPayload = """
             {
             "sub": "userWithEmptyAuthorities",
             "roles": [{
@@ -311,8 +306,7 @@ class DefaultJwtEncoderServiceTest {
             """;
 
         // language=json
-        String expectedPayload =
-                """
+        String expectedPayload = """
             {
               "sub": "hs256User",
               "roles": [{
@@ -350,8 +344,7 @@ class DefaultJwtEncoderServiceTest {
             }
             """;
         // language=json
-        String expectedPayload =
-                """
+        String expectedPayload = """
             {
               "sub": "hs384User",
               "roles": []

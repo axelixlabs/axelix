@@ -62,12 +62,10 @@ public class ShortPollingInstanceDiscoveryScheduler {
         Set<Instance> discoveredInstances = instancesDiscoverer.discoverSafely();
 
         if (discoveredInstances.isEmpty()) {
-            logger.error(
-                    """
+            logger.error("""
                 Despite the auto-discovery was enabled, the {} did not found any result.
                 That is almost certainly not the intended behavior. Please, revisit your configuration.
-                """,
-                    this.getClass().getSimpleName());
+                """, this.getClass().getSimpleName());
         }
 
         Set<InstanceId> currentlyRegisteredIds =

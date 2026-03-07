@@ -173,5 +173,6 @@ public enum PropertySourceDescription {
     /**
      * DTO, used to decouple the raw Spring property source name from its user-friendly representation.
      */
-    public record PropertySourceDisplayData(String displayName, @Nullable String description) {}
+    public record PropertySourceDisplayData(
+            String displayName, @Nullable String description) {}
 }

@@ -40,8 +40,7 @@ class ProfileMutationJacksonMessageDeserializationStrategyTest {
     @Test
     void shouldDeserializeProfileMutationResult() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
             {
               "updated": true,
               "reason": "New profiles have been activated"

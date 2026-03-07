@@ -26,4 +26,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author Mikhail Polivakha
  */
 public record ScheduledTaskCronExpressionValidationRequest(
-        @Schema(description = "Cron expression to validate", example = "*/5 * * * * *") String cronExpression) {}
+        @Schema(description = "Cron expression to validate", example = "*/5 * * * * *")
+        String cronExpression) {}

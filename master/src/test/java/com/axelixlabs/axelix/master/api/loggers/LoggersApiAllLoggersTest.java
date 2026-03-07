@@ -64,8 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LoggersApiAllLoggersTest {
 
     // language=json
-    private static final String EXPECTED_ALL_LOGGERS_JSON =
-            """
+    private static final String EXPECTED_ALL_LOGGERS_JSON = """
             {
               "levels": [
                 "OFF",
@@ -147,8 +146,7 @@ public class LoggersApiAllLoggersTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
 
                 {
            "levels" : [ "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" ],

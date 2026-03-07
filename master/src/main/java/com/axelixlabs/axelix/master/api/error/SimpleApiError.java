@@ -28,4 +28,5 @@ import org.jspecify.annotations.NonNull;
 // TODO:
 //  we're serializing this in json format. I am not sure that this is a good idea.
 //  conceptually, this is just the metadata about the response to the UI, not its body.
-public record SimpleApiError(@NonNull String errorCode, @JsonIgnore int statusCode) implements ApiError {}
+public record SimpleApiError(
+        @NonNull String errorCode, @JsonIgnore int statusCode) implements ApiError {}

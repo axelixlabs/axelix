@@ -31,7 +31,11 @@ import org.jspecify.annotations.Nullable;
  * @author Sergey Cherkasov
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record JavaProfile(String version, @Nullable Vendor vendor, @Nullable Runtime runtime, @Nullable JVM jvm) {
+public record JavaProfile(
+        String version,
+        @Nullable Vendor vendor,
+        @Nullable Runtime runtime,
+        @Nullable JVM jvm) {
     /**
      * The profile of a given vendor.
      *

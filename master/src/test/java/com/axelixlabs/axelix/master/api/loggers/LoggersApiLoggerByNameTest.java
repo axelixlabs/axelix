@@ -87,8 +87,7 @@ public class LoggersApiLoggerByNameTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonLoggerNameComExampleResponse =
-                """
+        String jsonLoggerNameComExampleResponse = """
             {
                "configuredLevel" : "INFO",
                "effectiveLevel" : "INFO"
@@ -96,8 +95,7 @@ public class LoggersApiLoggerByNameTest {
             """;
 
         // language=json
-        String jsonLoggerNameSpringframeworkResponse =
-                """
+        String jsonLoggerNameSpringframeworkResponse = """
             {
                 "effectiveLevel" : "INFO"
             }
@@ -135,8 +133,7 @@ public class LoggersApiLoggerByNameTest {
     @Test
     void shouldReturnJSONLoggerNameComExample() {
         // language=json
-        String expectedJson =
-                """
+        String expectedJson = """
             {
               "configuredLevel" : "INFO",
               "effectiveLevel" : "INFO"

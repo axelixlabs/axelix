@@ -32,7 +32,7 @@ import com.axelixlabs.axelix.master.api.external.request.deserilize.StateExportC
  */
 public record StateExportRequest(
         @NonNull @JsonDeserialize(using = StateExportComponentDeserializer.class)
-                List<StateComponentSettings> components) {
+        List<StateComponentSettings> components) {
 
     @Override
     public List<StateComponentSettings> components() {

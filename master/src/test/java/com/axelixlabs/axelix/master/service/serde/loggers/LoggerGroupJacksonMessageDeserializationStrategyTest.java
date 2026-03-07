@@ -38,8 +38,7 @@ public class LoggerGroupJacksonMessageDeserializationStrategyTest {
     @Test
     void shouldDeserializeGroupLoggers() {
         // language=json
-        String responseGroupTest =
-                """
+        String responseGroupTest = """
         {
           "configuredLevel" : "INFO",
           "members" : [ "test.member1", "test.member2" ]
@@ -47,8 +46,7 @@ public class LoggerGroupJacksonMessageDeserializationStrategyTest {
         """;
 
         // language=json
-        String responseGroupSql =
-                """
+        String responseGroupSql = """
         {
           "members" : [ "org.springframework.jdbc.core", "org.hibernate.SQL", "org.jooq.tools.LoggerListener" ]
         }

@@ -178,8 +178,7 @@ class ThreadDumpApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
     {
        "threadContentionMonitoringEnabled" : true,
        "threads" : [ {

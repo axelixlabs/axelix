@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 public record PropertyUpdatedRequest(
         @Schema(description = "The name of the property to update", example = "spring.jpa.show-sql")
-                String propertyName,
+        String propertyName,
+
         @Schema(description = "The new value of the property. May be null or empty", example = "true")
-                String newValue) {}
+        String newValue) {}

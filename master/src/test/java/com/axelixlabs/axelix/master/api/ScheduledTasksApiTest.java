@@ -76,8 +76,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ScheduledTasksApiTest {
 
     // language=json
-    private static final String EXPECTED_MASTER_RESPONSE =
-            """
+    private static final String EXPECTED_MASTER_RESPONSE = """
          {
           "cron": [
             {
@@ -196,8 +195,7 @@ public class ScheduledTasksApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
             {
               "cron": [
                 {

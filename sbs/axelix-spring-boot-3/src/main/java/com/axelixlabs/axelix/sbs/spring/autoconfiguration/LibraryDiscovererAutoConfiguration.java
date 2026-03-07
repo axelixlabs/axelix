@@ -56,14 +56,11 @@ public class LibraryDiscovererAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(LibraryDiscoverer.class)
     public LibraryDiscoverer noOpLibraryDiscoverer() {
-        log.warn(
-                """
+        log.warn("""
             The {} is active. It practically means that the versions of libs such
             as spring-boot and others will not be determined. If you see this message,
             then we were not able to find any valid {} that is going to work in your setup.
-            """,
-                NoOpLibraryDiscoverer.class.getSimpleName(),
-                LibraryDiscoverer.class.getSimpleName());
+            """, NoOpLibraryDiscoverer.class.getSimpleName(), LibraryDiscoverer.class.getSimpleName());
         return new NoOpLibraryDiscoverer();
     }
 

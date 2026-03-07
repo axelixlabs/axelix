@@ -1,3 +1,4 @@
+import Dependencies.junitPlatformLauncherVersion
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
 import java.nio.charset.StandardCharsets
@@ -36,6 +37,10 @@ subprojects {
     }
 
     plugins.withType<JavaPlugin> {
+        dependencies {
+            "testRuntimeOnly"("org.junit.platform:junit-platform-launcher:$junitPlatformLauncherVersion")
+        }
+
         tasks.withType<Test>().configureEach {
             useJUnitPlatform()
         }
@@ -43,7 +48,7 @@ subprojects {
 
     spotless {
         java {
-            palantirJavaFormat("2.69.0")
+            palantirJavaFormat("2.87.0")
             target("src/**/*.java")
             importOrder(
                 "java",
@@ -76,7 +81,7 @@ subprojects {
             val nexusUrl = project.findProperty("nexus.url") as String? ?: System.getenv("NEXUS_URL")
 
             // It may be null in case of launches in the PRs
-            if (nexusUrl != null) {
+            if (!nexusUrl.isNullOrBlank()) {
                 maven {
                     name = "NexusAxelix"
                     url = uri(nexusUrl)

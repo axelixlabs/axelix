@@ -8,4 +8,5 @@ object Dependencies {
     const val jsonUnitAssertJVersion = "3.5.0"
     const val jsonwebtokenVersion = "0.12.6"
     const val instancioVersion = "5.5.1"
+    const val junitPlatformLauncherVersion = "1.12.2"
 }
