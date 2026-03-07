@@ -86,11 +86,7 @@ export const getTimelineInterval = (data: IGetSingleCacheResponseBody): number =
     return SINGLE_CACHE_CHART_TIMELINE_STEP_30D;
 };
 
-const floorTimestamp = (timestamp: number, interval: number): number => {
-    return Math.floor(timestamp / interval) * interval;
-};
-
-export const createHitsAndMissesGroup = (data: IGetSingleCacheResponseBody): ISingleCacheChartEntity[] => {
+export const getChartData = (data: IGetSingleCacheResponseBody): ISingleCacheChartEntity[] => {
     const groupHitsAndMisses: Record<number, ISingleCacheChartEntity> = {};
 
     for (const { timestamp } of data.hits) {
@@ -115,63 +111,7 @@ export const createHitsAndMissesGroup = (data: IGetSingleCacheResponseBody): ISi
         groupHitsAndMisses[timestamp].misses++;
     }
 
-    return Object.values(groupHitsAndMisses);
-};
-
-const normalizeChartData = (data: ISingleCacheChartEntity[], interval: number): ISingleCacheChartEntity[] => {
-    const groupedData: Record<number, ISingleCacheChartEntity> = {};
-
-    for (const item of data) {
-        const normalizedData = floorTimestamp(item.timestamp, interval);
-
-        if (!groupedData[normalizedData]) {
-            groupedData[normalizedData] = {
-                timestamp: normalizedData,
-                hits: 0,
-                misses: 0,
-            };
-        }
-
-        groupedData[normalizedData].hits += item.hits;
-        groupedData[normalizedData].misses += item.misses;
-    }
-
-    return Object.values(groupedData).sort((a, b) => a.timestamp - b.timestamp);
-};
-
-const buildContinuousTimeline = (
-    normalizedData: ISingleCacheChartEntity[],
-    interval: number,
-): ISingleCacheChartEntity[] => {
-    if (!normalizedData.length) {
-        return [];
-    }
-
-    const firstTimestamp = normalizedData[0].timestamp;
-    const lastTimestamp = normalizedData[normalizedData.length - 1].timestamp;
-
-    const timelineMap: Record<number, ISingleCacheChartEntity> = {};
-    for (const item of normalizedData) {
-        timelineMap[item.timestamp] = item;
-    }
-
-    const chartData: ISingleCacheChartEntity[] = [];
-
-    for (let timestamp = firstTimestamp; timestamp <= lastTimestamp; timestamp += interval) {
-        const defaultChartData = {
-            timestamp: timestamp,
-            hits: 0,
-            misses: 0,
-        };
-        chartData.push(timelineMap[timestamp] ?? defaultChartData);
-    }
-
-    return chartData;
-};
-
-export const getChartData = (data: ISingleCacheChartEntity[], interval: number): ISingleCacheChartEntity[] => {
-    const normalized = normalizeChartData(data, interval);
-    return buildContinuousTimeline(normalized, interval);
+    return Object.values(groupHitsAndMisses).sort((a, b) => a.timestamp - b.timestamp);
 };
 
 export const cacheHitsMissesChartToFormattedTime = (value: number, interval: number): string => {
@@ -195,7 +135,6 @@ export const cacheHitsMissesChartToFormattedTime = (value: number, interval: num
     if (interval === SINGLE_CACHE_CHART_TIMELINE_STEP_H) {
         return date.toLocaleString([], {
             day: "2-digit",
-            month: "2-digit",
             hour: "2-digit",
             minute: "2-digit",
         });
