@@ -18,12 +18,7 @@
 import { useTranslation } from "react-i18next";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
-import {
-    cacheHitsMissesChartToFormattedTime,
-    createHitsAndMissesGroup,
-    getChartData,
-    getTimelineInterval,
-} from "helpers";
+import { cacheHitsMissesChartToFormattedTime, getChartData, getTimelineInterval } from "helpers";
 import type { IGetSingleCacheResponseBody } from "models";
 
 import { CacheChartStats } from "../../CacheChartStats";
@@ -38,8 +33,7 @@ interface IProps {
 export const CacheChart = ({ singleCacheData }: IProps) => {
     const { t } = useTranslation();
     const interval = getTimelineInterval(singleCacheData);
-    const hitsAndMissesGroup = createHitsAndMissesGroup(singleCacheData);
-    const data = getChartData(hitsAndMissesGroup, interval);
+    const data = getChartData(singleCacheData);
 
     return (
         <>
