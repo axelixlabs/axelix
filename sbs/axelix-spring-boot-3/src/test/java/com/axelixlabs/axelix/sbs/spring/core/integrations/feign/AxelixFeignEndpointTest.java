@@ -21,11 +21,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,45 +59,134 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(AxelixFeignEndpointTest.AxelixFeignEndpointTestConfiguration.class)
 public class AxelixFeignEndpointTest {
 
+    private static final String SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION = "service-1";
+    private static final String SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION = "service-2";
+    private static final String SERVICE_WITH_WITHOUT_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION =
+            "service-3";
+    private static final String SERVICE_WITHOUT_URL = "service-4";
+    private static final String SERVICE_DISCOVERY = "service-5";
+
+    private static final String NETWORK_ADDRESS_1 = "http://service1-api";
+    private static final String NETWORK_ADDRESS_2 = "http://service1-api";
+
     @Autowired
     private TestRestTemplate testRestTemplate;
 
-    @ParameterizedTest
-    @MethodSource("feignClientArgs")
-    void shouldFeignClientFeed(
-            String serviceName, List<String> networkAddresses, List<FeignIntegration.FeignHttpMethod> httpMethods) {
+    @Test
+    void shouldReturnService_WithPathInFeignAnnotation() {
+        List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
+                new FeignIntegration.FeignHttpMethod("POST", "/path/post"),
+                new FeignIntegration.FeignHttpMethod("GET", "/path/get"),
+                new FeignIntegration.FeignHttpMethod("PUT", "/path/put"),
+                new FeignIntegration.FeignHttpMethod("DELETE", "/path/delete"),
+                new FeignIntegration.FeignHttpMethod("UNKNOWN", "/path/request"));
 
-        ResponseEntity<Set<FeignIntegration>> response = testRestTemplate.exchange(
-                "/actuator/axelix-feign",
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<Set<FeignIntegration>>() {});
+        FeignIntegration service = getFeignIntegration(SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION);
 
-        FeignIntegration serviceIntegration = response.getBody().stream()
-                .filter(integration -> serviceName.equals(integration.getServiceName()))
-                .findFirst()
-                .orElseThrow();
-
-        assertThat(serviceIntegration)
-                .returns(serviceName, FeignIntegration::getServiceName)
-                .returns(networkAddresses, FeignIntegration::getNetworkAddresses)
+        assertThat(service)
+                .returns(SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION, FeignIntegration::getServiceName)
+                .returns(List.of(NETWORK_ADDRESS_1), FeignIntegration::getNetworkAddresses)
                 .returns(HttpVersion.V1_1.getDisplay(), FeignIntegration::getProtocol)
                 .satisfies(integration ->
                         assertThat(integration.getHttpMethods()).containsExactlyInAnyOrderElementsOf(httpMethods));
     }
 
-    public static Stream<Arguments> feignClientArgs() {
+    @Test
+    void shouldReturnService_WithPathInFeignAnnotationAndPathWithoutMappingAnnotation() {
+        List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
+                new FeignIntegration.FeignHttpMethod("POST", "/path"),
+                new FeignIntegration.FeignHttpMethod("GET", "/path"),
+                new FeignIntegration.FeignHttpMethod("PUT", "/path"),
+                new FeignIntegration.FeignHttpMethod("DELETE", "/path"),
+                new FeignIntegration.FeignHttpMethod("UNKNOWN", "/path"));
+
+        FeignIntegration service =
+                getFeignIntegration(SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION);
+
+        assertThat(service)
+                .returns(
+                        SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION,
+                        FeignIntegration::getServiceName)
+                .returns(List.of(NETWORK_ADDRESS_1), FeignIntegration::getNetworkAddresses)
+                .returns(HttpVersion.V1_1.getDisplay(), FeignIntegration::getProtocol)
+                .satisfies(integration ->
+                        assertThat(integration.getHttpMethods()).containsExactlyInAnyOrderElementsOf(httpMethods));
+    }
+
+    @Test
+    void shouldReturnService_WithoutPathInFeignAnnotationAndPathWithoutMappingAnnotation() {
+        List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
+                new FeignIntegration.FeignHttpMethod("POST", null),
+                new FeignIntegration.FeignHttpMethod("GET", null),
+                new FeignIntegration.FeignHttpMethod("PUT", null),
+                new FeignIntegration.FeignHttpMethod("DELETE", null),
+                new FeignIntegration.FeignHttpMethod("UNKNOWN", null));
+
+        FeignIntegration service =
+                getFeignIntegration(SERVICE_WITH_WITHOUT_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION);
+
+        assertThat(service)
+                .returns(
+                        SERVICE_WITH_WITHOUT_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION,
+                        FeignIntegration::getServiceName)
+                .returns(List.of(NETWORK_ADDRESS_1), FeignIntegration::getNetworkAddresses)
+                .returns(HttpVersion.V1_1.getDisplay(), FeignIntegration::getProtocol)
+                .satisfies(integration ->
+                        assertThat(integration.getHttpMethods()).containsExactlyInAnyOrderElementsOf(httpMethods));
+    }
+
+    // This is not a valid scenario, and OpenFeign cannot work with a service whose URL
+    // for load balancing is not defined. However, we still handle this case so that the service
+    // can appear in the services feed.
+    @Test
+    void shouldReturnService_WithoutURL() {
         List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
                 new FeignIntegration.FeignHttpMethod("POST", "/post"),
                 new FeignIntegration.FeignHttpMethod("GET", "/get"),
                 new FeignIntegration.FeignHttpMethod("PUT", "/put"),
                 new FeignIntegration.FeignHttpMethod("DELETE", "/delete"),
                 new FeignIntegration.FeignHttpMethod("UNKNOWN", "/request"));
-        return Stream.of(
-                Arguments.of("Service-1", List.of("http://service1-api"), httpMethods),
-                Arguments.of("Service-2", List.of(), httpMethods),
-                Arguments.of(
-                        "ServiceDiscovery", List.of("http://localhost:8081", "http://localhost:8082"), httpMethods));
+
+        FeignIntegration service = getFeignIntegration(SERVICE_WITHOUT_URL);
+
+        assertThat(service)
+                .returns(SERVICE_WITHOUT_URL, FeignIntegration::getServiceName)
+                .returns(List.of(), FeignIntegration::getNetworkAddresses)
+                .returns(HttpVersion.V1_1.getDisplay(), FeignIntegration::getProtocol)
+                .satisfies(integration ->
+                        assertThat(integration.getHttpMethods()).containsExactlyInAnyOrderElementsOf(httpMethods));
+    }
+
+    @Test
+    void shouldReturnService_Discovery() {
+        List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
+                new FeignIntegration.FeignHttpMethod("POST", "/path/post"),
+                new FeignIntegration.FeignHttpMethod("GET", "/path/get"),
+                new FeignIntegration.FeignHttpMethod("PUT", "/path/put"),
+                new FeignIntegration.FeignHttpMethod("DELETE", "/path/delete"),
+                new FeignIntegration.FeignHttpMethod("UNKNOWN", "/path/request"));
+
+        FeignIntegration service = getFeignIntegration(SERVICE_DISCOVERY);
+
+        assertThat(service)
+                .returns(SERVICE_DISCOVERY, FeignIntegration::getServiceName)
+                .returns(List.of(NETWORK_ADDRESS_1, NETWORK_ADDRESS_2), FeignIntegration::getNetworkAddresses)
+                .returns(HttpVersion.V1_1.getDisplay(), FeignIntegration::getProtocol)
+                .satisfies(integration ->
+                        assertThat(integration.getHttpMethods()).containsExactlyInAnyOrderElementsOf(httpMethods));
+    }
+
+    private FeignIntegration getFeignIntegration(String serviceName) {
+        ResponseEntity<Set<FeignIntegration>> response = testRestTemplate.exchange(
+                "/actuator/axelix-feign",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<Set<FeignIntegration>>() {});
+
+        return response.getBody().stream()
+                .filter(integration -> serviceName.equals(integration.getServiceName()))
+                .findFirst()
+                .orElseThrow();
     }
 
     @TestConfiguration
@@ -128,23 +214,27 @@ public class AxelixFeignEndpointTest {
 
                 @Override
                 public List<ServiceInstance> getInstances(String serviceId) {
-                    if ("ServiceDiscovery".equals(serviceId)) {
+                    if (SERVICE_DISCOVERY.equals(serviceId)) {
                         return List.of(
-                                new TestServiceInstance(serviceId, URI.create("http://localhost:8081")),
-                                new TestServiceInstance(serviceId, URI.create("http://localhost:8082")));
+                                new TestServiceInstance(serviceId, URI.create(NETWORK_ADDRESS_1)),
+                                new TestServiceInstance(serviceId, URI.create(NETWORK_ADDRESS_2)));
                     }
                     return List.of();
                 }
 
                 @Override
                 public List<String> getServices() {
-                    return List.of("ServiceDiscovery");
+                    return List.of(SERVICE_DISCOVERY);
                 }
             };
         }
     }
 
-    @FeignClient(contextId = "context-1", name = "Service-1", url = "http://service1-api")
+    @FeignClient(
+            contextId = "context-1",
+            name = SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION,
+            url = NETWORK_ADDRESS_1,
+            path = "/path")
     interface TestFeignClient1 {
         @PostMapping("/post")
         void post();
@@ -162,8 +252,51 @@ public class AxelixFeignEndpointTest {
         void request();
     }
 
-    @FeignClient(contextId = "context-2", name = "Service-2")
+    @FeignClient(
+            contextId = "context-2",
+            name = SERVICE_WITH_PATH_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION,
+            url = NETWORK_ADDRESS_1,
+            path = "/path")
     interface TestFeignClient2 {
+        @PostMapping()
+        void post();
+
+        @GetMapping()
+        void get();
+
+        @PutMapping()
+        void put();
+
+        @DeleteMapping()
+        void delete();
+
+        @RequestMapping()
+        void request();
+    }
+
+    @FeignClient(
+            contextId = "context-3",
+            name = SERVICE_WITH_WITHOUT_IN_FEIGN_ANNOTATION_AND_PATH_WITHOUT_MAPPING_ANNOTATION,
+            url = NETWORK_ADDRESS_1)
+    interface TestFeignClient3 {
+        @PostMapping()
+        void post();
+
+        @GetMapping()
+        void get();
+
+        @PutMapping()
+        void put();
+
+        @DeleteMapping()
+        void delete();
+
+        @RequestMapping()
+        void request();
+    }
+
+    @FeignClient(contextId = "context-4", name = SERVICE_WITHOUT_URL)
+    interface TestFeignClient4 {
         @PostMapping("/post")
         void post();
 
@@ -180,8 +313,8 @@ public class AxelixFeignEndpointTest {
         void request();
     }
 
-    @FeignClient(contextId = "context-discovery", name = "ServiceDiscovery")
-    interface TestFeignClientDiscovery {
+    @FeignClient(contextId = "context-5", name = SERVICE_DISCOVERY, path = "/path")
+    interface TestFeignClient5 {
         @PostMapping("/post")
         void post();
 
