@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -48,6 +49,7 @@ import com.axelixlabs.axelix.master.service.auth.UserLoginService;
 @Tag(name = "API for working with Users", description = "The endpoints for user login and authentication")
 @ExternalApiRestController
 @RequestMapping(path = ApiPaths.UsersApi.MAIN)
+@ConditionalOnProperty(prefix = "axelix.master.auth.static-admin", name = "enabled", havingValue = "true")
 public class UserApi {
 
     private final UserLoginService userLoginService;

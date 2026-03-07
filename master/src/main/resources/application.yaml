@@ -37,6 +37,7 @@ axelix:
       jwt:
         lifespan: 12h
       static-admin:
+        enabled: true
         credentials:
           password: admin
           username: admin
