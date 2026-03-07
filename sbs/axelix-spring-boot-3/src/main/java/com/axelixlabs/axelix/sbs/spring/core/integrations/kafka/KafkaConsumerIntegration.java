@@ -24,7 +24,7 @@ import org.apache.kafka.common.TopicPartition;
 
 import org.springframework.kafka.listener.ContainerProperties;
 
-import com.axelixlabs.axelix.sbs.spring.core.integrations.AbstractIntegration;
+import com.axelixlabs.axelix.common.api.integrations.AbstractIntegration;
 
 /**
  * Represents an integration with a Kafka consumer.

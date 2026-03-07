@@ -15,23 +15,19 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations.http;
+package com.axelixlabs.axelix.sbs.spring.core.integrations;
 
-import com.axelixlabs.axelix.sbs.spring.core.integrations.AbstractIntegration;
+import java.util.Set;
+
+import com.axelixlabs.axelix.common.api.integrations.Integration;
 
 /**
- * Represents an HTTP-based integration with an external service.
+ * Implementations of this interface are capable to discover specific {@link Integration integrations}.
  *
- * @since 05.07.2025
+ * @since 05.07.25
  * @author Mikhail Polivakha
  */
-public final class HttpIntegration extends AbstractIntegration {
+public interface IntegrationComponentDiscoverer<T> {
 
-    public HttpIntegration(String networkAddress, HttpVersion httpVersion) {
-        this(networkAddress, httpVersion, "External HTTP Service");
-    }
-
-    public HttpIntegration(String networkAddress, HttpVersion httpVersion, String serviceName) {
-        super(networkAddress, httpVersion.getDisplay(), serviceName);
-    }
+    Set<T> discoverIntegrations();
 }

@@ -15,28 +15,32 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations.http;
+package com.axelixlabs.axelix.sbs.spring.core.integrations.feign;
+
+import java.util.List;
+
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 /**
- * Version of an HTTP protocol in use.
+ * Implementation of {@link DiscoveryClient} used as a fallback
+ * when no real discovery integration is configured.
  *
- * @since 05.07.25
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public enum HttpVersion {
-    V1_0("HTTP 1/0"),
-    V1_1("HTTP 1/1"),
-    V2_0("HTTP 2/0"),
-    V3_0("HTTP 3/0"),
-    ;
-
-    private final String display;
-
-    HttpVersion(String display) {
-        this.display = display;
+public final class NoOpDiscoveryClient implements DiscoveryClient {
+    @Override
+    public String description() {
+        return "No discovery client configured";
     }
 
-    public String getDisplay() {
-        return display;
+    @Override
+    public List<ServiceInstance> getInstances(String serviceId) {
+        return List.of();
+    }
+
+    @Override
+    public List<String> getServices() {
+        return List.of();
     }
 }

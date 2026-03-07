@@ -15,9 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations.rdbms;
+package com.axelixlabs.axelix.sbs.spring.core.integrations;
 
 import java.sql.Connection;
+
+import com.axelixlabs.axelix.common.api.integrations.rdbms.RDBMSIntegration;
+import com.axelixlabs.axelix.common.api.integrations.rdbms.RDBMSType;
 
 /**
  * Strategy interface for creating an {@link RDBMSIntegration} instance

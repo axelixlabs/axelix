@@ -15,38 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations;
-
-import java.util.HashMap;
-import java.util.Map;
+package com.axelixlabs.axelix.common.domain.http;
 
 /**
- * The integration that service has with some other entity on the network
+ * Version of an HTTP protocol in use.
  *
  * @since 05.07.25
  * @author Mikhail Polivakha
  */
-public sealed interface Integration permits AbstractIntegration {
+public enum HttpVersion {
+    V1_0("HTTP/1.0"),
+    V1_1("HTTP/1.1"),
+    V2_0("HTTP/2.0"),
+    V3_0("HTTP/3.0");
 
-    /**
-     * @return abstract term that defines the type of entity with which the integration takes place
-     */
-    String entityType();
+    private final String display;
 
-    /**
-     * Protocol being used for communication
-     */
-    String protocol();
+    HttpVersion(String display) {
+        this.display = display;
+    }
 
-    /**
-     * @return network address being used inside the app for communicating with this entity
-     */
-    String networkAddress();
-
-    /**
-     * @return key-value pairs, that represent some properties, that are specific to this integration or integration entity
-     */
-    default Map<String, Object> properties() {
-        return new HashMap<>(0);
+    public String getDisplay() {
+        return display;
     }
 }

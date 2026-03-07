@@ -15,20 +15,38 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations.rdbms;
+package com.axelixlabs.axelix.common.api.integrations;
 
-import com.axelixlabs.axelix.sbs.spring.core.integrations.AbstractIntegration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Represents an integration with a relational database management system (RDBMS)
- * using the JDBC protocol.
+ * The integration that service has with some other entity on the network
  *
- * @since 09.07.2025
+ * @since 05.07.25
  * @author Mikhail Polivakha
  */
-public class RDBMSIntegration extends AbstractIntegration {
+public interface Integration {
 
-    public RDBMSIntegration(String networkAddress, RDBMSType entityType) {
-        super(networkAddress, "JDBC", entityType.getDisplayName());
+    /**
+     * @return abstract term that defines the type of entity with which the integration takes place
+     */
+    String entityType();
+
+    /**
+     * Protocol being used for communication
+     */
+    String protocol();
+
+    /**
+     * @return network address being used inside the app for communicating with this entity
+     */
+    String networkAddress();
+
+    /**
+     * @return key-value pairs, that represent some properties, that are specific to this integration or integration entity
+     */
+    default Map<String, Object> properties() {
+        return new HashMap<>(0);
     }
 }

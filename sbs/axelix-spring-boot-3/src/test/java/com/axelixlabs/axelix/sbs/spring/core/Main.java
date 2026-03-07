@@ -28,6 +28,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConditionsEndpoi
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixConfigurationsPropertiesEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixDetailsEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixEnvironmentEndpointAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixFeignEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration;
@@ -42,7 +43,6 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.PropertyManagementAuto
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SelfRegistrationAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SpringCloudFeignIntegrationAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
 
@@ -65,6 +65,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
             AxelixMetricsAutoConfiguration.class,
             ContextRestarterAutoConfiguration.class,
             AxelixGcEndpointAutoConfiguration.class,
+            AxelixFeignEndpointAutoConfiguration.class,
             GitInformationProviderAutoConfiguration.class,
             JwtAuthAutoConfiguration.class,
             KafkaIntegrationAutoConfiguration.class,
@@ -74,7 +75,6 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
             SelfRegistrationAutoConfiguration.class,
             ScheduledTaskManagementAutoConfiguration.class,
             ShortBuildInfoProviderAutoConfiguration.class,
-            SpringCloudFeignIntegrationAutoConfiguration.class,
             ThreadDumpManagementEndpointAutoConfiguration.class,
             TransactionMonitoringAutoConfiguration.class
         })
