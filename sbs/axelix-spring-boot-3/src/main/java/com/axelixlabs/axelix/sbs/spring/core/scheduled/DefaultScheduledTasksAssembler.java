@@ -17,8 +17,13 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.scheduled;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.FixedDelayTask;
@@ -27,12 +32,15 @@ import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.config.TriggerTask;
 
 import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
+import com.axelixlabs.axelix.common.api.ServiceScheduledTasks.LastExecution;
+import com.axelixlabs.axelix.common.api.ServiceScheduledTasks.NextExecution;
 
 /**
  * Default implementation of {@link ScheduledTasksAssembler}.
  *
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
+ * @author Aleksei Ermakov
  */
 public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler {
 
@@ -80,8 +88,8 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler {
         return new ServiceScheduledTasks.CronTask(
                 new ServiceScheduledTasks.Runnable(target),
                 task.getExpression(),
-                null,
-                null,
+                nextExecutionOf(managedScheduledTask),
+                lastExecutionOf(managedScheduledTask),
                 managedScheduledTask.isEnabled());
     }
 
@@ -93,8 +101,8 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler {
                 new ServiceScheduledTasks.Runnable(target),
                 task.getIntervalDuration().toMillis(),
                 task.getInitialDelayDuration().toMillis(),
-                null,
-                null,
+                nextExecutionOf(managedScheduledTask),
+                lastExecutionOf(managedScheduledTask),
                 managedScheduledTask.isEnabled());
     }
 
@@ -106,8 +114,8 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler {
                 new ServiceScheduledTasks.Runnable(target),
                 task.getIntervalDuration().toMillis(),
                 task.getInitialDelayDuration().toMillis(),
-                null,
-                null,
+                nextExecutionOf(managedScheduledTask),
+                lastExecutionOf(managedScheduledTask),
                 managedScheduledTask.isEnabled());
     }
 
@@ -118,8 +126,44 @@ public class DefaultScheduledTasksAssembler implements ScheduledTasksAssembler {
         return new ServiceScheduledTasks.CustomTask(
                 new ServiceScheduledTasks.Runnable(target),
                 task.getTrigger().toString(),
-                null,
-                null,
+                nextExecutionOf(managedScheduledTask),
+                lastExecutionOf(managedScheduledTask),
                 managedScheduledTask.isEnabled());
+    }
+
+    @Nullable
+    private NextExecution nextExecutionOf(ManagedScheduledTask task) {
+        if (!task.isEnabled()) {
+            return null;
+        }
+        ScheduledFuture<?> future = task.getFuture();
+        long delayMs = future.getDelay(TimeUnit.MILLISECONDS);
+        if (delayMs < 0) {
+            return null;
+        }
+        return new NextExecution(Instant.now().plusMillis(delayMs).toString());
+    }
+
+    @Nullable
+    private LastExecution lastExecutionOf(ManagedScheduledTask task) {
+        Runnable r = task.getRunnable();
+        if (!(r instanceof TrackingRunnable tr)) {
+            return null;
+        }
+        String status = tr.getLastStatus();
+        if (status == null) {
+            return null;
+        }
+        Instant lastTime = tr.getLastTime();
+        if (lastTime == null) {
+            return null;
+        }
+        LastExecution.Exception ex = null;
+        Throwable lastException = tr.getLastException();
+        if ("ERROR".equals(status) && lastException != null) {
+            String exMessage = lastException.getMessage();
+            ex = new LastExecution.Exception(lastException.getClass().getName(), exMessage != null ? exMessage : "");
+        }
+        return new LastExecution(status, lastTime.toString(), ex);
     }
 }

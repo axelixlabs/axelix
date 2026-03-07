@@ -272,8 +272,9 @@ class ScheduledTaskServiceTest {
         }
 
         @Bean
-        public ScheduledTasksRegistry scheduledTaskRegistry(ScheduledAnnotationBeanPostProcessor processor) {
-            return new ScheduledTasksRegistry(List.of(processor));
+        public ScheduledTasksRegistry scheduledTaskRegistry(
+                ScheduledAnnotationBeanPostProcessor processor, TaskScheduler taskScheduler) {
+            return new ScheduledTasksRegistry(List.of(processor), taskScheduler);
         }
 
         @Bean
