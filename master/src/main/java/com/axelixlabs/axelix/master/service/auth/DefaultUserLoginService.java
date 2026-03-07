@@ -19,8 +19,6 @@ package com.axelixlabs.axelix.master.service.auth;
 
 import java.util.Objects;
 
-import org.springframework.stereotype.Service;
-
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
@@ -32,7 +30,6 @@ import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
  *
  * @author Mikhail Polivakha
  */
-@Service
 public class DefaultUserLoginService implements UserLoginService {
 
     private final JwtEncoderService jwtEncoderService;
@@ -40,7 +37,7 @@ public class DefaultUserLoginService implements UserLoginService {
 
     private static final InvalidCredentialsException INVALID_CREDENTIALS_EXCEPTION = new InvalidCredentialsException();
 
-    protected DefaultUserLoginService(JwtEncoderService jwtEncoderService, UserProvider userProvider) {
+    public DefaultUserLoginService(JwtEncoderService jwtEncoderService, UserProvider userProvider) {
         this.jwtEncoderService = jwtEncoderService;
         this.userProvider = userProvider;
     }

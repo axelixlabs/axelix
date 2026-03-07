@@ -31,6 +31,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.master.api.external.endpoint.UserApi;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
@@ -46,6 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = "axelix.master.auth.static-admin.enabled=true")
 class UserApiTest {
 
     @Autowired
