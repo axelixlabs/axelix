@@ -4,7 +4,6 @@ import styles from "./styles.module.css";
 
 import LogoIcon from "@/assets/icons/logo.svg";
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 
 export const Header = () => {
@@ -19,7 +18,7 @@ export const Header = () => {
             <NavigationBar />
           </div>
 
-          <Link href="https://github.com/axelixlabs/axelix" target="_blank" rel="noopener noreferrer" className={styles.GitHubWrapper}>
+          <a href="https://github.com/axelixlabs/axelix" target="_blank" rel="noopener noreferrer" className={styles.GitHubWrapper}>
             {/*TODO: Replace via svgr in future */}
             <svg
               width="24"
@@ -33,7 +32,7 @@ export const Header = () => {
               />
             </svg>
             GitHub
-          </Link>
+          </a>
         </div>
         <div className={`MainContainer ${styles.MobileMenuWrapper} ${isBurgerOpen ? styles.MobileMenuOpened : ""}`}>
           <NavigationBar />

@@ -38,7 +38,6 @@ export const Installation = () => {
                         ))}
                     </ul>
 
-                    {/* FIX: Fix in future */}
                     <div>
                         <p className={styles.InstallDescription}>
                             {selectedOption.description}

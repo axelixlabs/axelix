@@ -111,22 +111,18 @@ export const zigzagSectionsData: IZigzagSectionData[] = [
     },
     {
         title: "Debug Spring Boot Applications with Ease",
-        description: [
-            "Gain valuable insights into your Spring Boot applications by unraveling the beans in use and " +
+        description: "Gain valuable insights into your Spring Boot applications by unraveling the beans in use and " +
             "their origins, discovering available properties and their actual values, determining " +
-            "long-executing @Transactional methods, @Cacheable caches usage statistics and much more"
-        ].join(),
+            "long-executing @Transactional methods, @Cacheable caches usage statistics and much more",
         href: "https://axelix.io/docs/category/features",
         image: MockImage
     },
     {
         title: "Streamline Your Spring Boot Testing Process",
-        description: [
-            "Make testing your Spring Boot Microservices enjoyable and efficient by modifying, " +
+        description: "Make testing your Spring Boot Microservices enjoyable and efficient by modifying, " +
             "triggering, or disabling @Scheduled jobs on the fly and changing logging levels as " +
             "needed at runtime. Furthermore, you can clear or disable Spring caches instantly " +
-            "and modify @ConfigurationProperties without the need for a re-deploy."
-        ].join(),
+            "and modify @ConfigurationProperties without the need for a re-deploy.",
         href: "https://axelix.io/docs/category/features",
         image: LoggersPage
     },

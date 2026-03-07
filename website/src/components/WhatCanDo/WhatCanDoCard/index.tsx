@@ -13,7 +13,7 @@ export const WhatCanDoCard = ({ cardData }: IProps) => {
     return (
         <motion.article className={styles.CardWrapper} variants={whatCanDoCardVariants}>
             <Badge.Ribbon text={cardData.category} color="#00ab55">
-                <a href={cardData.documentationLink} target="_blank" rel="noopener noreferrer" className={styles.ReadDocumentation}>
+                <a href={cardData.documentationLink} target="_blank" rel="noopener noreferrer">
                     <div className={styles.Card}>
                         <header className={styles.HeaderWrapper}>
                             <h3 className={`TextSmall ${styles.CardTitle}`} dangerouslySetInnerHTML={{ __html: cardData.title }}/>
@@ -24,22 +24,18 @@ export const WhatCanDoCard = ({ cardData }: IProps) => {
                                 <Image
                                     src={cardData.image}
                                     alt={cardData.title}
-                                    style={{
-                                        borderRadius: 5
-                                    }}
                                     preview={{
                                         cover: <EyeOutlined />,
                                     }}
                                     className={styles.Image}
                                     onClick={(e) => {
-                                        e.stopPropagation()
                                         e.preventDefault()
                                     }}
                                 />
                             </div>
 
                             <footer className={styles.ReadDocumentationWrapper}>
-                                <div className={styles.ReadDocumentation}>
+                                <div className={styles.DocsWrapper}>
                                     Docs
                                 </div>
                             </footer>

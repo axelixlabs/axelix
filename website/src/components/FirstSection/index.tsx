@@ -22,7 +22,9 @@ export const FirstSection = () => {
                     muted
                     playsInline
                     preload='auto'
-                    // TODO: Add the poster in future
+                    onContextMenu={(e) =>{
+                        e.preventDefault()
+                    }}
                     className={styles.HeroBackground}
                 >
                     <source src="/first-section-bg.mp4" type="video/mp4" />

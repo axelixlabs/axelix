@@ -99,7 +99,7 @@ const faqItems: IFAQItem[] = [
                 </p>
 
                 <p>
-                    The source code of the Axelix Project is Open Source and available under
+                    The source code of the Axelix Project is Open Source and available under{' '}
                     <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html" target="_blank" rel="noopener noreferrer">LGPL V3.0</a>.
                     You can find it over <a href="https://github.com/axelixlabs/axelix" target="_blank" rel="noopener noreferrer">on GitHub</a>.
                 </p>

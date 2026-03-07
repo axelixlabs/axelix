@@ -1,6 +1,14 @@
 .CardWrapper,
 .CardWrapper>* {
-    /*height: 100%;*/
+    height: 100%;
+}
+
+.CardWrapper {
+    transition: translate 0.3s;
+}
+
+.CardWrapper:hover {
+    translate: 0 -15px;
 }
 
 .Card {
@@ -12,8 +20,7 @@
     border: 1px solid #30363d;
     color: var(--axelix-primary-white);
     border-radius: var(--axelix-border-radius-large);
-    padding: 24px;
-    padding-top: 45px;
+    padding: 45px 24px 24px 24px;
     height: 100%;
     transition: border-color 0.3s, translate 0.3s;
 }
@@ -27,7 +34,6 @@
 
 .Card:hover {
     border-color: #484f58;
-    translate: 0 -15px;
 }
 
 .CardTitle code {
@@ -44,15 +50,23 @@
 }
 
 .ImageWrapper {
+    aspect-ratio: 16 / 10;
     border-radius: var(--axelix-border-radius-large);
-    /*aspect-ratio: 4 / 3;*/
+    overflow: hidden;
 }
 
-.Image {
+.ImageWrapper :global(.ant-image) {
     width: 100%;
     height: 100%;
+    display: block;
+}
+
+.ImageWrapper :global(.ant-image-img) {
+    width: 100% !important;
+    height: 100% !important;
     object-fit: cover;
     object-position: center;
+    display: block;
 }
 
 .ReadDocumentationWrapper {
@@ -60,6 +74,10 @@
     margin-top: 20px;
 }
 
-.Card:hover .ReadDocumentation {
+.DocsWrapper {
+    transition: color 0.3s;
+}
+
+.Card:hover .DocsWrapper {
     color: var(--axelix-primary-green);
 }
