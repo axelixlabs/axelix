@@ -19,34 +19,33 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.api.external.endpoint.ConfigPropsApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.BeansApi;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.ConfigPropsStateComponentSettings;
+import com.axelixlabs.axelix.master.service.export.settings.BeansStateComponentSettings;
 
 /**
- * Collects Spring Configuration Properties information for application state export.
+ * Collects Spring Beans information for application state export.
  *
- * @see ConfigPropsApi
+ * @see BeansApi
  * @since 27.10.2025
  * @author Nikita Kirillov
  */
 @Component
-public class ConfigpropsContributorJsonInstance
-        extends AbstractJsonInstanceStateCollector<ConfigPropsStateComponentSettings> {
+public class BeansContributorByteInstance extends AbstractByteInstanceStateCollector<BeansStateComponentSettings> {
 
-    private final ConfigPropsApi configpropsApi;
+    private final BeansApi beansApi;
 
-    public ConfigpropsContributorJsonInstance(ConfigPropsApi configpropsApi) {
-        this.configpropsApi = configpropsApi;
+    public BeansContributorByteInstance(BeansApi beansApi) {
+        this.beansApi = beansApi;
     }
 
     @Override
     public StateComponent responsibleFor() {
-        return StateComponent.CONFIG_PROPS;
+        return StateComponent.BEANS;
     }
 
     @Override
-    protected Object collectInternal(String instanceId, ConfigPropsStateComponentSettings settings) {
-        return configpropsApi.getConfigpropsFeed(instanceId);
+    protected byte[] collectByte(String instanceId, BeansStateComponentSettings settings) {
+        return beansApi.getBeansFeed(instanceId);
     }
 }

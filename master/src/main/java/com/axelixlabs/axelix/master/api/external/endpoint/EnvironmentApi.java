@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,11 +64,9 @@ public class EnvironmentApi {
             content =
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EnvironmentFeed.class)))
     @InstanceIdParameter
-    @GetMapping(path = ApiPaths.EnvironmentApi.FEED)
-    public ResponseEntity<byte[]> getAllEnvironmentProperties(@PathVariable("instanceId") String instanceId) {
-        byte[] body = endpointInvoker.invoke(
+    @GetMapping(path = ApiPaths.EnvironmentApi.FEED, produces = MediaType.APPLICATION_JSON_VALUE)
+    public byte[] getAllEnvironmentProperties(@PathVariable("instanceId") String instanceId) {
+        return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE);
-
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 }

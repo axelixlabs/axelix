@@ -19,34 +19,35 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.api.external.endpoint.ConditionsApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.ConditionsStateComponentSettings;
+import com.axelixlabs.axelix.master.service.export.settings.ScheduledTasksStateComponentSettings;
 
 /**
- * Collects Spring Conditions information for application state export.
+ * Collects Scheduled Tasks information for application state export.
  *
- * @see ConditionsApi
+ * @see ScheduledTasksApi
  * @since 27.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Component
-public class ConditionsContributorJsonInstance
-        extends AbstractJsonInstanceStateCollector<ConditionsStateComponentSettings> {
+public class ScheduledTasksContributorByteInstance
+        extends AbstractByteInstanceStateCollector<ScheduledTasksStateComponentSettings> {
 
-    private final ConditionsApi conditionsApi;
+    private final ScheduledTasksApi scheduledTasksApi;
 
-    public ConditionsContributorJsonInstance(final ConditionsApi conditionsApi) {
-        this.conditionsApi = conditionsApi;
+    public ScheduledTasksContributorByteInstance(ScheduledTasksApi scheduledTasksApi) {
+        this.scheduledTasksApi = scheduledTasksApi;
     }
 
     @Override
     public StateComponent responsibleFor() {
-        return StateComponent.CONDITIONS;
+        return StateComponent.SCHEDULED_TASKS;
     }
 
     @Override
-    protected Object collectInternal(String instanceId, ConditionsStateComponentSettings settings) {
-        return conditionsApi.getConditionsFeed(instanceId);
+    protected byte[] collectByte(String instanceId, ScheduledTasksStateComponentSettings settings) {
+        return scheduledTasksApi.getAllScheduledTasks(instanceId);
     }
 }

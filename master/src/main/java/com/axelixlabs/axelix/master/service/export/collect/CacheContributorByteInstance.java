@@ -19,33 +19,34 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.master.api.external.endpoint.BeansApi;
+import com.axelixlabs.axelix.master.api.external.endpoint.caches.CachesReadApi;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
-import com.axelixlabs.axelix.master.service.export.settings.BeansStateComponentSettings;
+import com.axelixlabs.axelix.master.service.export.settings.CachesStateComponentSettings;
 
 /**
- * Collects Spring Beans information for application state export.
+ * Collects Spring Caches information for application state export.
  *
- * @see BeansApi
+ * @see CachesReadApi
  * @since 27.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Component
-public class BeansContributorJsonInstance extends AbstractJsonInstanceStateCollector<BeansStateComponentSettings> {
+public class CacheContributorByteInstance extends AbstractByteInstanceStateCollector<CachesStateComponentSettings> {
 
-    private final BeansApi beansApi;
+    private final CachesReadApi cachesReadApi;
 
-    public BeansContributorJsonInstance(BeansApi beansApi) {
-        this.beansApi = beansApi;
+    public CacheContributorByteInstance(final CachesReadApi cachesReadApi) {
+        this.cachesReadApi = cachesReadApi;
     }
 
     @Override
     public StateComponent responsibleFor() {
-        return StateComponent.BEANS;
+        return StateComponent.CACHES;
     }
 
     @Override
-    protected Object collectInternal(String instanceId, BeansStateComponentSettings settings) {
-        return beansApi.getBeansFeed(instanceId);
+    protected byte[] collectByte(String instanceId, CachesStateComponentSettings settings) {
+        return cachesReadApi.getAllCaches(instanceId);
     }
 }

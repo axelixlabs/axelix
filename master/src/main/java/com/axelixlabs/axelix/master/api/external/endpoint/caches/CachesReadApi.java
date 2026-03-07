@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,12 +66,10 @@ public class CachesReadApi {
             responseCode = "200",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = CachesFeed.class)))
     @InstanceIdParameter
-    @GetMapping(path = ApiPaths.CachesApi.INSTANCE_ID)
-    public ResponseEntity<byte[]> getAllCaches(@PathVariable("instanceId") String instanceId) {
-        byte[] body = endpointInvoker.invoke(
+    @GetMapping(path = ApiPaths.CachesApi.INSTANCE_ID, produces = MediaType.APPLICATION_JSON_VALUE)
+    public byte[] getAllCaches(@PathVariable("instanceId") String instanceId) {
+        return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_CACHES, NoHttpPayload.INSTANCE);
-
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
     @DefaultApiResponse(summary = "Returns details of the requested cache by its name and cache manager name.")
@@ -86,15 +83,14 @@ public class CachesReadApi {
             description = "The name of the cache manager where the cache with the given 'cacheName' resides",
             required = true)
     @InstanceIdParameter
-    @GetMapping(path = ApiPaths.CachesApi.CACHE_NAME)
-    public ResponseEntity<byte[]> getCacheByNameWithQueryParameter(
+    @GetMapping(path = ApiPaths.CachesApi.CACHE_NAME, produces = MediaType.APPLICATION_JSON_VALUE)
+    public byte[] getCacheByNameWithQueryParameter(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("cacheName") String cacheName,
             @RequestParam("cacheManager") String cacheManager) {
 
         HttpPayload payload = new DefaultHttpPayload(Map.of("cacheManagerName", cacheManager, "cacheName", cacheName));
-        byte[] body = endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_SINGLE_CACHE, payload);
 
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
+        return endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_SINGLE_CACHE, payload);
     }
 }
