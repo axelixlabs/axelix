@@ -28,7 +28,7 @@ package com.axelixlabs.axelix.common.auth.core;
 public class InternalAuthorities {
 
     /**
-     * The authority that allows the potential Spring Boot service candidate to register itslef inside Axelix Master.
+     * The authority that allows the potential Spring Boot service candidate to register itself inside Axelix Master.
      */
     public static final InternalAuthority SELF_REGISTER_AUTHORITY = new InternalAuthority("INTERNAL.SELF_REGISTER");
 
