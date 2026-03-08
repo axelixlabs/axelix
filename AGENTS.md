@@ -82,9 +82,27 @@ When you're writing tests, please, make sure to follow the principles:
 - // when.
 - // then.
 
-3. It is often the case that within the Junit test class some test methods are related, and some do not. For instance, some test methods test the same method of the public API just under different conditions. When you notice this pattern it is generally a good idea to organize those tests inside dedicated `@Nested` inner classes.
+3. It is often the case that within the Junit test class some test methods are related, and some do not. For instance, some test methods test the same method of the public API just under different conditions. When you notice this pattern it is generally a good idea to organize those tests inside dedicated `@Nested` inner classes. If there is only one a single category of tests that you deem appropriate, then do not create it inside `@Nested` inner class, only create `@Nested` inner classes if there would be multiple `@Nested` inner classes. 
 
 In a very rare occasions the principles above MAY be violated, but you should always ask before attempting to do so and explain your reasoning. 
+
+### Code Style:
+
+You generally should not use `var`, unless when the type of the reference is clear just by looking on the right side of the statement (part after assignment operator)
+
+For example, here:
+
+```(java)
+var subject = new OptionsParsingVMFeaturesProvider(List.of());
+```
+
+Usage of `var` is appropriate, and you should use `var`. Reason is simple - the type of the `subject` variable can be inferred by human by just looking on the right side of the statement. However, here:
+
+```(java)
+var subject = Stream.of(1,2,3,4).map(ImmutableValue::of).collect(Collectors.toMap(i -> i % 2, it -> it));
+```
+
+Usage of `var` is ILLEGAL, so you MUST specify the explicit type of the `subject` variable in this case.
 
 ### Overall Behavioral Guidelines
 
