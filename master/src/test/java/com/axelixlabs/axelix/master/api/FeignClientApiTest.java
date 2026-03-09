@@ -57,8 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class FeignClientApiTest {
     // language=json
-    private static final String EXPECTED_FEIGN_JSON =
-            """
+    private static final String EXPECTED_FEIGN_JSON = """
         [
            {
              "serviceName": "service-1",
@@ -150,8 +149,7 @@ class FeignClientApiTest {
     @BeforeEach
     void prepare() {
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
             [
                {
                  "serviceName": "service-1",
