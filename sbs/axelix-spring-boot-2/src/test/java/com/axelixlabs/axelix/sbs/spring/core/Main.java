@@ -34,11 +34,9 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpoint
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.KafkaIntegrationAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryDiscovererAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SpringCloudFeignIntegrationAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ThreadDumpManagementEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringAutoConfiguration;
 
@@ -65,11 +63,9 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
             AxelixGcEndpointAutoConfiguration.class,
             GitInformationProviderAutoConfiguration.class,
             JwtAuthAutoConfiguration.class,
-            KafkaIntegrationAutoConfiguration.class,
             LibraryDiscovererAutoConfiguration.class,
             ScheduledTaskManagementAutoConfiguration.class,
             ShortBuildInfoProviderAutoConfiguration.class,
-            SpringCloudFeignIntegrationAutoConfiguration.class,
             ThreadDumpManagementEndpointAutoConfiguration.class,
             TransactionMonitoringAutoConfiguration.class
         })

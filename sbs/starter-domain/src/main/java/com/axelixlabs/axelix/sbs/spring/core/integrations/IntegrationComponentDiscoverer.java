@@ -20,12 +20,12 @@ package com.axelixlabs.axelix.sbs.spring.core.integrations;
 import java.util.Set;
 
 /**
- * Implementations of this interface are capable to discover specific {@link Integration integrations}.
+ * Implementations of this interface are capable to discover specific.
  *
  * @since 05.07.25
  * @author Mikhail Polivakha
  */
-public interface IntegrationComponentDiscoverer<T extends Integration> {
+public interface IntegrationComponentDiscoverer<T> {
 
     Set<T> discoverIntegrations();
 }

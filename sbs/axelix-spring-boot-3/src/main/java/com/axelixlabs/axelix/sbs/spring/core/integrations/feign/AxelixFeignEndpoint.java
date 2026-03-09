@@ -15,17 +15,31 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations;
+package com.axelixlabs.axelix.sbs.spring.core.integrations.feign;
 
 import java.util.Set;
 
-/**
- * Implementations of this interface are capable to discover specific {@link Integration integrations}.
- *
- * @since 05.07.25
- * @author Mikhail Polivakha
- */
-public interface IntegrationComponentDiscoverer<T extends Integration> {
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
-    Set<T> discoverIntegrations();
+import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
+
+/**
+ * Custom endpoint to expose Feign Client information.
+ *
+ * @author Sergey Cherkasov
+ */
+@Endpoint(id = "axelix-feign")
+public class AxelixFeignEndpoint {
+
+    private final FeignClientIntegrationDiscoverer discoverer;
+
+    public AxelixFeignEndpoint(FeignClientIntegrationDiscoverer discoverer) {
+        this.discoverer = discoverer;
+    }
+
+    @ReadOperation
+    public Set<FeignIntegration> feignClient() {
+        return discoverer.discoverIntegrations();
+    }
 }

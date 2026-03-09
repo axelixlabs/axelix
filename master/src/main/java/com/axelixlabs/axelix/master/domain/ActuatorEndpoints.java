@@ -177,6 +177,9 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint TRANSACTION_STATS_CLEAR =
             of("/axelix-transactions-monitoring", HttpMethod.DELETE);
 
+    // Feign Client
+    public static final ActuatorEndpoint GET_FEIGN_CLIENT = of("/axelix-feign", HttpMethod.GET);
+
     private static final ActuatorEndpoints INSTANCE = new ActuatorEndpoints();
 
     public static ActuatorEndpoints getInstance() {
@@ -233,7 +236,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
                 THREAD_DUMP_ENABLE_CONTENTION_MONITORING,
                 THREAD_DUMP_DISABLE_CONTENTION_MONITORING,
                 TRANSACTION_STATS_GET,
-                TRANSACTION_STATS_CLEAR));
+                TRANSACTION_STATS_CLEAR,
+                GET_FEIGN_CLIENT));
     }
 
     @Override
