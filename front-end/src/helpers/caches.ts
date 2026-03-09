@@ -15,7 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { ICacheData, ICachesManager, IGetSingleCacheResponseBody, ISingleCacheChartEntity } from "models";
+import type {
+    ICacheData,
+    ICacheLookup,
+    ICachesManager,
+    IGetSingleCacheResponseBody,
+    IGroupTimestampEvent,
+} from "models";
 
 import {
     SINGLE_CACHE_CHART_TIMELINE_STEP_5M,
@@ -86,34 +92,6 @@ export const getTimelineInterval = (data: IGetSingleCacheResponseBody): number =
     return SINGLE_CACHE_CHART_TIMELINE_STEP_30D;
 };
 
-export const getChartData = (data: IGetSingleCacheResponseBody): ISingleCacheChartEntity[] => {
-    const groupHitsAndMisses: Record<number, ISingleCacheChartEntity> = {};
-
-    for (const { timestamp } of data.hits) {
-        if (!groupHitsAndMisses[timestamp]) {
-            groupHitsAndMisses[timestamp] = {
-                timestamp: timestamp,
-                hits: 0,
-                misses: 0,
-            };
-        }
-        groupHitsAndMisses[timestamp].hits++;
-    }
-
-    for (const { timestamp } of data.misses) {
-        if (!groupHitsAndMisses[timestamp]) {
-            groupHitsAndMisses[timestamp] = {
-                timestamp: timestamp,
-                hits: 0,
-                misses: 0,
-            };
-        }
-        groupHitsAndMisses[timestamp].misses++;
-    }
-
-    return Object.values(groupHitsAndMisses).sort((a, b) => a.timestamp - b.timestamp);
-};
-
 export const cacheHitsMissesChartToFormattedTime = (value: number, interval: number): string => {
     const date = new Date(value);
 
@@ -169,4 +147,58 @@ export const splitCaches = (caches: ICacheData[]): [ICacheData[], ICacheData[]] 
     });
 
     return [withDropDown, withoutDropDown];
+};
+
+const getTimestampCountsMap = (events: ICacheLookup[]): Record<number, number> => {
+    const timestampCountsMap: Record<number, number> = {};
+    for (const { timestamp } of events) {
+        timestampCountsMap[timestamp] = (timestampCountsMap[timestamp] ?? 0) + 1;
+    }
+    return timestampCountsMap;
+};
+
+const groupTimestampsEvents = (events: ICacheLookup[]): IGroupTimestampEvent[] => {
+    const timestampCountsMap = getTimestampCountsMap(events);
+    const timestampsCountWithCount = Object.entries(timestampCountsMap).map(([timestamp, count]) => ({
+        timestamp: +timestamp,
+        count: count,
+    }));
+    return timestampsCountWithCount.sort((prevElement, nextElement) => prevElement.timestamp - nextElement.timestamp);
+};
+
+const addStartPoint = (data: IGroupTimestampEvent[], minTimestamp: number): IGroupTimestampEvent[] => {
+    const firstPoint = data[0];
+
+    if (firstPoint.timestamp > minTimestamp) {
+        data.unshift({
+            timestamp: minTimestamp,
+            count: 0,
+        });
+    }
+
+    return data;
+};
+
+const addEndPoint = (data: IGroupTimestampEvent[], maxTimestamp: number): IGroupTimestampEvent[] => {
+    const lastPoint = data[data.length - 1];
+
+    if (lastPoint.timestamp < maxTimestamp) {
+        data.push({
+            timestamp: maxTimestamp,
+            count: 0,
+        });
+    }
+
+    return data;
+};
+
+export const getCacheTimestampsChartData = (
+    events: ICacheLookup[],
+    minTimestamp: number,
+    maxTimestamp: number,
+): IGroupTimestampEvent[] => {
+    const groupedTimestampsEvents = groupTimestampsEvents(events);
+    addStartPoint(groupedTimestampsEvents, minTimestamp);
+    addEndPoint(groupedTimestampsEvents, maxTimestamp);
+    return groupedTimestampsEvents;
 };

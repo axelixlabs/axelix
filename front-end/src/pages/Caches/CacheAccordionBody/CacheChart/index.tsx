@@ -16,10 +16,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useTranslation } from "react-i18next";
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { cacheHitsMissesChartToFormattedTime, getChartData, getTimelineInterval } from "helpers";
+import { cacheHitsMissesChartToFormattedTime, getCacheTimestampsChartData, getTimelineInterval } from "helpers";
 import type { IGetSingleCacheResponseBody } from "models";
+import { CACHE_CHART_DOTS_VISIBILITY_THRESHOLD } from "utils";
 
 import { CacheChartStats } from "../../CacheChartStats";
 
@@ -32,45 +33,62 @@ interface IProps {
 
 export const CacheChart = ({ singleCacheData }: IProps) => {
     const { t } = useTranslation();
+
     const interval = getTimelineInterval(singleCacheData);
-    const data = getChartData(singleCacheData);
+    const { hits, misses } = singleCacheData;
+
+    const allTimestamps = hits.concat(misses).map(({ timestamp }) => timestamp);
+
+    const minTimestamp = Math.min(...allTimestamps);
+    const maxTimestamp = Math.max(...allTimestamps);
+
+    const hitsData = getCacheTimestampsChartData(hits, minTimestamp, maxTimestamp);
+    const missesData = getCacheTimestampsChartData(misses, minTimestamp, maxTimestamp);
+
+    const isHitsDotsNeeded = hitsData.length < CACHE_CHART_DOTS_VISIBILITY_THRESHOLD;
+    const isMissesDotsNeeded = missesData.length < CACHE_CHART_DOTS_VISIBILITY_THRESHOLD;
 
     return (
         <>
             <ResponsiveContainer width="100%" height={330}>
-                <LineChart data={data}>
+                <LineChart>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
                     <XAxis
                         dataKey="timestamp"
                         type="number"
-                        domain={["dataMin", "dataMax"]}
-                        tickFormatter={(value: number) => cacheHitsMissesChartToFormattedTime(value, interval)}
+                        domain={[minTimestamp, maxTimestamp]}
+                        tickFormatter={(timestamp: number) => cacheHitsMissesChartToFormattedTime(timestamp, interval)}
                         interval="preserveStartEnd"
                     />
 
                     <YAxis allowDecimals={false} width="auto" />
 
                     <Line
+                        data={hitsData}
                         type="monotone"
-                        dataKey="hits"
+                        dataKey="count"
                         name={t("Caches.hits")}
                         stroke="#95de64"
                         strokeWidth={3}
-                        dot={false}
-                        activeDot={false}
+                        dot={isHitsDotsNeeded}
+                        activeDot={isHitsDotsNeeded}
                     />
 
                     <Line
+                        data={missesData}
                         type="monotone"
-                        dataKey="misses"
+                        dataKey="count"
                         name={t("Caches.misses")}
                         stroke="#69c0ff"
                         strokeWidth={3}
-                        dot={false}
-                        activeDot={false}
+                        dot={isMissesDotsNeeded}
+                        activeDot={isMissesDotsNeeded}
                     />
 
+                    <Tooltip
+                        labelFormatter={(timestamp: number) => cacheHitsMissesChartToFormattedTime(timestamp, interval)}
+                    />
                     <Legend verticalAlign="top" align="right" />
                 </LineChart>
             </ResponsiveContainer>

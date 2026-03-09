@@ -112,7 +112,7 @@ export interface IGetSingleCacheData {
     cacheManagerName: string;
 }
 
-interface ICacheLookup {
+export interface ICacheLookup {
     /**
      * Timestamp of the given cache lookup.
      */
@@ -156,19 +156,9 @@ export interface IGetSingleCacheResponseBody {
     enabled: boolean;
 }
 
-export interface ISingleCacheChartEntity {
-    /**
-     * Timestamp entry.
-     */
-    timestamp: number;
-
-    /**
-     * List of hit timestamps.
-     */
-    hits: number;
-
-    /**
-     * List of miss timestamps.
-     */
-    misses: number;
+/**
+ * Represents a single chart data point with event count at a given timestamp.
+ */
+export interface IGroupTimestampEvent extends ICacheLookup {
+    count: number;
 }
