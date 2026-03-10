@@ -25,9 +25,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringDataSourceBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollector;
@@ -37,6 +40,7 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollec
  *
  * @since 21.01.2026
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @AutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
@@ -70,7 +74,20 @@ public class TransactionMonitoringAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-            TransactionStatsCollector transactionStatsCollector) {
-        return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector);
+            TransactionStatsCollector transactionStatsCollector, QueriesStatsCollector queriesStatsCollector) {
+        return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesStatsCollector);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public QueriesStatsCollector queriesStatsCollector() {
+        return new DefaultQueriesStatsCollector();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TransactionMonitoringDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+            QueriesStatsCollector queriesStatsCollector) {
+        return new TransactionMonitoringDataSourceBeanPostProcessor(queriesStatsCollector);
     }
 }

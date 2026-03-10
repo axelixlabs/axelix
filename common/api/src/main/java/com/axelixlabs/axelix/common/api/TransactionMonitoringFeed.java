@@ -26,6 +26,7 @@ import java.util.Objects;
  * @since 20.01.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public final class TransactionMonitoringFeed {
 
@@ -155,16 +156,19 @@ public final class TransactionMonitoringFeed {
 
         private final long durationMs;
         private final long timestamp;
+        private final List<Query> queries;
 
         /**
          * Creates a new TransactionExecution.
          *
          * @param durationMs transaction execution duration in milliseconds
-         * @param timestamp   unix timestamp (milliseconds from epoch) when transaction started
+         * @param timestamp  unix timestamp (milliseconds from epoch) when transaction started
+         * @param queries    the list of queries executed during a particular transaction.
          */
-        public TransactionExecution(long durationMs, long timestamp) {
+        public TransactionExecution(long durationMs, long timestamp, List<Query> queries) {
             this.durationMs = durationMs;
             this.timestamp = timestamp;
+            this.queries = queries;
         }
 
         public long getDurationMs() {
@@ -175,26 +179,99 @@ public final class TransactionMonitoringFeed {
             return timestamp;
         }
 
+        public List<Query> getQueries() {
+            return queries;
+        }
+
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
             TransactionExecution that = (TransactionExecution) o;
-            return durationMs == that.durationMs && timestamp == that.timestamp;
+            return durationMs == that.durationMs
+                    && timestamp == that.timestamp
+                    && Objects.equals(queries, that.queries);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(durationMs, timestamp);
+            return Objects.hash(durationMs, timestamp, queries);
         }
 
         @Override
         public String toString() {
-            return "TransactionExecution{" + "durationMs=" + durationMs + ", timestamp=" + timestamp + '}';
+            return "TransactionExecution{" + "durationMs="
+                    + durationMs + ", timestamp="
+                    + timestamp + ", queries="
+                    + queries + '}';
+        }
+    }
+
+    /**
+     * The query executed during a particular transaction.
+     */
+    public static final class Query {
+        private final String sql;
+        private final Long durationMs;
+        private final Long startTimestampMs;
+        private final Long endTimestampMs;
+
+        /**
+         * Creates a new Query.
+         *
+         * @param sql               the executed SQL statement
+         * @param durationMs        query execution duration in milliseconds.
+         * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started.
+         * @param endTimestampMs    unix timestamp (milliseconds since epoch) when the query finished.
+         */
+        public Query(String sql, Long durationMs, Long startTimestampMs, Long endTimestampMs) {
+            this.sql = sql;
+            this.durationMs = durationMs;
+            this.startTimestampMs = startTimestampMs;
+            this.endTimestampMs = endTimestampMs;
+        }
+
+        public String getSql() {
+            return sql;
+        }
+
+        public Long getDurationMs() {
+            return durationMs;
+        }
+
+        public Long getStartTimestampMs() {
+            return startTimestampMs;
+        }
+
+        public Long getEndTimestampMs() {
+            return endTimestampMs;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Query that = (Query) o;
+            return Objects.equals(sql, that.sql)
+                    && Objects.equals(durationMs, that.durationMs)
+                    && Objects.equals(startTimestampMs, that.startTimestampMs)
+                    && Objects.equals(endTimestampMs, that.endTimestampMs);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(sql, durationMs, startTimestampMs, endTimestampMs);
+        }
+
+        @Override
+        public String toString() {
+            return "Query{" + "sql='"
+                    + sql + '\'' + ", durationMs="
+                    + durationMs + ", startTimestampMs="
+                    + startTimestampMs + ", endTimestampMs="
+                    + endTimestampMs + '}';
         }
     }
 

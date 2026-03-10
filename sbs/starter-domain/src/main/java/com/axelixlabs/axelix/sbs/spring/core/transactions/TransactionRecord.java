@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -27,14 +28,17 @@ import java.util.Objects;
 public final class TransactionRecord {
     private final long durationMs;
     private final long startTimestamp;
+    private final List<TransactionQueryRecord> queries;
 
     /**
      * @param durationMs     transaction execution duration in milliseconds
      * @param startTimestamp transaction start timestamp in milliseconds since epoch
+     * @param queries        the list of queries executed during a particular transaction.
      */
-    public TransactionRecord(long durationMs, long startTimestamp) {
+    public TransactionRecord(long durationMs, long startTimestamp, List<TransactionQueryRecord> queries) {
         this.durationMs = durationMs;
         this.startTimestamp = startTimestamp;
+        this.queries = queries;
     }
 
     public long getDurationMs() {
@@ -45,25 +49,31 @@ public final class TransactionRecord {
         return startTimestamp;
     }
 
+    public List<TransactionQueryRecord> getQueries() {
+        return queries;
+    }
+
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj == null || obj.getClass() != this.getClass()) {
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        var that = (TransactionRecord) obj;
-        return this.durationMs == that.durationMs && this.startTimestamp == that.startTimestamp;
+        TransactionRecord that = (TransactionRecord) o;
+        return durationMs == that.durationMs
+                && startTimestamp == that.startTimestamp
+                && Objects.equals(queries, that.queries);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(durationMs, startTimestamp);
+        return Objects.hash(durationMs, startTimestamp, queries);
     }
 
     @Override
     public String toString() {
-        return "TransactionRecord[" + "durationMs=" + durationMs + ", " + "startTimestamp=" + startTimestamp + ']';
+        return "TransactionRecord{" + "durationMs="
+                + durationMs + ", startTimestamp="
+                + startTimestamp + ", queries="
+                + queries + '}';
     }
 }

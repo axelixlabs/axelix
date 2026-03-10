@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
@@ -171,8 +172,8 @@ class TransactionMonitoringAutoConfigurationTest {
 
         @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector) {
-            return new CustomTransactionMonitoringBeanPostProcessor(transactionStatsCollector);
+                TransactionStatsCollector transactionStatsCollector, QueriesStatsCollector queriesStatsCollector) {
+            return new CustomTransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesStatsCollector);
         }
     }
 
@@ -195,8 +196,9 @@ class TransactionMonitoringAutoConfigurationTest {
     }
 
     static class CustomTransactionMonitoringBeanPostProcessor extends TransactionMonitoringBeanPostProcessor {
-        public CustomTransactionMonitoringBeanPostProcessor(TransactionStatsCollector transactionStatsCollector) {
-            super(transactionStatsCollector);
+        public CustomTransactionMonitoringBeanPostProcessor(
+                TransactionStatsCollector transactionStatsCollector, QueriesStatsCollector queriesStatsCollector) {
+            super(transactionStatsCollector, queriesStatsCollector);
         }
     }
 }
