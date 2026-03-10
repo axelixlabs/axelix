@@ -15,33 +15,31 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations.feign;
+package com.axelixlabs.axelix.sbs.spring.core.integrations;
 
-import java.util.List;
+import java.util.Set;
 
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+
+import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
 
 /**
- * Implementation of {@link DiscoveryClient} used as a fallback
- * when no real discovery integration is configured.
+ * Custom endpoint to expose Feign Client information.
  *
  * @author Sergey Cherkasov
  */
-public final class NoOpDiscoveryClient implements DiscoveryClient {
+@Endpoint(id = "axelix-feign")
+public class AxelixFeignEndpoint {
 
-    @Override
-    public String description() {
-        return "No discovery client configured";
+    private final FeignClientIntegrationDiscoverer discoverer;
+
+    public AxelixFeignEndpoint(FeignClientIntegrationDiscoverer discoverer) {
+        this.discoverer = discoverer;
     }
 
-    @Override
-    public List<ServiceInstance> getInstances(String serviceId) {
-        return List.of();
-    }
-
-    @Override
-    public List<String> getServices() {
-        return List.of();
+    @ReadOperation
+    public Set<FeignIntegration> feignClient() {
+        return discoverer.discoverIntegrations();
     }
 }

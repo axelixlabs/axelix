@@ -20,6 +20,9 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+  cloud:
+    openfeign:
+      lazy-attributes-resolution: true
 
 management:
   endpoints:
@@ -42,8 +45,18 @@ management:
           - axelix-thread-dump
           - axelix-gc
           - axelix-heap-dump
+          - axelix-feign
 
 logging:
   level:
     org.apache.kafka: WARN
     org.apache.kafka.clients.NetworkClient: ERROR
+
+# Had to move these properties out of AxelixFeignEndpointTest, because neighboring tests were failing,
+# most likely due to how FeignClient behaves.
+test-open-feign:
+  service:
+    name: service-6
+    url: http://service-api:8081
+    feignPath: /path
+    mappingPath: /map-path

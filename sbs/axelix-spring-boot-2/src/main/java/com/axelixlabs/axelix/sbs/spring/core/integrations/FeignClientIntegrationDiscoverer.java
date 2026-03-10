@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations.feign;
+package com.axelixlabs.axelix.sbs.spring.core.integrations;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -32,11 +32,11 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
 import com.axelixlabs.axelix.common.domain.http.HttpVersion;
-import com.axelixlabs.axelix.sbs.spring.core.integrations.IntegrationComponentDiscoverer;
 
 /**
  * Discovers HTTP service integrations based on {@link FeignClient} annotations
@@ -54,12 +54,14 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
     private static final String UNKNOWN = "UNKNOWN";
 
     private final ApplicationContext context;
-
     private final DiscoveryClient discoveryClient;
+    private final Environment environment;
 
-    public FeignClientIntegrationDiscoverer(ApplicationContext context, DiscoveryClient discoveryClient) {
+    public FeignClientIntegrationDiscoverer(
+            ApplicationContext context, DiscoveryClient discoveryClient, Environment environment) {
         this.context = context;
         this.discoveryClient = discoveryClient;
+        this.environment = environment;
     }
 
     public Set<FeignIntegration> discoverIntegrations() {
@@ -75,6 +77,11 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
 
         FeignClient feignClient = AnnotatedElementUtils.findMergedAnnotation(feignType, FeignClient.class);
 
+        // The approach of using @RequestMapping at the class level with OpenFeign was only used up to Open Feign
+        // version 2.2.10.RELEASE.
+        // https://github.com/spring-cloud/spring-cloud-openfeign/issues/547
+        RequestMapping mapping = AnnotatedElementUtils.findMergedAnnotation(feignType, RequestMapping.class);
+
         if (feignClient == null) {
             return null;
         }
@@ -85,14 +92,15 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
 
         List<FeignIntegration.FeignHttpMethod> httpMethods = Arrays.stream(feignType.getMethods())
                 .filter(m -> m.getDeclaringClass() != Object.class)
-                .map(method -> createHttpMethod(method, feignClient.path()))
+                .map(method -> createHttpMethod(method, feignClient.path(), extractMappingPath(mapping)))
                 .filter(Objects::nonNull)
-                .toList();
+                .collect(Collectors.toList());
 
         return new FeignIntegration(serviceName, networkAddresses, HttpVersion.V1_1.getDisplay(), httpMethods);
     }
 
-    private FeignIntegration.@Nullable FeignHttpMethod createHttpMethod(Method method, String feignPath) {
+    private FeignIntegration.@Nullable FeignHttpMethod createHttpMethod(
+            Method method, String feignPath, String mappingPath) {
 
         RequestMapping mapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
 
@@ -102,7 +110,7 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
 
         String httpMethod = mapping.method().length == 0 ? UNKNOWN : mapping.method()[0].name();
 
-        return new FeignIntegration.FeignHttpMethod(httpMethod, pickPath(mapping.path(), feignPath));
+        return new FeignIntegration.FeignHttpMethod(httpMethod, pickPath(mapping.path(), feignPath, mappingPath));
     }
 
     private @Nullable Class<?> extractFeignClientClass(String beanName) {
@@ -125,7 +133,7 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
 
     private String extractServiceName(FeignClient feignClient) {
         if (!feignClient.name().isBlank()) {
-            return feignClient.name();
+            return environment.resolvePlaceholders(feignClient.name());
         }
 
         return feignClient.value();
@@ -133,7 +141,7 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
 
     private List<String> extractNetworkAddresses(FeignClient feignClient, String serviceId) {
         if (!feignClient.url().isBlank()) {
-            return List.of(feignClient.url());
+            return List.of(environment.resolvePlaceholders(feignClient.url()));
         }
 
         // Retrieving the network address from the DiscoveryClient can be significantly delayed,
@@ -143,14 +151,26 @@ public class FeignClientIntegrationDiscoverer implements IntegrationComponentDis
         return instances.stream()
                 .map(instance -> instance.getUri().toString())
                 .filter(service -> !service.isBlank())
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    private @Nullable String pickPath(String[] path, String feignPath) {
+    private @Nullable String pickPath(String[] path, String feignPath, String mappingPath) {
         if (path.length > 0) {
-            return feignPath + path[0];
+            return environment.resolvePlaceholders(feignPath) + mappingPath + environment.resolvePlaceholders(path[0]);
+        } else if (!feignPath.isBlank()) {
+            return environment.resolvePlaceholders(feignPath) + mappingPath;
+        } else if (!mappingPath.isBlank()) {
+            return mappingPath;
         }
 
-        return !feignPath.isBlank() ? feignPath : null;
+        return null;
+    }
+
+    private String extractMappingPath(@Nullable RequestMapping mapping) {
+        if (mapping == null) {
+            return "";
+        }
+
+        return mapping.path().length > 0 ? environment.resolvePlaceholders(mapping.path()[0]) : "";
     }
 }

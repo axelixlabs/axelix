@@ -47,3 +47,12 @@ logging:
   level:
     org.apache.kafka: WARN
     org.apache.kafka.clients.NetworkClient: ERROR
+
+# Had to move these properties out of AxelixFeignEndpointTest, because neighboring tests were failing,
+# most likely due to how FeignClient behaves.
+test-open-feign:
+  service:
+    name: service-6
+    url: http://service-api:8081
+    feignPath: /path
+    mappingPath: /map-path

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations.feign;
+package com.axelixlabs.axelix.sbs.spring.core.integrations;
 
 import java.net.URI;
 import java.util.List;
@@ -35,6 +35,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -65,9 +66,10 @@ public class AxelixFeignEndpointTest {
             "service-3";
     private static final String SERVICE_WITHOUT_URL = "service-4";
     private static final String SERVICE_DISCOVERY = "service-5";
+    private static final String SERVICE_PROPERTIES_1 = "service-6";
 
-    private static final String NETWORK_ADDRESS_1 = "http://service1-api";
-    private static final String NETWORK_ADDRESS_2 = "http://service1-api";
+    private static final String NETWORK_ADDRESS_1 = "http://service-api:8081";
+    private static final String NETWORK_ADDRESS_2 = "http://service-api:8082";
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -176,6 +178,25 @@ public class AxelixFeignEndpointTest {
                         assertThat(integration.getHttpMethods()).containsExactlyInAnyOrderElementsOf(httpMethods));
     }
 
+    @Test
+    void shouldReturnService_Properties1() {
+        List<FeignIntegration.FeignHttpMethod> httpMethods = List.of(
+                new FeignIntegration.FeignHttpMethod("POST", "/path/post"),
+                new FeignIntegration.FeignHttpMethod("GET", "/path/map-path"),
+                new FeignIntegration.FeignHttpMethod("PUT", "/path/put"),
+                new FeignIntegration.FeignHttpMethod("DELETE", "/path/delete"),
+                new FeignIntegration.FeignHttpMethod("UNKNOWN", "/path/map-path"));
+
+        FeignIntegration service = getFeignIntegration(SERVICE_PROPERTIES_1);
+
+        assertThat(service)
+                .returns(SERVICE_PROPERTIES_1, FeignIntegration::getServiceName)
+                .returns(List.of(NETWORK_ADDRESS_1), FeignIntegration::getNetworkAddresses)
+                .returns(HttpVersion.V1_1.getDisplay(), FeignIntegration::getProtocol)
+                .satisfies(integration ->
+                        assertThat(integration.getHttpMethods()).containsExactlyInAnyOrderElementsOf(httpMethods));
+    }
+
     private FeignIntegration getFeignIntegration(String serviceName) {
         ResponseEntity<Set<FeignIntegration>> response = testRestTemplate.exchange(
                 "/actuator/axelix-feign",
@@ -199,8 +220,8 @@ public class AxelixFeignEndpointTest {
 
         @Bean
         public FeignClientIntegrationDiscoverer feignClientIntegrationDiscoverer(
-                ApplicationContext applicationContext, DiscoveryClient discoveryClient) {
-            return new FeignClientIntegrationDiscoverer(applicationContext, discoveryClient);
+                ApplicationContext applicationContext, DiscoveryClient discoveryClient, Environment environment) {
+            return new FeignClientIntegrationDiscoverer(applicationContext, discoveryClient, environment);
         }
 
         @Bean
@@ -328,6 +349,28 @@ public class AxelixFeignEndpointTest {
         void delete();
 
         @RequestMapping("/request")
+        void request();
+    }
+
+    @FeignClient(
+            contextId = "context-6",
+            name = "${test-open-feign.service.name}",
+            url = "${test-open-feign.service.url}",
+            path = "${test-open-feign.service.feignPath}")
+    interface TestFeignClient6 {
+        @PostMapping("/post")
+        void post();
+
+        @GetMapping("${test-open-feign.service.mappingPath}")
+        void get();
+
+        @PutMapping("/put")
+        void put();
+
+        @DeleteMapping("/delete")
+        void delete();
+
+        @RequestMapping("${test-open-feign.service.mappingPath}")
         void request();
     }
 
