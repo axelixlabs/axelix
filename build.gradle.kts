@@ -3,6 +3,7 @@ import net.ltgt.gradle.errorprone.errorprone
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import kotlin.io.path.readText
+import Dependencies.junitPlatformLauncherVersion
 
 plugins {
     id("java")
@@ -38,7 +39,7 @@ subprojects {
     plugins.withType<JavaPlugin> {
 
         dependencies {
-            testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+            testRuntimeOnly("org.junit.platform:junit-platform-launcher:${junitPlatformLauncherVersion}")
         }
 
         tasks.withType<Test>().configureEach {
