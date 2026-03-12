@@ -16,9 +16,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import js from "@eslint/js";
+import licenseHeader from "@tony.ganchev/eslint-plugin-header";
 
 import eslintConfigPrettier from "eslint-config-prettier";
-import licenseHeader from "eslint-plugin-header";
 import jsdoc from "eslint-plugin-jsdoc";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import eslintPluginPrettier from "eslint-plugin-prettier";
@@ -28,9 +28,6 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import jsoncParser from "jsonc-eslint-parser";
 import tseslint from "typescript-eslint";
-
-// See https://github.com/Stuk/eslint-plugin-header/issues/57
-licenseHeader.rules.header.meta.schema = false;
 
 export default [
     {
