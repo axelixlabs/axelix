@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,10 +59,8 @@ public class BeansApi {
             responseCode = "200",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = BeansFeed.class)))
     @InstanceIdParameter
-    @GetMapping(path = ApiPaths.BeansApi.FEED)
-    public ResponseEntity<byte[]> getBeansFeed(@PathVariable("instanceId") String instanceId) {
-        byte[] body =
-                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
+    @GetMapping(path = ApiPaths.BeansApi.FEED, produces = MediaType.APPLICATION_JSON_VALUE)
+    public byte[] getBeansFeed(@PathVariable("instanceId") String instanceId) {
+        return endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
     }
 }

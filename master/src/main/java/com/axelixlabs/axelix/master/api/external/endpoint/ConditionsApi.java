@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,10 +63,9 @@ public class ConditionsApi {
             responseCode = "200",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ConditionsFeed.class)))
     @InstanceIdParameter
-    @GetMapping(path = ApiPaths.ConditionsApi.FEED)
-    public ResponseEntity<byte[]> getConditionsFeed(@PathVariable("instanceId") String instanceId) {
-        byte[] body = endpointInvoker.invoke(
+    @GetMapping(path = ApiPaths.ConditionsApi.FEED, produces = MediaType.APPLICATION_JSON_VALUE)
+    public byte[] getConditionsFeed(@PathVariable("instanceId") String instanceId) {
+        return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_CONDITIONS, NoHttpPayload.INSTANCE);
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 }

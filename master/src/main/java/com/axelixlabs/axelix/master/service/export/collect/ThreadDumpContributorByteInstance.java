@@ -29,14 +29,15 @@ import com.axelixlabs.axelix.master.service.export.settings.ThreadDumpStateCompo
  * @see ThreadDumpApi
  * @since 20.11.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Component
-public class ThreadDumpContributorJsonInstance
-        extends AbstractJsonInstanceStateCollector<ThreadDumpStateComponentSettings> {
+public class ThreadDumpContributorByteInstance
+        extends AbstractByteInstanceStateCollector<ThreadDumpStateComponentSettings> {
 
     private final ThreadDumpApi threadDumpApi;
 
-    public ThreadDumpContributorJsonInstance(ThreadDumpApi threadDumpApi) {
+    public ThreadDumpContributorByteInstance(ThreadDumpApi threadDumpApi) {
         this.threadDumpApi = threadDumpApi;
     }
 
@@ -46,7 +47,7 @@ public class ThreadDumpContributorJsonInstance
     }
 
     @Override
-    protected Object collectInternal(String instanceId, ThreadDumpStateComponentSettings settings) {
+    protected byte[] collectByte(String instanceId, ThreadDumpStateComponentSettings settings) {
         return threadDumpApi.getThreadDump(instanceId);
     }
 }

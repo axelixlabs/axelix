@@ -83,11 +83,10 @@ public class ScheduledTasksApi {
                             mediaType = "application/json",
                             schema = @Schema(implementation = ServiceScheduledTasks.class)))
     @InstanceIdParameter
-    @GetMapping(path = ApiPaths.ScheduledTasksApi.INSTANCE_ID)
-    public ResponseEntity<byte[]> getAllScheduledTasks(@PathVariable("instanceId") String instanceId) {
-        byte[] body = endpointInvoker.invoke(
+    @GetMapping(path = ApiPaths.ScheduledTasksApi.INSTANCE_ID, produces = MediaType.APPLICATION_JSON_VALUE)
+    public byte[] getAllScheduledTasks(@PathVariable("instanceId") String instanceId) {
+        return endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_SCHEDULED_TASKS, NoHttpPayload.INSTANCE);
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
     @DefaultApiResponse(

@@ -29,13 +29,14 @@ import com.axelixlabs.axelix.master.service.export.settings.EnvStateComponentSet
  * @see EnvironmentApi
  * @since 27.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Component
-public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStateCollector<EnvStateComponentSettings> {
+public class EnvironmentContributorByteInstance extends AbstractByteInstanceStateCollector<EnvStateComponentSettings> {
 
     private final EnvironmentApi environmentApi;
 
-    public EnvironmentContributorJsonInstance(EnvironmentApi environmentApi) {
+    public EnvironmentContributorByteInstance(EnvironmentApi environmentApi) {
         this.environmentApi = environmentApi;
     }
 
@@ -45,7 +46,7 @@ public class EnvironmentContributorJsonInstance extends AbstractJsonInstanceStat
     }
 
     @Override
-    protected Object collectInternal(String instanceId, EnvStateComponentSettings settings) {
+    protected byte[] collectByte(String instanceId, EnvStateComponentSettings settings) {
         return environmentApi.getAllEnvironmentProperties(instanceId);
     }
 }
