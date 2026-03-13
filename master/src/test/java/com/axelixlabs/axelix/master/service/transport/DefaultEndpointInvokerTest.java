@@ -142,7 +142,7 @@ public class DefaultEndpointInvokerTest {
             }
         });
 
-        registry.register(TestObjectFactory.createInstance(
+        registry.register(TestObjectFactory.withUrl(
                 activeInstanceId, mockWebServer.url("/actuator").toString()));
     }
 

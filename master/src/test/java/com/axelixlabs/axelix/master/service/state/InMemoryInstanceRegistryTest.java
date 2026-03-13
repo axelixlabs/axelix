@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -25,6 +27,7 @@ import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
+import static com.axelixlabs.axelix.master.utils.TestObjectFactory.withName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -34,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  *
  * @since 31.07.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 class InMemoryInstanceRegistryTest {
 
@@ -94,6 +98,40 @@ class InMemoryInstanceRegistryTest {
         registry.register(instance2);
 
         assertThat(registry.getAll()).containsOnly(instance1, instance2);
+    }
+
+    @Test
+    void shouldFindInstancesByQuery_CommonCase() {
+        // given.
+        Stream.of(
+                        withName("id-9", "invoice-processing"),
+                        withName("id-10", "payments"),
+                        withName("id-11", "orders-old"),
+                        withName("id-12", "commission-processing"))
+                .forEach(registry::register);
+
+        // when.
+        var result = registry.findByQuery("processing");
+
+        // then.
+        assertThat(result).extracting(Instance::id).containsOnly(InstanceId.of("id-9"), InstanceId.of("id-12"));
+    }
+
+    @Test
+    void shouldFindInstancesByQuery_NoEntriesFound() {
+        // given.
+        Stream.of(
+                        withName("id-9", "invoice-processing"),
+                        withName("id-10", "payments"),
+                        withName("id-11", "orders-old"),
+                        withName("id-12", "commission-processing"))
+                .forEach(registry::register);
+
+        // when.
+        var result = registry.findByQuery("data");
+
+        // then.
+        assertThat(result).isEmpty();
     }
 
     @Test

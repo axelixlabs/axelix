@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -87,5 +88,14 @@ public class InMemoryInstanceRegistry implements InstanceRegistry {
     @Override
     public Set<Instance> getAll() {
         return Set.copyOf(source.values());
+    }
+
+    @Override
+    public Set<Instance> findByQuery(String query) {
+        String queryLowerCase = query.toLowerCase();
+
+        return source.values().stream()
+                .filter(instance -> instance.name().toLowerCase().contains(queryLowerCase))
+                .collect(Collectors.toSet());
     }
 }

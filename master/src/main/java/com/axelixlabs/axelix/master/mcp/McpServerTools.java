@@ -18,57 +18,44 @@
 package com.axelixlabs.axelix.master.mcp;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Objects;
+import java.util.Set;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springaicommunity.mcp.annotation.McpTool;
 import org.springaicommunity.mcp.annotation.McpToolParam;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import com.axelixlabs.axelix.master.api.external.endpoint.BeansApi;
-import com.axelixlabs.axelix.master.api.external.endpoint.ConditionsApi;
-import com.axelixlabs.axelix.master.api.external.endpoint.ConfigPropsApi;
-import com.axelixlabs.axelix.master.api.external.endpoint.EnvironmentApi;
-import com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi;
-import com.axelixlabs.axelix.master.api.external.endpoint.WallboardApi;
-import com.axelixlabs.axelix.master.api.external.response.InstancesGridResponse;
+import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Provides a collection of MCP tools for inspecting Spring Boot instances.
  *
  * @since 19.02.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SuppressWarnings("NullAway")
 @Service
 public class McpServerTools {
 
-    private final BeansApi beansApi;
-
-    private final EnvironmentApi environmentApi;
-
-    private final ConfigPropsApi configPropsApi;
-
-    private final ConditionsApi conditionsApi;
-
-    private final ScheduledTasksApi scheduledTasksApi;
-
-    private final WallboardApi wallboardApi;
+    private final EndpointInvoker endpointInvoker;
+    private final ObjectMapper objectMapper;
+    private final InstanceRegistry instanceRegistry;
 
     public McpServerTools(
-            BeansApi beansApi,
-            EnvironmentApi environmentApi,
-            ConfigPropsApi configPropsApi,
-            ConditionsApi conditionsApi,
-            ScheduledTasksApi scheduledTasksApi,
-            WallboardApi wallboardApi) {
-        this.beansApi = beansApi;
-        this.environmentApi = environmentApi;
-        this.configPropsApi = configPropsApi;
-        this.conditionsApi = conditionsApi;
-        this.scheduledTasksApi = scheduledTasksApi;
-        this.wallboardApi = wallboardApi;
+            ObjectMapper objectMapper, InstanceRegistry instanceRegistry, EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
+        this.objectMapper = objectMapper;
+        this.instanceRegistry = instanceRegistry;
     }
 
     @McpTool(description = """
@@ -78,8 +65,9 @@ public class McpServerTools {
             dependencies, or services of an instance.
             """)
     public String getInstanceBeans(@McpToolParam(description = "The instance ID") String instanceId) {
-        return new String(
-                Objects.requireNonNull(beansApi.getBeansFeed(instanceId).getBody()), StandardCharsets.UTF_8);
+        byte[] body =
+                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
+        return new String(Objects.requireNonNull(body), StandardCharsets.UTF_8);
     }
 
     @McpTool(description = """
@@ -88,7 +76,8 @@ public class McpServerTools {
     Use this when user asks about configuration, properties or environment of an instance.
     """)
     public String getInstanceEnvironment(@McpToolParam(description = "The instance ID") String instanceId) {
-        return String.valueOf(environmentApi.getAllEnvironmentProperties(instanceId));
+        return String.valueOf(endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE));
     }
 
     @McpTool(description = """
@@ -97,27 +86,35 @@ public class McpServerTools {
     Use this when user asks about configuration properties or settings of an instance.
     """)
     public String getInstanceConfigProps(@McpToolParam(description = "The instance ID") String instanceId) {
-        return String.valueOf(configPropsApi.getConfigpropsFeed(instanceId));
+        return new String(
+                endpointInvoker.invoke(
+                        InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE),
+                StandardCharsets.UTF_8);
     }
 
     @McpTool(description = """
-    Get conditions evaluation report for a specific instance.
-    Returns which auto-configurations were applied or skipped and why.
-    Use this when user asks about auto-configuration, conditions or why a bean is missing.
+    Get @Conditional conditions evaluation report for a specific instance.
+    This endpoint returns which Spring Boot and custom auto-configurations were applied or skipped with explanation why.
+    Use this when user asks about auto-configuration, conditions or why a bean is either missing and user expects it to
+    be there, or the bean is present, but the user expects this bean to not be bootstrapped.
     """)
     public String getInstanceConditions(@McpToolParam(description = "The instance ID") String instanceId) {
-        return String.valueOf(conditionsApi.getConditionsFeed(instanceId));
+        return new String(
+                endpointInvoker.invoke(
+                        InstanceId.of(instanceId), ActuatorEndpoints.GET_CONDITIONS, NoHttpPayload.INSTANCE),
+                StandardCharsets.UTF_8);
     }
 
     @McpTool(description = """
-        Get all scheduled tasks for a specific instance registered in master.
+        Get all scheduled tasks (i.e. typically created via @Scheduled) for a specific instance.
         Returns cron tasks, fixed-rate tasks, fixed-delay tasks and custom tasks.
         Use this when user asks about scheduled or cron tasks of an instance.
         """)
     public String getInstanceScheduledTasks(@McpToolParam(description = "The instance ID") String instanceId) {
-
-        return Arrays.toString(
-                scheduledTasksApi.getAllScheduledTasks(instanceId).getBody());
+        return new String(
+                endpointInvoker.invoke(
+                        InstanceId.of(instanceId), ActuatorEndpoints.GET_SCHEDULED_TASKS, NoHttpPayload.INSTANCE),
+                StandardCharsets.UTF_8);
     }
 
     @McpTool(description = """
@@ -133,7 +130,24 @@ public class McpServerTools {
         or 'current instances', call this tool.
         If you suspect an ID is stale or a service just restarted, refresh by calling this again.
         """)
-    public InstancesGridResponse getWallboard() {
-        return wallboardApi.getInstancesGrid();
+    public String getWallboard(@McpToolParam(required = false, description = """
+            Query string by which to search for an instance insides the instances list.
+            This query string MUST be a part of the service name, for instance if the service
+            name is 'invoice-internal-process', then the query string may be 'invoice', 'InVoiCe'
+            or 'invoice-internal-process'. Use this when you're confident that you know the name
+            of the service. If you're not sure - just do not specify it, request the whole feed, and
+            find it manually.
+            """) String query)
+            throws JsonProcessingException {
+        Set<Instance> instancesFeed = getInstancesFeed(query);
+        return objectMapper.writeValueAsString(instancesFeed);
+    }
+
+    private Set<Instance> getInstancesFeed(String query) {
+        if (StringUtils.hasText(query)) {
+            return instanceRegistry.findByQuery(query);
+        } else {
+            return instanceRegistry.getAll();
+        }
     }
 }

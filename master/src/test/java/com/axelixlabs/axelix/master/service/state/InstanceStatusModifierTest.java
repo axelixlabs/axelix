@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
+import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 
-import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -42,7 +42,7 @@ public class InstanceStatusModifierTest {
     @Test
     void shouldInstanceModifyStatus() {
         String instanceId = UUID.randomUUID().toString();
-        registry.register(createInstance(instanceId, Instance.InstanceStatus.UP));
+        registry.register(TestObjectFactory.withStatus(instanceId, Instance.InstanceStatus.UP));
 
         // when.
         modifyStatus.modifyStatus(instanceId, Instance.InstanceStatus.RELOAD);

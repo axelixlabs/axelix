@@ -121,7 +121,7 @@ public class LoggersApiLoggerByNameTest {
             }
         });
 
-        registry.register(TestObjectFactory.createInstance(
+        registry.register(TestObjectFactory.withUrl(
                 activeInstanceId, mockWebServer.url(activeInstanceId).toString()));
     }
 

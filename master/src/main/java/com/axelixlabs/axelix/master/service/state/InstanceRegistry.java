@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.service.state;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
  * @see Instance
  * @author Mikhail Polivakha
  */
+@NullMarked
 public interface InstanceRegistry {
 
     /**
@@ -89,6 +90,12 @@ public interface InstanceRegistry {
      *
      * @return all instances that are managed by this registry.
      */
-    @NonNull
     Set<Instance> getAll();
+
+    /**
+     * Find instance by the arbitrary search query
+     *
+     * @return {@link Instance}
+     */
+    Set<Instance> findByQuery(String query);
 }

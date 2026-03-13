@@ -164,6 +164,7 @@ public class DashboardApiTest {
         registry.register(TestObjectFactory.createInstance(
                 instance1Id,
                 "http://example.com/1",
+                "test-name",
                 Instance.InstanceStatus.UP,
                 "25",
                 "3.5.2",
@@ -176,6 +177,7 @@ public class DashboardApiTest {
         registry.register(TestObjectFactory.createInstance(
                 instance2Id,
                 "http://example.com/2",
+                "test-name",
                 Instance.InstanceStatus.UP,
                 "25",
                 "3.5.1",
@@ -188,6 +190,7 @@ public class DashboardApiTest {
         registry.register(TestObjectFactory.createInstance(
                 instance3Id,
                 "http://example.com/3",
+                "test-name",
                 Instance.InstanceStatus.DOWN,
                 "17",
                 "2.7.0",
@@ -243,7 +246,7 @@ public class DashboardApiTest {
     void shouldReturnDashboardWithUnknownStatusInstances() {
         // given.
         String unknownInstanceId = UUID.randomUUID().toString();
-        registry.register(TestObjectFactory.createInstance(unknownInstanceId, Instance.InstanceStatus.UNKNOWN));
+        registry.register(TestObjectFactory.withStatus(unknownInstanceId, Instance.InstanceStatus.UNKNOWN));
         memoryUsageCache.putHeapSize(InstanceId.of(unknownInstanceId), 1000.0);
 
         try {

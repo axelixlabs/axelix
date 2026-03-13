@@ -44,14 +44,18 @@ public final class TestObjectFactory {
     private TestObjectFactory() {}
 
     public static Instance createInstance(String id) {
-        return createInstance(id, DEFAULT_URL);
+        return withUrl(id, DEFAULT_URL);
     }
 
-    public static Instance createInstance(String id, String url) {
+    public static Instance withName(String id, String name) {
+        return createInstance(id, DEFAULT_URL, name, null, "25", "3.5.2", "6.0.2", "BellSoft", null, List.of());
+    }
+
+    public static Instance withUrl(String id, String url) {
         return createInstance(id, url, DEFAULT_STATUS);
     }
 
-    public static Instance createInstance(String id, Instance.InstanceStatus status) {
+    public static Instance withStatus(String id, Instance.InstanceStatus status) {
         return createInstance(id, DEFAULT_URL, status);
     }
 
@@ -63,11 +67,21 @@ public final class TestObjectFactory {
             String jdkVendor,
             @Nullable String kotlin) {
         return createInstance(
-                id, DEFAULT_URL, DEFAULT_STATUS, java, springBoot, springFramework, jdkVendor, kotlin, List.of());
+                id,
+                DEFAULT_URL,
+                "test-object-factory-instance",
+                DEFAULT_STATUS,
+                java,
+                springBoot,
+                springFramework,
+                jdkVendor,
+                kotlin,
+                List.of());
     }
 
     public static Instance createInstance(String id, String url, Instance.InstanceStatus status) {
-        return createInstance(id, url, status, "25", "3.5.2", "6.0.2", "BellSoft", null, List.of());
+        return createInstance(
+                id, url, "test-object-factory-instance", status, "25", "3.5.2", "6.0.2", "BellSoft", null, List.of());
     }
 
     public static Instance createInstance(
@@ -75,6 +89,7 @@ public final class TestObjectFactory {
         return createInstance(
                 id,
                 url,
+                "test-object-factory-instance",
                 status,
                 "25",
                 "3.5.2",
@@ -88,6 +103,7 @@ public final class TestObjectFactory {
         return createInstance(
                 id,
                 url,
+                "test-object-factory-instance",
                 DEFAULT_STATUS,
                 "25",
                 "3.5.2",
@@ -100,6 +116,7 @@ public final class TestObjectFactory {
     public static Instance createInstance(
             String id,
             String url,
+            String name,
             Instance.InstanceStatus status,
             String java,
             String springBoot,
@@ -109,7 +126,7 @@ public final class TestObjectFactory {
             List<VMFeature> vmFeatures) {
         return new Instance(
                 InstanceId.of(id),
-                "test-object-factory-instance",
+                name,
                 "1.2.3-classifer-test",
                 java,
                 springBoot,
