@@ -1,7 +1,6 @@
 server:
   port: 8080
 
-# TODO: we need to think about the design of properties in general
 spring:
   application:
     name: axelix
@@ -22,6 +21,8 @@ management:
       base-path: /api/actuator
       exposure:
         include: [ "health" ]
+
+# TODO: we need to think about the design of properties in general
 axelix:
   master:
     discovery:

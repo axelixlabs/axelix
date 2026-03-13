@@ -29,13 +29,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link McpServerTools}
+ * Integration tests for {@link ReadOnlyMcpServerTools}
  *
  * @since 24.02.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest
-class McpServerToolsRegistrationTest {
+class ReadOnlyMcpServerToolsRegistrationTest {
 
     @Autowired
     private McpSyncServer mcpSyncServer;
