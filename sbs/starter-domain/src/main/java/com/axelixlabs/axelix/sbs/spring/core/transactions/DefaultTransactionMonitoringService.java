@@ -109,6 +109,17 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
     }
 
     private TransactionExecution convertToTransactionExecution(TransactionRecord record) {
-        return new TransactionExecution(record.getDurationMs(), record.getStartTimestamp());
+        return new TransactionExecution(
+                record.getDurationMs(), record.getStartTimestamp(), convertToQueries(record.getQueries()));
+    }
+
+    private List<TransactionMonitoringFeed.Query> convertToQueries(List<TransactionQueryRecord> queriesRecords) {
+        return queriesRecords.stream()
+                .map(queries -> new TransactionMonitoringFeed.Query(
+                        queries.getSql(),
+                        queries.getDurationMs(),
+                        queries.getStartTimestampMs(),
+                        queries.getEndTimestampMs()))
+                .collect(Collectors.toList());
     }
 }

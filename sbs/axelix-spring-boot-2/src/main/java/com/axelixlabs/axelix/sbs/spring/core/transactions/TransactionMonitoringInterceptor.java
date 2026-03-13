@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -40,11 +41,15 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
+    private final QueriesStatsCollector queriesStatsCollector;
 
     public TransactionMonitoringInterceptor(
-            Map<MethodClassKey, Propagation> propagationCache, TransactionStatsCollector statsCollector) {
+            Map<MethodClassKey, Propagation> propagationCache,
+            TransactionStatsCollector statsCollector,
+            QueriesStatsCollector queriesStatsCollector) {
         this.propagationCache = propagationCache;
         this.statsCollector = statsCollector;
+        this.queriesStatsCollector = queriesStatsCollector;
     }
 
     @Override
@@ -58,12 +63,17 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
         if (propagation != null && shouldCreateNewTransaction(propagation)) {
             long startTime = System.nanoTime();
+
+            queriesStatsCollector.clearAllStats();
+
             try {
                 return invocation.proceed();
             } finally {
                 long duration = System.nanoTime() - startTime;
+                List<TransactionQueryRecord> queries = queriesStatsCollector.getAllStats();
+
                 statsCollector.recordTransaction(
-                        key, new TransactionRecord(duration / 1_000_000, startTime / 1_000_000));
+                        key, new TransactionRecord(duration / 1_000_000, startTime / 1_000_000, queries));
             }
         }
 
