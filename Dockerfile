@@ -25,7 +25,8 @@ RUN java \
     -XX:AOTConfiguration=app.aotconf \
     -Dspring.main.web-application-type=none \
     -Daxelix.master.web.static-resources.location=file:/application/dist/ \
-    org.springframework.boot.loader.launch.JarLauncher; exit 0
+    -Dspring.context.exit=onRefresh \
+    org.springframework.boot.loader.launch.JarLauncher
 
 # Step 2: Create AOT cache from the recorded profile (does not execute application code)
 RUN java \
