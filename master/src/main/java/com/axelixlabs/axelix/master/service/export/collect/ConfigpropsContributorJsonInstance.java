@@ -19,9 +19,14 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.ConfigPropsApi;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.ConfigPropsStateComponentSettings;
+import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Collects Spring Configuration Properties information for application state export.
@@ -31,13 +36,12 @@ import com.axelixlabs.axelix.master.service.export.settings.ConfigPropsStateComp
  * @author Nikita Kirillov
  */
 @Component
-public class ConfigpropsContributorJsonInstance
-        extends AbstractJsonInstanceStateCollector<ConfigPropsStateComponentSettings> {
+public class ConfigpropsContributorJsonInstance implements InstanceStateCollector<ConfigPropsStateComponentSettings> {
 
-    private final ConfigPropsApi configpropsApi;
+    private final EndpointInvoker endpointInvoker;
 
-    public ConfigpropsContributorJsonInstance(ConfigPropsApi configpropsApi) {
-        this.configpropsApi = configpropsApi;
+    public ConfigpropsContributorJsonInstance(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Override
@@ -46,7 +50,8 @@ public class ConfigpropsContributorJsonInstance
     }
 
     @Override
-    protected Object collectInternal(String instanceId, ConfigPropsStateComponentSettings settings) {
-        return configpropsApi.getConfigpropsFeed(instanceId);
+    public byte[] collect(String instanceId, ConfigPropsStateComponentSettings settings) throws StateExportException {
+        return endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_CONFIG_PROPS, NoHttpPayload.INSTANCE);
     }
 }

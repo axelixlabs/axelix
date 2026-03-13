@@ -19,9 +19,14 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.ThreadDumpApi;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.ThreadDumpStateComponentSettings;
+import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Collects Thread Dump information for application state export.
@@ -31,13 +36,12 @@ import com.axelixlabs.axelix.master.service.export.settings.ThreadDumpStateCompo
  * @author Nikita Kirillov
  */
 @Component
-public class ThreadDumpContributorJsonInstance
-        extends AbstractJsonInstanceStateCollector<ThreadDumpStateComponentSettings> {
+public class ThreadDumpContributorJsonInstance implements InstanceStateCollector<ThreadDumpStateComponentSettings> {
 
-    private final ThreadDumpApi threadDumpApi;
+    private final EndpointInvoker endpointInvoker;
 
-    public ThreadDumpContributorJsonInstance(ThreadDumpApi threadDumpApi) {
-        this.threadDumpApi = threadDumpApi;
+    public ThreadDumpContributorJsonInstance(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Override
@@ -46,7 +50,8 @@ public class ThreadDumpContributorJsonInstance
     }
 
     @Override
-    protected Object collectInternal(String instanceId, ThreadDumpStateComponentSettings settings) {
-        return threadDumpApi.getThreadDump(instanceId);
+    public byte[] collect(String instanceId, ThreadDumpStateComponentSettings settings) throws StateExportException {
+        return endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_THREAD_DUMP, NoHttpPayload.INSTANCE);
     }
 }

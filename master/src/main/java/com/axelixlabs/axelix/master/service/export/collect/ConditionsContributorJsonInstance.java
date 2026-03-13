@@ -19,9 +19,14 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.ConditionsApi;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.ConditionsStateComponentSettings;
+import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Collects Spring Conditions information for application state export.
@@ -31,13 +36,12 @@ import com.axelixlabs.axelix.master.service.export.settings.ConditionsStateCompo
  * @author Nikita Kirillov
  */
 @Component
-public class ConditionsContributorJsonInstance
-        extends AbstractJsonInstanceStateCollector<ConditionsStateComponentSettings> {
+public class ConditionsContributorJsonInstance implements InstanceStateCollector<ConditionsStateComponentSettings> {
 
-    private final ConditionsApi conditionsApi;
+    private final EndpointInvoker endpointInvoker;
 
-    public ConditionsContributorJsonInstance(final ConditionsApi conditionsApi) {
-        this.conditionsApi = conditionsApi;
+    public ConditionsContributorJsonInstance(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Override
@@ -46,7 +50,8 @@ public class ConditionsContributorJsonInstance
     }
 
     @Override
-    protected Object collectInternal(String instanceId, ConditionsStateComponentSettings settings) {
-        return conditionsApi.getConditionsFeed(instanceId);
+    public byte[] collect(String instanceId, ConditionsStateComponentSettings settings) throws StateExportException {
+        return endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_CONDITIONS, NoHttpPayload.INSTANCE);
     }
 }

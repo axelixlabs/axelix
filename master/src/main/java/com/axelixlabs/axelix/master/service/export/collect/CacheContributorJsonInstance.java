@@ -19,9 +19,14 @@ package com.axelixlabs.axelix.master.service.export.collect;
 
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.api.external.endpoint.caches.CachesReadApi;
+import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.StateExportException;
 import com.axelixlabs.axelix.master.service.export.StateComponent;
 import com.axelixlabs.axelix.master.service.export.settings.CachesStateComponentSettings;
+import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
  * Collects Spring Caches information for application state export.
@@ -31,12 +36,12 @@ import com.axelixlabs.axelix.master.service.export.settings.CachesStateComponent
  * @author Nikita Kirillov
  */
 @Component
-public class CacheContributorJsonInstance extends AbstractJsonInstanceStateCollector<CachesStateComponentSettings> {
+public class CacheContributorJsonInstance implements InstanceStateCollector<CachesStateComponentSettings> {
 
-    private final CachesReadApi cachesReadApi;
+    private final EndpointInvoker endpointInvoker;
 
-    public CacheContributorJsonInstance(final CachesReadApi cachesReadApi) {
-        this.cachesReadApi = cachesReadApi;
+    public CacheContributorJsonInstance(EndpointInvoker endpointInvoker) {
+        this.endpointInvoker = endpointInvoker;
     }
 
     @Override
@@ -45,7 +50,8 @@ public class CacheContributorJsonInstance extends AbstractJsonInstanceStateColle
     }
 
     @Override
-    protected Object collectInternal(String instanceId, CachesStateComponentSettings settings) {
-        return cachesReadApi.getAllCaches(instanceId);
+    public byte[] collect(String instanceId, CachesStateComponentSettings settings) throws StateExportException {
+        return endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_CACHES, NoHttpPayload.INSTANCE);
     }
 }
