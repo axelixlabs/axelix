@@ -60,6 +60,7 @@ public class ReadOnlyMcpServerTools {
     }
 
     @McpTool(
+            title = "Beans Feed",
             description = """
             Get all Spring beans information for a specific instance.
             Returns details about bean names, types, and dependencies.
@@ -79,6 +80,7 @@ public class ReadOnlyMcpServerTools {
     }
 
     @McpTool(
+            title = "Properties",
             description = """
             Get all environment properties for a specific instance.
             Returns application properties, system properties and environment variables.
@@ -96,6 +98,7 @@ public class ReadOnlyMcpServerTools {
     }
 
     @McpTool(
+            title = "Config Props Beans",
             description = """
             Get all configuration properties for a specific instance.
             Returns @ConfigurationProperties beans with their values.
@@ -115,6 +118,7 @@ public class ReadOnlyMcpServerTools {
     }
 
     @McpTool(
+            title = "@Conditional Feed",
             description = """
             Get @Conditional conditions evaluation report for a specific instance.
             This endpoint returns which Spring Boot and custom auto-configurations were applied or skipped with explanation why.
@@ -135,6 +139,7 @@ public class ReadOnlyMcpServerTools {
     }
 
     @McpTool(
+            title = "Scheduled Tasks",
             description = """
             Get all scheduled tasks (i.e. typically created via @Scheduled) for a specific instance.
             Returns cron tasks, fixed-rate tasks, fixed-delay tasks and custom tasks.
@@ -154,6 +159,7 @@ public class ReadOnlyMcpServerTools {
     }
 
     @McpTool(
+            title = "Instances Feed",
             description = """
             Fetch the comprehensive snapshot of all managed instances (also known as 'Wallboard', 'Grid', 'Instances List').
 
