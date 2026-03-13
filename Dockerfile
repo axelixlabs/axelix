@@ -7,16 +7,16 @@ WORKDIR /application
 COPY front-end/dist dist
 COPY master/build/libs/master.jar master.jar
 
-RUN java -Djarmode=layertools -jar master.jar extract
+RUN java -Djarmode=tools -jar master.jar extract --layers --launcher
 
 # Stage: AOT Cache training (JEP 483 — Ahead-of-Time Class Loading & Linking)
 FROM eclipse-temurin:25-jre-alpine AS training
 WORKDIR /application
 
-COPY --from=layers /application/dependencies/ ./
-COPY --from=layers /application/spring-boot-loader/ ./
-COPY --from=layers /application/snapshot-dependencies/ ./
-COPY --from=layers /application/application/ ./
+COPY --from=layers /application/master/dependencies/ ./
+COPY --from=layers /application/master/spring-boot-loader/ ./
+COPY --from=layers /application/master/snapshot-dependencies/ ./
+COPY --from=layers /application/master/application/ ./
 COPY --from=layers /application/dist/ ./dist
 
 # Step 1: Record class loading profile (training run — app may crash without infra, that's expected)
@@ -25,6 +25,9 @@ RUN java \
     -XX:AOTConfiguration=app.aotconf \
     -Dspring.main.web-application-type=none \
     -Daxelix.master.web.static-resources.location=file:/application/dist/ \
+    -Daxelix.master.auth.jwt.algorithm=HMAC256 \
+    -Daxelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn \
+    -Daxelix.master.discovery.auto=false \
     -Dspring.context.exit=onRefresh \
     org.springframework.boot.loader.launch.JarLauncher
 
@@ -47,10 +50,10 @@ USER axelix
 WORKDIR /application
 
 # Copy Spring Boot application layers
-COPY --from=layers /application/dependencies/ ./
-COPY --from=layers /application/spring-boot-loader/ ./
-COPY --from=layers /application/snapshot-dependencies/ ./
-COPY --from=layers /application/application/ ./
+COPY --from=layers /application/master/dependencies/ ./
+COPY --from=layers /application/master/spring-boot-loader/ ./
+COPY --from=layers /application/master/snapshot-dependencies/ ./
+COPY --from=layers /application/master/application/ ./
 
 # Copy the front-end static files distribution (path must match static-locations below)
 COPY --from=layers /application/dist/ ./dist
