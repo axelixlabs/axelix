@@ -64,7 +64,9 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
                 // Temporarily excluded /api/mcp, waiting for the mcp server authentication issue to be resolved
                 // https://github.com/axelixlabs/axelix/issues/758
                 || path.startsWith("/api/mcp")
-                || path.equalsIgnoreCase("/api/external/users/login");
+                || path.equalsIgnoreCase("/api/external/users/login")
+                || path.startsWith("/api/external/oauth2/callback")
+                || path.startsWith("/api/external/settings/auth");
     }
 
     @Override

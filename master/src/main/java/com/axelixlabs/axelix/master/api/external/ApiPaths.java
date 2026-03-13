@@ -30,6 +30,13 @@ public final class ApiPaths {
 
     private ApiPaths() {}
 
+    public static final class SettingsApi {
+
+        public static final String MAIN = "/settings";
+
+        public static final String AUTH = "/auth";
+    }
+
     public static final class UsersApi {
 
         public static final String MAIN = "/users";
@@ -37,6 +44,13 @@ public final class ApiPaths {
         public static final String LOGIN = "/login";
 
         public static final String LOGOUT = "/logout";
+    }
+
+    public static final class OAuth2Api {
+
+        public static final String MAIN = "/oauth2";
+
+        public static final String CALLBACK = "/callback";
     }
 
     public static final class InstancesApi {
