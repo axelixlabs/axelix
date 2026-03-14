@@ -1,3 +1,4 @@
+import { BeansFeedImage, ConditionsFeedImage, LoggersImage, MockImageImage, PropertiesFeedImage, SchedukedTaskFeedImage, TransactionsFeedImage } from "@/assets";
 import {
     ELanguage,
     IInstallationInstructions,
@@ -5,56 +6,44 @@ import {
     IZigzagSectionData
 } from "@/models";
 
-// Feature cards
-import MockImage from "@/assets/images/mockImage.png"
-import BeansFeed from "@/assets/images/beans_feed.png"
-import TransactionalFeed from "@/assets/images/transactions_feed.png"
-import PropertiesFeed from "@/assets/images/properties_feed.png"
-import ScheduledTasksFeed from "@/assets/images/scheduled_task_feed.png"
-import ConditionsFeed from "@/assets/images/conditions_feed.png"
-
-// ZigZag layout
-import LoggersPage from "@/assets/images/loggers.png"
-
-// TODO: revisit the links here
 export const whatCanDoCardsData: IWhatCanDoCardData[] = [
     {
-        image: BeansFeed.src,
+        image: BeansFeedImage.src,
         title: "Explore Application Context Beans",
         description: "Gain deep insights into Application Context beans, including their origins and details on why certain beans were excluded.",
         category: "@Bean",
         documentationLink: "https://axelix.io/docs/features/beans",
     },
     {
-        image: TransactionalFeed.src,
+        image: TransactionsFeedImage.src,
         title: "Reveal <code>@Transactional</code> bottlenecks",
         description: "Gain visibility into <code>@Transactional</code> execution timelines and identify potential performance pitfalls before they escalate",
         category: "@Transactional",
         documentationLink: "https://axelix.io/docs/features/transaction-control",
     },
     {
-        image: PropertiesFeed.src,
+        image: PropertiesFeedImage.src,
         title: "Uncover Property Origins and Sources",
         description: "Trace Spring Boot property values to their origins and identify which configuration source or override is currently in effect",
         category: "@Value",
         documentationLink: "https://axelix.io/docs/features/properties",
     },
     {
-        image: ScheduledTasksFeed.src,
+        image: SchedukedTaskFeedImage.src,
         title: "Orchestrate <code>@Scheduled</code> Tasks",
         description: "Take command of background jobs by toggling tasks, redefining cron expressions, and triggering manual executions with a click",
         category: "@Scheduled",
         documentationLink: "https://axelix.io/docs/features/scheduled-tasks",
     },
     {
-        image: MockImage.src,
+        image: MockImageImage.src,
         title: "Control Runtime Caching Behavior",
         description: "Manage your data layer by monitoring real-time cache efficiency and hit/miss ratios while clearing or toggling caches instantly",
         category: "@Cacheable",
         documentationLink: "https://axelix.io/docs/features/caches",
     },
     {
-        image: ConditionsFeed.src,
+        image: ConditionsFeedImage.src,
         title: "Discover the <code>@Conditional</code> Outcomes",
         description: "Analyze the results of <code>@Conditional</code> evaluations and explore the specific reasons behind each outcome",
         category: "@Conditional",
@@ -107,7 +96,7 @@ export const zigzagSectionsData: IZigzagSectionData[] = [
             "contains a built-in MCP server that delivers the accurate and secured state of the running Spring Boot " +
             "application to AI.",
         href: "",
-        image: MockImage
+        image: MockImageImage
     },
     {
         title: "Debug Spring Boot Applications with Ease",
@@ -115,7 +104,7 @@ export const zigzagSectionsData: IZigzagSectionData[] = [
             "their origins, discovering available properties and their actual values, determining " +
             "long-executing @Transactional methods, @Cacheable caches usage statistics and much more",
         href: "https://axelix.io/docs/category/features",
-        image: MockImage
+        image: MockImageImage
     },
     {
         title: "Streamline Your Spring Boot Testing Process",
@@ -124,7 +113,7 @@ export const zigzagSectionsData: IZigzagSectionData[] = [
             "needed at runtime. Furthermore, you can clear or disable Spring caches instantly " +
             "and modify @ConfigurationProperties without the need for a re-deploy.",
         href: "https://axelix.io/docs/category/features",
-        image: LoggersPage
+        image: LoggersImage
     },
 ]
 

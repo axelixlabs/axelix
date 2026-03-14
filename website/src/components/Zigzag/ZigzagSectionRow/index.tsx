@@ -5,6 +5,7 @@ import { IZigzagSectionData } from "@/models";
 import styles from "./styles.module.css"
 import {Image} from "antd";
 import {EyeOutlined} from "@ant-design/icons";
+import { ArrowIcon } from "@/assets";
 
 export interface IProps {
     section: IZigzagSectionData;
@@ -28,22 +29,7 @@ export const ZigzagSectionRow = ({ section, index }: IProps) => {
                 <p className={styles.Description}>{description}</p>
                 <a href={href} target="_blank" rel="noreferrer noopener" className={styles.Link}>
                     See Docs
-                    {/*TODO: Replace via svgr in future */}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className={styles.ArrowIcon}
-                    >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <polyline points="6 9 12 15 18 9" />
-                    </svg>
+                    <ArrowIcon className={styles.ArrowIcon}/>
                 </a>
             </div>
 
