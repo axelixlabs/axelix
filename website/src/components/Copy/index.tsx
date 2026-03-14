@@ -1,12 +1,10 @@
 "use client"
-import Image from "next/image"
 import { useState } from "react";
 
-import CopyIcon from "@/assets/icons/copy.svg"
-import CopiedIcon from "@/assets/icons/ok.svg"
+import { CopyIcon, CopiedIcon } from "@/assets"
 
 import styles from "./styles.module.css";
-import {Tooltip} from "antd";
+import { Tooltip } from "antd";
 
 interface IProps {
     text: string;
@@ -31,10 +29,10 @@ export const Copy = ({ text }: IProps) => {
                 copied
                     ? <>
                         <Tooltip open={true} trigger={[]} title="Copied!">
-                            <Image src={CopiedIcon} alt="Copied icon" />
+                            <CopiedIcon />
                         </Tooltip>
                     </>
-                    : <Image className={styles.Copy} src={CopyIcon} alt="Copy icon" onClick={handleCopy} />
+                    : <CopyIcon className={styles.Copy} onClick={handleCopy} />
             }
         </>
     )

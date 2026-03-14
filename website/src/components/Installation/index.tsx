@@ -43,11 +43,10 @@ export const Installation = () => {
                             {selectedOption.description}
                         </p>
 
-                        {/* TODO: Add target="_blank" and rel="noopener noreferrer" in the future if needed */}
-                        {/* TODO: Replace Link via a if that needed */}
-                        <Link href="https://spring.io/" className={styles.ReadDocumentation}>
+                        {/* TODO: Add correct url */}
+                        <a href="https://spring.io/" target="_blank" rel="noopener noreferrer" className={styles.ReadDocumentation}>
                             Read Documentation
-                        </Link>
+                        </a>
                     </div>
                 </div>
 
