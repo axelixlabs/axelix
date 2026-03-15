@@ -18,25 +18,31 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Deprecation;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
+import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMappingBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadata;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadataExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription;
+import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescriptionResolver;
+import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDisplayData;
+import com.axelixlabs.axelix.sbs.spring.core.env.ValueAnnotationInjectionProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostProcessor;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,6 +66,9 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
             assertThat(context).hasSingleBean(PropertyNameNormalizer.class);
             assertThat(context).hasSingleBean(PropertyMetadataExtractor.class);
             assertThat(context).hasSingleBean(SmartSanitizingFunction.class);
+            assertThat(context).hasSingleBean(PropertyMappingBuilder.class);
+            assertThat(context).hasSingleBean(PropertySourceDescriptionResolver.class);
+            assertThat(context).hasSingleBean(ValueAnnotationInjectionProcessor.class);
             assertThat(context).hasSingleBean(EnvPropertyEnricher.class);
             assertThat(context).hasSingleBean(AxelixEnvironmentEndpoint.class);
             assertThat(context).hasSingleBean(ValueInjectionTrackerBeanPostProcessor.class);
@@ -90,7 +99,10 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
                         CustomEnvPropertyEnricherConfig.class,
                         CustomPropertyNameNormalizerConfig.class,
                         CustomAxelixEnvironmentEndpointConfig.class,
-                        CustomValueInjectionTrackerBeanPostProcessorConfig.class)
+                        CustomValueInjectionTrackerBeanPostProcessorConfig.class,
+                        CustomPropertyMappingBuilderConfig.class,
+                        CustomPropertySourceDescriptionResolverConfig.class,
+                        CustomValueAnnotationInjectionProcessorConfig.class)
                 .run(context -> {
                     assertThat(context.getBean(PropertyMetadataExtractor.class))
                             .isExactlyInstanceOf(CustomPropertyMetadataExtractor.class);
@@ -102,6 +114,12 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
                             .isExactlyInstanceOf(CustomAxelixEnvironmentEndpoint.class);
                     assertThat(context.getBean(ValueInjectionTrackerBeanPostProcessor.class))
                             .isExactlyInstanceOf(CustomValueInjectionTrackerBeanPostProcessor.class);
+                    assertThat(context.getBean(PropertyMappingBuilder.class))
+                            .isExactlyInstanceOf(CustomPropertyMappingBuilder.class);
+                    assertThat(context.getBean(PropertySourceDescriptionResolver.class))
+                            .isExactlyInstanceOf(CustomPropertySourceDescriptionResolver.class);
+                    assertThat(context.getBean(ValueAnnotationInjectionProcessor.class))
+                            .isExactlyInstanceOf(CustomValueAnnotationInjectionProcessor.class);
                 });
     }
 
@@ -132,11 +150,8 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
     @TestConfiguration
     static class CustomAxelixEnvironmentEndpointConfig {
         @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-                Environment environment,
-                EnvPropertyEnricher envPropertyEnricher,
-                SmartSanitizingFunction smartSanitizingFunction) {
-            return new CustomAxelixEnvironmentEndpoint(environment, envPropertyEnricher, smartSanitizingFunction);
+        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvPropertyEnricher envPropertyEnricher) {
+            return new CustomAxelixEnvironmentEndpoint(envPropertyEnricher);
         }
     }
 
@@ -145,6 +160,30 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
         @Bean
         public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor() {
             return new CustomValueInjectionTrackerBeanPostProcessor(null);
+        }
+    }
+
+    @TestConfiguration
+    static class CustomPropertyMappingBuilderConfig {
+        @Bean
+        public PropertyMappingBuilder propertyMappingBuilder() {
+            return new CustomPropertyMappingBuilder();
+        }
+    }
+
+    @TestConfiguration
+    static class CustomPropertySourceDescriptionResolverConfig {
+        @Bean
+        public PropertySourceDescriptionResolver propertySourceDescriptionResolver() {
+            return new CustomPropertySourceDescriptionResolver();
+        }
+    }
+
+    @TestConfiguration
+    static class CustomValueAnnotationInjectionProcessorConfig {
+        @Bean
+        public ValueAnnotationInjectionProcessor valueAnnotationInjectionProcessor() {
+            return new CustomValueAnnotationInjectionProcessor();
         }
     }
 
@@ -157,7 +196,7 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
 
     static class CustomEnvPropertyEnricher implements EnvPropertyEnricher {
         @Override
-        public EnvironmentFeed enrich(EnvironmentEndpoint.EnvironmentDescriptor originalDescriptor) {
+        public EnvironmentFeed enrich(@Nullable String pattern) {
             return null;
         }
     }
@@ -175,17 +214,45 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
     }
 
     static class CustomAxelixEnvironmentEndpoint extends AxelixEnvironmentEndpoint {
-        public CustomAxelixEnvironmentEndpoint(
-                Environment environment,
-                EnvPropertyEnricher envPropertyEnricher,
-                SmartSanitizingFunction smartSanitizingFunction) {
-            super(environment, smartSanitizingFunction, envPropertyEnricher);
+        public CustomAxelixEnvironmentEndpoint(EnvPropertyEnricher envPropertyEnricher) {
+            super(envPropertyEnricher);
         }
     }
 
     static class CustomValueInjectionTrackerBeanPostProcessor extends ValueInjectionTrackerBeanPostProcessor {
-        public CustomValueInjectionTrackerBeanPostProcessor(PropertyNameNormalizer propertyNameNormalizer) {
-            super(propertyNameNormalizer);
+        public CustomValueInjectionTrackerBeanPostProcessor(
+                ValueAnnotationInjectionProcessor annotationInjectionProcessor) {
+            super(annotationInjectionProcessor);
         }
+    }
+
+    static class CustomPropertyMappingBuilder implements PropertyMappingBuilder {
+        @Override
+        public @Nullable Deprecation buildFromMetadata(@Nullable PropertyMetadata propertyMetadata) {
+            return null;
+        }
+
+        @Override
+        public Map<String, String> buildConfigPropsMappingMap() {
+            return Map.of();
+        }
+    }
+
+    static class CustomPropertySourceDescriptionResolver implements PropertySourceDescriptionResolver {
+        @Override
+        public PropertySourceDisplayData resolveDisplayData(
+                String sourceName, PropertySourceDescription[] descriptions) {
+            return new PropertySourceDisplayData(sourceName, null);
+        }
+    }
+
+    static class CustomValueAnnotationInjectionProcessor implements ValueAnnotationInjectionProcessor {
+        @Override
+        public void processValueAnnotation(
+                Map<String, List<EnvironmentFeed.InjectionPoint>> propertyToInjectionPoints,
+                String expression,
+                String beanName,
+                EnvironmentFeed.InjectionType injectionType,
+                String targetName) {}
     }
 }

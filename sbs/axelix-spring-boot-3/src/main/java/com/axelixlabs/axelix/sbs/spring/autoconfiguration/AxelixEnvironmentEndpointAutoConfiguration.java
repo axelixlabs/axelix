@@ -31,11 +31,17 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationProperties
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvPropertyEnricher;
+import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyMappingBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyMetadataExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertySourceDescriptionResolver;
+import com.axelixlabs.axelix.sbs.spring.core.env.DefaultValueAnnotationInjectionProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
+import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMappingBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadataExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescriptionResolver;
+import com.axelixlabs.axelix.sbs.spring.core.env.ValueAnnotationInjectionProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostProcessor;
 
 /**
@@ -44,6 +50,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostPr
  * @since 21.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @AutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = AxelixEnvironmentEndpoint.class)
@@ -77,30 +84,51 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     public EnvPropertyEnricher envPropertyEnricher(
             Environment environment,
             PropertyNameNormalizer propertyNameNormalizer,
-            ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache,
-            PropertyMetadataExtractor propertyMetadataExtractor,
-            ValueInjectionTrackerBeanPostProcessor injectionTracker) {
+            PropertyMetadataExtractor metadataExtractor,
+            ValueInjectionTrackerBeanPostProcessor valueInjectionTracker,
+            SmartSanitizingFunction smartSanitizingFunction,
+            PropertySourceDescriptionResolver sourceDescriptionResolver,
+            PropertyMappingBuilder environmentMappingBuilder) {
         return new DefaultEnvPropertyEnricher(
                 environment,
                 propertyNameNormalizer,
-                configurationPropertiesCache,
-                propertyMetadataExtractor,
-                injectionTracker);
+                metadataExtractor,
+                valueInjectionTracker,
+                smartSanitizingFunction,
+                sourceDescriptionResolver,
+                environmentMappingBuilder);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-            Environment environment,
-            SmartSanitizingFunction smartSanitizingFunction,
-            EnvPropertyEnricher envPropertyEnricher) {
-        return new AxelixEnvironmentEndpoint(environment, smartSanitizingFunction, envPropertyEnricher);
+    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvPropertyEnricher envPropertyEnricher) {
+        return new AxelixEnvironmentEndpoint(envPropertyEnricher);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor(
+            ValueAnnotationInjectionProcessor annotationInjectionProcessor) {
+        return new ValueInjectionTrackerBeanPostProcessor(annotationInjectionProcessor);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PropertyMappingBuilder propertyMappingBuilder(
+            PropertyNameNormalizer propertyNameNormalizer, ObjectProvider<ConfigurationPropertiesCache> cache) {
+        return new DefaultPropertyMappingBuilder(propertyNameNormalizer, cache.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ValueAnnotationInjectionProcessor valueAnnotationInjectionProcessor(
             PropertyNameNormalizer propertyNameNormalizer) {
-        return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
+        return new DefaultValueAnnotationInjectionProcessor(propertyNameNormalizer);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PropertySourceDescriptionResolver propertySourceDescriptionResolver() {
+        return new DefaultPropertySourceDescriptionResolver();
     }
 }

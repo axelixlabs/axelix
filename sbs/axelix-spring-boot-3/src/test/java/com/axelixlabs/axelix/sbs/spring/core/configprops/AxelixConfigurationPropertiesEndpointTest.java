@@ -158,7 +158,7 @@ public class AxelixConfigurationPropertiesEndpointTest {
                 SmartSanitizingFunction smartSanitizingFunction,
                 ApplicationContext applicationContext,
                 ConfigurationPropertiesConverter configurationPropertiesConverter) {
-            return new ConfigurationPropertiesCache(
+            return new DefaultConfigurationPropertiesCache(
                     smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
         }
 

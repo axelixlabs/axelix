@@ -235,6 +235,7 @@ public final class EnvironmentFeed {
             return value;
         }
 
+        @JsonProperty("isPrimary")
         public boolean isPrimary() {
             return isPrimary;
         }

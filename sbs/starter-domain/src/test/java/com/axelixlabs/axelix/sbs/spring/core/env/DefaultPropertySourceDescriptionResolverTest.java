@@ -23,30 +23,31 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import org.springframework.core.env.StandardEnvironment;
-
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription.PropertySourceDisplayData;
-
-import static com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription.resolveDisplayData;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link PropertySourceDescription}
+ * Unit tests for {@link PropertySourceDescriptionResolver}
  *
- * @since 11.02.2026
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
-class PropertySourceDescriptionTest {
+class DefaultPropertySourceDescriptionResolverTest {
+    public static final String SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME = "systemEnvironment";
+    public static final String SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME = "systemProperties";
+
+    PropertySourceDescriptionResolver propertySourceDescriptionResolver =
+            new DefaultPropertySourceDescriptionResolver();
 
     @ParameterizedTest
     @MethodSource("configResourceSources")
     void shouldParseConfigResourceSourceCorrectly(
             String sourceName, String expectedDisplayName, String expectedDescription) {
 
-        PropertySourceDisplayData result = resolveDisplayData(sourceName);
+        PropertySourceDisplayData result = propertySourceDescriptionResolver.resolveDisplayData(
+                sourceName, TestPropertySourceDescription.values());
 
-        assertThat(result.displayName()).isEqualTo(expectedDisplayName);
-        assertThat(result.description()).isEqualTo(expectedDescription);
+        assertThat(result.getDisplayName()).isEqualTo(expectedDisplayName);
+        assertThat(result.getDescription()).isEqualTo(expectedDescription);
     }
 
     private static Stream<Arguments> configResourceSources() {
@@ -72,10 +73,11 @@ class PropertySourceDescriptionTest {
     @ParameterizedTest
     @MethodSource("unknownSources")
     void shouldReturnOriginalNameAndNullDescriptionForUnknownSources(String sourceName, String expectedDescription) {
-        PropertySourceDisplayData result = resolveDisplayData(sourceName);
+        PropertySourceDisplayData result = propertySourceDescriptionResolver.resolveDisplayData(
+                sourceName, TestPropertySourceDescription.values());
 
-        assertThat(result.displayName()).isEqualTo(sourceName);
-        assertThat(result.description()).isEqualTo(expectedDescription);
+        assertThat(result.getDisplayName()).isEqualTo(sourceName);
+        assertThat(result.getDescription()).isEqualTo(expectedDescription);
     }
 
     private static Stream<Arguments> unknownSources() {
@@ -91,19 +93,49 @@ class PropertySourceDescriptionTest {
     @MethodSource("knownNonConfigResourceSources")
     void shouldReturnOriginalNameAndDescriptionForKnownSources(String sourceName, String expectedDescription) {
 
-        PropertySourceDisplayData result = resolveDisplayData(sourceName);
+        PropertySourceDisplayData result = propertySourceDescriptionResolver.resolveDisplayData(
+                sourceName, TestPropertySourceDescription.values());
 
-        assertThat(result.displayName()).isEqualTo(sourceName);
-        assertThat(result.description()).isEqualTo(expectedDescription);
+        assertThat(result.getDisplayName()).isEqualTo(sourceName);
+        assertThat(result.getDescription()).isEqualTo(expectedDescription);
     }
 
     private static Stream<Arguments> knownNonConfigResourceSources() {
         return Stream.of(
                 Arguments.of(
-                        StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME,
-                        PropertySourceDescription.SYSTEM_PROPERTIES.getDescription()),
+                        SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME,
+                        TestPropertySourceDescription.SYSTEM_PROPERTIES.getDescription()),
                 Arguments.of(
-                        StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
-                        PropertySourceDescription.SYSTEM_ENVIRONMENT.getDescription()));
+                        SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
+                        TestPropertySourceDescription.SYSTEM_ENVIRONMENT.getDescription()));
+    }
+
+    enum TestPropertySourceDescription implements PropertySourceDescription {
+        SYSTEM_PROPERTIES(
+                SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME,
+                PropertySourceCustomDescription.SYSTEM_PROPERTIES.getDescription()),
+        SYSTEM_ENVIRONMENT(
+                SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
+                PropertySourceCustomDescription.SYSTEM_ENVIRONMENT.getDescription()),
+        APPLICATION_PROPERTIES(
+                "Config resource", PropertySourceCustomDescription.APPLICATION_PROPERTIES.getDescription());
+
+        private final String sourceName;
+        private final String description;
+
+        TestPropertySourceDescription(String sourceName, String description) {
+            this.sourceName = sourceName;
+            this.description = description;
+        }
+
+        @Override
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public String getSourceName() {
+            return sourceName;
+        }
     }
 }

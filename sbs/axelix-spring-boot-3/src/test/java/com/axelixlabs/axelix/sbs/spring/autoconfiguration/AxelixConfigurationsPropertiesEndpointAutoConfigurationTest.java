@@ -34,6 +34,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProper
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
@@ -191,7 +192,7 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
         }
     }
 
-    static class CustomConfigurationPropertiesCache extends ConfigurationPropertiesCache {
+    static class CustomConfigurationPropertiesCache extends DefaultConfigurationPropertiesCache {
         public CustomConfigurationPropertiesCache(
                 SmartSanitizingFunction smartSanitizingFunction,
                 ApplicationContext applicationContext,

@@ -17,33 +17,24 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
-import org.jspecify.annotations.Nullable;
-
-import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-
 /**
- * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.
+ * Property source and its custom description.
  *
- * @since 21.10.2025
- * @author Nikita Kirillov
- * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-@RestControllerEndpoint(id = "axelix-env")
-public class AxelixEnvironmentEndpoint {
+public interface PropertySourceDescription {
 
-    private final EnvPropertyEnricher envPropertyEnricher;
+    /**
+     * Returns the custom description of the property source.
+     *
+     * @return property source description
+     */
+    String getDescription();
 
-    public AxelixEnvironmentEndpoint(EnvPropertyEnricher envPropertyEnricher) {
-        this.envPropertyEnricher = envPropertyEnricher;
-    }
-
-    @GetMapping
-    public EnvironmentFeed environment(@Nullable String pattern) {
-
-        return envPropertyEnricher.enrich(pattern);
-    }
+    /**
+     * Returns the raw name of the property source as exposed by Spring.
+     *
+     * @return property source name
+     */
+    String getSourceName();
 }

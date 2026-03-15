@@ -36,7 +36,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -279,11 +278,8 @@ class AxelixEnvironmentEndpointTest {
     static class AxelixEnvironmentEndpointTestConfiguration {
 
         @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-                Environment environment,
-                SmartSanitizingFunction smartSanitizingFunction,
-                EnvPropertyEnricher envPropertyEnricher) {
-            return new AxelixEnvironmentEndpoint(environment, smartSanitizingFunction, envPropertyEnricher);
+        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvPropertyEnricher envPropertyEnricher) {
+            return new AxelixEnvironmentEndpoint(envPropertyEnricher);
         }
 
         @Bean

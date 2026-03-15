@@ -17,23 +17,20 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
-import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
-
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-
 /**
- * Enriches environment property information with additional metadata.
+ * Resolves user-facing display data for environment property sources.
  *
- * @since 21.10.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
-public interface EnvPropertyEnricher {
+public interface PropertySourceDescriptionResolver {
 
     /**
-     * Enriches the original environment descriptor with additional metadata.
+     * Resolves the display name and description for the given property source.
      *
-     * @param originalDescriptor the original environment descriptor from Spring Boot
-     * @return enriched environment descriptor
+     * @param sourceName the raw property source name as exposed by Spring
+     * @param descriptions property source descriptors that may provide a matching description
+     * @return resolved display data for the property source
      */
-    EnvironmentFeed enrich(EnvironmentDescriptor originalDescriptor);
+    PropertySourceDisplayData resolveDisplayData(String sourceName, PropertySourceDescription[] descriptions);
 }
