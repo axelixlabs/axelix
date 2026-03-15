@@ -45,72 +45,64 @@ public enum PropertySourceDescription {
                 AxelixPropertySource.AXELIX_PROPERTY_SOURCE_NAME,
                 "A custom {@link MapPropertySource} implementation used to hold mutable property values, managed dynamically during application runtime, and having the highest priority"),
     */
-    SERVER_PORTS(
-            "server.ports",
-            "Contains the 'server.port' property from 'application.properties/yaml', which defines the web server port (8080 by default)."),
+
+    // Server Ports
+    SERVER_PORTS("server.ports", PropertySourceCustomDescription.SERVER_PORTS.getDescription()),
 
     // StandardEnvironment
     SYSTEM_PROPERTIES(
             StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME,
-            "Contains all Java system properties (those set via -Dkey=value at JVM startup, as well as properties set via 'System.setProperty()' at runtime) and has higher priority than properties in 'systemEnvironment'"),
+            PropertySourceCustomDescription.SYSTEM_PROPERTIES.getDescription()),
     SYSTEM_ENVIRONMENT(
             StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
-            "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application*.properties/yaml'"),
+            PropertySourceCustomDescription.SYSTEM_ENVIRONMENT.getDescription()),
 
-    APPLICATION_INFO(
-            "applicationInfo",
-            "Contains application metadata extracted from the 'MANIFEST.MF' file and core Spring Boot properties 'spring.application.*'"),
+    // Application
+    APPLICATION_INFO("applicationInfo", PropertySourceCustomDescription.APPLICATION_INFO.getDescription()),
 
-    // TODO: simplify the description here. It is not true that the config file is necessarily loaded from the
     // classpath.
-    APPLICATION_PROPERTIES(
-            "Config resource",
-            "Contains properties from the 'application*.properties/yaml' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources."),
+    APPLICATION_PROPERTIES("Config resource", PropertySourceCustomDescription.APPLICATION_PROPERTIES.getDescription()),
 
     // CommandLinePropertySource
     COMMAND_LINE_ARGS(
             CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME,
-            "Contains properties from the command-line arguments passed to the application at startup"),
+            PropertySourceCustomDescription.COMMAND_LINE_ARGS.getDescription()),
     NON_OPTION_ARGS(
             CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME,
-            "Contains 'non-option' command-line arguments—that is, arguments passed without the '--' or '-' prefixes"),
+            PropertySourceCustomDescription.NON_OPTION_ARGS.getDescription()),
 
     // StandardServletEnvironment
     SERVLET_CONTEXT_INIT_PARAMS(
             StandardServletEnvironment.SERVLET_CONTEXT_PROPERTY_SOURCE_NAME,
-            "Contains the initialization parameters of the 'ServletContext', defined in 'web.xml' or set via 'ServletContext.setInitParameter()', and has higher priority than properties in 'jndiProperties' and 'StandardEnvironment'"),
+            PropertySourceCustomDescription.SERVLET_CONTEXT_INIT_PARAMS.getDescription()),
     SERVLET_CONFIG_INIT_PARAMS(
             StandardServletEnvironment.SERVLET_CONFIG_PROPERTY_SOURCE_NAME,
-            "Contains the initialization parameters (init-params) from 'web.xml' for a specific 'ServletConfig' and has higher priority than properties in 'servletContextInitParams' and 'StandardEnvironment'"),
+            PropertySourceCustomDescription.SERVLET_CONFIG_INIT_PARAMS.getDescription()),
     JNDI_PROPERTIES(
             StandardServletEnvironment.JNDI_PROPERTY_SOURCE_NAME,
-            "Contains properties from Java Naming and Directory Interface resources configured in the application server and has higher priority than properties in 'StandardEnvironment'"),
+            PropertySourceCustomDescription.JNDI_PROPERTIES.getDescription()),
 
     // HostInfoEnvironmentPostProcessor
     SPRING_CLOUD_CLIENT_HOST_INFO(
             "springCloudClientHostInfo",
-            "Contains information about the client host for discovering and identifying instances in the cluster"),
+            PropertySourceCustomDescription.SPRING_CLOUD_CLIENT_HOST_INFO.getDescription()),
 
     // BootstrapApplicationListener
     SPRING_CLOUD_DEFAULT_PROPERTIES(
             BootstrapApplicationListener.DEFAULT_PROPERTIES,
-            "Contains default configuration values provided by 'Spring Cloud' components, used unless they are overridden by 'bootstrap.properties/yaml' settings or properties defined in the 'StandardEnvironment'"),
+            PropertySourceCustomDescription.SPRING_CLOUD_DEFAULT_PROPERTIES.getDescription()),
     BOOTSTRAP(
             BootstrapApplicationListener.BOOTSTRAP_PROPERTY_SOURCE_NAME,
-            "Contains configuration loaded from 'bootstrap.properties/yaml' and initialized before the 'ApplicationContext', providing early-stage settings"),
+            PropertySourceCustomDescription.BOOTSTRAP.getDescription()),
 
     // ContextRefresher
-    REFRESH_ARGS(
-            "refreshArgs",
-            "Contains arguments passed during a context refresh triggered by Spring Cloud’s ContextRefresher. Used to propagate dynamic configuration updates at runtime"),
-    DEFAULT_PROPERTIES(
-            "defaultProperties",
-            "Contains default property values registered via 'SpringApplication.setDefaultProperties()' and has the lowest priority among properties added in code."),
+    REFRESH_ARGS("refreshArgs", PropertySourceCustomDescription.REFRESH_ARGS.getDescription()),
+    DEFAULT_PROPERTIES("defaultProperties", PropertySourceCustomDescription.DEFAULT_PROPERTIES.getDescription()),
 
     // RandomValuePropertySource
     RANDOM(
             RandomValuePropertySource.RANDOM_PROPERTY_SOURCE_NAME,
-            "Contains dynamically generated random values for placeholders like ${random.*}");
+            PropertySourceCustomDescription.RANDOM.getDescription());
 
     /**
      * Matches Spring's config resource property source names to extract the file name and location.
