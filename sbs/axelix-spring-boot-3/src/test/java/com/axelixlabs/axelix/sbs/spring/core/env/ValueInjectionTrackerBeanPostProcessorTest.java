@@ -67,8 +67,20 @@ class ValueInjectionTrackerBeanPostProcessorTest {
     static class ValueInjectionTrackerBeanPostProcessorTestConfig {
 
         @Bean
-        public static ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor() {
-            return new ValueInjectionTrackerBeanPostProcessor(new DefaultPropertyNameNormalizer());
+        public PropertyNameNormalizer propertyNameNormalizer() {
+            return new DefaultPropertyNameNormalizer();
+        }
+
+        @Bean
+        public ValueAnnotationInjectionProcessor valueAnnotationInjectionProcessor(
+                PropertyNameNormalizer propertyNameNormalizer) {
+            return new DefaultValueAnnotationInjectionProcessor(propertyNameNormalizer);
+        }
+
+        @Bean
+        public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor(
+                ValueAnnotationInjectionProcessor annotationInjectionProcessor) {
+            return new ValueInjectionTrackerBeanPostProcessor(annotationInjectionProcessor);
         }
     }
 

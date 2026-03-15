@@ -28,14 +28,13 @@ import org.springframework.context.ApplicationContext;
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 
 /**
- * Service caching the application's {@code @ConfigurationProperties}
- * data from the standard Spring Boot Actuator endpoint.
+ * Default implementation {@link ConfigurationPropertiesCache}.
  *
  * @since 13.11.2025
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public class ConfigurationPropertiesCache {
+public class DefaultConfigurationPropertiesCache implements ConfigurationPropertiesCache {
 
     private final ConfigurationPropertiesReportEndpoint delegate;
     private final ConfigurationPropertiesConverter configurationPropertiesConverter;
@@ -43,7 +42,7 @@ public class ConfigurationPropertiesCache {
     @Nullable
     private volatile ConfigurationPropertiesFeed cachedResult;
 
-    public ConfigurationPropertiesCache(
+    public DefaultConfigurationPropertiesCache(
             SmartSanitizingFunction smartSanitizingFunction,
             ApplicationContext applicationContext,
             ConfigurationPropertiesConverter configurationPropertiesConverter) {
@@ -53,7 +52,8 @@ public class ConfigurationPropertiesCache {
         this.configurationPropertiesConverter = configurationPropertiesConverter;
     }
 
-    public ConfigurationPropertiesFeed getConfigProps() {
+    @Override
+    public ConfigurationPropertiesFeed getConfigurationPropertiesFeed() {
         if (cachedResult == null) {
             synchronized (this) {
                 if (cachedResult == null) {

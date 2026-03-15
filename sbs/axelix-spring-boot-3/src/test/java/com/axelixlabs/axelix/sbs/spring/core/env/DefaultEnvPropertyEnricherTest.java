@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
-import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -74,9 +73,7 @@ class DefaultEnvPropertyEnricherTest {
 
     @Test
     void shouldEnrichAllPropertiesWithPrimaryField() {
-        EnvironmentDescriptor defaultDescriptor = environmentEndpoint.environment(null);
-
-        EnvironmentFeed environmentFeed = enricher.enrich(defaultDescriptor);
+        EnvironmentFeed environmentFeed = enricher.enrich(null);
 
         assertThat(environmentFeed).isNotNull();
         assertThat(environmentFeed.getActiveProfiles()).isNotNull();
@@ -95,9 +92,7 @@ class DefaultEnvPropertyEnricherTest {
 
     @Test
     void shouldNormalizeConfigResourcePropertySourceNameAndDescription() {
-        EnvironmentDescriptor defaultDescriptor = environmentEndpoint.environment(null);
-
-        EnvironmentFeed environmentFeed = enricher.enrich(defaultDescriptor);
+        EnvironmentFeed environmentFeed = enricher.enrich(null);
 
         List<PropertySource> configResourceSources = environmentFeed.getPropertySources().stream()
                 .filter(it -> it.getName().endsWith(".yaml"))

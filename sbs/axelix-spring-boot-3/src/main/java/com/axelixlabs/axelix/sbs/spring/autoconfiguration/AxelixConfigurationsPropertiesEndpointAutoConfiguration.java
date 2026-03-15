@@ -29,6 +29,7 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationProp
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
@@ -80,7 +81,7 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
             SmartSanitizingFunction smartSanitizingFunction,
             ApplicationContext applicationContext,
             ConfigurationPropertiesConverter configurationPropertiesConverter) {
-        return new ConfigurationPropertiesCache(
+        return new DefaultConfigurationPropertiesCache(
                 smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
     }
 

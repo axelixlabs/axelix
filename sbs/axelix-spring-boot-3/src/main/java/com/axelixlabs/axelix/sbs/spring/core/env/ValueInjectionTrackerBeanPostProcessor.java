@@ -20,13 +20,9 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -56,22 +52,10 @@ import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionType;
 public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor {
 
     private final Map<String, List<InjectionPoint>> propertyToInjectionPoints = new ConcurrentHashMap<>();
-    private final PropertyNameNormalizer propertyNameNormalizer;
+    private final ValueAnnotationInjectionProcessor annotationInjectionProcessor;
 
-    // Looks up for the pattern @Value("${my.property:123}"), works also if the default value is absent.
-    private static final Pattern PROPERTY_PATTERN = Pattern.compile("\\$\\{(.+?)(?::(.+?))?}");
-
-    // Looks up for the pattern ".getProperty()", such as "#{environment.getProperty('server.port')}"
-    // Note that as of now we're not checking that the actual receiver is instanceof Spring's Environment
-    private static final Pattern ENVIRONMENT_GET_PROPERTY_CALLS_PATTERN =
-            Pattern.compile("getProperty\\s*\\(\\s*['\"]([^'\"]+)['\"]");
-
-    // Looks up for the pattern that uses property source name indexed usage, such as
-    // "#{systemProperties['server.port']}"
-    private final Pattern SYSTEM_PROPERTIES_ACCESS_PATTERN = Pattern.compile("\\[\\s*['\"]([^'\"]+)['\"]\\s*]");
-
-    public ValueInjectionTrackerBeanPostProcessor(PropertyNameNormalizer propertyNameNormalizer) {
-        this.propertyNameNormalizer = propertyNameNormalizer;
+    public ValueInjectionTrackerBeanPostProcessor(ValueAnnotationInjectionProcessor annotationInjectionProcessor) {
+        this.annotationInjectionProcessor = annotationInjectionProcessor;
     }
 
     @Override
@@ -98,7 +82,12 @@ public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor
         ReflectionUtils.doWithFields(beanClass, field -> {
             Value valueAnnotation = findValueAnnotation(field);
             if (valueAnnotation != null) {
-                processValueAnnotation(valueAnnotation, beanName, InjectionType.FIELD, field.getName());
+                annotationInjectionProcessor.processValueAnnotation(
+                        propertyToInjectionPoints,
+                        valueAnnotation.value(),
+                        beanName,
+                        InjectionType.FIELD,
+                        field.getName());
             }
         });
     }
@@ -108,8 +97,9 @@ public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor
             for (Parameter parameter : method.getParameters()) {
                 Value parameterAnnotation = findValueAnnotation(parameter);
                 if (parameterAnnotation != null) {
-                    processValueAnnotation(
-                            parameterAnnotation,
+                    annotationInjectionProcessor.processValueAnnotation(
+                            propertyToInjectionPoints,
+                            parameterAnnotation.value(),
                             beanName,
                             InjectionType.METHOD_PARAMETER,
                             method.getName() + "::" + parameter.getName());
@@ -118,7 +108,12 @@ public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor
 
             Value methodAnnotation = findValueAnnotation(method);
             if (methodAnnotation != null) {
-                processValueAnnotation(methodAnnotation, beanName, InjectionType.METHOD, method.getName());
+                annotationInjectionProcessor.processValueAnnotation(
+                        propertyToInjectionPoints,
+                        methodAnnotation.value(),
+                        beanName,
+                        InjectionType.METHOD,
+                        method.getName());
             }
         });
     }
@@ -128,8 +123,12 @@ public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor
             for (Parameter parameter : constructor.getParameters()) {
                 Value valueAnnotation = findValueAnnotation(parameter);
                 if (valueAnnotation != null) {
-                    processValueAnnotation(
-                            valueAnnotation, beanName, InjectionType.CONSTRUCTOR_PARAMETER, parameter.getName());
+                    annotationInjectionProcessor.processValueAnnotation(
+                            propertyToInjectionPoints,
+                            valueAnnotation.value(),
+                            beanName,
+                            InjectionType.CONSTRUCTOR_PARAMETER,
+                            parameter.getName());
                 }
             }
         }
@@ -141,52 +140,5 @@ public class ValueInjectionTrackerBeanPostProcessor implements BeanPostProcessor
                 .get(Value.class)
                 .synthesize(MergedAnnotation::isPresent)
                 .orElse(null);
-    }
-
-    private void processValueAnnotation(
-            Value annotation, String beanName, InjectionType injectionType, String targetName) {
-        String expression = annotation.value();
-
-        List<String> propertyNames = extractPropertyNamesFromExpression(expression);
-
-        for (String propertyName : propertyNames) {
-            String normalizedName = propertyNameNormalizer.normalize(propertyName);
-
-            InjectionPoint injectionPoint = new InjectionPoint(beanName, injectionType, targetName, expression);
-
-            propertyToInjectionPoints
-                    .computeIfAbsent(normalizedName, k -> Collections.synchronizedList(new ArrayList<>()))
-                    .add(injectionPoint);
-        }
-    }
-
-    private List<String> extractPropertyNamesFromExpression(String expression) {
-        List<String> propertyNames = new ArrayList<>();
-
-        // ${property.name}
-        Matcher matcher = PROPERTY_PATTERN.matcher(expression);
-        while (matcher.find()) {
-            String propertyExpression = matcher.group(1).trim();
-            propertyNames.add(propertyExpression);
-        }
-
-        // SpEL
-        if (expression.contains("#{")) {
-            extractPropertyNamesFromSpEL(expression, propertyNames);
-        }
-
-        return propertyNames;
-    }
-
-    private void extractPropertyNamesFromSpEL(String expression, List<String> propertyNames) {
-        Matcher matcher = ENVIRONMENT_GET_PROPERTY_CALLS_PATTERN.matcher(expression);
-        while (matcher.find()) {
-            propertyNames.add(matcher.group(1));
-        }
-
-        matcher = SYSTEM_PROPERTIES_ACCESS_PATTERN.matcher(expression);
-        while (matcher.find()) {
-            propertyNames.add(matcher.group(1));
-        }
     }
 }

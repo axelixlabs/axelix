@@ -17,29 +17,19 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 
 /**
- * Custom Actuator endpoint exposing the application's {@code @ConfigurationProperties}
+ * Service caching the application's {@code @ConfigurationProperties}
  * data from the standard Spring Boot Actuator endpoint.
  *
- * @since 13.11.2025
+ * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-@Endpoint(id = "axelix-configprops")
-public class AxelixConfigurationPropertiesEndpoint {
+public interface ConfigurationPropertiesCache {
 
-    private final ConfigurationPropertiesCache configurationPropertiesCache;
-
-    public AxelixConfigurationPropertiesEndpoint(ConfigurationPropertiesCache cache) {
-        this.configurationPropertiesCache = cache;
-    }
-
-    @ReadOperation
-    public ConfigurationPropertiesFeed configurationProperties() {
-        return configurationPropertiesCache.getConfigurationPropertiesFeed();
-    }
+    /**
+     * @return the cached {@link ConfigurationPropertiesFeed}
+     */
+    ConfigurationPropertiesFeed getConfigurationPropertiesFeed();
 }

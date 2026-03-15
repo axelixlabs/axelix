@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,19 +26,17 @@ import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.actuate.endpoint.Show;
+import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.PropertySourceDescriptor;
 import org.springframework.core.env.Environment;
 
-import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Deprecation;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Property;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription.PropertySourceDisplayData;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 /**
  * Default implementation {@link EnvPropertyEnricher}
@@ -51,33 +48,36 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription.Prope
 public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
     private final Environment environment;
-
-    @Nullable
-    private final ConfigurationPropertiesCache configurationPropertiesCache;
-
+    private final EnvironmentEndpoint delegate;
     private final PropertyNameNormalizer propertyNameNormalizer;
-
     private final PropertyMetadataExtractor metadataExtractor;
-
     private final ValueInjectionTrackerBeanPostProcessor valueInjectionTracker;
+    private final PropertySourceDescriptionResolver sourceDescriptionResolver;
+    private final PropertyMappingBuilder environmentMappingBuilder;
 
     public DefaultEnvPropertyEnricher(
             Environment environment,
             PropertyNameNormalizer propertyNameNormalizer,
-            ObjectProvider<ConfigurationPropertiesCache> cache,
             PropertyMetadataExtractor metadataExtractor,
-            ValueInjectionTrackerBeanPostProcessor valueInjectionTracker) {
-        this.configurationPropertiesCache = cache.getIfAvailable();
+            ValueInjectionTrackerBeanPostProcessor valueInjectionTracker,
+            SmartSanitizingFunction smartSanitizingFunction,
+            PropertySourceDescriptionResolver sourceDescriptionResolver,
+            PropertyMappingBuilder environmentMappingBuilder) {
         this.propertyNameNormalizer = propertyNameNormalizer;
         this.environment = environment;
         this.metadataExtractor = metadataExtractor;
         this.valueInjectionTracker = valueInjectionTracker;
+        this.delegate = new EnvironmentEndpoint(environment, List.of(smartSanitizingFunction), Show.ALWAYS);
+        this.sourceDescriptionResolver = sourceDescriptionResolver;
+        this.environmentMappingBuilder = environmentMappingBuilder;
     }
 
     @Override
-    public EnvironmentFeed enrich(EnvironmentDescriptor originalDescriptor) {
+    public EnvironmentFeed enrich(@Nullable String pattern) {
+        EnvironmentDescriptor originalDescriptor = delegate.environment(pattern);
+
         Map<String, String> primarySourceMap = buildPrimarySourceMap(originalDescriptor);
-        Map<String, String> configPropsMapping = buildConfigPropsMappingMap();
+        Map<String, String> configPropsMapping = environmentMappingBuilder.buildConfigPropsMappingMap();
 
         List<PropertySource> enrichedSources = originalDescriptor.getPropertySources().stream()
                 .map(source -> enrichPropertySource(source, primarySourceMap, configPropsMapping))
@@ -132,46 +132,14 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
                             Optional.ofNullable(metadata)
                                     .map(PropertyMetadata::getDescription)
                                     .orElse(null),
-                            buildFromMetadata(metadata),
+                            environmentMappingBuilder.buildFromMetadata(metadata),
                             injectionPoints);
                 })
                 .toList();
 
-        PropertySourceDisplayData displayData = PropertySourceDescription.resolveDisplayData(source.getName());
+        PropertySourceDisplayData displayData = sourceDescriptionResolver.resolveDisplayData(
+                source.getName(), DefaultPropertySourceDescription.values());
 
-        return new PropertySource(displayData.displayName(), displayData.description(), enrichedProperties);
-    }
-
-    @Nullable
-    private Deprecation buildFromMetadata(@Nullable PropertyMetadata propertyMetadata) {
-        if (propertyMetadata == null || propertyMetadata.getDeprecation() == null) {
-            return null;
-        }
-
-        return new Deprecation(propertyMetadata.getDeprecation().getMessage());
-    }
-
-    private Map<String, String> buildConfigPropsMappingMap() {
-        if (configurationPropertiesCache == null) {
-            return Map.of();
-        }
-
-        Map<String, String> configPropsMapping = new HashMap<>();
-
-        configurationPropertiesCache
-                .getConfigProps()
-                .getBeans()
-                .forEach((bean) -> applyPrefixAndProperty(
-                        bean.getPrefix(), bean.getProperties(), configPropsMapping, bean.getBeanName()));
-
-        return configPropsMapping;
-    }
-
-    private void applyPrefixAndProperty(
-            String prefix, List<KeyValue> properties, Map<String, String> configPropsMapping, String beanName) {
-        for (var property : properties) {
-            String fullProperty = propertyNameNormalizer.normalize(prefix + property.getKey());
-            configPropsMapping.put(fullProperty, beanName);
-        }
+        return new PropertySource(displayData.getDisplayName(), displayData.getDescription(), enrichedProperties);
     }
 }

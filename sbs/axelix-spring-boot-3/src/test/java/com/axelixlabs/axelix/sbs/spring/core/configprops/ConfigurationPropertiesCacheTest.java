@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link ConfigurationPropertiesCache}.
+ * Integration tests for {@link DefaultConfigurationPropertiesCache}.
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
@@ -55,7 +55,7 @@ public class ConfigurationPropertiesCacheTest {
     @Test
     void shouldReturnConfigurationProperties() {
         // when.
-        ConfigurationPropertiesFeed configProps = configurationPropertiesCache.getConfigProps();
+        ConfigurationPropertiesFeed configProps = configurationPropertiesCache.getConfigurationPropertiesFeed();
 
         // then.
         Set<@Nullable String> values = configProps.getBeans().stream()
@@ -100,7 +100,7 @@ public class ConfigurationPropertiesCacheTest {
                 SmartSanitizingFunction smartSanitizingFunction,
                 ApplicationContext applicationContext,
                 ConfigurationPropertiesConverter configurationPropertiesConverter) {
-            return new ConfigurationPropertiesCache(
+            return new DefaultConfigurationPropertiesCache(
                     smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
         }
     }

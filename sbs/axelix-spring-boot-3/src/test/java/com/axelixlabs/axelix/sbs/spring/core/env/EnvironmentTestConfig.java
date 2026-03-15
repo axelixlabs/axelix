@@ -27,6 +27,7 @@ import org.springframework.core.env.Environment;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
@@ -52,11 +53,11 @@ public class EnvironmentTestConfig {
     }
 
     @Bean
-    public ConfigurationPropertiesCache configurationPropertiesCache(
+    public DefaultConfigurationPropertiesCache configurationPropertiesCache(
             SmartSanitizingFunction smartSanitizingFunction,
             ApplicationContext applicationContext,
             ConfigurationPropertiesConverter configurationPropertiesConverter) {
-        return new ConfigurationPropertiesCache(
+        return new DefaultConfigurationPropertiesCache(
                 smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
     }
 
@@ -73,22 +74,44 @@ public class EnvironmentTestConfig {
 
     @Bean
     public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor(
-            PropertyNameNormalizer propertyNameNormalizer) {
-        return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
+            ValueAnnotationInjectionProcessor annotationInjectionProcessor) {
+        return new ValueInjectionTrackerBeanPostProcessor(annotationInjectionProcessor);
     }
 
     @Bean
     public EnvPropertyEnricher envPropertyEnricher(
             Environment environment,
             PropertyNameNormalizer propertyNameNormalizer,
-            ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache,
-            PropertyMetadataExtractor propertyMetadataExtractor,
-            ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor) {
+            PropertyMetadataExtractor metadataExtractor,
+            ValueInjectionTrackerBeanPostProcessor valueInjectionTracker,
+            SmartSanitizingFunction smartSanitizingFunction,
+            PropertySourceDescriptionResolver sourceDescriptionResolver,
+            PropertyMappingBuilder environmentMappingBuilder,
+            ObjectProvider<ConfigurationPropertiesCache> cache) {
         return new DefaultEnvPropertyEnricher(
                 environment,
                 propertyNameNormalizer,
-                configurationPropertiesCache,
-                propertyMetadataExtractor,
-                valueInjectionTrackerBeanPostProcessor);
+                metadataExtractor,
+                valueInjectionTracker,
+                smartSanitizingFunction,
+                sourceDescriptionResolver,
+                environmentMappingBuilder);
+    }
+
+    @Bean
+    public PropertyMappingBuilder propertyMappingBuilder(
+            PropertyNameNormalizer propertyNameNormalizer, ObjectProvider<ConfigurationPropertiesCache> cache) {
+        return new DefaultPropertyMappingBuilder(propertyNameNormalizer, cache.getIfAvailable());
+    }
+
+    @Bean
+    public ValueAnnotationInjectionProcessor valueAnnotationInjectionProcessor(
+            PropertyNameNormalizer propertyNameNormalizer) {
+        return new DefaultValueAnnotationInjectionProcessor(propertyNameNormalizer);
+    }
+
+    @Bean
+    public PropertySourceDescriptionResolver propertySourceDescriptionResolver() {
+        return new DefaultPropertySourceDescriptionResolver();
     }
 }
