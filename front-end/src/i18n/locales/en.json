@@ -102,10 +102,9 @@
         "name": "Name",
         "cleared": "Cleared",
         "clear": "Clear",
+        "ratio" : "Hits/Total Ratio",
         "enabled": "Cache is enabled at runtime",
         "disabled": "Cache is disabled at runtime",
-        "hits": "Hits",
-        "misses": "Misses",
         "estimatedEntrySize": "Entries count",
         "statistics": "Statistics"
     },

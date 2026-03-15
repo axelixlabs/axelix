@@ -16,14 +16,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useTranslation } from "react-i18next";
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import {
-    cacheHitsMissesChartToFormattedTime,
-    createHitsAndMissesGroup,
-    getChartData,
-    getTimelineInterval,
-} from "helpers";
+import { buildChartData, cacheHitsMissesChartToFormattedTime, getTimelineInterval } from "helpers";
 import type { IGetSingleCacheResponseBody } from "models";
 
 import { CacheChartStats } from "../../CacheChartStats";
@@ -37,50 +32,44 @@ interface IProps {
 
 export const CacheChart = ({ singleCacheData }: IProps) => {
     const { t } = useTranslation();
-    const interval = getTimelineInterval(singleCacheData);
-    const hitsAndMissesGroup = createHitsAndMissesGroup(singleCacheData);
-    const data = getChartData(hitsAndMissesGroup, interval);
+
+    const { interval, minTimestamp, maxTimestamp } = getTimelineInterval(singleCacheData.lookupHistory);
+    const { lookupHistory } = singleCacheData;
+
+    const slidingRatio = buildChartData(lookupHistory, 50);
 
     return (
         <>
             <ResponsiveContainer width="100%" height={330}>
-                <LineChart data={data}>
+                <LineChart data={slidingRatio}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
                     <XAxis
                         dataKey="timestamp"
                         type="number"
-                        domain={["dataMin", "dataMax"]}
-                        tickFormatter={(value: number) => cacheHitsMissesChartToFormattedTime(value, interval)}
+                        domain={[minTimestamp, maxTimestamp]}
+                        tickFormatter={(timestamp: number) => cacheHitsMissesChartToFormattedTime(timestamp, interval)}
                         interval="preserveStartEnd"
                     />
 
-                    <YAxis allowDecimals={false} width="auto" />
+                    <YAxis domain={[0, 1]} allowDecimals width="auto" />
 
                     <Line
                         type="monotone"
-                        dataKey="hits"
-                        name={t("Caches.hits")}
+                        dataKey="count"
+                        name={t("Caches.ratio")}
                         stroke="#95de64"
-                        strokeWidth={3}
                         dot={false}
-                        activeDot={false}
+                        strokeWidth={3}
                     />
 
-                    <Line
-                        type="monotone"
-                        dataKey="misses"
-                        name={t("Caches.misses")}
-                        stroke="#69c0ff"
-                        strokeWidth={3}
-                        dot={false}
-                        activeDot={false}
+                    <Tooltip
+                        labelFormatter={(timestamp: number) => cacheHitsMissesChartToFormattedTime(timestamp, interval)}
                     />
-
                     <Legend verticalAlign="top" align="right" />
                 </LineChart>
             </ResponsiveContainer>
-            <CacheChartStats singleCacheData={singleCacheData} />
+            <CacheChartStats cacheData={singleCacheData} />
         </>
     );
 };
