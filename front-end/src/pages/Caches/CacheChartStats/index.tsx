@@ -17,7 +17,7 @@
  */
 import { useTranslation } from "react-i18next";
 
-import type { IGetSingleCacheResponseBody } from "models";
+import { ELookupOutcome, type IGetSingleCacheResponseBody } from "models";
 
 import styles from "./styles.module.css";
 
@@ -25,25 +25,24 @@ interface IProps {
     /**
      * Single cache data
      */
-    singleCacheData: IGetSingleCacheResponseBody;
+    cacheData: IGetSingleCacheResponseBody;
 }
 
-export const CacheChartStats = ({ singleCacheData }: IProps) => {
+export const CacheChartStats = ({ cacheData }: IProps) => {
     const { t } = useTranslation();
 
-    // TODO: Refactore this code in future
-    const hitsCount = singleCacheData.hits.length;
-    const missesCount = singleCacheData.misses.length;
-    const allCountOfMissesAndHits = hitsCount + missesCount;
-    const hitsPercentage = allCountOfMissesAndHits > 0 ? (hitsCount / allCountOfMissesAndHits) * 100 : 0;
-    const missesPercentage = allCountOfMissesAndHits > 0 ? (missesCount / allCountOfMissesAndHits) * 100 : 0;
+    const hitsCount = cacheData.lookupHistory.filter((value) => value.outcome === ELookupOutcome.HIT).length;
+    const missCount = cacheData.lookupHistory.filter((value) => value.outcome === ELookupOutcome.MISS).length;
+
+    const hitsPercentage = (hitsCount / cacheData.lookupHistory.length) * 100;
+    const missesPercentage = (missCount / cacheData.lookupHistory.length) * 100;
 
     return (
         <>
             <div className={styles.MainWrapper}>
                 <div className={styles.Percentage}>{t("Caches.hits")}</div>
                 <div className={styles.Count}>{t("Caches.misses")}</div>
-                {!!singleCacheData.estimatedEntrySize && (
+                {cacheData.estimatedEntrySize && (
                     <div className={styles.EstimatedEntrySize}>{t("Caches.estimatedEntrySize")}</div>
                 )}
                 <div className={styles.HeaderLine} />
@@ -54,11 +53,11 @@ export const CacheChartStats = ({ singleCacheData }: IProps) => {
                     {hitsCount} ({Number(hitsPercentage.toFixed(1))}%)
                 </div>
                 <div className={styles.CountValue}>
-                    {missesCount} ({Number(missesPercentage.toFixed(1))}%)
+                    {missCount} ({Number(missesPercentage.toFixed(1))}%)
                 </div>
 
-                {!!singleCacheData.estimatedEntrySize && (
-                    <div className={styles.EstimatedEntrySizeValue}>{singleCacheData.estimatedEntrySize}</div>
+                {cacheData.estimatedEntrySize && (
+                    <div className={styles.EstimatedEntrySizeValue}>{cacheData.estimatedEntrySize}</div>
                 )}
             </div>
         </>

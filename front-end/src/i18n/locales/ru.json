@@ -103,9 +103,8 @@
         "cleared": "Очищено",
         "clear": "Очистить",
         "enabled": "Кэш включён",
+        "ratio": "Соотношение hits/total",
         "disabled": "Кэш выключен",
-        "hits": "Попадания",
-        "misses": "Промахи",
         "estimatedEntrySize": "Количество записей",
         "statistics": "Статистика"
     },

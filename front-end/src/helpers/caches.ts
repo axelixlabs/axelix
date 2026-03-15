@@ -15,13 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type {
-    ICacheData,
-    ICacheLookup,
-    ICachesManager,
-    IGetSingleCacheResponseBody,
-    IGroupTimestampEvent,
-} from "models";
+import { ELookupOutcome, type ICacheData, type ICacheLookup, type ICachesManager, type ITimelineData } from "models";
 
 import {
     SINGLE_CACHE_CHART_TIMELINE_STEP_5M,
@@ -47,49 +41,49 @@ export const filterCacheManagers = (cacheManager: ICachesManager[], search: stri
     });
 };
 
-export const getTimelineInterval = (data: IGetSingleCacheResponseBody): number => {
-    const allTimestamps = [
-        ...data.hits.map(({ timestamp }) => timestamp),
-        ...data.misses.map(({ timestamp }) => timestamp),
-    ];
-
-    if (allTimestamps.length === 0) {
-        return SINGLE_CACHE_CHART_TIMELINE_STEP_S;
+export const getTimelineInterval = (data: ICacheLookup[]): ITimelineData => {
+    // That theoretically should not happen at all, since this function should be invoked
+    // when we have at least 1 hit or miss, but still a safeguard
+    if (data.length === 0) {
+        return { maxTimestamp: -1, interval: SINGLE_CACHE_CHART_TIMELINE_STEP_S, minTimestamp: -1 };
     }
 
-    // TODO: This can be optimized since the hits and misses are guaranteed to be sorted in
-    // response from the backend
-    const range = Math.max(...allTimestamps) - Math.min(...allTimestamps);
+    const timelineData = {
+        maxTimestamp: data.at(-1)!.timestamp,
+        minTimestamp: data.at(0)!.timestamp,
+    };
+
+    const range = timelineData.maxTimestamp - timelineData.minTimestamp;
 
     if (range <= SINGLE_CACHE_CHART_TIMELINE_STEP_M) {
-        return SINGLE_CACHE_CHART_TIMELINE_STEP_S;
+        return { interval: SINGLE_CACHE_CHART_TIMELINE_STEP_S, ...timelineData };
     }
 
     if (range <= 10 * SINGLE_CACHE_CHART_TIMELINE_STEP_M) {
-        return SINGLE_CACHE_CHART_TIMELINE_STEP_5S;
+        return { interval: SINGLE_CACHE_CHART_TIMELINE_STEP_5S, ...timelineData };
     }
 
     if (range <= SINGLE_CACHE_CHART_TIMELINE_STEP_H) {
-        return SINGLE_CACHE_CHART_TIMELINE_STEP_M;
+        return { interval: SINGLE_CACHE_CHART_TIMELINE_STEP_M, ...timelineData };
     }
 
     if (range <= 6 * SINGLE_CACHE_CHART_TIMELINE_STEP_H) {
-        return SINGLE_CACHE_CHART_TIMELINE_STEP_5M;
+        return { interval: SINGLE_CACHE_CHART_TIMELINE_STEP_5M, ...timelineData };
     }
 
     if (range <= SINGLE_CACHE_CHART_TIMELINE_STEP_D) {
-        return SINGLE_CACHE_CHART_TIMELINE_STEP_15M;
+        return { interval: SINGLE_CACHE_CHART_TIMELINE_STEP_15M, ...timelineData };
     }
 
     if (range <= 7 * SINGLE_CACHE_CHART_TIMELINE_STEP_D) {
-        return SINGLE_CACHE_CHART_TIMELINE_STEP_H;
+        return { interval: SINGLE_CACHE_CHART_TIMELINE_STEP_H, ...timelineData };
     }
 
     if (range <= 30 * SINGLE_CACHE_CHART_TIMELINE_STEP_D) {
-        return SINGLE_CACHE_CHART_TIMELINE_STEP_D;
+        return { interval: SINGLE_CACHE_CHART_TIMELINE_STEP_D, ...timelineData };
     }
 
-    return SINGLE_CACHE_CHART_TIMELINE_STEP_30D;
+    return { interval: SINGLE_CACHE_CHART_TIMELINE_STEP_30D, ...timelineData };
 };
 
 export const cacheHitsMissesChartToFormattedTime = (value: number, interval: number): string => {
@@ -149,56 +143,47 @@ export const splitCaches = (caches: ICacheData[]): [ICacheData[], ICacheData[]] 
     return [withDropDown, withoutDropDown];
 };
 
-const getTimestampCountsMap = (events: ICacheLookup[]): Record<number, number> => {
-    const timestampCountsMap: Record<number, number> = {};
-    for (const { timestamp } of events) {
-        timestampCountsMap[timestamp] = (timestampCountsMap[timestamp] ?? 0) + 1;
-    }
-    return timestampCountsMap;
-};
+/**
+ * Builds the array of data points (basically, each data point is a Y coordinate value
+ * on the cartesian plane) from the provided history of lookups.
+ *
+ * The data points (Y coordinate values) represent the ration of hits to total lookups into
+ * the cache accumulated within the provided {@code slidingWindow}.
+ *
+ * @param lookupHistory the history of lookups from which the Y plane is built.
+ * @param slidingWindow the sliding window size.
+ *
+ * @return Y coordinate values.
+ */
+export const buildChartData = (lookupHistory: ICacheLookup[], slidingWindow: number): number[] => {
+    let windowHits = 0;
+    const data: number[] = [];
 
-const groupTimestampsEvents = (events: ICacheLookup[]): IGroupTimestampEvent[] => {
-    const timestampCountsMap = getTimestampCountsMap(events);
-    const timestampsCountWithCount = Object.entries(timestampCountsMap).map(([timestamp, count]) => ({
-        timestamp: +timestamp,
-        count: count,
-    }));
-    return timestampsCountWithCount.sort((prevElement, nextElement) => prevElement.timestamp - nextElement.timestamp);
-};
+    for (let i = 0; i < lookupHistory.length; i++) {
+        const lookup = lookupHistory[i];
 
-const addStartPoint = (data: IGroupTimestampEvent[], minTimestamp: number): IGroupTimestampEvent[] => {
-    const firstPoint = data[0];
+        if (i < slidingWindow) {
+            // eslint-disable-next-line max-depth
+            if (lookup.outcome === ELookupOutcome.HIT) {
+                windowHits++;
+            }
+            data.push(windowHits / (i + 1));
+        } else {
+            // eslint-disable-next-line max-depth
+            if (lookup.outcome == ELookupOutcome.HIT) {
+                windowHits++;
+            }
 
-    if (firstPoint.timestamp > minTimestamp) {
-        data.unshift({
-            timestamp: minTimestamp,
-            count: 0,
-        });
+            // lookupHistory[i - windowSize] is a tail of sliding window
+            // we know that 'i' is at least has 'windowSize'
+            // eslint-disable-next-line max-depth
+            if (lookupHistory[i - slidingWindow].outcome === ELookupOutcome.MISS) {
+                windowHits--;
+            }
+
+            data.push(windowHits / slidingWindow);
+        }
     }
 
     return data;
-};
-
-const addEndPoint = (data: IGroupTimestampEvent[], maxTimestamp: number): IGroupTimestampEvent[] => {
-    const lastPoint = data[data.length - 1];
-
-    if (lastPoint.timestamp < maxTimestamp) {
-        data.push({
-            timestamp: maxTimestamp,
-            count: 0,
-        });
-    }
-
-    return data;
-};
-
-export const getCacheTimestampsChartData = (
-    events: ICacheLookup[],
-    minTimestamp: number,
-    maxTimestamp: number,
-): IGroupTimestampEvent[] => {
-    const groupedTimestampsEvents = groupTimestampsEvents(events);
-    addStartPoint(groupedTimestampsEvents, minTimestamp);
-    addEndPoint(groupedTimestampsEvents, maxTimestamp);
-    return groupedTimestampsEvents;
 };

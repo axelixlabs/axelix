@@ -18,9 +18,8 @@
 import { useTranslation } from "react-i18next";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import { cacheHitsMissesChartToFormattedTime, getCacheTimestampsChartData, getTimelineInterval } from "helpers";
+import { buildChartData, cacheHitsMissesChartToFormattedTime, getTimelineInterval } from "helpers";
 import type { IGetSingleCacheResponseBody } from "models";
-import { CACHE_CHART_DOTS_VISIBILITY_THRESHOLD } from "utils";
 
 import { CacheChartStats } from "../../CacheChartStats";
 
@@ -34,19 +33,10 @@ interface IProps {
 export const CacheChart = ({ singleCacheData }: IProps) => {
     const { t } = useTranslation();
 
-    const interval = getTimelineInterval(singleCacheData);
-    const { hits, misses } = singleCacheData;
+    const { interval, minTimestamp, maxTimestamp } = getTimelineInterval(singleCacheData.lookupHistory);
+    const { lookupHistory } = singleCacheData;
 
-    const allTimestamps = hits.concat(misses).map(({ timestamp }) => timestamp);
-
-    const minTimestamp = Math.min(...allTimestamps);
-    const maxTimestamp = Math.max(...allTimestamps);
-
-    const hitsData = getCacheTimestampsChartData(hits, minTimestamp, maxTimestamp);
-    const missesData = getCacheTimestampsChartData(misses, minTimestamp, maxTimestamp);
-
-    const isHitsDotsNeeded = hitsData.length < CACHE_CHART_DOTS_VISIBILITY_THRESHOLD;
-    const isMissesDotsNeeded = missesData.length < CACHE_CHART_DOTS_VISIBILITY_THRESHOLD;
+    const slidingRatio = buildChartData(lookupHistory, 50);
 
     return (
         <>
@@ -65,25 +55,12 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
                     <YAxis allowDecimals={false} width="auto" />
 
                     <Line
-                        data={hitsData}
+                        data={slidingRatio}
                         type="monotone"
                         dataKey="count"
-                        name={t("Caches.hits")}
-                        stroke="#95de64"
-                        strokeWidth={3}
-                        dot={isHitsDotsNeeded}
-                        activeDot={isHitsDotsNeeded}
-                    />
-
-                    <Line
-                        data={missesData}
-                        type="monotone"
-                        dataKey="count"
-                        name={t("Caches.misses")}
+                        name={t("Caches.ratio")}
                         stroke="#69c0ff"
                         strokeWidth={3}
-                        dot={isMissesDotsNeeded}
-                        activeDot={isMissesDotsNeeded}
                     />
 
                     <Tooltip
@@ -92,7 +69,7 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
                     <Legend verticalAlign="top" align="right" />
                 </LineChart>
             </ResponsiveContainer>
-            <CacheChartStats singleCacheData={singleCacheData} />
+            <CacheChartStats cacheData={singleCacheData} />
         </>
     );
 };

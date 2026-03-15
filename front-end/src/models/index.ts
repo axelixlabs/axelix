@@ -47,3 +47,4 @@ export * from "./enums/details";
 export * from "./enums/globals";
 export * from "./enums/loggers";
 export * from "./enums/beans";
+export * from "./enums/caches";

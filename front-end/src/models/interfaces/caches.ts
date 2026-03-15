@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import type { ELookupOutcome } from "../enums/caches.ts";
+
 export interface ICacheData {
     /**
      * Name of the cache
@@ -117,6 +119,11 @@ export interface ICacheLookup {
      * Timestamp of the given cache lookup.
      */
     timestamp: number;
+
+    /**
+     * Cache lookup outcome.
+     */
+    outcome: ELookupOutcome;
 }
 
 export interface IGetSingleCacheResponseBody {
@@ -138,12 +145,7 @@ export interface IGetSingleCacheResponseBody {
     /**
      * Recorded history of hits.
      */
-    hits: ICacheLookup[];
-
-    /**
-     * Recorded history of misses.
-     */
-    misses: ICacheLookup[];
+    lookupHistory: ICacheLookup[];
 
     /**
      * Estimated amount of entries inside the cache. May be absent.
@@ -156,9 +158,19 @@ export interface IGetSingleCacheResponseBody {
     enabled: boolean;
 }
 
-/**
- * Represents a single chart data point with event count at a given timestamp.
- */
-export interface IGroupTimestampEvent extends ICacheLookup {
-    count: number;
+export interface ITimelineData {
+    /**
+     * Interval to be displayed on the UI.
+     */
+    interval: number;
+
+    /**
+     * min timestamp from which we have cache hits/misses data available.
+     */
+    minTimestamp: number;
+
+    /**
+     * max timestamp until which we have cache hits/misses data available.
+     */
+    maxTimestamp: number;
 }
