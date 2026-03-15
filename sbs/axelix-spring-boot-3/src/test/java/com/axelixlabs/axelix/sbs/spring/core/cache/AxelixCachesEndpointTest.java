@@ -115,8 +115,7 @@ class AxelixCachesEndpointTest {
                     "target" : "java.util.concurrent.ConcurrentHashMap",
                     "enabled" : true,
                     "estimatedEntrySize" : 0,
-                    "misses" : [],
-                    "hits" : []
+                    "lookupHistory" : []
                 }
                 """);
     }

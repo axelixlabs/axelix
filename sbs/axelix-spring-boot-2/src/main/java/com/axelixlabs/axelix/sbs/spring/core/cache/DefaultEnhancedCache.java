@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
-import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -68,17 +67,8 @@ public class DefaultEnhancedCache implements EnhancedCache {
     }
 
     @Override
-    public List<CacheLookup> getHits() {
-        return cacheLookupHistory.get().stream()
-                .filter(cacheLookup -> cacheLookup.outcome() == CacheLookup.Outcome.HIT)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<CacheLookup> getMisses() {
-        return cacheLookupHistory.get().stream()
-                .filter(cacheLookup -> cacheLookup.outcome() == CacheLookup.Outcome.MISS)
-                .collect(Collectors.toList());
+    public List<CacheLookup> getCacheLookups() {
+        return cacheLookupHistory.get();
     }
 
     @Override

@@ -90,12 +90,7 @@ class NonExistentEnhancedCache implements EnhancedCache {
     }
 
     @Override
-    public List<CacheLookup> getHits() {
-        return List.of();
-    }
-
-    @Override
-    public List<CacheLookup> getMisses() {
+    public List<CacheLookup> getCacheLookups() {
         return List.of();
     }
 }

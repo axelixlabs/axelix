@@ -72,8 +72,7 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
                     cache.getName(),
                     cache.getNativeCache().getClass().getName(),
                     cacheManager.getUnderlyingCacheManagerBeanName(),
-                    toApiCacheLookups(cache.getHits()),
-                    toApiCacheLookups(cache.getMisses()),
+                    toApiCacheLookups(cache.getCacheLookups()),
                     cacheSizeProvider.getEstimatedCacheSize(cache.getNativeCache()),
                     cache.isEnabled());
         });
@@ -81,7 +80,9 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
 
     private static List<SingleCache.CacheLookup> toApiCacheLookups(List<CacheLookup> cache) {
         return cache.stream()
-                .map(it -> new SingleCache.CacheLookup(it.timestamp().toEpochMilli()))
+                .map(it -> new SingleCache.CacheLookup(
+                        it.timestamp().toEpochMilli(),
+                        SingleCache.LookupOutcome.valueOf(it.outcome().name())))
                 .toList();
     }
 
@@ -94,8 +95,9 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
                     cacheManagerName,
                     enhancedCacheManager.getAll().stream()
                             .map(enhancedCache -> {
-                                boolean containsStats = !enhancedCache.getHits().isEmpty()
-                                        || !enhancedCache.getMisses().isEmpty();
+                                boolean containsStats =
+                                        !enhancedCache.getCacheLookups().isEmpty();
+
                                 return new CachesFeed.Cache(
                                         enhancedCache.getName(),
                                         enhancedCache

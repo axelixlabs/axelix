@@ -39,11 +39,11 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -74,13 +74,13 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     @Autowired
     private ShortPollingInstanceDiscoveryScheduler subject;
 
-    @MockBean
+    @MockitoBean
     private KubernetesClient kubernetesClient;
 
     @Autowired
     private InstanceRegistry instanceRegistry;
 
-    @MockBean
+    @MockitoBean
     private DiscoveryClient discoveryClient;
 
     private URI uri;

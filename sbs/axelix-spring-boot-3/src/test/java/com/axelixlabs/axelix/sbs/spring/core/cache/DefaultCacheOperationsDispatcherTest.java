@@ -309,9 +309,13 @@ class DefaultCacheOperationsDispatcherTest {
         SingleCache first = dispatcher.get(TEST_CACHE_MANAGER_1, TEST_CACHE_2);
 
         // then.
-        assertThat(first.getMisses()).hasSize(2);
         assertThat(first.getEstimatedEntrySize()).isEqualTo(2L);
-        assertThat(first.getHits()).hasSize(2);
+        assertThat(first.getLookupHistory().stream()
+                        .filter(it -> SingleCache.LookupOutcome.MISS.equals(it.getOutcome())))
+                .hasSize(2);
+        assertThat(first.getLookupHistory().stream()
+                        .filter(it -> SingleCache.LookupOutcome.HIT.equals(it.getOutcome())))
+                .hasSize(2);
 
         // given.
         Cache cache2 = cacheManager2.getCache(TEST_CACHE_2);
@@ -323,9 +327,13 @@ class DefaultCacheOperationsDispatcherTest {
         SingleCache second = dispatcher.get(TEST_CACHE_MANAGER_2, TEST_CACHE_2);
 
         // then.
-        assertThat(second.getMisses()).hasSize(1);
         assertThat(second.getEstimatedEntrySize()).isEqualTo(1L);
-        assertThat(second.getHits()).hasSize(1);
+        assertThat(second.getLookupHistory().stream()
+                        .filter(it -> SingleCache.LookupOutcome.MISS.equals(it.getOutcome())))
+                .hasSize(1);
+        assertThat(second.getLookupHistory().stream()
+                        .filter(it -> SingleCache.LookupOutcome.HIT.equals(it.getOutcome())))
+                .hasSize(1);
     }
 
     @Test

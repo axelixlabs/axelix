@@ -56,12 +56,7 @@ public interface EnhancedCache extends Cache {
     boolean isEnabled();
 
     /**
-     * @return the estimated number of cache hits.
-     */
-    List<CacheLookup> getHits();
-
-    /**
      * @return the estimated number of cache misses.
      */
-    List<CacheLookup> getMisses();
+    List<CacheLookup> getCacheLookups();
 }

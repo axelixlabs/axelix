@@ -37,13 +37,13 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.HeapDumpApi;
@@ -83,7 +83,7 @@ class HeapDumpApiTest {
     @Autowired
     private InstanceRegistry registry;
 
-    @MockBean
+    @MockitoBean
     private HeapDumpAnonymizer heapDumpAnonymizer;
 
     @BeforeAll

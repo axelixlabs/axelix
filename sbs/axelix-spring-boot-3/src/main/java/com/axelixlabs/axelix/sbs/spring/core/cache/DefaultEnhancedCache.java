@@ -150,17 +150,8 @@ public class DefaultEnhancedCache implements EnhancedCache {
     }
 
     @Override
-    public List<CacheLookup> getHits() {
-        return cacheLookupHistory.get().stream()
-                .filter(cacheLookup -> cacheLookup.outcome() == CacheLookup.Outcome.HIT)
-                .toList();
-    }
-
-    @Override
-    public List<CacheLookup> getMisses() {
-        return cacheLookupHistory.get().stream()
-                .filter(cacheLookup -> cacheLookup.outcome() == CacheLookup.Outcome.MISS)
-                .toList();
+    public List<CacheLookup> getCacheLookups() {
+        return cacheLookupHistory.get();
     }
 
     private boolean executeIfEnabledOrElseFalse(BooleanSupplier supplier) {

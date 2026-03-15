@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
@@ -35,8 +36,7 @@ public final class SingleCache {
     private final String name;
     private final String target;
     private final String cacheManager;
-    private final List<CacheLookup> hits;
-    private final List<CacheLookup> misses;
+    private final List<CacheLookup> lookupHistory;
 
     @Nullable
     private final Long estimatedEntrySize;
@@ -49,8 +49,7 @@ public final class SingleCache {
      * @param name               The cache name.
      * @param target             The fully qualified name of the native cache.
      * @param cacheManager       The name of the cache manager that manages current cache.
-     * @param hits               The array of all recorded cache hits, or empty if unknown.
-     * @param misses             The array of all recorded cache misses, or empty if unknown.
+     * @param lookupHistory      The array of all recorded cache lookups. May be or empty if unknown.
      * @param estimatedEntrySize The estimated number of entries in the cache, or {@code null} if unknown.
      * @param enabled            Whether the cache is enabled ({@code true}) or disabled ({@code false}).
      */
@@ -59,15 +58,13 @@ public final class SingleCache {
             @JsonProperty("name") String name,
             @JsonProperty("target") String target,
             @JsonProperty("cacheManager") String cacheManager,
-            @JsonProperty("hits") List<CacheLookup> hits,
-            @JsonProperty("misses") List<CacheLookup> misses,
+            @JsonProperty("lookupHistory") List<CacheLookup> lookupHistory,
             @JsonProperty("estimatedEntrySize") @Nullable Long estimatedEntrySize,
             @JsonProperty("enabled") boolean enabled) {
         this.name = name;
         this.target = target;
         this.cacheManager = cacheManager;
-        this.hits = hits;
-        this.misses = misses;
+        this.lookupHistory = lookupHistory;
         this.estimatedEntrySize = estimatedEntrySize;
         this.enabled = enabled;
     }
@@ -84,12 +81,8 @@ public final class SingleCache {
         return cacheManager;
     }
 
-    public List<CacheLookup> getHits() {
-        return hits;
-    }
-
-    public List<CacheLookup> getMisses() {
-        return misses;
+    public List<CacheLookup> getLookupHistory() {
+        return lookupHistory;
     }
 
     @Nullable
@@ -114,37 +107,24 @@ public final class SingleCache {
                 && Objects.equals(name, that.name)
                 && Objects.equals(target, that.target)
                 && Objects.equals(cacheManager, that.cacheManager)
-                && Objects.equals(hits, that.hits)
-                && Objects.equals(misses, that.misses)
+                && Objects.equals(lookupHistory, that.lookupHistory)
                 && Objects.equals(estimatedEntrySize, that.estimatedEntrySize);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, target, cacheManager, hits, misses, estimatedEntrySize, enabled);
+        return Objects.hash(name, target, cacheManager, lookupHistory, estimatedEntrySize, enabled);
     }
 
     @Override
     public String toString() {
-        return "SingleCache{"
-                + "name='"
-                + name
-                + '\''
-                + ", target='"
-                + target
-                + '\''
-                + ", cacheManager='"
-                + cacheManager
-                + '\''
-                + ", hits="
-                + hits
-                + ", misses="
-                + misses
-                + ", estimatedEntrySize="
-                + estimatedEntrySize
-                + ", enabled="
-                + enabled
-                + '}';
+        return "SingleCache{" + "name='"
+                + name + '\'' + ", target='"
+                + target + '\'' + ", cacheManager='"
+                + cacheManager + '\'' + ", lookupHistory="
+                + lookupHistory + ", estimatedEntrySize="
+                + estimatedEntrySize + ", enabled="
+                + enabled + '}';
     }
 
     public static class CacheLookup {
@@ -154,13 +134,25 @@ public final class SingleCache {
          */
         private final long timestamp;
 
+        /**
+         * Outcome of the cache lookup.
+         */
+        private final LookupOutcome outcome;
+
         @JsonCreator
-        public CacheLookup(@JsonProperty("timestamp") long timestamp) {
+        public CacheLookup(long timestamp, LookupOutcome outcome) {
             this.timestamp = timestamp;
+            this.outcome = outcome;
         }
 
+        @JsonGetter("timestamp")
         public long getTimestamp() {
             return timestamp;
+        }
+
+        @JsonGetter("outcome")
+        public LookupOutcome getOutcome() {
+            return outcome;
         }
 
         @Override
@@ -169,17 +161,22 @@ public final class SingleCache {
                 return false;
             }
             CacheLookup that = (CacheLookup) o;
-            return timestamp == that.timestamp;
+            return timestamp == that.timestamp && outcome == that.outcome;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(timestamp);
+            return Objects.hash(timestamp, outcome);
         }
 
         @Override
         public String toString() {
-            return "CacheLookup{" + "timestamp=" + timestamp + '}';
+            return "CacheLookup{" + "timestamp=" + timestamp + ", outcome=" + outcome + '}';
         }
+    }
+
+    public enum LookupOutcome {
+        HIT,
+        MISS
     }
 }

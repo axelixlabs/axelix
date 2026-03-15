@@ -161,8 +161,8 @@ class DefaultEnhancedCacheTest {
             enhancedCache.get(KEY);
 
             // then.
-            assertThat(enhancedCache.getHits()).hasSize(1);
-            assertThat(enhancedCache.getMisses()).isEmpty();
+            assertThat(enhancedCache.getCacheLookups()).hasSize(1);
+            assertThat(enhancedCache.getCacheLookups().get(0).outcome()).isEqualTo(CacheLookup.Outcome.HIT);
         }
 
         @Test
@@ -174,8 +174,8 @@ class DefaultEnhancedCacheTest {
             enhancedCache.get(KEY);
 
             // then.
-            assertThat(enhancedCache.getHits()).isEmpty();
-            assertThat(enhancedCache.getMisses()).hasSize(1);
+            assertThat(enhancedCache.getCacheLookups()).hasSize(1);
+            assertThat(enhancedCache.getCacheLookups().get(0).outcome()).isEqualTo(CacheLookup.Outcome.MISS);
         }
     }
 
@@ -250,8 +250,8 @@ class DefaultEnhancedCacheTest {
             enhancedCache.get(KEY, () -> VALUE);
 
             // then.
-            assertThat(enhancedCache.getHits()).hasSize(1);
-            assertThat(enhancedCache.getMisses()).isEmpty();
+            assertThat(enhancedCache.getCacheLookups()).hasSize(1);
+            assertThat(enhancedCache.getCacheLookups().get(0).outcome()).isEqualTo(CacheLookup.Outcome.HIT);
         }
 
         @Test
@@ -266,8 +266,8 @@ class DefaultEnhancedCacheTest {
             enhancedCache.get(KEY, () -> VALUE);
 
             // then.
-            assertThat(enhancedCache.getHits()).isEmpty();
-            assertThat(enhancedCache.getMisses()).hasSize(1);
+            assertThat(enhancedCache.getCacheLookups()).hasSize(1);
+            assertThat(enhancedCache.getCacheLookups().get(0).outcome()).isEqualTo(CacheLookup.Outcome.MISS);
         }
     }
 
@@ -457,8 +457,10 @@ class DefaultEnhancedCacheTest {
             enhancedCache.get("key3");
 
             // then.
-            assertThat(enhancedCache.getHits()).hasSize(3);
-            assertThat(enhancedCache.getMisses()).isEmpty();
+            assertThat(enhancedCache.getCacheLookups()).hasSize(3);
+            assertThat(enhancedCache.getCacheLookups())
+                    .extracting(CacheLookup::outcome)
+                    .containsOnly(CacheLookup.Outcome.HIT);
         }
 
         @Test
@@ -474,8 +476,10 @@ class DefaultEnhancedCacheTest {
             enhancedCache.get("key3");
 
             // then.
-            assertThat(enhancedCache.getMisses()).hasSize(3);
-            assertThat(enhancedCache.getHits()).isEmpty();
+            assertThat(enhancedCache.getCacheLookups()).hasSize(3);
+            assertThat(enhancedCache.getCacheLookups())
+                    .extracting(CacheLookup::outcome)
+                    .containsOnly(CacheLookup.Outcome.MISS);
         }
 
         @Test
@@ -487,8 +491,7 @@ class DefaultEnhancedCacheTest {
             enhancedCache.get(KEY);
 
             // then.
-            assertThat(enhancedCache.getHits()).isEmpty();
-            assertThat(enhancedCache.getMisses()).isEmpty();
+            assertThat(enhancedCache.getCacheLookups()).isEmpty();
         }
 
         @Test
@@ -509,8 +512,15 @@ class DefaultEnhancedCacheTest {
             enhancedCache.get("hit3");
 
             // then.
-            assertThat(enhancedCache.getHits()).hasSize(3);
-            assertThat(enhancedCache.getMisses()).hasSize(2);
+            assertThat(enhancedCache.getCacheLookups()).hasSize(5);
+            assertThat(enhancedCache.getCacheLookups())
+                    .extracting(CacheLookup::outcome)
+                    .containsExactly(
+                            CacheLookup.Outcome.HIT,
+                            CacheLookup.Outcome.MISS,
+                            CacheLookup.Outcome.HIT,
+                            CacheLookup.Outcome.MISS,
+                            CacheLookup.Outcome.HIT);
         }
     }
 }
