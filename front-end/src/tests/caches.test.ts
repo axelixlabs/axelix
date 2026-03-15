@@ -20,8 +20,11 @@ import { describe, expect, it } from "vitest";
 import { buildChartData } from "helpers";
 import { ELookupOutcome, type ICacheLookup } from "models";
 
-const hit = (timestamp = 0): ICacheLookup => ({ timestamp: timestamp, outcome: ELookupOutcome.HIT });
-const miss = (timestamp = 0): ICacheLookup => ({ timestamp: timestamp, outcome: ELookupOutcome.MISS });
+const hit = (timestamp = 0): ICacheLookup => ({ timestamp, outcome: ELookupOutcome.HIT });
+const miss = (timestamp = 0): ICacheLookup => ({ timestamp, outcome: ELookupOutcome.MISS });
+
+const ratios = (lookupHistory: ICacheLookup[], slidingWindow: number): number[] =>
+    buildChartData(lookupHistory, slidingWindow).map((dp) => dp.count);
 
 describe("buildChartData", () => {
     it("Returns an empty array for empty lookup history", () => {
@@ -40,7 +43,7 @@ describe("buildChartData", () => {
         const lookupHistory = [hit()];
 
         // when.
-        const result = buildChartData(lookupHistory, 3);
+        const result = ratios(lookupHistory, 3);
 
         // then.
         expect(result).toEqual([1]);
@@ -51,7 +54,7 @@ describe("buildChartData", () => {
         const lookupHistory = [miss()];
 
         // when.
-        const result = buildChartData(lookupHistory, 3);
+        const result = ratios(lookupHistory, 3);
 
         // then.
         expect(result).toEqual([0]);
@@ -62,7 +65,7 @@ describe("buildChartData", () => {
         const lookupHistory = [hit(), hit(), hit(), hit(), hit()];
 
         // when.
-        const result = buildChartData(lookupHistory, 3);
+        const result = ratios(lookupHistory, 3);
 
         // then.
         expect(result).toEqual([1, 1, 1, 1, 1]);
@@ -73,7 +76,7 @@ describe("buildChartData", () => {
         const lookupHistory = [miss(), miss(), miss(), miss(), miss()];
 
         // when.
-        const result = buildChartData(lookupHistory, 3);
+        const result = ratios(lookupHistory, 3);
 
         // then.
         expect(result).toEqual([0, 0, 0, 0, 0]);
@@ -84,7 +87,7 @@ describe("buildChartData", () => {
         const lookupHistory = [hit(), miss(), hit()];
 
         // when.
-        const result = buildChartData(lookupHistory, 10);
+        const result = ratios(lookupHistory, 10);
 
         // then.
         expect(result).toEqual([1, 1 / 2, 2 / 3]);
@@ -95,7 +98,7 @@ describe("buildChartData", () => {
         const lookupHistory = [hit(), miss(), hit(), miss(), hit()];
 
         // when.
-        const result = buildChartData(lookupHistory, 1);
+        const result = ratios(lookupHistory, 1);
 
         // then.
         expect(result).toEqual([1, 0, 1, 0, 1]);
@@ -107,16 +110,16 @@ describe("buildChartData", () => {
         const lookupHistory = [hit(), hit(), miss(), hit(), miss(), miss()];
 
         // when.
-        const result = buildChartData(lookupHistory, 3);
+        const result = ratios(lookupHistory, 3);
 
         // then.
         expect(result).toEqual([
             1 / 1, // warmup: 1 hit / 1 total
             2 / 2, // warmup: 2 hits / 2 total
-            2 / 3, // warmup: 2 hits / 3 total (window full: [H, H, M])
-            2 / 3, // window [H, M, H]: evict H, add H -> 2 hits
-            1 / 3, // window [M, H, M]: evict H, add M -> 1 hit
-            1 / 3, // window [H, M, M]: evict M, add M -> 1 hit
+            2 / 3, // warmup complete: [H, H, M] -> 2 hits
+            2 / 3, // slide: add H, evict H -> [H, M, H] -> 2 hits
+            1 / 3, // slide: add M, evict H -> [M, H, M] -> 1 hit
+            1 / 3, // slide: add M, evict M -> [H, M, M] -> 1 hit
         ]);
     });
 
@@ -126,7 +129,7 @@ describe("buildChartData", () => {
         const lookupHistory = [miss(), hit(), hit()];
 
         // when.
-        const result = buildChartData(lookupHistory, 2);
+        const result = ratios(lookupHistory, 2);
 
         // then.
         expect(result).toEqual([
@@ -141,16 +144,16 @@ describe("buildChartData", () => {
         const lookupHistory = [hit(), miss(), hit(), miss(), hit(), miss()];
 
         // when.
-        const result = buildChartData(lookupHistory, 2);
+        const result = ratios(lookupHistory, 2);
 
         // then.
         expect(result).toEqual([
             1 / 1, // warmup: [H]
             1 / 2, // warmup: [H, M]
-            1 / 2, // window [M, H]: evict H, add H -> 1 hit
-            1 / 2, // window [H, M]: evict M, add M -> 1 hit
-            1 / 2, // window [M, H]: evict H, add H -> 1 hit
-            1 / 2, // window [H, M]: evict M, add M -> 1 hit
+            1 / 2, // slide: add H, evict H -> [M, H] -> 1 hit
+            1 / 2, // slide: add M, evict M -> [H, M] -> 1 hit
+            1 / 2, // slide: add H, evict H -> [M, H] -> 1 hit
+            1 / 2, // slide: add M, evict M -> [H, M] -> 1 hit
         ]);
     });
 
@@ -159,7 +162,7 @@ describe("buildChartData", () => {
         const lookupHistory = [hit(), miss(), hit(), miss()];
 
         // when.
-        const result = buildChartData(lookupHistory, 4);
+        const result = ratios(lookupHistory, 4);
 
         // then.
         expect(result).toEqual([1 / 1, 1 / 2, 2 / 3, 2 / 4]);
@@ -170,9 +173,24 @@ describe("buildChartData", () => {
         const lookupHistory = [miss(), hit(), hit()];
 
         // when.
-        const result = buildChartData(lookupHistory, 100);
+        const result = ratios(lookupHistory, 100);
 
         // then.
         expect(result).toEqual([0 / 1, 1 / 2, 2 / 3]);
+    });
+
+    it("Each data point carries the timestamp from its corresponding lookup", () => {
+        // given.
+        const lookupHistory = [hit(1000), miss(2000), hit(3000)];
+
+        // when.
+        const result = buildChartData(lookupHistory, 2);
+
+        // then.
+        expect(result).toEqual([
+            { timestamp: 1000, count: 1 },
+            { timestamp: 2000, count: 1 / 2 },
+            { timestamp: 3000, count: 1 / 2 },
+        ]);
     });
 });

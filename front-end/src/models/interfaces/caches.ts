@@ -158,6 +158,18 @@ export interface IGetSingleCacheResponseBody {
     enabled: boolean;
 }
 
+export interface ICacheChartDataPoint {
+    /**
+     * Timestamp of the data point, taken from the corresponding cache lookup.
+     */
+    timestamp: number;
+
+    /**
+     * Sliding-window hit ratio at this point.
+     */
+    count: number;
+}
+
 export interface ITimelineData {
     /**
      * Interval to be displayed on the UI.

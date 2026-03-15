@@ -15,7 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { ELookupOutcome, type ICacheData, type ICacheLookup, type ICachesManager, type ITimelineData } from "models";
+import {
+    ELookupOutcome,
+    type ICacheChartDataPoint,
+    type ICacheData,
+    type ICacheLookup,
+    type ICachesManager,
+    type ITimelineData,
+} from "models";
 
 import {
     SINGLE_CACHE_CHART_TIMELINE_STEP_5M,
@@ -155,9 +162,9 @@ export const splitCaches = (caches: ICacheData[]): [ICacheData[], ICacheData[]] 
  *
  * @return Y coordinate values.
  */
-export const buildChartData = (lookupHistory: ICacheLookup[], slidingWindow: number): number[] => {
+export const buildChartData = (lookupHistory: ICacheLookup[], slidingWindow: number): ICacheChartDataPoint[] => {
     let windowHits = 0;
-    const data: number[] = [];
+    const data: ICacheChartDataPoint[] = [];
 
     for (let i = 0; i < lookupHistory.length; i++) {
         const lookup = lookupHistory[i];
@@ -167,7 +174,7 @@ export const buildChartData = (lookupHistory: ICacheLookup[], slidingWindow: num
             if (lookup.outcome === ELookupOutcome.HIT) {
                 windowHits++;
             }
-            data.push(windowHits / (i + 1));
+            data.push({ timestamp: lookup.timestamp, count: windowHits / (i + 1) });
         } else {
             // eslint-disable-next-line max-depth
             if (lookup.outcome == ELookupOutcome.HIT) {
@@ -181,7 +188,7 @@ export const buildChartData = (lookupHistory: ICacheLookup[], slidingWindow: num
                 windowHits--;
             }
 
-            data.push(windowHits / slidingWindow);
+            data.push({ timestamp: lookup.timestamp, count: windowHits / slidingWindow });
         }
     }
 

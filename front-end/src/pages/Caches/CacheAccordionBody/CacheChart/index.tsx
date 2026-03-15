@@ -41,7 +41,7 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
     return (
         <>
             <ResponsiveContainer width="100%" height={330}>
-                <LineChart>
+                <LineChart data={slidingRatio}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
                     <XAxis
@@ -52,14 +52,14 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
                         interval="preserveStartEnd"
                     />
 
-                    <YAxis allowDecimals={false} width="auto" />
+                    <YAxis domain={[0, 1]} allowDecimals width="auto" />
 
                     <Line
-                        data={slidingRatio}
                         type="monotone"
                         dataKey="count"
                         name={t("Caches.ratio")}
-                        stroke="#69c0ff"
+                        stroke="#95de64"
+                        dot={false}
                         strokeWidth={3}
                     />
 
