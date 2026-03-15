@@ -177,7 +177,7 @@ export const buildChartData = (lookupHistory: ICacheLookup[], slidingWindow: num
             // lookupHistory[i - windowSize] is a tail of sliding window
             // we know that 'i' is at least has 'windowSize'
             // eslint-disable-next-line max-depth
-            if (lookupHistory[i - slidingWindow].outcome === ELookupOutcome.MISS) {
+            if (lookupHistory[i - slidingWindow].outcome === ELookupOutcome.HIT) {
                 windowHits--;
             }
 
