@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.DefaultEndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
@@ -47,7 +47,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostPr
  */
 @AutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = AxelixEnvironmentEndpoint.class)
-@EnableConfigurationProperties(EndpointsConfigurationProperties.class)
+@EnableConfigurationProperties(DefaultEndpointsConfigurationProperties.class)
 public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean
@@ -66,7 +66,7 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SmartSanitizingFunction smartSanitizingFunction(
-            EndpointsConfigurationProperties endpointsConfigurationProperties,
+            DefaultEndpointsConfigurationProperties endpointsConfigurationProperties,
             PropertyNameNormalizer propertyNameNormalizer) {
         return new SmartSanitizingFunction(
                 endpointsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);

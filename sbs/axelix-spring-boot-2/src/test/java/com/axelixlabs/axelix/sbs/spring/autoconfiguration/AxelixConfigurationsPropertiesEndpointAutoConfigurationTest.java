@@ -30,7 +30,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.DefaultEndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
@@ -135,7 +135,7 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
     static class CustomSmartSanitizingFunctionConfig {
         @Bean
         public SmartSanitizingFunction smartSanitizingFunction(
-                EndpointsConfigurationProperties endpointsConfigurationProperties,
+                DefaultEndpointsConfigurationProperties endpointsConfigurationProperties,
                 PropertyNameNormalizer propertyNameNormalizer) {
             return new CustomSmartSanitizingFunction(endpointsConfigurationProperties, propertyNameNormalizer);
         }
@@ -185,7 +185,7 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
 
     static class CustomSmartSanitizingFunction extends SmartSanitizingFunction {
         public CustomSmartSanitizingFunction(
-                EndpointsConfigurationProperties endpointsConfigurationProperties,
+                DefaultEndpointsConfigurationProperties endpointsConfigurationProperties,
                 PropertyNameNormalizer propertyNameNormalizer) {
             super(endpointsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);
         }

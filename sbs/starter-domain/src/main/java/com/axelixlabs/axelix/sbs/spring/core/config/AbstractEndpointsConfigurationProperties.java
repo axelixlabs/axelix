@@ -19,15 +19,13 @@ package com.axelixlabs.axelix.sbs.spring.core.config;
 
 import java.util.List;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 /**
  * Configuration properties that apply across different endpoints.
  *
  * @author Mikhail Polivakha
+ * @author Cherkasov Sergey
  */
-@ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
-public class EndpointsConfigurationProperties {
+public class AbstractEndpointsConfigurationProperties<T extends AbstractEndpointsConfigurationProperties<T>> {
 
     public static final List<String> SANITIZE_ALL = List.of("*");
 
@@ -41,8 +39,8 @@ public class EndpointsConfigurationProperties {
         return sanitizedProperties;
     }
 
-    public EndpointsConfigurationProperties setSanitizedProperties(List<String> sanitizedProperties) {
+    public T setSanitizedProperties(List<String> sanitizedProperties) {
         this.sanitizedProperties = sanitizedProperties;
-        return this;
+        return (T) this;
     }
 }

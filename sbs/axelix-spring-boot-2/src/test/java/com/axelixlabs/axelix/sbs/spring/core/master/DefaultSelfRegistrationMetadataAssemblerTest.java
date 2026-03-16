@@ -36,7 +36,7 @@ import org.springframework.test.context.TestPropertySource;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.DefaultSelfRegistrationConfigurationProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -67,13 +67,13 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
     private SelfRegistrationMetadataAssembler subject;
 
     @TestConfiguration
-    @EnableConfigurationProperties({SelfRegistrationConfigurationProperties.class, WebEndpointProperties.class})
+    @EnableConfigurationProperties({DefaultSelfRegistrationConfigurationProperties.class, WebEndpointProperties.class})
     static class CurrentConfig {
 
         @Bean
         public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+                DefaultSelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
                 WebEndpointProperties webEndpointProperties) {
             return new DefaultSelfRegistrationMetadataAssembler(
                     serviceMetadataAssembler,

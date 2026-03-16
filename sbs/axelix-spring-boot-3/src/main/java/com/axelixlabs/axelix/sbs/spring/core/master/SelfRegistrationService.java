@@ -41,7 +41,7 @@ import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.http.HttpHeader;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.DefaultSelfRegistrationConfigurationProperties;
 
 /**
  * Self-registration service that automatically registers with master.
@@ -55,12 +55,12 @@ public class SelfRegistrationService implements ApplicationListener<ApplicationR
 
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
-    private final SelfRegistrationConfigurationProperties properties;
+    private final DefaultSelfRegistrationConfigurationProperties properties;
     private final SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler;
     private final ScheduledExecutorService executor;
 
     public SelfRegistrationService(
-            SelfRegistrationConfigurationProperties properties,
+            DefaultSelfRegistrationConfigurationProperties properties,
             SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler) {
 
         this.httpClient =

@@ -28,14 +28,14 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.boot.actuate.endpoint.SanitizableData;
 import org.springframework.boot.actuate.endpoint.SanitizingFunction;
 
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.DefaultEndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
 /**
  * {@link SanitizingFunction} that is capable to make sanitization decisions on a per-property basis.
  *
  * <p>Typically, only the specific specified properties are sanitized, see {@link #toBeSanitized}. However,
- * there is a universal placeholder {@link EndpointsConfigurationProperties#SANITIZE_ALL} which implies that
+ * there is a universal placeholder {@link DefaultEndpointsConfigurationProperties#SANITIZE_ALL} which implies that
  * all properties values must be sanitized.
  *
  * @author Mikhail Polivakha
@@ -51,7 +51,8 @@ public class SmartSanitizingFunction implements SanitizingFunction {
      * @param toBeSanitized names of properties to be sanitized
      */
     public SmartSanitizingFunction(List<String> toBeSanitized, PropertyNameNormalizer propertyNameNormalizer) {
-        this.shouldSanitizeAllValues = Objects.equals(toBeSanitized, EndpointsConfigurationProperties.SANITIZE_ALL);
+        this.shouldSanitizeAllValues =
+                Objects.equals(toBeSanitized, DefaultEndpointsConfigurationProperties.SANITIZE_ALL);
         this.toBeSanitized = new HashSet<>(toBeSanitized.size(), 1.1f);
 
         for (String propertyName : toBeSanitized) {

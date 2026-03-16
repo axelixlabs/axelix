@@ -40,7 +40,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.DefaultSelfRegistrationConfigurationProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,7 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.sbs.discovery.instance-name=testApp",
             "axelix.sbs.discovery.instance-url=http://localhost:8089/"
         })
-@EnableConfigurationProperties({SelfRegistrationConfigurationProperties.class, WebEndpointProperties.class})
+@EnableConfigurationProperties({DefaultSelfRegistrationConfigurationProperties.class, WebEndpointProperties.class})
 class SelfRegistrationServiceTest {
 
     private static MockWebServer mockWebServer;
@@ -77,7 +77,7 @@ class SelfRegistrationServiceTest {
 
         @Bean
         public SelfRegistrationService selfRegistrationService(
-                SelfRegistrationConfigurationProperties properties,
+                DefaultSelfRegistrationConfigurationProperties properties,
                 SelfRegistrationMetadataAssembler metadataAssembler) {
             return new SelfRegistrationService(properties, metadataAssembler);
         }
@@ -85,7 +85,7 @@ class SelfRegistrationServiceTest {
         @Bean
         public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+                DefaultSelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
                 WebEndpointProperties webEndpointProperties) {
             return new DefaultSelfRegistrationMetadataAssembler(
                     serviceMetadataAssembler,

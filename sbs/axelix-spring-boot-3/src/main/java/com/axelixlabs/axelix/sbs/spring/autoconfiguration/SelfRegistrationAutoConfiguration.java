@@ -25,7 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.DefaultSelfRegistrationConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationService;
@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
  */
 @AutoConfiguration
 @ConditionalOnClass(WebEndpointProperties.class)
-@EnableConfigurationProperties(SelfRegistrationConfigurationProperties.class)
+@EnableConfigurationProperties(DefaultSelfRegistrationConfigurationProperties.class)
 @ConditionalOnProperty(value = "axelix.sbs.discovery.auto", havingValue = "true")
 public class SelfRegistrationAutoConfiguration {
 
@@ -47,7 +47,7 @@ public class SelfRegistrationAutoConfiguration {
     @ConditionalOnMissingBean
     public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
-            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+            DefaultSelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
             WebEndpointProperties webEndpointProperties) {
         return new DefaultSelfRegistrationMetadataAssembler(
                 serviceMetadataAssembler, selfRegistrationConfigurationProperties, webEndpointProperties.getBasePath());
@@ -56,7 +56,7 @@ public class SelfRegistrationAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SelfRegistrationService selfRegistrationService(
-            SelfRegistrationConfigurationProperties properties,
+            DefaultSelfRegistrationConfigurationProperties properties,
             SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler) {
         return new SelfRegistrationService(properties, selfRegistrationMetadataAssembler);
     }

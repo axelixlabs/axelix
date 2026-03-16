@@ -17,32 +17,25 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.config;
 
-import java.util.List;
+import java.time.Duration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 /**
- * Configuration properties that apply across different endpoints.
+ * Default implementation of the {@link AbstractTransactionMonitoringConfigurationProperties}.
  *
- * @author Mikhail Polivakha
+ * @since 26.01.2026
+ * @author Nikita Kirillov
+ * @author Cherkasov Sergey
  */
-@ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
-public class EndpointsConfigurationProperties {
+@ConstructorBinding
+@ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
+public final class DefaultTransactionMonitoringConfigurationProperties
+        extends AbstractTransactionMonitoringConfigurationProperties {
 
-    public static final List<String> SANITIZE_ALL = List.of("*");
-
-    /**
-     * List of properties whose values needs to be sanitized before being returned.
-     * Single value of {@code "*"} means all properties must be sanitized.
-     */
-    private List<String> sanitizedProperties = List.of();
-
-    public List<String> getSanitizedProperties() {
-        return sanitizedProperties;
-    }
-
-    public EndpointsConfigurationProperties setSanitizedProperties(List<String> sanitizedProperties) {
-        this.sanitizedProperties = sanitizedProperties;
-        return this;
+    public DefaultTransactionMonitoringConfigurationProperties(
+            Integer maxTransactionsPerMethod, Duration cleanupInterval) {
+        super(maxTransactionsPerMethod, cleanupInterval);
     }
 }

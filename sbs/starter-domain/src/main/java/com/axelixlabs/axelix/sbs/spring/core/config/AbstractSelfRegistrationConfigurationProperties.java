@@ -24,19 +24,16 @@ import java.time.temporal.ChronoUnit;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
-import org.springframework.util.Assert;
+import com.axelixlabs.axelix.common.utils.Assert;
 
 /**
  * Configuration properties for self-registration of the service instance.
  *
  * @since 05.02.2026
  * @author Nikita Kirillov
+ * @author Cherkasov Sergey
  */
-@ConstructorBinding
-@ConfigurationProperties(prefix = "axelix.sbs.discovery")
-public class SelfRegistrationConfigurationProperties {
+public class AbstractSelfRegistrationConfigurationProperties {
 
     private final String masterUrl;
 
@@ -46,7 +43,7 @@ public class SelfRegistrationConfigurationProperties {
 
     private Duration heartbeatInterval = Duration.of(15, ChronoUnit.SECONDS);
 
-    public SelfRegistrationConfigurationProperties(
+    public AbstractSelfRegistrationConfigurationProperties(
             String masterUrl, String instanceUrl, String instanceName, @Nullable Duration heartbeatInterval) {
         validateRequiredProperty(masterUrl, "axelix.sbs.discovery.master-url");
         validateRequiredProperty(instanceUrl, "axelix.sbs.discovery.instance-url");

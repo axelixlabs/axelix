@@ -20,57 +20,47 @@ package com.axelixlabs.axelix.sbs.spring.core.config;
 import java.time.Duration;
 import java.util.Objects;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
-
 /**
  * Configuration properties for transaction monitoring feature.
  *
  * @since 26.01.2026
  * @author Nikita Kirillov
+ * @author Cherkasov Sergey
  */
-@ConstructorBinding
-@ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
-public final class TransactionMonitoringConfigurationProperties {
+public class AbstractTransactionMonitoringConfigurationProperties {
 
     private final Integer maxTransactionsPerMethod;
     private final Duration cleanupInterval;
 
     /**
+     * Create a new TransactionMonitoringConfigurationProperties
+     *
      * @param maxTransactionsPerMethod maximum number of transaction records to keep per method.
      * @param cleanupInterval          interval for clearing old transaction records.
      */
-    public TransactionMonitoringConfigurationProperties(Integer maxTransactionsPerMethod, Duration cleanupInterval) {
-        if (maxTransactionsPerMethod == null) {
-            maxTransactionsPerMethod = 30;
-        }
-
-        if (cleanupInterval == null) {
-            cleanupInterval = Duration.ofSeconds(5);
-        }
-        this.maxTransactionsPerMethod = maxTransactionsPerMethod;
-        this.cleanupInterval = cleanupInterval;
+    public AbstractTransactionMonitoringConfigurationProperties(
+            Integer maxTransactionsPerMethod, Duration cleanupInterval) {
+        this.maxTransactionsPerMethod = Objects.requireNonNullElse(maxTransactionsPerMethod, 30);
+        this.cleanupInterval = Objects.requireNonNullElse(cleanupInterval, Duration.ofSeconds(5));
     }
 
-    public Integer maxTransactionsPerMethod() {
+    public Integer getMaxTransactionsPerMethod() {
         return maxTransactionsPerMethod;
     }
 
-    public Duration cleanupInterval() {
+    public Duration getCleanupInterval() {
         return cleanupInterval;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj == null || obj.getClass() != this.getClass()) {
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        var that = (TransactionMonitoringConfigurationProperties) obj;
-        return Objects.equals(this.maxTransactionsPerMethod, that.maxTransactionsPerMethod)
-                && Objects.equals(this.cleanupInterval, that.cleanupInterval);
+        AbstractTransactionMonitoringConfigurationProperties that =
+                (AbstractTransactionMonitoringConfigurationProperties) o;
+        return Objects.equals(maxTransactionsPerMethod, that.maxTransactionsPerMethod)
+                && Objects.equals(cleanupInterval, that.cleanupInterval);
     }
 
     @Override
@@ -80,8 +70,8 @@ public final class TransactionMonitoringConfigurationProperties {
 
     @Override
     public String toString() {
-        return "TransactionMonitoringConfigurationProperties[" + "maxTransactionsPerMethod="
-                + maxTransactionsPerMethod + ", " + "cleanupInterval="
-                + cleanupInterval + ']';
+        return "TransactionMonitoringConfigurationProperties{" + "maxTransactionsPerMethod="
+                + maxTransactionsPerMethod + ", cleanupInterval="
+                + cleanupInterval + '}';
     }
 }
