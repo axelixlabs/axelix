@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +36,7 @@ import org.springframework.core.env.StandardEnvironment;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Property;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
-import com.axelixlabs.axelix.sbs.spring.core.config.DefaultEndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +49,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(args = "--fooBar=fromArgs")
-@EnableConfigurationProperties(DefaultEndpointsConfigurationProperties.class)
 @Import({EnvironmentTestConfig.class, DefaultEnvPropertyEnricherTest.CurrentTestConfig.class})
 class DefaultEnvPropertyEnricherTest {
 
@@ -61,6 +60,12 @@ class DefaultEnvPropertyEnricherTest {
 
     @TestConfiguration
     static class CurrentTestConfig {
+
+        @Bean
+        @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+        public EndpointsConfigurationProperties endpointsConfigurationProperties() {
+            return new EndpointsConfigurationProperties();
+        }
 
         @Bean
         SmartSanitizingFunction smartSanitizingFunction() {

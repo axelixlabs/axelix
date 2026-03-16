@@ -27,21 +27,24 @@ import java.util.Objects;
  * @author Nikita Kirillov
  * @author Cherkasov Sergey
  */
-public class AbstractTransactionMonitoringConfigurationProperties {
+public class TransactionMonitoringConfigurationProperties {
 
-    private final Integer maxTransactionsPerMethod;
-    private final Duration cleanupInterval;
+    /**
+     * Maximum number of transaction records to keep per method.
+     */
+    private Integer maxTransactionsPerMethod;
+
+    /**
+     * Interval for clearing old transaction records.
+     */
+    private Duration cleanupInterval;
 
     /**
      * Create a new TransactionMonitoringConfigurationProperties
-     *
-     * @param maxTransactionsPerMethod maximum number of transaction records to keep per method.
-     * @param cleanupInterval          interval for clearing old transaction records.
      */
-    public AbstractTransactionMonitoringConfigurationProperties(
-            Integer maxTransactionsPerMethod, Duration cleanupInterval) {
-        this.maxTransactionsPerMethod = Objects.requireNonNullElse(maxTransactionsPerMethod, 30);
-        this.cleanupInterval = Objects.requireNonNullElse(cleanupInterval, Duration.ofSeconds(5));
+    public TransactionMonitoringConfigurationProperties() {
+        this.maxTransactionsPerMethod = 30;
+        this.cleanupInterval = Duration.ofSeconds(5);
     }
 
     public Integer getMaxTransactionsPerMethod() {
@@ -52,13 +55,22 @@ public class AbstractTransactionMonitoringConfigurationProperties {
         return cleanupInterval;
     }
 
+    public TransactionMonitoringConfigurationProperties setMaxTransactionsPerMethod(Integer maxTransactionsPerMethod) {
+        this.maxTransactionsPerMethod = maxTransactionsPerMethod;
+        return this;
+    }
+
+    public TransactionMonitoringConfigurationProperties setCleanupInterval(Duration cleanupInterval) {
+        this.cleanupInterval = cleanupInterval;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AbstractTransactionMonitoringConfigurationProperties that =
-                (AbstractTransactionMonitoringConfigurationProperties) o;
+        TransactionMonitoringConfigurationProperties that = (TransactionMonitoringConfigurationProperties) o;
         return Objects.equals(maxTransactionsPerMethod, that.maxTransactionsPerMethod)
                 && Objects.equals(cleanupInterval, that.cleanupInterval);
     }

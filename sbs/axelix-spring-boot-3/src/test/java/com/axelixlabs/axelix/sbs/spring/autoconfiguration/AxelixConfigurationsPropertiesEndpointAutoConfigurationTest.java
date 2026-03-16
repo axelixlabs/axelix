@@ -30,7 +30,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
-import com.axelixlabs.axelix.sbs.spring.core.config.DefaultEndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
@@ -48,7 +48,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(AxelixConfigurationsPropertiesEndpointAutoConfiguration.class))
+            .withConfiguration(AutoConfigurations.of(
+                    AxelixConfigurationsPropertiesEndpointAutoConfiguration.class,
+                    EndpointsConfigurationPropertiesAutoConfiguration.class))
             .withPropertyValues("management.endpoints.web.exposure.include=axelix-configprops");
 
     @Test
@@ -135,7 +137,7 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
     static class CustomSmartSanitizingFunctionConfig {
         @Bean
         public SmartSanitizingFunction smartSanitizingFunction(
-                DefaultEndpointsConfigurationProperties endpointsConfigurationProperties,
+                EndpointsConfigurationProperties endpointsConfigurationProperties,
                 PropertyNameNormalizer propertyNameNormalizer) {
             return new CustomSmartSanitizingFunction(endpointsConfigurationProperties, propertyNameNormalizer);
         }
@@ -185,7 +187,7 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
 
     static class CustomSmartSanitizingFunction extends SmartSanitizingFunction {
         public CustomSmartSanitizingFunction(
-                DefaultEndpointsConfigurationProperties endpointsConfigurationProperties,
+                EndpointsConfigurationProperties endpointsConfigurationProperties,
                 PropertyNameNormalizer propertyNameNormalizer) {
             super(endpointsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);
         }

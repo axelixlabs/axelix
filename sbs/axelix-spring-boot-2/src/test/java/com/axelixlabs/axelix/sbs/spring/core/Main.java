@@ -32,6 +32,7 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoCo
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration;
+import com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointsConfigurationPropertiesAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryDiscovererAutoConfiguration;
@@ -67,7 +68,8 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
             ScheduledTaskManagementAutoConfiguration.class,
             ShortBuildInfoProviderAutoConfiguration.class,
             ThreadDumpManagementEndpointAutoConfiguration.class,
-            TransactionMonitoringAutoConfiguration.class
+            TransactionMonitoringAutoConfiguration.class,
+            EndpointsConfigurationPropertiesAutoConfiguration.class
         })
 @EnableCaching
 @EnableFeignClients

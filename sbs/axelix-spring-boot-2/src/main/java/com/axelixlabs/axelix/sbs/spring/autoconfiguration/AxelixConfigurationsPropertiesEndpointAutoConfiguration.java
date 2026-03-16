@@ -20,11 +20,10 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.sbs.spring.core.config.DefaultEndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
@@ -41,9 +40,8 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
  * @since 13.11.2025
  * @author Sergey Cherkasov
  */
-@AutoConfiguration
+@AutoConfiguration(after = EndpointsConfigurationPropertiesAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixConfigurationPropertiesEndpoint.class)
-@EnableConfigurationProperties(DefaultEndpointsConfigurationProperties.class)
 public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
@@ -68,7 +66,7 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SmartSanitizingFunction smartSanitizingFunction(
-            DefaultEndpointsConfigurationProperties endpointsConfigurationProperties,
+            EndpointsConfigurationProperties endpointsConfigurationProperties,
             PropertyNameNormalizer propertyNameNormalizer) {
         return new SmartSanitizingFunction(
                 endpointsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);

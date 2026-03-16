@@ -20,11 +20,12 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 
-import com.axelixlabs.axelix.sbs.spring.core.config.DefaultTransactionMonitoringConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
@@ -40,13 +41,19 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollec
  */
 @AutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
-@EnableConfigurationProperties(DefaultTransactionMonitoringConfigurationProperties.class)
+@EnableConfigurationProperties // required for TransactionMonitoringAutoConfigurationTest to run
 public class TransactionMonitoringAutoConfiguration {
+
+    @Bean
+    @ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
+    public TransactionMonitoringConfigurationProperties transactionMonitoringConfigurationProperties() {
+        return new TransactionMonitoringConfigurationProperties();
+    }
 
     @Bean
     @ConditionalOnMissingBean
     public TransactionStatsCollector transactionStatsCollector(
-            DefaultTransactionMonitoringConfigurationProperties properties) {
+            TransactionMonitoringConfigurationProperties properties) {
         Assert.isTrue(properties.getMaxTransactionsPerMethod() > 0, "maxTransactionsPerMethod must be positive");
         Assert.isTrue(properties.getCleanupInterval().toSeconds() > 0L, "cleanupInterval must be positive");
         return new DefaultTransactionStatsCollector(

@@ -15,27 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.config;
+package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.time.Duration;
-
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.context.annotation.Bean;
+
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 
 /**
- * Default implementation of the {@link AbstractTransactionMonitoringConfigurationProperties}.
+ * Auto-configuration for the {@link EndpointsConfigurationProperties}.
  *
- * @since 26.01.2026
- * @author Nikita Kirillov
- * @author Cherkasov Sergey
+ * @author Sergey Cherkasov
  */
-@ConstructorBinding
-@ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
-public final class DefaultTransactionMonitoringConfigurationProperties
-        extends AbstractTransactionMonitoringConfigurationProperties {
+@AutoConfiguration
+public class EndpointsConfigurationPropertiesAutoConfiguration {
 
-    public DefaultTransactionMonitoringConfigurationProperties(
-            Integer maxTransactionsPerMethod, Duration cleanupInterval) {
-        super(maxTransactionsPerMethod, cleanupInterval);
+    @Bean
+    @ConditionalOnMissingBean
+    @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+    public EndpointsConfigurationProperties endpointsConfigurationProperties() {
+        return new EndpointsConfigurationProperties();
     }
 }

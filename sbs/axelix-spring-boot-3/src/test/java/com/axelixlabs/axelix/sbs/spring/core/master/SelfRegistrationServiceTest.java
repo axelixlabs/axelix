@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -40,7 +41,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.config.DefaultSelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,7 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.sbs.discovery.instance-name=testApp",
             "axelix.sbs.discovery.instance-url=http://localhost:8089/"
         })
-@EnableConfigurationProperties({DefaultSelfRegistrationConfigurationProperties.class, WebEndpointProperties.class})
+@EnableConfigurationProperties(WebEndpointProperties.class)
 class SelfRegistrationServiceTest {
 
     private static MockWebServer mockWebServer;
@@ -75,8 +76,14 @@ class SelfRegistrationServiceTest {
     static class SelfRegistrationServiceTestConfiguration {
 
         @Bean
+        @ConfigurationProperties(prefix = "axelix.sbs.discovery")
+        public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
+            return new SelfRegistrationConfigurationProperties();
+        }
+
+        @Bean
         public SelfRegistrationService selfRegistrationService(
-                DefaultSelfRegistrationConfigurationProperties properties,
+                SelfRegistrationConfigurationProperties properties,
                 SelfRegistrationMetadataAssembler metadataAssembler) {
             return new SelfRegistrationService(properties, metadataAssembler);
         }
@@ -84,8 +91,9 @@ class SelfRegistrationServiceTest {
         @Bean
         public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                DefaultSelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
                 WebEndpointProperties webEndpointProperties) {
+            selfRegistrationConfigurationProperties.validate();
             return new DefaultSelfRegistrationMetadataAssembler(
                     serviceMetadataAssembler,
                     selfRegistrationConfigurationProperties,

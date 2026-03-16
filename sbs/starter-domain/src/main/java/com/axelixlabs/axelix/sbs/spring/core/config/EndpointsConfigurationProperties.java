@@ -25,7 +25,7 @@ import java.util.List;
  * @author Mikhail Polivakha
  * @author Cherkasov Sergey
  */
-public class AbstractEndpointsConfigurationProperties<T extends AbstractEndpointsConfigurationProperties<T>> {
+public class EndpointsConfigurationProperties {
 
     public static final List<String> SANITIZE_ALL = List.of("*");
 
@@ -39,8 +39,8 @@ public class AbstractEndpointsConfigurationProperties<T extends AbstractEndpoint
         return sanitizedProperties;
     }
 
-    public T setSanitizedProperties(List<String> sanitizedProperties) {
+    public EndpointsConfigurationProperties setSanitizedProperties(List<String> sanitizedProperties) {
         this.sanitizedProperties = sanitizedProperties;
-        return (T) this;
+        return this;
     }
 }

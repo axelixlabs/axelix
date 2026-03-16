@@ -21,7 +21,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
-import com.axelixlabs.axelix.sbs.spring.core.config.DefaultSelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
 
 /**
  * Default implementation of {@link SelfRegistrationMetadataAssembler}.
@@ -31,7 +31,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.DefaultSelfRegistrationConfi
  */
 public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistrationMetadataAssembler {
 
-    private final DefaultSelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties;
+    private final SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties;
 
     private final ServiceMetadataAssembler serviceMetadataAssembler;
 
@@ -43,7 +43,7 @@ public class DefaultSelfRegistrationMetadataAssembler implements SelfRegistratio
 
     public DefaultSelfRegistrationMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
-            DefaultSelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
             String baseActuatorPath) {
         this.selfRegistrationConfigurationProperties = selfRegistrationConfigurationProperties;
         this.serviceMetadataAssembler = serviceMetadataAssembler;

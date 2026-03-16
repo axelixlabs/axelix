@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
-import com.axelixlabs.axelix.sbs.spring.core.config.DefaultEndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
@@ -46,7 +46,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableConfigurationProperties(DefaultEndpointsConfigurationProperties.class)
 public class ConfigurationPropertiesCacheTest {
 
     @Autowired
@@ -75,6 +74,12 @@ public class ConfigurationPropertiesCacheTest {
     static class ConfigurationPropertiesCacheTestConfiguration {
 
         @Bean
+        @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+        public EndpointsConfigurationProperties endpointsConfigurationProperties() {
+            return new EndpointsConfigurationProperties();
+        }
+
+        @Bean
         public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
             return new DefaultConfigurationPropertiesFlattener();
         }
@@ -92,8 +97,7 @@ public class ConfigurationPropertiesCacheTest {
 
         @Bean
         public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(
-                    DefaultEndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
+            return new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
         }
 
         @Bean

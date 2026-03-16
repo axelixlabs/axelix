@@ -48,7 +48,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.sbs.spring.core.config.DefaultEndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
@@ -91,10 +91,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
-@EnableConfigurationProperties({
-    AxelixEnvironmentEndpointTest.AxelixPropTest.class,
-    DefaultEndpointsConfigurationProperties.class
-})
+@EnableConfigurationProperties(AxelixEnvironmentEndpointTest.AxelixPropTest.class)
 @Import({EnvironmentTestConfig.class})
 class AxelixEnvironmentEndpointTest {
 
@@ -487,6 +484,12 @@ class AxelixEnvironmentEndpointTest {
 
     @TestConfiguration
     static class AxelixEnvironmentEndpointTestConfiguration {
+
+        @Bean
+        @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+        public EndpointsConfigurationProperties endpointsConfigurationProperties() {
+            return new EndpointsConfigurationProperties();
+        }
 
         @Bean
         public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(

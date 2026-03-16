@@ -22,10 +22,10 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.sbs.spring.core.config.DefaultSelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationService;
@@ -39,16 +39,23 @@ import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
  */
 @AutoConfiguration
 @ConditionalOnClass(WebEndpointProperties.class)
-@EnableConfigurationProperties(DefaultSelfRegistrationConfigurationProperties.class)
 @ConditionalOnProperty(value = "axelix.sbs.discovery.auto", havingValue = "true")
 public class SelfRegistrationAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConfigurationProperties(prefix = "axelix.sbs.discovery")
+    public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
+        return new SelfRegistrationConfigurationProperties();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
             ServiceMetadataAssembler serviceMetadataAssembler,
-            DefaultSelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
+            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
             WebEndpointProperties webEndpointProperties) {
+        selfRegistrationConfigurationProperties.validate();
         return new DefaultSelfRegistrationMetadataAssembler(
                 serviceMetadataAssembler, selfRegistrationConfigurationProperties, webEndpointProperties.getBasePath());
     }
@@ -56,8 +63,9 @@ public class SelfRegistrationAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SelfRegistrationService selfRegistrationService(
-            DefaultSelfRegistrationConfigurationProperties properties,
-            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler) {
+            SelfRegistrationConfigurationProperties properties,
+            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler,
+            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
         return new SelfRegistrationService(properties, selfRegistrationMetadataAssembler);
     }
 }

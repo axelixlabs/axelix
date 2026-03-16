@@ -21,12 +21,11 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
-import com.axelixlabs.axelix.sbs.spring.core.config.DefaultEndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
@@ -45,9 +44,8 @@ import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostPr
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@AutoConfiguration
+@AutoConfiguration(after = EndpointsConfigurationPropertiesAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixEnvironmentEndpoint.class)
-@EnableConfigurationProperties(DefaultEndpointsConfigurationProperties.class)
 public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean
@@ -66,7 +64,7 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SmartSanitizingFunction smartSanitizingFunction(
-            DefaultEndpointsConfigurationProperties endpointsConfigurationProperties,
+            EndpointsConfigurationProperties endpointsConfigurationProperties,
             PropertyNameNormalizer propertyNameNormalizer) {
         return new SmartSanitizingFunction(
                 endpointsConfigurationProperties.getSanitizedProperties(), propertyNameNormalizer);
