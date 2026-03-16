@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
  * @since 27.02.2026
  * @author Nikita Kirillov
  */
-@ConfigurationProperties(prefix = "axelix.master.auth.oauth2")
+@ConfigurationProperties(prefix = "axelix.master.auth.options.oauth2")
 public record OAuth2Properties(
         String issuerUri,
         String clientId,
@@ -45,7 +45,7 @@ public record OAuth2Properties(
         @Nullable String usernameClaim,
         String scopes) {
 
-    private static final String PROPERTY_PREFIX = "axelix.master.auth.oauth2.";
+    private static final String PROPERTY_PREFIX = "axelix.master.auth.options.oauth2";
     private static final String DEFAULT_SCOPE = "openid";
 
     public OAuth2Properties {

@@ -49,7 +49,7 @@ import com.axelixlabs.axelix.master.service.auth.UserLoginService;
 @Tag(name = "API for working with Users", description = "The endpoints for user login and authentication")
 @ExternalApiRestController
 @RequestMapping(path = ApiPaths.UsersApi.MAIN)
-@ConditionalOnProperty(prefix = "axelix.master.auth.static-admin", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "axelix.master.auth.options.static-admin", name = "enabled", havingValue = "true")
 public class UserApi {
 
     private final UserLoginService userLoginService;

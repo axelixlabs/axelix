@@ -47,7 +47,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = "axelix.master.auth.static-admin.enabled=true")
+@TestPropertySource(
+        properties = {
+            "axelix.master.auth.options.static-admin.enabled=true",
+            "axelix.master.auth.options.static-admin.credentials.username=admin",
+            "axelix.master.auth.options.static-admin.credentials.password=admin"
+        })
 class UserApiTest {
 
     @Autowired

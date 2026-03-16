@@ -39,10 +39,8 @@ import com.axelixlabs.axelix.master.service.auth.UserLoginService;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
-import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcTokenProcessor;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
-import com.axelixlabs.axelix.master.service.auth.oauth.OidcTokenProcessor;
 import com.axelixlabs.axelix.master.service.auth.provider.StaticAdminUserProvider;
 import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
 
@@ -108,7 +106,7 @@ public class SecurityAutoConfiguration {
      * Autoconfiguration for static-admin security option.
      */
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = "axelix.master.auth.static-admin", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "axelix.master.auth.options.static-admin", name = "enabled", havingValue = "true")
     static class StaticCredentialsConfig {
 
         private static final String USERNAME_NULL_MESSAGE =
@@ -136,7 +134,7 @@ public class SecurityAutoConfiguration {
         }
 
         @Bean
-        @ConfigurationProperties(prefix = "axelix.master.auth.static-admin.credentials")
+        @ConfigurationProperties(prefix = "axelix.master.auth.options.static-admin.credentials")
         public StaticAdminCredentialsProperties staticAdminCredentialsProperties() {
             return new StaticAdminCredentialsProperties();
         }
@@ -146,7 +144,7 @@ public class SecurityAutoConfiguration {
      * Autoconfiguration for OAuth2/OIDC security option.
      */
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = "axelix.master.auth.oauth2", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = "axelix.master.auth.options.oauth2", name = "enabled", havingValue = "true")
     @EnableConfigurationProperties(OAuth2Properties.class)
     public static class OAuth2Config {
 
@@ -164,11 +162,6 @@ public class SecurityAutoConfiguration {
         public OidcClient oidcClient(
                 RestClient restClient, OAuth2Properties oAuth2Properties, OidcMetadataProvider oidcMetadataProvider) {
             return new DefaultOidcClient(restClient, oAuth2Properties, oidcMetadataProvider);
-        }
-
-        @Bean
-        public OidcTokenProcessor oidcTokenProcessor(OidcClient oidcClient, OAuth2Properties oAuth2Properties) {
-            return new DefaultOidcTokenProcessor(oidcClient, oAuth2Properties);
         }
 
         @Bean

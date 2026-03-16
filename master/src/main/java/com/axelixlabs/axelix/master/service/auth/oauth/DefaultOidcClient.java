@@ -17,18 +17,20 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
-import java.math.BigInteger;
-import java.security.AlgorithmParameters;
-import java.security.KeyFactory;
 import java.security.PublicKey;
-import java.security.spec.ECGenParameterSpec;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.ECPoint;
-import java.security.spec.ECPublicKeySpec;
-import java.security.spec.RSAPublicKeySpec;
+import java.text.ParseException;
 import java.util.Base64;
-import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -36,6 +38,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
+import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
+import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
@@ -54,11 +58,14 @@ public class DefaultOidcClient implements OidcClient {
 
     private final OidcMetadataProvider oidcMetadataProvider;
 
+    private final ObjectMapper objectMapper;
+
     public DefaultOidcClient(
             RestClient restClient, OAuth2Properties oAuth2Properties, OidcMetadataProvider oidcMetadataProvider) {
         this.restClient = restClient;
         this.oAuth2Properties = oAuth2Properties;
         this.oidcMetadataProvider = oidcMetadataProvider;
+        this.objectMapper = new ObjectMapper();
     }
 
     /**
@@ -109,8 +116,68 @@ public class DefaultOidcClient implements OidcClient {
         }
     }
 
+    /**
+     * Needs additional validation the {@code iss} (issuer) and {@code aud} (audience) claims
+     * as required by OpenID Connect Core 1.0 Section 3.1.3.7 ID Token Validation (points 2 and 3).
+     * <p>
+     * The {@code aud} claim must equal the {@code clientId}.
+     * The {@code iss} claim must equal the {@code issuerUri}.
+     *
+     * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation"> OpenID Connect Core 1.0 - ID Token Validation</a>
+     */
     @Override
-    public PublicKey fetchPublicKey(String keyId) throws JwtParsingException {
+    public String validateOAuth2JwtTokenAndExtractUsername(String token)
+            throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtParsingException {
+        try {
+            String kid = extractPublicKeyId(token);
+            PublicKey publicKey = fetchPublicKey(kid);
+
+            Claims claims = Jwts.parser()
+                    .verifyWith(publicKey)
+                    .requireIssuer(oAuth2Properties.issuerUri())
+                    .requireAudience(oAuth2Properties.clientId())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            return extractUsername(claims);
+
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredJwtTokenException("OAuth2Jwt token has expired", e);
+        } catch (JwtException e) {
+            throw new InvalidJwtTokenException("OAuth2Jwt token is invalid or tampered", e);
+        } catch (Exception e) {
+            throw new JwtParsingException("Unexpected error while decoding OAuth2Jwt token", e);
+        }
+    }
+
+    private String extractPublicKeyId(String token) {
+        try {
+            String headerPart = token.split("\\.")[0];
+            String headerJson = new String(Base64.getUrlDecoder().decode(headerPart));
+            Map<String, Object> header = objectMapper.readValue(headerJson, Map.class);
+            String kid = (String) header.get("kid");
+            if (kid == null) {
+                throw new JwtParsingException("kid is missing in OAuth2Jwt header");
+            }
+            return kid;
+        } catch (JsonProcessingException e) {
+            throw new JwtParsingException("Failed to parse OAuth2Jwt header", e);
+        }
+    }
+
+    /**
+     * Fetches and constructs a public key from the OIDC provider's JWKS endpoint
+     * that corresponds to the given key ID.
+     * <p>
+     * The key is located by matching the provided {@code kid} against the keys
+     * returned from the JWKS URI as defined in RFC 7517.
+     *
+     * @param keyId the key ID ({@code kid}) extracted from the JWT header
+     * @return the public key used to verify the JWT signature
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7517">RFC 7517 - JSON Web Key (JWK)</a>
+     */
+    private PublicKey fetchPublicKey(String keyId) throws JwtParsingException {
         String jwksUri = oidcMetadataProvider.getJwksUri();
 
         Map<String, Object> body = restClient.get().uri(jwksUri).retrieve().body(new ParameterizedTypeReference<>() {});
@@ -119,104 +186,58 @@ public class DefaultOidcClient implements OidcClient {
             throw new JwtParsingException("JWKS response is empty from " + jwksUri);
         }
 
-        List<Map<String, Object>> keys = getKeysList(body);
+        try {
+            JWKSet jwkSet = JWKSet.parse(body);
+            JWK jwk = jwkSet.getKeyByKeyId(keyId);
 
-        Map<String, Object> jwk = keys.stream()
-                .filter(key -> keyId.equals(key.get("kid")))
-                .findFirst()
-                .orElseThrow(() -> new JwtParsingException("Public key not found for kid: " + keyId));
+            if (jwk == null) {
+                throw new JwtParsingException("Public key not found for kid: " + keyId);
+            }
 
-        return buildPublicKey(jwk);
+            return buildPublicKey(jwk);
+
+        } catch (ParseException e) {
+            throw new JwtParsingException("Failed to parse JWKS response from " + jwksUri + ": " + e.getMessage(), e);
+        }
     }
 
-    @SuppressWarnings("unchecked")
-    private List<Map<String, Object>> getKeysList(Map<String, Object> body) {
-        Object keysObj = body.get("keys");
-
-        if (!(keysObj instanceof List<?> keysList)) {
-            throw new JwtParsingException("JWKS response does not contain a valid 'keys' list");
+    private PublicKey buildPublicKey(JWK jwk) throws JwtParsingException {
+        try {
+            return switch (jwk.getKeyType().getValue()) {
+                case "RSA" -> jwk.toRSAKey().toPublicKey();
+                case "EC" -> jwk.toECKey().toPublicKey();
+                case "OKP" ->
+                    throw new JwtParsingException(
+                            "EdDSA/OKP keys are not supported yet. Currently supported: RSA, EC.");
+                default -> throw new JwtParsingException("Unsupported key type: " + jwk.getKeyType());
+            };
+        } catch (JOSEException e) {
+            throw new JwtParsingException("Failed to build public key for kid: " + jwk.getKeyID(), e);
         }
+    }
 
-        for (Object item : keysList) {
-            if (!(item instanceof Map)) {
-                throw new JwtParsingException("Invalid JWKS key format: key is not a Map");
+    /**
+     * Extracts the username from JWT claims.
+     * Falls back to {@code sub} (subject) as a last resort it is always present per OIDC spec.
+     */
+    private String extractUsername(Claims claims) {
+        if (oAuth2Properties.usernameClaim() != null) {
+            String username = claims.get(oAuth2Properties.usernameClaim(), String.class);
+            if (username != null) {
+                return username;
             }
         }
 
-        return (List<Map<String, Object>>) keysList;
-    }
-
-    private PublicKey buildPublicKey(Map<String, Object> jwk) {
-
-        String keyType = (String) jwk.get("kty");
-
-        return switch (keyType) {
-            case "RSA" -> buildRsaPublicKey(jwk);
-            case "EC" -> buildEcPublicKey(jwk);
-            default -> throw new JwtParsingException("Unsupported key type: " + keyType);
-        };
-    }
-
-    /**
-     * Builds an RSA PublicKey from a JSON Web Key (JWK) map.
-     * <ul>
-     *  <li> - "n" (Modulus)  — the Base64urlUInt-encoded modulus of the RSA public key</li>
-     *  <li> - "e" (Exponent) — the Base64urlUInt-encoded public exponent of the RSA public key </li>
-     * </ul>
-     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7518#section-6.3.1">RFC 7518 Section 6.3.1</a>
-     */
-    private PublicKey buildRsaPublicKey(Map<String, Object> jwk) {
-        try {
-            String n = (String) jwk.get("n");
-            String e = (String) jwk.get("e");
-
-            BigInteger modulus = new BigInteger(1, Base64.getUrlDecoder().decode(n));
-            BigInteger exponent = new BigInteger(1, Base64.getUrlDecoder().decode(e));
-
-            RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, exponent);
-            return KeyFactory.getInstance("RSA").generatePublic(spec);
-        } catch (Exception ex) {
-            throw new JwtParsingException("Failed to build RSA public key", ex);
+        String preferredUsername = claims.get("preferred_username", String.class);
+        if (preferredUsername != null) {
+            return preferredUsername;
         }
-    }
 
-    /**
-     * Builds an EC PublicKey from a JSON Web Key (JWK) map.
-     * <ul>
-     *  <li> - "crv" (Curve)   — the cryptographic curve used </li>
-     *  <li> - "x"  (X)        — the Base64urlUInt-encoded x coordinate </li>
-     *  <li> - "y"  (Y)        — the Base64urlUInt-encoded y coordinate</li>
-     * </ul>
-     *
-     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7518#section-6.2.1">RFC 7518 Section 6.2.1</a>
-     */
-    private PublicKey buildEcPublicKey(Map<String, Object> jwk) {
-        try {
-            String x = (String) jwk.get("x");
-            String y = (String) jwk.get("y");
-            String crv = (String) jwk.get("crv");
-
-            ECPoint ecPoint = new ECPoint(
-                    new BigInteger(1, Base64.getUrlDecoder().decode(x)),
-                    new BigInteger(1, Base64.getUrlDecoder().decode(y)));
-
-            String algorithm =
-                    switch (crv) {
-                        case "P-256" -> "secp256r1";
-                        case "P-384" -> "secp384r1";
-                        case "P-521" -> "secp521r1";
-                        default -> throw new JwtParsingException("Unsupported EC curve: " + crv);
-                    };
-
-            AlgorithmParameters algorithmParameters = AlgorithmParameters.getInstance("EC");
-            algorithmParameters.init(new ECGenParameterSpec(algorithm));
-
-            ECParameterSpec ecParameterSpec = algorithmParameters.getParameterSpec(ECParameterSpec.class);
-
-            ECPublicKeySpec keySpec = new ECPublicKeySpec(ecPoint, ecParameterSpec);
-            return KeyFactory.getInstance("EC").generatePublic(keySpec);
-        } catch (Exception ex) {
-            throw new JwtParsingException("Failed to build EC public key", ex);
+        String name = claims.get("name", String.class);
+        if (name != null) {
+            return name;
         }
+
+        return claims.getSubject();
     }
 }

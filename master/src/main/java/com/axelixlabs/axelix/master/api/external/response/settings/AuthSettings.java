@@ -18,12 +18,18 @@
 package com.axelixlabs.axelix.master.api.external.response.settings;
 
 /**
- * Marker interface representing authentication settings for a specific auth provider.
+ * Interface that represent a specific authentication option.
  *
  * @since 06.03.2026
  * @author Nikita Kirillov
  */
 public sealed interface AuthSettings permits AuthSettingsOAuth2, AuthSettingsStaticAdmin {
 
+    /**
+     * Returns the authentication provider type identifier.
+     * Used by the Frontend to determine which login option to display.
+     *
+     * @return the type identifier, e.g.  {@code "static-admin"} or {@code "oauth2"}
+     */
     String type();
 }

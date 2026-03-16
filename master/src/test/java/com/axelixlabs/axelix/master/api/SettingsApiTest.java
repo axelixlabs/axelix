@@ -41,8 +41,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.api.external.endpoint.SettingsApi;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider.OidcMetadata;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,12 +75,24 @@ class SettingsApiTest {
     @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
     @TestPropertySource(
             properties = {
-                "axelix.master.auth.static-admin.enabled=true",
-                "axelix.master.auth.static-admin.credentials.username=admin",
-                "axelix.master.auth.static-admin.credentials.password=password"
+                "axelix.master.auth.options.static-admin.enabled=true",
+                "axelix.master.auth.options.static-admin.credentials.username=admin",
+                "axelix.master.auth.options.static-admin.credentials.password=password",
             })
     @Nested
     class WhenStaticAdminEnabled {
+
+        private final String EXPECTED_JSON =
+                // language=json
+                """
+        {
+          "authProviders": [
+            {
+              "type": "static-admin"
+            }
+          ]
+        }
+        """;
 
         @LocalServerPort
         private int port;
@@ -96,18 +110,18 @@ class SettingsApiTest {
                     restTemplate.getForEntity("http://localhost:" + port + "/api/external/settings/auth", String.class);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody()).isEqualTo("{\"authProviders\":[{\"type\":\"static-admin\"}]}");
+            assertThatJson(response.getBody()).isEqualTo(EXPECTED_JSON);
         }
     }
 
     @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
     @TestPropertySource(
             properties = {
-                "axelix.master.auth.oauth2.enabled=true",
-                "axelix.master.auth.oauth2.issuer-uri=http://placeholder.will.be.overridden",
-                "axelix.master.auth.oauth2.client-id=test-client",
-                "axelix.master.auth.oauth2.client-secret=test-secret",
-                "axelix.master.auth.oauth2.redirect-uri=http://localhost:3000/api/external/oauth2/callback"
+                "axelix.master.auth.options.oauth2.enabled=true",
+                "axelix.master.auth.options.oauth2.issuer-uri=http://placeholder.will.be.overridden",
+                "axelix.master.auth.options.oauth2.client-id=test-client",
+                "axelix.master.auth.options.oauth2.client-secret=test-secret",
+                "axelix.master.auth.options.oauth2.redirect-uri=http://localhost:3000/api/external/oauth2/callback"
             })
     @Nested
     class WhenOAuth2Enabled {
@@ -123,13 +137,12 @@ class SettingsApiTest {
                   "clientId": "test-client",
                   "redirectUri": "http://localhost:3000/api/external/oauth2/callback",
                   "scope": "openid",
-                  "authorizationEndpoint": "%srealms/axelix/protocol/openid-connect/auth",
+                  "authorizationEndpoint": "%srealms/axelix/openid-connect/auth",
                   "type": "oauth2"
                 }
               ]
             }
-            """
-                        .formatted(baseUrl);
+            """.formatted(baseUrl);
 
         @LocalServerPort
         private int port;
@@ -146,8 +159,11 @@ class SettingsApiTest {
             String baseUrl = mockWebServer.url("").toString();
 
             // override issuerUri after start mockWebServer
-            ReflectionTestUtils.setField(oidcMetadataProvider, "issuerUri", baseUrl);
-            ReflectionTestUtils.setField(oidcMetadataProvider, "authorizationEndpoint", null);
+            ReflectionTestUtils.setField(
+                    oidcMetadataProvider,
+                    "lazyOidcMetadata",
+                    Lazy.resolved(new OidcMetadata(
+                            baseUrl, baseUrl + "token", baseUrl + "realms/axelix/openid-connect/auth")));
 
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
@@ -166,8 +182,7 @@ class SettingsApiTest {
                                           "token_endpoint": "%stoken",
                                           "authorization_endpoint": "%srealms/axelix/protocol/openid-connect/auth"
                                         }
-                                        """
-                                                .formatted(baseUrl, baseUrl, baseUrl, baseUrl))
+                                        """.formatted(baseUrl, baseUrl, baseUrl, baseUrl))
                                 .addHeader("Content-Type", APPLICATION_JSON_VALUE);
                     }
                     return new MockResponse().setResponseCode(404);
@@ -188,14 +203,14 @@ class SettingsApiTest {
     @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
     @TestPropertySource(
             properties = {
-                "axelix.master.auth.static-admin.enabled=true",
-                "axelix.master.auth.static-admin.credentials.username=admin",
-                "axelix.master.auth.static-admin.credentials.password=password",
-                "axelix.master.auth.oauth2.enabled=true",
-                "axelix.master.auth.oauth2.issuer-uri=http://placeholder.will.be.overridden",
-                "axelix.master.auth.oauth2.client-id=test-client",
-                "axelix.master.auth.oauth2.client-secret=test-secret",
-                "axelix.master.auth.oauth2.redirect-uri=http://localhost:3000/api/external/oauth2/callback"
+                "axelix.master.auth.options.static-admin.enabled=true",
+                "axelix.master.auth.options.static-admin.credentials.username=admin",
+                "axelix.master.auth.options.static-admin.credentials.password=password",
+                "axelix.master.auth.options.oauth2.enabled=true",
+                "axelix.master.auth.options.oauth2.issuer-uri=http://placeholder.will.be.overridden",
+                "axelix.master.auth.options.oauth2.client-id=test-client",
+                "axelix.master.auth.options.oauth2.client-secret=test-secret",
+                "axelix.master.auth.options.oauth2.redirect-uri=http://localhost:3000/api/external/oauth2/callback"
             })
     @Nested
     class WhenStaticAdminAndOAuth2Enabled {
@@ -211,7 +226,7 @@ class SettingsApiTest {
                       "clientId": "test-client",
                       "redirectUri": "http://localhost:3000/api/external/oauth2/callback",
                       "scope": "openid",
-                      "authorizationEndpoint": "%srealms/axelix/protocol/openid-connect/auth",
+                      "authorizationEndpoint": "%srealms/axelix/openid-connect/auth",
                       "type": "oauth2"
                     },
                     {
@@ -219,8 +234,7 @@ class SettingsApiTest {
                     }
                   ]
                 }
-                """
-                        .formatted(baseUrl);
+                """.formatted(baseUrl);
 
         @LocalServerPort
         private int port;
@@ -237,8 +251,11 @@ class SettingsApiTest {
             String baseUrl = mockWebServer.url("").toString();
 
             // override issuerUri after start mockWebServer
-            ReflectionTestUtils.setField(oidcMetadataProvider, "issuerUri", baseUrl);
-            ReflectionTestUtils.setField(oidcMetadataProvider, "authorizationEndpoint", null);
+            ReflectionTestUtils.setField(
+                    oidcMetadataProvider,
+                    "lazyOidcMetadata",
+                    Lazy.resolved(new OidcMetadata(
+                            baseUrl, baseUrl + "token", baseUrl + "realms/axelix/openid-connect/auth")));
 
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
@@ -249,16 +266,14 @@ class SettingsApiTest {
                             && Objects.equals(request.getMethod(), "GET")) {
                         return new MockResponse()
                                 // language=json
-                                .setBody(
-                                        """
+                                .setBody("""
                                     {
                                       "issuer": "%s",
                                       "jwks_uri": "%scerts",
                                       "token_endpoint": "%stoken",
-                                      "authorization_endpoint": "%srealms/axelix/protocol/openid-connect/auth"
+                                      "authorization_endpoint": "%srealms/axelix/openid-connect/auth"
                                     }
-                                    """
-                                                .formatted(baseUrl, baseUrl, baseUrl, baseUrl))
+                                    """.formatted(baseUrl, baseUrl, baseUrl, baseUrl))
                                 .addHeader("Content-Type", APPLICATION_JSON_VALUE);
                     }
                     return new MockResponse().setResponseCode(404);

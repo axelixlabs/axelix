@@ -63,16 +63,14 @@ class OidcMetadataProviderTest {
         String baseUrl = mockWebServer.url("").toString();
 
         // language=json
-        String jsonResponse =
-                """
+        String jsonResponse = """
             {
               "issuer": "%s",
               "jwks_uri": "%srealms/axelix/protocol/openid-connect/certs",
               "token_endpoint": "%srealms/axelix/protocol/openid-connect/token",
               "authorization_endpoint": "%srealms/axelix/protocol/openid-connect/auth"
             }
-            """
-                        .formatted(baseUrl, baseUrl, baseUrl, baseUrl);
+            """.formatted(baseUrl, baseUrl, baseUrl, baseUrl);
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override

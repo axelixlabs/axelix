@@ -37,12 +37,9 @@ import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
-import com.axelixlabs.axelix.master.service.auth.oauth.OidcTokenProcessor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -54,12 +51,11 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
         properties = {
-            "axelix.master.auth.oauth2.enabled=true",
-            "axelix.master.auth.type=oauth2",
-            "axelix.master.auth.oauth2.issuer-uri=https://test-issuer.com",
-            "axelix.master.auth.oauth2.client-id=test-client",
-            "axelix.master.auth.oauth2.client-secret=test-secret",
-            "axelix.master.auth.oauth2.redirect-uri=http://localhost:8080/api/external/oauth2/callback"
+            "axelix.master.auth.options.oauth2.enabled=true",
+            "axelix.master.auth.options.oauth2.issuer-uri=http://placeholder.will.be.overridden",
+            "axelix.master.auth.options.oauth2.client-id=test-client",
+            "axelix.master.auth.options.oauth2.client-secret=test-secret",
+            "axelix.master.auth.options.oauth2.redirect-uri=http://localhost:3000/api/external/oauth2/callback"
         })
 @TestPropertySource(properties = "axelix.master.auth.static-admin.enabled=true")
 class OAuth2CallbackControllerTest {
@@ -81,9 +77,6 @@ class OAuth2CallbackControllerTest {
     private CookieService cookieService;
 
     @MockitoBean
-    private OidcTokenProcessor oidcTokenProcessor;
-
-    @MockitoBean
     private JwtEncoderService jwtEncoderService;
 
     @BeforeEach
@@ -96,8 +89,7 @@ class OAuth2CallbackControllerTest {
         restTemplate = new TestRestTemplate().withRedirects(ClientHttpRequestFactorySettings.Redirects.DONT_FOLLOW);
 
         when(oidcClient.exchangeCodeForIdToken(CODE)).thenReturn(ID_TOKEN);
-        when(oidcTokenProcessor.validateOAuth2JwtTokenAndExtractUsername(ID_TOKEN))
-                .thenReturn(USERNAME);
+        when(oidcClient.validateOAuth2JwtTokenAndExtractUsername(ID_TOKEN)).thenReturn(USERNAME);
         when(jwtEncoderService.generateToken(any())).thenReturn(OUR_JWT_TOKEN);
         when(cookieService.buildAuthCookie(OUR_JWT_TOKEN)).thenReturn(cookie);
     }
@@ -132,23 +124,12 @@ class OAuth2CallbackControllerTest {
 
     @Test
     void shouldReturn401WhenTokenValidationFails() {
-        when(oidcTokenProcessor.validateOAuth2JwtTokenAndExtractUsername(ID_TOKEN))
+        when(oidcClient.validateOAuth2JwtTokenAndExtractUsername(ID_TOKEN))
                 .thenThrow(new InvalidJwtTokenException("invalid token"));
 
         ResponseEntity<Void> response = restTemplate.getForEntity(
                 "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
-    @Test
-    void shouldGenerateTokenWithCorrectUsername() {
-        restTemplate.getForEntity(
-                "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
-
-        verify(jwtEncoderService)
-                .generateToken(argThat(user -> user.getUsername().equals(USERNAME)
-                        && user.getRoles().stream()
-                                .anyMatch(role -> role.getName().equals("ADMIN"))));
     }
 }

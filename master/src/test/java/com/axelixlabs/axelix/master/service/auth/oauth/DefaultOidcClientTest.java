@@ -18,19 +18,29 @@
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
 import java.io.IOException;
-import java.security.KeyPairGenerator;
-import java.security.PublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.ECGenParameterSpec;
-import java.util.Base64;
-import java.util.Objects;
+import java.security.PrivateKey;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +48,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.web.client.RestClient;
 
-import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 
@@ -56,19 +66,25 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
  */
 class DefaultOidcClientTest {
 
-    private static final String KEY_ID = "test-key-id";
-    private static final String CLIENT_ID = "test-client";
+    private static final String RSA_KEY_ID = "rsa-key-id";
+    private static final String EC_KEY_ID = "ec-key-id";
+    private static final String CLIENT_ID = "test-client-id";
     private static final String CLIENT_SECRET = "test-secret";
     private static final String AUTH_CODE = "test-code";
 
     private static MockWebServer mockWebServer;
+    private static RSAKey rsaKey;
+    private static ECKey ecKey;
 
     private OidcClient oidcClient;
 
     @BeforeAll
-    static void startServer() throws IOException {
+    static void startServer() throws Exception {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
+
+        rsaKey = new RSAKeyGenerator(2048).keyID(RSA_KEY_ID).generate();
+        ecKey = new ECKeyGenerator(Curve.P_256).keyID(EC_KEY_ID).generate();
     }
 
     @AfterAll
@@ -93,35 +109,44 @@ class DefaultOidcClientTest {
     @Test
     void shouldExchangeCodeForIdToken() {
         String idToken = "eyJhbGciOiJSUzI1NiJ9.test.token";
+        // language=json
+        String jsonResponse = """
+            {
+              "id_token": "%s"
+            }
+            """;
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
-                String path = request.getPath();
-                assert request.getPath() != null;
-
-                if (path.equals("/token") && Objects.equals(request.getMethod(), "POST")) {
+                if ("/token".equals(request.getPath()) && "POST".equals(request.getMethod())) {
                     return new MockResponse()
-                            .setBody("{\"id_token\": \"%s\"}\n".formatted(idToken))
+                            .setBody(jsonResponse.formatted(idToken))
                             .addHeader("Content-Type", APPLICATION_JSON_VALUE);
                 }
                 return new MockResponse().setResponseCode(404);
             }
         });
 
-        String result = oidcClient.exchangeCodeForIdToken(AUTH_CODE);
-
-        assertThat(result).isEqualTo(idToken);
+        assertThat(oidcClient.exchangeCodeForIdToken(AUTH_CODE)).isEqualTo(idToken);
     }
 
     @Test
     void shouldThrowWhenIdTokenMissingInResponse() {
+        // language=json
+        String jsonResponse = """
+            {
+              "access_token": "some-token"
+            }
+            """;
+
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
-                return new MockResponse()
-                        .setBody("{\"access_token\": \"some-token\"}")
-                        .addHeader("Content-Type", APPLICATION_JSON_VALUE);
+                if ("/token".equals(request.getPath()) && "POST".equals(request.getMethod())) {
+                    return new MockResponse().setBody(jsonResponse).addHeader("Content-Type", APPLICATION_JSON_VALUE);
+                }
+                return new MockResponse().setResponseCode(404);
             }
         });
 
@@ -130,112 +155,100 @@ class DefaultOidcClientTest {
     }
 
     @Test
-    void shouldFetchRsaPublicKey() throws Exception {
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-        generator.initialize(2048);
+    void shouldExtractUsernameFromTokenSignedWithRsaKey() throws Exception {
+        setupJwksDispatcher();
+        String token = buildToken(RSA_KEY_ID, rsaKey.toPrivateKey(), "preferred-user", null);
 
-        RSAPublicKey rsaPublicKey = (RSAPublicKey) generator.generateKeyPair().getPublic();
-        String modulus = Base64.getUrlEncoder()
-                .withoutPadding()
-                .encodeToString(rsaPublicKey.getModulus().toByteArray());
+        String result = oidcClient.validateOAuth2JwtTokenAndExtractUsername(token);
 
-        String exponent = Base64.getUrlEncoder()
-                .withoutPadding()
-                .encodeToString(rsaPublicKey.getPublicExponent().toByteArray());
+        assertThat(result).isEqualTo("preferred-user");
+    }
 
-        String jwksJson =
-                // language=json
-                """
-                {
-                  "keys": [
-                    {
-                      "kid": "%s",
-                      "kty": "RSA",
-                      "n": "%s",
-                      "e": "%s"
-                    }
-                  ]
-                }
-                """
-                        .formatted(KEY_ID, modulus, exponent);
+    @Test
+    void shouldExtractUsernameFromTokenSignedWithEcKey() throws Exception {
+        setupJwksDispatcher();
+        String token = buildToken(EC_KEY_ID, ecKey.toPrivateKey(), "ec-user", null);
+
+        String result = oidcClient.validateOAuth2JwtTokenAndExtractUsername(token);
+
+        assertThat(result).isEqualTo("ec-user");
+    }
+
+    @Test
+    void shouldFallbackToSubjectWhenNoPreferredUsername() throws Exception {
+        setupJwksDispatcher();
+        String subject = UUID.randomUUID().toString();
+        String token = buildToken(RSA_KEY_ID, rsaKey.toPrivateKey(), null, subject);
+
+        String result = oidcClient.validateOAuth2JwtTokenAndExtractUsername(token);
+
+        assertThat(result).isEqualTo(subject);
+    }
+
+    @Test
+    void shouldThrowWhenTokenExpired() throws Exception {
+        setupJwksDispatcher();
+        String token = buildExpiredToken();
+
+        assertThatThrownBy(() -> oidcClient.validateOAuth2JwtTokenAndExtractUsername(token))
+                .isInstanceOf(ExpiredJwtTokenException.class);
+    }
+
+    private void setupJwksDispatcher() throws Exception {
+        String jwksJson = new ObjectMapper().writeValueAsString(new JWKSet(List.of(rsaKey, ecKey)).toJSONObject());
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
             public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
-                String path = request.getPath();
-                assert request.getPath() != null;
-
-                if (path.equals("/certs") && Objects.equals(request.getMethod(), "GET")) {
+                if ("/certs".equals(request.getPath()) && "GET".equals(request.getMethod())) {
                     return new MockResponse().setBody(jwksJson).addHeader("Content-Type", APPLICATION_JSON_VALUE);
                 }
                 return new MockResponse().setResponseCode(404);
             }
         });
-
-        PublicKey result = oidcClient.fetchPublicKey(KEY_ID);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getAlgorithm()).isEqualTo("RSA");
     }
 
-    @Test
-    void shouldFetchEcPublicKey() throws Exception {
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
-        generator.initialize(new ECGenParameterSpec("secp256r1"));
+    private String buildToken(
+            String keyId, PrivateKey privateKey, @Nullable String preferredUsername, @Nullable String subject) {
+        String baseUrl = mockWebServer.url("").toString();
+        Instant now = Instant.now();
 
-        ECPublicKey ecPublicKey = (ECPublicKey) generator.generateKeyPair().getPublic();
-        String xCoord = Base64.getUrlEncoder()
-                .withoutPadding()
-                .encodeToString(ecPublicKey.getW().getAffineX().toByteArray());
-        String yCoord = Base64.getUrlEncoder()
-                .withoutPadding()
-                .encodeToString(ecPublicKey.getW().getAffineY().toByteArray());
+        JwtBuilder builder = Jwts.builder()
+                .header()
+                .keyId(keyId)
+                .and()
+                .subject(subject != null ? subject : UUID.randomUUID().toString())
+                .issuer(baseUrl)
+                .audience()
+                .add(CLIENT_ID)
+                .and()
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plus(Duration.ofHours(1))))
+                .signWith(privateKey);
 
-        String jwksJson =
-                // language=json
-                """
-                {
-                  "keys": [
-                    {
-                      "kid": "%s",
-                      "kty": "EC",
-                      "crv": "P-256",
-                      "x": "%s",
-                      "y": "%s"
-                    }
-                  ]
-                }
-                """
-                        .formatted(KEY_ID, xCoord, yCoord);
+        if (preferredUsername != null) {
+            builder.claim("preferred_username", preferredUsername);
+        }
 
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
-                String path = request.getPath();
-                assert request.getPath() != null;
-
-                if (path.equals("/certs") && Objects.equals(request.getMethod(), "GET")) {
-                    return new MockResponse().setBody(jwksJson).addHeader("Content-Type", APPLICATION_JSON_VALUE);
-                }
-                return new MockResponse().setResponseCode(404);
-            }
-        });
-
-        PublicKey result = oidcClient.fetchPublicKey(KEY_ID);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getAlgorithm()).isEqualTo("EC");
+        return builder.compact();
     }
 
-    @Test
-    void shouldThrowWhenKeyNotFound() {
-        mockWebServer.setDispatcher(new Dispatcher() {
-            @Override
-            public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
-                return new MockResponse().setBody("{\"keys\": []}").addHeader("Content-Type", APPLICATION_JSON_VALUE);
-            }
-        });
+    private String buildExpiredToken() throws JOSEException {
+        String baseUrl = mockWebServer.url("").toString();
+        Instant past = Instant.now().minus(Duration.ofHours(2));
 
-        assertThatThrownBy(() -> oidcClient.fetchPublicKey(KEY_ID)).isInstanceOf(JwtParsingException.class);
+        return Jwts.builder()
+                .header()
+                .keyId(RSA_KEY_ID)
+                .and()
+                .subject("user")
+                .issuer(baseUrl)
+                .audience()
+                .add(CLIENT_ID)
+                .and()
+                .issuedAt(Date.from(past))
+                .expiration(Date.from(past.plus(Duration.ofMinutes(1))))
+                .signWith(rsaKey.toPrivateKey())
+                .compact();
     }
 }

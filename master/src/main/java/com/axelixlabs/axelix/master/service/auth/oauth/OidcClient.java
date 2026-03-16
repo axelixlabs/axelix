@@ -17,9 +17,9 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
-import java.security.PublicKey;
-
-import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
+import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
+import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 
 /**
@@ -41,17 +41,22 @@ public interface OidcClient {
     String exchangeCodeForIdToken(String code) throws OidcTokenExchangeException;
 
     /**
-     * Fetches and constructs a public key from the OIDC provider's JWKS endpoint
-     * that corresponds to the given key ID.
-     * <p>
-     * The key is located by matching the provided {@code kid} against the keys
-     * returned from the JWKS URI as defined in RFC 7517.
+     * Validates the given OIDC ID Token and extracts the username from its claims.
      *
-     * @param keyId the key ID ({@code kid}) extracted from the JWT header
-     * @return the public key used to verify the JWT signature
-     * @throws JwtParsingException if the JWKS response is empty, the key is not found,
-     *                             or the key cannot be constructed
-     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7517">RFC 7517 - JSON Web Key (JWK)</a>
+     * <p>Needs additional validation of the {@code iss} (issuer) and {@code aud} (audience) claims
+     * as required by OpenID Connect Core 1.0 Section 3.1.3.7 ID Token Validation (points 2 and 3).</p>
+     *
+     * <p>The {@code aud} claim must equal the {@code client_id}.</p>
+     *
+     * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation">
+     *      OpenID Connect Core 1.0 - ID Token Validation</a>
+     *
+     * @param token the OIDC ID Token to validate and process
+     * @return the extracted username
+     * @throws ExpiredJwtTokenException if the token has expired
+     * @throws InvalidJwtTokenException if the token signature is invalid or tampered
+     * @throws JwtProcessingException   if the token cannot be parsed
      */
-    PublicKey fetchPublicKey(String keyId) throws JwtParsingException;
+    String validateOAuth2JwtTokenAndExtractUsername(String token)
+            throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtProcessingException;
 }

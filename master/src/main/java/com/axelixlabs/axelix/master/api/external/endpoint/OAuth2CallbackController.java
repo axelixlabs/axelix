@@ -17,9 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.Arrays;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
@@ -32,14 +30,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
-import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
-import com.axelixlabs.axelix.master.service.auth.oauth.OidcTokenProcessor;
 
 /**
  * Controller handling the OAuth2 Authorization Code Flow callback.
@@ -54,7 +50,7 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcTokenProcessor;
  * @author Nikita Kirillov
  */
 @ExternalApiRestController
-@ConditionalOnProperty(prefix = "axelix.master.auth.oauth2", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "axelix.master.auth.options.oauth2", name = "enabled", havingValue = "true")
 @RequestMapping(ApiPaths.OAuth2Api.MAIN)
 public class OAuth2CallbackController {
 
@@ -62,17 +58,12 @@ public class OAuth2CallbackController {
 
     private final OidcClient oidcClient;
     private final CookieService cookieService;
-    private final OidcTokenProcessor oidcTokenProcessor;
     private final JwtEncoderService jwtEncoderService;
 
     public OAuth2CallbackController(
-            OidcClient oidcClient,
-            CookieService cookieService,
-            OidcTokenProcessor oidcTokenProcessor,
-            JwtEncoderService jwtEncoderService) {
+            OidcClient oidcClient, CookieService cookieService, JwtEncoderService jwtEncoderService) {
         this.oidcClient = oidcClient;
         this.cookieService = cookieService;
-        this.oidcTokenProcessor = oidcTokenProcessor;
         this.jwtEncoderService = jwtEncoderService;
     }
 
@@ -81,13 +72,9 @@ public class OAuth2CallbackController {
 
         String oidcToken = oidcClient.exchangeCodeForIdToken(code);
 
-        String username = oidcTokenProcessor.validateOAuth2JwtTokenAndExtractUsername(oidcToken);
+        String username = oidcClient.validateOAuth2JwtTokenAndExtractUsername(oidcToken);
 
-        User user = new DefaultUser(
-                username,
-                "",
-                Set.of(new DefaultRole(
-                        "ADMIN", Arrays.stream(ExternalAuthority.values()).collect(Collectors.toSet()))));
+        User user = new DefaultUser(username, "", Set.of(DefaultRole.ADMIN));
 
         String ourToken = jwtEncoderService.generateToken(user);
 
