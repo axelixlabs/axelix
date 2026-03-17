@@ -22,6 +22,7 @@ import type { IMeasurementsWithTimestamp } from "models";
 import { METRIC_SLIDING_WINDOW_MS } from "utils";
 
 import styles from "./styles.module.css";
+import { Fragment } from "react";
 
 interface IProps {
     /**
@@ -61,6 +62,20 @@ export const MetricChart = ({ measurements, startTime }: IProps) => {
                         stroke="#00ab55"
                         strokeWidth={3}
                         activeDot={{ r: 5 }}
+                        dot={({ cx, cy, index, points }) => {
+                            if (index !== points.length - 1) {
+                                return <Fragment key={index} />
+                            };
+
+                            return (
+                                <circle
+                                    cx={cx}
+                                    cy={cy}
+                                    r={3}
+                                    className={styles.Dot}
+                                />
+                            );
+                        }}
                         isAnimationActive={false}
                     />
                 </LineChart>
