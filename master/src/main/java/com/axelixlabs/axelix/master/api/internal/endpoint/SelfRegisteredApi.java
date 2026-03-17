@@ -30,7 +30,7 @@ import com.axelixlabs.axelix.master.api.internal.ApiPaths;
 import com.axelixlabs.axelix.master.api.internal.InternalApiRestController;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
-import com.axelixlabs.axelix.master.service.InstanceRegistrar;
+import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
  * The API used for service self-registration.
@@ -43,11 +43,11 @@ import com.axelixlabs.axelix.master.service.InstanceRegistrar;
 @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "auto", havingValue = "false")
 public class SelfRegisteredApi {
 
-    private final InstanceRegistrar instanceRegistrar;
+    private final InstanceRegistry instanceRegistry;
     private final InstanceFactory instanceFactory;
 
-    public SelfRegisteredApi(InstanceRegistrar instanceRegistrar, InstanceFactory instanceFactory) {
-        this.instanceRegistrar = instanceRegistrar;
+    public SelfRegisteredApi(InstanceRegistry instanceRegistry, InstanceFactory instanceFactory) {
+        this.instanceRegistry = instanceRegistry;
         this.instanceFactory = instanceFactory;
     }
 
@@ -60,7 +60,7 @@ public class SelfRegisteredApi {
                 request.getDeploymentAt(),
                 request.getInstanceActuatorUrl(),
                 request.getBasicDiscoveryMetadata());
-        instanceRegistrar.register(instance);
+        instanceRegistry.register(instance);
 
         return ResponseEntity.noContent().build();
     }

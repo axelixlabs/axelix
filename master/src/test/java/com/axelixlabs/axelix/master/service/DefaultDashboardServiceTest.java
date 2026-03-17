@@ -21,9 +21,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.assertj.core.data.Percentage;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitValueTransformer;
@@ -32,8 +35,6 @@ import com.axelixlabs.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTr
 import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.software.DistributionResponse;
 import com.axelixlabs.axelix.master.api.external.response.software.SoftwareDistributions;
-import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.state.InMemoryInstanceRegistry;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
@@ -45,37 +46,35 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
  */
+@SpringBootTest
 class DefaultDashboardServiceTest {
 
     private DefaultDashboardService subject;
 
+    @Autowired
+    private InstanceRegistry instanceRegistry;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @BeforeEach
     void setUp() {
-        InstanceRegistry instanceRegistry = createInMemoryInstanceRegistry();
-        MemoryUsageCache memoryUsageCache = createInMemoryUsageCache();
+        // clear instanceRegistry before test
+        instanceRegistry.deRegisterAll(instanceRegistry.getAllIds());
+
+        createInMemoryInstanceRegistry();
+
         BaseUnitParser baseUnitParser = new BaseUnitParser();
         Set<BaseUnitValueTransformer> transformerSet =
                 Set.of(new BytesMemoryBaseUnitValueTransformer(), new KilobytesMemoryBaseUnitValueTransformer());
 
-        subject = new DefaultDashboardService(instanceRegistry, memoryUsageCache, baseUnitParser, transformerSet);
+        subject = new DefaultDashboardService(instanceRegistry, baseUnitParser, transformerSet);
     }
 
-    private static @NotNull InMemoryInstanceRegistry createInMemoryInstanceRegistry() {
-        var registry = new InMemoryInstanceRegistry();
-        registry.register(createInstance("123", "21.0.0", "3.5.2", "6.1.1", "BellSoft", "2.0.2"));
-        registry.register(createInstance("456", "25.0.1", "3.4.1", "6.2.0", "BellSoft", null));
-        registry.register(createInstance("789", "21", "4.0.0", "7.0.1", "Oracle", null));
-
-        return registry;
-    }
-
-    private static InMemoryMemoryUsageCache createInMemoryUsageCache() {
-        var cache = new InMemoryMemoryUsageCache();
-        cache.putHeapSize(InstanceId.of("123"), 300d);
-        cache.putHeapSize(InstanceId.of("456"), 550d);
-        cache.putHeapSize(InstanceId.of("789"), 410d);
-
-        return cache;
+    private void createInMemoryInstanceRegistry() {
+        instanceRegistry.register(createInstance("123", "21.0.0", "3.5.2", "6.1.1", "BellSoft", "2.0.2", 300d));
+        instanceRegistry.register(createInstance("456", "25.0.1", "3.4.1", "6.2.0", "BellSoft", null, 550d));
+        instanceRegistry.register(createInstance("789", "21", "4.0.0", "7.0.1", "Oracle", null, 410d));
     }
 
     @Test

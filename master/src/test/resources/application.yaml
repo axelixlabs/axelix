@@ -3,6 +3,16 @@ spring:
     name: axelix
   config:
     import: "classpath:tokens.yml"
+  datasource:
+    url: jdbc:sqlite:axelix.db
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      maximum-pool-size: 3
+      connection-init-sql: "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;"
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:instances-schema.sql
 
 management:
   endpoint:

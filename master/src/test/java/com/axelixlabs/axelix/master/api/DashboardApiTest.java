@@ -27,18 +27,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.DashboardApi;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.service.MemoryUsageCache;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
@@ -54,7 +52,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 public class DashboardApiTest {
 
     // language=json
@@ -156,10 +153,13 @@ public class DashboardApiTest {
     private InstanceRegistry registry;
 
     @Autowired
-    private MemoryUsageCache memoryUsageCache;
+    private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void prepare() {
+        // clear instanceRegistry before test
+        deRegisterAll();
+
         // Register instances with different versions and statuses
         registry.register(TestObjectFactory.createInstance(
                 instance1Id,
@@ -172,7 +172,6 @@ public class DashboardApiTest {
                 "BellSoft",
                 null,
                 java.util.List.of()));
-        memoryUsageCache.putHeapSize(InstanceId.of(instance1Id), 1000.0);
 
         registry.register(TestObjectFactory.createInstance(
                 instance2Id,
@@ -185,7 +184,6 @@ public class DashboardApiTest {
                 "BellSoft",
                 "1.9.0",
                 java.util.List.of()));
-        memoryUsageCache.putHeapSize(InstanceId.of(instance2Id), 1000.0);
 
         registry.register(TestObjectFactory.createInstance(
                 instance3Id,
@@ -198,19 +196,11 @@ public class DashboardApiTest {
                 "BellSoft",
                 null,
                 java.util.List.of()));
-        memoryUsageCache.putHeapSize(InstanceId.of(instance3Id), 1000.0);
     }
 
     @AfterEach
     void cleanup() {
         deRegisterAll();
-        clearMemoryCache();
-    }
-
-    private void clearMemoryCache() {
-        memoryUsageCache.clear(InstanceId.of(instance1Id));
-        memoryUsageCache.clear(InstanceId.of(instance2Id));
-        memoryUsageCache.clear(InstanceId.of(instance3Id));
     }
 
     @Test
@@ -229,7 +219,6 @@ public class DashboardApiTest {
     void shouldReturnJSONDashboardResponseWithEmptyRegistry() {
         // given.
         deRegisterAll();
-        clearMemoryCache();
 
         // when.
         ResponseEntity<String> response =
@@ -247,7 +236,6 @@ public class DashboardApiTest {
         // given.
         String unknownInstanceId = UUID.randomUUID().toString();
         registry.register(TestObjectFactory.withStatus(unknownInstanceId, Instance.InstanceStatus.UNKNOWN));
-        memoryUsageCache.putHeapSize(InstanceId.of(unknownInstanceId), 1000.0);
 
         try {
             // when.
@@ -262,7 +250,6 @@ public class DashboardApiTest {
                     .isPresent();
         } finally {
             registry.deRegister(InstanceId.of(unknownInstanceId));
-            memoryUsageCache.clear(InstanceId.of(unknownInstanceId));
         }
     }
 
@@ -278,8 +265,7 @@ public class DashboardApiTest {
     }
 
     private void deRegisterAll() {
-        registry.deRegisterQuietly(InstanceId.of(instance1Id));
-        registry.deRegisterQuietly(InstanceId.of(instance2Id));
-        registry.deRegisterQuietly(InstanceId.of(instance3Id));
+        jdbcTemplate.execute("DELETE FROM instance_vm_features");
+        jdbcTemplate.execute("DELETE FROM instances");
     }
 }

@@ -33,7 +33,6 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
-import com.axelixlabs.axelix.master.service.InstanceRegistrar;
 import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesDiscoveryClient;
@@ -52,10 +51,8 @@ public class DiscoveryAutoConfiguration {
 
     @Bean
     public ShortPollingInstanceDiscoveryScheduler shortPollingInstanceDiscoveryScheduler(
-            InstancesDiscoverer instancesDiscoverer,
-            InstanceRegistrar instanceRegistrar,
-            InstanceRegistry instanceRegistry) {
-        return new ShortPollingInstanceDiscoveryScheduler(instancesDiscoverer, instanceRegistrar, instanceRegistry);
+            InstancesDiscoverer instancesDiscoverer, InstanceRegistry instanceRegistry) {
+        return new ShortPollingInstanceDiscoveryScheduler(instancesDiscoverer, instanceRegistry);
     }
 
     @AutoConfiguration

@@ -54,17 +54,14 @@ import static com.axelixlabs.axelix.master.utils.VersionTrimmer.getMajorVersion;
 public class DefaultDashboardService implements DashboardService {
 
     private final InstanceRegistry instanceRegistry;
-    private final MemoryUsageCache memoryUsageCache;
     private final BaseUnitParser baseUnitParser;
     private final Map<BaseUnit, BaseUnitValueTransformer> baseUnitValueTransformers;
 
     public DefaultDashboardService(
             InstanceRegistry instanceRegistry,
-            MemoryUsageCache memoryUsageCache,
             BaseUnitParser baseUnitParser,
             Set<BaseUnitValueTransformer> baseUnitValueTransformers) {
         this.instanceRegistry = instanceRegistry;
-        this.memoryUsageCache = memoryUsageCache;
         this.baseUnitParser = baseUnitParser;
 
         this.baseUnitValueTransformers = baseUnitValueTransformers.stream()
@@ -108,8 +105,8 @@ public class DefaultDashboardService implements DashboardService {
                 .map(baseUnitValueTransformers::get)
                 .orElse(null);
 
-        double averageHeapSize = memoryUsageCache.getAverageHeapSize();
-        double totalHeapSize = memoryUsageCache.getTotalHeapSize();
+        double averageHeapSize = instanceRegistry.getAverageHeapSize();
+        double totalHeapSize = instanceRegistry.getTotalHeapSize();
 
         if (baseUnitValueTransformer != null) {
             TransformedMetricValue transformedAverageRss = baseUnitValueTransformer.transform(averageHeapSize);

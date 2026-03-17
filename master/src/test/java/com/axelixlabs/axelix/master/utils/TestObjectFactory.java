@@ -48,7 +48,8 @@ public final class TestObjectFactory {
     }
 
     public static Instance withName(String id, String name) {
-        return createInstance(id, DEFAULT_URL, name, null, "25", "3.5.2", "6.0.2", "BellSoft", null, List.of());
+        return createInstance(
+                id, DEFAULT_URL, name, DEFAULT_STATUS, "25", "3.5.2", "6.0.2", "BellSoft", null, List.of());
     }
 
     public static Instance withUrl(String id, String url) {
@@ -76,6 +77,31 @@ public final class TestObjectFactory {
                 springFramework,
                 jdkVendor,
                 kotlin,
+                List.of());
+    }
+
+    public static Instance createInstance(
+            String id,
+            String java,
+            String springBoot,
+            String springFramework,
+            String jdkVendor,
+            @Nullable String kotlin,
+            double memoryUsage) {
+        return new Instance(
+                InstanceId.of(id),
+                "test-object-factory-instance",
+                "1.2.3-classifer-test",
+                java,
+                springBoot,
+                springFramework,
+                kotlin,
+                jdkVendor,
+                "df027cf",
+                Instant.now(),
+                Instance.InstanceStatus.UP,
+                new MemoryUsage(memoryUsage),
+                "url",
                 List.of());
     }
 

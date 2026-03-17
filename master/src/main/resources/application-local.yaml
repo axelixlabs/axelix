@@ -3,7 +3,7 @@ axelix:
   master:
     web:
       static-resources:
-        location: ../front-end/dist
+        location: /application/dist/
     discovery:
       auto: true
       platform: kubernetes
@@ -40,3 +40,17 @@ management:
     web:
       exposure:
         include: [ "health" ]
+
+spring:
+  datasource:
+    url: jdbc:sqlite:axelix.db
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-init-sql: "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;"
+  type: org.springframework.jdbc.datasource.DriverManagerDataSource
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:instances-schema.sql

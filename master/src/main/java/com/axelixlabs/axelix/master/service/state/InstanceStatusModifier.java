@@ -40,6 +40,6 @@ public class InstanceStatusModifier {
     public void modifyStatus(String instanceId, Instance.InstanceStatus instanceStatus) {
         Instance instance = instanceRegistry.get(InstanceId.of(instanceId)).orElseThrow(InstanceNotFoundException::new);
         Instance instanceNew = instance.copy(instanceStatus);
-        instanceRegistry.replace(instanceNew);
+        instanceRegistry.register(instanceNew);
     }
 }
