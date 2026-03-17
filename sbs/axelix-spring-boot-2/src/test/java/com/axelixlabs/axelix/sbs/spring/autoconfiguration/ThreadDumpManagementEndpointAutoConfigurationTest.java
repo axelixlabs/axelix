@@ -24,7 +24,10 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
+import com.axelixlabs.axelix.sbs.spring.core.threaddump.DefaultThreadDumpBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.threaddump.DefaultThreadDumpContentionMonitoringManagement;
+import com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpContentionMonitoringManagement;
 import com.axelixlabs.axelix.sbs.spring.core.threaddump.ThreadDumpManagementEndpoint;
 
@@ -48,8 +51,10 @@ class ThreadDumpManagementEndpointAutoConfigurationTest {
             assertThat(context).hasSingleBean(ThreadDumpManagementEndpointAutoConfiguration.class);
             assertThat(context).hasSingleBean(ThreadDumpContentionMonitoringManagement.class);
             assertThat(context).hasSingleBean(ThreadDumpManagementEndpoint.class);
+            assertThat(context).hasSingleBean(ThreadDumpBuilder.class);
             assertThat(context.getBean(ThreadDumpContentionMonitoringManagement.class))
                     .isExactlyInstanceOf(DefaultThreadDumpContentionMonitoringManagement.class);
+            assertThat(context.getBean(ThreadDumpBuilder.class)).isExactlyInstanceOf(DefaultThreadDumpBuilder.class);
         });
     }
 
@@ -61,6 +66,7 @@ class ThreadDumpManagementEndpointAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(ThreadDumpManagementEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(ThreadDumpContentionMonitoringManagement.class);
                     assertThat(context).doesNotHaveBean(ThreadDumpManagementEndpoint.class);
+                    assertThat(context).doesNotHaveBean(ThreadDumpBuilder.class);
                 });
     }
 
@@ -72,6 +78,7 @@ class ThreadDumpManagementEndpointAutoConfigurationTest {
                     assertThat(context).doesNotHaveBean(ThreadDumpManagementEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(ThreadDumpContentionMonitoringManagement.class);
                     assertThat(context).doesNotHaveBean(ThreadDumpManagementEndpoint.class);
+                    assertThat(context).doesNotHaveBean(ThreadDumpBuilder.class);
                 });
     }
 
@@ -100,6 +107,14 @@ class ThreadDumpManagementEndpointAutoConfigurationTest {
                 });
     }
 
+    @Test
+    void shouldNotCreateDefaultThreadDumpBuilder_whenCustomBeanProvided() {
+        contextRunner.withUserConfiguration(CustomThreadDumpBuilderConfig.class).run(context -> {
+            assertThat(context).hasSingleBean(ThreadDumpBuilder.class);
+            assertThat(context.getBean(ThreadDumpBuilder.class)).isExactlyInstanceOf(CustomThreadDumpBuilder.class);
+        });
+    }
+
     @TestConfiguration
     static class CustomThreadDumpManagementConfig {
         @Bean
@@ -112,8 +127,17 @@ class ThreadDumpManagementEndpointAutoConfigurationTest {
     static class CustomThreadDumpEndpointConfig {
         @Bean
         public ThreadDumpManagementEndpoint threadDumpManagementEndpoint(
-                ThreadDumpContentionMonitoringManagement threadDumpContentionMonitoringManagement) {
-            return new CustomThreadDumpManagementEndpoint(threadDumpContentionMonitoringManagement);
+                ThreadDumpContentionMonitoringManagement threadDumpContentionMonitoringManagement,
+                ThreadDumpBuilder threadDumpBuilder) {
+            return new CustomThreadDumpManagementEndpoint(threadDumpContentionMonitoringManagement, threadDumpBuilder);
+        }
+    }
+
+    @TestConfiguration
+    static class CustomThreadDumpBuilderConfig {
+        @Bean
+        public ThreadDumpBuilder threadDumpBuilder() {
+            return new CustomThreadDumpBuilder();
         }
     }
 
@@ -127,8 +151,16 @@ class ThreadDumpManagementEndpointAutoConfigurationTest {
 
     static class CustomThreadDumpManagementEndpoint extends ThreadDumpManagementEndpoint {
         public CustomThreadDumpManagementEndpoint(
-                ThreadDumpContentionMonitoringManagement threadDumpContentionMonitoringManagement) {
-            super(threadDumpContentionMonitoringManagement);
+                ThreadDumpContentionMonitoringManagement threadDumpContentionMonitoringManagement,
+                ThreadDumpBuilder threadDumpBuilder) {
+            super(threadDumpContentionMonitoringManagement, threadDumpBuilder);
+        }
+    }
+
+    static class CustomThreadDumpBuilder implements ThreadDumpBuilder {
+        @Override
+        public ThreadDumpFeed buildThreadDumpFeed() {
+            return null;
         }
     }
 }

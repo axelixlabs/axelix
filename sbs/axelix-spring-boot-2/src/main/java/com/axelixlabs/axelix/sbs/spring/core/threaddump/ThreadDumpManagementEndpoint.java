@@ -17,10 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.threaddump;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
-
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,18 +31,19 @@ import com.axelixlabs.axelix.common.api.ThreadDumpFeed;
 @RestControllerEndpoint(id = "axelix-thread-dump")
 public class ThreadDumpManagementEndpoint {
 
-    private static final ThreadMXBean THREAD_MX_BEAN = ManagementFactory.getThreadMXBean();
+    private final ThreadDumpBuilder threadDumpBuilder;
 
     private final ThreadDumpContentionMonitoringManagement management;
 
-    public ThreadDumpManagementEndpoint(ThreadDumpContentionMonitoringManagement management) {
+    public ThreadDumpManagementEndpoint(
+            ThreadDumpContentionMonitoringManagement management, ThreadDumpBuilder threadDumpBuilder) {
         this.management = management;
+        this.threadDumpBuilder = threadDumpBuilder;
     }
 
     @GetMapping
     public ThreadDumpFeed getThreadDump() {
-        ThreadInfo[] jmxThreads = THREAD_MX_BEAN.dumpAllThreads(true, true);
-        return new ThreadDumpFeed(THREAD_MX_BEAN.isThreadContentionMonitoringEnabled(), jmxThreads);
+        return threadDumpBuilder.buildThreadDumpFeed();
     }
 
     @PostMapping("/enable")

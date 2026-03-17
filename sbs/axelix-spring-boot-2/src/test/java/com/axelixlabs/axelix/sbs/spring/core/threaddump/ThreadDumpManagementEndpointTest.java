@@ -73,9 +73,15 @@ public class ThreadDumpManagementEndpointTest {
         }
 
         @Bean
+        public ThreadDumpBuilder threadDumpBuilder() {
+            return new DefaultThreadDumpBuilder();
+        }
+
+        @Bean
         public ThreadDumpManagementEndpoint threadDumpManagementEndpoint(
-                ThreadDumpContentionMonitoringManagement management) {
-            return new ThreadDumpManagementEndpoint(management);
+                ThreadDumpContentionMonitoringManagement threadDumpContentionMonitoringManagement,
+                ThreadDumpBuilder threadDumpBuilder) {
+            return new ThreadDumpManagementEndpoint(threadDumpContentionMonitoringManagement, threadDumpBuilder);
         }
     }
 }
