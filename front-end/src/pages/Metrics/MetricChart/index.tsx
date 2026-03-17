@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { Fragment, type JSX } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { getMetricsChartTicks, reduceDisplayedNumber, toFormattedTime } from "helpers";
@@ -22,7 +23,6 @@ import type { IMeasurementsWithTimestamp } from "models";
 import { METRIC_SLIDING_WINDOW_MS } from "utils";
 
 import styles from "./styles.module.css";
-import { Fragment } from "react";
 
 interface IProps {
     /**
@@ -35,6 +35,14 @@ interface IProps {
      */
     startTime: number;
 }
+
+const renderDot = ({ cx, cy, index, points }: any): JSX.Element => {
+    if (index !== points.length - 1) {
+        return <Fragment key={index} />;
+    }
+
+    return <circle cx={cx} cy={cy} r={3} className={styles.Dot} />;
+};
 
 export const MetricChart = ({ measurements, startTime }: IProps) => {
     const endTime = startTime + METRIC_SLIDING_WINDOW_MS;
@@ -62,20 +70,7 @@ export const MetricChart = ({ measurements, startTime }: IProps) => {
                         stroke="#00ab55"
                         strokeWidth={3}
                         activeDot={{ r: 5 }}
-                        dot={({ cx, cy, index, points }) => {
-                            if (index !== points.length - 1) {
-                                return <Fragment key={index} />
-                            };
-
-                            return (
-                                <circle
-                                    cx={cx}
-                                    cy={cy}
-                                    r={3}
-                                    className={styles.Dot}
-                                />
-                            );
-                        }}
+                        dot={renderDot}
                         isAnimationActive={false}
                     />
                 </LineChart>
