@@ -388,4 +388,17 @@ public final class ApiPaths {
          */
         public static final String INSTANCE_ID = "/{instanceId}";
     }
+
+    public static final class McpToolApi {
+
+        /**
+         * Base path for all MCP APIs.
+         */
+        public static final String MAIN = "/mcp";
+
+        /**
+         * The feed of MCP tools configured in the master service.
+         */
+        public static final String TOOLS_LIST = "/tools-feed";
+    }
 }
