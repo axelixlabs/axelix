@@ -35,6 +35,7 @@ const Details = Loadable(lazy(() => import("pages/Details")));
 const Metrics = Loadable(lazy(() => import("pages/Metrics")));
 const Caches = Loadable(lazy(() => import("pages/Caches")));
 const Beans = Loadable(lazy(() => import("pages/Beans")));
+const MCP = Loadable(lazy(() => import("pages/MCP")));
 
 export const MainRoutes = () => {
     return (
@@ -44,6 +45,7 @@ export const MainRoutes = () => {
                     <Route index element={<Navigate to="/wallboard" replace />} />
                     <Route path="/wallboard" element={<Wallboard />} />
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/mcp-server" element={<MCP />} />
                     <Route path="*" element={<Navigate to="/wallboard" replace />} />
                 </Route>
 
