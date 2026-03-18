@@ -18,12 +18,14 @@
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.assertj.core.api.SoftAssertions;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,6 +42,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  *
  * @since 04.03.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 class OidcMetadataProviderTest {
 
@@ -59,18 +62,12 @@ class OidcMetadataProviderTest {
     }
 
     @BeforeEach
-    void prepare() {
-        String baseUrl = mockWebServer.url("").toString();
+    void prepare() throws IOException {
+        String jsonResponse;
 
-        // language=json
-        String jsonResponse = """
-            {
-              "issuer": "%s",
-              "jwks_uri": "%srealms/axelix/protocol/openid-connect/certs",
-              "token_endpoint": "%srealms/axelix/protocol/openid-connect/token",
-              "authorization_endpoint": "%srealms/axelix/protocol/openid-connect/auth"
-            }
-            """.formatted(baseUrl, baseUrl, baseUrl, baseUrl);
+        try (var googleOidcJson = getClass().getClassLoader().getResourceAsStream("other/google-oidc-configuration.json")) {
+            jsonResponse = new String(googleOidcJson.readAllBytes(), StandardCharsets.UTF_8);
+        }
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -86,16 +83,17 @@ class OidcMetadataProviderTest {
             }
         });
 
-        subject = new OidcMetadataProvider(RestClient.builder().build(), baseUrl);
+        subject = new OidcMetadataProvider(RestClient.builder().build(), "https://accounts.google.com");
     }
 
     @Test
-    void shouldFetchOidcMetadata() {
-        String baseUrl = mockWebServer.url("").toString();
+    void shouldSuccessfullyDecodeOidcConfiguration() {
 
-        assertThat(subject.getJwksUri()).isEqualTo(baseUrl + "realms/axelix/protocol/openid-connect/certs");
-        assertThat(subject.getTokenEndpoint()).isEqualTo(baseUrl + "realms/axelix/protocol/openid-connect/token");
-        assertThat(subject.getAuthorizationEndpoint())
-                .isEqualTo(baseUrl + "realms/axelix/protocol/openid-connect/auth");
+        // when/then
+        SoftAssertions.assertSoftly(it -> {
+            it.assertThat(subject.getJwksUri()).isEqualTo("https://www.googleapis.com/oauth2/v3/certs");
+            it.assertThat(subject.getTokenEndpoint()).isEqualTo("https://oauth2.googleapis.com/token");
+            it.assertThat(subject.getAuthorizationEndpoint()).isEqualTo("https://accounts.google.com/o/oauth2/v2/auth");
+        });
     }
 }
