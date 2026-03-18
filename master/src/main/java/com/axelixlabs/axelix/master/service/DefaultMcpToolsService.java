@@ -49,7 +49,7 @@ public class DefaultMcpToolsService implements McpToolsService {
         return new McpToolFeedResponse(mcpTools);
     }
 
-    public McpToolFeedResponse.Tool createTool(McpSchema.Tool mcpTool) {
+    private McpToolFeedResponse.Tool createTool(McpSchema.Tool mcpTool) {
 
         return new McpToolFeedResponse.Tool(
                 mcpTool.title(),
@@ -58,7 +58,7 @@ public class DefaultMcpToolsService implements McpToolsService {
                 McpToolFeedResponse.ToolStatus.UP);
     }
 
-    public McpToolFeedResponse.ToolAnnotations createAnnotations(McpSchema.ToolAnnotations annotations) {
+    private McpToolFeedResponse.ToolAnnotations createAnnotations(McpSchema.ToolAnnotations annotations) {
         return new McpToolFeedResponse.ToolAnnotations(
                 annotations.readOnlyHint(),
                 annotations.destructiveHint(),
