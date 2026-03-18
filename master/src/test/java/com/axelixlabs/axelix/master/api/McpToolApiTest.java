@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -29,19 +28,18 @@ import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.McpToolApi;
-import com.axelixlabs.axelix.master.api.external.response.McpToolFeedResponse;
 import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
-import static net.javacrumbs.jsonunit.core.Option.IGNORING_EXTRA_ARRAY_ITEMS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for {@link McpToolApi}.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class McpToolApiTest {
@@ -49,36 +47,81 @@ public class McpToolApiTest {
     @Autowired
     private TestRestTemplateBuilder restTemplate;
 
+    // language=json
+    private static final String EXPECTED_MCP_TOOLS_FEED = """
+        {
+          "tools" : [ {
+            "title" : "Beans Feed",
+            "description" : "#{json-unit.ignore}",
+            "annotations" : {
+              "readOnlyHint" : true,
+              "destructiveHint" : false,
+              "idempotentHint" : true,
+              "openWorldHint" : false
+            },
+            "status" : "UP"
+          }, {
+            "title" : "@Conditional Feed",
+            "description" : "#{json-unit.ignore}",
+            "annotations" : {
+              "readOnlyHint" : true,
+              "destructiveHint" : false,
+              "idempotentHint" : true,
+              "openWorldHint" : false
+            },
+            "status" : "UP"
+          }, {
+            "title" : "Config Props Beans",
+            "description" : "#{json-unit.ignore}",
+            "annotations" : {
+              "readOnlyHint" : true,
+              "destructiveHint" : false,
+              "idempotentHint" : true,
+              "openWorldHint" : false
+            },
+            "status" : "UP"
+          }, {
+            "title" : "Properties",
+            "description" : "#{json-unit.ignore}",
+            "annotations" : {
+              "readOnlyHint" : true,
+              "destructiveHint" : false,
+              "idempotentHint" : true,
+              "openWorldHint" : false
+            },
+            "status" : "UP"
+          }, {
+            "title" : "Scheduled Tasks",
+            "description" : "#{json-unit.ignore}",
+            "annotations" : {
+              "readOnlyHint" : true,
+              "destructiveHint" : false,
+              "idempotentHint" : true,
+              "openWorldHint" : false
+            },
+            "status" : "UP"
+          }, {
+            "title" : "Instances Feed",
+            "description" : "#{json-unit.ignore}",
+            "annotations" : {
+              "readOnlyHint" : true,
+              "destructiveHint" : false,
+              "idempotentHint" : true,
+              "openWorldHint" : false
+            },
+            "status" : "UP"
+          } ]
+        }
+        """;
+
     @Test
-    void should() {
+    void shouldReturnMcpToolsFeed() {
         // when.
-        ResponseEntity<McpToolFeedResponse> response = restTemplate
-                .withoutAuthorities()
-                .getForEntity("/api/external/mcp/tools-feed", McpToolFeedResponse.class);
+        ResponseEntity<String> response =
+                restTemplate.withoutAuthorities().getForEntity("/api/external/mcp/tools-feed", String.class);
 
         // then.
-        // language=json
-        String expectedJsonBody = """
-            {
-              "title": "Beans Feed",
-              "description": "#{json-unit.ignore}",
-              "annotations": {
-                "readOnlyHint": true,
-                "destructiveHint": false,
-                "idempotentHint": true,
-                "openWorldHint": false
-              },
-              "status": "#{json-unit.matches:toolStatus}"
-            }""";
-
-        assertThatJson(response.getBody())
-                .when(IGNORING_ARRAY_ORDER)
-                .when(IGNORING_EXTRA_ARRAY_ITEMS)
-                .withMatcher("toolStatus", Matchers.oneOf("UP", "DISABLE"))
-                .node("tools")
-                .isArray()
-                .isNotEmpty()
-                .contains(expectedJsonBody);
+        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_MCP_TOOLS_FEED);
     }
 
     @ParameterizedTest
