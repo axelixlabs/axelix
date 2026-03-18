@@ -139,7 +139,8 @@ class DefaultOidcClientTest {
         String data = oidcClient.exchangeCodeForIdToken(AUTH_CODE);
 
         // then.
-        String idToken = new ObjectMapper().readTree(jsonResponse).get("id_token").asText();
+        String idToken =
+                new ObjectMapper().readTree(jsonResponse).get("id_token").asText();
         assertThat(data).isEqualTo(idToken);
 
         // and then.
@@ -309,7 +310,8 @@ class DefaultOidcClientTest {
         Map<String, String> params = new HashMap<>();
         for (String pair : body.split("&")) {
             String[] kv = pair.split("=", 2);
-            params.put(URLDecoder.decode(kv[0], StandardCharsets.UTF_8), URLDecoder.decode(kv[1], StandardCharsets.UTF_8));
+            params.put(
+                    URLDecoder.decode(kv[0], StandardCharsets.UTF_8), URLDecoder.decode(kv[1], StandardCharsets.UTF_8));
         }
         return params;
     }
