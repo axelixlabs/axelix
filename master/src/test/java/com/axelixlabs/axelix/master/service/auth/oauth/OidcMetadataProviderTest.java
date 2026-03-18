@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -34,7 +33,8 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.web.client.RestClient;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.axelixlabs.axelix.master.utils.TestResourceReader;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
@@ -62,12 +62,8 @@ class OidcMetadataProviderTest {
     }
 
     @BeforeEach
-    void prepare() throws IOException {
-        String jsonResponse;
-
-        try (var googleOidcJson = getClass().getClassLoader().getResourceAsStream("other/google-oidc-configuration.json")) {
-            jsonResponse = new String(googleOidcJson.readAllBytes(), StandardCharsets.UTF_8);
-        }
+    void prepare() {
+        String jsonResponse = TestResourceReader.readResource("other/google-oidc-configuration.json");
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override

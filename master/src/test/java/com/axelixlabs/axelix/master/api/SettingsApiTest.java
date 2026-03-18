@@ -19,8 +19,6 @@ package com.axelixlabs.axelix.master.api;
 
 import java.io.IOException;
 
-import com.axelixlabs.axelix.master.api.external.endpoint.SettingsApi;
-import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,6 +34,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import com.axelixlabs.axelix.master.api.external.endpoint.SettingsApi;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,7 +73,8 @@ class SettingsApiTest {
     @Nested
     class WhenStaticAdminEnabled {
 
-        // The TestRestTemplateBuilder is intentionally not used here, since we do not require any auth to access settings API.
+        // The TestRestTemplateBuilder is intentionally not used here, since we do not require any auth to access
+        // settings API.
         @Autowired
         private TestRestTemplate restTemplate;
 
@@ -124,7 +126,8 @@ class SettingsApiTest {
             }
             """;
 
-        // The TestRestTemplateBuilder is intentionally not used here, since we do not require any auth to access settings API.
+        // The TestRestTemplateBuilder is intentionally not used here, since we do not require any auth to access
+        // settings API.
         @Autowired
         private TestRestTemplate restTemplate;
 
@@ -133,7 +136,8 @@ class SettingsApiTest {
 
         @BeforeEach
         void prepare() {
-            Mockito.when(oidcMetadataProvider.getAuthorizationEndpoint()).thenReturn("https://example.external.com/realms/axelix/openid-connect/auth");
+            Mockito.when(oidcMetadataProvider.getAuthorizationEndpoint())
+                    .thenReturn("https://example.external.com/realms/axelix/openid-connect/auth");
         }
 
         @Test
@@ -187,7 +191,8 @@ class SettingsApiTest {
 
         @BeforeEach
         void prepare() {
-            Mockito.when(oidcMetadataProvider.getAuthorizationEndpoint()).thenReturn("https://example.external.com/realms/axelix/openid-connect/auth");
+            Mockito.when(oidcMetadataProvider.getAuthorizationEndpoint())
+                    .thenReturn("https://example.external.com/realms/axelix/openid-connect/auth");
         }
 
         @Test
