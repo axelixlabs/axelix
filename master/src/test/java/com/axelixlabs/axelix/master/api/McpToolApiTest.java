@@ -17,8 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api;
 
-import java.util.Objects;
-
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -34,6 +33,9 @@ import com.axelixlabs.axelix.master.api.external.response.McpToolFeedResponse;
 import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_EXTRA_ARRAY_ITEMS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -55,20 +57,28 @@ public class McpToolApiTest {
                 .getForEntity("/api/external/mcp/tools-feed", McpToolFeedResponse.class);
 
         // then.
-        assertThat(Objects.requireNonNull(response.getBody()).tools())
+        // language=json
+        String expectedJsonBody = """
+            {
+              "title": "Beans Feed",
+              "description": "#{json-unit.ignore}",
+              "annotations": {
+                "readOnlyHint": true,
+                "destructiveHint": false,
+                "idempotentHint": true,
+                "openWorldHint": false
+              },
+              "status": "#{json-unit.matches:toolStatus}"
+            }""";
+
+        assertThatJson(response.getBody())
+                .when(IGNORING_ARRAY_ORDER)
+                .when(IGNORING_EXTRA_ARRAY_ITEMS)
+                .withMatcher("toolStatus", Matchers.oneOf("UP", "DISABLE"))
+                .node("tools")
+                .isArray()
                 .isNotEmpty()
-                .hasSizeGreaterThan(0)
-                .first()
-                .satisfies(tool -> {
-                    assertThat(tool.title()).isNotBlank();
-                    assertThat(tool.description()).isNotBlank();
-                    assertThat(tool.annotations().destructiveHint()).isIn(true, false);
-                    assertThat(tool.annotations().idempotentHint()).isIn(true, false);
-                    assertThat(tool.annotations().openWorldHint()).isIn(true, false);
-                    assertThat(tool.annotations().readOnlyHint()).isIn(true, false);
-                    assertThat(tool.status())
-                            .isIn(McpToolFeedResponse.ToolStatus.UP, McpToolFeedResponse.ToolStatus.DISABLE);
-                });
+                .contains(expectedJsonBody);
     }
 
     @ParameterizedTest
