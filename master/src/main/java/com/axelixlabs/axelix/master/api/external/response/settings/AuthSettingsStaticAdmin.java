@@ -15,37 +15,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.autoconfiguration.auth;
+package com.axelixlabs.axelix.master.api.external.response.settings;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Cookie configuration properties.
+ * Authentication settings for static admin credentials.
  *
- * @since 11.12.2025
+ * @since 06.03.2026
  * @author Nikita Kirillov
  */
-public class CookieProperties {
+public record AuthSettingsStaticAdmin() implements AuthSettings {
 
-    private String name = "auth_token";
-
-    /**
-     * Secure attribute for cookies.
-     * <p><b>Default:</b> true</p>
-     */
-    private boolean secure = true;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isSecure() {
-        return secure;
-    }
-
-    public void setSecure(boolean secure) {
-        this.secure = secure;
+    @Override
+    @JsonProperty("type")
+    public String type() {
+        return "static-admin";
     }
 }

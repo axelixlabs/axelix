@@ -10,6 +10,7 @@ val springAiVersion = "1.1.2"
 val testcontainersVersion = "1.21.3"
 val springDocSwaggerVersion = "2.0.4"
 val heapDumpToolVersion = "1.3.3"
+val nimbusJoseJwt ="10.8"
 
 dependencies {
     // Self
@@ -30,10 +31,10 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.paypal:heap-dump-tool:${heapDumpToolVersion}")
+    implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
 
     // Runtime
     runtimeOnly("ch.qos.logback:logback-classic")
-
 
     // Test
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion"))

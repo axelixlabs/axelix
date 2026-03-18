@@ -19,8 +19,8 @@ package com.axelixlabs.axelix.master.service.auth;
 
 import org.springframework.http.ResponseCookie;
 
-import com.axelixlabs.axelix.master.autoconfiguration.auth.CookieProperties;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.JwtProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 
 /**
  * Default implementation of {@link CookieService}.

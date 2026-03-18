@@ -15,29 +15,29 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.beans;
+package com.axelixlabs.axelix.master.utils;
 
-import org.jspecify.annotations.NonNull;
-
-import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.utils.Lazy;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
- * Caching decorator over the actual {@link BeansFeedBuilder}.
+ * Test utilities class for reading test resources.
  *
  * @author Mikhail Polivakha
  */
-public class CachingBeansFeedBuilder implements BeansFeedBuilder {
+public class TestResourceReader {
 
-    private final Lazy<BeansFeed> lazyBeansFeed;
-
-    public CachingBeansFeedBuilder(BeansFeedBuilder delegate) {
-        this.lazyBeansFeed = Lazy.of(delegate::buildBeansFeed);
-    }
-
-    @Override
-    @NonNull
-    public BeansFeed buildBeansFeed() {
-        return lazyBeansFeed.require();
+    /**
+     * Reads the file resource inside the test classpath.
+     *
+     * @param path the path to the test resource starting from the test classpath root.
+     */
+    public static String readResource(String path) {
+        try (InputStream dataStream = TestResourceReader.class.getClassLoader().getResourceAsStream(path)) {
+            return new String(dataStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

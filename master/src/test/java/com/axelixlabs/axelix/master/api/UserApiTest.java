@@ -31,11 +31,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.master.api.external.endpoint.UserApi;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.CookieProperties;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.JwtProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,6 +47,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(
+        properties = {
+            "axelix.master.auth.options.static-admin.enabled=true",
+            "axelix.master.auth.options.static-admin.credentials.username=admin",
+            "axelix.master.auth.options.static-admin.credentials.password=admin"
+        })
 class UserApiTest {
 
     @Autowired

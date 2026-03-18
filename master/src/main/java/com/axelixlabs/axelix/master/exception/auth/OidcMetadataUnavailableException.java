@@ -15,29 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.beans;
-
-import org.jspecify.annotations.NonNull;
-
-import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.utils.Lazy;
+package com.axelixlabs.axelix.master.exception.auth;
 
 /**
- * Caching decorator over the actual {@link BeansFeedBuilder}.
+ * Exception thrown when the OIDC provider metadata cannot be retrieved
+ * from the discovery endpoint ({@code /.well-known/openid-configuration}).
  *
- * @author Mikhail Polivakha
+ * @since 04.03.2026
+ * @author Nikita Kirillov
  */
-public class CachingBeansFeedBuilder implements BeansFeedBuilder {
+public class OidcMetadataUnavailableException extends RuntimeException {
 
-    private final Lazy<BeansFeed> lazyBeansFeed;
-
-    public CachingBeansFeedBuilder(BeansFeedBuilder delegate) {
-        this.lazyBeansFeed = Lazy.of(delegate::buildBeansFeed);
+    public OidcMetadataUnavailableException(String issuerUri) {
+        super("OIDC metadata is unavailable from: " + issuerUri);
     }
 
-    @Override
-    @NonNull
-    public BeansFeed buildBeansFeed() {
-        return lazyBeansFeed.require();
+    public OidcMetadataUnavailableException(String issuerUri, Throwable cause) {
+        super("OIDC metadata is unavailable from: " + issuerUri, cause);
     }
 }

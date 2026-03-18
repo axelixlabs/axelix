@@ -48,19 +48,19 @@ class LazyTest {
     }
 
     @Test
-    void testRequiredLazyLiteral() {
+    void testRequireLazyLiteral() {
         Lazy<String> value = Lazy.resolved("value");
 
-        String first = value.required();
+        String first = value.require();
 
         Assertions.assertThat(first).isEqualTo("value");
     }
 
     @Test
-    void testRequiredLazySupplier() {
+    void testRequireLazySupplier() {
         Lazy<String> value = Lazy.of(() -> "value");
 
-        String first = value.required();
+        String first = value.require();
 
         Assertions.assertThat(first).isEqualTo("value");
     }

@@ -15,34 +15,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.autoconfiguration.auth;
+package com.axelixlabs.axelix.master.api.external.response.settings;
 
 /**
- * Configuration of the static-admin.
+ * Interface that represent a specific authentication option.
  *
- * @author Mikhail Polivakha
+ * @since 06.03.2026
+ * @author Nikita Kirillov
  */
-@SuppressWarnings("NullAway")
-public class StaticAdminCredentialsProperties {
+public sealed interface AuthSettings permits AuthSettingsOAuth2, AuthSettingsStaticAdmin {
 
-    private String username;
-    private String password;
-
-    public StaticAdminCredentialsProperties setUsername(String username) {
-        this.username = username;
-        return this;
-    }
-
-    public StaticAdminCredentialsProperties setPassword(String password) {
-        this.password = password;
-        return this;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
+    /**
+     * Returns the authentication provider type identifier.
+     * Used by the Frontend to determine which login option to display.
+     *
+     * @return the type identifier, e.g.  {@code "static-admin"} or {@code "oauth2"}
+     */
+    String type();
 }

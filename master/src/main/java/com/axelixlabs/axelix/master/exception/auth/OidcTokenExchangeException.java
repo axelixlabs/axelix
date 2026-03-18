@@ -15,29 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.beans;
+package com.axelixlabs.axelix.master.exception.auth;
 
-import org.jspecify.annotations.NonNull;
-
-import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.utils.Lazy;
+import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 
 /**
- * Caching decorator over the actual {@link BeansFeedBuilder}.
+ * Exception thrown when the authorization code exchange with the OIDC provider fails.
  *
- * @author Mikhail Polivakha
+ * @since 04.03.2026
+ * @author Nikita Kirillov
  */
-public class CachingBeansFeedBuilder implements BeansFeedBuilder {
+public class OidcTokenExchangeException extends JwtProcessingException {
 
-    private final Lazy<BeansFeed> lazyBeansFeed;
-
-    public CachingBeansFeedBuilder(BeansFeedBuilder delegate) {
-        this.lazyBeansFeed = Lazy.of(delegate::buildBeansFeed);
+    public OidcTokenExchangeException(String message) {
+        super(message);
     }
 
-    @Override
-    @NonNull
-    public BeansFeed buildBeansFeed() {
-        return lazyBeansFeed.require();
+    public OidcTokenExchangeException(Throwable cause) {
+        super(cause);
+    }
+
+    public OidcTokenExchangeException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

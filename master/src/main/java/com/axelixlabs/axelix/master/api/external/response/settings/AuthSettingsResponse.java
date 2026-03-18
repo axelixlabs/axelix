@@ -15,29 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.beans;
+package com.axelixlabs.axelix.master.api.external.response.settings;
 
-import org.jspecify.annotations.NonNull;
-
-import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.utils.Lazy;
+import java.util.List;
 
 /**
- * Caching decorator over the actual {@link BeansFeedBuilder}.
+ * Response containing the list of available authentication providers and their settings.
  *
- * @author Mikhail Polivakha
+ * @since 06.03.2026
+ * @author Nikita Kirillov
  */
-public class CachingBeansFeedBuilder implements BeansFeedBuilder {
-
-    private final Lazy<BeansFeed> lazyBeansFeed;
-
-    public CachingBeansFeedBuilder(BeansFeedBuilder delegate) {
-        this.lazyBeansFeed = Lazy.of(delegate::buildBeansFeed);
-    }
-
-    @Override
-    @NonNull
-    public BeansFeed buildBeansFeed() {
-        return lazyBeansFeed.require();
-    }
-}
+public record AuthSettingsResponse(List<AuthSettings> authProviders) {}

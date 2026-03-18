@@ -15,29 +15,37 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.beans;
-
-import org.jspecify.annotations.NonNull;
-
-import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.utils.Lazy;
+package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
 
 /**
- * Caching decorator over the actual {@link BeansFeedBuilder}.
+ * Cookie configuration properties.
  *
- * @author Mikhail Polivakha
+ * @since 11.12.2025
+ * @author Nikita Kirillov
  */
-public class CachingBeansFeedBuilder implements BeansFeedBuilder {
+public class CookieProperties {
 
-    private final Lazy<BeansFeed> lazyBeansFeed;
+    private String name = "auth_token";
 
-    public CachingBeansFeedBuilder(BeansFeedBuilder delegate) {
-        this.lazyBeansFeed = Lazy.of(delegate::buildBeansFeed);
+    /**
+     * Secure attribute for cookies.
+     * <p><b>Default:</b> true</p>
+     */
+    private boolean secure = true;
+
+    public String getName() {
+        return name;
     }
 
-    @Override
-    @NonNull
-    public BeansFeed buildBeansFeed() {
-        return lazyBeansFeed.require();
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isSecure() {
+        return secure;
+    }
+
+    public void setSecure(boolean secure) {
+        this.secure = secure;
     }
 }

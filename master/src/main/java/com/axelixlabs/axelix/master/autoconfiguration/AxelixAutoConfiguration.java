@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.domain.PropertiesAxelixVersionDiscoverer;
@@ -46,5 +47,10 @@ public class AxelixAutoConfiguration {
     public ExceptionHandlingFilter exceptionHandlingFilter(
             ApiExceptionTranslator apiExceptionTranslator, ObjectMapper objectMapper) {
         return new ExceptionHandlingFilter(apiExceptionTranslator, objectMapper);
+    }
+
+    @Bean
+    public RestClient restClient() {
+        return RestClient.builder().build();
     }
 }

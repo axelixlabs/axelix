@@ -32,8 +32,8 @@ import org.springframework.stereotype.Component;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.CookieProperties;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.JwtProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 
