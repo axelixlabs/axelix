@@ -62,7 +62,8 @@ public class Lazy<T> {
     }
 
     public @NonNull T require() {
-        return requireOrElseThrow(() -> new IllegalStateException("Expected a lazily-resolved value to be not null, but it is null"));
+        return requireOrElseThrow(
+                () -> new IllegalStateException("Expected a lazily-resolved value to be not null, but it is null"));
     }
 
     public @NonNull T requireOrElseThrow(Supplier<RuntimeException> exceptionSupplier) {

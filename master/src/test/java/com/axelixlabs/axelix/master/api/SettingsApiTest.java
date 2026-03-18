@@ -82,18 +82,6 @@ class SettingsApiTest {
     @Nested
     class WhenStaticAdminEnabled {
 
-        private final String EXPECTED_JSON =
-                // language=json
-                """
-        {
-          "authProviders": [
-            {
-              "type": "static-admin"
-            }
-          ]
-        }
-        """;
-
         @LocalServerPort
         private int port;
 
@@ -110,6 +98,16 @@ class SettingsApiTest {
                     restTemplate.getForEntity("http://localhost:" + port + "/api/external/settings/auth", String.class);
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            // language=json
+            String EXPECTED_JSON = """
+                {
+                  "authProviders": [
+                    {
+                      "type": "static-admin"
+                    }
+                  ]
+                }
+                """;
             assertThatJson(response.getBody()).isEqualTo(EXPECTED_JSON);
         }
     }

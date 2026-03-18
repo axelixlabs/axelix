@@ -23,6 +23,7 @@ import java.util.Base64;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
@@ -155,7 +156,7 @@ public class DefaultOidcClient implements OidcClient {
         try {
             String headerPart = token.split("\\.")[0];
             String headerJson = new String(Base64.getUrlDecoder().decode(headerPart));
-            Map<String, Object> header = objectMapper.readValue(headerJson, Map.class);
+            Map<String, Object> header = objectMapper.readValue(headerJson, new TypeReference<>() {});
             String kid = (String) header.get("kid");
             if (kid == null) {
                 throw new JwtParsingException("kid is missing in OAuth2Jwt header");

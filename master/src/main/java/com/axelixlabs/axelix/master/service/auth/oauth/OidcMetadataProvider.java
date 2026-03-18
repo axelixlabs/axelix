@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.service.auth.oauth;
 import java.util.Map;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -132,6 +131,5 @@ public class OidcMetadataProvider {
      * @param tokenEndpoint         URL of the token endpoint, used to exchange the authorization code for an ID Token
      * @param authorizationEndpoint URL of the authorization endpoint, used to initiate the OAuth2 login flow.
      */
-    public record OidcMetadata(
-            String jwksUri, String tokenEndpoint, String authorizationEndpoint) {}
+    public record OidcMetadata(String jwksUri, String tokenEndpoint, String authorizationEndpoint) {}
 }

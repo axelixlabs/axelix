@@ -52,10 +52,7 @@ public record OAuth2Properties(
         Assert.notNull(issuerUri, "OAuth2 issuer-uri is required. Set " + PROPERTY_PREFIX + "issuer-uri");
         Assert.notNull(clientId, "OAuth2 client-id is required. Set " + PROPERTY_PREFIX + "client-id");
         Assert.notNull(clientSecret, "OAuth2 client-secret is required. Set " + PROPERTY_PREFIX + "client-secret");
-        Assert.notNull(
-                redirectUri,
-                "OAuth2 redirect-uri is required. Set " + PROPERTY_PREFIX + "redirect-uri"
-                        + ", e.g. https://axelix.master.com/api/external/oauth2/callback");
+        Assert.notNull(redirectUri, "OAuth2 redirect-uri is required. Set " + PROPERTY_PREFIX + "redirect-uri");
 
         if (scopes == null) {
             scopes = DEFAULT_SCOPE;
