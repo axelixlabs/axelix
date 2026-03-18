@@ -18,14 +18,17 @@
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
@@ -53,6 +56,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
+import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
+import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.utils.TestResourceReader;
@@ -113,7 +118,7 @@ class DefaultOidcClientTest {
     }
 
     @Test
-    void shouldExchangeCodeForIdToken() throws JsonProcessingException {
+    void shouldExchangeCodeForIdToken() throws Exception {
         // given.
         String jsonResponse = TestResourceReader.readResource("other/id-token-response.json");
 
@@ -134,11 +139,20 @@ class DefaultOidcClientTest {
         String data = oidcClient.exchangeCodeForIdToken(AUTH_CODE);
 
         // then.
-        assertThat(data)
-                .isEqualTo(new ObjectMapper()
-                        .readTree(jsonResponse)
-                        .get("id_token")
-                        .asText());
+        String idToken = new ObjectMapper().readTree(jsonResponse).get("id_token").asText();
+        assertThat(data).isEqualTo(idToken);
+
+        // and then.
+        RecordedRequest tokenRequest = mockWebServer.takeRequest();
+        Map<String, String> formParams = parseFormBody(tokenRequest.getBody().readUtf8());
+        String expectedRedirectUri = mockWebServer.url("") + "/oauth2/callback";
+
+        assertThat(formParams)
+                .containsEntry("grant_type", "authorization_code")
+                .containsEntry("client_id", CLIENT_ID)
+                .containsEntry("client_secret", CLIENT_SECRET)
+                .containsEntry("redirect_uri", expectedRedirectUri)
+                .containsEntry("code", AUTH_CODE);
     }
 
     @Test
@@ -209,6 +223,29 @@ class DefaultOidcClientTest {
                     .isInstanceOf(ExpiredJwtTokenException.class);
         }
 
+        @Test
+        void shouldThrowWhenSignatureValidationFails() throws Exception {
+            // given.
+            setupJwksDispatcher();
+            RSAKey differentRsaKey = new RSAKeyGenerator(2048).keyID(RSA_KEY_ID).generate();
+            String token = buildIdToken(RSA_KEY_ID, differentRsaKey.toPrivateKey(), "user", null);
+
+            // when/then.
+            assertThatThrownBy(() -> oidcClient.validateOAuth2JwtTokenAndExtractUsername(token))
+                    .isInstanceOf(InvalidJwtTokenException.class);
+        }
+
+        @Test
+        void shouldThrowWhenKeyNotFoundInJwks() throws Exception {
+            // given.
+            setupJwksDispatcher();
+            String token = buildIdToken("unknown-key-id", rsaKey.toPrivateKey(), "user", null);
+
+            // when/then.
+            assertThatThrownBy(() -> oidcClient.validateOAuth2JwtTokenAndExtractUsername(token))
+                    .isInstanceOf(JwtParsingException.class);
+        }
+
         private void setupJwksDispatcher() throws Exception {
             String jwksJson = new ObjectMapper().writeValueAsString(new JWKSet(List.of(rsaKey, ecKey)).toJSONObject());
 
@@ -266,5 +303,14 @@ class DefaultOidcClientTest {
                     .signWith(rsaKey.toPrivateKey())
                     .compact();
         }
+    }
+
+    private static Map<String, String> parseFormBody(String body) {
+        Map<String, String> params = new HashMap<>();
+        for (String pair : body.split("&")) {
+            String[] kv = pair.split("=", 2);
+            params.put(URLDecoder.decode(kv[0], StandardCharsets.UTF_8), URLDecoder.decode(kv[1], StandardCharsets.UTF_8));
+        }
+        return params;
     }
 }
