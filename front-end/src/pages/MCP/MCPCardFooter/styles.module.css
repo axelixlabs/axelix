@@ -1,0 +1,39 @@
+.AnnotationWrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 20px;
+}
+
+.AnnotationWrapper > div:nth-child(even) {
+    margin-left: auto;
+}
+
+.Footer {
+    grid-row: 3;
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding: 10px 16px 16px;
+    border-top: 1px dashed var(--axelix-medium-grey);
+}
+
+.GreenTag {
+    border: 1px solid var(--axelix-primary-green);
+    background-color: var(--axelix-primary-light-green);
+    color: var(--axelix-primary-green);
+}
+
+.OrangeTag {
+    border: 1px solid #faad14;
+    background-color: #faad141a;
+    color: #faad14;
+}
+
+.LinesIcon {
+    cursor: pointer;
+}
+
+.AnnotationTag {
+    width: 44px;
+    text-align: center;
+}

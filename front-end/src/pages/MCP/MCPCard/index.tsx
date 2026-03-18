@@ -15,23 +15,29 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Switch, Tooltip } from "antd";
+import { Badge, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 
+import { EMCPToolStatus, type IMCPTool } from "models";
+
+import { MCPCardDescription } from "../MCPCardDescription";
+import { MCPCardFooter } from "../MCPCardFooter";
+
 import styles from "./styles.module.css";
-import { useTranslation } from "react-i18next";
 
 interface IProps {
-    MCPTool: any;
+    /**
+     * Single MCP tool data
+     */
+    MCPTool: IMCPTool;
 }
 
 export const MCPCard = ({ MCPTool }: IProps) => {
-    const { t } = useTranslation()
-
     const textRef = useRef<HTMLDivElement>(null);
+
     const [isEllipsis, setIsEllipsis] = useState<boolean>(false);
 
-    const { title, description, viewAccessLog, annotation, isEnable } = MCPTool
+    const { title, description, annotations, status } = MCPTool;
 
     useEffect(() => {
         const element = textRef.current;
@@ -40,48 +46,34 @@ export const MCPCard = ({ MCPTool }: IProps) => {
             return;
         }
 
-        const checkTruncation = (): void => {
-            setIsEllipsis(element.scrollHeight > element.clientHeight + 1);
-        };
-
-        const resizeObserver = new ResizeObserver(() => checkTruncation());
-
-        resizeObserver.observe(element);
-        checkTruncation();
-
-        return () => {
-            resizeObserver.disconnect();
-        };
+        setIsEllipsis(element.scrollHeight > element.clientHeight + 1);
     }, []);
+
+    const isEnabled = status === EMCPToolStatus.UP;
 
     return (
         <>
             <div className={styles.Card}>
-                <div className={styles.Header}>
-                    <div className={`TextSmall ${styles.RibbonWrapper}`}>
-                        <span className={styles.Ribbon}>{viewAccessLog}</span>
-                    </div>
+                <div className={`${styles.Header} ${isEllipsis ? styles.TwoLinesHeader : ""}`}>
                     <Tooltip title={isEllipsis ? title : undefined}>
                         <div ref={textRef} className={styles.Title}>
                             {title}
                         </div>
                     </Tooltip>
+                    <Badge
+                        color={isEnabled ? "#00ab55" : "#ff000a"}
+                        styles={{
+                            indicator: {
+                                width: "8px",
+                                height: "8px",
+                            },
+                        }}
+                    />
                 </div>
 
-                <div className={`TextSmall ${styles.Description}`}>
-                    {description}
-                </div>
+                <MCPCardDescription description={description} />
 
-                <div className={`TextSmall ${styles.Annotation}`}>
-                    {annotation}
-                </div>
-
-                <div className={styles.Footer}>
-                    <div>{isEnable ? t("MCP.enabled") : t("MCP.disabled")}</div>
-                    <div className={styles.StatusSwitchWrapper}>
-                        <Switch checked={isEnable} size="small" className={styles.StatusSwitch} />
-                    </div>
-                </div>
+                <MCPCardFooter annotations={annotations} />
             </div>
         </>
     );

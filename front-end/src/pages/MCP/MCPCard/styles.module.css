@@ -1,27 +1,29 @@
 .Card {
     display: grid;
     grid-template-rows: subgrid;
-    grid-row: span 4;
+    grid-row: span 3;
     border-radius: 16px;
     background-color: #f9fafb;
     box-shadow: var(--axelix-box-shadow-light);
     border: 1px solid var(--axelix-medium-grey);
     transition: all 0.3s;
     row-gap: 8px;
-
-    &:hover {
-        box-shadow: var(--axelix-box-shadow-bold);
-        transform: translateY(-10px);
-    }
 }
 
 .Header {
-    position: relative;
-    padding: 30px 16px 14px;
+    padding: 14px 16px;
     font-weight: 600;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    column-gap: 8px;
     border-bottom: 1px solid var(--axelix-medium-grey);
-    min-height: 91px;
     grid-row: 1;
+}
+
+.TwoLinesHeader {
+    /* Formula: line-height * number of lines + total vertical padding */
+    min-height: calc(22.5px * 2 + 28px);
 }
 
 .Title {
@@ -30,53 +32,4 @@
     -webkit-box-orient: vertical;
     word-break: break-all;
     overflow: hidden;
-}
-
-.Body {
-    padding: 16px;
-}
-
-.Description {
-    grid-row: 2;
-    padding-inline: 16px;
-    font-weight: 500;
-}
-
-.Annotation {
-    grid-row: 3;
-    padding-inline: 16px;
-    font-weight: 500;
-    color: var(--axelix-bold-grey);
-}
-
-.Footer {
-    grid-row: 4;
-    display: flex;
-    align-items: center;
-    column-gap: 8px;
-    padding: 10px 16px 16px;
-    border-top: 1px dashed var(--axelix-medium-grey);
-}
-
-.RibbonWrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
-
-.Ribbon {
-    position: relative;
-    display: block;
-    padding: 4px 12px;
-    color: var(--axelix-primary-white);
-    background-color: var(--axelix-primary-green);
-    border-radius: 0 16px;
-}
-
-.StatusSwitchWrapper {
-    cursor: not-allowed;
-}
-
-.StatusSwitch {
-    pointer-events: none;
 }

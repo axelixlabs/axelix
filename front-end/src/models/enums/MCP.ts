@@ -15,15 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IMCPTool } from "models";
-
-export const filterMCPTools = (MCPTools: IMCPTool[], search: string): IMCPTool[] => {
-    const formattedSearch = search.toLowerCase().trim();
-
-    return MCPTools.filter(({ title }) => {
-        const lowerTitle = title.toLowerCase();
-        if (lowerTitle.includes(formattedSearch)) {
-            return true;
-        }
-    });
-};
+export enum EMCPToolStatus {
+    UP = "UP",
+    DISABLE = "DISABLE",
+}
