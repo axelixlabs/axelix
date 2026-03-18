@@ -38,6 +38,6 @@ public class CachingBeansFeedBuilder implements BeansFeedBuilder {
     @Override
     @NonNull
     public BeansFeed buildBeansFeed() {
-        return lazyBeansFeed.required();
+        return lazyBeansFeed.require();
     }
 }

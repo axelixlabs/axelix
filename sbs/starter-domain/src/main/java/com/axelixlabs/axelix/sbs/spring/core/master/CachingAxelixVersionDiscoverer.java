@@ -35,6 +35,6 @@ public class CachingAxelixVersionDiscoverer implements AxelixVersionDiscoverer {
 
     @Override
     public String getVersion() throws IllegalStateException {
-        return lazyVersion.required();
+        return lazyVersion.require();
     }
 }

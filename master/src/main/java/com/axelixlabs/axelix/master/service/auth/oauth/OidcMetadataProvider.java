@@ -19,7 +19,9 @@ package com.axelixlabs.axelix.master.service.auth.oauth;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,71 +36,38 @@ import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableExcept
  * Provider for OpenID Connect (OIDC) metadata discovered via the
  * OpenID Connect Discovery endpoint ({@code /.well-known/openid-configuration}).
  *
- * @see <a href="https://openid.net/specs/openid-connect-discovery-1_0.html"> OpenID Connect Discovery 1.0</a>
+ * @see <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery 1.0</a>
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
+@NullMarked
 public class OidcMetadataProvider {
 
     private static final Logger log = LoggerFactory.getLogger(OidcMetadataProvider.class);
-
     private static final String OIDC_DISCOVERY_PATH = "/.well-known/openid-configuration";
 
-    private Lazy<OidcMetadata> lazyOidcMetadata;
-
+    private final Lazy<OidcMetadata> oidcMetadata;
     private final RestClient restClient;
-
     private final String issuerUri;
 
     public OidcMetadataProvider(RestClient restClient, String issuerUri) {
         this.restClient = restClient;
         this.issuerUri = issuerUri;
-        this.lazyOidcMetadata = Lazy.of(this::fetchOidcMetadata);
+        this.oidcMetadata = Lazy.of(this::fetchOidcMetadata);
     }
 
-    @NonNull
     public String getJwksUri() {
-        OidcMetadata metadata = resolveOidcMetadata();
-        if (metadata == null) {
-            throw new OidcMetadataUnavailableException(issuerUri);
-        }
-        return metadata.jwksUri();
+        return oidcMetadata.require().jwksUri();
     }
 
-    @NonNull
     public String getTokenEndpoint() {
-        OidcMetadata metadata = resolveOidcMetadata();
-        if (metadata == null) {
-            throw new OidcMetadataUnavailableException(issuerUri);
-        }
-        return metadata.tokenEndpoint();
+        return oidcMetadata.require().tokenEndpoint();
     }
 
-    /**
-     * Returns the authorization endpoint URL, or {@code null} if the OIDC provider is unavailable.
-     * This method does not throw an exception when the endpoint is unavailable — it is used for UI purposes only.
-     */
-    @Nullable
     public String getAuthorizationEndpoint() {
-        OidcMetadata metadata = resolveOidcMetadata();
-        return metadata != null ? metadata.authorizationEndpoint() : null;
+        return oidcMetadata.require().authorizationEndpoint();
     }
 
-    /**
-     * Resolves the OIDC provider metadata, allowing recovery if the provider was previously unavailable.
-     * If the previous resolution attempt failed (returned {@code null}), a new attempt will be made on the next call.
-     *
-     * @return the resolved {@link OidcMetadata}, or {@code null} if the provider is unavailable
-     */
-    @Nullable
-    private OidcMetadata resolveOidcMetadata() {
-        OidcMetadata metadata = lazyOidcMetadata.get();
-        if (metadata == null) {
-            lazyOidcMetadata = Lazy.of(this::fetchOidcMetadata);
-        }
-        return metadata;
-    }
-
-    @Nullable
     private OidcMetadata fetchOidcMetadata() {
         try {
             Map<String, Object> body = restClient
@@ -109,30 +78,28 @@ public class OidcMetadataProvider {
 
             if (body == null) {
                 log.error("OIDC discovery endpoint returned empty response from {}", issuerUri);
-                return null;
+                throw new OidcMetadataUnavailableException(issuerUri);
             }
 
-            return applyMetadata(body);
+            return buildMetadata(body);
 
         } catch (Exception e) {
             log.error("Failed to fetch OIDC metadata from {}", issuerUri, e);
+            throw new OidcMetadataUnavailableException(issuerUri);
         }
-
-        return null;
     }
 
     /**
      * Needs additional validation required fields per OpenID Connect Discovery 1.0
      * See: <a href="https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata">OpenID Provider Metadata</a>
      */
-    @Nullable
-    private OidcMetadata applyMetadata(Map<String, Object> body) {
+    private OidcMetadata buildMetadata(Map<String, Object> body) {
         String issuer = getStringValue(body, "issuer");
         String jwksUri = getStringValue(body, "jwks_uri");
         String tokenEndpoint = getStringValue(body, "token_endpoint");
         String authorizationEndpoint = getStringValue(body, "authorization_endpoint");
 
-        if (issuer == null || jwksUri == null || tokenEndpoint == null || authorizationEndpoint == null) {
+        if (ObjectUtils.anyNull(issuer, jwksUri, tokenEndpoint, authorizationEndpoint)) {
             log.error(
                     "OIDC discovery response from {} is missing required fields: "
                             + "issuer={}, jwks_uri={}, token_endpoint={}, authorization_endpoint={}",
@@ -141,12 +108,12 @@ public class OidcMetadataProvider {
                     jwksUri,
                     tokenEndpoint,
                     authorizationEndpoint);
-            return null;
+            throw new OidcMetadataUnavailableException(issuerUri);
         }
 
         if (!issuer.equals(issuerUri)) {
             log.error("OIDC issuer mismatch: expected '{}' but got '{}'", issuerUri, issuer);
-            return null;
+            throw new OidcMetadataUnavailableException(issuerUri);
         }
 
         return new OidcMetadata(jwksUri, tokenEndpoint, authorizationEndpoint);
@@ -164,8 +131,7 @@ public class OidcMetadataProvider {
      * @param jwksUri               URL of the OIDC provider's JWK Set, used to fetch public keys for token verification
      * @param tokenEndpoint         URL of the token endpoint, used to exchange the authorization code for an ID Token
      * @param authorizationEndpoint URL of the authorization endpoint, used to initiate the OAuth2 login flow.
-     *                              May be {@code null} if the provider is unavailable
      */
     public record OidcMetadata(
-            String jwksUri, String tokenEndpoint, @Nullable String authorizationEndpoint) {}
+            String jwksUri, String tokenEndpoint, String authorizationEndpoint) {}
 }
