@@ -24,8 +24,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseCookie;
 import org.springframework.test.context.TestPropertySource;
 
-import com.axelixlabs.axelix.master.autoconfiguration.auth.CookieProperties;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.JwtProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

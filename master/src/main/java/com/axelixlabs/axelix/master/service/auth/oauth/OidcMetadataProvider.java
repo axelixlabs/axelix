@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.jspecify.annotations.NullMarked;
@@ -92,6 +93,7 @@ public class OidcMetadataProvider {
      * Needs additional validation required fields per OpenID Connect Discovery 1.0
      * See: <a href="https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata">OpenID Provider Metadata</a>
      */
+    @SuppressWarnings("NullAway") // Null away cannot reason about ObjectUtils.anyNull semantics
     private OidcMetadata buildMetadata(Map<String, Object> body) {
         String issuer = getStringValue(body, "issuer");
         String jwksUri = getStringValue(body, "jwks_uri");
@@ -110,7 +112,7 @@ public class OidcMetadataProvider {
             throw new OidcMetadataUnavailableException(issuerUri);
         }
 
-        if (!issuer.equals(issuerUri)) {
+        if (!Objects.equals(issuer, issuerUri)) {
             log.error("OIDC issuer mismatch: expected '{}' but got '{}'", issuerUri, issuer);
             throw new OidcMetadataUnavailableException(issuerUri);
         }

@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.autoconfiguration.auth;
+package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
 
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.Assert;
+
+import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.OAUTH_PROPERTIES_PREFIX;
 
 /**
  * Configuration properties for OAuth2/OIDC authentication.
@@ -35,8 +37,9 @@ import org.springframework.util.Assert;
  *
  * @since 27.02.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-@ConfigurationProperties(prefix = "axelix.master.auth.options.oauth2")
+@ConfigurationProperties(prefix = OAUTH_PROPERTIES_PREFIX)
 public record OAuth2Properties(
         String issuerUri,
         String clientId,
@@ -45,14 +48,14 @@ public record OAuth2Properties(
         @Nullable String usernameClaim,
         String scopes) {
 
-    private static final String PROPERTY_PREFIX = "axelix.master.auth.options.oauth2";
     private static final String DEFAULT_SCOPE = "openid";
 
     public OAuth2Properties {
-        Assert.notNull(issuerUri, "OAuth2 issuer-uri is required. Set " + PROPERTY_PREFIX + "issuer-uri");
-        Assert.notNull(clientId, "OAuth2 client-id is required. Set " + PROPERTY_PREFIX + "client-id");
-        Assert.notNull(clientSecret, "OAuth2 client-secret is required. Set " + PROPERTY_PREFIX + "client-secret");
-        Assert.notNull(redirectUri, "OAuth2 redirect-uri is required. Set " + PROPERTY_PREFIX + "redirect-uri");
+        Assert.notNull(issuerUri, "OAuth2 issuer-uri is required. Set " + OAUTH_PROPERTIES_PREFIX + "issuer-uri");
+        Assert.notNull(clientId, "OAuth2 client-id is required. Set " + OAUTH_PROPERTIES_PREFIX + "client-id");
+        Assert.notNull(
+                clientSecret, "OAuth2 client-secret is required. Set " + OAUTH_PROPERTIES_PREFIX + "client-secret");
+        Assert.notNull(redirectUri, "OAuth2 redirect-uri is required. Set " + OAUTH_PROPERTIES_PREFIX + "redirect-uri");
 
         if (scopes == null) {
             scopes = DEFAULT_SCOPE;

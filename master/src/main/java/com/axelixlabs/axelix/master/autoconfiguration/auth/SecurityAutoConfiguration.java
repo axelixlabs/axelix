@@ -31,6 +31,10 @@ import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettings;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettingsOAuth2;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettingsStaticAdmin;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.StaticAdminCredentialsProperties;
 import com.axelixlabs.axelix.master.filter.CookieBasedJwtAuthorizationFilter;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
@@ -52,6 +56,8 @@ import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
  */
 @AutoConfiguration
 public class SecurityAutoConfiguration {
+
+    public static final String OAUTH_PROPERTIES_PREFIX = "axelix.master.auth.options.oauth2";
 
     /**
      * Autoconfiguration for the JWT-related part.
@@ -144,7 +150,7 @@ public class SecurityAutoConfiguration {
      * Autoconfiguration for OAuth2/OIDC security option.
      */
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = "axelix.master.auth.options.oauth2", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = OAUTH_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
     @EnableConfigurationProperties(OAuth2Properties.class)
     public static class OAuth2Config {
 

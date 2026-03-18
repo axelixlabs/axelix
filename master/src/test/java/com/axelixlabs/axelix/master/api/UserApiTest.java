@@ -35,8 +35,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.master.api.external.endpoint.UserApi;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.CookieProperties;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.JwtProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -49,7 +49,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.OAuth2Properties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 
 import static org.assertj.core.api.Assertions.assertThat;

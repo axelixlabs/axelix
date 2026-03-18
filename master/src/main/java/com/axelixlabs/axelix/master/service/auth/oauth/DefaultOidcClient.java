@@ -42,7 +42,7 @@ import org.springframework.web.client.RestClient;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
-import com.axelixlabs.axelix.master.autoconfiguration.auth.OAuth2Properties;
+import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 
 /**
