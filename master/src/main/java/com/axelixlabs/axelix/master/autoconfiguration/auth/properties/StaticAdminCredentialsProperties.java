@@ -17,32 +17,35 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.Assert;
+
 /**
  * Configuration of the static-admin.
  *
  * @author Mikhail Polivakha
  */
 @SuppressWarnings("NullAway")
-public class StaticAdminCredentialsProperties {
+@ConfigurationProperties(prefix = "axelix.master.auth.options.static-admin")
+public record StaticAdminCredentialsProperties(Credentials credentials) {
 
-    private String username;
-    private String password;
+    public StaticAdminCredentialsProperties {
+        Assert.notNull(
+                credentials.username(),
+                "The username for the static-admin is 'null'. Make sure the axelix.master.auth.static-admin.credentials.username is specified correctly");
 
-    public StaticAdminCredentialsProperties setUsername(String username) {
-        this.username = username;
-        return this;
-    }
-
-    public StaticAdminCredentialsProperties setPassword(String password) {
-        this.password = password;
-        return this;
+        Assert.notNull(
+                credentials.password(),
+                "The password for the static-admin is 'null'. Make sure the axelix.master.auth.static-admin.credentials.password is specified correctly");
     }
 
     public String getUsername() {
-        return username;
+        return credentials.username();
     }
 
     public String getPassword() {
-        return password;
+        return credentials.password();
     }
+
+    record Credentials(String username, String password) {}
 }

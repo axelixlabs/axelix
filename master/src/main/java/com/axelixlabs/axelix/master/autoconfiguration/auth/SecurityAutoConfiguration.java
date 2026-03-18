@@ -23,11 +23,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.util.Assert;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.JwtDecoderService;
+import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettings;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettingsOAuth2;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettingsStaticAdmin;
@@ -58,6 +58,7 @@ import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
 public class SecurityAutoConfiguration {
 
     public static final String OAUTH_PROPERTIES_PREFIX = "axelix.master.auth.options.oauth2";
+    public static final String STATIC_ADMIN_PROPERTIES_PREFIX = "axelix.master.auth.options.static-admin";
 
     /**
      * Autoconfiguration for the JWT-related part.
@@ -112,13 +113,9 @@ public class SecurityAutoConfiguration {
      * Autoconfiguration for static-admin security option.
      */
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = "axelix.master.auth.options.static-admin", name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = STATIC_ADMIN_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
+    @EnableConfigurationProperties(StaticAdminCredentialsProperties.class)
     static class StaticCredentialsConfig {
-
-        private static final String USERNAME_NULL_MESSAGE =
-                "The username for the static-admin is 'null'. Make sure the axelix.master.auth.static-admin.credentials.username is specified correctly";
-        private static final String PASSWORD_NULL_MESSAGE =
-                "The password for the static-admin is 'null'. Make sure the axelix.master.auth.static-admin.credentials.password is specified correctly";
 
         @Bean
         public AuthSettings authSettingsStaticAdmin() {
@@ -133,16 +130,7 @@ public class SecurityAutoConfiguration {
         @Bean
         public StaticAdminUserProvider staticCredentialsUserProvider(
                 StaticAdminCredentialsProperties staticCredentialsConfig) {
-            Assert.notNull(staticCredentialsConfig.getUsername(), USERNAME_NULL_MESSAGE);
-            Assert.notNull(staticCredentialsConfig.getPassword(), PASSWORD_NULL_MESSAGE);
-
             return new StaticAdminUserProvider(staticCredentialsConfig);
-        }
-
-        @Bean
-        @ConfigurationProperties(prefix = "axelix.master.auth.options.static-admin.credentials")
-        public StaticAdminCredentialsProperties staticAdminCredentialsProperties() {
-            return new StaticAdminCredentialsProperties();
         }
     }
 
@@ -161,7 +149,7 @@ public class SecurityAutoConfiguration {
                     oAuth2Properties.scopes(),
                     oAuth2Properties.clientId(),
                     oAuth2Properties.redirectUri(),
-                    oidcMetadataProvider);
+                    Lazy.of(oidcMetadataProvider::getAuthorizationEndpoint));
         }
 
         @Bean

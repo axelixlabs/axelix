@@ -18,9 +18,8 @@
 package com.axelixlabs.axelix.master.api.external.response.settings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
+import com.axelixlabs.axelix.common.utils.Lazy;
 
 /**
  * Authentication settings for OAuth2/OIDC provider.
@@ -33,14 +32,14 @@ public final class AuthSettingsOAuth2 implements AuthSettings {
     private final String scope;
     private final String clientId;
     private final String redirectUri;
-    private final OidcMetadataProvider metadataProvider;
+    private final Lazy<String> authorizationEndpointResolver;
 
     public AuthSettingsOAuth2(
-            String scope, String clientId, String redirectUri, OidcMetadataProvider metadataProvider) {
+            String scope, String clientId, String redirectUri, Lazy<String> authorizationEndpointResolver) {
         this.scope = scope;
         this.clientId = clientId;
         this.redirectUri = redirectUri;
-        this.metadataProvider = metadataProvider;
+        this.authorizationEndpointResolver = authorizationEndpointResolver;
     }
 
     @Override
@@ -49,9 +48,8 @@ public final class AuthSettingsOAuth2 implements AuthSettings {
         return "oauth2";
     }
 
-    @Nullable
     public String getAuthorizationEndpoint() {
-        return metadataProvider.getAuthorizationEndpoint();
+        return authorizationEndpointResolver.require();
     }
 
     public String getClientId() {
