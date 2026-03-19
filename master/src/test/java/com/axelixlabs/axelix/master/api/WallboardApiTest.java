@@ -73,6 +73,10 @@ public class WallboardApiTest {
 
         @BeforeEach
         void prepare() {
+            registry.getAll().forEach(instance -> {
+                registry.deRegisterQuietly(instance.id());
+            });
+
             registry.register(TestObjectFactory.createInstance(
                     instance1Id,
                     "http://example.com/1",
