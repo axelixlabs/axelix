@@ -37,12 +37,12 @@ axelix:
     auth:
       jwt:
         lifespan: 12h
-      static-admin:
-        enabled: true
-        credentials:
-          password: admin
-          username: admin
-      type: static-admin
+      options:
+        static-admin:
+          enabled: true
+          credentials:
+            username: admin
+            password: admin
       cookie:
         name: auth_token
         secure: false
