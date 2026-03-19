@@ -1,0 +1,12 @@
+.DescriptionWrapper {
+    grid-row: 2;
+    padding: 0 16px;
+    font-weight: 500;
+}
+
+.Description {
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

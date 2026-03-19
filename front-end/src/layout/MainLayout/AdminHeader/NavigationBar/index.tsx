@@ -27,6 +27,12 @@ export const NavigationBar = () => {
         <>
             <nav data-test="header-links">
                 <NavLink
+                    to="/mcp-server"
+                    className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
+                >
+                    MCP Server
+                </NavLink>
+                <NavLink
                     to="/dashboard"
                     className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
                 >

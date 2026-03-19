@@ -1,0 +1,35 @@
+.Card {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 3;
+    border-radius: 16px;
+    background-color: #f9fafb;
+    box-shadow: var(--axelix-box-shadow-light);
+    border: 1px solid var(--axelix-medium-grey);
+    transition: all 0.3s;
+    row-gap: 8px;
+}
+
+.Header {
+    padding: 14px 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    column-gap: 8px;
+    border-bottom: 1px solid var(--axelix-medium-grey);
+    grid-row: 1;
+}
+
+.TwoLinesHeader {
+    /* Formula: line-height * number of lines + total vertical padding */
+    min-height: calc(22.5px * 2 + 28px);
+}
+
+.Title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-all;
+    overflow: hidden;
+}

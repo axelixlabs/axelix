@@ -1,0 +1,48 @@
+.HiddenAnnotationWrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 20px;
+}
+
+.HiddenAnnotationValue {
+    margin-left: auto;
+}
+
+.FooterDisplayedAnnotations {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding-left: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.Footer {
+    grid-row: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px dashed var(--axelix-medium-grey);
+}
+
+.GreenTag {
+    border: 1px solid var(--axelix-primary-green);
+    background-color: var(--axelix-primary-light-green);
+    color: var(--axelix-primary-green);
+}
+
+.OrangeTag {
+    border: 1px solid #faad14;
+    background-color: #faad141a;
+    color: #faad14;
+}
+
+.BurgerIcon {
+    cursor: pointer;
+    margin-right: 12px;
+}
+
+.AnnotationTag {
+    width: 44px;
+    text-align: center;
+}
