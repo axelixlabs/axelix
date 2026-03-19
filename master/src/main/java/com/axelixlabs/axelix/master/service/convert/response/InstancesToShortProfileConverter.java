@@ -53,7 +53,9 @@ public class InstancesToShortProfileConverter implements Converter<Instance, Ins
                 },
                 buildDeployedForField(instance),
                 instance.javaVersion(),
-                instance.springBootVersion());
+                instance.springBootVersion(),
+                instance.springFrameworkVersion(),
+                instance.kotlinVersion());
     }
 
     @Nullable

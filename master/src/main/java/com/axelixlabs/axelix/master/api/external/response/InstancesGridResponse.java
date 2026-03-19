@@ -43,7 +43,9 @@ public record InstancesGridResponse(Collection<InstanceShortProfile> instances) 
             InstanceStatus status,
             @Nullable String deployedFor,
             String javaVersion,
-            String springBootVersion) {}
+            String springBootVersion,
+            String springFrameworkVersion,
+            @Nullable String kotlinVersion) {}
 
     /**
      * The state of the given instance.
