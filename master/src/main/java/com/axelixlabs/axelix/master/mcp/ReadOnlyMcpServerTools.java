@@ -69,6 +69,7 @@ public class ReadOnlyMcpServerTools {
             """,
             annotations =
                     @McpAnnotations(
+                            title = "List of all the beans available in the ApplicationContext",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,
@@ -88,6 +89,7 @@ public class ReadOnlyMcpServerTools {
         """,
             annotations =
                     @McpAnnotations(
+                            title = "List of all the properties inside the Spring Boot application",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,
@@ -106,6 +108,7 @@ public class ReadOnlyMcpServerTools {
         """,
             annotations =
                     @McpAnnotations(
+                            title = "List of all the @ConfigurationProperties beans inside this Spring Boot app",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,
@@ -127,6 +130,7 @@ public class ReadOnlyMcpServerTools {
         """,
             annotations =
                     @McpAnnotations(
+                            title = "List that contain results of all @Conditional evaluations",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,
@@ -147,6 +151,7 @@ public class ReadOnlyMcpServerTools {
         """,
             annotations =
                     @McpAnnotations(
+                            title = "List of all scheduled tasks inside this Spring Boot app",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,
@@ -175,6 +180,7 @@ public class ReadOnlyMcpServerTools {
         """,
             annotations =
                     @McpAnnotations(
+                            title = "List of all Spring Boot applications instances currently deployed",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,

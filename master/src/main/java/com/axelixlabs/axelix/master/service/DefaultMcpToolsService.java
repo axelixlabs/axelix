@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -31,6 +32,7 @@ import com.axelixlabs.axelix.master.api.external.response.McpToolFeedResponse;
  * Default implementation of {@link McpToolsService}.
  *
  * @author Sergey Cherksov
+ * @author Mikhail Polivakha
  */
 @Service
 public class DefaultMcpToolsService implements McpToolsService {
@@ -53,9 +55,15 @@ public class DefaultMcpToolsService implements McpToolsService {
 
         return new McpToolFeedResponse.Tool(
                 mcpTool.title(),
-                mcpTool.description(),
+                getDescription(mcpTool),
                 createAnnotations(mcpTool.annotations()),
                 McpToolFeedResponse.ToolStatus.UP);
+    }
+
+    private static String getDescription(McpSchema.Tool mcpTool) {
+        return Optional.ofNullable(mcpTool.annotations())
+                .map(McpSchema.ToolAnnotations::title)
+                .orElse(mcpTool.description());
     }
 
     private McpToolFeedResponse.ToolAnnotations createAnnotations(McpSchema.ToolAnnotations annotations) {

@@ -52,7 +52,7 @@ public class McpToolApiTest {
         {
           "tools" : [ {
             "title" : "Beans Feed",
-            "description" : "#{json-unit.ignore}",
+            "description" : "List of all the beans available in the ApplicationContext",
             "annotations" : {
               "readOnlyHint" : true,
               "destructiveHint" : false,
@@ -62,7 +62,7 @@ public class McpToolApiTest {
             "status" : "UP"
           }, {
             "title" : "@Conditional Feed",
-            "description" : "#{json-unit.ignore}",
+            "description" : "List that contain results of all @Conditional evaluations",
             "annotations" : {
               "readOnlyHint" : true,
               "destructiveHint" : false,
@@ -72,7 +72,7 @@ public class McpToolApiTest {
             "status" : "UP"
           }, {
             "title" : "Config Props Beans",
-            "description" : "#{json-unit.ignore}",
+            "description" : "List of all the @ConfigurationProperties beans inside this Spring Boot app",
             "annotations" : {
               "readOnlyHint" : true,
               "destructiveHint" : false,
@@ -82,7 +82,7 @@ public class McpToolApiTest {
             "status" : "UP"
           }, {
             "title" : "Properties",
-            "description" : "#{json-unit.ignore}",
+            "description" : "List of all the properties inside the Spring Boot application",
             "annotations" : {
               "readOnlyHint" : true,
               "destructiveHint" : false,
@@ -92,7 +92,7 @@ public class McpToolApiTest {
             "status" : "UP"
           }, {
             "title" : "Scheduled Tasks",
-            "description" : "#{json-unit.ignore}",
+            "description" : "List of all scheduled tasks inside this Spring Boot app",
             "annotations" : {
               "readOnlyHint" : true,
               "destructiveHint" : false,
@@ -102,7 +102,7 @@ public class McpToolApiTest {
             "status" : "UP"
           }, {
             "title" : "Instances Feed",
-            "description" : "#{json-unit.ignore}",
+            "description" : "List of all Spring Boot applications instances currently deployed",
             "annotations" : {
               "readOnlyHint" : true,
               "destructiveHint" : false,
