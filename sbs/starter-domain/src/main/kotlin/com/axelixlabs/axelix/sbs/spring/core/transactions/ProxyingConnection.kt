@@ -53,12 +53,12 @@ class ProxyingConnection(private val delegate : Connection, private val statsCol
     }
 
     private fun recordStats(sql: String, supplier: () -> PreparedStatement): PreparedStatement {
-        val startTimeNano: Long = System.nanoTime()
+        val startTime: Long = System.nanoTime()
 
         return ProxyingPreparedStatement(
             sql,
             supplier(),
-            startTimeNano,
+            startTime,
             statsCollector
         )
     }

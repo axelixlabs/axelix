@@ -76,6 +76,12 @@ class TransactionMonitoringBeanPostProcessorTest {
 
     private List<Object> transactionalBeans;
 
+    @Autowired
+    private TransactionStatsCollector transactionStatsCollector;
+
+    @Autowired
+    private QueriesStatsCollector queriesStatsCollector;
+
     @BeforeEach
     @SuppressWarnings("unchecked")
     void setup() {
@@ -135,6 +141,17 @@ class TransactionMonitoringBeanPostProcessorTest {
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector, QueriesStatsCollector queriesStatsCollector) {
             return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesStatsCollector);
+        }
+
+        @Bean
+        public QueriesStatsCollector queriesStatsCollector() {
+            return new DefaultQueriesStatsCollector();
+        }
+
+        @Bean
+        public TransactionMonitoringDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+                QueriesStatsCollector queriesStatsCollector) {
+            return new TransactionMonitoringDataSourceBeanPostProcessor(queriesStatsCollector);
         }
 
         @Bean

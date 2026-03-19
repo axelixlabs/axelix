@@ -12,7 +12,7 @@ import java.sql.ResultSet
 class ProxyingPreparedStatement(
     private val sql: String,
     private val delegate: PreparedStatement,
-    private val startPreparedStatement: Long,
+    private val startTime: Long,
     private val statsCollector: QueriesStatsCollector
 ) : PreparedStatement by delegate {
 
@@ -50,16 +50,13 @@ class ProxyingPreparedStatement(
         try {
             return supplier()
         } finally {
-            val endTimeNano: Long = System.nanoTime()
-            val duration: Long = endTimeNano - startPreparedStatement
-            val endTimestamp: Long = startPreparedStatement + duration
+            val duration: Long = System.nanoTime() - startTime
 
             statsCollector.recordQueries(
                 TransactionQueryRecord(
                     sql,
                     duration / 1_000_000,
-                    startPreparedStatement / 1_000_000,
-                    endTimestamp / 1_000_000
+                    startTime / 1_000_000
                 )
             )
         }

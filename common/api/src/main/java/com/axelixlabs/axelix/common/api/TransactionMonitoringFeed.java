@@ -155,19 +155,26 @@ public final class TransactionMonitoringFeed {
     public static final class TransactionExecution {
 
         private final long durationMs;
-        private final long timestamp;
+        private final long startTimestampMs;
+        private final long endTimestampMs;
+        private final int queriesCount;
         private final List<Query> queries;
 
         /**
          * Creates a new TransactionExecution.
          *
-         * @param durationMs transaction execution duration in milliseconds
-         * @param timestamp  unix timestamp (milliseconds from epoch) when transaction started
-         * @param queries    the list of queries executed during a particular transaction.
+         * @param durationMs         transaction execution duration in milliseconds
+         * @param startTimestampMs   unix timestamp (milliseconds from epoch) when transaction started
+         * @param endTimestampMs     unix timestamp (milliseconds from epoch) when transaction finished
+         * @param queriesCount       number of requests made within this transaction
+         * @param queries            the list of queries executed during a particular transaction
          */
-        public TransactionExecution(long durationMs, long timestamp, List<Query> queries) {
+        public TransactionExecution(
+                long durationMs, long startTimestampMs, long endTimestampMs, int queriesCount, List<Query> queries) {
             this.durationMs = durationMs;
-            this.timestamp = timestamp;
+            this.startTimestampMs = startTimestampMs;
+            this.endTimestampMs = endTimestampMs;
+            this.queriesCount = queriesCount;
             this.queries = queries;
         }
 
@@ -175,8 +182,16 @@ public final class TransactionMonitoringFeed {
             return durationMs;
         }
 
-        public long getTimestamp() {
-            return timestamp;
+        public long getStartTimestampMs() {
+            return startTimestampMs;
+        }
+
+        public long getEndTimestampMs() {
+            return endTimestampMs;
+        }
+
+        public Integer getQueriesCount() {
+            return queriesCount;
         }
 
         public List<Query> getQueries() {
@@ -190,20 +205,24 @@ public final class TransactionMonitoringFeed {
             }
             TransactionExecution that = (TransactionExecution) o;
             return durationMs == that.durationMs
-                    && timestamp == that.timestamp
+                    && startTimestampMs == that.startTimestampMs
+                    && endTimestampMs == that.endTimestampMs
+                    && Objects.equals(queriesCount, that.queriesCount)
                     && Objects.equals(queries, that.queries);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(durationMs, timestamp, queries);
+            return Objects.hash(durationMs, startTimestampMs, endTimestampMs, queriesCount, queries);
         }
 
         @Override
         public String toString() {
             return "TransactionExecution{" + "durationMs="
-                    + durationMs + ", timestamp="
-                    + timestamp + ", queries="
+                    + durationMs + ", startTimestampMs="
+                    + startTimestampMs + ", endTimestampMs="
+                    + endTimestampMs + ", queriesCount="
+                    + queriesCount + ", queries="
                     + queries + '}';
         }
     }
@@ -221,9 +240,9 @@ public final class TransactionMonitoringFeed {
          * Creates a new Query.
          *
          * @param sql               the executed SQL statement
-         * @param durationMs        query execution duration in milliseconds.
-         * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started.
-         * @param endTimestampMs    unix timestamp (milliseconds since epoch) when the query finished.
+         * @param durationMs        query execution duration in milliseconds
+         * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started
+         * @param endTimestampMs    unix timestamp (milliseconds since epoch) when the query finished
          */
         public Query(String sql, Long durationMs, Long startTimestampMs, Long endTimestampMs) {
             this.sql = sql;

@@ -72,6 +72,12 @@ public class TransactionMonitoringServiceTest {
     @Autowired
     private TransactionMonitoringService transactionMonitoringService;
 
+    @Autowired
+    private TransactionStatsCollector transactionStatsCollector;
+
+    @Autowired
+    private QueriesStatsCollector queriesStatsCollector;
+
     @BeforeEach
     void cleanUp() {
         transactionMonitoringService.clearAllStats();
@@ -295,6 +301,17 @@ public class TransactionMonitoringServiceTest {
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector, QueriesStatsCollector queriesStatsCollector) {
             return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesStatsCollector);
+        }
+
+        @Bean
+        public QueriesStatsCollector queriesStatsCollector() {
+            return new DefaultQueriesStatsCollector();
+        }
+
+        @Bean
+        public TransactionMonitoringDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+                QueriesStatsCollector queriesStatsCollector) {
+            return new TransactionMonitoringDataSourceBeanPostProcessor(queriesStatsCollector);
         }
 
         @Bean

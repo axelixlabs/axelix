@@ -138,6 +138,17 @@ class TransactionMonitoringBeanPostProcessorTest {
         }
 
         @Bean
+        public QueriesStatsCollector queriesStatsCollector() {
+            return new DefaultQueriesStatsCollector();
+        }
+
+        @Bean
+        public TransactionMonitoringDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+                QueriesStatsCollector queriesStatsCollector) {
+            return new TransactionMonitoringDataSourceBeanPostProcessor(queriesStatsCollector);
+        }
+
+        @Bean
         public PropagationTestHelper propagationTestHelper(
                 OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
             return new PropagationTestHelper(ownerRepository, self);

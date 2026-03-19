@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.ExecutionStats;
+import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.Query;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.TransactionExecution;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.TransactionalEntrypoint;
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
@@ -109,17 +110,22 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
     }
 
     private TransactionExecution convertToTransactionExecution(TransactionRecord record) {
-        return new TransactionExecution(
-                record.getDurationMs(), record.getStartTimestamp(), convertToQueries(record.getQueries()));
+        List<Query> queries = convertToQueries(record.getQueries());
+        long duration = record.getDurationMs();
+        long startTimestamp = record.getStartTimestamp();
+        long endTimestamp = duration + startTimestamp;
+        return new TransactionExecution(duration, startTimestamp, endTimestamp, queries.size(), queries);
     }
 
-    private List<TransactionMonitoringFeed.Query> convertToQueries(List<TransactionQueryRecord> queriesRecords) {
+    private List<Query> convertToQueries(List<TransactionQueryRecord> queriesRecords) {
         return queriesRecords.stream()
-                .map(queries -> new TransactionMonitoringFeed.Query(
-                        queries.getSql(),
-                        queries.getDurationMs(),
-                        queries.getStartTimestampMs(),
-                        queries.getEndTimestampMs()))
+                .map(queries -> {
+                    long duration = queries.getDurationMs();
+                    long startTimestamp = queries.getStartTimestampMs();
+                    long endTimestamp = duration + startTimestamp;
+                    return new Query(
+                            queries.getSql(), queries.getDurationMs(), queries.getStartTimestampMs(), endTimestamp);
+                })
                 .collect(Collectors.toList());
     }
 }

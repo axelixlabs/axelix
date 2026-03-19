@@ -105,7 +105,7 @@ class TransactionMonitoringEndpointTest {
                 .node("entrypoints[0].executions[0].durationMs")
                 .isNumber();
         assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].timestamp")
+                .node("entrypoints[0].executions[0].startTimestampMs")
                 .isNumber();
 
         assertThatJson(responseBody).node("entrypoints[0].executionStats").isObject();
@@ -165,6 +165,17 @@ class TransactionMonitoringEndpointTest {
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector, QueriesStatsCollector queriesStatsCollector) {
             return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesStatsCollector);
+        }
+
+        @Bean
+        public QueriesStatsCollector queriesStatsCollector() {
+            return new DefaultQueriesStatsCollector();
+        }
+
+        @Bean
+        public TransactionMonitoringDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+                QueriesStatsCollector queriesStatsCollector) {
+            return new TransactionMonitoringDataSourceBeanPostProcessor(queriesStatsCollector);
         }
 
         @Bean
