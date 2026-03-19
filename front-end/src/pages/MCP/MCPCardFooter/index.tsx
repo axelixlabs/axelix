@@ -21,7 +21,7 @@ import type { IMCPAnnotation } from "models";
 
 import styles from "./styles.module.css";
 
-import { LinesIcon } from "assets";
+import { BurgerIcon } from "assets";
 
 interface IProps {
     /**
@@ -46,18 +46,20 @@ export const MCPCardFooter = ({ annotations }: IProps) => {
 
     return (
         <div className={styles.Footer}>
-            <Tag className={getTagClass(readOnlyHint)}>Read-only</Tag>
-            <Tag className={getTagClass(idempotentHint)}>Idempotent</Tag>
+            <div className={styles.FooterDisplayedAnnotations}>
+                <Tag className={getTagClass(readOnlyHint)}>Read-only</Tag>
+                <Tag className={getTagClass(idempotentHint)}>Idempotent</Tag>
+            </div>
 
             <Popover
                 title="Annotations"
                 trigger="click"
                 content={
-                    <div className={styles.AnnotationWrapper}>
+                    <div className={styles.HiddenAnnotationWrapper}>
                         {annotationItems.map(({ label, value }) => (
                             <>
                                 <div>{label}</div>
-                                <div>
+                                <div className={styles.HiddenAnnotationValue}>
                                     <Tag className={`${getTagClass(value)} ${styles.AnnotationTag}`}>
                                         {String(value)}
                                     </Tag>
@@ -67,7 +69,7 @@ export const MCPCardFooter = ({ annotations }: IProps) => {
                     </div>
                 }
             >
-                <LinesIcon className={styles.LinesIcon} />
+                <BurgerIcon className={styles.BurgerIcon} />
             </Popover>
         </div>
     );

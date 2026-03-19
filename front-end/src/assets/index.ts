@@ -43,7 +43,7 @@ export { default as CloseIcon } from "../assets/icons/close.svg?react";
 export { default as CrownIcon } from "../assets/icons/crown.svg?react";
 export { default as LinuxIcon } from "../assets/icons/linux.svg?react";
 export { default as OnOffIcon } from "../assets/icons/onOff.svg?react";
-export { default as LinesIcon } from "../assets/icons/lines.svg?react";
+export { default as BurgerIcon } from "../assets/icons/burger.svg?react";
 export { default as LogoIcon } from "../assets/icons/logo.svg?react";
 export { default as LinkIcon } from "../assets/icons/link.svg?react";
 export { default as JavaIcon } from "../assets/icons/java.svg?react";

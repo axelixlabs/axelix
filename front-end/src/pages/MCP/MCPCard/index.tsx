@@ -29,15 +29,15 @@ interface IProps {
     /**
      * Single MCP tool data
      */
-    MCPTool: IMCPTool;
+    mcpTool: IMCPTool;
 }
 
-export const MCPCard = ({ MCPTool }: IProps) => {
+export const MCPCard = ({ mcpTool }: IProps) => {
     const textRef = useRef<HTMLDivElement>(null);
 
     const [isEllipsis, setIsEllipsis] = useState<boolean>(false);
 
-    const { title, description, annotations, status } = MCPTool;
+    const { title, description, annotations, status } = mcpTool;
 
     useEffect(() => {
         const element = textRef.current;

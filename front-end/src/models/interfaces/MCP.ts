@@ -19,22 +19,22 @@ import type { EMCPToolStatus } from "models";
 
 export interface IMCPAnnotation {
     /**
-     * Indicates that the tool does not modify any data
+     * true if mcp tool does not modify any data, false otherwise
      */
     readOnlyHint: boolean;
 
     /**
-     * Indicates that the tool performs destructive actions
+     * true if mcp tool performs destructive actions, false otherwise
      */
     destructiveHint: boolean;
 
     /**
-     * Indicates that repeated calls produce the same result
+     * true if the mcp tool is idempotent, false otherwise
      */
     idempotentHint: boolean;
 
     /**
-     * Indicates that the tool may interact with external systems
+     * true if the tool interacts with open world, false otherwise.
      */
     openWorldHint: boolean;
 }

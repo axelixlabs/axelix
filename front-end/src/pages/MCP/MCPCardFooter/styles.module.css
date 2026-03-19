@@ -1,19 +1,27 @@
-.AnnotationWrapper {
+.HiddenAnnotationWrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px 20px;
 }
 
-.AnnotationWrapper > div:nth-child(even) {
+.HiddenAnnotationValue {
     margin-left: auto;
+}
+
+.FooterDisplayedAnnotations {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+    padding-left: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 .Footer {
     grid-row: 3;
     display: flex;
     align-items: center;
-    column-gap: 8px;
-    padding: 10px 16px 16px;
+    justify-content: space-between;
     border-top: 1px dashed var(--axelix-medium-grey);
 }
 
@@ -29,8 +37,9 @@
     color: #faad14;
 }
 
-.LinesIcon {
+.BurgerIcon {
     cursor: pointer;
+    margin-right: 12px;
 }
 
 .AnnotationTag {

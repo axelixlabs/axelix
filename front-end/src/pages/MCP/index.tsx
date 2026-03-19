@@ -28,24 +28,24 @@ import styles from "./styles.module.css";
 
 const MCP = () => {
     const [search, setSearch] = useState<string>("");
-    const [MCPToolsData, setMCPToolsData] = useState(StatefulRequest.loading<IMCPToolsResponseBody>());
+    const [mcpToolsData, setMcpToolsData] = useState(StatefulRequest.loading<IMCPToolsResponseBody>());
 
     useEffect(() => {
-        fetchData(setMCPToolsData, () => getMCPTools());
+        fetchData(setMcpToolsData, () => getMCPTools());
     }, []);
 
-    if (MCPToolsData.loading) {
+    if (mcpToolsData.loading) {
         return <Loader />;
     }
 
-    if (MCPToolsData.error) {
+    if (mcpToolsData.error) {
         return <EmptyHandler isEmpty />;
     }
 
-    const MCPTools = MCPToolsData.response!.tools;
-    const effectiveMCPTools = search ? filterMCPTools(MCPTools, search) : MCPTools;
+    const mcpTools = mcpToolsData.response!.tools;
+    const effectiveMCPTools = search ? filterMCPTools(mcpTools, search) : mcpTools;
 
-    const addonAfter = `${effectiveMCPTools.length} / ${MCPTools.length}`;
+    const addonAfter = `${effectiveMCPTools.length} / ${mcpTools.length}`;
 
     return (
         <>
@@ -53,8 +53,8 @@ const MCP = () => {
 
             <EmptyHandler isEmpty={effectiveMCPTools.length === 0}>
                 <div className={styles.CardsWrapper}>
-                    {effectiveMCPTools.map((MCPTool) => (
-                        <MCPCard MCPTool={MCPTool} key={MCPTool.title} />
+                    {effectiveMCPTools.map((mcpTool) => (
+                        <MCPCard mcpTool={mcpTool} key={mcpTool.title} />
                     ))}
                 </div>
             </EmptyHandler>
