@@ -1,5 +1,15 @@
-.MainWrapper {
+.ScatterChart {
     height: 300px;
     width: 100%;
     margin-top: 10px;
+}
+
+.ScatterShape {
+    fill: var(--axelix-primary-green);
+    cursor: pointer;
+}
+
+.ActiveScatterShape {
+    fill: var(--axelix-primary-red);
+    cursor: initial;
 }

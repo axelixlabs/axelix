@@ -1,0 +1,5 @@
+.MainWrapper {
+    background-color: var(--axelix-light-grey);
+    border-radius: var(--axelix-border-radius-large);
+    border: 1px solid var(--axelix-medium-grey);
+}

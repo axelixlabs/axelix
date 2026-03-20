@@ -26,6 +26,7 @@ export { default as DownloadIcon } from "../assets/icons/download.svg?react";
 export { default as InsightsIcon } from "../assets/icons/insights.svg?react";
 export { default as QuestionIcon } from "../assets/icons/question.svg?react";
 export { default as SettingsIcon } from "../assets/icons/settings.svg?react";
+export { default as WarningIcon } from "../assets/icons/warning.svg?react";
 export { default as DetailsIcon } from "../assets/icons/details.svg?react";
 export { default as FreeBSDIcon } from "../assets/icons/freeBSD.svg?react";
 export { default as LoggersIcon } from "../assets/icons/loggers.svg?react";

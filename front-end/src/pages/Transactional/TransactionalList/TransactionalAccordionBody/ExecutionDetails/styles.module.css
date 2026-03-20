@@ -1,0 +1,60 @@
+.MainWrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.3s ease, opacity 0.3s ease;
+}
+
+.MainWrapperOpened {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.InnerWrapper {
+    overflow: hidden;
+}
+
+.Divider {
+    border-top: 1px solid var(--axelix-bold-grey);
+    margin-block: 30px 20px;
+}
+
+.Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.Close {
+    cursor: pointer;
+}
+
+.ExecutionDataWrapper {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    column-gap: 20px;
+}
+
+.ExecutionDataInnerWrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.ExecutionDataChunk {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.InfoIcon {
+    color: var(--axelix-primary-orange);
+    cursor: pointer;
+}
+
+.NoQueriesTooltipTitle {
+    color: var(--axelix-primary-white);
+}

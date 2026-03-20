@@ -17,18 +17,55 @@
  */
 
 /**
- * The actual transaction execution.
+ * The query executed during a particular transaction.
  */
-interface ITransactionalExecution {
+export interface IQueryData {
     /**
-     * Execution duration in milliseconds.
+     * UNIX timestamp (milliseconds since epoch) when the query finished
      */
-    durationMs: number;
+    endTimestampMs: number;
 
     /**
-     * Execution timestamp (milliseconds from epoch).
+     * The executed SQL statement
      */
-    timestamp: number;
+    sql: string;
+
+    /**
+     * UNIX timestamp (milliseconds from epoch) when the query started
+     */
+    startTimestampMs: number;
+
+    /**
+     * The query's ID
+     */
+    queryId?: string;
+}
+
+/**
+ * A single transaction execution record with timing information.
+ */
+export interface ITransactionalExecution {
+    /**
+     * UNIX timestamp (milliseconds from epoch) when transaction started
+     */
+    startTimestampMs: number;
+
+    /**
+     * UNIX timestamp (milliseconds from epoch) when transaction finished
+     */
+    endTimestampMs: number;
+
+    /**
+     * The list of queries executed during a particular transaction
+     */
+    queries: IQueryData[];
+}
+
+export interface IExecutionWithDurationMs extends ITransactionalExecution {
+    /**
+     * The execution duration
+     */
+    durationMs: number;
 }
 
 /**

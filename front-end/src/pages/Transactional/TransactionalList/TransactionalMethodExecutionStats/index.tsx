@@ -36,10 +36,10 @@ export const TransactionalMethodExecutionStats = ({ stats }: IProps) => {
                 <div className={styles.Max}>{t("Transactional.max")}</div>
                 <div className={styles.Average}>{t("Transactional.average")}</div>
                 <div className={styles.Median}>{t("Transactional.median")}</div>
-                <div className={styles.HeaderLine}></div>
+                <div className={styles.HeaderLine} />
                 <div className={styles.Duration}>
                     <div>{t("Transactional.duration")}:</div>
-                    <InfoTooltip text={t("Transactional.durationTooltip")}></InfoTooltip>
+                    <InfoTooltip text={t("Transactional.durationTooltip")} />
                 </div>
                 <div className={styles.MaxValue}>{formatTransactionDuration(stats.maxDurationMs)}</div>
                 <div className={styles.AvgValue}>{formatTransactionDuration(stats.averageDurationMs)}</div>

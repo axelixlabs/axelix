@@ -32,9 +32,9 @@
 }
 
 .OrangeTag {
-    border: 1px solid #faad14;
+    border: 1px solid var(--axelix-primary-orange);
     background-color: #faad141a;
-    color: #faad14;
+    color: var(--axelix-primary-orange);
 }
 
 .BurgerIcon {

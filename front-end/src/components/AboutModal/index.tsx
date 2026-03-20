@@ -115,7 +115,7 @@ export function AboutModal({ open, setOpen }: IProps) {
                     </Button>
 
                     <Button icon={<FileTextOutlined />} size="small" shape="round" href={blogLink} target="_blank">
-                        {t("About.blog")}
+                        {t("blog")}
                     </Button>
                 </div>
             </UniversalModal>

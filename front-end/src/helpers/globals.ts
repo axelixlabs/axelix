@@ -117,6 +117,13 @@ export const toFormattedTime = (value: number): string => {
     });
 };
 
+export const toFormattedTimeWithMs = (value: number): string => {
+    const formattedTime = toFormattedTime(value);
+    const ms = new Date(value).getMilliseconds();
+
+    return `${formattedTime}.${ms}`;
+};
+
 export const createWallboardFilterSearchParam = (
     key: EWallboardFilterKey,
     operator: EWallboardFilterOperator,
