@@ -15,18 +15,30 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations;
+package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.util.Set;
+import org.jspecify.annotations.NonNull;
 
 /**
- * Implementations of this interface are capable to discover specific.
+ * The function that is capable to serialize any given object to its JSON representation.
  *
- * @since 05.07.25
  * @author Mikhail Polivakha
  */
-@Deprecated // I am not sure we need this abstraction
-public interface IntegrationComponentDiscoverer<T> {
+public interface JsonSerializationFunction {
 
-    Set<T> discoverIntegrations();
+    /**
+     * @param o object to be serialized.
+     * @return serialized version of object.
+     */
+    @NonNull
+    default String serialize(Object o) {
+        try {
+            return serializeInternal(o);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @NonNull
+    String serializeInternal(Object o) throws Exception;
 }
