@@ -16,15 +16,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
-import { getMCPTools } from "services/MCP";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
-import { fetchData } from "helpers";
-import { filterMCPTools } from "helpers/mcp";
+import { fetchData, filterMCPTools } from "helpers";
 import { type IMCPToolsResponseBody, StatefulRequest } from "models";
+import { getMCPTools } from "services";
 
-import { MCPCard } from "./MCPCard";
-import styles from "./styles.module.css";
+import { MCPCardsList } from "./MCPCardsList";
 
 const MCP = () => {
     const [search, setSearch] = useState<string>("");
@@ -44,20 +42,12 @@ const MCP = () => {
 
     const mcpTools = mcpToolsData.response!.tools;
     const effectiveMCPTools = search ? filterMCPTools(mcpTools, search) : mcpTools;
-
     const addonAfter = `${effectiveMCPTools.length} / ${mcpTools.length}`;
 
     return (
         <>
             <PageSearch addonAfter={addonAfter} setSearch={setSearch} />
-
-            <EmptyHandler isEmpty={effectiveMCPTools.length === 0}>
-                <div className={styles.CardsWrapper}>
-                    {effectiveMCPTools.map((mcpTool) => (
-                        <MCPCard mcpTool={mcpTool} key={mcpTool.title} />
-                    ))}
-                </div>
-            </EmptyHandler>
+            <MCPCardsList effectiveMCPTools={effectiveMCPTools} />
         </>
     );
 };

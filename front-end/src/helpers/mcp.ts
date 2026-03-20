@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { IMCPTool } from "models";
+import { EMCPCardChunks, type IMCPTool } from "models";
 
 export const filterMCPTools = (MCPTools: IMCPTool[], search: string): IMCPTool[] => {
     const formattedSearch = search.toLowerCase().trim();
@@ -25,5 +25,37 @@ export const filterMCPTools = (MCPTools: IMCPTool[], search: string): IMCPTool[]
         if (lowerTitle.includes(formattedSearch)) {
             return true;
         }
+    });
+};
+
+/**
+ * Synchronizes MCP card heights by internal segments (chunks).
+ * Finds max height of headers/descriptions and sets them as CSS variables.
+ */
+export const synchronizeMCPCardChunksHeights = (cardsWrapper: HTMLElement | null): void => {
+    if (!cardsWrapper) {
+        return;
+    }
+
+    cardsWrapper.style.removeProperty("--height-header");
+    cardsWrapper.style.removeProperty("--height-description");
+
+    requestAnimationFrame(() => {
+        const allHeaders = Array.from(
+            cardsWrapper.querySelectorAll(`[data-card-chunk=${EMCPCardChunks.HEADER}]`),
+        ) as HTMLElement[];
+
+        const allDescriptions = Array.from(
+            cardsWrapper.querySelectorAll(`[data-card-chunk=${EMCPCardChunks.DESCRIPTION}]`),
+        ) as HTMLElement[];
+
+        const allHeadersHeights = allHeaders.map(({ offsetHeight }) => offsetHeight);
+        const allDescriptionsHeights = allDescriptions.map(({ offsetHeight }) => offsetHeight);
+
+        const maxHeaderHeight = Math.max(...allHeadersHeights);
+        const maxDescriptionHeight = Math.max(...allDescriptionsHeights);
+
+        cardsWrapper.style.setProperty("--height-header", `${maxHeaderHeight}px`);
+        cardsWrapper.style.setProperty("--height-description", `${maxDescriptionHeight}px`);
     });
 };

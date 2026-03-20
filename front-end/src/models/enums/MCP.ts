@@ -19,3 +19,8 @@ export enum EMCPToolStatus {
     UP = "UP",
     DISABLE = "DISABLE",
 }
+
+export enum EMCPCardChunks {
+    HEADER = "header",
+    DESCRIPTION = "description",
+}

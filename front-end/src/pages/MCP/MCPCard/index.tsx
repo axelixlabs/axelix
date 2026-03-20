@@ -18,7 +18,7 @@
 import { Badge, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 
-import { EMCPToolStatus, type IMCPTool } from "models";
+import { EMCPCardChunks, EMCPToolStatus, type IMCPTool } from "models";
 
 import { MCPCardDescription } from "../MCPCardDescription";
 import { MCPCardFooter } from "../MCPCardFooter";
@@ -54,7 +54,10 @@ export const MCPCard = ({ mcpTool }: IProps) => {
     return (
         <>
             <div className={styles.Card}>
-                <div className={`${styles.Header} ${isEllipsis ? styles.TwoLinesHeader : ""}`}>
+                <div
+                    className={`${styles.Header} ${isEllipsis ? styles.TwoLinesHeader : ""}`}
+                    data-card-chunk={EMCPCardChunks.HEADER}
+                >
                     <Tooltip title={isEllipsis ? title : undefined}>
                         <div ref={textRef} className={styles.Title}>
                             {title}

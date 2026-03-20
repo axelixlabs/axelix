@@ -18,6 +18,8 @@
 import { Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 
+import { EMCPCardChunks } from "models";
+
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -43,7 +45,7 @@ export const MCPCardDescription = ({ description }: IProps) => {
     }, []);
 
     return (
-        <div className={styles.DescriptionWrapper}>
+        <div className={styles.DescriptionWrapper} data-card-chunk={EMCPCardChunks.DESCRIPTION}>
             <Tooltip title={isEllipsis ? description : undefined}>
                 <div ref={descriptionRef} className={`TextSmall ${styles.Description}`}>
                     {description}

@@ -30,4 +30,5 @@ export * from "./metrics";
 export * from "./caches";
 export * from "./beans";
 export * from "./auth";
+export * from "./MCP";
 export * from "./gc";
