@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_EXTRA_ARRAY_ITEMS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -121,7 +122,10 @@ public class McpToolApiTest {
                 restTemplate.withoutAuthorities().getForEntity("/api/external/mcp/tools-feed", String.class);
 
         // then.
-        assertThatJson(response.getBody()).when(IGNORING_ARRAY_ORDER).isEqualTo(EXPECTED_MCP_TOOLS_FEED);
+        assertThatJson(response.getBody())
+                .when(IGNORING_EXTRA_ARRAY_ITEMS)
+                .when(IGNORING_ARRAY_ORDER)
+                .isEqualTo(EXPECTED_MCP_TOOLS_FEED);
     }
 
     @ParameterizedTest

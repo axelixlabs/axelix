@@ -53,6 +53,10 @@ class ReadOnlyMcpServerToolsRegistrationTest {
                         "getInstanceConfigProps",
                         "getInstanceConditions",
                         "getInstanceScheduledTasks",
-                        "getWallboard");
+                        "getWallboard",
+                        "getAllCaches",
+                        "clearAllCaches",
+                        "clearSpecificCacheManager",
+                        "clearSpecificCacheEntity");
     }
 }
