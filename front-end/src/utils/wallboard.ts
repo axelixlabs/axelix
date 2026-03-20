@@ -73,7 +73,13 @@ export const getWallboardFilterDefinitions = (
             operatorOptions: getOperators(t),
             getOperandsOptions: (instances) =>
                 getAllKotlinVersions(instances).map((version) => ({ value: version, label: version })),
-            match: (instance, filter) => semVerMatch(instance.kotlinVersion, filter),
+            match: (instance, filter) => {
+                if (instance.kotlinVersion) {
+                    return semVerMatch(instance.kotlinVersion, filter);
+                } else {
+                    return false;
+                }
+            },
         },
     };
 };

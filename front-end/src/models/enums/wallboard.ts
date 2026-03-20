@@ -22,7 +22,7 @@
 export enum EWallboardFilterKey {
     SPRING_BOOT = "Spring Boot",
     JAVA = "Java",
-    SPRING_FRAMEWORK = "SpringFramework",
+    SPRING_FRAMEWORK = "Spring Framework",
     KOTLIN = "Kotlin",
 }
 

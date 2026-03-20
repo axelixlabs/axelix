@@ -52,10 +52,6 @@ export const getAllSpringFrameworkVersions = (instances: IInstanceCard[]): strin
     const allVersions = new Set<string>();
 
     instances.forEach((instance) => {
-        if (!instance.springFrameworkVersion) {
-            return;
-        }
-
         const [major, minor] = instance.springFrameworkVersion.split(".");
         allVersions.add(`${major}.${minor}`);
     });
@@ -89,11 +85,7 @@ const parseVersion = (version: string): number[] => {
  * @param filter
  */
 // eslint-disable-next-line complexity
-export const semVerMatch = (candidateSemVer: string | null, filter: IWallboardSingleOperandFilter): boolean => {
-    if (!candidateSemVer) {
-        return false;
-    }
-
+export const semVerMatch = (candidateSemVer: string, filter: IWallboardSingleOperandFilter): boolean => {
     if (!filter) {
         return true;
     }

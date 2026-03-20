@@ -27,7 +27,7 @@ export interface IInstanceCard {
     commitShaShort: string;
     deployedFor: string;
     kotlinVersion: string | null;
-    springFrameworkVersion: string | null;
+    springFrameworkVersion: string;
 }
 
 export interface IServiceCardsResponseBody {
