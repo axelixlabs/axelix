@@ -88,10 +88,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
-@EnableConfigurationProperties({
-    AxelixEnvironmentEndpointTest.AxelixPropTest.class,
-    EndpointsConfigurationProperties.class
-})
+@EnableConfigurationProperties(AxelixEnvironmentEndpointTest.AxelixPropTest.class)
 @Import({EnvironmentTestConfig.class})
 class AxelixEnvironmentEndpointTest {
 
@@ -277,6 +274,12 @@ class AxelixEnvironmentEndpointTest {
 
     @TestConfiguration
     static class AxelixEnvironmentEndpointTestConfiguration {
+
+        @Bean
+        @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+        public EndpointsConfigurationProperties endpointsConfigurationProperties() {
+            return new EndpointsConfigurationProperties();
+        }
 
         @Bean
         public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(

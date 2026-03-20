@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -41,9 +40,8 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
  * @since 13.11.2025
  * @author Sergey Cherkasov
  */
-@AutoConfiguration
+@AutoConfiguration(after = EndpointsConfigurationPropertiesAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixConfigurationPropertiesEndpoint.class)
-@EnableConfigurationProperties(EndpointsConfigurationProperties.class)
 public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean

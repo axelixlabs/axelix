@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -67,8 +68,14 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
     private SelfRegistrationMetadataAssembler subject;
 
     @TestConfiguration
-    @EnableConfigurationProperties({SelfRegistrationConfigurationProperties.class, WebEndpointProperties.class})
+    @EnableConfigurationProperties(WebEndpointProperties.class)
     static class CurrentConfig {
+
+        @Bean
+        @ConfigurationProperties(prefix = "axelix.sbs.discovery")
+        public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
+            return new SelfRegistrationConfigurationProperties();
+        }
 
         @Bean
         public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(

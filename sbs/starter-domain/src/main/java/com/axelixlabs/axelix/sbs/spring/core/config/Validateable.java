@@ -17,32 +17,17 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.config;
 
-import java.util.List;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 /**
- * Configuration properties that apply across different endpoints.
+ * An object whose state must be validated after the Application Context boostrap.
  *
  * @author Mikhail Polivakha
  */
-@ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
-public class EndpointsConfigurationProperties {
-
-    public static final List<String> SANITIZE_ALL = List.of("*");
+public interface Validateable {
 
     /**
-     * List of properties whose values needs to be sanitized before being returned.
-     * Single value of {@code "*"} means all properties must be sanitized.
+     * Perform the actual validation. Exits normally if everything is okay.
+     *
+     * @throws IllegalArgumentException thrown in case any validation errors occurred.
      */
-    private List<String> sanitizedProperties = List.of();
-
-    public List<String> getSanitizedProperties() {
-        return sanitizedProperties;
-    }
-
-    public EndpointsConfigurationProperties setSanitizedProperties(List<String> sanitizedProperties) {
-        this.sanitizedProperties = sanitizedProperties;
-        return this;
-    }
+    void validate() throws IllegalArgumentException;
 }

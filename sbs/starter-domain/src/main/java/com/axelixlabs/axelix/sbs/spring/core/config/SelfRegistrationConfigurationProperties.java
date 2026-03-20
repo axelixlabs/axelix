@@ -24,45 +24,40 @@ import java.time.temporal.ChronoUnit;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
-import org.springframework.util.Assert;
+import com.axelixlabs.axelix.common.utils.Assert;
 
 /**
  * Configuration properties for self-registration of the service instance.
  *
  * @since 05.02.2026
  * @author Nikita Kirillov
+ * @author Cherkasov Sergey
  */
-@ConstructorBinding
-@ConfigurationProperties(prefix = "axelix.sbs.discovery")
-public class SelfRegistrationConfigurationProperties {
+@SuppressWarnings("NullAway.Init")
+public class SelfRegistrationConfigurationProperties implements Validateable {
 
-    private final String masterUrl;
+    /**
+     * The URL of the master that the service must connect to.
+     */
+    private String masterUrl;
 
-    private final String instanceName;
+    /**
+     * The name of the service under which it will be registered in the master and subsequently displayed
+     * in wallboard, mcp, etc.
+     */
+    private String instanceName;
 
-    private final String instanceUrl;
+    /**
+     * The URL of the service, including the postfix for the actuator path, e.g. {@code https://my-app:6061/actuator}.
+     * The master will use this URL to communicate with this service.
+     */
+    private String instanceUrl;
 
+    /**
+     * The interval of the frequency of self-registration of this service in the master.
+     * By default, the interval is 15 seconds.
+     */
     private Duration heartbeatInterval = Duration.of(15, ChronoUnit.SECONDS);
-
-    public SelfRegistrationConfigurationProperties(
-            String masterUrl, String instanceUrl, String instanceName, @Nullable Duration heartbeatInterval) {
-        validateRequiredProperty(masterUrl, "axelix.sbs.discovery.master-url");
-        validateRequiredProperty(instanceUrl, "axelix.sbs.discovery.instance-url");
-        validateRequiredProperty(instanceName, "axelix.sbs.discovery.instance-name");
-
-        validateUrl(masterUrl, "axelix.sbs.discovery.master-url");
-        validateUrl(instanceUrl, "axelix.sbs.discovery.instance-url");
-
-        this.masterUrl = masterUrl;
-        this.instanceUrl = instanceUrl;
-        this.instanceName = instanceName;
-
-        if (heartbeatInterval != null) {
-            this.heartbeatInterval = heartbeatInterval;
-        }
-    }
 
     public String getMasterUrl() {
         return masterUrl;
@@ -78,6 +73,37 @@ public class SelfRegistrationConfigurationProperties {
 
     public Duration getHeartbeatInterval() {
         return heartbeatInterval;
+    }
+
+    public SelfRegistrationConfigurationProperties setMasterUrl(String masterUrl) {
+        validateUrl(masterUrl, "axelix.sbs.discovery.master-url");
+        this.masterUrl = masterUrl;
+        return this;
+    }
+
+    public SelfRegistrationConfigurationProperties setInstanceUrl(String instanceUrl) {
+        validateUrl(instanceUrl, "axelix.sbs.discovery.instance-url");
+        this.instanceUrl = instanceUrl;
+        return this;
+    }
+
+    public SelfRegistrationConfigurationProperties setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
+        return this;
+    }
+
+    public SelfRegistrationConfigurationProperties setHeartbeatInterval(@Nullable Duration heartbeatInterval) {
+        if (heartbeatInterval != null) {
+            this.heartbeatInterval = heartbeatInterval;
+        }
+        return this;
+    }
+
+    @Override
+    public void validate() {
+        validateRequiredProperty(masterUrl, "axelix.sbs.discovery.master-url");
+        validateRequiredProperty(instanceUrl, "axelix.sbs.discovery.instance-url");
+        validateRequiredProperty(instanceName, "axelix.sbs.discovery.instance-name");
     }
 
     private void validateRequiredProperty(Object value, String propertyName) {

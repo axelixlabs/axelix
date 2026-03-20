@@ -52,7 +52,9 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues("management.endpoints.web.exposure.include=axelix-env")
-            .withConfiguration(AutoConfigurations.of(AxelixEnvironmentEndpointAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(
+                    AxelixEnvironmentEndpointAutoConfiguration.class,
+                    EndpointsConfigurationPropertiesAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {

@@ -15,31 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.config;
+package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.time.Duration;
-
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 
 /**
- * Configuration properties for transaction monitoring feature.
+ * Auto-configuration for the {@link EndpointsConfigurationProperties}.
  *
- * @param maxTransactionsPerMethod maximum number of transaction records to keep per method.
- * @param cleanupInterval          interval for clearing old transaction records.
- *
- * @since 26.01.2026
- * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
-@ConfigurationProperties(prefix = "axelix.sbs.transaction.monitoring")
-public record TransactionMonitoringConfigurationProperties(Integer maxTransactionsPerMethod, Duration cleanupInterval) {
+@AutoConfiguration
+public class EndpointsConfigurationPropertiesAutoConfiguration {
 
-    public TransactionMonitoringConfigurationProperties {
-        if (maxTransactionsPerMethod == null) {
-            maxTransactionsPerMethod = 30;
-        }
-
-        if (cleanupInterval == null) {
-            cleanupInterval = Duration.ofSeconds(5);
-        }
+    @Bean
+    @ConditionalOnMissingBean
+    @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+    public EndpointsConfigurationProperties endpointsConfigurationProperties() {
+        return new EndpointsConfigurationProperties();
     }
 }

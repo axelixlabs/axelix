@@ -15,34 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.config;
+package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import java.util.List;
-
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 
 /**
- * Configuration properties that apply across different endpoints.
+ * Auto-configuration for the {@link EndpointsConfigurationProperties}.
  *
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-@ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
-public class EndpointsConfigurationProperties {
+@AutoConfiguration
+public class EndpointsConfigurationPropertiesAutoConfiguration {
 
-    public static final List<String> SANITIZE_ALL = List.of("*");
-
-    /**
-     * List of properties whose values needs to be sanitized before being returned.
-     * Single value of {@code "*"} means all properties must be sanitized.
-     */
-    private List<String> sanitizedProperties = List.of();
-
-    public List<String> getSanitizedProperties() {
-        return sanitizedProperties;
-    }
-
-    public EndpointsConfigurationProperties setSanitizedProperties(List<String> sanitizedProperties) {
-        this.sanitizedProperties = sanitizedProperties;
-        return this;
+    @Bean
+    @ConditionalOnMissingBean
+    @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+    public EndpointsConfigurationProperties endpointsConfigurationProperties() {
+        return new EndpointsConfigurationProperties();
     }
 }

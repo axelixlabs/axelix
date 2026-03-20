@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.config;
 
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.utils.Assert;
 
 /**
  * Configuration properties related to auth.
@@ -25,12 +26,18 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
  * @author Mikhail Polivakha
  */
 @SuppressWarnings("NullAway.Init")
-public class AuthProperties {
+public class AuthProperties implements Validateable {
 
     /**
      * JWT related configuration
      */
     private Jwt jwt = new Jwt();
+
+    @Override
+    public void validate() throws IllegalArgumentException {
+        Assert.notNull(jwt.getAlgorithm(), "The algorithm for the JWS cannot be null");
+        Assert.notNull(jwt.getSigningKey(), "The singing key for the JWS cannot be null");
+    }
 
     public static class Jwt {
 

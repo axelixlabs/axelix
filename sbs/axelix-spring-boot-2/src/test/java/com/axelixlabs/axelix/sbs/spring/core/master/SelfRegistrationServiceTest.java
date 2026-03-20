@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -64,7 +65,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.sbs.discovery.instance-name=testApp",
             "axelix.sbs.discovery.instance-url=http://localhost:8089/"
         })
-@EnableConfigurationProperties({SelfRegistrationConfigurationProperties.class, WebEndpointProperties.class})
+@EnableConfigurationProperties(WebEndpointProperties.class)
 class SelfRegistrationServiceTest {
 
     private static MockWebServer mockWebServer;
@@ -74,6 +75,12 @@ class SelfRegistrationServiceTest {
 
     @TestConfiguration
     static class SelfRegistrationServiceTestConfiguration {
+
+        @Bean
+        @ConfigurationProperties(prefix = "axelix.sbs.discovery")
+        public SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties() {
+            return new SelfRegistrationConfigurationProperties();
+        }
 
         @Bean
         public SelfRegistrationService selfRegistrationService(
@@ -87,6 +94,7 @@ class SelfRegistrationServiceTest {
                 ServiceMetadataAssembler serviceMetadataAssembler,
                 SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
                 WebEndpointProperties webEndpointProperties) {
+
             return new DefaultSelfRegistrationMetadataAssembler(
                     serviceMetadataAssembler,
                     selfRegistrationConfigurationProperties,

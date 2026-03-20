@@ -48,7 +48,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(AxelixConfigurationsPropertiesEndpointAutoConfiguration.class))
+            .withConfiguration(AutoConfigurations.of(
+                    AxelixConfigurationsPropertiesEndpointAutoConfiguration.class,
+                    EndpointsConfigurationPropertiesAutoConfiguration.class))
             .withPropertyValues("management.endpoints.web.exposure.include=axelix-configprops");
 
     @Test

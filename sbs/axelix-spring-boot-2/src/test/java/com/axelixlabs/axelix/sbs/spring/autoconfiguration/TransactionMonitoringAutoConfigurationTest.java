@@ -87,37 +87,6 @@ class TransactionMonitoringAutoConfigurationTest {
     }
 
     @Test
-    void shouldFailure_handleInvalidMaxTransactionsPerMethod() {
-        new ApplicationContextRunner()
-                .withPropertyValues(
-                        "management.endpoints.web.exposure.include=axelix-transactions-monitoring",
-                        "axelix.sbs.transaction.monitoring.max-transactions-per-method=0",
-                        "axelix.sbs.transaction.monitoring.cleanup-interval=PT5S")
-                .withConfiguration(AutoConfigurations.of(TransactionMonitoringAutoConfiguration.class))
-                .run(context -> {
-                    assertThat(context).hasFailed();
-                    assertThat(context.getStartupFailure()).isNotNull();
-                    assertThat(context.getStartupFailure().getMessage())
-                            .contains("maxTransactionsPerMethod must be positive");
-                });
-    }
-
-    @Test
-    void shouldFailure_HandleInvalidCleanupInterval() {
-        new ApplicationContextRunner()
-                .withPropertyValues(
-                        "management.endpoints.web.exposure.include=axelix-transactions-monitoring",
-                        "axelix.sbs.transaction.monitoring.max-transactions-per-method=10",
-                        "axelix.sbs.transaction.monitoring.cleanup-interval=PT0S")
-                .withConfiguration(AutoConfigurations.of(TransactionMonitoringAutoConfiguration.class))
-                .run(context -> {
-                    assertThat(context).hasFailed();
-                    assertThat(context.getStartupFailure()).isNotNull();
-                    assertThat(context.getStartupFailure().getMessage()).contains("cleanupInterval must be positive");
-                });
-    }
-
-    @Test
     void shouldHandleMultipleCustomBeans() {
         contextRunner
                 .withUserConfiguration(

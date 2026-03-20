@@ -17,12 +17,15 @@
  */
 package com.axelixlabs.axelix.common.utils;
 
+import java.util.function.Supplier;
+
 import org.jspecify.annotations.Nullable;
 
 /**
  * Assertions
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public class Assert {
 
@@ -34,5 +37,22 @@ public class Assert {
 
     public static void notNull(@Nullable Object object) {
         notNull(object, "The argument is supposed to be not null");
+    }
+
+    public static void isTrue(boolean expression, String message) {
+        if (!expression) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    public static void isTrue(boolean expression, Supplier<String> messageSupplier) {
+        if (!expression) {
+            throw new IllegalArgumentException(nullSafeGet(messageSupplier));
+        }
+    }
+
+    @Nullable
+    private static String nullSafeGet(@Nullable Supplier<String> messageSupplier) {
+        return (messageSupplier != null ? messageSupplier.get() : null);
     }
 }

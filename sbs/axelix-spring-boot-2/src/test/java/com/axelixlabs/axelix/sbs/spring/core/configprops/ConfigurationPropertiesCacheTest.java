@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
@@ -46,7 +46,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableConfigurationProperties(EndpointsConfigurationProperties.class)
 public class ConfigurationPropertiesCacheTest {
 
     @Autowired
@@ -73,6 +72,12 @@ public class ConfigurationPropertiesCacheTest {
 
     @TestConfiguration
     static class ConfigurationPropertiesCacheTestConfiguration {
+
+        @Bean
+        @ConfigurationProperties(prefix = "axelix.sbs.endpoints.config")
+        public EndpointsConfigurationProperties endpointsConfigurationProperties() {
+            return new EndpointsConfigurationProperties();
+        }
 
         @Bean
         public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
