@@ -17,6 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -26,6 +29,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationService;
@@ -64,7 +68,12 @@ public class SelfRegistrationAutoConfiguration {
     @ConditionalOnMissingBean
     public SelfRegistrationService selfRegistrationService(
             SelfRegistrationConfigurationProperties properties,
+            ObjectMapper objectMapper,
             SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler) {
-        return new SelfRegistrationService(properties, selfRegistrationMetadataAssembler);
+        return new SelfRegistrationService(
+                new SLF4JLogger(LoggerFactory.getLogger(SelfRegistrationService.class)),
+                objectMapper::writeValueAsString,
+                properties,
+                selfRegistrationMetadataAssembler);
     }
 }

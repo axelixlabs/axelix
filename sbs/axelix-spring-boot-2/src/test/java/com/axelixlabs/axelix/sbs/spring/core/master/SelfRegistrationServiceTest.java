@@ -21,12 +21,14 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
@@ -42,6 +44,7 @@ import org.springframework.test.context.TestPropertySource;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -85,8 +88,13 @@ class SelfRegistrationServiceTest {
         @Bean
         public SelfRegistrationService selfRegistrationService(
                 SelfRegistrationConfigurationProperties properties,
+                ObjectMapper objectMapper,
                 SelfRegistrationMetadataAssembler metadataAssembler) {
-            return new SelfRegistrationService(properties, metadataAssembler);
+            return new SelfRegistrationService(
+                    new SLF4JLogger(LoggerFactory.getLogger(SelfRegistrationService.class)),
+                    objectMapper::writeValueAsString,
+                    properties,
+                    metadataAssembler);
         }
 
         @Bean
@@ -142,7 +150,7 @@ class SelfRegistrationServiceTest {
     void shouldRegisterOnApplicationEvent() throws Exception {
         mockWebServer.enqueue(new MockResponse().setResponseCode(204));
 
-        selfRegistrationService.onApplicationEvent(null);
+        selfRegistrationService.scheduleSelfRegistration();
 
         RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
         assertThat(request).isNotNull();
@@ -159,7 +167,7 @@ class SelfRegistrationServiceTest {
     void shouldHandleRejectedRegistration() throws Exception {
         mockWebServer.enqueue(new MockResponse().setResponseCode(400));
 
-        selfRegistrationService.onApplicationEvent(null);
+        selfRegistrationService.scheduleSelfRegistration();
 
         RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
         assertThat(request).isNotNull();
@@ -170,7 +178,7 @@ class SelfRegistrationServiceTest {
     void shouldHandleServerError() throws Exception {
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
 
-        selfRegistrationService.onApplicationEvent(null);
+        selfRegistrationService.scheduleSelfRegistration();
 
         RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
         assertThat(request).isNotNull();
@@ -181,7 +189,7 @@ class SelfRegistrationServiceTest {
     void shouldHandleTimeout() throws Exception {
         mockWebServer.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
 
-        selfRegistrationService.onApplicationEvent(null);
+        selfRegistrationService.scheduleSelfRegistration();
 
         RecordedRequest request = mockWebServer.takeRequest(1, TimeUnit.SECONDS);
         assertThat(request).isNotNull();

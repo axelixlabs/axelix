@@ -15,18 +15,33 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations;
+package com.axelixlabs.axelix.sbs.spring.core.log;
 
-import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Implementations of this interface are capable to discover specific.
+ * Port interface (from Ports-And-Adapters) for the abstract logger. This interface is here to abstract away
+ * different versions of SLF4J that may be used in different version of the Spring Boot.
+ * <p>
+ * We need this port since, again, Spring Boot 4 may (and it does AFAIR) use SLF4J 2, but Spring Boot 2 uses
+ * SLF4J 1. So we have to abstract it away.
  *
- * @since 05.07.25
  * @author Mikhail Polivakha
  */
-@Deprecated // I am not sure we need this abstraction
-public interface IntegrationComponentDiscoverer<T> {
+public interface Logger {
 
-    Set<T> discoverIntegrations();
+    /**
+     * Trace-log message
+     */
+    void trace(String message, @Nullable Object @Nullable ... args);
+
+    /**
+     * Info-log message
+     */
+    void info(String message, @Nullable Object @Nullable ... args);
+
+    /**
+     * Debug-log message
+     */
+    void debug(String message, @Nullable Object @Nullable ... args);
 }

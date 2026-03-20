@@ -15,18 +15,35 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.integrations;
+package com.axelixlabs.axelix.sbs.spring.core.log;
 
-import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Implementations of this interface are capable to discover specific.
+ * SLF4J implementation for {@link Logger}.
  *
- * @since 05.07.25
  * @author Mikhail Polivakha
  */
-@Deprecated // I am not sure we need this abstraction
-public interface IntegrationComponentDiscoverer<T> {
+public class SLF4JLogger implements Logger {
 
-    Set<T> discoverIntegrations();
+    private final org.slf4j.Logger delegate;
+
+    public SLF4JLogger(org.slf4j.Logger delegate) {
+        this.delegate = delegate;
+    }
+
+    @Override
+    public void trace(String message, @Nullable Object @Nullable ... args) {
+        delegate.trace(message, args);
+    }
+
+    @Override
+    public void info(String message, @Nullable Object @Nullable ... args) {
+        delegate.info(message, args);
+    }
+
+    @Override
+    public void debug(String message, @Nullable Object @Nullable ... args) {
+        delegate.debug(message, args);
+    }
 }

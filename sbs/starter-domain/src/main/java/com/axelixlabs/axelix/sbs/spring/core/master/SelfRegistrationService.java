@@ -17,56 +17,54 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
 
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
 import com.axelixlabs.axelix.common.domain.http.HttpHeader;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 
 /**
  * Self-registration service that automatically registers with master.
  *
  * @since 05.02.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public class SelfRegistrationService implements ApplicationListener<ApplicationReadyEvent>, DisposableBean {
-
-    private static final Logger log = LoggerFactory.getLogger(SelfRegistrationService.class);
+public class SelfRegistrationService implements Closeable {
 
     private final HttpClient httpClient;
-    private final ObjectMapper objectMapper;
+    private final JsonSerializationFunction serializationFunction;
     private final SelfRegistrationConfigurationProperties properties;
     private final SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler;
     private final ScheduledExecutorService executor;
+    private final Logger logger;
 
     public SelfRegistrationService(
+            Logger logger,
+            JsonSerializationFunction serializationFunction,
             SelfRegistrationConfigurationProperties properties,
             SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler) {
 
+        this.logger = logger;
         this.httpClient =
                 HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
         this.properties = properties;
-        this.objectMapper = new ObjectMapper();
+        this.serializationFunction = serializationFunction;
         this.selfRegistrationMetadataAssembler = selfRegistrationMetadataAssembler;
 
         this.executor = Executors.newSingleThreadScheduledExecutor(runnable -> {
@@ -76,15 +74,9 @@ public class SelfRegistrationService implements ApplicationListener<ApplicationR
         });
     }
 
-    @Override
-    public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-        register();
-
+    public void scheduleSelfRegistration() {
         executor.scheduleAtFixedRate(
-                this::register,
-                properties.getHeartbeatInterval().getSeconds(),
-                properties.getHeartbeatInterval().getSeconds(),
-                TimeUnit.SECONDS);
+                this::register, 0L, properties.getHeartbeatInterval().getSeconds(), TimeUnit.SECONDS);
     }
 
     private void register() {
@@ -95,24 +87,21 @@ public class SelfRegistrationService implements ApplicationListener<ApplicationR
 
             int statusCode = response.statusCode();
             if (statusCode >= 200 && statusCode < 300) {
-                log.trace("Heartbeat successful. Master URL: {}", properties.getMasterUrl());
+                logger.trace("Heartbeat successful. Master URL: {}", properties.getMasterUrl());
             } else {
-                log.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
+                logger.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
             }
         } catch (IOException | InterruptedException e) {
-            log.info("Error sending registration request or heartbeat to master: {}", e.getMessage());
+            logger.info("Error sending registration request or heartbeat to master: {}", e.getMessage());
         }
     }
 
     private HttpResponse<Void> sendRequest(@NonNull SelfRegistrationMetadata selfRegistrationMetadata, String url)
             throws IOException, InterruptedException {
-        HttpPayload payload = HttpPayload.json(serializeToJson(selfRegistrationMetadata));
+        HttpPayload payload = HttpPayload.json(
+                serializationFunction.serialize(selfRegistrationMetadata).getBytes(StandardCharsets.UTF_8));
         HttpRequest request = buildHttpRequest(url, payload);
         return httpClient.send(request, HttpResponse.BodyHandlers.discarding());
-    }
-
-    private byte[] serializeToJson(SelfRegistrationMetadata metadata) throws JsonProcessingException {
-        return objectMapper.writeValueAsBytes(metadata);
     }
 
     private HttpRequest buildHttpRequest(String url, HttpPayload httpPayload) {
@@ -133,7 +122,7 @@ public class SelfRegistrationService implements ApplicationListener<ApplicationR
     }
 
     @Override
-    public void destroy() {
+    public void close() {
         executor.shutdown();
         try {
             if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
