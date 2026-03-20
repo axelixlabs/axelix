@@ -17,7 +17,13 @@
  */
 import type { TFunction } from "i18next";
 
-import { getAllJavaVersions, getAllSpringBootVersions, semVerMatch } from "helpers";
+import {
+    getAllJavaVersions,
+    getAllKotlinVersions,
+    getAllSpringBootVersions,
+    getAllSpringFrameworkVersions,
+    semVerMatch,
+} from "helpers";
 import {
     EWallboardFilterKey,
     EWallboardFilterOperator,
@@ -55,6 +61,26 @@ export const getWallboardFilterDefinitions = (
                 getAllSpringBootVersions(instances).map((version) => ({ value: version, label: version })),
             match: (instance, filter) => semVerMatch(instance.springBootVersion, filter),
         },
+
+        [EWallboardFilterKey.SPRING_FRAMEWORK]: {
+            operatorOptions: getOperators(t),
+            getOperandsOptions: (instances) =>
+                getAllSpringFrameworkVersions(instances).map((version) => ({ value: version, label: version })),
+            match: (instance, filter) => semVerMatch(instance.springFrameworkVersion, filter),
+        },
+
+        [EWallboardFilterKey.KOTLIN]: {
+            operatorOptions: getOperators(t),
+            getOperandsOptions: (instances) =>
+                getAllKotlinVersions(instances).map((version) => ({ value: version, label: version })),
+            match: (instance, filter) => {
+                if (instance.kotlinVersion) {
+                    return semVerMatch(instance.kotlinVersion, filter);
+                } else {
+                    return false;
+                }
+            },
+        },
     };
 };
 
@@ -70,6 +96,10 @@ export const mapSoftwareComponentToFilterKey = (name: string): EWallboardFilterK
             return EWallboardFilterKey.SPRING_BOOT;
         case "Java":
             return EWallboardFilterKey.JAVA;
+        case "SpringFramework":
+            return EWallboardFilterKey.SPRING_FRAMEWORK;
+        case "Kotlin":
+            return EWallboardFilterKey.KOTLIN;
         default:
             return;
     }

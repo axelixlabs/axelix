@@ -48,6 +48,32 @@ export const getAllSpringBootVersions = (instances: IInstanceCard[]): string[] =
     return Array.from(allVersions);
 };
 
+export const getAllSpringFrameworkVersions = (instances: IInstanceCard[]): string[] => {
+    const allVersions = new Set<string>();
+
+    instances.forEach((instance) => {
+        const [major, minor] = instance.springFrameworkVersion.split(".");
+        allVersions.add(`${major}.${minor}`);
+    });
+
+    return Array.from(allVersions);
+};
+
+export const getAllKotlinVersions = (instances: IInstanceCard[]): string[] => {
+    const allVersions = new Set<string>();
+
+    instances.forEach((instance) => {
+        if (!instance.kotlinVersion) {
+            return;
+        }
+
+        const [major, minor] = instance.kotlinVersion.split(".");
+        allVersions.add(`${major}.${minor}`);
+    });
+
+    return Array.from(allVersions);
+};
+
 const parseVersion = (version: string): number[] => {
     return version.split(".").map(Number);
 };
@@ -144,7 +170,7 @@ export const filterWallboardInstances = (
     const normalizedQuery = searchQuery.toLowerCase().trim();
 
     return instances
-        .filter((value) => value.name.toLowerCase().includes(normalizedQuery.toLowerCase()))
+        .filter(({ name }) => name.toLowerCase().includes(normalizedQuery))
         .filter((instance) =>
             Object.values(filters).every((filter) => {
                 const definition = getWallboardFilterDefinitions(t)[filter.key];
