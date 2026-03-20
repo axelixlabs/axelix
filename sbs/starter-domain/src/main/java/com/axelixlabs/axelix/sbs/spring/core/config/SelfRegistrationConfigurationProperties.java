@@ -34,7 +34,7 @@ import com.axelixlabs.axelix.common.utils.Assert;
  * @author Cherkasov Sergey
  */
 @SuppressWarnings("NullAway.Init")
-public class SelfRegistrationConfigurationProperties {
+public class SelfRegistrationConfigurationProperties implements Validateable {
 
     /**
      * The URL of the master that the service must connect to.
@@ -99,6 +99,7 @@ public class SelfRegistrationConfigurationProperties {
         return this;
     }
 
+    @Override
     public void validate() {
         validateRequiredProperty(masterUrl, "axelix.sbs.discovery.master-url");
         validateRequiredProperty(instanceUrl, "axelix.sbs.discovery.instance-url");

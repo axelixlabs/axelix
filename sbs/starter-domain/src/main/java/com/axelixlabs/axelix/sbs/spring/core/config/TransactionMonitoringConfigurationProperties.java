@@ -20,14 +20,17 @@ package com.axelixlabs.axelix.sbs.spring.core.config;
 import java.time.Duration;
 import java.util.Objects;
 
+import com.axelixlabs.axelix.common.utils.Assert;
+
 /**
  * Configuration properties for transaction monitoring feature.
  *
  * @since 26.01.2026
  * @author Nikita Kirillov
  * @author Cherkasov Sergey
+ * @author Mikhail Polivakha
  */
-public class TransactionMonitoringConfigurationProperties {
+public class TransactionMonitoringConfigurationProperties implements Validateable {
 
     /**
      * Maximum number of transaction records to keep per method.
@@ -85,5 +88,11 @@ public class TransactionMonitoringConfigurationProperties {
         return "TransactionMonitoringConfigurationProperties{" + "maxTransactionsPerMethod="
                 + maxTransactionsPerMethod + ", cleanupInterval="
                 + cleanupInterval + '}';
+    }
+
+    @Override
+    public void validate() throws IllegalArgumentException {
+        Assert.isTrue(maxTransactionsPerMethod > 0, "maxTransactionsPerMethod must be positive");
+        Assert.isTrue(cleanupInterval.toMillis() > 0, "cleanupInterval must be positive");
     }
 }

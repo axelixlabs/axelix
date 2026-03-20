@@ -55,7 +55,6 @@ public class SelfRegistrationAutoConfiguration {
             ServiceMetadataAssembler serviceMetadataAssembler,
             SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
             WebEndpointProperties webEndpointProperties) {
-        selfRegistrationConfigurationProperties.validate();
         return new DefaultSelfRegistrationMetadataAssembler(
                 serviceMetadataAssembler, selfRegistrationConfigurationProperties, webEndpointProperties.getBasePath());
     }
@@ -64,8 +63,7 @@ public class SelfRegistrationAutoConfiguration {
     @ConditionalOnMissingBean
     public SelfRegistrationService selfRegistrationService(
             SelfRegistrationConfigurationProperties properties,
-            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler,
-            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
+            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler) {
         return new SelfRegistrationService(properties, selfRegistrationMetadataAssembler);
     }
 }

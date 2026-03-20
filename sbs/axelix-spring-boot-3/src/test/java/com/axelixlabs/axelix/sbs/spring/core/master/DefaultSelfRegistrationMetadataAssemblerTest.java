@@ -81,7 +81,7 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
                 ServiceMetadataAssembler serviceMetadataAssembler,
                 SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
                 WebEndpointProperties webEndpointProperties) {
-            selfRegistrationConfigurationProperties.validate();
+
             return new DefaultSelfRegistrationMetadataAssembler(
                     serviceMetadataAssembler,
                     selfRegistrationConfigurationProperties,

@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
  */
 @AutoConfiguration
 @ConditionalOnClass(WebEndpointProperties.class)
-@ConditionalOnProperty(value = "axelix.sbs.discovery.auto", havingValue = "true")
+@ConditionalOnProperty(prefix = "axelix.sbs.discovery", value = "auto", havingValue = "true")
 public class SelfRegistrationAutoConfiguration {
 
     @Bean
@@ -56,8 +56,6 @@ public class SelfRegistrationAutoConfiguration {
             SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
             WebEndpointProperties webEndpointProperties) {
 
-        selfRegistrationConfigurationProperties.validate();
-
         return new DefaultSelfRegistrationMetadataAssembler(
                 serviceMetadataAssembler, selfRegistrationConfigurationProperties, webEndpointProperties.getBasePath());
     }
@@ -66,8 +64,7 @@ public class SelfRegistrationAutoConfiguration {
     @ConditionalOnMissingBean
     public SelfRegistrationService selfRegistrationService(
             SelfRegistrationConfigurationProperties properties,
-            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler,
-            SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
+            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler) {
         return new SelfRegistrationService(properties, selfRegistrationMetadataAssembler);
     }
 }
