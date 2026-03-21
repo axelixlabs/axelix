@@ -20,6 +20,8 @@ package com.axelixlabs.axelix.common.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscoverer;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.DecodedUser;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
+import com.axelixlabs.axelix.common.auth.core.GlobalAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -43,85 +43,81 @@ class DefaultAuthorizerTest {
     @Test
     void shouldAuthorize_UserHasRequiredAuthorities() {
         Role role = new DefaultRole(
-                "testRole", Set.of(ExternalAuthority.BEANS, ExternalAuthority.HEALTH), Collections.emptySet());
+                "testRole", Set.of(GlobalAuthority.BEANS, GlobalAuthority.HEALTH), Collections.emptySet());
         DecodedUser user = new DecodedUser("testUser", Set.of(role));
 
-        AuthorizationRequest request = new AuthorizationRequest(Set.of(ExternalAuthority.HEALTH));
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.HEALTH));
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
 
     @Test
     void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole() {
-        Role role1 =
-                new DefaultRole("firstTestRole", Set.of(ExternalAuthority.CACHE_DISPATCHER), Collections.emptySet());
+        Role role1 = new DefaultRole("firstTestRole", Set.of(GlobalAuthority.CACHE_DISPATCHER), Collections.emptySet());
         Role role2 =
-                new DefaultRole("secondTestRole", Set.of(ExternalAuthority.PROFILE_MANAGEMENT), Collections.emptySet());
+                new DefaultRole("secondTestRole", Set.of(GlobalAuthority.PROFILE_MANAGEMENT), Collections.emptySet());
         DecodedUser user = new DecodedUser("testUser", Set.of(role1, role2));
 
         assertThatNoException()
                 .isThrownBy(() -> authorizer.authorize(
-                        user, new AuthorizationRequest(Set.of(ExternalAuthority.PROFILE_MANAGEMENT))));
+                        user, new AuthorizationRequest(Set.of(GlobalAuthority.PROFILE_MANAGEMENT))));
 
         assertThatNoException()
-                .isThrownBy(() -> authorizer.authorize(
-                        user, new AuthorizationRequest(Set.of(ExternalAuthority.CACHE_DISPATCHER))));
+                .isThrownBy(() ->
+                        authorizer.authorize(user, new AuthorizationRequest(Set.of(GlobalAuthority.CACHE_DISPATCHER))));
     }
 
     @Test
     void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInInnerRole() {
-        Role innerRole1 =
-                new DefaultRole("firstInnerTestRole", Set.of(ExternalAuthority.PROPERTY_MANAGEMENT), Set.of());
+        Role innerRole1 = new DefaultRole("firstInnerTestRole", Set.of(GlobalAuthority.PROPERTY_MANAGEMENT), Set.of());
         Role role1 = new DefaultRole("firstTestRole", null, Set.of(innerRole1));
 
-        Role innerRole2 =
-                new DefaultRole("secondInnerTestRole", Set.of(ExternalAuthority.PROFILE_MANAGEMENT), Set.of());
+        Role innerRole2 = new DefaultRole("secondInnerTestRole", Set.of(GlobalAuthority.PROFILE_MANAGEMENT), Set.of());
         Role role2 = new DefaultRole("secondTestRole", null, Set.of(innerRole2));
 
         DecodedUser user = new DecodedUser("testUser", Set.of(role1, role2));
 
         assertThatNoException()
                 .isThrownBy(() -> authorizer.authorize(
-                        user, new AuthorizationRequest(Set.of(ExternalAuthority.PROPERTY_MANAGEMENT))));
+                        user, new AuthorizationRequest(Set.of(GlobalAuthority.PROPERTY_MANAGEMENT))));
 
         assertThatNoException()
                 .isThrownBy(() -> authorizer.authorize(
-                        user, new AuthorizationRequest(Set.of(ExternalAuthority.PROFILE_MANAGEMENT))));
+                        user, new AuthorizationRequest(Set.of(GlobalAuthority.PROFILE_MANAGEMENT))));
     }
 
     @Test
     void shouldAuthorize_UserWithEmptyAndValidRole_WhenValidRoleHasRequiredAuthority() {
         Role emptyRole = new DefaultRole("emptyRole", Set.of(), Collections.emptySet());
-        Role role = new DefaultRole("testRole", Set.of(ExternalAuthority.HEALTH), Collections.emptySet());
+        Role role = new DefaultRole("testRole", Set.of(GlobalAuthority.HEALTH), Collections.emptySet());
         DecodedUser user = new DecodedUser("testUser", Set.of(emptyRole, role));
 
-        AuthorizationRequest request = new AuthorizationRequest(Set.of(ExternalAuthority.HEALTH));
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.HEALTH));
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
 
     @Test
     void shouldThrowAuthorizationException_UserWithoutRequiredAuthorities() {
-        Role role = new DefaultRole("testRole", Set.of(ExternalAuthority.BEANS), Set.of());
+        Role role = new DefaultRole("testRole", Set.of(GlobalAuthority.BEANS), Set.of());
         DecodedUser user = new DecodedUser("testUser", Set.of(role));
 
-        AuthorizationRequest request = new AuthorizationRequest(Set.of(ExternalAuthority.METRICS));
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.METRICS));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request))
                 .isInstanceOf(AuthorizationException.class)
-                .hasMessageContaining(
-                        "Access denied: missing required authorities " + Set.of(ExternalAuthority.METRICS));
+                .hasMessageContaining("Access denied: missing required authorities " + Set.of(GlobalAuthority.METRICS));
     }
 
     @Test
     void shouldThrowAuthorizationException_WhenUserHasNoAuthoritiesAndRequestRequiresThem() {
         DecodedUser user = new DecodedUser("testUserWithEmptyAuthorities", Set.of());
 
-        AuthorizationRequest request = new AuthorizationRequest(Set.of(ExternalAuthority.CACHE_DISPATCHER));
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.CACHE_DISPATCHER));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request))
                 .isInstanceOf(AuthorizationException.class)
                 .hasMessageContaining(
-                        "Access denied: missing required authorities " + Set.of(ExternalAuthority.CACHE_DISPATCHER));
+                        "Access denied: missing required authorities " + Set.of(GlobalAuthority.CACHE_DISPATCHER));
     }
 }

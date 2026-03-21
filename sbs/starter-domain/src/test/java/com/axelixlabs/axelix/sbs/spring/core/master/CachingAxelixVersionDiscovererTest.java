@@ -23,7 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;

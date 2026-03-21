@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.test.context.jdbc.Sql;
 
-import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
+import com.axelixlabs.axelix.common.auth.core.GlobalAuthority;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
@@ -69,9 +69,8 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
                 .filteredOn(role -> role.getName().equals("ROLE_ADMIN"))
                 .hasSize(1)
                 .first()
-                .satisfies(role -> assertThat(role.getAuthorities())
-                        .hasSize(1)
-                        .containsOnly(ExternalAuthority.PROFILE_MANAGEMENT));
+                .satisfies(role ->
+                        assertThat(role.getAuthorities()).hasSize(1).containsOnly(GlobalAuthority.PROFILE_MANAGEMENT));
 
         // ROLE_ADMIN -> ROLE_ENGINEER, ROLE_CACHE_DISPATCHER
         Role adminRole = user.getRoles().iterator().next();
@@ -91,14 +90,14 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(engineerRole.getAuthorities()).hasSize(1).containsOnly(ExternalAuthority.ENV);
+        assertThat(engineerRole.getAuthorities()).hasSize(1).containsOnly(GlobalAuthority.ENV);
 
         // ROLE_ADMIN -> ROLE_ENGINEER -> ROLE_USER
         assertThat(engineerRole.getComponents())
                 .filteredOn(role -> role.getName().equals("ROLE_USER"))
                 .hasSize(1)
                 .first()
-                .satisfies(role -> assertThat(role.getAuthorities()).hasSize(1).containsOnly(ExternalAuthority.INFO))
+                .satisfies(role -> assertThat(role.getAuthorities()).hasSize(1).containsOnly(GlobalAuthority.INFO))
                 .satisfies(role -> assertThat(role.getComponents()).isEmpty());
 
         // ROLE_ADMIN -> ROLE_CACHE_DISPATCHER
@@ -107,14 +106,14 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(cacheDispatcherRole.getAuthorities()).hasSize(1).containsOnly(ExternalAuthority.CACHE_DISPATCHER);
+        assertThat(cacheDispatcherRole.getAuthorities()).hasSize(1).containsOnly(GlobalAuthority.CACHE_DISPATCHER);
 
         // ROLE_ADMIN -> ROLE_CACHE_DISPATCHER -> ROLE_CACHE_ACCESS
         assertThat(cacheDispatcherRole.getComponents())
                 .filteredOn(role -> role.getName().equals("ROLE_CACHE_ACCESS"))
                 .hasSize(1)
                 .first()
-                .satisfies(role -> assertThat(role.getAuthorities()).hasSize(1).containsOnly(ExternalAuthority.CACHES))
+                .satisfies(role -> assertThat(role.getAuthorities()).hasSize(1).containsOnly(GlobalAuthority.CACHES))
                 .satisfies(role -> assertThat(role.getComponents()).isEmpty());
     }
 
@@ -128,7 +127,7 @@ class JdbcUserProviderTestcontainersTest extends BaseTestcontainersIntegrationTe
                 .hasSize(1)
                 .filteredOn(role -> role.getName().equals("ROLE_BEANS_ACCESS"))
                 .first()
-                .satisfies(role -> assertThat(role.getAuthorities()).containsOnly(ExternalAuthority.BEANS));
+                .satisfies(role -> assertThat(role.getAuthorities()).containsOnly(GlobalAuthority.BEANS));
     }
 
     @Test

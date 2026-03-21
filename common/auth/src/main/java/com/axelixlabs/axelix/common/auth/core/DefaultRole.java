@@ -35,7 +35,7 @@ public final class DefaultRole implements Role {
     private static final String ADMIN_ROLE_NAME = "ADMIN";
 
     public static final Role ADMIN = new DefaultRole(
-            ADMIN_ROLE_NAME, Arrays.stream(ExternalAuthority.values()).collect(Collectors.toSet()));
+            ADMIN_ROLE_NAME, Arrays.stream(GlobalAuthority.values()).collect(Collectors.toSet()));
 
     private final String name;
     private final Set<Authority> authorities;

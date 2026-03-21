@@ -37,6 +37,7 @@ import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
 import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
 import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
@@ -47,7 +48,6 @@ import com.axelixlabs.axelix.master.api.external.response.loggers.LoggerProfileR
 import com.axelixlabs.axelix.master.api.external.response.loggers.LoggersResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
-import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.convert.response.Converter;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;

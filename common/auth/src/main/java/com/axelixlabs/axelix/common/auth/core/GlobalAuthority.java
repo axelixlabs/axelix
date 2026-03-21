@@ -18,17 +18,14 @@
 package com.axelixlabs.axelix.common.auth.core;
 
 /**
- * Enumeration of authorities required for accessing specific front-end endpoints.
- *
- * <p>Each authority corresponds to a single Spring Boot Actuator endpoint or a custom extension.</p>
+ * Enumeration of authorities supported by Axelix.
  *
  * @see Authority
  * @since 28.07.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-// TODO: Move this class to Master
-public enum ExternalAuthority implements Authority {
+public enum GlobalAuthority implements Authority {
 
     /**
      * Grants access to actuator cache control operations.

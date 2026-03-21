@@ -39,7 +39,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
-import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
+import com.axelixlabs.axelix.common.auth.core.GlobalAuthority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
@@ -87,8 +87,8 @@ class DefaultJwtEncoderServiceTest {
 
     @Test
     void shouldGenerateValidJwtToken() {
-        Role role = new DefaultRole(
-                "testRole", Set.of(ExternalAuthority.ENV, ExternalAuthority.BEANS), Collections.emptySet());
+        Role role =
+                new DefaultRole("testRole", Set.of(GlobalAuthority.ENV, GlobalAuthority.BEANS), Collections.emptySet());
         User user = new DefaultUser("testUser", "testPassword", Set.of(role));
 
         String token = jwtEncoderService.generateToken(user);
@@ -115,8 +115,8 @@ class DefaultJwtEncoderServiceTest {
     @Test
     void shouldGenerateValidJwtTokenMultipleRoles() {
         Role role1 = new DefaultRole(
-                "firstTestRole", Set.of(ExternalAuthority.HEALTH, ExternalAuthority.INFO), Collections.emptySet());
-        Role role2 = new DefaultRole("secondTestRole", Set.of(ExternalAuthority.BEANS), Collections.emptySet());
+                "firstTestRole", Set.of(GlobalAuthority.HEALTH, GlobalAuthority.INFO), Collections.emptySet());
+        Role role2 = new DefaultRole("secondTestRole", Set.of(GlobalAuthority.BEANS), Collections.emptySet());
 
         User user = new DefaultUser("multiRoleUser", "testPassword", Set.of(role1, role2));
 
@@ -151,7 +151,7 @@ class DefaultJwtEncoderServiceTest {
     @Test
     void shouldGenerateValidJwtTokenWithRoleHierarchy() {
         Role adminRole = createAdminRoleHierarchy();
-        Role rootRole = new DefaultRole("rootRole", Set.of(ExternalAuthority.HEALTH), Set.of(adminRole));
+        Role rootRole = new DefaultRole("rootRole", Set.of(GlobalAuthority.HEALTH), Set.of(adminRole));
         User user = new DefaultUser("multiRoleUser", "testPassword", Set.of(rootRole));
 
         String token = jwtEncoderService.generateToken(user);
@@ -291,7 +291,7 @@ class DefaultJwtEncoderServiceTest {
         JwtAlgorithm algorithm = JwtAlgorithm.HMAC256;
         JwtEncoderService encoder = new DefaultJwtEncoderService(algorithm, hs256Key, lifespan);
 
-        Role role = new DefaultRole("role", Set.of(ExternalAuthority.HEALTH, ExternalAuthority.INFO), null);
+        Role role = new DefaultRole("role", Set.of(GlobalAuthority.HEALTH, GlobalAuthority.INFO), null);
         User user = new DefaultUser("hs256User", "testPassword", Set.of(role));
 
         String token = encoder.generateToken(user);
@@ -365,13 +365,13 @@ class DefaultJwtEncoderServiceTest {
 
     private Role createAdminRoleHierarchy() {
         Role cacheAccessRole =
-                new DefaultRole("cacheAccessRole", Set.of(ExternalAuthority.CACHES), Collections.emptySet());
+                new DefaultRole("cacheAccessRole", Set.of(GlobalAuthority.CACHES), Collections.emptySet());
         Role cacheDispatcherRole = new DefaultRole(
-                "cacheDispatcherRole", Set.of(ExternalAuthority.CACHE_DISPATCHER), Set.of(cacheAccessRole));
-        Role userRole = new DefaultRole("user", Set.of(ExternalAuthority.INFO), Collections.emptySet());
-        Role engineerRole = new DefaultRole("engineer", Set.of(ExternalAuthority.ENV), Set.of(userRole));
+                "cacheDispatcherRole", Set.of(GlobalAuthority.CACHE_DISPATCHER), Set.of(cacheAccessRole));
+        Role userRole = new DefaultRole("user", Set.of(GlobalAuthority.INFO), Collections.emptySet());
+        Role engineerRole = new DefaultRole("engineer", Set.of(GlobalAuthority.ENV), Set.of(userRole));
         return new DefaultRole(
-                "admin", Set.of(ExternalAuthority.PROFILE_MANAGEMENT), Set.of(engineerRole, cacheDispatcherRole));
+                "admin", Set.of(GlobalAuthority.PROFILE_MANAGEMENT), Set.of(engineerRole, cacheDispatcherRole));
     }
 
     private String getPayload(String token) {

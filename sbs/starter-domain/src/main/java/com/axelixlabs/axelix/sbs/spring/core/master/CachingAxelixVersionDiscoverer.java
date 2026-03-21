@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.common.utils.Lazy;
 
 /**

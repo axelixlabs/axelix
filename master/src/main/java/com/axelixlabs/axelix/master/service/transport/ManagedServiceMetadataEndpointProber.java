@@ -22,8 +22,8 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.master.domain.ActuatorEndpoint;
-import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 

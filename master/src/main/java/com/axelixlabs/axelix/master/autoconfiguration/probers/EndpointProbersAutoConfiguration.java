@@ -26,7 +26,7 @@ import com.axelixlabs.axelix.common.api.ProfileMutationResult;
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
 import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
 import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
-import com.axelixlabs.axelix.master.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;

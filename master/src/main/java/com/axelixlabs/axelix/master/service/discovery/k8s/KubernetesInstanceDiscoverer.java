@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
-import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
 import com.axelixlabs.axelix.master.service.discovery.AbstractInstancesDiscoverer;
