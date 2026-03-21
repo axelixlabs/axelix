@@ -174,7 +174,7 @@ public class DefaultEndpointInvokerTest {
     void invoke_shouldReturnEndpointInvocationException_OnUnknownActuatorEndpoint() {
         ThrowableAssert.ThrowingCallable callable = () -> endpointInvoker.invoke(
                 InstanceId.of(activeInstanceId),
-                new ActuatorEndpoint(new HttpUrl("other"), HttpMethod.POST),
+                ActuatorEndpoint.of("other", HttpMethod.POST),
                 NoHttpPayload.INSTANCE);
 
         assertThatThrownBy(callable).isInstanceOf(EndpointInvocationException.class);

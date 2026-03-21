@@ -23,11 +23,8 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpUrl;
 
 /**
- * Spring Actuator Endpoint.
+ * Representation of Axelix endpoint.
  *
- * @param httpMethod the HTTP method by which this actuator endpoint should be reached.
- * @param path the specific path template for this actuator endpoint, that follows the {@code /actuator}.
- *            For instance, for the beans endpoint, the path would be {@literal /axelix-beans}.
  * @author Mikhail Polivakha
  */
 @NullMarked
@@ -36,11 +33,17 @@ public class ActuatorEndpoint {
     private final HttpUrl path;
     private final HttpMethod httpMethod;
 
-    public ActuatorEndpoint(HttpUrl path, HttpMethod httpMethod) {
+    private ActuatorEndpoint(HttpUrl path, HttpMethod httpMethod) {
         this.path = path;
         this.httpMethod = httpMethod;
     }
 
+    /**
+     * @param httpMethod the HTTP method by which this actuator endpoint should be reached.
+     *
+     * @param path the specific path template for this actuator endpoint, that follows the {@code /actuator}.
+     *            For instance, for the beans endpoint, the path would be {@literal /axelix-beans}.
+     */
     public static ActuatorEndpoint of(String path, HttpMethod httpMethod) {
         HttpUrl httpUrl = new HttpUrl(path);
         return new ActuatorEndpoint(httpUrl, httpMethod);
