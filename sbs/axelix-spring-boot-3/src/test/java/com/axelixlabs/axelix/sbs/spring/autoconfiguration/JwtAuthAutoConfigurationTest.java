@@ -17,6 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import java.util.Optional;
+
+import com.axelixlabs.axelix.common.auth.core.Authority;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -31,7 +34,6 @@ import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.Authorizer;
-import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.SecurityManager;
@@ -159,7 +161,13 @@ class JwtAuthAutoConfigurationTest {
         }
     }
 
-    static class CustomAuthorityResolver extends DefaultAuthorityResolver {}
+    static class CustomAuthorityResolver implements AuthorityResolver {
+
+        @Override
+        public Optional<Authority> resolve(String path) {
+            return Optional.empty();
+        }
+    }
 
     static class CustomAuthorizer extends DefaultAuthorizer {}
 
