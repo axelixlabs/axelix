@@ -17,7 +17,7 @@
  */
 import accordionStyles from "components/Accordion/styles.module.css";
 import { type PropsWithChildren, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
 import styles from "./styles.module.css";
 

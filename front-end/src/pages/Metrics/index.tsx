@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { Accordion, EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterMetrics, findMetricsCount, metricsAutocompleteOptions } from "helpers";

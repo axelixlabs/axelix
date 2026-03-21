@@ -21,7 +21,7 @@ import { App, Button } from "antd";
 import type { AxiosError } from "axios";
 import { type MouseEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { TooltipWithCopy } from "components";
 import { extractErrorCode } from "helpers";

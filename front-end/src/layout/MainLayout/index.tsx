@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Layout } from "antd";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 
 import { AdminHeader } from "./AdminHeader";
 import { SiderMenu } from "./SiderMenu";

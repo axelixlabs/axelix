@@ -17,7 +17,7 @@
  */
 import { Badge, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import { EInstanceStatus, type IInstanceCard } from "models";
 

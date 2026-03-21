@@ -19,7 +19,7 @@ import { App, Button } from "antd";
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { extractErrorCode, fetchData, filterCacheManagers } from "helpers";

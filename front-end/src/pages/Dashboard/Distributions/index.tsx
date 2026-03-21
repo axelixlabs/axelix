@@ -17,7 +17,7 @@
  */
 import type { JSX } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Cell, Legend, Pie, PieChart, type PieLabelRenderProps, ResponsiveContainer, Tooltip } from "recharts";
 
 import {
@@ -124,7 +124,9 @@ export function Distributions({ distributions }: IProps) {
                                             labelLine={false}
                                             stroke={versions.length > 1 ? "#fff" : "none"}
                                             onClick={(entry, _index, e) => {
-                                                clickHandler(e, wallboardFilterComponent, entry.name);
+                                                if (entry.name !== undefined) {
+                                                    clickHandler(e, wallboardFilterComponent, entry.name);
+                                                }
                                             }}
                                         >
                                             {versions.map(({ versionColor }) => (

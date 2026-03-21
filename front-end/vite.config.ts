@@ -15,10 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import react from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 
 import * as path from "path";
-import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig, loadEnv } from "vite";
 import svgr from "vite-plugin-svgr";
 
@@ -29,10 +29,9 @@ export default defineConfig(() => {
 
     return {
         plugins: [
-            react({
-                babel: {
-                    plugins: ["babel-plugin-react-compiler"],
-                },
+            react(),
+            babel({
+                presets: [reactCompilerPreset()],
             }),
             svgr(),
         ],
@@ -43,32 +42,6 @@ export default defineConfig(() => {
                     target: apiTarget,
                     changeOrigin: true,
                     secure: false,
-                },
-            },
-        },
-        build: {
-            rollupOptions: {
-                plugins: [
-                    visualizer({
-                        filename: "dist/bundle-stats.html",
-                        title: "Bundle Visualizer",
-                        template: "treemap",
-                        open: false,
-                        gzipSize: true,
-                        brotliSize: true,
-                    }),
-                ],
-                output: {
-                    /* TODO: Vite/Rollup detected a circular dependency inside Recharts (modules re-exporting each other)
-                       If Recharts modules end up in different chunks, the build can brea
-                       So we forced all Recharts code into one chunk
-                       This is a temporary fix 
-                    */
-                    manualChunks(id) {
-                        if (id.includes("node_modules/recharts")) {
-                            return "recharts";
-                        }
-                    },
                 },
             },
         },

@@ -18,7 +18,7 @@
 import { App, Tabs, type TabsProps } from "antd";
 import { type MouseEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { fetchData, filterLoggerGroups, filterLoggers } from "helpers";

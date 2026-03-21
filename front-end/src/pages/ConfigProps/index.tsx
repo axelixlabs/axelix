@@ -18,7 +18,7 @@
 import { App } from "antd";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { EmptyHandler, HashNavigable, Loader, PageSearch } from "components";
 import { fetchData, filterConfigPropsBeans, getPropertiesCount } from "helpers";

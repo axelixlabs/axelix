@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { EditableValue } from "components";
 import { useAppDispatch } from "hooks";
