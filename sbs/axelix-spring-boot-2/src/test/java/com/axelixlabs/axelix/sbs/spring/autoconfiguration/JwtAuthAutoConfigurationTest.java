@@ -19,6 +19,15 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.Test;
+
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+
 import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.core.Authority;
@@ -28,14 +37,6 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.Authorizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.auth.SecurityManager;
-import org.junit.jupiter.api.Test;
-
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

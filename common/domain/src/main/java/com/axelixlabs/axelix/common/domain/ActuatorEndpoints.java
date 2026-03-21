@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.common.domain;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
@@ -108,8 +107,10 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint GET_ONE_LOGGER = endpoint("/axelix-loggers/{logger.name}", HttpMethod.GET);
     public static final ActuatorEndpoint GET_LOGGER_GROUP = endpoint("/axelix-loggers/{group.name}", HttpMethod.GET);
     public static final ActuatorEndpoint SET_ONE_LOGGER = endpoint("/axelix-loggers/{logger.name}", HttpMethod.POST);
-    public static final ActuatorEndpoint SET_FOR_LOGGER_GROUP = endpoint("/axelix-loggers/{group.name}", HttpMethod.POST);
-    public static final ActuatorEndpoint RESET_FOR_LOGGER = endpoint("/axelix-loggers/reset/{logger.name}", HttpMethod.POST);
+    public static final ActuatorEndpoint SET_FOR_LOGGER_GROUP =
+            endpoint("/axelix-loggers/{group.name}", HttpMethod.POST);
+    public static final ActuatorEndpoint RESET_FOR_LOGGER =
+            endpoint("/axelix-loggers/reset/{logger.name}", HttpMethod.POST);
 
     // Metadata
     public static final ActuatorEndpoint METADATA = endpoint("/axelix-metadata", HttpMethod.GET);
@@ -130,7 +131,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
             endpoint("/axelix-scheduled-tasks/modify/cron-expression", HttpMethod.POST);
     public static final ActuatorEndpoint MODIFY_INTERVAL_SCHEDULED_TASK =
             endpoint("/axelix-scheduled-tasks/modify/interval", HttpMethod.POST);
-    public static final ActuatorEndpoint ENABLE_SCHEDULED_TASK = endpoint("/axelix-scheduled-tasks/enable", HttpMethod.POST);
+    public static final ActuatorEndpoint ENABLE_SCHEDULED_TASK =
+            endpoint("/axelix-scheduled-tasks/enable", HttpMethod.POST);
     public static final ActuatorEndpoint DISABLE_SCHEDULED_TASK =
             endpoint("/axelix-scheduled-tasks/disable", HttpMethod.POST);
     public static final ActuatorEndpoint EXECUTE_SCHEDULED_TASK =
@@ -144,7 +146,8 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
             endpoint("/axelix-thread-dump/disable", HttpMethod.POST);
 
     // @Transaction monitoring
-    public static final ActuatorEndpoint TRANSACTION_STATS_GET = endpoint("/axelix-transactions-monitoring", HttpMethod.GET);
+    public static final ActuatorEndpoint TRANSACTION_STATS_GET =
+            endpoint("/axelix-transactions-monitoring", HttpMethod.GET);
     public static final ActuatorEndpoint TRANSACTION_STATS_CLEAR =
             endpoint("/axelix-transactions-monitoring", HttpMethod.DELETE);
 

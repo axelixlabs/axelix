@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.util.Optional;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -31,6 +30,7 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.JwtDecoderService;
+import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.Authorizer;

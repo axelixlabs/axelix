@@ -19,8 +19,8 @@ package com.axelixlabs.axelix.master.service.transport;
 
 import org.jspecify.annotations.NonNull;
 
-import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
+import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 

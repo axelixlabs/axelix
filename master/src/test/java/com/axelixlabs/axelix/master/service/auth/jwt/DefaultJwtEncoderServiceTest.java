@@ -87,8 +87,8 @@ class DefaultJwtEncoderServiceTest {
 
     @Test
     void shouldGenerateValidJwtToken() {
-        Role role = new DefaultRole(
-                "testRole", Set.of(GlobalAuthority.ENV, GlobalAuthority.BEANS), Collections.emptySet());
+        Role role =
+                new DefaultRole("testRole", Set.of(GlobalAuthority.ENV, GlobalAuthority.BEANS), Collections.emptySet());
         User user = new DefaultUser("testUser", "testPassword", Set.of(role));
 
         String token = jwtEncoderService.generateToken(user);

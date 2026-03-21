@@ -53,8 +53,7 @@ class DefaultAuthorizerTest {
 
     @Test
     void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole() {
-        Role role1 =
-                new DefaultRole("firstTestRole", Set.of(GlobalAuthority.CACHE_DISPATCHER), Collections.emptySet());
+        Role role1 = new DefaultRole("firstTestRole", Set.of(GlobalAuthority.CACHE_DISPATCHER), Collections.emptySet());
         Role role2 =
                 new DefaultRole("secondTestRole", Set.of(GlobalAuthority.PROFILE_MANAGEMENT), Collections.emptySet());
         DecodedUser user = new DecodedUser("testUser", Set.of(role1, role2));
@@ -64,18 +63,16 @@ class DefaultAuthorizerTest {
                         user, new AuthorizationRequest(Set.of(GlobalAuthority.PROFILE_MANAGEMENT))));
 
         assertThatNoException()
-                .isThrownBy(() -> authorizer.authorize(
-                        user, new AuthorizationRequest(Set.of(GlobalAuthority.CACHE_DISPATCHER))));
+                .isThrownBy(() ->
+                        authorizer.authorize(user, new AuthorizationRequest(Set.of(GlobalAuthority.CACHE_DISPATCHER))));
     }
 
     @Test
     void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInInnerRole() {
-        Role innerRole1 =
-                new DefaultRole("firstInnerTestRole", Set.of(GlobalAuthority.PROPERTY_MANAGEMENT), Set.of());
+        Role innerRole1 = new DefaultRole("firstInnerTestRole", Set.of(GlobalAuthority.PROPERTY_MANAGEMENT), Set.of());
         Role role1 = new DefaultRole("firstTestRole", null, Set.of(innerRole1));
 
-        Role innerRole2 =
-                new DefaultRole("secondInnerTestRole", Set.of(GlobalAuthority.PROFILE_MANAGEMENT), Set.of());
+        Role innerRole2 = new DefaultRole("secondInnerTestRole", Set.of(GlobalAuthority.PROFILE_MANAGEMENT), Set.of());
         Role role2 = new DefaultRole("secondTestRole", null, Set.of(innerRole2));
 
         DecodedUser user = new DecodedUser("testUser", Set.of(role1, role2));
@@ -109,8 +106,7 @@ class DefaultAuthorizerTest {
 
         assertThatThrownBy(() -> authorizer.authorize(user, request))
                 .isInstanceOf(AuthorizationException.class)
-                .hasMessageContaining(
-                        "Access denied: missing required authorities " + Set.of(GlobalAuthority.METRICS));
+                .hasMessageContaining("Access denied: missing required authorities " + Set.of(GlobalAuthority.METRICS));
     }
 
     @Test

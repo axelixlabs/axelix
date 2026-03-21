@@ -89,8 +89,7 @@ class DefaultJwtDecoderServiceTest {
                 .orElseThrow();
 
         assertThat(userRole.getAuthorities()).containsAll(Set.of(GlobalAuthority.ENV, GlobalAuthority.INFO));
-        assertThat(engineerRole.getAuthorities())
-                .containsAll(Set.of(GlobalAuthority.BEANS, GlobalAuthority.HEALTH));
+        assertThat(engineerRole.getAuthorities()).containsAll(Set.of(GlobalAuthority.BEANS, GlobalAuthority.HEALTH));
     }
 
     @Test
