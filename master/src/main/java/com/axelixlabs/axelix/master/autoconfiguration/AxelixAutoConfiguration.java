@@ -24,8 +24,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClient;
 
-import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.common.domain.PropertiesAxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.domain.version.PropertiesAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
 import com.axelixlabs.axelix.master.exception.ExceptionHandlingFilter;
 

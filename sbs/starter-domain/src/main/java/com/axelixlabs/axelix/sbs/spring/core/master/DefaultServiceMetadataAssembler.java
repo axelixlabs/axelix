@@ -25,7 +25,7 @@ import java.util.Optional;
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
-import com.axelixlabs.axelix.common.domain.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 
 /**
  * Default implementation of {@link ServiceMetadataAssembler}.

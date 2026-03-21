@@ -23,12 +23,12 @@ import java.util.Optional;
 import org.springframework.util.AntPathMatcher;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
+import com.axelixlabs.axelix.common.auth.core.GlobalAuthority;
 
 /**
  * Default implementation of {@link AuthorityResolver}.
  *
- * @see ExternalAuthority
+ * @see GlobalAuthority
  * @see AntPathMatcher
  * @since 29.07.2025
  * @author Nikita Kirillov
@@ -36,23 +36,23 @@ import com.axelixlabs.axelix.common.auth.core.ExternalAuthority;
 public class DefaultAuthorityResolver implements AuthorityResolver {
 
     private final Map<String, Authority> pathAuthoritiesMap = Map.ofEntries(
-            Map.entry("/actuator/axelix-beans", ExternalAuthority.BEANS),
-            Map.entry("/actuator/axelix-caches/**", ExternalAuthority.CACHES),
-            Map.entry("/actuator/cache-dispatcher/**", ExternalAuthority.CACHE_DISPATCHER),
-            Map.entry("/actuator/property-management/**", ExternalAuthority.PROPERTY_MANAGEMENT),
-            Map.entry("/actuator/profile-management/**", ExternalAuthority.PROFILE_MANAGEMENT),
-            Map.entry("/actuator/health/**", ExternalAuthority.HEALTH),
-            Map.entry("/actuator/info", ExternalAuthority.INFO),
-            Map.entry("/actuator/axelix-conditions", ExternalAuthority.CONDITIONS),
-            Map.entry("/actuator/axelix-configprops", ExternalAuthority.CONFIGPROPS),
-            Map.entry("/actuator/axelix-details", ExternalAuthority.DETAILS),
-            Map.entry("/actuator/axelix-env/**", ExternalAuthority.ENV),
-            Map.entry("/actuator/heapdump", ExternalAuthority.HEAP_DUMP),
-            Map.entry("/actuator/axelix-thread-dump/**", ExternalAuthority.THREAD_DUMP),
-            Map.entry("/actuator/axelix-metrics/**", ExternalAuthority.METRICS),
-            Map.entry("/actuator/loggers/**", ExternalAuthority.LOGGERS),
-            Map.entry("/actuator/mappings", ExternalAuthority.MAPPINGS),
-            Map.entry("/actuator/axelix-scheduled-tasks/**", ExternalAuthority.SCHEDULED_TASKS));
+            Map.entry("/actuator/axelix-beans", GlobalAuthority.BEANS),
+            Map.entry("/actuator/axelix-caches/**", GlobalAuthority.CACHES),
+            Map.entry("/actuator/cache-dispatcher/**", GlobalAuthority.CACHE_DISPATCHER),
+            Map.entry("/actuator/property-management/**", GlobalAuthority.PROPERTY_MANAGEMENT),
+            Map.entry("/actuator/profile-management/**", GlobalAuthority.PROFILE_MANAGEMENT),
+            Map.entry("/actuator/health/**", GlobalAuthority.HEALTH),
+            Map.entry("/actuator/info", GlobalAuthority.INFO),
+            Map.entry("/actuator/axelix-conditions", GlobalAuthority.CONDITIONS),
+            Map.entry("/actuator/axelix-configprops", GlobalAuthority.CONFIGPROPS),
+            Map.entry("/actuator/axelix-details", GlobalAuthority.DETAILS),
+            Map.entry("/actuator/axelix-env/**", GlobalAuthority.ENV),
+            Map.entry("/actuator/heapdump", GlobalAuthority.HEAP_DUMP),
+            Map.entry("/actuator/axelix-thread-dump/**", GlobalAuthority.THREAD_DUMP),
+            Map.entry("/actuator/axelix-metrics/**", GlobalAuthority.METRICS),
+            Map.entry("/actuator/loggers/**", GlobalAuthority.LOGGERS),
+            Map.entry("/actuator/mappings", GlobalAuthority.MAPPINGS),
+            Map.entry("/actuator/axelix-scheduled-tasks/**", GlobalAuthority.SCHEDULED_TASKS));
 
     private final AntPathMatcher matcher = new AntPathMatcher();
 
