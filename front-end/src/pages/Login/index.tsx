@@ -15,91 +15,32 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Alert, Button, Form, Input } from "antd";
-import type { AxiosError } from "axios";
-import { useState } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "components";
 
-import { extractErrorCode } from "helpers";
-import { EIgnoredErrors, type IErrorResponse, type ILoginSubmitRequestData, StatelessRequest } from "models";
-import { login } from "services";
-import { IS_AUTH } from "utils";
-
+import { LoginFooter } from "./LoginFooter";
+import { LoginForm } from "./LoginForm";
 import styles from "./styles.module.css";
 
+import { LoginLeftImage, LogoIcon } from "assets";
+
 const Login = () => {
-    const { t } = useTranslation();
-    const [loginData, setLoginData] = useState(StatelessRequest.inactive());
-
-    const onFinish = (values: ILoginSubmitRequestData): void => {
-        const { username, password } = values;
-
-        const loginResponseBody = {
-            username,
-            password,
-        };
-
-        setLoginData(StatelessRequest.loading());
-
-        login(loginResponseBody)
-            .then(() => {
-                setLoginData(StatelessRequest.success());
-                localStorage.setItem(IS_AUTH, "true");
-                window.location.href = "/";
-            })
-            .catch((error: AxiosError<IErrorResponse>) => {
-                setLoginData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
-            });
-    };
-
     return (
         <>
-            <div className={styles.LoginFormWrapper}>
-                <h1 className={`TextLarge ${styles.LoginTitle}`}>
-                    <Trans
-                        t={t}
-                        i18nKey={"Authentication.login"}
-                        components={{ green: <span className={styles.GreenLetter} /> }}
-                    />
-                </h1>
-                <Form layout="vertical" onFinish={onFinish} autoComplete="off">
-                    <Form.Item
-                        key="username"
-                        label={t("Authentication.username")}
-                        name="username"
-                        required={false}
-                        rules={[{ required: true, message: t("Authentication.enterUsername") }]}
-                    >
-                        <Input className={styles.LoginInput} />
-                    </Form.Item>
-                    <Form.Item
-                        key="password"
-                        label={t("Authentication.password")}
-                        name="password"
-                        required={false}
-                        rules={[{ required: true, message: t("Authentication.enterPassword") }]}
-                    >
-                        <Input.Password className={styles.LoginInput} />
-                    </Form.Item>
+            <div className={styles.MainWrapper}>
+                <div className={styles.LeftImageWrapper}>
+                    <img src={LoginLeftImage} alt="Login left image" className={styles.LeftImage} />
+                </div>
 
-                    {loginData.error === EIgnoredErrors.INVALID_CREDENTIALS && (
-                        <Alert
-                            title={t(`Error.codes.${loginData.error}`)}
-                            type="error"
-                            showIcon
-                            className={styles.ErrorAlert}
-                        />
-                    )}
+                <div className={styles.ContentWrapper}>
+                    <div className={styles.ContentHeaderWrapper}>
+                        <LogoIcon className={styles.Logo} />
+                        <LanguageSwitcher />
+                    </div>
 
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={loginData.loading}
-                        className={styles.SubmitButton}
-                    >
-                        {t("Authentication.loginButtonText")}
-                    </Button>
-                </Form>
+                    <LoginForm />
+
+                    <LoginFooter />
+                </div>
             </div>
         </>
     );

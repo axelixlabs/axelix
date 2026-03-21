@@ -11,6 +11,7 @@
     "off": "OFF",
     "documentation": "Documentation",
     "value": "Value",
+    "blog": "Blog",
     "Details": {
         "downloadState": "Download state",
         "exportConfigurationOptions": "List of state export components",
@@ -109,13 +110,14 @@
         "statistics": "Statistics"
     },
     "Authentication": {
-        "login": "Welcome to <green>A</green>xelix",
+        "welcome": "Welcome",
         "logout": "Logout",
         "username": "Username",
         "enterUsername": "Enter username",
         "password": "Password",
         "enterPassword": "Enter password",
-        "loginButtonText": "Sign In"
+        "loginButtonText": "Sign In",
+        "docs": "Docs"
     },
     "Conditions": {
         "negativeMatches": "Negative Matches",
@@ -205,8 +207,7 @@
         "licensing": "The core of the <0>Axelix</0> product is Open Source and is available under <1>LGPL 3.0</1>. The source code of the <0>Axelix</0> core is available over on <2>GitHub</2>.",
         "contact": "In case of any questions please consult the <0>Reference Guide</0>",
         "bug": "If you found a bug, want to propose a feature or submit a pull request, please, use the GitHub issue tracker. We're really glad to review your experience.",
-        "githubSource": "GitHub Source",
-        "blog": "Blog"
+        "githubSource": "GitHub Source"
     },
     "ThreadDump": {
         "id": "Thread id",

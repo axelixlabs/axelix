@@ -11,6 +11,7 @@
     "off": "ВЫКЛ",
     "documentation": "Документация",
     "value": "Значение",
+    "blog": "Блог",
     "Details": {
         "downloadState": "Выгрузить состояние",
         "exportConfigurationOptions": "Список компонентов состояния для экспорта",
@@ -109,13 +110,14 @@
         "statistics": "Статистика"
     },
     "Authentication": {
-        "login": "Добро пожаловать в <green>A</green>xelix",
+        "welcome": "Добро пожаловать",
         "logout": "Выйти",
         "username": "Имя пользователя",
         "enterUsername": "Введите имя пользователя",
         "password": "Пароль",
         "enterPassword": "Введите пароль",
-        "loginButtonText": "Войти"
+        "loginButtonText": "Войти",
+        "docs": "Доки"
     },
     "Conditions": {
         "negativeMatches": "Отрицательные совпадения",
@@ -205,8 +207,7 @@
         "licensing": "Ядро продукта <0>Axelix</0> лежит в открытом досутпе и доступно в рамках Open Source лицензии <1>LGPL 3.0</1>. Исходный код ядра Axelix доступен на <2>GitHub</2>.",
         "contact": "Если у вас есть вопросы, пожалуйста, обратитесь к <0>Документации</0>",
         "bug": "Если вы нашли ошибку, хотите предложить функцию или отправить pull request, пожалуйста, используйте issue-трекер на GitHub. Мы будем рады рассмотреть ваш вклад.",
-        "githubSource": "Исходный код на GitHub",
-        "blog": "Блог"
+        "githubSource": "Исходный код на GitHub"
     },
     "ThreadDump": {
         "id": "Id потока",
