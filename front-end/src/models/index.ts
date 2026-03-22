@@ -31,7 +31,7 @@ export * from "./interfaces/loggers";
 export * from "./interfaces/caches";
 export * from "./interfaces/beans";
 export * from "./interfaces/auth";
-export * from "./interfaces/MCP";
+export * from "./interfaces/mcp";
 export * from "./interfaces/gc";
 
 export * from "./types/conditions";
@@ -49,4 +49,4 @@ export * from "./enums/globals";
 export * from "./enums/loggers";
 export * from "./enums/caches";
 export * from "./enums/beans";
-export * from "./enums/MCP";
+export * from "./enums/mcp";
