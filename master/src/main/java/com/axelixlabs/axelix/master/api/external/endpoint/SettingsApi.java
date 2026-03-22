@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettings;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettingsResponse;
+import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
 
 /**
  * API for retrieving master settings.
@@ -37,9 +37,9 @@ import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettingsR
 @RequestMapping(ApiPaths.SettingsApi.MAIN)
 public class SettingsApi {
 
-    private final List<AuthSettings> authSettings;
+    private final List<AuthenticationOption> authSettings;
 
-    public SettingsApi(List<AuthSettings> authSettings) {
+    public SettingsApi(List<AuthenticationOption> authSettings) {
         this.authSettings = authSettings;
     }
 

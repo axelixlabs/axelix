@@ -26,15 +26,16 @@ import com.axelixlabs.axelix.common.utils.Lazy;
  *
  * @since 06.03.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public final class AuthSettingsOAuth2 implements AuthSettings {
+public final class OidcAuthenticationOption implements AuthenticationOption {
 
     private final String scope;
     private final String clientId;
     private final String redirectUri;
     private final Lazy<String> authorizationEndpointResolver;
 
-    public AuthSettingsOAuth2(
+    public OidcAuthenticationOption(
             String scope, String clientId, String redirectUri, Lazy<String> authorizationEndpointResolver) {
         this.scope = scope;
         this.clientId = clientId;
@@ -45,7 +46,7 @@ public final class AuthSettingsOAuth2 implements AuthSettings {
     @Override
     @JsonProperty("type")
     public String type() {
-        return "oauth2";
+        return "odic";
     }
 
     public String getAuthorizationEndpoint() {

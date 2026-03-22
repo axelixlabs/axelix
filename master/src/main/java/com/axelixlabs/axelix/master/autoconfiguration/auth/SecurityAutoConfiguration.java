@@ -28,9 +28,9 @@ import org.springframework.web.client.RestClient;
 import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.common.utils.Lazy;
-import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettings;
-import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettingsOAuth2;
-import com.axelixlabs.axelix.master.api.external.response.settings.AuthSettingsStaticAdmin;
+import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
+import com.axelixlabs.axelix.master.api.external.response.settings.LoginPasswordAuthenticationOption;
+import com.axelixlabs.axelix.master.api.external.response.settings.OidcAuthenticationOption;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
@@ -118,8 +118,8 @@ public class SecurityAutoConfiguration {
     static class StaticCredentialsConfig {
 
         @Bean
-        public AuthSettings authSettingsStaticAdmin() {
-            return new AuthSettingsStaticAdmin();
+        public AuthenticationOption authSettingsStaticAdmin() {
+            return new LoginPasswordAuthenticationOption();
         }
 
         @Bean
@@ -143,9 +143,9 @@ public class SecurityAutoConfiguration {
     public static class OAuth2Config {
 
         @Bean
-        public AuthSettings authSettingsOAuth2(
+        public AuthenticationOption authSettingsOAuth2(
                 OAuth2Properties oAuth2Properties, OidcMetadataProvider oidcMetadataProvider) {
-            return new AuthSettingsOAuth2(
+            return new OidcAuthenticationOption(
                     oAuth2Properties.scopes(),
                     oAuth2Properties.clientId(),
                     oAuth2Properties.redirectUri(),

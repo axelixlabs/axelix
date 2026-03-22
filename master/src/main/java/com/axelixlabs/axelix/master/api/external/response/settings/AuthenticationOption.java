@@ -17,19 +17,19 @@
  */
 package com.axelixlabs.axelix.master.api.external.response.settings;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
- * Authentication settings for static admin credentials.
+ * Interface that represent a specific authentication option.
  *
  * @since 06.03.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public record AuthSettingsStaticAdmin() implements AuthSettings {
+public sealed interface AuthenticationOption permits OidcAuthenticationOption, LoginPasswordAuthenticationOption {
 
-    @Override
-    @JsonProperty("type")
-    public String type() {
-        return "static-admin";
-    }
+    /**
+     * Returns the name of the authentication option.
+     *
+     * @return the type identifier, e.g. {@code "oidc"} or {@code login-password}
+     */
+    String type();
 }
