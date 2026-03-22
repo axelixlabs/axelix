@@ -1,0 +1,23 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.Link,
+.Version {
+    color: var(--axelix-bold-grey);
+    font-weight: 500;
+}
+
+.Link {
+    transition: color 0.3s ease;
+}
+
+.Link:hover {
+    color: var(--axelix-primary-green);
+}
+
+.Divider {
+    color: var(--axelix-bold-grey);
+}

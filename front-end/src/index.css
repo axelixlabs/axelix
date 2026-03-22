@@ -78,6 +78,11 @@ a {
     line-height: 1.4;
 }
 
+.TextUltraSmall {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 .AccordionsWrapper {
     border: 1px solid var(--axelix-medium-grey);
     border-radius: var(--axelix-border-radius-large);

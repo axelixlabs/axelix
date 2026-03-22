@@ -54,3 +54,5 @@ export { default as GitIcon } from "../assets/icons/git.svg?react";
 export { default as RunIcon } from "../assets/icons/run.svg?react";
 export { default as Reset } from "../assets/icons/reset.svg?react";
 export { default as GCIcon } from "../assets/icons/gc.svg?react";
+
+export { default as LoginLeftImage } from "../assets/images/loginLeftImage.png";

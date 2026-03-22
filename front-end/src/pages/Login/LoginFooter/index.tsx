@@ -15,29 +15,29 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Outlet } from "react-router-dom";
-
-import { LanguageSwitcher } from "components";
+import { useTranslation } from "react-i18next";
 
 import styles from "./styles.module.css";
 
-import { LogoIcon } from "assets";
+export const LoginFooter = () => {
+    const { t } = useTranslation();
 
-export const MinimalLayout = () => {
+    const version = import.meta.env.VITE_APP_VERSION;
+    const blogLink = import.meta.env.VITE_APP_BLOG_LINK;
+    const referenceGuideLink = import.meta.env.VITE_APP_REFERENCE_GUIDE_LINK;
+
     return (
         <>
-            <div className={styles.MainWrapper}>
-                <div className={styles.Header}>
-                    <div className="MainContainer">
-                        <div className={styles.LanguageSwitcherWrapper}>
-                            <LogoIcon className={styles.Logo} />
-                            <LanguageSwitcher />
-                        </div>
-                    </div>
-                </div>
-                <div className={styles.ContentWrapper}>
-                    <Outlet />
-                </div>
+            <div className={`TextUltraSmall ${styles.MainWrapper}`}>
+                <a href={referenceGuideLink} target="_blank" rel="noopener noreferrer" className={styles.Link}>
+                    {t("Authentication.docs")}
+                </a>
+                <div className={styles.Divider}>|</div>
+                <a href={blogLink} target="_blank" rel="noopener noreferrer" className={styles.Link}>
+                    {t("blog")}
+                </a>
+                <div className={styles.Divider}>|</div>
+                <div className={styles.Version}>{version}</div>
             </div>
         </>
     );
