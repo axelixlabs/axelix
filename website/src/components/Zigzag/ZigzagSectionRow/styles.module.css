@@ -41,14 +41,14 @@
     width: 100%;
 }
 
-@media (width <= 870px) {
+@media (width <=870px) {
+    .MainWrapper {
+        max-width: 550px;
+    }
+
     .MainWrapper,
     .MainWrapper:nth-child(even) {
         flex-direction: column;
-    }
-
-    .MainWrapper {
-        max-width: 550px;
     }
 
     .Description {

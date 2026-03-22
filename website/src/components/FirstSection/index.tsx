@@ -1,7 +1,8 @@
-"use client"
-import { useEffect, useRef } from 'react';
-import { HeroContent } from './HeroContent';
-import styles from "./styles.module.css"
+"use client";
+import { useEffect, useRef } from "react";
+
+import { HeroContent } from "./HeroContent";
+import styles from "./styles.module.css";
 
 export const FirstSection = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -21,9 +22,9 @@ export const FirstSection = () => {
                     loop
                     muted
                     playsInline
-                    preload='auto'
-                    onContextMenu={(e) =>{
-                        e.preventDefault()
+                    preload="auto"
+                    onContextMenu={(e) => {
+                        e.preventDefault();
                     }}
                     className={styles.HeroBackground}
                 >
@@ -36,4 +37,4 @@ export const FirstSection = () => {
             </div>
         </section>
     );
-}
+};

@@ -1,5 +1,5 @@
 .CardWrapper,
-.CardWrapper>* {
+.CardWrapper > * {
     height: 100%;
 }
 
@@ -20,7 +20,7 @@
     border: 1px solid #30363d;
     color: var(--axelix-primary-white);
     border-radius: var(--axelix-border-radius-large);
-    padding: 45px 24px 24px 24px;
+    padding: 45px 24px 24px;
     height: 100%;
     transition: border-color 0.3s, translate 0.3s;
 }

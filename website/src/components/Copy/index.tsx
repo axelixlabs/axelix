@@ -1,10 +1,10 @@
-"use client"
+"use client";
+import { CopiedIcon, CopyIcon } from "@/assets";
+
+import { Tooltip } from "antd";
 import { useState } from "react";
 
-import { CopyIcon, CopiedIcon } from "@/assets"
-
 import styles from "./styles.module.css";
-import { Tooltip } from "antd";
 
 interface IProps {
     text: string;
@@ -19,21 +19,21 @@ export const Copy = ({ text }: IProps) => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
-            console.error('Failed to copy!', err);
+            console.error("Failed to copy!", err);
         }
     };
 
     return (
         <>
-            {
-                copied
-                    ? <>
-                        <Tooltip open={true} trigger={[]} title="Copied!">
-                            <CopiedIcon />
-                        </Tooltip>
-                    </>
-                    : <CopyIcon className={styles.Copy} onClick={handleCopy} />
-            }
+            {copied ? (
+                <>
+                    <Tooltip open={true} trigger={[]} title="Copied!">
+                        <CopiedIcon />
+                    </Tooltip>
+                </>
+            ) : (
+                <CopyIcon className={styles.Copy} onClick={handleCopy} />
+            )}
         </>
-    )
-} 
+    );
+};

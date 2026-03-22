@@ -1,7 +1,7 @@
 import { IFAQItem } from "@/models";
 
 interface IProps {
-    faqItems: IFAQItem[]
+    faqItems: IFAQItem[];
 }
 
 export const FAQStructuredData = ({ faqItems }: IProps) => {
@@ -9,7 +9,7 @@ export const FAQStructuredData = ({ faqItems }: IProps) => {
         "@context": "https://schema.org",
         "@type": "FAQPage",
         mainEntity: faqItems.map(({ question, structuredDataAnswer }) => ({
-            "@type": "Question",    
+            "@type": "Question",
             name: question,
             acceptedAnswer: {
                 "@type": "Answer",
@@ -18,10 +18,5 @@ export const FAQStructuredData = ({ faqItems }: IProps) => {
         })),
     };
 
-    return (
-        <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
-        />
-    )
-} 
+    return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />;
+};

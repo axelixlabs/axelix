@@ -1,20 +1,21 @@
-"use client"
-import { motion } from "motion/react"
-
-import { IZigzagSectionData } from "@/models";
-import styles from "./styles.module.css"
-import {Image} from "antd";
-import {EyeOutlined} from "@ant-design/icons";
+"use client";
 import { ArrowIcon } from "@/assets";
+import { IZigzagSectionData } from "@/models";
+import { EyeOutlined } from "@ant-design/icons";
+
+import { Image } from "antd";
+import { motion } from "motion/react";
+
+import styles from "./styles.module.css";
 
 export interface IProps {
     section: IZigzagSectionData;
-    index: number
+    index: number;
 }
 
 export const ZigzagSectionRow = ({ section, index }: IProps) => {
     const { title, description, href, image } = section;
-    const isEvenNumber = index % 2 === 0
+    const isEvenNumber = index % 2 === 0;
 
     return (
         <motion.article
@@ -29,15 +30,22 @@ export const ZigzagSectionRow = ({ section, index }: IProps) => {
                 <p className={styles.Description}>{description}</p>
                 <a href={href} target="_blank" rel="noreferrer noopener" className={styles.Link}>
                     See Docs
-                    <ArrowIcon className={styles.ArrowIcon}/>
+                    <ArrowIcon className={styles.ArrowIcon} />
                 </a>
             </div>
 
             <div className={styles.SectionImageWrapper}>
-                <Image height="513" width="605" src={image.src} preview={{
-                    cover: <EyeOutlined/>
-                }} alt="Mock image" className={styles.SectionImage} />
+                <Image
+                    height="513"
+                    width="605"
+                    src={image.src}
+                    preview={{
+                        cover: <EyeOutlined />,
+                    }}
+                    alt="Mock image"
+                    className={styles.SectionImage}
+                />
             </div>
         </motion.article>
-    )
-}
+    );
+};

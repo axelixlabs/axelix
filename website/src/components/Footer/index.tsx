@@ -1,5 +1,6 @@
-import { EmailIcon, LinkedinIcon, XIcon } from '@/assets';
-import styles from './styles.module.css'
+import { EmailIcon, LinkedinIcon, XIcon } from "@/assets";
+
+import styles from "./styles.module.css";
 
 export const Footer = () => {
     const currentYear = new Date().getFullYear().toString();
@@ -29,5 +30,5 @@ export const Footer = () => {
                 </ul>
             </nav>
         </footer>
-    )
-}
+    );
+};

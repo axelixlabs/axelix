@@ -1,9 +1,10 @@
-"use client"
-import styles from "./styles.module.css"
-import { WhatCanDoCard } from "./WhatCanDoCard";
-
-import { motion } from "motion/react"
+"use client";
 import { whatCanDoCardsData, whatCanDoContainerVariants } from "@/utils";
+
+import { motion } from "motion/react";
+
+import { WhatCanDoCard } from "./WhatCanDoCard";
+import styles from "./styles.module.css";
 
 export const WhatCanDo = () => {
     return (
@@ -31,4 +32,4 @@ export const WhatCanDo = () => {
             </motion.div>
         </section>
     );
-}
+};

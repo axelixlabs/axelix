@@ -1,14 +1,15 @@
-"use client"
-import Link from "next/link"
-import { InstallationContent } from "./InstallationContent"
-import styles from "./styles.module.css"
-import { useState } from "react"
-import { IInstallationInstructions } from "@/models"
-import { motion } from "motion/react"
-import { installationOptions } from "@/utils"
+"use client";
+import { IInstallationInstructions } from "@/models";
+import { installationOptions } from "@/utils";
+
+import { motion } from "motion/react";
+import { useState } from "react";
+
+import { InstallationContent } from "./InstallationContent";
+import styles from "./styles.module.css";
 
 export const Installation = () => {
-    const [selectedOption, setSelectedOption] = useState<IInstallationInstructions>(installationOptions[0])
+    const [selectedOption, setSelectedOption] = useState<IInstallationInstructions>(installationOptions[0]);
 
     return (
         <motion.section
@@ -24,9 +25,7 @@ export const Installation = () => {
                 <div className={styles.GuidePanel}>
                     <ul className={styles.TabsWrapper}>
                         {installationOptions.map((option) => (
-                            <li
-                                key={option.option}
-                            >
+                            <li key={option.option}>
                                 <button
                                     type="button"
                                     onClick={() => setSelectedOption(option)}
@@ -39,12 +38,15 @@ export const Installation = () => {
                     </ul>
 
                     <div>
-                        <p className={styles.InstallDescription}>
-                            {selectedOption.description}
-                        </p>
+                        <p className={styles.InstallDescription}>{selectedOption.description}</p>
 
                         {/* TODO: Add correct url */}
-                        <a href="https://spring.io/" target="_blank" rel="noopener noreferrer" className={styles.ReadDocumentation}>
+                        <a
+                            href="https://spring.io/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.ReadDocumentation}
+                        >
                             Read Documentation
                         </a>
                     </div>
@@ -53,5 +55,5 @@ export const Installation = () => {
                 <InstallationContent instructions={selectedOption} key={selectedOption.option} />
             </div>
         </motion.section>
-    )
-}
+    );
+};

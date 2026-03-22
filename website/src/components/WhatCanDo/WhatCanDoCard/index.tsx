@@ -1,12 +1,14 @@
-import styles from "./styles.module.css"
-import { motion } from "motion/react"
 import { IWhatCanDoCardData } from "@/models";
 import { whatCanDoCardVariants } from "@/utils";
+import { EyeOutlined } from "@ant-design/icons";
+
 import { Badge, Image } from "antd";
-import { EyeOutlined } from '@ant-design/icons';
+import { motion } from "motion/react";
+
+import styles from "./styles.module.css";
 
 interface IProps {
-    cardData: IWhatCanDoCardData
+    cardData: IWhatCanDoCardData;
 }
 
 export const WhatCanDoCard = ({ cardData }: IProps) => {
@@ -16,8 +18,14 @@ export const WhatCanDoCard = ({ cardData }: IProps) => {
                 <a href={cardData.documentationLink} target="_blank" rel="noopener noreferrer">
                     <div className={styles.Card}>
                         <header className={styles.HeaderWrapper}>
-                            <h3 className={`TextSmall ${styles.CardTitle}`} dangerouslySetInnerHTML={{ __html: cardData.title }}/>
-                            <p className={styles.CardDescription} dangerouslySetInnerHTML={{ __html: cardData.description }}/>
+                            <h3
+                                className={`TextSmall ${styles.CardTitle}`}
+                                dangerouslySetInnerHTML={{ __html: cardData.title }}
+                            />
+                            <p
+                                className={styles.CardDescription}
+                                dangerouslySetInnerHTML={{ __html: cardData.description }}
+                            />
                         </header>
                         <div>
                             <div className={styles.ImageWrapper}>
@@ -29,20 +37,18 @@ export const WhatCanDoCard = ({ cardData }: IProps) => {
                                     }}
                                     className={styles.Image}
                                     onClick={(e) => {
-                                        e.preventDefault()
+                                        e.preventDefault();
                                     }}
                                 />
                             </div>
 
                             <footer className={styles.ReadDocumentationWrapper}>
-                                <div className={styles.DocsWrapper}>
-                                    Docs
-                                </div>
+                                <div className={styles.DocsWrapper}>Docs</div>
                             </footer>
                         </div>
                     </div>
                 </a>
             </Badge.Ribbon>
-        </motion.article >
-    )
-}
+        </motion.article>
+    );
+};

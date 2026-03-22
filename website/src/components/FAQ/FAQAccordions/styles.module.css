@@ -12,7 +12,7 @@
 
 .SingleAccordionWrapper {
     border-top: 1px solid var(--axelix-bold-grey);
-    border-bottom: 1px solid var(--axelix-bold-grey)
+    border-bottom: 1px solid var(--axelix-bold-grey);
 }
 
 .InteractiveHeader {

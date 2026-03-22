@@ -1,17 +1,15 @@
-import { TypeAnimation } from 'react-type-animation';
+import { createSeoKeywordsFromSequence } from "@/helpers";
+import { enSequence } from "@/utils";
 
-import styles from "./styles.module.css"
-import { enSequence } from '@/utils';
-import { createSeoKeywordsFromSequence } from '@/helpers';
+import { TypeAnimation } from "react-type-animation";
+
+import styles from "./styles.module.css";
 
 export const HeroContent = () => {
-
     return (
         <div className="MainContainer">
             <div className={styles.TitlesWrapper}>
-                <h1 className='VisuallyHidden'>
-                    Axelix makes Spring Boot {createSeoKeywordsFromSequence}
-                </h1>
+                <h1 className="VisuallyHidden">Axelix makes Spring Boot {createSeoKeywordsFromSequence}</h1>
                 <div className={`TextLarge ${styles.Title}`}>
                     Axelix makes Spring Boot <TypeAnimation sequence={enSequence} repeat={Infinity} />
                 </div>
@@ -23,19 +21,16 @@ export const HeroContent = () => {
             <div className={styles.LinksWrapper}>
                 <a
                     href="https://axelix.io/docs/introduction"
-                    target='_blank'
-                    rel='noopener noreferrer'
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={styles.LinkPrimary}
                 >
                     Get Started
                 </a>
-                <a
-                    href="#installation"
-                    className={styles.LinkSecondary}
-                >
+                <a href="#installation" className={styles.LinkSecondary}>
                     Installation
                 </a>
             </div>
         </div>
-    )
-}
+    );
+};
