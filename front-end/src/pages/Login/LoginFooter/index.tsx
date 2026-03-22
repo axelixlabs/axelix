@@ -22,23 +22,22 @@ import styles from "./styles.module.css";
 export const LoginFooter = () => {
     const { t } = useTranslation();
 
+    const version = import.meta.env.VITE_APP_VERSION;
+    const blogLink = import.meta.env.VITE_APP_BLOG_LINK;
+    const referenceGuideLink = import.meta.env.VITE_APP_REFERENCE_GUIDE_LINK;
+
     return (
         <>
             <div className={`TextUltraSmall ${styles.MainWrapper}`}>
-                <a
-                    href="https://axelix.io/docs/introduction"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.Link}
-                >
+                <a href={referenceGuideLink} target="_blank" rel="noopener noreferrer" className={styles.Link}>
                     {t("Authentication.docs")}
                 </a>
                 <div className={styles.Divider}>|</div>
-                <a href="https://axelix.io/blog" target="_blank" rel="noopener noreferrer" className={styles.Link}>
+                <a href={blogLink} target="_blank" rel="noopener noreferrer" className={styles.Link}>
                     {t("blog")}
                 </a>
                 <div className={styles.Divider}>|</div>
-                <div className={styles.Version}>v1.0.0</div>
+                <div className={styles.Version}>{version}</div>
             </div>
         </>
     );
