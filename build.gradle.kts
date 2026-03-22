@@ -60,7 +60,7 @@ subprojects {
                 "com.axelixlabs",
                 "\\#"
             )
-            removeUnusedImports()
+            removeUnusedImports("cleanthat-javaparser-unnecessaryimport")
             forbidWildcardImports()
             trimTrailingWhitespace()
 //            TODO:
