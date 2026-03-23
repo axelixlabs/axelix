@@ -25,13 +25,13 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ env.RELEASE_TAG }}
           fetch-depth: 0
 
       - name: Set up JDK 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'liberica'
           java-version: '25'
@@ -45,13 +45,13 @@ jobs:
         run: ./gradlew publishGprPublicationToGitHubPackagesRepository
 
       - name: Set up Docker
-        uses: docker/setup-docker-action@v4
+        uses: docker/setup-docker-action@v5
 
       - name: Build Docker Image
         run: docker build --tag ${{ env.GITHUB_CONTAINER_REGISTRY }}/${{ github.repository_owner }}/axelix:${{ env.RELEASE_TAG }} --file master/docker/Dockerfile .
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
           username: ${{ env.USERNAME }}
@@ -77,7 +77,7 @@ jobs:
         working-directory: front-end
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.git_tag }}
           fetch-depth: 0
@@ -110,10 +110,10 @@ jobs:
         run: rm .env
 
       - name: Set up Docker
-        uses: docker/setup-docker-action@v4
+        uses: docker/setup-docker-action@v5
 
       - name: Log in to the Container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
           username: ${{ env.USERNAME }}
@@ -126,7 +126,7 @@ jobs:
             --file Dockerfile .
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.GITHUB_CONTAINER_REGISTRY }}
           username: ${{ env.USERNAME }}

@@ -48,7 +48,7 @@ jobs:
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_REDIRECT_URI: ${{ secrets.OIDC_GOOGLE_REDIRECT_URL }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Build Backend
         uses: ./.github/actions/build-backend
@@ -59,7 +59,7 @@ jobs:
         uses: ./.github/actions/build-frontend
 
       - name: Set up Docker
-        uses: docker/setup-docker-action@v4
+        uses: docker/setup-docker-action@v5
 
       - name: Read Gradle Properties file
         uses: madhead/read-java-properties@4
@@ -90,7 +90,7 @@ jobs:
         run: docker logout
 
       - name: Checkout helm-charts repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: axelixlabs/helm-charts
           ref: ${{ env.HELM_CHART_BRANCH }}
@@ -98,7 +98,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Helm
-        uses: azure/setup-helm@v4.3.0
+        uses: azure/setup-helm@v5.0.0
         with:
           version: v3.14.0
 
