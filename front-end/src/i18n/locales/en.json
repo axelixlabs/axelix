@@ -114,14 +114,14 @@
         "logout": "Logout",
         "docs": "Docs",
         "loginPasswordForm" : {
-          "username": "Username",
-          "enterUsername": "Enter username",
-          "password": "Password",
-          "enterPassword": "Enter password",
-          "loginButtonText": "Sign In"
+            "username": "Username",
+            "enterUsername": "Enter username",
+            "password": "Password",
+            "enterPassword": "Enter password",
+            "loginButtonText": "Sign In"
         },
         "oidcForm" : {
-          "loginButtonText": "Sign in with OAuth2/OIDC Provider"
+            "loginButtonText": "Sign in with OAuth2/OIDC Provider"
         }
     },
     "Conditions": {

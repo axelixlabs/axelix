@@ -113,14 +113,14 @@
         "welcome": "Добро пожаловать",
         "logout": "Выйти",
         "loginPasswordForm" : {
-          "username": "Имя пользователя",
-          "enterUsername": "Введите имя пользователя",
-          "password": "Пароль",
-          "enterPassword": "Введите пароль",
-          "loginButtonText": "Войти"
+            "username": "Имя пользователя",
+            "enterUsername": "Введите имя пользователя",
+            "password": "Пароль",
+            "enterPassword": "Введите пароль",
+            "loginButtonText": "Войти"
         },
         "oidcForm" : {
-          "loginButtonText": "Войти с помощью OAuth2/OIDC"
+            "loginButtonText": "Войти с помощью OAuth2/OIDC"
         },
         "docs": "Доки"
     },
