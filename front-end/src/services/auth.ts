@@ -15,8 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import axios from "axios";
+
 import { apiFetch } from "api";
-import type { ILoginSubmitRequestData } from "models";
+import type { ILoginSubmitRequestData, OIDCAuthOption } from "models";
 
 export const login = (data: ILoginSubmitRequestData) => {
     return apiFetch.post("users/login", data);
@@ -24,4 +26,25 @@ export const login = (data: ILoginSubmitRequestData) => {
 
 export const logout = () => {
     return apiFetch.post("users/logout");
+};
+
+export const getAuthOptions = () => {
+    return apiFetch.get("settings/auth");
+};
+
+/**
+ * Invoke OIDC '/authorize' endpoint
+ */
+export const authorize = (option: OIDCAuthOption) => {
+    const params = new URLSearchParams();
+    params.append("client_id", option.clientId);
+    params.append("scope", option.scope);
+    params.append("response_type", "code");
+    params.append("redirect_uri", option.redirectUri);
+
+    return axios.post(option.authorizationEndpoint, params, {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    });
 };

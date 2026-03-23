@@ -15,25 +15,5 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { AuthOption } from "../types/auth";
-
-export interface ILoginSubmitRequestData {
-    /**
-     * The username of the user.
-     * Used to identify the user during the login process.
-     */
-    username: string;
-
-    /**
-     * The password of the user.
-     * Used to authenticate the user during the login process.
-     */
-    password: string;
-}
-
-export interface IAuthOptionsResponseBody {
-    /**
-     * Authentication options configured on the backend
-     */
-    authProviders: AuthOption[];
-}
+export const LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME = "login-password";
+export const OIDC_AUTH_OPTION_TYPE_NAME = "oidc";

@@ -1,0 +1,10 @@
+.SubmitButton {
+    height: 48px;
+    width: 100%;
+    margin-top: 16px;
+    font-weight: bold;
+}
+
+.ErrorAlert {
+    color: var(--axelix-primary-red);
+}

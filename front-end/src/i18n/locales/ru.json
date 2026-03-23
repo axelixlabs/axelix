@@ -112,11 +112,16 @@
     "Authentication": {
         "welcome": "Добро пожаловать",
         "logout": "Выйти",
-        "username": "Имя пользователя",
-        "enterUsername": "Введите имя пользователя",
-        "password": "Пароль",
-        "enterPassword": "Введите пароль",
-        "loginButtonText": "Войти",
+        "loginPasswordForm" : {
+            "username": "Имя пользователя",
+            "enterUsername": "Введите имя пользователя",
+            "password": "Пароль",
+            "enterPassword": "Введите пароль",
+            "loginButtonText": "Войти"
+        },
+        "oidcForm" : {
+            "loginButtonText": "Войти с помощью OAuth2/OIDC"
+        },
         "docs": "Доки"
     },
     "Conditions": {

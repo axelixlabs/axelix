@@ -1,0 +1,15 @@
+.MainWrapper {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.Or {
+    padding-inline: 10px;
+}
+
+.Line {
+    flex: 1;
+    height: 1px;
+    background-color: var(--axelix-medium-grey);
+}

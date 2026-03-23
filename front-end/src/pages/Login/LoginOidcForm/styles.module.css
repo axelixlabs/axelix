@@ -1,0 +1,9 @@
+.SubmitButton {
+    height: 48px;
+    width: 100%;
+    margin-top: 16px;
+    font-weight: 700;
+    border-color: var(--axelix-bold-grey);
+    background-color: var(--axelix-primary-white);
+    color: var(--axelix-bold-grey);
+}

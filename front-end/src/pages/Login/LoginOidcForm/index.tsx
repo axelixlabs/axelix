@@ -15,25 +15,33 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { AuthOption } from "../types/auth";
+import { Button } from "antd";
+import { useTranslation } from "react-i18next";
 
-export interface ILoginSubmitRequestData {
-    /**
-     * The username of the user.
-     * Used to identify the user during the login process.
-     */
-    username: string;
+import { type OIDCAuthOption } from "models";
+import { authorize } from "services";
 
-    /**
-     * The password of the user.
-     * Used to authenticate the user during the login process.
-     */
-    password: string;
+import styles from "./styles.module.css";
+
+import { LockIcon } from "assets";
+
+interface IProps {
+    option: OIDCAuthOption;
 }
 
-export interface IAuthOptionsResponseBody {
-    /**
-     * Authentication options configured on the backend
-     */
-    authProviders: AuthOption[];
-}
+export const LoginOidcForm = ({ option }: IProps) => {
+    const { t } = useTranslation();
+
+    return (
+        <>
+            <Button
+                htmlType="submit"
+                icon={<LockIcon />}
+                className={styles.SubmitButton}
+                onClick={() => authorize(option)}
+            >
+                {t("Authentication.oidcForm.loginButtonText")}
+            </Button>
+        </>
+    );
+};

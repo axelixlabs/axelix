@@ -15,38 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { LanguageSwitcher } from "components";
-
-import { LoginContent } from "./LoginContent";
-import { LoginFooter } from "./LoginFooter";
 import styles from "./styles.module.css";
 
-import { LoginLeftImage, LogoIcon } from "assets";
-
-const Login = () => {
+export const SeparatorLine = () => {
     return (
         <>
             <div className={styles.MainWrapper}>
-                <div className={styles.LeftImageWrapper}>
-                    <img
-                        fetchPriority="high"
-                        src={LoginLeftImage}
-                        alt="Login left image"
-                        className={styles.LeftImage}
-                    />
-                </div>
-
-                <div className={styles.ContentWrapper}>
-                    <div className={styles.ContentHeaderWrapper}>
-                        <LogoIcon className={styles.Logo} />
-                        <LanguageSwitcher />
-                    </div>
-                    <LoginContent />
-                    <LoginFooter />
-                </div>
+                <div className={styles.Line} />
+                <div className={`TextSmall ${styles.Or}`}>OR</div>
+                <div className={styles.Line} />
             </div>
         </>
     );
 };
-
-export default Login;
