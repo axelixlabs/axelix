@@ -15,26 +15,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Button } from "antd";
-import { useTranslation } from "react-i18next";
-
-import { type OIDCAuthOption } from "models";
-import { authorize } from "services";
-
 import styles from "./styles.module.css";
 
-interface IProps {
-    option: OIDCAuthOption;
-}
-
-export const LoginOidcForm = ({ option }: IProps) => {
-    const { t } = useTranslation();
-
+const SeparatorLine = () => {
     return (
         <>
-            <Button htmlType="submit" loading={false} className={styles.SubmitButton} onClick={() => authorize(option)}>
-                {t("Authentication.oidcForm.loginButtonText")}
-            </Button>
+            <div className={styles.MainWrapper}>
+                <div className={styles.Line} />
+                <div className={`TextSmall ${styles.Or}`}>OR</div>
+                <div className={styles.Line} />
+            </div>
         </>
     );
 };
+
+export default SeparatorLine;

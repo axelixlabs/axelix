@@ -25,9 +25,10 @@ import { getAuthOptions } from "services";
 import { LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME } from "utils";
 
 import { LoginOidcForm } from "../LoginOidcForm";
+import { LoginPasswordForm } from "../LoginPasswordForm";
+import SeparatorLine from "../SeparatorLine";
 
 import styles from "./styles.module.css";
-import { LoginPasswordForm } from "../LoginPasswordForm";
 
 /**
  * Function that is similar to kotlin's let - apply transformation on an
@@ -64,12 +65,19 @@ export const LoginContent = () => {
         return response.authProviders.find((value) => optionName === value.type);
     };
 
+    const loginPasswordOptionPresent = getAuthOption(LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME);
+    const oidcOptionPresent = getAuthOption(OIDC_AUTH_OPTION_TYPE_NAME);
+
     return (
         <>
             <div className={styles.MainWrapper}>
                 <h1 className={`TextLarge ${styles.LoginTitle}`}>{t("Authentication.welcome")}</h1>
-                {getAuthOption(LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME) && <LoginPasswordForm />}
-                {ifFound(getAuthOption(OIDC_AUTH_OPTION_TYPE_NAME), (value) => (
+
+                {loginPasswordOptionPresent && <LoginPasswordForm />}
+
+                {loginPasswordOptionPresent && oidcOptionPresent && <SeparatorLine />}
+
+                {ifFound(oidcOptionPresent, (value) => (
                     <LoginOidcForm option={value as OIDCAuthOption} />
                 ))}
             </div>
