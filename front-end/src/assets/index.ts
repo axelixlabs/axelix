@@ -49,6 +49,7 @@ export { default as LinkIcon } from "../assets/icons/link.svg?react";
 export { default as JavaIcon } from "../assets/icons/java.svg?react";
 export { default as CopyIcon } from "../assets/icons/copy.svg?react";
 export { default as InfoIcon } from "../assets/icons/info.svg?react";
+export { default as LockIcon } from "../assets/icons/lock.svg?react";
 export { default as JVMIcon } from "../assets/icons/jvm.svg?react";
 export { default as GitIcon } from "../assets/icons/git.svg?react";
 export { default as RunIcon } from "../assets/icons/run.svg?react";

@@ -23,6 +23,8 @@ import { authorize } from "services";
 
 import styles from "./styles.module.css";
 
+import { LockIcon } from "assets";
+
 interface IProps {
     option: OIDCAuthOption;
 }
@@ -32,7 +34,12 @@ export const LoginOidcForm = ({ option }: IProps) => {
 
     return (
         <>
-            <Button htmlType="submit" className={styles.SubmitButton} onClick={() => authorize(option)}>
+            <Button
+                htmlType="submit"
+                icon={<LockIcon />}
+                className={styles.SubmitButton}
+                onClick={() => authorize(option)}
+            >
                 {t("Authentication.oidcForm.loginButtonText")}
             </Button>
         </>

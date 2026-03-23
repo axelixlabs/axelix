@@ -2,8 +2,8 @@
     height: 48px;
     width: 100%;
     margin-top: 16px;
-    font-weight: bold;
-    border-color: #4b5563;
+    font-weight: 700;
+    border-color: var(--axelix-bold-grey);
     background-color: var(--axelix-primary-white);
-    color: #4b5563;
+    color: var(--axelix-bold-grey);
 }
