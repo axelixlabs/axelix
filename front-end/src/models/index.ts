@@ -39,6 +39,7 @@ export * from "./types/wallboard";
 export * from "./types/globals";
 export * from "./types/details";
 export * from "./types/antd";
+export * from "./types/auth";
 
 export * from "./enums/environments";
 export * from "./enums/conditions";

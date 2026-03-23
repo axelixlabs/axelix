@@ -112,12 +112,17 @@
     "Authentication": {
         "welcome": "Welcome",
         "logout": "Logout",
-        "username": "Username",
-        "enterUsername": "Enter username",
-        "password": "Password",
-        "enterPassword": "Enter password",
-        "loginButtonText": "Sign In",
-        "docs": "Docs"
+        "docs": "Docs",
+        "loginPasswordForm" : {
+          "username": "Username",
+          "enterUsername": "Enter username",
+          "password": "Password",
+          "enterPassword": "Enter password",
+          "loginButtonText": "Sign In"
+        },
+        "oidcForm" : {
+          "loginButtonText": "Sign in with OAuth2/OIDC Provider"
+        }
     },
     "Conditions": {
         "negativeMatches": "Negative Matches",

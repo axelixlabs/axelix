@@ -15,16 +15,5 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./scheduledTasks";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./dashboard";
-export * from "./wallboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./caches";
-export * from "./beans";
-export * from "./gc";
-export * from "./auth";
+export const LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME = "login-password";
+export const OIDC_AUTH_OPTION_TYPE_NAME = "oidc";

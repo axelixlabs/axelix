@@ -15,25 +15,37 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { AuthOption } from "../types/auth.ts";
+import { type LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME } from "utils";
 
-export interface ILoginSubmitRequestData {
-    /**
-     * The username of the user.
-     * Used to identify the user during the login process.
-     */
-    username: string;
+export type LoginPasswordAuthOption = {
+    type: typeof LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME;
+};
+
+export type OIDCAuthOption = {
+    type: typeof OIDC_AUTH_OPTION_TYPE_NAME;
 
     /**
-     * The password of the user.
-     * Used to authenticate the user during the login process.
+     * The scope with which the /authorize endpoint of the OIDC provider must be hit.
      */
-    password: string;
-}
+    scope: string;
 
-export interface IAuthOptionsResponseBody {
     /**
-     * Authentication options configured on the backend
+     * The client-id of the Axelix as the client of the external OIDC provider.
      */
-    authProviders: AuthOption[];
-}
+    clientId: string;
+
+    /**
+     * The redirect-uri onto which the OIDC provider must redirect with the authorization_code.
+     */
+    redirectUri: string;
+
+    /**
+     * The URL of the /authorize on the OIDC provider side.
+     */
+    authorizationEndpoint: string;
+};
+
+/**
+ * Possible auth option from the backend.
+ */
+export type AuthOption = LoginPasswordAuthOption | OIDCAuthOption;

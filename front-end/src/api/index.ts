@@ -35,6 +35,8 @@ export const apiFetch = axios.create({
     },
 });
 
+export const externalApiFetch = axios.create();
+
 apiFetch.interceptors.response.use(
     (response) => response,
 

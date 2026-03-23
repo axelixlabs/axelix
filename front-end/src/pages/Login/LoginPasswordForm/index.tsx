@@ -27,12 +27,12 @@ import { IS_AUTH } from "utils";
 
 import styles from "./styles.module.css";
 
-export const LoginForm = () => {
+export const LoginPasswordForm = () => {
     const { t } = useTranslation();
 
     const [loginData, setLoginData] = useState(StatelessRequest.inactive());
 
-    const onFinish = (values: ILoginSubmitRequestData): void => {
+    const authenticate = (values: ILoginSubmitRequestData): void => {
         const { username, password } = values;
 
         const loginResponseBody = {
@@ -55,45 +55,37 @@ export const LoginForm = () => {
 
     return (
         <>
-            <div className={styles.MainWrapper}>
-                <h1 className={`TextLarge ${styles.LoginTitle}`}>{t("Authentication.welcome")}</h1>
-                <Form layout="vertical" onFinish={onFinish} autoComplete="off">
-                    <Form.Item
-                        key="username"
-                        label={t("Authentication.username")}
-                        name="username"
-                        required={false}
-                        rules={[{ required: true, message: t("Authentication.enterUsername") }]}
-                    >
-                        <Input className={styles.LoginInput} />
-                    </Form.Item>
-                    <Form.Item
-                        key="password"
-                        label={t("Authentication.password")}
-                        name="password"
-                        required={false}
-                        rules={[{ required: true, message: t("Authentication.enterPassword") }]}
-                    >
-                        <Input.Password className={styles.LoginInput} />
-                    </Form.Item>
-                    {loginData.error === EIgnoredErrors.INVALID_CREDENTIALS && (
-                        <Alert
-                            title={t(`Error.codes.${loginData.error}`)}
-                            type="error"
-                            showIcon
-                            className={styles.ErrorAlert}
-                        />
-                    )}
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={loginData.loading}
-                        className={styles.SubmitButton}
-                    >
-                        {t("Authentication.loginButtonText")}
-                    </Button>
-                </Form>
-            </div>
+            <Form layout="vertical" onFinish={authenticate} autoComplete="off">
+                <Form.Item
+                    key="username"
+                    label={t("Authentication.loginPasswordForm.username")}
+                    name="username"
+                    required={false}
+                    rules={[{ required: true, message: t("Authentication.loginPasswordForm.enterUsername") }]}
+                >
+                    <Input className={styles.LoginInput} />
+                </Form.Item>
+                <Form.Item
+                    key="password"
+                    label={t("Authentication.loginPasswordForm.password")}
+                    name="password"
+                    required={false}
+                    rules={[{ required: true, message: t("Authentication.loginPasswordForm.enterPassword") }]}
+                >
+                    <Input.Password className={styles.LoginInput} />
+                </Form.Item>
+                {loginData.error === EIgnoredErrors.INVALID_CREDENTIALS && (
+                    <Alert
+                        title={t(`Error.codes.${loginData.error}`)}
+                        type="error"
+                        showIcon
+                        className={styles.ErrorAlert}
+                    />
+                )}
+                <Button type="primary" htmlType="submit" loading={loginData.loading} className={styles.SubmitButton}>
+                    {t("Authentication.loginPasswordForm.loginButtonText")}
+                </Button>
+            </Form>
         </>
     );
 };

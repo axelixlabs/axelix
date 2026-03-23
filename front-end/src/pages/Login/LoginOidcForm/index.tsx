@@ -15,33 +15,32 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { LanguageSwitcher } from "components";
+import { Button } from "antd";
+import { useTranslation } from "react-i18next";
 
-import { LoginContent } from "./LoginContent";
-import { LoginFooter } from "./LoginFooter";
+import { type OIDCAuthOption } from "models";
+import { authorize } from "services";
+
 import styles from "./styles.module.css";
 
-import { LoginLeftImage, LogoIcon } from "assets";
+interface IProps {
+    option: OIDCAuthOption;
+}
 
-const Login = () => {
+export const LoginOidcForm = ({ option }: IProps) => {
+    const { t } = useTranslation();
+
     return (
         <>
-            <div className={styles.MainWrapper}>
-                <div className={styles.LeftImageWrapper}>
-                    <img src={LoginLeftImage} alt="Login left image" className={styles.LeftImage} />
-                </div>
-
-                <div className={styles.ContentWrapper}>
-                    <div className={styles.ContentHeaderWrapper}>
-                        <LogoIcon className={styles.Logo} />
-                        <LanguageSwitcher />
-                    </div>
-                    <LoginContent />
-                    <LoginFooter />
-                </div>
-            </div>
+            <Button
+                type="primary"
+                htmlType="submit"
+                loading={false}
+                className={styles.SubmitButton}
+                onClick={() => authorize(option)}
+            >
+                {t("Authentication.oidcForm.loginButtonText")}
+            </Button>
         </>
     );
 };
-
-export default Login;
