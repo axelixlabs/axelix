@@ -19,7 +19,6 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,10 +56,10 @@ public enum PropertySourceDescription {
             StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
             PropertySourceCustomDescription.SYSTEM_ENVIRONMENT.getDescription()),
 
-    // Application
+    // Application Info
     APPLICATION_INFO("applicationInfo", PropertySourceCustomDescription.APPLICATION_INFO.getDescription()),
 
-    // classpath.
+    // Application Properties
     APPLICATION_PROPERTIES("Config resource", PropertySourceCustomDescription.APPLICATION_PROPERTIES.getDescription()),
 
     // CommandLinePropertySource
@@ -160,52 +159,5 @@ public enum PropertySourceDescription {
         return Arrays.stream(values())
                 .filter(desc -> desc.sourceName.equals(sourceName) || sourceName.startsWith(desc.sourceName))
                 .findFirst();
-    }
-
-    /**
-     * DTO, used to decouple the raw Spring property source name from its user-friendly representation.
-     */
-    public static final class PropertySourceDisplayData {
-        private final String displayName;
-        private final @Nullable String description;
-
-        public PropertySourceDisplayData(String displayName, @Nullable String description) {
-            this.displayName = displayName;
-            this.description = description;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        @Nullable
-        public String getDescription() {
-            return description;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (obj == null || obj.getClass() != this.getClass()) {
-                return false;
-            }
-            var that = (PropertySourceDisplayData) obj;
-            return Objects.equals(this.displayName, that.displayName)
-                    && Objects.equals(this.description, that.description);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(displayName, description);
-        }
-
-        @Override
-        public String toString() {
-            return "PropertySourceDisplayData[" + "displayName="
-                    + displayName + ", " + "description="
-                    + description + ']';
-        }
     }
 }

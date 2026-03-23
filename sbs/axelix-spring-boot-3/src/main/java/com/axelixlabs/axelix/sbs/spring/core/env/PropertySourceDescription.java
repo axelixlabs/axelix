@@ -56,10 +56,10 @@ public enum PropertySourceDescription {
             StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
             PropertySourceCustomDescription.SYSTEM_ENVIRONMENT.getDescription()),
 
-    // Application
+    // Application Info
     APPLICATION_INFO("applicationInfo", PropertySourceCustomDescription.APPLICATION_INFO.getDescription()),
 
-    // classpath.
+    // Application Properties
     APPLICATION_PROPERTIES("Config resource", PropertySourceCustomDescription.APPLICATION_PROPERTIES.getDescription()),
 
     // CommandLinePropertySource
@@ -160,10 +160,4 @@ public enum PropertySourceDescription {
                 .filter(desc -> desc.sourceName.equals(sourceName) || sourceName.startsWith(desc.sourceName))
                 .findFirst();
     }
-
-    /**
-     * DTO, used to decouple the raw Spring property source name from its user-friendly representation.
-     */
-    public record PropertySourceDisplayData(
-            String displayName, @Nullable String description) {}
 }

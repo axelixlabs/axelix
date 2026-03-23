@@ -38,14 +38,13 @@ public enum PropertySourceCustomDescription {
     SYSTEM_ENVIRONMENT(
             "Contains all OS environment variables available to the 'JVM' process and has higher priority than properties from 'application*.properties/yaml'"),
 
-    // Application
+    // Application Info
     APPLICATION_INFO(
             "Contains application metadata extracted from the 'MANIFEST.MF' file and core Spring Boot properties 'spring.application.*'"),
 
-    // TODO: simplify the description here. It is not true that the config file is necessarily loaded from the
-    // classpath.
+    // Application Properties
     APPLICATION_PROPERTIES(
-            "Contains properties from the 'application*.properties/yaml' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources."),
+            "Contains properties from 'application*.properties' or 'application*.yaml' configuration files"),
 
     // CommandLinePropertySource
     COMMAND_LINE_ARGS("Contains properties from the command-line arguments passed to the application at startup"),
