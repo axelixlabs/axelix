@@ -46,7 +46,7 @@ public final class OidcAuthenticationOption implements AuthenticationOption {
     @Override
     @JsonProperty("type")
     public String type() {
-        return "odic";
+        return "oidc";
     }
 
     public String getAuthorizationEndpoint() {

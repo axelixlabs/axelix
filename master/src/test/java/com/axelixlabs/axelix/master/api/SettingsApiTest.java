@@ -89,7 +89,7 @@ class SettingsApiTest {
                 {
                   "authProviders": [
                     {
-                      "type": "static-admin"
+                      "type": "login-password"
                     }
                   ]
                 }
@@ -120,7 +120,7 @@ class SettingsApiTest {
                   "redirectUri": "http://localhost:3000/api/external/oauth2/callback",
                   "scope": "openid",
                   "authorizationEndpoint": "https://example.external.com/realms/axelix/openid-connect/auth",
-                  "type": "oauth2"
+                  "type": "oidc"
                 }
               ]
             }
@@ -174,10 +174,10 @@ class SettingsApiTest {
                       "redirectUri": "http://localhost:3000/api/external/oauth2/callback",
                       "scope": "openid",
                       "authorizationEndpoint": "https://example.external.com/realms/axelix/openid-connect/auth",
-                      "type": "oauth2"
+                      "type": "oidc"
                     },
                     {
-                      "type": "static-admin"
+                      "type": "login-password"
                     }
                   ]
                 }
