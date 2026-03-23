@@ -39,6 +39,13 @@ jobs:
       NEXUS_URL: ${{ secrets.NEXUS_URL }}
       NEXUS_HOST_PORT: ${{ secrets.NEXUS_HOST_PORT }}
       STORE_PASS: ${{ secrets.STORE_PASS }}
+
+      # OIDC Related settings
+      AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ENABLED: true
+      AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ISSUER_URL: ${{ secrets.OIDC_GOOGLE_ISSUER_URL }}
+      AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_ID: ${{ secrets.OIDC_GOOGLE_CLIENT_ID }}
+      AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_SECRET: ${{ secrets.OIDC_GOOGLE_CLIENT_SECRET }}
+      AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_REDIRECT_URI: ${{ secrets.OIDC_GOOGLE_REDIRECT_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
