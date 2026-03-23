@@ -5,11 +5,11 @@
 }
 
 .Or {
-   padding: 0 10px;
+    padding-inline: 10px;
 }
 
 .Line {
     flex: 1;
     height: 1px;
-    background-color: #e0e0e0;
+    background-color: var(--axelix-medium-grey);
 }

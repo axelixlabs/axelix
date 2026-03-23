@@ -20,13 +20,13 @@ import { useTranslation } from "react-i18next";
 
 import { Loader } from "components";
 import { fetchData } from "helpers";
-import { type IAuthOptionsResponseBody, type OIDCAuthOption, StatefulRequest } from "models";
+import { type AuthOption, type IAuthOptionsResponseBody, type OIDCAuthOption, StatefulRequest } from "models";
 import { getAuthOptions } from "services";
 import { LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME, OIDC_AUTH_OPTION_TYPE_NAME } from "utils";
 
 import { LoginOidcForm } from "../LoginOidcForm";
 import { LoginPasswordForm } from "../LoginPasswordForm";
-import SeparatorLine from "../SeparatorLine";
+import { SeparatorLine } from "../SeparatorLine";
 
 import styles from "./styles.module.css";
 
@@ -34,13 +34,13 @@ import styles from "./styles.module.css";
  * Function that is similar to kotlin's let - apply transformation on an
  * arbitrary value if the value is there (not undefied).
  */
-function ifFound<I, O>(value: I | undefined, transformer: (val: I) => O): O | undefined {
+const ifFound = <I, O>(value: I | undefined, transformer: (val: I) => O): O | undefined => {
     if (value) {
         return transformer(value);
     } else {
         return undefined;
     }
-}
+};
 
 export const LoginContent = () => {
     const { t } = useTranslation();
@@ -61,8 +61,8 @@ export const LoginContent = () => {
 
     const response = authOptions.response!;
 
-    const getAuthOption = (optionName: string) => {
-        return response.authProviders.find((value) => optionName === value.type);
+    const getAuthOption = (optionName: string): AuthOption | undefined => {
+        return response.authProviders.find(({ type }) => optionName === type);
     };
 
     const loginPasswordOptionPresent = getAuthOption(LOGIN_PASSWORD_AUTH_OPTION_TYPE_NAME);

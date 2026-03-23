@@ -26,5 +26,5 @@ export * from "./metrics";
 export * from "./globals";
 export * from "./caches";
 export * from "./beans";
-export * from "./gc";
 export * from "./auth";
+export * from "./gc";

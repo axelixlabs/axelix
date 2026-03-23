@@ -32,7 +32,7 @@ export const LoginOidcForm = ({ option }: IProps) => {
 
     return (
         <>
-            <Button htmlType="submit" loading={false} className={styles.SubmitButton} onClick={() => authorize(option)}>
+            <Button htmlType="submit" className={styles.SubmitButton} onClick={() => authorize(option)}>
                 {t("Authentication.oidcForm.loginButtonText")}
             </Button>
         </>

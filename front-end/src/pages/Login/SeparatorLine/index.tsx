@@ -17,7 +17,7 @@
  */
 import styles from "./styles.module.css";
 
-const SeparatorLine = () => {
+export const SeparatorLine = () => {
     return (
         <>
             <div className={styles.MainWrapper}>
@@ -28,5 +28,3 @@ const SeparatorLine = () => {
         </>
     );
 };
-
-export default SeparatorLine;

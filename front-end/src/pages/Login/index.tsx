@@ -28,7 +28,12 @@ const Login = () => {
         <>
             <div className={styles.MainWrapper}>
                 <div className={styles.LeftImageWrapper}>
-                    <img src={LoginLeftImage} alt="Login left image" className={styles.LeftImage} />
+                    <img
+                        fetchPriority="high"
+                        src={LoginLeftImage}
+                        alt="Login left image"
+                        className={styles.LeftImage}
+                    />
                 </div>
 
                 <div className={styles.ContentWrapper}>
