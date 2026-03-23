@@ -51,11 +51,12 @@ public record OAuth2Properties(
     private static final String DEFAULT_SCOPE = "openid";
 
     public OAuth2Properties {
-        Assert.notNull(issuerUri, "OAuth2 issuer-uri is required. Set " + OAUTH_PROPERTIES_PREFIX + "issuer-uri");
-        Assert.notNull(clientId, "OAuth2 client-id is required. Set " + OAUTH_PROPERTIES_PREFIX + "client-id");
+        Assert.notNull(issuerUri, "OAuth2 issuer-uri is required. Set " + OAUTH_PROPERTIES_PREFIX + ".issuer-uri");
+        Assert.notNull(clientId, "OAuth2 client-id is required. Set " + OAUTH_PROPERTIES_PREFIX + ".client-id");
         Assert.notNull(
-                clientSecret, "OAuth2 client-secret is required. Set " + OAUTH_PROPERTIES_PREFIX + "client-secret");
-        Assert.notNull(redirectUri, "OAuth2 redirect-uri is required. Set " + OAUTH_PROPERTIES_PREFIX + "redirect-uri");
+                clientSecret, "OAuth2 client-secret is required. Set " + OAUTH_PROPERTIES_PREFIX + ".client-secret");
+        Assert.notNull(
+                redirectUri, "OAuth2 redirect-uri is required. Set " + OAUTH_PROPERTIES_PREFIX + ".redirect-uri");
 
         if (scopes == null) {
             scopes = DEFAULT_SCOPE;
