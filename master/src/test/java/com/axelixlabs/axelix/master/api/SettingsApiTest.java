@@ -69,6 +69,7 @@ class SettingsApiTest {
                 "axelix.master.auth.options.static-admin.enabled=true",
                 "axelix.master.auth.options.static-admin.credentials.username=admin",
                 "axelix.master.auth.options.static-admin.credentials.password=password",
+                "axelix.master.auth.options.oauth2.enabled=false"
             })
     @Nested
     class WhenStaticAdminEnabled {
