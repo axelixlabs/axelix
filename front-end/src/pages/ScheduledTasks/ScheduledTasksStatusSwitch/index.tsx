@@ -22,7 +22,8 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { extractErrorCode } from "helpers";
-import { type IErrorResponse, type IRunnable, StatelessRequest } from "models";
+import { useServiceAccess } from "hooks";
+import { EAvailableServices, type IErrorResponse, type IRunnable, StatelessRequest } from "models";
 import { updateScheduledTasksStatus } from "services";
 
 interface IProps {
@@ -33,6 +34,8 @@ interface IProps {
 }
 
 export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
+    const scheduledTasksAccess = useServiceAccess(EAvailableServices.SCHEDULED_TASKS_MODIFY);
+
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { message } = App.useApp();
@@ -66,6 +69,7 @@ export const ScheduledTasksStatusSwitch = ({ runnable }: IProps) => {
                 onChange={() => switchTaskStatus()}
                 loading={mutationRequest.loading}
                 checked={runnable.enabled}
+                disabled={!scheduledTasksAccess}
             />
         </>
     );

@@ -18,6 +18,8 @@
 import { Layout } from "antd";
 import { Outlet } from "react-router";
 
+import { AccessProvider } from "components";
+
 import { AdminHeader } from "./AdminHeader";
 import { SiderMenu } from "./SiderMenu";
 import styles from "./styles.module.css";
@@ -34,6 +36,7 @@ interface IProps {
 export const MainLayout = ({ hideSider }: IProps) => {
     return (
         <>
+            <AccessProvider />
             <Layout className={styles.MainWrapper}>
                 <AdminHeader />
 

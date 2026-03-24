@@ -17,7 +17,13 @@
  */
 import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
-import type { AppDispatch, RootState } from "../store";
+import type { EAvailableServices } from "models";
+import type { AppDispatch, RootState } from "store";
 
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+export const useServiceAccess = (serviceName: EAvailableServices): boolean => {
+    const availableServices = useSelector((state: RootState) => state.services);
+    return availableServices.includes(serviceName);
+};

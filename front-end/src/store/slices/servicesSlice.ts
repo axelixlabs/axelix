@@ -15,19 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export { LanguageSwitcher } from "./LanguageSwitcher";
-export { TooltipWithCopy } from "./TooltipWithCopy";
-export { LinearProgress } from "./LinearProgress";
-export { UniversalModal } from "./UniversalModal";
-export { AccessProvider } from "./AccessProvider";
-export { HashNavigable } from "./HashNavigable";
-export { EditableValue } from "./EditableValue";
-export { EmptyHandler } from "./EmptyHandler";
-export { InfoTooltip } from "./InfoTooltip";
-export { PageSearch } from "./PageSearch";
-export { AboutModal } from "./AboutModal";
-export { StyledLink } from "./StyledLink";
-export { Accordion } from "./Accordion";
-export { default } from "./Loadable";
-export { Loader } from "./Loader";
-export { Copy } from "./Copy";
+import { createSlice } from "@reduxjs/toolkit";
+
+import type { EAvailableServices } from "models";
+
+const initialState: EAvailableServices[] = [];
+
+export const ServicesSlice = createSlice({
+    name: "services",
+    initialState: initialState,
+    reducers: {
+        setAvailableServices: (_, action) => {
+            return action.payload;
+        },
+    },
+});
+
+export const { setAvailableServices } = ServicesSlice.actions;

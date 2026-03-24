@@ -19,7 +19,8 @@ import { Button } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { IGCLoggingStatusResponseBody } from "models";
+import { useServiceAccess } from "hooks";
+import { EAvailableServices, type IGCLoggingStatusResponseBody } from "models";
 
 import { GCLogEnableSettings } from "../GCLogEnableSettings";
 
@@ -40,6 +41,7 @@ interface IProps {
 }
 
 export const GCDisabledMessage = ({ loggingStatusData, loadGCStatus }: IProps) => {
+    const GCAccess = useServiceAccess(EAvailableServices.GARBAGE_COLLECTOR);
     const { t } = useTranslation();
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -53,7 +55,12 @@ export const GCDisabledMessage = ({ loggingStatusData, loadGCStatus }: IProps) =
                     </div>
                     <div className={`TextLarge ${styles.Title}`}>{t("GC.disableTitle")}</div>
                     <div className={styles.SubTitle}>{t("GC.disableSubtitle")}</div>
-                    <Button icon={<OnOffIcon />} type="primary" onClick={() => setIsModalOpen(true)}>
+                    <Button
+                        icon={<OnOffIcon />}
+                        type="primary"
+                        onClick={() => setIsModalOpen(true)}
+                        disabled={!GCAccess}
+                    >
                         {t("GC.enableButtonText")}
                     </Button>
                 </div>

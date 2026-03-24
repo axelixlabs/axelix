@@ -22,7 +22,8 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { downloadFile, extractErrorCode } from "helpers";
-import { type IErrorResponse, StatelessRequest } from "models";
+import { useServiceAccess } from "hooks";
+import { EAvailableServices, type IErrorResponse, StatelessRequest } from "models";
 import { disableGCLogging, getGCLogFile, triggerGC } from "services";
 
 import styles from "./styles.module.css";
@@ -42,6 +43,8 @@ export interface IProps {
 }
 
 export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps) => {
+    const GCAccess = useServiceAccess(EAvailableServices.GARBAGE_COLLECTOR);
+
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { message } = App.useApp();
@@ -106,6 +109,7 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
                                     loading={downloadFileLoading}
                                     onClick={downloadFileHandler}
                                     className={styles.ActionButton}
+                                    disabled={!GCAccess}
                                 />
                             </Tooltip>
                             <Tooltip title={t("GC.disable")}>
@@ -116,6 +120,7 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
                                     onClick={disableGCHandler}
                                     danger
                                     className={styles.ActionButton}
+                                    disabled={!GCAccess}
                                 />
                             </Tooltip>
                         </>
@@ -127,6 +132,7 @@ export const GCFirstSection = ({ loadGCStatus, isLoggingStatusEnabled }: IProps)
                             loading={triggerGBData.loading}
                             onClick={triggerGBHandler}
                             className={styles.ActionButton}
+                            disabled={!GCAccess}
                         />
                     </Tooltip>
                 </div>

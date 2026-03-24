@@ -17,11 +17,12 @@
  */
 import { configureStore } from "@reduxjs/toolkit";
 
-import { UpdatePropertySlice } from "./slices";
+import { ServicesSlice, UpdatePropertySlice } from "./slices";
 
 export const store = configureStore({
     reducer: {
         updateProperty: UpdatePropertySlice.reducer,
+        services: ServicesSlice.reducer,
     },
 });
 

@@ -22,7 +22,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
-import { type IFixedTasks } from "models";
+import { useServiceAccess } from "hooks";
+import { EAvailableServices, type IFixedTasks } from "models";
 import { changeScheduledTaskInterval } from "services";
 
 import styles from "./styles.module.css";
@@ -35,6 +36,8 @@ interface IProps {
 }
 
 export const FixedTasksEditableValue = ({ task }: IProps) => {
+    const scheduledTasksAccess = useServiceAccess(EAvailableServices.SCHEDULED_TASKS_MODIFY);
+
     const { instanceId } = useParams();
     const { message } = App.useApp();
     const { t } = useTranslation();
@@ -124,7 +127,7 @@ export const FixedTasksEditableValue = ({ task }: IProps) => {
                     }}
                     trigger="click"
                 >
-                    <Button icon={<EditOutlined />} type="primary" />
+                    <Button icon={<EditOutlined />} disabled={!scheduledTasksAccess} type="primary" />
                 </Popover>
             </div>
         </>

@@ -23,13 +23,22 @@ import { useParams } from "react-router";
 
 import { EmptyHandler, Loader, PageSearch } from "components";
 import { extractErrorCode, fetchData, filterCacheManagers } from "helpers";
-import { type ICachesResponseBody, type IErrorResponse, StatefulRequest, StatelessRequest } from "models";
+import { useServiceAccess } from "hooks";
+import {
+    EAvailableServices,
+    type ICachesResponseBody,
+    type IErrorResponse,
+    StatefulRequest,
+    StatelessRequest,
+} from "models";
 import { clearAllCachesData, getCachesData } from "services";
 
 import { CacheManagerSection } from "./CacheManagerSection";
 import styles from "./styles.module.css";
 
 const Caches = () => {
+    const cachesClearAccess = useServiceAccess(EAvailableServices.CACHES_CLEAR);
+
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { message } = App.useApp();
@@ -77,7 +86,12 @@ const Caches = () => {
         <>
             <div className={styles.TopSection}>
                 <PageSearch setSearch={setSearch} />
-                <Button type="primary" onClick={clearAllCachesClickHandler} loading={clearAllCaches.loading}>
+                <Button
+                    type="primary"
+                    onClick={clearAllCachesClickHandler}
+                    loading={clearAllCaches.loading}
+                    disabled={!cachesClearAccess}
+                >
                     {t("Caches.clearAll")}
                 </Button>
             </div>

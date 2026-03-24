@@ -12,6 +12,7 @@
     "documentation": "Документация",
     "value": "Значение",
     "blog": "Блог",
+    "unknownError": "Неизвестная ошибка. Попробуйте обновить страницу.",
     "Details": {
         "downloadState": "Выгрузить состояние",
         "exportConfigurationOptions": "Список компонентов состояния для экспорта",
@@ -135,7 +136,7 @@
         "isLazyInitBean": "Ленивый",
         "isPrimaryBean": "Primary",
         "beanProxyType": "Проксирование",
-        "unknownProxyingType": "Незивестно",
+        "unknownProxyingType": "Неизвестно",
         "cglibProxy": "CGLIB",
         "jdkProxy": "JDK Динамический Прокси",
         "noProxy": "Не проксирован",
@@ -153,7 +154,7 @@
             "AUTO_CONFIGURATION_CLASS" : "Класс Авто-Конфигурации",
             "COMPONENT_ANNOTATION": "@Component или аналоги",
             "SYNTHETIC_BEAN": "Синтетический bean",
-            "UNKNOWN": "Незивестно",
+            "UNKNOWN": "Неизвестно",
             "FACTORY_BEAN": "Создан другим FactoryBean-ом",
             "BEAN_METHOD": "@Bean метод",
             "CONFIG_PROPS_BEAN": "@ConfigurationProperties bean"

@@ -25,7 +25,8 @@ import { useParams } from "react-router";
 
 import { TooltipWithCopy } from "components";
 import { extractErrorCode } from "helpers";
-import { type ICacheData, type IErrorResponse, StatelessRequest } from "models";
+import { useServiceAccess } from "hooks";
+import { EAvailableServices, type ICacheData, type IErrorResponse, StatelessRequest } from "models";
 import { clearCacheData } from "services";
 
 import { CacheStatusSwitch } from "../CacheStatusSwitch";
@@ -45,6 +46,8 @@ interface IProps {
 }
 
 export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
+    const cachesClearAccess = useServiceAccess(EAvailableServices.CACHES_CLEAR);
+
     const { instanceId } = useParams();
     const { t } = useTranslation();
     const { message } = App.useApp();
@@ -87,6 +90,7 @@ export const SingleCacheHeader = ({ cacheManagerName, cache }: IProps) => {
                         type="primary"
                         loading={clearSingleCache.loading}
                         onClick={clearCacheClickHandler}
+                        disabled={!cachesClearAccess}
                     />
                 </div>
                 <div>

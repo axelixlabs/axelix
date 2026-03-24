@@ -20,6 +20,7 @@ import type { AxiosResponse } from "axios";
 import { t } from "i18next";
 
 import {
+    EAvailableServices,
     EMimeTypes,
     EWallboardFilterKey,
     EWallboardFilterOperator,
@@ -122,4 +123,27 @@ export const createWallboardFilterSearchParam = (
     operand: string,
 ): string => {
     return `${key}:${operator}:${operand}`;
+};
+
+export const getCookie = (name: string): string | undefined => {
+    const cookie: Record<string, string> = {};
+
+    document.cookie.split(";").forEach((el) => {
+        const [key, ...rest] = el.split("=");
+        const value = rest.join("=");
+        cookie[key.trim()] = value;
+    });
+
+    return cookie?.[name];
+};
+
+export const getAvailableServices = (authorities: string): EAvailableServices[] => {
+    const authoritiesWithoutBrackets = authorities.replaceAll("[", "").replaceAll("]", "");
+    const authorityNames = authoritiesWithoutBrackets.split(",");
+    const trimmedAuthorityNames = authorityNames.map((authorityName) => authorityName.trim());
+    const availableServices = trimmedAuthorityNames.map(
+        (authorityName) => EAvailableServices[authorityName as keyof typeof EAvailableServices],
+    );
+
+    return availableServices;
 };
