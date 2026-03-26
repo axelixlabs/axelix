@@ -83,7 +83,7 @@ public class CachesClearApiTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches")) {
+                if (path.equals("/" + activeInstanceId + "/actuator/axelix-caches/clear")) {
                     return new MockResponse();
                 } else if (path.equals(
                         "/" + activeInstanceId + "/actuator/axelix-caches/testCacheManager/cities/clear")) {
@@ -111,7 +111,7 @@ public class CachesClearApiTest {
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest(10, TimeUnit.SECONDS);
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
-        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/actuator/axelix-caches");
+        assertThat(recordedRequest.getPath()).isEqualTo("/" + activeInstanceId + "/actuator/axelix-caches/clear");
     }
 
     @Test
