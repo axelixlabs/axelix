@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+export { default as CodeSnippetArrowIcon } from "../assets/icons/codeSnippetArrow.svg?react";
 export { default as ScheduledTasksIcon } from "../assets/icons/scheduledTasks.svg?react";
 export { default as ConfigPropsIcon } from "../assets/icons/configProps.svg?react";
 export { default as EnvironmentIcon } from "../assets/icons/environment.svg?react";
@@ -37,6 +38,7 @@ export { default as KotlinIcon } from "../assets/icons/kotlin.svg?react";
 export { default as LoaderIcon } from "../assets/icons/loader.svg?react";
 export { default as SpringIcon } from "../assets/icons/spring.svg?react";
 export { default as TargetIcon } from "../assets/icons/target.svg?react";
+export { default as BurgerIcon } from "../assets/icons/burger.svg?react";
 export { default as ArrowIcon } from "../assets/icons/arrow.svg?react";
 export { default as BeansIcon } from "../assets/icons/beans.svg?react";
 export { default as BuildIcon } from "../assets/icons/build.svg?react";
@@ -44,7 +46,6 @@ export { default as CloseIcon } from "../assets/icons/close.svg?react";
 export { default as CrownIcon } from "../assets/icons/crown.svg?react";
 export { default as LinuxIcon } from "../assets/icons/linux.svg?react";
 export { default as OnOffIcon } from "../assets/icons/onOff.svg?react";
-export { default as BurgerIcon } from "../assets/icons/burger.svg?react";
 export { default as LogoIcon } from "../assets/icons/logo.svg?react";
 export { default as LinkIcon } from "../assets/icons/link.svg?react";
 export { default as JavaIcon } from "../assets/icons/java.svg?react";
