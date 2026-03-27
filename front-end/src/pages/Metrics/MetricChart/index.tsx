@@ -37,11 +37,12 @@ interface IProps {
 }
 
 const renderDot = ({ cx, cy, index, points }: any): JSX.Element => {
-    if (index !== points.length - 1) {
-        return <Fragment key={index} />;
+    // we're rendering the head of the line - render the dot.
+    if (index === points.length - 1) {
+        return <circle cx={cx} cy={cy} r={3} className={styles.Dot} />;
     }
 
-    return <circle cx={cx} cy={cy} r={3} className={styles.Dot} />;
+    return <Fragment key={index} />;
 };
 
 export const MetricChart = ({ measurements, startTime }: IProps) => {
