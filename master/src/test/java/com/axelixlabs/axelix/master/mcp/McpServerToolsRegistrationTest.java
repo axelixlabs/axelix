@@ -56,7 +56,6 @@ class McpServerToolsRegistrationTest {
                         "getWallboard",
                         "getAllCaches",
                         "clearAllCaches",
-                        "clearSpecificCacheManager",
                         "clearSpecificCacheEntity");
     }
 }

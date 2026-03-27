@@ -20,12 +20,12 @@ package com.axelixlabs.axelix.master.mcp;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import org.springaicommunity.mcp.annotation.McpTool;
 import org.springaicommunity.mcp.annotation.McpToolParam;
 
 import org.springframework.stereotype.Service;
 
+import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
@@ -67,7 +67,8 @@ public class CacheMcpServerTools {
             """,
             annotations =
                     @McpTool.McpAnnotations(
-                            title = "Provides the list of all caches (along with Cache Managers) inside this Spring Boot app",
+                            title =
+                                    "Provides the list of all caches (along with Cache Managers) inside this Spring Boot app",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,
