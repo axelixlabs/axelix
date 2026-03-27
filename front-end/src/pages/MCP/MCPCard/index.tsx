@@ -16,10 +16,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Badge, Tooltip } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 import { EMCPToolStatus, type IMCPTool } from "models";
 
+import { getExtension } from "../../../../extensions.ts";
 import { MCPCardDescription } from "../MCPCardDescription";
 import { MCPCardFooter } from "../MCPCardFooter";
 
@@ -33,6 +34,8 @@ interface IProps {
 }
 
 export const MCPCard = ({ mcpTool }: IProps) => {
+    const MCPAccessLogComponent = getExtension("MCPAccessLog") ?? Fragment;
+
     const textRef = useRef<HTMLDivElement>(null);
 
     const [isEllipsis, setIsEllipsis] = useState<boolean>(false);
@@ -53,28 +56,30 @@ export const MCPCard = ({ mcpTool }: IProps) => {
 
     return (
         <>
-            <div className={styles.Card}>
-                <div className={`${styles.Header} ${isEllipsis ? styles.TwoLinesHeader : ""}`}>
-                    <Tooltip title={isEllipsis ? title : undefined}>
-                        <div ref={textRef} className={styles.Title}>
-                            {title}
-                        </div>
-                    </Tooltip>
-                    <Badge
-                        color={isEnabled ? "#00ab55" : "#ff000a"}
-                        styles={{
-                            indicator: {
-                                width: "8px",
-                                height: "8px",
-                            },
-                        }}
-                    />
+            <MCPAccessLogComponent>
+                <div className={styles.Card}>
+                    <div className={`${styles.Header} ${isEllipsis ? styles.TwoLinesHeader : ""}`}>
+                        <Tooltip title={isEllipsis ? title : undefined}>
+                            <div ref={textRef} className={styles.Title}>
+                                {title}
+                            </div>
+                        </Tooltip>
+                        <Badge
+                            color={isEnabled ? "#00ab55" : "#ff000a"}
+                            styles={{
+                                indicator: {
+                                    width: "8px",
+                                    height: "8px",
+                                },
+                            }}
+                        />
+                    </div>
+
+                    <MCPCardDescription description={description} />
+
+                    <MCPCardFooter annotations={annotations} />
                 </div>
-
-                <MCPCardDescription description={description} />
-
-                <MCPCardFooter annotations={annotations} />
-            </div>
+            </MCPAccessLogComponent>
         </>
     );
 };

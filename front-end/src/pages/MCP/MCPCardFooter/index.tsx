@@ -70,7 +70,7 @@ export const MCPCardFooter = ({ annotations }: IProps) => {
                     </div>
                 }
             >
-                <BurgerIcon className={styles.BurgerIcon} />
+                <BurgerIcon className={styles.BurgerIcon} onClick={(e) => e.stopPropagation()} />
             </Popover>
         </div>
     );

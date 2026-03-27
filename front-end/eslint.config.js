@@ -102,6 +102,12 @@ export default [
         },
     },
     {
+        files: ["src/enterprise/**/*.{js,jsx,ts,tsx}"],
+        rules: {
+            "header/header": ["error", "../LICENSE_HEADER_ENTERPRISE"],
+        },
+    },
+    {
         files: ["eslint.config.js"],
         rules: {
             complexity: ["off"],
