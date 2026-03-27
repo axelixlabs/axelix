@@ -19,6 +19,5 @@ CREATE TABLE IF NOT EXISTS instance_vm_features (
     name          TEXT    NOT NULL,
     description   TEXT    NOT NULL,
     enabled       INTEGER NOT NULL,
-    instances_key INTEGER,
     PRIMARY KEY (instance_id, name)
 );

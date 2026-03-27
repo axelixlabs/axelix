@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.response;
 
-import java.util.List;
+import java.util.Collection;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.jspecify.annotations.Nullable;
@@ -34,7 +34,8 @@ import com.axelixlabs.axelix.master.domain.Instance.VMFeature;
  * @param build        The profile of the build component response.
  * @param os           The profile of the OS component response.
  *
- * @author Nikita Kirilov, Sergey Cherkasov
+ * @author Nikita Kirilov
+ * @author Sergey Cherkasov
  */
 public record InstanceDetailsResponse(
         @Nullable String serviceName,
@@ -43,7 +44,7 @@ public record InstanceDetailsResponse(
         SpringProfile spring,
         @Nullable BuildProfile build,
         OSProfile os,
-        List<VMFeature> vmFeatures) {
+        Collection<VMFeature> vmFeatures) {
 
     /**
      * The profile of a given build.

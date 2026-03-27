@@ -17,83 +17,57 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.repository.InstanceRepository;
-import com.axelixlabs.axelix.master.repository.entity.InstanceEntity;
 
 /**
  * JDBC-based implementation of {@link InstanceRegistry} that persists instances in a relational database.
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @Service
+@NullMarked
+@Transactional
 public class DatabaseInstanceRegistry implements InstanceRegistry {
 
-    private final InstanceEntityMapper mapper;
-
+    // Technically, mixing the Repositories with JdbcAggregateTemplate abstraction layers is not
+    // the brightest idea, but that is a trade-off for not making Instance implement Persistable and stuff.
     private final InstanceRepository instanceRepository;
-
     private final JdbcAggregateTemplate jdbcAggregateTemplate;
 
     public DatabaseInstanceRegistry(
-            InstanceEntityMapper mapper,
-            InstanceRepository instanceRepository,
-            JdbcAggregateTemplate jdbcAggregateTemplate) {
-        this.mapper = mapper;
+            InstanceRepository instanceRepository, JdbcAggregateTemplate jdbcAggregateTemplate) {
         this.instanceRepository = instanceRepository;
         this.jdbcAggregateTemplate = jdbcAggregateTemplate;
     }
 
     @Override
     public void register(Instance instance) {
-        InstanceEntity entity = mapper.toEntity(instance);
-        if (instanceRepository.existsById(entity.id())) {
-            jdbcAggregateTemplate.update(entity);
+        if (instanceRepository.existsById(instance.id().instanceId())) {
+            jdbcAggregateTemplate.update(instance);
         } else {
-            jdbcAggregateTemplate.insert(entity);
+            jdbcAggregateTemplate.insert(instance);
         }
     }
 
     @Override
     public void registerAll(Collection<Instance> instances) {
-        List<InstanceEntity> incoming = instances.stream().map(mapper::toEntity).toList();
-
-        Map<String, InstanceEntity> existingById = new HashMap<>();
-        instanceRepository.findAll().forEach(entity -> existingById.put(entity.id(), entity));
-
-        List<InstanceEntity> toInsert = new ArrayList<>();
-        List<InstanceEntity> toUpdate = new ArrayList<>();
-
-        for (InstanceEntity entity : incoming) {
-            InstanceEntity existing = existingById.get(entity.id());
-            if (existing == null) {
-                toInsert.add(entity);
-            } else if (!existing.equals(entity)) {
-                toUpdate.add(entity);
-            }
-        }
-
-        if (!toInsert.isEmpty()) {
-            jdbcAggregateTemplate.insertAll(toInsert);
-        }
-        if (!toUpdate.isEmpty()) {
-            jdbcAggregateTemplate.updateAll(toUpdate);
-        }
+        jdbcAggregateTemplate.deleteAll(Instance.class);
+        jdbcAggregateTemplate.insertAll(instances);
     }
 
     @Override
@@ -109,18 +83,17 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
 
     @Override
     public Optional<Instance> get(InstanceId instanceId) {
-        return instanceRepository.findById(instanceId.instanceId()).map(mapper::toDomain);
+        return instanceRepository.findById(instanceId.instanceId());
     }
 
     @Override
-    public @NonNull Set<Instance> getAll() {
-        List<Instance> result = new ArrayList<>();
-        instanceRepository.findAll().forEach(entity -> result.add(mapper.toDomain(entity)));
-        return Set.copyOf(result);
+    public List<Instance> getAll() {
+        // No need to coping collections or anything - the domain instances are not proxied
+        return instanceRepository.findAll();
     }
 
     @Override
-    public @NonNull Set<InstanceId> getAllIds() {
+    public Set<InstanceId> getAllIds() {
         return instanceRepository.findAllIds().stream().map(InstanceId::of).collect(Collectors.toSet());
     }
 
@@ -138,8 +111,6 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
 
     @Override
     public Set<Instance> findByQuery(String query) {
-        return instanceRepository.findByNameLike("%" + query.toLowerCase() + "%").stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toSet());
+        return instanceRepository.findByNameLike("%" + query.toLowerCase() + "%");
     }
 }

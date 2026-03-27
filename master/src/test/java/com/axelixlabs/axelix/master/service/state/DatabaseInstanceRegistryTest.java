@@ -42,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link DatabaseInstanceRegistry}
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest
 class DatabaseInstanceRegistryTest {
@@ -76,7 +77,7 @@ class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
                 "Http://localhost:8080/actuator",
-                List.of(
+                Set.of(
                         new VMFeature("feature-1", "description-1", true),
                         new VMFeature("feature-2", "description-2", false)));
 
@@ -104,7 +105,7 @@ class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
                 "Http://localhost:8080/actuator",
-                List.of(
+                Set.of(
                         new VMFeature("feature-1", "description-1", true),
                         new VMFeature("feature-2", "description-2", false)));
         instanceRegistry.register(instance);
@@ -230,6 +231,6 @@ class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.DOWN,
                 new MemoryUsage(heap),
                 "/actuator",
-                List.of());
+                Set.of());
     }
 }

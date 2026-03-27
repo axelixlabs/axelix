@@ -18,10 +18,11 @@
 package com.axelixlabs.axelix.master.service.state;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
@@ -35,6 +36,7 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
  */
+@NullMarked
 public interface InstanceRegistry {
 
     /**
@@ -51,9 +53,7 @@ public interface InstanceRegistry {
      *
      * @param instances the instances to be registered or updated
      */
-    default void registerAll(Collection<Instance> instances) {
-        instances.forEach(this::register);
-    }
+    void registerAll(Collection<Instance> instances);
 
     /**
      * Deregisters the {@link Instance} by the instanceId.
@@ -67,9 +67,7 @@ public interface InstanceRegistry {
      *
      * @param instanceIds the collection of IDs of the instances to be deregistered.
      */
-    default void deRegisterAll(Collection<InstanceId> instanceIds) {
-        instanceIds.forEach(this::deRegister);
-    }
+    void deRegisterAll(Collection<InstanceId> instanceIds);
 
     /**
      * Get {@link Instance} by its id.
@@ -85,15 +83,13 @@ public interface InstanceRegistry {
      *
      * @return all instances that are managed by this registry.
      */
-    @NonNull
-    Set<Instance> getAll();
+    List<Instance> getAll();
 
     /**
      * Get all instance IDs that are managed by this registry.
      *
      * @return all instance IDs that are managed by this registry.
      */
-    @NonNull
     Set<InstanceId> getAllIds();
 
     /**

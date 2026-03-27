@@ -18,19 +18,21 @@
 package com.axelixlabs.axelix.master.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import com.axelixlabs.axelix.master.repository.entity.InstanceEntity;
+import com.axelixlabs.axelix.master.domain.Instance;
 
 /**
- * Repository for {@link InstanceEntity}.
+ * Repository for {@link Instance} aggregate.
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public interface InstanceRepository extends CrudRepository<InstanceEntity, String> {
+public interface InstanceRepository extends ListCrudRepository<Instance, String> {
 
     @Query("SELECT AVG(heap) FROM instances")
     Double findAverageHeap();
@@ -45,5 +47,5 @@ public interface InstanceRepository extends CrudRepository<InstanceEntity, Strin
         SELECT * FROM instances
         WHERE LOWER(name) LIKE :query
         """)
-    List<InstanceEntity> findByNameLike(@Param("query") String query);
+    Set<Instance> findByNameLike(@Param("query") String query);
 }

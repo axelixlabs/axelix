@@ -38,7 +38,9 @@ public class SQLiteDialect extends AnsiDialect {
 
     @Override
     public @NonNull LockClause lock() {
+
         return new LockClause() {
+
             @Override
             public @NonNull String getLock(@NonNull LockOptions lockOptions) {
                 return "";

@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.service.discovery;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -177,7 +176,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
 
         subject.performDiscovery();
 
-        Set<Instance> registeredInstances = instanceRegistry.getAll();
+        List<Instance> registeredInstances = instanceRegistry.getAll();
         assertThat(registeredInstances).hasSize(2);
 
         assertThat(registeredInstances).extracting(it -> it.id().instanceId()).containsOnly(instance1Id, instance2Id);

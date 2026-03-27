@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api;
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
@@ -171,7 +172,7 @@ public class DashboardApiTest {
                 "6.0.2",
                 "BellSoft",
                 null,
-                java.util.List.of()));
+                Set.of()));
 
         registry.register(TestObjectFactory.createInstance(
                 instance2Id,
@@ -183,7 +184,7 @@ public class DashboardApiTest {
                 "6.0.1",
                 "BellSoft",
                 "1.9.0",
-                java.util.List.of()));
+                Set.of()));
 
         registry.register(TestObjectFactory.createInstance(
                 instance3Id,
@@ -195,7 +196,7 @@ public class DashboardApiTest {
                 "5.3.0",
                 "BellSoft",
                 null,
-                java.util.List.of()));
+                Set.of()));
     }
 
     @AfterEach

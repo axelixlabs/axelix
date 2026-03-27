@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
@@ -84,7 +84,7 @@ public class WallboardApiTest {
                     "6.2.0",
                     "BellSoft",
                     "2.0.0",
-                    List.of()));
+                    Set.of()));
 
             registry.register(TestObjectFactory.createInstance(
                     instance2Id,
@@ -96,7 +96,7 @@ public class WallboardApiTest {
                     "5.3.0",
                     "Corretto",
                     null,
-                    List.of()));
+                    Set.of()));
         }
 
         @AfterEach

@@ -22,7 +22,6 @@ import org.springframework.data.relational.core.mapping.Table;
 /**
  * Persistence entity representing a JVM feature for a specific instance.
  *
- * @see InstanceEntity
  * @author Nikita Kirillov
  */
 @Table("instance_vm_features")

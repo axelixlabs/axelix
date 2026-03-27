@@ -18,10 +18,15 @@
 package com.axelixlabs.axelix.master.domain;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Embedded;
+import org.springframework.data.relational.core.mapping.MappedCollection;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * @param id                      The id of the instance. This id must be unique among all the other instances that are
@@ -38,8 +43,9 @@ import org.jspecify.annotations.Nullable;
  * @param status                  The status of the given instance from the Master standpoint.
  * @param actuatorUrl             The URL of the actuator root, e.g. {@code https://my-app:6061/actuator}
  */
+@Table("instances")
 public record Instance(
-        InstanceId id,
+        @Embedded.Nullable @Id InstanceId id,
         String name,
         String serviceVersion,
         String javaVersion,
@@ -50,9 +56,9 @@ public record Instance(
         String commitShaShort,
         @Nullable Instant deployedAt,
         InstanceStatus status,
-        MemoryUsage memoryUsage,
+        @Embedded.Empty MemoryUsage memoryUsage,
         @NonNull String actuatorUrl,
-        List<VMFeature> vmFeatures) {
+        @MappedCollection(idColumn = "instance_id") Set<VMFeature> vmFeatures) {
 
     /**
      * Status of various useful JVM features for this service, like AOT Cache, AppCDS etc.

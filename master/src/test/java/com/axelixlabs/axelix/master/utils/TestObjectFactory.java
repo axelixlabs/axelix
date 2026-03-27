@@ -19,7 +19,8 @@ package com.axelixlabs.axelix.master.utils;
 
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
@@ -49,7 +50,7 @@ public final class TestObjectFactory {
 
     public static Instance withName(String id, String name) {
         return createInstance(
-                id, DEFAULT_URL, name, DEFAULT_STATUS, "25", "3.5.2", "6.0.2", "BellSoft", null, List.of());
+                id, DEFAULT_URL, name, DEFAULT_STATUS, "25", "3.5.2", "6.0.2", "BellSoft", null, Set.of());
     }
 
     public static Instance withUrl(String id, String url) {
@@ -77,7 +78,7 @@ public final class TestObjectFactory {
                 springFramework,
                 jdkVendor,
                 kotlin,
-                List.of());
+                Set.of());
     }
 
     public static Instance createInstance(
@@ -102,12 +103,12 @@ public final class TestObjectFactory {
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(memoryUsage),
                 "url",
-                List.of());
+                Set.of());
     }
 
     public static Instance createInstance(String id, String url, Instance.InstanceStatus status) {
         return createInstance(
-                id, url, "test-object-factory-instance", status, "25", "3.5.2", "6.0.2", "BellSoft", null, List.of());
+                id, url, "test-object-factory-instance", status, "25", "3.5.2", "6.0.2", "BellSoft", null, Set.of());
     }
 
     public static Instance createInstance(
@@ -122,7 +123,7 @@ public final class TestObjectFactory {
                 "6.0.2",
                 "BellSoft",
                 null,
-                Arrays.stream(vmFeatures).toList());
+                Arrays.stream(vmFeatures).collect(Collectors.toSet()));
     }
 
     public static Instance createInstance(String id, String url, VMFeature... vmFeatures) {
@@ -136,7 +137,7 @@ public final class TestObjectFactory {
                 "6.0.2",
                 "BellSoft",
                 null,
-                Arrays.stream(vmFeatures).toList());
+                Arrays.stream(vmFeatures).collect(Collectors.toSet()));
     }
 
     public static Instance createInstance(
@@ -149,7 +150,7 @@ public final class TestObjectFactory {
             String springFramework,
             String jdkVendor,
             @Nullable String kotlin,
-            List<VMFeature> vmFeatures) {
+            Set<VMFeature> vmFeatures) {
         return new Instance(
                 InstanceId.of(id),
                 name,
