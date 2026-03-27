@@ -15,30 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
 
-import { App } from "./App";
+// TODO: Fix types in future
+export const extensions: Record<string, any> = {};
 
-import "./index.css";
-import "./customizedTable.css";
+export const registerExtension = (id: string, value: any): void => {
+    extensions[id] = value;
+};
 
-const ENTERPRISE = "enterprise";
-
-if (import.meta.env.VITE_EDITION === ENTERPRISE) {
-    const modules = import.meta.glob("./enterprise/src/index.ts");
-
-    const path = "./enterprise/src/index.ts";
-
-    const enterpriseModule = modules[path];
-
-    if (enterpriseModule) {
-        await enterpriseModule();
-    }
-}
-
-createRoot(document.getElementById("root")!).render(
-    <StrictMode>
-        <App />
-    </StrictMode>,
-);
+export const getExtension = (id: string): any | null => {
+    return extensions[id] ?? null;
+};

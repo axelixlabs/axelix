@@ -48,6 +48,11 @@ export default defineConfig(() => {
         resolve: {
             alias: {
                 "@": path.resolve(__dirname, "./src"),
+                "enterprise-assets": path.resolve(__dirname, "./src/enterprise/src/assets"),
+                "enterprise-components": path.resolve(__dirname, "./src/enterprise/src/components"),
+                "enterprise-helpers": path.resolve(__dirname, "./src/enterprise/src/helpers"),
+                "enterprise-models": path.resolve(__dirname, "./src/enterprise/src/models"),
+                "enterprise-utils": path.resolve(__dirname, "./src/enterprise/src/utils"),
             },
         },
     };

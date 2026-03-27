@@ -25,8 +25,13 @@
 
         /* Paths */
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "enterprise-assets": ["./enterprise/src/assets"],
+            "enterprise-components": ["./enterprise/src/components"],
+            "enterprise-helpers": ["./enterprise/src/helpers"],
+            "enterprise-models": ["./enterprise/src/models"],
+            "enterprise-utils": ["./enterprise/src/utils"]
         }
     },
-    "include": ["src"]
+    "include": ["./src", "./extensions.ts"]
 }
