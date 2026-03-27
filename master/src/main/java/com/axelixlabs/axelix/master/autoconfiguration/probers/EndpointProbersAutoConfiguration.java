@@ -109,11 +109,6 @@ public class EndpointProbersAutoConfiguration {
     }
 
     @Bean
-    public DiscardingAbstractEndpointProber clearCacheManagerEndpointProber() {
-        return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.CLEAR_SINGLE_CACHE_MANAGER);
-    }
-
-    @Bean
     public DiscardingAbstractEndpointProber enableCacheEndpointProver() {
         return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.ENABLE_CACHE);
     }

@@ -50,70 +50,110 @@ public class McpToolApiTest {
 
     // language=json
     private static final String EXPECTED_MCP_TOOLS_FEED = """
-        {
-          "tools" : [ {
-            "title" : "Beans Feed",
-            "description" : "List of all the beans available in the ApplicationContext",
-            "annotations" : {
-              "readOnlyHint" : true,
-              "destructiveHint" : false,
-              "idempotentHint" : true,
-              "openWorldHint" : false
-            },
-            "status" : "UP"
-          }, {
-            "title" : "@Conditional Feed",
-            "description" : "List that contain results of all @Conditional evaluations",
-            "annotations" : {
-              "readOnlyHint" : true,
-              "destructiveHint" : false,
-              "idempotentHint" : true,
-              "openWorldHint" : false
-            },
-            "status" : "UP"
-          }, {
-            "title" : "Config Props Beans",
-            "description" : "List of all the @ConfigurationProperties beans inside this Spring Boot app",
-            "annotations" : {
-              "readOnlyHint" : true,
-              "destructiveHint" : false,
-              "idempotentHint" : true,
-              "openWorldHint" : false
-            },
-            "status" : "UP"
-          }, {
-            "title" : "Properties",
-            "description" : "List of all the properties inside the Spring Boot application",
-            "annotations" : {
-              "readOnlyHint" : true,
-              "destructiveHint" : false,
-              "idempotentHint" : true,
-              "openWorldHint" : false
-            },
-            "status" : "UP"
-          }, {
-            "title" : "Scheduled Tasks",
-            "description" : "List of all scheduled tasks inside this Spring Boot app",
-            "annotations" : {
-              "readOnlyHint" : true,
-              "destructiveHint" : false,
-              "idempotentHint" : true,
-              "openWorldHint" : false
-            },
-            "status" : "UP"
-          }, {
-            "title" : "Instances Feed",
-            "description" : "List of all Spring Boot applications instances currently deployed",
-            "annotations" : {
-              "readOnlyHint" : true,
-              "destructiveHint" : false,
-              "idempotentHint" : true,
-              "openWorldHint" : false
-            },
-            "status" : "UP"
-          } ]
-        }
-        """;
+            {
+              "tools" : [
+                  {
+                    "title" : "Clear All Cache",
+                    "description" : "Clears all caches inside the Spring Boot app",
+                    "annotations" : {
+                      "readOnlyHint" : false,
+                      "destructiveHint" : true,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Clear Specific Cache",
+                    "description" : "Clears a specific cache inside a given Cache Manager",
+                    "annotations" : {
+                      "readOnlyHint" : false,
+                      "destructiveHint" : true,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Caches Feed",
+                    "description" : "Provides the list of all caches (along with Cache Managers) inside this Spring Boot app",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Beans Feed",
+                    "description" : "List of all the beans available in the ApplicationContext",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "@Conditional Feed",
+                    "description" : "List that contain results of all @Conditional evaluations",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Config Props Beans",
+                    "description" : "List of all the @ConfigurationProperties beans inside this Spring Boot app",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Properties",
+                    "description" : "List of all the properties inside the Spring Boot application",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Scheduled Tasks",
+                    "description" : "List of all scheduled tasks inside this Spring Boot app",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Instances Feed",
+                    "description" : "List of all Spring Boot applications instances currently deployed",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  }
+              ]
+            }
+            """;
 
     @Test
     void shouldReturnMcpToolsFeed() {

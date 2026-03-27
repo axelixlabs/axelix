@@ -67,7 +67,7 @@ public class CacheMcpServerTools {
             """,
             annotations =
                     @McpTool.McpAnnotations(
-                            title = "List of all caches this Spring Boot app",
+                            title = "Provides the list of all caches (along with Cache Managers) inside this Spring Boot app",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,
@@ -93,7 +93,7 @@ public class CacheMcpServerTools {
             """,
             annotations =
                     @McpTool.McpAnnotations(
-                            title = "Clears all cache in the Spring Boot app",
+                            title = "Clears all caches inside the Spring Boot app",
                             readOnlyHint = false,
                             destructiveHint = true,
                             idempotentHint = true,
@@ -119,7 +119,7 @@ public class CacheMcpServerTools {
             """,
             annotations =
                     @McpTool.McpAnnotations(
-                            title = "Clears a specific cache in a specific cache manager",
+                            title = "Clears a specific cache inside a given Cache Manager",
                             readOnlyHint = false,
                             destructiveHint = true,
                             idempotentHint = true,
