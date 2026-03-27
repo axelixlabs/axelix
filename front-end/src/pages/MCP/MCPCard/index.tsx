@@ -24,6 +24,7 @@ import { MCPCardDescription } from "../MCPCardDescription";
 import { MCPCardFooter } from "../MCPCardFooter";
 
 import styles from "./styles.module.css";
+import { getExtension } from "../../../../extensions";
 
 interface IProps {
     /**
@@ -33,6 +34,8 @@ interface IProps {
 }
 
 export const MCPCard = ({ mcpTool }: IProps) => {
+    const MCPAccessLogComponent = getExtension("MCPAccessLog") ?? <></>;
+
     const textRef = useRef<HTMLDivElement>(null);
 
     const [isEllipsis, setIsEllipsis] = useState<boolean>(false);
@@ -53,28 +56,30 @@ export const MCPCard = ({ mcpTool }: IProps) => {
 
     return (
         <>
-            <div className={styles.Card}>
-                <div className={`${styles.Header} ${isEllipsis ? styles.TwoLinesHeader : ""}`}>
-                    <Tooltip title={isEllipsis ? title : undefined}>
-                        <div ref={textRef} className={styles.Title}>
-                            {title}
-                        </div>
-                    </Tooltip>
-                    <Badge
-                        color={isEnabled ? "#00ab55" : "#ff000a"}
-                        styles={{
-                            indicator: {
-                                width: "8px",
-                                height: "8px",
-                            },
-                        }}
-                    />
+            <MCPAccessLogComponent>
+                <div className={styles.Card}>
+                    <div className={`${styles.Header} ${isEllipsis ? styles.TwoLinesHeader : ""}`}>
+                        <Tooltip title={isEllipsis ? title : undefined}>
+                            <div ref={textRef} className={styles.Title}>
+                                {title}
+                            </div>
+                        </Tooltip>
+                        <Badge
+                            color={isEnabled ? "#00ab55" : "#ff000a"}
+                            styles={{
+                                indicator: {
+                                    width: "8px",
+                                    height: "8px",
+                                },
+                            }}
+                        />
+                    </div>
+
+                    <MCPCardDescription description={description} />
+
+                    <MCPCardFooter annotations={annotations} />
                 </div>
-
-                <MCPCardDescription description={description} />
-
-                <MCPCardFooter annotations={annotations} />
-            </div>
+            </MCPAccessLogComponent>
         </>
     );
 };

@@ -272,5 +272,8 @@
         "average": "Average",
         "duration": "Duration",
         "durationTooltip": "Aggregated information about the duration of this transactional method execution"
+    },
+    "MCP": {
+        "accessLog": "Access Log"
     }
 }

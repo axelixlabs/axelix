@@ -15,20 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { type ReactNode } from "react";
 
-import { App } from "./App";
+export const extensions: Record<string, ReactNode> = {};
 
-import "./index.css";
-import "./customizedTable.css";
+export const registerExtension = (id: string, value: ReactNode): void => {
+    extensions[id] = value;
+};
 
-if (import.meta.env.VITE_NNN === "enterprise") {
-    await import("../../../index");
+export const getExtension = (id: string): ReactNode => {
+    return extensions[id] || null;
 }
-
-createRoot(document.getElementById("root")!).render(
-    <StrictMode>
-        <App />
-    </StrictMode>,
-);
