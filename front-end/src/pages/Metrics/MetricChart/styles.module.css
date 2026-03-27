@@ -2,3 +2,9 @@
     width: 100%;
     aspect-ratio: 16 / 9;
 }
+
+.Dot {
+    fill: var(--axelix-primary-white);
+    stroke: var(--axelix-primary-green);
+    stroke-width: 3px;
+}
