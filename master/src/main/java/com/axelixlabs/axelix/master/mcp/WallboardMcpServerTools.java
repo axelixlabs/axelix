@@ -19,11 +19,10 @@ package com.axelixlabs.axelix.master.mcp;
 
 import java.util.Set;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springaicommunity.mcp.annotation.McpTool;
 import org.springaicommunity.mcp.annotation.McpTool.McpAnnotations;
 import org.springaicommunity.mcp.annotation.McpToolParam;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -78,8 +77,7 @@ public class WallboardMcpServerTools {
             or 'invoice-internal-process'. Use this when you're confident that you know the name
             of the service. If you're not sure - just do not specify it, request the whole feed, and
             find it manually.
-            """) String query)
-            throws JsonProcessingException {
+            """) String query) {
         Set<Instance> instancesFeed = getInstancesFeed(query);
         return objectMapper.writeValueAsString(instancesFeed);
     }

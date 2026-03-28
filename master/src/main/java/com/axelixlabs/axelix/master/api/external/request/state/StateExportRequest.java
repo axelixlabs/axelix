@@ -19,8 +19,8 @@ package com.axelixlabs.axelix.master.api.external.request.state;
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.jspecify.annotations.NonNull;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import com.axelixlabs.axelix.master.api.external.request.deserilize.StateExportComponentDeserializer;
 

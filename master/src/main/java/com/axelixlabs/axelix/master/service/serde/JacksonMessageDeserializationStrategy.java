@@ -17,10 +17,9 @@
  */
 package com.axelixlabs.axelix.master.service.serde;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.NonNull;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * {@link MessageDeserializationStrategy} based on Jackson.
@@ -39,7 +38,7 @@ public abstract class JacksonMessageDeserializationStrategy<T> implements Messag
     public @NonNull T deserialize(byte @NonNull [] binary) throws DeserializationException {
         try {
             return objectMapper.readValue(binary, supported());
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new DeserializationException(e);
         }
     }

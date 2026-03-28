@@ -20,9 +20,10 @@ package com.axelixlabs.axelix.master.api;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
+import org.springframework.boot.http.client.HttpRedirects;
+import org.springframework.boot.restclient.RestTemplateBuilder;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -86,7 +87,7 @@ class OAuth2CallbackControllerTest {
                 .httpOnly(true)
                 .build();
 
-        restTemplate = new TestRestTemplate().withRedirects(ClientHttpRequestFactorySettings.Redirects.DONT_FOLLOW);
+        restTemplate = new TestRestTemplate(new RestTemplateBuilder().redirects(HttpRedirects.DONT_FOLLOW));
 
         when(oidcClient.exchangeCodeForIdToken(CODE)).thenReturn(ID_TOKEN);
         when(oidcClient.validateOAuth2JwtTokenAndExtractUsername(ID_TOKEN)).thenReturn(USERNAME);

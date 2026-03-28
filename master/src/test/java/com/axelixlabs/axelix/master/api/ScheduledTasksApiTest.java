@@ -48,7 +48,6 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteReques
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
-import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
@@ -424,19 +423,26 @@ public class ScheduledTasksApiTest {
         ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", invalidCronExpression);
 
+        // and.
+        String expectedResponse = """
+            {
+                "errorCode" : "%s"
+            }
+            """.formatted(ApiErrorCodes.INVALID_CRON_EXPRESSION.getErrorCode());
+
         // when.
-        ResponseEntity<SimpleApiError> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .withoutAuthorities()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
-                        SimpleApiError.class,
+                        String.class,
                         activeInstanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().errorCode()).isEqualTo(ApiErrorCodes.INVALID_CRON_EXPRESSION.getErrorCode());
+        assertThatJson(response.getBody()).isEqualTo(expectedResponse);
     }
 
     @Test

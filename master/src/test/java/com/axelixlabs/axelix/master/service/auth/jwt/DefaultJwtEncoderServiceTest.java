@@ -23,14 +23,13 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Set;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -207,7 +206,7 @@ class DefaultJwtEncoderServiceTest {
     }
 
     @Test
-    void shouldContainCorrectExpirationTime() throws JsonProcessingException {
+    void shouldContainCorrectExpirationTime() {
         User user = new DefaultUser("expUser", "testPassword", Set.of());
 
         String token = jwtEncoderService.generateToken(user);

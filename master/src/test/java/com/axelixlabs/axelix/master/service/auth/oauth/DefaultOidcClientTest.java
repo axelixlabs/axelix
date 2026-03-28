@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
@@ -50,6 +49,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -114,7 +114,8 @@ class DefaultOidcClientTest {
         when(oidcMetadataProvider.getTokenEndpoint()).thenReturn(baseUrl + "/token");
         when(oidcMetadataProvider.getJwksUri()).thenReturn(baseUrl + "/certs");
 
-        oidcClient = new DefaultOidcClient(RestClient.builder().build(), oAuth2Properties, oidcMetadataProvider);
+        oidcClient = new DefaultOidcClient(
+                RestClient.builder().build(), oAuth2Properties, oidcMetadataProvider, new ObjectMapper());
     }
 
     @Test

@@ -17,9 +17,9 @@
  */
 package com.axelixlabs.axelix.master.service.serde;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.NonNull;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Component;
 
@@ -41,7 +41,7 @@ public class JacksonMessageSerializationStrategy implements MessageSerialization
     public byte @NonNull [] serialize(@NonNull Object object) throws SerializationException {
         try {
             return objectMapper.writeValueAsBytes(object);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new SerializationException(e);
         }
     }

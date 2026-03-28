@@ -19,13 +19,14 @@ package com.axelixlabs.axelix.master.api;
 
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,10 +40,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhil Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
 class ActuatorHealthEndpointTest {
 
     private static final Set<String> VALID_HEALTH_STATUSES = Set.of("UP", "DOWN", "OUT_OF_SERVICE", "UNKNOWN");
 
+    // The TestRestTemplateBuilder is intentionally not used here, since we do not require any auth to access
+    // settings API.
     @Autowired
     private TestRestTemplate restTemplate;
 

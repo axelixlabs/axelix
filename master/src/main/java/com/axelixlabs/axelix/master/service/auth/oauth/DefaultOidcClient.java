@@ -22,9 +22,6 @@ import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -32,6 +29,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -62,11 +62,14 @@ public class DefaultOidcClient implements OidcClient {
     private final ObjectMapper objectMapper;
 
     public DefaultOidcClient(
-            RestClient restClient, OAuth2Properties oAuth2Properties, OidcMetadataProvider oidcMetadataProvider) {
+            RestClient restClient,
+            OAuth2Properties oAuth2Properties,
+            OidcMetadataProvider oidcMetadataProvider,
+            ObjectMapper objectMapper) {
         this.restClient = restClient;
         this.oAuth2Properties = oAuth2Properties;
         this.oidcMetadataProvider = oidcMetadataProvider;
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -162,7 +165,7 @@ public class DefaultOidcClient implements OidcClient {
                 throw new JwtParsingException("kid is missing in OAuth2Jwt header");
             }
             return kid;
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new JwtParsingException("Failed to parse OAuth2Jwt header", e);
         }
     }
