@@ -69,13 +69,12 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         // as well as actuator health endpoints
         return !path.startsWith("/api/")
                 || path.startsWith("/api/actuator/health")
-                // Temporarily excluded /api/mcp, waiting for the mcp server authentication issue to be resolved
-                // https://github.com/axelixlabs/axelix/issues/758
-                || path.startsWith("/api/mcp")
                 || path.equalsIgnoreCase("/api/external/users/login")
                 || path.startsWith("/api/external/oauth2/callback")
                 || path.startsWith("/api/external/settings/auth")
-                || path.equalsIgnoreCase("/api/internal/service/register");
+                || path.equalsIgnoreCase("/api/internal/service/register")
+                || path.startsWith("/api/mcp")
+                || path.equalsIgnoreCase("/api/external/mcp-oauth2/.well-known/oauth-protected-resource");
     }
 
     @Override

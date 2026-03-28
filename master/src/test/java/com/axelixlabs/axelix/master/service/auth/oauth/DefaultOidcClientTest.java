@@ -317,7 +317,7 @@ class DefaultOidcClientTest {
     }
 
     @Nested
-    class AccessTokenValidation {
+    class UserInfoEndpointValidation {
 
         @BeforeEach
         void drainStaleRecordedRequests() throws InterruptedException {
@@ -329,8 +329,8 @@ class DefaultOidcClientTest {
 
         @Test
         void shouldCompleteWhenUserInfoReturnsOk() throws Exception {
+            // given.
             String accessToken = "test-access-token";
-
             String jsonResponse = TestResourceReader.readResource("other/user-info-response.json");
 
             mockWebServer.setDispatcher(new Dispatcher() {
@@ -349,8 +349,10 @@ class DefaultOidcClientTest {
                 }
             });
 
+            // when.
             String userInfoJson = oidcClient.validateAccessTokenAndExtractUserInfo(accessToken);
 
+            // then.
             assertThat(userInfoJson).isEqualTo(jsonResponse);
             RecordedRequest userInfoRequest = mockWebServer.takeRequest();
             assertThat(userInfoRequest.getPath()).isEqualTo("/userinfo");
@@ -360,7 +362,7 @@ class DefaultOidcClientTest {
         }
 
         @Test
-        void shouldThrowTokenExchangeExceptionWhenUserInfoReturnsUnauthorized() {
+        void shouldThrowWhenUserInfoReturnsUnauthorized() {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {

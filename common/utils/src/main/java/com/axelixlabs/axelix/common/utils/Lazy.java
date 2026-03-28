@@ -29,7 +29,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Mikhail Polivakha
  */
-public class Lazy<T> {
+public class Lazy<T extends @Nullable Object> {
 
     private @Nullable T value;
     private @Nullable Supplier<T> supplier;

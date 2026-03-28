@@ -126,8 +126,8 @@ public class OidcMetadataProvider {
 
         if (userInfoEndpoint == null) {
             log.warn(
-                    "OIDC userOrigin at {} does not provide a userinfo_endpoint. "
-                            + "MCP server OAuth2 authentication via userinfo_endpoint will not be available.",
+                    "OIDC provider at {} does not provide a userinfo_endpoint. "
+                            + "MCP server OAuth2 authentication via userinfo_endpoint will not be available",
                     issuerUri);
         }
 

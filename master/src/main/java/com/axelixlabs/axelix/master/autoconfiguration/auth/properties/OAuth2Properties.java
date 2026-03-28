@@ -48,6 +48,9 @@ import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoCo
  *                          and then against the userinfo endpoint response if needed. The expression
  *                          should resolve to an Axelix role name like {@code admin} or {@code editor}
  *
+ * @param usernameClaim     the JWT claim to use as the username. If not specified,
+ *                          falls back to {@code preferred_username}, then {@code name}, then {@code sub}
+ *
  * @since 27.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
