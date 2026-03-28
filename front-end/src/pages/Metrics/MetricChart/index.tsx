@@ -63,7 +63,15 @@ export const MetricChart = ({ measurements, startTime }: IProps) => {
                     />
 
                     <YAxis tickFormatter={reduceDisplayedNumber} type="number" domain={["auto", "auto"]} />
-                    <Tooltip labelFormatter={toFormattedTime} />
+                    <Tooltip
+                        labelFormatter={(label) => {
+                            if (typeof label !== "number") {
+                                return label;
+                            }
+
+                            return toFormattedTime(label);
+                        }}
+                    />
 
                     <Line
                         type="monotone"

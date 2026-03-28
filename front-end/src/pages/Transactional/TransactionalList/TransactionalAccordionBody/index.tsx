@@ -42,7 +42,13 @@ export const TransactionalAccordionBody = ({ transactional }: IProps) => {
                     <XAxis dataKey="timestamp" tickFormatter={toFormattedTime} />
                     <YAxis width="auto" tickFormatter={formatTransactionDuration} />
                     <Tooltip
-                        labelFormatter={toFormattedTime}
+                        labelFormatter={(label) => {
+                            if (typeof label !== "number") {
+                                return label;
+                            }
+
+                            return toFormattedTime(label);
+                        }}
                         itemStyle={{ color: "green" }}
                         formatter={(value, name) => {
                             const valueAsNum = Number(value);

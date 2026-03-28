@@ -64,7 +64,13 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
                     />
 
                     <Tooltip
-                        labelFormatter={(timestamp: number) => cacheHitsMissesChartToFormattedTime(timestamp, interval)}
+                        labelFormatter={(label) => {
+                            if (typeof label !== "number") {
+                                return label;
+                            }
+
+                            return cacheHitsMissesChartToFormattedTime(label, interval);
+                        }}
                     />
                     <Legend verticalAlign="top" align="right" />
                 </LineChart>

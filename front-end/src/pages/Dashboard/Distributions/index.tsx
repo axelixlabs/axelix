@@ -59,9 +59,9 @@ export function Distributions({ distributions }: IProps) {
     const clickHandler = (
         e: React.MouseEvent | undefined,
         wallboardFilterComponent: EWallboardFilterKey | undefined,
-        version: string,
+        version: string | undefined,
     ): void => {
-        if (!wallboardFilterComponent) {
+        if (!wallboardFilterComponent || version === undefined) {
             return;
         }
 
