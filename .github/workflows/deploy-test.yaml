@@ -46,6 +46,8 @@ jobs:
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_ID: ${{ secrets.OIDC_GOOGLE_CLIENT_ID }}
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_SECRET: ${{ secrets.OIDC_GOOGLE_CLIENT_SECRET }}
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_REDIRECT_URI: ${{ secrets.OIDC_GOOGLE_REDIRECT_URL }}
+
+      GRADLE_CACHE_ENCRYPTION_KEY: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -54,6 +56,7 @@ jobs:
         uses: ./.github/actions/build-backend
         with:
           deploy-to-nexus: true
+          gradle-cache-enryption-key: ${{ env.GRADLE_CACHE_ENCRYPTION_KEY }}
 
       - name: Build Frontend
         uses: ./.github/actions/build-frontend
