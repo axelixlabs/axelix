@@ -22,8 +22,8 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
-import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
@@ -47,7 +47,7 @@ public class PersistenceAutoConfiguration {
 
         @Bean
         @Override
-        public @NonNull Dialect jdbcDialect(@NonNull NamedParameterJdbcOperations operations) {
+        public @NonNull JdbcDialect jdbcDialect(@NonNull NamedParameterJdbcOperations operations) {
             return new SQLiteDialect();
         }
     }

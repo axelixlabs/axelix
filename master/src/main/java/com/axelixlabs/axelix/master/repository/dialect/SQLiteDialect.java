@@ -19,8 +19,9 @@ package com.axelixlabs.axelix.master.repository.dialect;
 
 import org.jspecify.annotations.NonNull;
 
+import org.springframework.data.jdbc.core.dialect.JdbcArrayColumns;
+import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.relational.core.dialect.AnsiDialect;
-import org.springframework.data.relational.core.dialect.ArrayColumns;
 import org.springframework.data.relational.core.dialect.LockClause;
 import org.springframework.data.relational.core.sql.LockOptions;
 
@@ -28,12 +29,13 @@ import org.springframework.data.relational.core.sql.LockOptions;
  * SQLite-specific dialect for Spring Data JDBC.
  *
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-public class SQLiteDialect extends AnsiDialect {
+public class SQLiteDialect extends AnsiDialect implements JdbcDialect {
 
     @Override
-    public @NonNull ArrayColumns getArraySupport() {
-        return ArrayColumns.Unsupported.INSTANCE;
+    public @NonNull JdbcArrayColumns getArraySupport() {
+        return JdbcArrayColumns.Unsupported.INSTANCE;
     }
 
     @Override

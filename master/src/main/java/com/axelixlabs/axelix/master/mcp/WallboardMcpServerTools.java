@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.mcp;
 
-import java.util.Set;
+import java.util.Collection;
 
 import org.springaicommunity.mcp.annotation.McpTool;
 import org.springaicommunity.mcp.annotation.McpTool.McpAnnotations;
@@ -78,11 +78,11 @@ public class WallboardMcpServerTools {
             of the service. If you're not sure - just do not specify it, request the whole feed, and
             find it manually.
             """) String query) {
-        Set<Instance> instancesFeed = getInstancesFeed(query);
+        Collection<Instance> instancesFeed = getInstancesFeed(query);
         return objectMapper.writeValueAsString(instancesFeed);
     }
 
-    private Set<Instance> getInstancesFeed(String query) {
+    private Collection<Instance> getInstancesFeed(String query) {
         if (StringUtils.hasText(query)) {
             return instanceRegistry.findByQuery(query);
         } else {

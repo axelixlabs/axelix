@@ -4,7 +4,7 @@ plugins {
     id("com.axelixlabs.axelix-internal")
 }
 
-val springBootVersion = "4.0.1"
+val springBootVersion = "4.0.5"
 val springCloudVersion = "2025.1.1"
 val springAiVersion = "2.0.0-M2"
 val testcontainersVersion = "1.21.3"

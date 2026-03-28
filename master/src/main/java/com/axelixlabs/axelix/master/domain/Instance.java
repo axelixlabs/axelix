@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.domain;
 import java.time.Instant;
 import java.util.Set;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.data.annotation.Id;
@@ -45,7 +44,7 @@ import org.springframework.data.relational.core.mapping.Table;
  */
 @Table("instances")
 public record Instance(
-        @Embedded.Nullable @Id InstanceId id,
+        @Id InstanceId id,
         String name,
         String serviceVersion,
         String javaVersion,
@@ -57,7 +56,7 @@ public record Instance(
         @Nullable Instant deployedAt,
         InstanceStatus status,
         @Embedded.Empty MemoryUsage memoryUsage,
-        @NonNull String actuatorUrl,
+        String actuatorUrl,
         @MappedCollection(idColumn = "instance_id") Set<VMFeature> vmFeatures) {
 
     /**
