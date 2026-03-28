@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
@@ -41,6 +42,7 @@ import com.axelixlabs.axelix.master.service.auth.UserLoginService;
  *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @Tag(name = "API for working with Users", description = "The endpoints for user login and authentication")
 @ExternalApiRestController
@@ -49,10 +51,12 @@ public class UserApi {
 
     private final UserLoginService userLoginService;
     private final CookieService cookieService;
+    private final JwtDecoderService decoderService;
 
-    public UserApi(UserLoginService userLoginService, CookieService cookieService) {
+    public UserApi(UserLoginService userLoginService, CookieService cookieService, JwtDecoderService decoderService) {
         this.userLoginService = userLoginService;
         this.cookieService = cookieService;
+        this.decoderService = decoderService;
     }
 
     /**
@@ -80,9 +84,12 @@ public class UserApi {
         String token = userLoginService.login(loginRequest.username(), loginRequest.password());
 
         ResponseCookie cookie = cookieService.buildAuthCookie(token);
+        ResponseCookie cookieAuthorities = cookieService.buildAuthoritiesCookie(
+                decoderService.decodeTokenToUser(token).getRoles());
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, cookieAuthorities.toString())
                 .build();
     }
 

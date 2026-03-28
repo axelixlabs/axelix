@@ -17,8 +17,15 @@
  */
 package com.axelixlabs.axelix.master.service.auth;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.http.ResponseCookie;
 
+import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 
@@ -27,6 +34,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtPropert
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public class DefaultCookieService implements CookieService {
 
@@ -42,6 +50,25 @@ public class DefaultCookieService implements CookieService {
     @Override
     public ResponseCookie buildAuthCookie(String token) {
         return buildCookie(token, jwtProperties.getLifespan().toSeconds());
+    }
+
+    public ResponseCookie buildAuthoritiesCookie(Set<Role> roles) {
+        String authoritiesRaw = roles.stream()
+                .flatMap(role -> role.getAuthorities().stream())
+                .map(Authority::getName)
+                .distinct()
+                .collect(Collectors.joining("|"));
+
+        String authorities =
+                Base64.getUrlEncoder().withoutPadding().encodeToString(authoritiesRaw.getBytes(StandardCharsets.UTF_8));
+
+        return ResponseCookie.from(cookieProperties.getNameAuthority(), authorities)
+                .httpOnly(false)
+                .secure(cookieProperties.isSecure())
+                .path("/")
+                .maxAge(jwtProperties.getLifespan().toSeconds())
+                .sameSite("Strict")
+                .build();
     }
 
     @Override

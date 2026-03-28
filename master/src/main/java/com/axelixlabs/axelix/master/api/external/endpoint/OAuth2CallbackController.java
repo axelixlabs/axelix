@@ -77,9 +77,11 @@ public class OAuth2CallbackController {
         String ourToken = jwtEncoderService.generateToken(user);
 
         ResponseCookie cookie = cookieService.buildAuthCookie(ourToken);
+        ResponseCookie cookieAuthorities = cookieService.buildAuthoritiesCookie(user.getRoles());
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, cookieAuthorities.toString())
                 .header(HttpHeaders.LOCATION, WALLBOARD_PATH)
                 .build();
     }
