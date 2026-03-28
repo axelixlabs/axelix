@@ -17,8 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.serde;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.NonNull;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.stereotype.Component;
 

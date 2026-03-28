@@ -17,17 +17,15 @@
  */
 package com.axelixlabs.axelix.master.api.external.request.deserilize;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 
 import com.axelixlabs.axelix.master.api.external.request.state.BeansStateComponentSettings;
 import com.axelixlabs.axelix.master.api.external.request.state.CachesStateComponentSettings;
@@ -42,30 +40,29 @@ import com.axelixlabs.axelix.master.api.external.request.state.StateExportCompon
 import com.axelixlabs.axelix.master.api.external.request.state.ThreadDumpStateComponentSettings;
 
 /**
- * {@link JsonDeserializer} for the {@link List} of {@link StateExportComponent StateExportComponents}.
+ * {@link ValueDeserializer} for the {@link List} of {@link StateExportComponent StateExportComponents}.
  *
  * @author Mikhail Polivakha
  */
-public class StateExportComponentDeserializer extends JsonDeserializer<List<StateComponentSettings>> {
+public class StateExportComponentDeserializer extends ValueDeserializer<List<StateComponentSettings>> {
 
     private static final String SANITIZED_FIELD = "sanitized";
 
     @Override
-    public List<StateComponentSettings> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        JsonNode componentsNode = p.getCodec().readTree(p);
+    public List<StateComponentSettings> deserialize(JsonParser p, DeserializationContext ctxt) {
+        JsonNode componentsNode = p.readValueAsTree();
 
         if (componentsNode.isArray()) {
             return parseComponents(p, componentsNode);
         } else {
-            throw new JsonParseException(p, "The 'components' is expected to be an array");
+            throw new IllegalArgumentException("The 'components' is expected to be an array");
         }
     }
 
     // null away is simply wrong here
     // cyclomatic complexity skyrockets because of the switch
     @SuppressWarnings({"NullAway", "PMD.CyclomaticComplexity"})
-    private static List<StateComponentSettings> parseComponents(JsonParser p, JsonNode componentsNode)
-            throws JsonParseException {
+    private static List<StateComponentSettings> parseComponents(JsonParser p, JsonNode componentsNode) {
         List<StateComponentSettings> results = new ArrayList<>(componentsNode.size());
 
         for (JsonNode childNode : componentsNode) {
@@ -104,11 +101,8 @@ public class StateExportComponentDeserializer extends JsonDeserializer<List<Stat
                 .orElse(true);
     }
 
-    private static void throwUnexpectedStateExportValue(JsonParser p, String stateComponentAsText)
-            throws JsonParseException {
-        throw new JsonParseException(
-                p,
-                "The 'component' field is expected to be one of %s but was %s"
-                        .formatted(Arrays.toString(StateExportComponent.values()), stateComponentAsText));
+    private static void throwUnexpectedStateExportValue(JsonParser p, String stateComponentAsText) {
+        throw new IllegalArgumentException("The 'component' field is expected to be one of %s but was %s"
+                .formatted(Arrays.toString(StateExportComponent.values()), stateComponentAsText));
     }
 }

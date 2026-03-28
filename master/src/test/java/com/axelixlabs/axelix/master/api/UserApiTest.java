@@ -17,14 +17,14 @@
  */
 package com.axelixlabs.axelix.master.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -47,6 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
 @TestPropertySource(
         properties = {
             "axelix.master.auth.options.static-admin.enabled=true",
@@ -71,7 +72,7 @@ class UserApiTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void login_shouldReturnJwtInCookie() throws JsonProcessingException {
+    void login_shouldReturnJwtInCookie() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -95,7 +96,7 @@ class UserApiTest {
     }
 
     @Test
-    void login_withInvalidCredentials() throws JsonProcessingException {
+    void login_withInvalidCredentials() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

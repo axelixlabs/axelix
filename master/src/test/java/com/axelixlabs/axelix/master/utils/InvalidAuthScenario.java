@@ -19,7 +19,7 @@ package com.axelixlabs.axelix.master.utils;
 
 import java.util.function.Function;
 
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 
 /**
  * This enum contains a set of invalid authentication scenarios used to parameterize API integration tests.

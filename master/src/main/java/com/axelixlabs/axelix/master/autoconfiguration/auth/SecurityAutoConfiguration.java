@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.auth;
 
+import tools.jackson.databind.ObjectMapper;
+
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -154,8 +156,11 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public OidcClient oidcClient(
-                RestClient restClient, OAuth2Properties oAuth2Properties, OidcMetadataProvider oidcMetadataProvider) {
-            return new DefaultOidcClient(restClient, oAuth2Properties, oidcMetadataProvider);
+                RestClient restClient,
+                OAuth2Properties oAuth2Properties,
+                OidcMetadataProvider oidcMetadataProvider,
+                ObjectMapper objectMapper) {
+            return new DefaultOidcClient(restClient, oAuth2Properties, oidcMetadataProvider, objectMapper);
         }
 
         @Bean
