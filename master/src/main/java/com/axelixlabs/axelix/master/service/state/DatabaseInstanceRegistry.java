@@ -110,6 +110,6 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
 
     @Override
     public Set<Instance> findByQuery(String query) {
-        return instanceRepository.findByNameLike("%" + query.toLowerCase() + "%");
+        return instanceRepository.findByNameLikeIgnoreCase("%" + query + "%");
     }
 }

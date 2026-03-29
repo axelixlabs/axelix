@@ -44,9 +44,5 @@ public interface InstanceRepository extends ListCrudRepository<Instance, Instanc
     @Query("SELECT instance_id FROM instances")
     List<String> findAllIds();
 
-    @Query("""
-        SELECT * FROM instances
-        WHERE LOWER(name) LIKE :query
-        """)
-    Set<Instance> findByNameLike(@Param("query") String query);
+    Set<Instance> findByNameLikeIgnoreCase(@Param("query") String query);
 }
