@@ -48,12 +48,15 @@ public interface InstanceRegistry {
     void register(Instance instance);
 
     /**
-     * Registers all given instances in the registry.
-     * If an instance with the same ID is already present, it will be updated (upsert semantics).
+     * Reloads the registry.
      *
-     * @param instances the instances to be registered or updated
+     * It essentially means that the entire database of Instances is wiped out, and after that
+     * only the provided Instances are persisted. So the passed collection of instances is effectively
+     * the new state of this Instance Registry
+     *
+     * @param instances the instances to replace all the existing onces
      */
-    void registerAll(Collection<Instance> instances);
+    void reload(Collection<Instance> instances);
 
     /**
      * Deregisters the {@link Instance} by the instanceId.

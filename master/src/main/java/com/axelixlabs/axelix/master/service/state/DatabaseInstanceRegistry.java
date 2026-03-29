@@ -65,7 +65,7 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public void registerAll(Collection<Instance> instances) {
+    public void reload(Collection<Instance> instances) {
         jdbcAggregateTemplate.deleteAll(Instance.class);
         jdbcAggregateTemplate.insertAll(instances);
     }

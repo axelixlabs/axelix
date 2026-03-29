@@ -51,17 +51,15 @@ class DatabaseInstanceRegistryTest {
     private InstanceRegistry instanceRegistry;
 
     @BeforeEach
-    void setup() {
-        instanceRegistry.deRegisterAll(instanceRegistry.getAllIds());
-    }
-
     @AfterEach
-    void cleanup() {
+    void setup() {
         instanceRegistry.deRegisterAll(instanceRegistry.getAllIds());
     }
 
     @Test
     void register_shouldPersistInstance() {
+
+        // given.
         Instant instant = Instant.now();
         Instance instance = new Instance(
                 InstanceId.of("test-id-1"),
@@ -81,8 +79,10 @@ class DatabaseInstanceRegistryTest {
                         new VMFeature("feature-1", "description-1", true),
                         new VMFeature("feature-2", "description-2", false))));
 
+        // when.
         instanceRegistry.register(instance);
 
+        // then.
         Optional<Instance> expectedInstance = instanceRegistry.get(InstanceId.of("test-id-1"));
         assertThat(expectedInstance).isPresent();
 
@@ -96,6 +96,7 @@ class DatabaseInstanceRegistryTest {
 
     @Test
     void register_shouldUpdateExistingInstance() {
+        // given.
         Instant instant = Instant.now();
         Instance instance = new Instance(
                 InstanceId.of("test-id-2"),
@@ -116,6 +117,7 @@ class DatabaseInstanceRegistryTest {
                         new VMFeature("feature-2", "description-2", false))));
         instanceRegistry.register(instance);
 
+        // when.
         Instance updated = new Instance(
                 instance.id(),
                 "updated-name",
@@ -131,8 +133,10 @@ class DatabaseInstanceRegistryTest {
                 new MemoryUsage(1200d),
                 instance.actuatorUrl(),
                 instance.vmFeatures());
+
         instanceRegistry.register(updated);
 
+        // then.
         Optional<Instance> found = instanceRegistry.get(InstanceId.of("test-id-2"));
         assertThat(found).isPresent();
 
@@ -146,45 +150,53 @@ class DatabaseInstanceRegistryTest {
 
     @Test
     void registerAll_shouldPersistAllInstances() {
+        // given.
         List<Instance> instances =
                 List.of(createInstance("batch-id-1"), createInstance("batch-id-2"), createInstance("batch-id-3"));
 
-        for (int i = 0; i < 3; i++) {
-            instanceRegistry.registerAll(instances);
-        }
+        // when
+        instanceRegistry.reload(instances);
 
+        // then.
         assertThat(instanceRegistry.getAll()).hasSize(3);
     }
 
     @Test
     void deRegister_shouldRemoveInstance() {
+        // given.
         Instance instance = createInstance("deregister-id-1");
-
         instanceRegistry.register(instance);
         assertThat(instanceRegistry.get(InstanceId.of("deregister-id-1"))).isNotEmpty();
 
+        // when.
         instanceRegistry.deRegister(InstanceId.of("deregister-id-1"));
+
+        // then.
         assertThat(instanceRegistry.get(InstanceId.of("deregister-id-1"))).isEmpty();
     }
 
     @Test
     void deRegisterAll_shouldRemoveAllInstances() {
+        // given.
         instanceRegistry.register(createInstance("deregister-all-1"));
         instanceRegistry.register(createInstance("deregister-all-2"));
 
         assertThat(instanceRegistry.getAll()).hasSize(2);
 
+        // when.
         instanceRegistry.deRegisterAll(List.of(InstanceId.of("deregister-all-1"), InstanceId.of("deregister-all-2")));
 
-        assertThat(instanceRegistry.getAllIds())
-                .doesNotContain(InstanceId.of("deregister-all-1"), InstanceId.of("deregister-all-2"));
+        // then.
+        assertThat(instanceRegistry.getAllIds()).isEmpty();
     }
 
     @Test
     void getAll_shouldReturnAllInstances() {
+        // given.
         instanceRegistry.register(createInstance("test-id-1"));
         instanceRegistry.register(createInstance("test-id-2"));
 
+        // when. / then.
         assertThat(instanceRegistry.getAll())
                 .extracting(Instance::id)
                 .containsOnly(InstanceId.of("test-id-1"), InstanceId.of("test-id-2"));
@@ -192,40 +204,49 @@ class DatabaseInstanceRegistryTest {
 
     @Test
     void getAllIds_shouldReturnOnlyIds() {
+        // given.
         instanceRegistry.register(createInstance("test-id-1"));
         instanceRegistry.register(createInstance("test-id-2"));
 
+        // when. / then.
         Set<InstanceId> ids = instanceRegistry.getAllIds();
         assertThat(ids).containsOnly(InstanceId.of("test-id-1"), InstanceId.of("test-id-2"));
     }
 
     @Test
     void getAverageHeapSize_shouldReturnAverage() {
+        // given.
         instanceRegistry.register(createInstanceWithHeap("heap-id-1", 100.0));
         instanceRegistry.register(createInstanceWithHeap("heap-id-2", 200.0));
 
+        // when. / then.
         assertThat(instanceRegistry.getAverageHeapSize()).isEqualTo(150.0);
     }
 
     @Test
     void getTotalHeapSize_shouldReturnSum() {
+        // given.
         instanceRegistry.register(createInstanceWithHeap("total-id-1", 100.0));
         instanceRegistry.register(createInstanceWithHeap("total-id-2", 200.0));
 
+        // when. / then.
         assertThat(instanceRegistry.getTotalHeapSize()).isEqualTo(300.0);
     }
 
     @Test
     void findByQuery_shouldReturnMatchingInstances() {
+        // given.
         Instance petclinicInstance = withName("query-id-1", "petclinic-service");
         Instance featureServiceInstance = withName("query-id-2", "feature-service");
 
         instanceRegistry.register(petclinicInstance);
         instanceRegistry.register(featureServiceInstance);
 
+        // when.
         Set<Instance> result = instanceRegistry.findByQuery("petclinic");
         assertThat(result).hasSize(1);
 
+        // then.
         // When persisting an Instant, either the Spring Data or SQLite (I am not sure) truncates the Instant (which has
         // nano time precision) to the microseconds or something.
         assertThat(result.iterator().next())

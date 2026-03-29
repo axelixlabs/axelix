@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.service.discovery;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,27 +63,8 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
         Set<InstanceId> currentlyRegisteredIds = instanceRegistry.getAllIds();
 
-        Set<InstanceId> discoveredIds = getDiscoveredIds(discoveredInstances);
-
-        instanceRegistry.registerAll(discoveredInstances);
-
-        deregisterMissingInstances(currentlyRegisteredIds, discoveredIds);
+        instanceRegistry.reload(discoveredInstances);
 
         logger.debug("Registered instances: {}", currentlyRegisteredIds.size());
-    }
-
-    private Set<InstanceId> getDiscoveredIds(Set<Instance> discoveredInstances) {
-        return discoveredInstances.stream().map(Instance::id).collect(Collectors.toSet());
-    }
-
-    private void deregisterMissingInstances(Set<InstanceId> currentlyRegisteredIds, Set<InstanceId> discoveredIds) {
-        Set<InstanceId> toDeregister = currentlyRegisteredIds.stream()
-                .filter(id -> !discoveredIds.contains(id))
-                .collect(Collectors.toSet());
-
-        if (!toDeregister.isEmpty()) {
-            instanceRegistry.deRegisterAll(toDeregister);
-            logger.debug("Deregistered {} missing instances", toDeregister.size());
-        }
     }
 }
