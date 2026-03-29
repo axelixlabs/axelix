@@ -57,7 +57,7 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
 
     @Override
     public void register(Instance instance) {
-        if (instanceRepository.existsById(instance.id().instanceId())) {
+        if (instanceRepository.existsById(instance.id())) {
             jdbcAggregateTemplate.update(instance);
         } else {
             jdbcAggregateTemplate.insert(instance);
@@ -72,18 +72,17 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
 
     @Override
     public void deRegister(InstanceId instanceId) {
-        instanceRepository.deleteById(instanceId.instanceId());
+        instanceRepository.deleteById(instanceId);
     }
 
     @Override
     public void deRegisterAll(Collection<InstanceId> instanceIds) {
-        instanceRepository.deleteAllById(
-                instanceIds.stream().map(InstanceId::instanceId).toList());
+        instanceRepository.deleteAllById(instanceIds);
     }
 
     @Override
     public Optional<Instance> get(InstanceId instanceId) {
-        return instanceRepository.findById(instanceId.instanceId());
+        return instanceRepository.findById(instanceId);
     }
 
     @Override

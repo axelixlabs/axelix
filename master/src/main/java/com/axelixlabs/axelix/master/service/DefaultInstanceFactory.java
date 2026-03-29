@@ -69,7 +69,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 convertServiceStatus(metadata.getHealthStatus()),
                 new MemoryUsage(metadata.getMemoryDetails().getHeap()),
                 instanceActuatorUrl,
-                convertMapVMFeatures(metadata.getVmFeatures()));
+                Instance.VmFeatures.of(convertMapVMFeatures(metadata.getVmFeatures())));
     }
 
     private InstanceStatus convertServiceStatus(HealthStatus healthStatus) {

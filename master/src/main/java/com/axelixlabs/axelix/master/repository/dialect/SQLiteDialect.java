@@ -23,6 +23,7 @@ import org.springframework.data.jdbc.core.dialect.JdbcArrayColumns;
 import org.springframework.data.jdbc.core.dialect.JdbcDialect;
 import org.springframework.data.relational.core.dialect.AnsiDialect;
 import org.springframework.data.relational.core.dialect.LockClause;
+import org.springframework.data.relational.core.sql.IdentifierProcessing;
 import org.springframework.data.relational.core.sql.LockOptions;
 
 /**
@@ -32,6 +33,11 @@ import org.springframework.data.relational.core.sql.LockOptions;
  * @author Mikhail Polivakha
  */
 public class SQLiteDialect extends AnsiDialect implements JdbcDialect {
+
+    @Override
+    public @NonNull IdentifierProcessing getIdentifierProcessing() {
+        return IdentifierProcessing.create(IdentifierProcessing.Quoting.NONE, IdentifierProcessing.LetterCasing.AS_IS);
+    }
 
     @Override
     public @NonNull JdbcArrayColumns getArraySupport() {

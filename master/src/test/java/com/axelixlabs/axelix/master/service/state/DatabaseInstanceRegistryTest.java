@@ -77,15 +77,21 @@ class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
                 "Http://localhost:8080/actuator",
-                Set.of(
+                Instance.VmFeatures.of(Set.of(
                         new VMFeature("feature-1", "description-1", true),
-                        new VMFeature("feature-2", "description-2", false)));
+                        new VMFeature("feature-2", "description-2", false))));
 
         instanceRegistry.register(instance);
 
         Optional<Instance> expectedInstance = instanceRegistry.get(InstanceId.of("test-id-1"));
         assertThat(expectedInstance).isPresent();
-        assertThat(expectedInstance.get()).isEqualTo(instance);
+
+        // When persisting an Instant, either the Spring Data or SQLite (I am not sure) truncates the Instant (which has
+        // nano time precision) to the microseconds or something.
+        assertThat(expectedInstance.get())
+                .usingRecursiveComparison()
+                .ignoringFieldsOfTypes(Instant.class)
+                .isEqualTo(instance);
     }
 
     @Test
@@ -105,9 +111,9 @@ class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.UP,
                 new MemoryUsage(1234d),
                 "Http://localhost:8080/actuator",
-                Set.of(
+                Instance.VmFeatures.of(Set.of(
                         new VMFeature("feature-1", "description-1", true),
-                        new VMFeature("feature-2", "description-2", false)));
+                        new VMFeature("feature-2", "description-2", false))));
         instanceRegistry.register(instance);
 
         Instance updated = new Instance(
@@ -120,7 +126,7 @@ class DatabaseInstanceRegistryTest {
                 "2.2.0",
                 "Axiom JDK",
                 "new-sha",
-                Instant.now(),
+                instant,
                 Instance.InstanceStatus.DOWN,
                 new MemoryUsage(1200d),
                 instance.actuatorUrl(),
@@ -129,7 +135,13 @@ class DatabaseInstanceRegistryTest {
 
         Optional<Instance> found = instanceRegistry.get(InstanceId.of("test-id-2"));
         assertThat(found).isPresent();
-        assertThat(found.get()).isEqualTo(updated);
+
+        // When persisting an Instant, either the Spring Data or SQLite (I am not sure) truncates the Instant (which has
+        // nano time precision) to the microseconds or something.
+        assertThat(found.get())
+                .usingRecursiveComparison()
+                .ignoringFieldsOfTypes(Instant.class)
+                .isEqualTo(updated);
     }
 
     @Test
@@ -213,7 +225,13 @@ class DatabaseInstanceRegistryTest {
 
         Set<Instance> result = instanceRegistry.findByQuery("petclinic");
         assertThat(result).hasSize(1);
-        assertThat(result.iterator().next()).isEqualTo(petclinicInstance);
+
+        // When persisting an Instant, either the Spring Data or SQLite (I am not sure) truncates the Instant (which has
+        // nano time precision) to the microseconds or something.
+        assertThat(result.iterator().next())
+                .usingRecursiveComparison()
+                .ignoringFieldsOfTypes(Instant.class)
+                .isEqualTo(petclinicInstance);
     }
 
     private Instance createInstanceWithHeap(String instanceId, double heap) {
@@ -231,6 +249,6 @@ class DatabaseInstanceRegistryTest {
                 Instance.InstanceStatus.DOWN,
                 new MemoryUsage(heap),
                 "/actuator",
-                Set.of());
+                Instance.VmFeatures.empty());
     }
 }

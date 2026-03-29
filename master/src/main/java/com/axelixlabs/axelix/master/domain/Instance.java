@@ -23,8 +23,8 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Embedded;
-import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
@@ -57,7 +57,7 @@ public record Instance(
         InstanceStatus status,
         @Embedded.Empty MemoryUsage memoryUsage,
         String actuatorUrl,
-        @MappedCollection(idColumn = "instance_id") Set<VMFeature> vmFeatures) {
+        @Column("vm_features") VmFeatures vmFeatures) {
 
     /**
      * Status of various useful JVM features for this service, like AOT Cache, AppCDS etc.
@@ -67,6 +67,21 @@ public record Instance(
      * @param enabled enabled or not
      */
     public record VMFeature(String name, String description, boolean enabled) {}
+
+    /**
+     * Wraps persisted VM features JSON. A dedicated type (not {@code Set}) is required so Spring Data JDBC maps a
+     * single column instead of a separate {@code vm_feature} collection table.
+     */
+    public record VmFeatures(Set<VMFeature> features) {
+
+        public static VmFeatures of(Set<VMFeature> features) {
+            return new VmFeatures(features);
+        }
+
+        public static VmFeatures empty() {
+            return new VmFeatures(Set.of());
+        }
+    }
 
     public Instance copy(InstanceStatus instanceStatus) {
         return new Instance(

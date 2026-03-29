@@ -25,6 +25,7 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.InstanceId;
 
 /**
  * Repository for {@link Instance} aggregate.
@@ -32,7 +33,7 @@ import com.axelixlabs.axelix.master.domain.Instance;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public interface InstanceRepository extends ListCrudRepository<Instance, String> {
+public interface InstanceRepository extends ListCrudRepository<Instance, InstanceId> {
 
     @Query("SELECT AVG(heap) FROM instances")
     Double findAverageHeap();
@@ -40,7 +41,7 @@ public interface InstanceRepository extends ListCrudRepository<Instance, String>
     @Query("SELECT SUM(heap) FROM instances")
     Double findTotalHeap();
 
-    @Query("SELECT id FROM instances")
+    @Query("SELECT instance_id FROM instances")
     List<String> findAllIds();
 
     @Query("""

@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.axelixlabs.axelix.common.api.transform.BaseUnitParser;
 import com.axelixlabs.axelix.common.api.transform.BaseUnitValueTransformer;
@@ -54,15 +53,12 @@ class DefaultDashboardServiceTest {
     @Autowired
     private InstanceRegistry instanceRegistry;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     @BeforeEach
     void setUp() {
         // clear instanceRegistry before test
         instanceRegistry.deRegisterAll(instanceRegistry.getAllIds());
 
-        createInMemoryInstanceRegistry();
+        populateInstanceRegistry();
 
         BaseUnitParser baseUnitParser = new BaseUnitParser();
         Set<BaseUnitValueTransformer> transformerSet =
@@ -71,7 +67,7 @@ class DefaultDashboardServiceTest {
         subject = new DefaultDashboardService(instanceRegistry, baseUnitParser, transformerSet);
     }
 
-    private void createInMemoryInstanceRegistry() {
+    private void populateInstanceRegistry() {
         instanceRegistry.register(createInstance("123", "21.0.0", "3.5.2", "6.1.1", "BellSoft", "2.0.2", 300d));
         instanceRegistry.register(createInstance("456", "25.0.1", "3.4.1", "6.2.0", "BellSoft", null, 550d));
         instanceRegistry.register(createInstance("789", "21", "4.0.0", "7.0.1", "Oracle", null, 410d));

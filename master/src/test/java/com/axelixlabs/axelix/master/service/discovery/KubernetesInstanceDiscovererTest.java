@@ -200,7 +200,7 @@ class KubernetesInstanceDiscovererTest {
             assertThat(it.springFrameworkVersion()).isEqualTo("6.1.2");
             assertThat(it.kotlinVersion()).isNull();
             assertThat(it.status()).isEqualTo(Instance.InstanceStatus.UP);
-            assertThat(it.vmFeatures())
+            assertThat(it.vmFeatures().features())
                     .hasSize(1)
                     .first()
                     .isEqualTo(new Instance.VMFeature("AppCDS", "AppCDS Description", false));
