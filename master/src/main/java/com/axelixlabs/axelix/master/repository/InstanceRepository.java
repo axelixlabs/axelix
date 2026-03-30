@@ -15,31 +15,34 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.state;
+package com.axelixlabs.axelix.master.repository;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 
 /**
- * Service for changing the status of an {@link Instance}.
+ * Repository for {@link Instance} aggregate.
  *
- * @author Sergey Cherkasov
+ * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-@Service
-public class InstanceStatusModifier {
+public interface InstanceRepository extends ListCrudRepository<Instance, InstanceId> {
 
-    private final InstanceRegistry instanceRegistry;
+    @Query("SELECT AVG(heap) FROM instances")
+    Double findAverageHeap();
 
-    public InstanceStatusModifier(InstanceRegistry instanceRegistry) {
-        this.instanceRegistry = instanceRegistry;
-    }
+    @Query("SELECT SUM(heap) FROM instances")
+    Double findTotalHeap();
 
-    public void modifyStatus(String instanceId, Instance.InstanceStatus instanceStatus) {
-        Instance instance = instanceRegistry.get(InstanceId.of(instanceId)).orElseThrow(InstanceNotFoundException::new);
-        Instance instanceNew = instance.copy(instanceStatus);
-        instanceRegistry.register(instanceNew);
-    }
+    @Query("SELECT instance_id FROM instances")
+    List<String> findAllIds();
+
+    Set<Instance> findByNameLikeIgnoreCase(@Param("query") String query);
 }

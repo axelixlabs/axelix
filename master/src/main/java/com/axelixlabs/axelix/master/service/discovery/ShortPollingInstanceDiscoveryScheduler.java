@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.service.discovery;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +26,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
-import com.axelixlabs.axelix.master.service.InstanceRegistrar;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -44,15 +41,11 @@ public class ShortPollingInstanceDiscoveryScheduler {
     private static final Logger logger = LoggerFactory.getLogger(ShortPollingInstanceDiscoveryScheduler.class);
 
     private final InstancesDiscoverer instancesDiscoverer;
-    private final InstanceRegistrar instanceRegistrar;
     private final InstanceRegistry instanceRegistry;
 
     public ShortPollingInstanceDiscoveryScheduler(
-            InstancesDiscoverer instancesDiscoverer,
-            InstanceRegistrar instanceRegistrar,
-            InstanceRegistry instanceRegistry) {
+            InstancesDiscoverer instancesDiscoverer, InstanceRegistry instanceRegistry) {
         this.instancesDiscoverer = instancesDiscoverer;
-        this.instanceRegistrar = instanceRegistrar;
         this.instanceRegistry = instanceRegistry;
     }
 
@@ -68,31 +61,10 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 """, this.getClass().getSimpleName());
         }
 
-        Set<InstanceId> currentlyRegisteredIds =
-                instanceRegistry.getAll().stream().map(Instance::id).collect(Collectors.toSet());
-        Set<InstanceId> discoveredIds = getDiscoveredIds(discoveredInstances);
+        Set<InstanceId> currentlyRegisteredIds = instanceRegistry.getAllIds();
 
-        discoveredInstances.forEach(instanceRegistrar::register);
-
-        deregisterMissingInstances(currentlyRegisteredIds, discoveredIds);
+        instanceRegistry.reload(discoveredInstances);
 
         logger.debug("Registered instances: {}", currentlyRegisteredIds.size());
-    }
-
-    private Set<InstanceId> getDiscoveredIds(Set<Instance> discoveredInstances) {
-        return discoveredInstances.stream().map(Instance::id).collect(Collectors.toSet());
-    }
-
-    private void deregisterMissingInstances(Set<InstanceId> currentlyRegisteredIds, Set<InstanceId> discoveredIds) {
-        for (InstanceId existingId : currentlyRegisteredIds) {
-            if (!discoveredIds.contains(existingId)) {
-                try {
-                    instanceRegistrar.deregister(existingId);
-                    logger.debug("Deregistered instance: {}", existingId);
-                } catch (InstanceNotFoundException e) {
-                    logger.debug("Instance not found during deregistration: {}", existingId);
-                }
-            }
-        }
     }
 }

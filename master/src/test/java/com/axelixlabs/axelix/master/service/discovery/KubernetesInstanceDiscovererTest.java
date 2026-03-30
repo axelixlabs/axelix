@@ -49,12 +49,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
-import com.axelixlabs.axelix.master.service.InMemoryMemoryUsageCache;
-import com.axelixlabs.axelix.master.service.MemoryUsageCache;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesInstanceDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
 import com.axelixlabs.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.state.InMemoryInstanceRegistry;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
 
@@ -77,11 +74,11 @@ class KubernetesInstanceDiscovererTest {
     @MockitoBean
     private DiscoveryClient discoveryClient;
 
-    @Autowired
-    private ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber;
+    @MockitoBean
+    private InstanceRegistry instanceRegistry;
 
     @Autowired
-    private MemoryUsageCache memoryUsageCache;
+    private ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber;
 
     @Autowired
     private AxelixVersionDiscoverer axelixVersionDiscoverer;
@@ -104,18 +101,8 @@ class KubernetesInstanceDiscovererTest {
         }
 
         @Bean
-        public InstanceRegistry instanceRegistry() {
-            return new InMemoryInstanceRegistry();
-        }
-
-        @Bean
         public MetadataJacksonMessageDeserializationStrategy deserializationStrategy() {
             return new MetadataJacksonMessageDeserializationStrategy(new ObjectMapper());
-        }
-
-        @Bean
-        public MemoryUsageCache memoryUsageCache() {
-            return new InMemoryMemoryUsageCache();
         }
 
         @Bean
@@ -213,7 +200,7 @@ class KubernetesInstanceDiscovererTest {
             assertThat(it.springFrameworkVersion()).isEqualTo("6.1.2");
             assertThat(it.kotlinVersion()).isNull();
             assertThat(it.status()).isEqualTo(Instance.InstanceStatus.UP);
-            assertThat(it.vmFeatures())
+            assertThat(it.vmFeatures().features())
                     .hasSize(1)
                     .first()
                     .isEqualTo(new Instance.VMFeature("AppCDS", "AppCDS Description", false));

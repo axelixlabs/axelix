@@ -60,7 +60,7 @@ public class DefaultInstanceFactoryTest {
         assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
         assertThat(instance.memoryUsage().heap()).isEqualTo(12000.0);
         assertThat(instance.actuatorUrl()).isEqualTo("http://localhost:8080/actuator");
-        assertThat(instance.vmFeatures()).hasSize(1).first().satisfies(vmFeature -> {
+        assertThat(instance.vmFeatures().features()).hasSize(1).first().satisfies(vmFeature -> {
             assertThat(vmFeature.name()).isEqualTo("AppCDS");
             assertThat(vmFeature.description()).isEqualTo("AppCDS Description");
             assertThat(vmFeature.enabled()).isFalse();

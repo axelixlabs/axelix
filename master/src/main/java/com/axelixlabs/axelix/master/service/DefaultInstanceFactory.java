@@ -22,6 +22,8 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -67,7 +69,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 convertServiceStatus(metadata.getHealthStatus()),
                 new MemoryUsage(metadata.getMemoryDetails().getHeap()),
                 instanceActuatorUrl,
-                convertMapVMFeatures(metadata.getVmFeatures()));
+                Instance.VmFeatures.of(convertMapVMFeatures(metadata.getVmFeatures())));
     }
 
     private InstanceStatus convertServiceStatus(HealthStatus healthStatus) {
@@ -78,10 +80,10 @@ public class DefaultInstanceFactory implements InstanceFactory {
         };
     }
 
-    private List<Instance.VMFeature> convertMapVMFeatures(List<BasicDiscoveryMetadata.VMFeature> vmFeature) {
+    private Set<Instance.VMFeature> convertMapVMFeatures(List<BasicDiscoveryMetadata.VMFeature> vmFeature) {
         return vmFeature.stream()
                 .map(it -> new Instance.VMFeature(it.getName(), it.getDescription(), it.isEnabled()))
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     @Nullable

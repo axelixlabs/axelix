@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.util.Set;
+import java.util.Collection;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -66,7 +66,7 @@ public class WallboardApi {
     @GetMapping(path = ApiPaths.InstancesApi.GRID)
     @SuppressWarnings("NullAway")
     public InstancesGridResponse getInstancesGrid() {
-        Set<Instance> all = instanceRegistry.getAll();
+        Collection<Instance> all = instanceRegistry.getAll();
         return new InstancesGridResponse(instancesToShortProfileConverter.convertAll(all));
     }
 }

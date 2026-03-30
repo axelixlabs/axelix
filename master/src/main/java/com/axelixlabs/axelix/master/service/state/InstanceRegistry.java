@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,8 +26,6 @@ import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.InstanceAlreadyRegisteredException;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 
 /**
  * Central registry of all the {@link Instance instances} that this Master deployment is aware about.
@@ -34,47 +34,43 @@ import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
  *
  * @see Instance
  * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
 @NullMarked
 public interface InstanceRegistry {
 
     /**
-     * Register the given instance inside the registry. In case the {@link Instance} with this ID
-     * is already present then re-registration must not happen and the exception must be thrown.
+     * Registers the given instance inside the registry. In case the {@link Instance} with this ID
+     * is already present, it will be updated with the new data (upsert semantics).
      *
-     * @param instance the instance to be registered
-     * @throws InstanceAlreadyRegisteredException in case the {@link Instance} with
-     *         the same id is already present in the registry
+     * @param instance the instance to be registered or updated
      */
-    void register(Instance instance) throws InstanceAlreadyRegisteredException;
+    void register(Instance instance);
 
     /**
-     * Deregister the {@link Instance} by the instanceId.
+     * Reloads the registry.
+     *
+     * It essentially means that the entire database of Instances is wiped out, and after that
+     * only the provided Instances are persisted. So the passed collection of instances is effectively
+     * the new state of this Instance Registry
+     *
+     * @param instances the instances to replace all the existing onces
+     */
+    void reload(Collection<Instance> instances);
+
+    /**
+     * Deregisters the {@link Instance} by the instanceId.
      *
      * @param instanceId the id of the instance that is supposed to be deregistered.
-     * @throws InstanceNotFoundException in case such an {@link Instance} is not found.
      */
-    void deRegister(InstanceId instanceId) throws InstanceNotFoundException;
+    void deRegister(InstanceId instanceId);
 
     /**
-     * Quietly deregisters the {@link Instance} by the given instanceId.
+     * Deregisters all instances identified by the given instance IDs.
      *
-     * @param instanceId the id of the instance that is supposed to be deregistered.
+     * @param instanceIds the collection of IDs of the instances to be deregistered.
      */
-    default void deRegisterQuietly(InstanceId instanceId) {
-        try {
-            deRegister(instanceId);
-        } catch (InstanceNotFoundException ignored) {
-        }
-    }
-
-    /**
-     * Deregister and register the {@link Instance}. If the {@link Instance} with such {@link InstanceId}
-     * is not present in the registry, then simply new {@link Instance} is registered.
-     *
-     * @param  instance the instance to be registered
-     */
-    void replace(Instance instance);
+    void deRegisterAll(Collection<InstanceId> instanceIds);
 
     /**
      * Get {@link Instance} by its id.
@@ -90,7 +86,24 @@ public interface InstanceRegistry {
      *
      * @return all instances that are managed by this registry.
      */
-    Set<Instance> getAll();
+    List<Instance> getAll();
+
+    /**
+     * Get all instance IDs that are managed by this registry.
+     *
+     * @return all instance IDs that are managed by this registry.
+     */
+    Set<InstanceId> getAllIds();
+
+    /**
+     * @return average heap usage in bytes across all instances, or -1 if no instances registered.
+     */
+    double getAverageHeapSize();
+
+    /**
+     * @return total heap usage in bytes across all instances, or 0 if no instances registered.
+     */
+    double getTotalHeapSize();
 
     /**
      * Find instance by the arbitrary search query

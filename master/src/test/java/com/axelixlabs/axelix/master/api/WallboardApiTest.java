@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
@@ -28,8 +27,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,7 +51,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 public class WallboardApiTest {
 
     private static final String GRID_URL = "/api/external/applications/grid";
@@ -74,7 +70,7 @@ public class WallboardApiTest {
         @BeforeEach
         void prepare() {
             registry.getAll().forEach(instance -> {
-                registry.deRegisterQuietly(instance.id());
+                registry.deRegister(instance.id());
             });
 
             registry.register(TestObjectFactory.createInstance(
@@ -87,7 +83,7 @@ public class WallboardApiTest {
                     "6.2.0",
                     "BellSoft",
                     "2.0.0",
-                    List.of()));
+                    Instance.VmFeatures.empty()));
 
             registry.register(TestObjectFactory.createInstance(
                     instance2Id,
@@ -99,13 +95,13 @@ public class WallboardApiTest {
                     "5.3.0",
                     "Corretto",
                     null,
-                    List.of()));
+                    Instance.VmFeatures.empty()));
         }
 
         @AfterEach
         void cleanup() {
-            registry.deRegisterQuietly(InstanceId.of(instance1Id));
-            registry.deRegisterQuietly(InstanceId.of(instance2Id));
+            registry.deRegister(InstanceId.of(instance1Id));
+            registry.deRegister(InstanceId.of(instance2Id));
         }
 
         @Test
@@ -154,8 +150,8 @@ public class WallboardApiTest {
         @Test
         void shouldReturnEmptyGridWhenNoInstancesRegistered() {
             // given.
-            registry.deRegisterQuietly(InstanceId.of(instance1Id));
-            registry.deRegisterQuietly(InstanceId.of(instance2Id));
+            registry.deRegister(InstanceId.of(instance1Id));
+            registry.deRegister(InstanceId.of(instance2Id));
 
             // language=json
             String expectedJson = """

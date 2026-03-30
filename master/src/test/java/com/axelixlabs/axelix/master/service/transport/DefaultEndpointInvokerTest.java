@@ -125,19 +125,20 @@ public class DefaultEndpointInvokerTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/actuator/axelix-test/invoke")) {
-                    return new MockResponse()
-                            .setBody(jsonResponse)
-                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/actuator/axelix-test/invoke/bad-request")) {
-                    return new MockResponse().setResponseCode(400);
-                } else if (path.equals("/actuator/axelix-test/invoke-no-value")) {
-                    return new MockResponse();
-                } else if (path.equals("/actuator/axelix-test/invoke-no-value/bad-request")) {
-                    return new MockResponse().setResponseCode(400);
-                } else {
-                    return new MockResponse().setResponseCode(404);
-                }
+                return switch (path) {
+                    case "/actuator/axelix-test/invoke" ->
+                        new MockResponse()
+                                .setBody(jsonResponse)
+                                .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+
+                    case "/actuator/axelix-test/invoke/bad-request",
+                            "/actuator/axelix-test/invoke-no-value/bad-request" ->
+                        new MockResponse().setResponseCode(400);
+
+                    case "/actuator/axelix-test/invoke-no-value" -> new MockResponse();
+
+                    default -> new MockResponse().setResponseCode(404);
+                };
             }
         });
 

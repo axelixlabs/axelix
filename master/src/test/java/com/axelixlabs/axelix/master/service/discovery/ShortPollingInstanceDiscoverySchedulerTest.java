@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.service.discovery;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -47,7 +46,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -59,6 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 29.10.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(
         properties = {
@@ -92,12 +91,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         }
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        instanceRegistry.getAll().forEach(instance -> {
-            try {
-                instanceRegistry.deRegister(instance.id());
-            } catch (InstanceNotFoundException ignored) {
-            }
-        });
+        instanceRegistry.deRegisterAll(instanceRegistry.getAllIds());
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
     }
 
@@ -177,12 +171,12 @@ class ShortPollingInstanceDiscoverySchedulerTest {
 
         subject.performDiscovery();
 
-        Set<Instance> registeredInstances = instanceRegistry.getAll();
+        List<Instance> registeredInstances = instanceRegistry.getAll();
         assertThat(registeredInstances).hasSize(2);
 
         assertThat(registeredInstances).extracting(it -> it.id().instanceId()).containsOnly(instance1Id, instance2Id);
         assertThat(registeredInstances)
-                .flatExtracting(Instance::vmFeatures)
+                .flatExtracting(inst -> inst.vmFeatures().features())
                 .containsOnly(new Instance.VMFeature("AppCDS", "AppCDS Description", false));
     }
 
@@ -271,7 +265,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
             assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.DOWN);
             assertThat(instance.commitShaShort()).isEqualTo("910230");
             assertThat(instance.springBootVersion()).isEqualTo("3.5.2");
-            assertThat(instance.vmFeatures())
+            assertThat(instance.vmFeatures().features())
                     .hasSize(1)
                     .containsOnly(new Instance.VMFeature("AppCDS", "AppCDS Description", false));
         });

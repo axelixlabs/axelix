@@ -73,7 +73,7 @@ public class SelfRegisteredApiTest {
        },
          "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
          "instanceName" : "petclinic",
-         "instanceUrl" : "http://localhost:8080/actuator",
+         "instanceActuatorUrl" : "http://localhost:8080/actuator",
          "deploymentAt" : "2025-02-03T13:29:29Z"
      }
     """;

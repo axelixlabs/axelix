@@ -4,3 +4,4 @@ com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.MemoryTransformerAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.AxelixAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfigurationConfiguration
+com.axelixlabs.axelix.master.autoconfiguration.PersistenceAutoConfiguration

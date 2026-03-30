@@ -18,10 +18,14 @@
 package com.axelixlabs.axelix.master.domain;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Embedded;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * @param id                      The id of the instance. This id must be unique among all the other instances that are
@@ -38,8 +42,9 @@ import org.jspecify.annotations.Nullable;
  * @param status                  The status of the given instance from the Master standpoint.
  * @param actuatorUrl             The URL of the actuator root, e.g. {@code https://my-app:6061/actuator}
  */
+@Table("instances")
 public record Instance(
-        InstanceId id,
+        @Id InstanceId id,
         String name,
         String serviceVersion,
         String javaVersion,
@@ -50,9 +55,9 @@ public record Instance(
         String commitShaShort,
         @Nullable Instant deployedAt,
         InstanceStatus status,
-        MemoryUsage memoryUsage,
-        @NonNull String actuatorUrl,
-        List<VMFeature> vmFeatures) {
+        @Embedded.Empty MemoryUsage memoryUsage,
+        String actuatorUrl,
+        @Column("vm_features") VmFeatures vmFeatures) {
 
     /**
      * Status of various useful JVM features for this service, like AOT Cache, AppCDS etc.
@@ -62,6 +67,21 @@ public record Instance(
      * @param enabled enabled or not
      */
     public record VMFeature(String name, String description, boolean enabled) {}
+
+    /**
+     * Wraps persisted VM features JSON. A dedicated type (not {@code Set}) is required so Spring Data JDBC maps a
+     * single column instead of a separate {@code vm_feature} collection table.
+     */
+    public record VmFeatures(Set<VMFeature> features) {
+
+        public static VmFeatures of(Set<VMFeature> features) {
+            return new VmFeatures(features);
+        }
+
+        public static VmFeatures empty() {
+            return new VmFeatures(Set.of());
+        }
+    }
 
     public Instance copy(InstanceStatus instanceStatus) {
         return new Instance(
