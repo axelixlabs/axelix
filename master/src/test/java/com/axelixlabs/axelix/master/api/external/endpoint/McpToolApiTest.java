@@ -48,6 +48,83 @@ public class McpToolApiTest {
             {
               "tools" : [
                   {
+                    "title" : "Reset Loggers Level",
+                    "description" : "Resets the logging level for a specific logger by its name",
+                    "annotations" : {
+                      "readOnlyHint" : false,
+                      "destructiveHint" : true,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Change Group Loggers Level",
+                    "description" : "Changes the logging level of a specific logger group by its name",
+                    "annotations" : {
+                      "readOnlyHint" : false,
+                      "destructiveHint" : true,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Change Logger Level",
+                    "description" : "Changes the logging level of a specific logger by its name",
+                    "annotations" : {
+                      "readOnlyHint" : false,
+                      "destructiveHint" : true,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Find Loggers Group",
+                    "description" : "Shows information about a logger group by its name (or assumed name)",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Find Logger",
+                    "description" : "Shows information about a logger by its name (or assumed name)",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Logger Groups Feed",
+                    "description" : "Provides a list of logging groups within this Spring Boot app",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
+                    "title" : "Available Logging Levels",
+                    "description" : "Provides the list of available logging levels inside this Spring Boot app",
+                    "annotations" : {
+                      "readOnlyHint" : true,
+                      "destructiveHint" : false,
+                      "idempotentHint" : true,
+                      "openWorldHint" : false
+                    },
+                    "status" : "UP"
+                  },
+                  {
                     "title" : "Clear All Cache",
                     "description" : "Clears all caches inside the Spring Boot app",
                     "annotations" : {
