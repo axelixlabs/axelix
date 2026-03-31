@@ -41,15 +41,15 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
 
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
-    private final QueriesStatsCollector queriesStatsCollector;
+    private final QueriesRecorder queriesCollector;
 
     public TransactionMonitoringInterceptor(
             Map<MethodClassKey, Propagation> propagationCache,
             TransactionStatsCollector statsCollector,
-            QueriesStatsCollector queriesStatsCollector) {
+            QueriesRecorder queriesCollector) {
         this.propagationCache = propagationCache;
         this.statsCollector = statsCollector;
-        this.queriesStatsCollector = queriesStatsCollector;
+        this.queriesCollector = queriesCollector;
     }
 
     @Override
@@ -64,13 +64,13 @@ public class TransactionMonitoringInterceptor implements MethodInterceptor {
         if (propagation != null && shouldCreateNewTransaction(propagation)) {
             long startTime = System.nanoTime();
 
-            queriesStatsCollector.clearAllStats();
+            queriesCollector.clearAll();
 
             try {
                 return invocation.proceed();
             } finally {
                 long duration = System.nanoTime() - startTime;
-                List<TransactionQueryRecord> queries = queriesStatsCollector.getAllStats();
+                List<SqlQueryRecord> queries = queriesCollector.popAllRecords();
 
                 statsCollector.recordTransaction(
                         key, new TransactionRecord(duration / 1_000_000, startTime / 1_000_000, queries));

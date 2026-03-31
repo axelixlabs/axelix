@@ -111,20 +111,17 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
 
     private TransactionExecution convertToTransactionExecution(TransactionRecord record) {
         List<Query> queries = convertToQueries(record.getQueries());
-        long duration = record.getDurationMs();
         long startTimestamp = record.getStartTimestamp();
-        long endTimestamp = duration + startTimestamp;
-        return new TransactionExecution(duration, startTimestamp, endTimestamp, queries.size(), queries);
+        long endTimestamp = startTimestamp + record.getDurationMs();
+        return new TransactionExecution(startTimestamp, endTimestamp, queries);
     }
 
-    private List<Query> convertToQueries(List<TransactionQueryRecord> queriesRecords) {
+    private List<Query> convertToQueries(List<SqlQueryRecord> queriesRecords) {
         return queriesRecords.stream()
                 .map(queries -> {
-                    long duration = queries.getDurationMs();
                     long startTimestamp = queries.getStartTimestampMs();
-                    long endTimestamp = duration + startTimestamp;
-                    return new Query(
-                            queries.getSql(), queries.getDurationMs(), queries.getStartTimestampMs(), endTimestamp);
+                    long endTimestamp = queries.getDurationMs() + startTimestamp;
+                    return new Query(queries.getSql(), queries.getStartTimestampMs(), endTimestamp);
                 })
                 .collect(Collectors.toList());
     }

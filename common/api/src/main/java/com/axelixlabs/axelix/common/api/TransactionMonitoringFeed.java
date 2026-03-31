@@ -154,32 +154,21 @@ public final class TransactionMonitoringFeed {
      */
     public static final class TransactionExecution {
 
-        private final long durationMs;
         private final long startTimestampMs;
         private final long endTimestampMs;
-        private final int queriesCount;
         private final List<Query> queries;
 
         /**
          * Creates a new TransactionExecution.
          *
-         * @param durationMs         transaction execution duration in milliseconds
          * @param startTimestampMs   unix timestamp (milliseconds from epoch) when transaction started
          * @param endTimestampMs     unix timestamp (milliseconds from epoch) when transaction finished
-         * @param queriesCount       number of requests made within this transaction
          * @param queries            the list of queries executed during a particular transaction
          */
-        public TransactionExecution(
-                long durationMs, long startTimestampMs, long endTimestampMs, int queriesCount, List<Query> queries) {
-            this.durationMs = durationMs;
+        public TransactionExecution(long startTimestampMs, long endTimestampMs, List<Query> queries) {
             this.startTimestampMs = startTimestampMs;
             this.endTimestampMs = endTimestampMs;
-            this.queriesCount = queriesCount;
             this.queries = queries;
-        }
-
-        public long getDurationMs() {
-            return durationMs;
         }
 
         public long getStartTimestampMs() {
@@ -188,10 +177,6 @@ public final class TransactionMonitoringFeed {
 
         public long getEndTimestampMs() {
             return endTimestampMs;
-        }
-
-        public Integer getQueriesCount() {
-            return queriesCount;
         }
 
         public List<Query> getQueries() {
@@ -204,25 +189,21 @@ public final class TransactionMonitoringFeed {
                 return false;
             }
             TransactionExecution that = (TransactionExecution) o;
-            return durationMs == that.durationMs
-                    && startTimestampMs == that.startTimestampMs
+            return startTimestampMs == that.startTimestampMs
                     && endTimestampMs == that.endTimestampMs
-                    && Objects.equals(queriesCount, that.queriesCount)
                     && Objects.equals(queries, that.queries);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(durationMs, startTimestampMs, endTimestampMs, queriesCount, queries);
+            return Objects.hash(startTimestampMs, endTimestampMs, queries);
         }
 
         @Override
         public String toString() {
-            return "TransactionExecution{" + "durationMs="
-                    + durationMs + ", startTimestampMs="
+            return "TransactionExecution{" + "startTimestampMs="
                     + startTimestampMs + ", endTimestampMs="
                     + endTimestampMs + ", queriesCount="
-                    + queriesCount + ", queries="
                     + queries + '}';
         }
     }
@@ -232,7 +213,6 @@ public final class TransactionMonitoringFeed {
      */
     public static final class Query {
         private final String sql;
-        private final Long durationMs;
         private final Long startTimestampMs;
         private final Long endTimestampMs;
 
@@ -240,23 +220,17 @@ public final class TransactionMonitoringFeed {
          * Creates a new Query.
          *
          * @param sql               the executed SQL statement
-         * @param durationMs        query execution duration in milliseconds
          * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started
          * @param endTimestampMs    unix timestamp (milliseconds since epoch) when the query finished
          */
-        public Query(String sql, Long durationMs, Long startTimestampMs, Long endTimestampMs) {
+        public Query(String sql, Long startTimestampMs, Long endTimestampMs) {
             this.sql = sql;
-            this.durationMs = durationMs;
             this.startTimestampMs = startTimestampMs;
             this.endTimestampMs = endTimestampMs;
         }
 
         public String getSql() {
             return sql;
-        }
-
-        public Long getDurationMs() {
-            return durationMs;
         }
 
         public Long getStartTimestampMs() {
@@ -274,21 +248,19 @@ public final class TransactionMonitoringFeed {
             }
             Query that = (Query) o;
             return Objects.equals(sql, that.sql)
-                    && Objects.equals(durationMs, that.durationMs)
                     && Objects.equals(startTimestampMs, that.startTimestampMs)
                     && Objects.equals(endTimestampMs, that.endTimestampMs);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(sql, durationMs, startTimestampMs, endTimestampMs);
+            return Objects.hash(sql, startTimestampMs, endTimestampMs);
         }
 
         @Override
         public String toString() {
             return "Query{" + "sql='"
                     + sql + '\'' + ", durationMs="
-                    + durationMs + ", startTimestampMs="
                     + startTimestampMs + ", endTimestampMs="
                     + endTimestampMs + '}';
         }

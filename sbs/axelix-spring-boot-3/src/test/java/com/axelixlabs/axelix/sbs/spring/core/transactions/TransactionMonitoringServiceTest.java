@@ -72,12 +72,6 @@ public class TransactionMonitoringServiceTest {
     @Autowired
     private TransactionMonitoringService transactionMonitoringService;
 
-    @Autowired
-    private TransactionStatsCollector transactionStatsCollector;
-
-    @Autowired
-    private QueriesStatsCollector queriesStatsCollector;
-
     @BeforeEach
     void cleanUp() {
         transactionMonitoringService.clearAllStats();
@@ -299,19 +293,19 @@ public class TransactionMonitoringServiceTest {
 
         @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesStatsCollector queriesStatsCollector) {
-            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesStatsCollector);
+                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
+            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
         }
 
         @Bean
-        public QueriesStatsCollector queriesStatsCollector() {
-            return new DefaultQueriesStatsCollector();
+        public QueriesRecorder queriesStatsCollector() {
+            return new DefaultQueriesRecorder();
         }
 
         @Bean
-        public TransactionMonitoringDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-                QueriesStatsCollector queriesStatsCollector) {
-            return new TransactionMonitoringDataSourceBeanPostProcessor(queriesStatsCollector);
+        public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+                QueriesRecorder queriesCollector) {
+            return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
         }
 
         @Bean

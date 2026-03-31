@@ -28,14 +28,14 @@ import java.util.Objects;
 public final class TransactionRecord {
     private final long durationMs;
     private final long startTimestamp;
-    private final List<TransactionQueryRecord> queries;
+    private final List<SqlQueryRecord> queries;
 
     /**
      * @param durationMs     transaction execution duration in milliseconds
      * @param startTimestamp transaction start timestamp in milliseconds since epoch
      * @param queries        the list of queries executed during a particular transaction.
      */
-    public TransactionRecord(long durationMs, long startTimestamp, List<TransactionQueryRecord> queries) {
+    public TransactionRecord(long durationMs, long startTimestamp, List<SqlQueryRecord> queries) {
         this.durationMs = durationMs;
         this.startTimestamp = startTimestamp;
         this.queries = queries;
@@ -49,7 +49,7 @@ public final class TransactionRecord {
         return startTimestamp;
     }
 
-    public List<TransactionQueryRecord> getQueries() {
+    public List<SqlQueryRecord> getQueries() {
         return queries;
     }
 

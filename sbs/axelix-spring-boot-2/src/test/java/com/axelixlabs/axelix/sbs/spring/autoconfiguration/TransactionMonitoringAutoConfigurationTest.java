@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.time.Duration;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,9 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
-import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.SqlQueryRecord;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
@@ -41,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 10.02.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 class TransactionMonitoringAutoConfigurationTest {
 
@@ -53,9 +57,11 @@ class TransactionMonitoringAutoConfigurationTest {
         contextRunner.run(context -> {
             assertThat(context).hasSingleBean(TransactionMonitoringAutoConfiguration.class);
             assertThat(context).hasSingleBean(TransactionStatsCollector.class);
+            assertThat(context).hasSingleBean(QueriesRecorder.class);
             assertThat(context).hasSingleBean(TransactionMonitoringService.class);
             assertThat(context).hasSingleBean(TransactionMonitoringEndpoint.class);
             assertThat(context).hasSingleBean(TransactionMonitoringBeanPostProcessor.class);
+            assertThat(context).hasSingleBean(ProxyingDataSourceBeanPostProcessor.class);
         });
     }
 
@@ -66,9 +72,11 @@ class TransactionMonitoringAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(TransactionMonitoringAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(TransactionStatsCollector.class);
+                    assertThat(context).doesNotHaveBean(QueriesRecorder.class);
                     assertThat(context).doesNotHaveBean(TransactionMonitoringService.class);
                     assertThat(context).doesNotHaveBean(TransactionMonitoringEndpoint.class);
                     assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
+                    assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
                 });
     }
 
@@ -81,9 +89,11 @@ class TransactionMonitoringAutoConfigurationTest {
         runnerWithoutRequiredProperty.run(context -> {
             assertThat(context).doesNotHaveBean(TransactionMonitoringAutoConfiguration.class);
             assertThat(context).doesNotHaveBean(TransactionStatsCollector.class);
+            assertThat(context).doesNotHaveBean(QueriesRecorder.class);
             assertThat(context).doesNotHaveBean(TransactionMonitoringService.class);
             assertThat(context).doesNotHaveBean(TransactionMonitoringEndpoint.class);
             assertThat(context).doesNotHaveBean(TransactionMonitoringBeanPostProcessor.class);
+            assertThat(context).doesNotHaveBean(ProxyingDataSourceBeanPostProcessor.class);
         });
     }
 
@@ -121,14 +131,12 @@ class TransactionMonitoringAutoConfigurationTest {
     @Test
     void shouldHandleMultipleCustomBeans() {
         contextRunner
-                .withUserConfiguration(
-                        CustomTransactionStatsCollectorConfig.class,
-                        CustomTransactionMonitoringServiceConfig.class,
-                        CustomTransactionMonitoringEndpointConfig.class,
-                        CustomTransactionMonitoringBeanPostProcessorConfig.class)
+                .withUserConfiguration(CustomTransactionConfiguration.class)
                 .run(context -> {
                     assertThat(context.getBean(TransactionStatsCollector.class))
                             .isExactlyInstanceOf(CustomTransactionStatsCollector.class);
+                    assertThat(context.getBean(QueriesRecorder.class))
+                            .isExactlyInstanceOf(CustomDefaultQueriesRecorder.class);
                     assertThat(context.getBean(TransactionMonitoringService.class))
                             .isExactlyInstanceOf(CustomTransactionMonitoringService.class);
                     assertThat(context.getBean(TransactionMonitoringEndpoint.class))
@@ -139,66 +147,77 @@ class TransactionMonitoringAutoConfigurationTest {
     }
 
     @TestConfiguration
-    static class CustomTransactionStatsCollectorConfig {
+    static class CustomTransactionConfiguration {
 
         @Bean
         public TransactionStatsCollector transactionStatsCollector() {
             return new CustomTransactionStatsCollector();
         }
-    }
-
-    @TestConfiguration
-    static class CustomTransactionMonitoringServiceConfig {
 
         @Bean
         public TransactionMonitoringService transactionMonitoringService(
                 TransactionStatsCollector transactionStatsCollector) {
             return new CustomTransactionMonitoringService(transactionStatsCollector);
         }
-    }
 
-    @TestConfiguration
-    static class CustomTransactionMonitoringEndpointConfig {
+        @Bean
+        public QueriesRecorder testQueriesRecorder() {
+            return new CustomDefaultQueriesRecorder();
+        }
 
         @Bean
         public TransactionMonitoringEndpoint transactionMonitoringEndpoint(
                 TransactionMonitoringService transactionMonitoringService) {
             return new CustomTransactionMonitoringEndpoint(transactionMonitoringService);
         }
-    }
-
-    @TestConfiguration
-    static class CustomTransactionMonitoringBeanPostProcessorConfig {
 
         @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesStatsCollector queriesStatsCollector) {
-            return new CustomTransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesStatsCollector);
+                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
+            return new CustomTransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
         }
     }
 
     static class CustomTransactionStatsCollector extends DefaultTransactionStatsCollector {
+
         public CustomTransactionStatsCollector() {
             super(1000, Duration.ofSeconds(5));
         }
     }
 
+    static class CustomDefaultQueriesRecorder implements QueriesRecorder {
+
+        @Override
+        public void recordQuery(SqlQueryRecord query) {}
+
+        @Override
+        public List<SqlQueryRecord> popAllRecords() {
+            return List.of();
+        }
+
+        @Override
+        public void clearAll() {}
+    }
+
     static class CustomTransactionMonitoringService extends DefaultTransactionMonitoringService {
+
         public CustomTransactionMonitoringService(TransactionStatsCollector transactionStatsCollector) {
             super(transactionStatsCollector);
         }
     }
 
     static class CustomTransactionMonitoringEndpoint extends TransactionMonitoringEndpoint {
+
         public CustomTransactionMonitoringEndpoint(TransactionMonitoringService transactionMonitoringService) {
             super(transactionMonitoringService);
         }
     }
 
     static class CustomTransactionMonitoringBeanPostProcessor extends TransactionMonitoringBeanPostProcessor {
+
         public CustomTransactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesStatsCollector queriesStatsCollector) {
-            super(transactionStatsCollector, queriesStatsCollector);
+                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
+            super(transactionStatsCollector, queriesCollector);
         }
     }
 }

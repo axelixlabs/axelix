@@ -12,48 +12,49 @@ import java.sql.ResultSet
 class ProxyingPreparedStatement(
     private val sql: String,
     private val delegate: PreparedStatement,
-    private val startTime: Long,
-    private val statsCollector: QueriesStatsCollector
+    private val statsCollector: QueriesRecorder
 ) : PreparedStatement by delegate {
 
     override fun executeQuery(): ResultSet {
-        return recordStats {
+        return execute {
             delegate.executeQuery()
         }
     }
 
     override fun executeUpdate(): Int {
-        return recordStats {
+        return execute {
             delegate.executeUpdate()
         }
     }
 
     override fun execute(): Boolean {
-        return recordStats {
+        return execute {
             delegate.execute()
         }
     }
 
     override fun executeLargeUpdate(): Long {
-        return recordStats {
+        return execute {
             delegate.executeLargeUpdate()
         }
     }
 
     override fun executeBatch(): IntArray {
-        return recordStats {
+        return execute {
             delegate.executeBatch()
         }
     }
 
-    private fun <T> recordStats(supplier: () -> T): T {
+    private fun <T> execute(action: () -> T): T {
+        val startTime = System.nanoTime()
+
         try {
-            return supplier()
+            return action()
         } finally {
             val duration: Long = System.nanoTime() - startTime
 
-            statsCollector.recordQueries(
-                TransactionQueryRecord(
+            statsCollector.recordQuery(
+                SqlQueryRecord(
                     sql,
                     duration / 1_000_000,
                     startTime / 1_000_000

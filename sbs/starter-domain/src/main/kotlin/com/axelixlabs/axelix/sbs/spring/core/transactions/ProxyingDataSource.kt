@@ -8,7 +8,7 @@ import javax.sql.DataSource
  *
  * @author Sergey Cherkasov
  */
-class DelegatingDataSource(private val delegate : DataSource, private val statsCollector : QueriesStatsCollector) : DataSource by delegate {
+class ProxyingDataSource(private val delegate : DataSource, private val statsCollector : QueriesRecorder) : DataSource by delegate {
 
     override fun getConnection() = ProxyingConnection(delegate.getConnection(), statsCollector)
 

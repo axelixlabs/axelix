@@ -59,13 +59,13 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
 
     private final Map<MethodClassKey, Propagation> propagationCache;
     private final TransactionStatsCollector statsCollector;
-    private final QueriesStatsCollector queriesStatsCollector;
+    private final QueriesRecorder queriesCollector;
 
     public TransactionMonitoringBeanPostProcessor(
-            TransactionStatsCollector statsCollector, QueriesStatsCollector queriesStatsCollector) {
+            TransactionStatsCollector statsCollector, QueriesRecorder queriesCollector) {
         this.propagationCache = new ConcurrentHashMap<>();
         this.statsCollector = statsCollector;
-        this.queriesStatsCollector = queriesStatsCollector;
+        this.queriesCollector = queriesCollector;
     }
 
     @Override
@@ -138,7 +138,7 @@ public class TransactionMonitoringBeanPostProcessor implements BeanPostProcessor
         proxyFactory.setProxyTargetClass(true);
 
         TransactionMonitoringInterceptor interceptor =
-                new TransactionMonitoringInterceptor(propagationCache, statsCollector, queriesStatsCollector);
+                new TransactionMonitoringInterceptor(propagationCache, statsCollector, queriesCollector);
 
         // Pointcut provides fast filtering at the proxy level and is necessary for performance
         DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(createTransactionMonitoringPointcut(), interceptor);

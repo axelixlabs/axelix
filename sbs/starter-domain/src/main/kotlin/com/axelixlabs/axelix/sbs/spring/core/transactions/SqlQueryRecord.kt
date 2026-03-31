@@ -1,7 +1,7 @@
 package com.axelixlabs.axelix.sbs.spring.core.transactions
 
 /**
- * Record of a single query execution for monitoring purposes.
+ * Record of a single SQL query execution.
  *
  * @param sql               the executed SQL statement
  * @param durationMs        query execution duration in milliseconds.
@@ -9,7 +9,7 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions
  *
  * @author Sergey Cherkasov
  */
-data class TransactionQueryRecord(
+data class SqlQueryRecord(
     val sql: String,
     val durationMs: Long,
     val startTimestampMs: Long

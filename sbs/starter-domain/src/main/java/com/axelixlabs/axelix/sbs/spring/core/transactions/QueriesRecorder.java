@@ -17,32 +17,34 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Service providing access to queries in transaction monitoring data and statistics.
+ * Recorder of the SQL queries. It assumes that all sequentially related queries
+ * are executed within a single Thread.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
-public final class DefaultQueriesStatsCollector implements QueriesStatsCollector {
+public interface QueriesRecorder {
 
-    private final ThreadLocal<List<TransactionQueryRecord>> threadLocal = ThreadLocal.withInitial(ArrayList::new);
+    /**
+     * Records a query execution for statistics collection.
+     *
+     * @param query the query execution record
+     */
+    void recordQuery(SqlQueryRecord query);
 
-    @Override
-    public void recordQueries(TransactionQueryRecord transactionQueries) {
-        threadLocal.get().add(transactionQueries);
-    }
+    /**
+     * Pops all query statistics collected within the particular transaction
+     * (i.e. the history of queries is removed from {@link QueriesRecorder})
+     *
+     * @return list ща query statistics
+     */
+    List<SqlQueryRecord> popAllRecords();
 
-    @Override
-    public List<TransactionQueryRecord> getAllStats() {
-        List<TransactionQueryRecord> queries = new ArrayList<>(threadLocal.get());
-        threadLocal.remove();
-        return queries;
-    }
-
-    @Override
-    public void clearAllStats() {
-        threadLocal.remove();
-    }
+    /**
+     * Clears all collected query statistics.
+     */
+    void clearAll();
 }

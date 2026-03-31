@@ -26,24 +26,25 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
  * {@link BeanPostProcessor} that wraps {@link DataSource} beans with a monitoring
- * {@link DelegatingDataSource} to collect real-time SQL query execution statistics.
+ * {@link ProxyingDataSource} to collect real-time SQL query execution statistics.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
-public final class TransactionMonitoringDataSourceBeanPostProcessor implements BeanPostProcessor {
+public final class ProxyingDataSourceBeanPostProcessor implements BeanPostProcessor {
 
-    private final QueriesStatsCollector queriesStatsCollector;
+    private final QueriesRecorder queriesCollector;
 
-    public TransactionMonitoringDataSourceBeanPostProcessor(QueriesStatsCollector queriesStatsCollector) {
-        this.queriesStatsCollector = queriesStatsCollector;
+    public ProxyingDataSourceBeanPostProcessor(QueriesRecorder queriesCollector) {
+        this.queriesCollector = queriesCollector;
     }
 
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
-        if (!(bean instanceof DataSource dataSource) || bean instanceof DelegatingDataSource) {
+        if (!(bean instanceof DataSource dataSource) || bean instanceof ProxyingDataSource) {
             return bean;
         }
 
-        return new DelegatingDataSource(dataSource, queriesStatsCollector);
+        return new ProxyingDataSource(dataSource, queriesCollector);
     }
 }

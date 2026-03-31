@@ -72,9 +72,6 @@ class TransactionMonitoringEndpointTest {
     @Autowired
     private TransactionStatsCollector transactionStatsCollector;
 
-    @Autowired
-    private QueriesStatsCollector queriesStatsCollector;
-
     @BeforeEach
     void cleanUp() {
         transactionStatsCollector.clearAllStats();
@@ -105,7 +102,7 @@ class TransactionMonitoringEndpointTest {
         assertThatJson(responseBody).node("entrypoints[0].executions").isArray();
         assertThatJson(responseBody).node("entrypoints[0].executions[0]").isObject();
         assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].durationMs")
+                .node("entrypoints[0].executions[0].endTimestampMs")
                 .isNumber();
         assertThatJson(responseBody)
                 .node("entrypoints[0].executions[0].startTimestampMs")
@@ -166,19 +163,19 @@ class TransactionMonitoringEndpointTest {
 
         @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector, QueriesStatsCollector queriesStatsCollector) {
-            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesStatsCollector);
+                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
+            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
         }
 
         @Bean
-        public QueriesStatsCollector queriesStatsCollector() {
-            return new DefaultQueriesStatsCollector();
+        public QueriesRecorder queriesStatsCollector() {
+            return new DefaultQueriesRecorder();
         }
 
         @Bean
-        public TransactionMonitoringDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
-                QueriesStatsCollector queriesStatsCollector) {
-            return new TransactionMonitoringDataSourceBeanPostProcessor(queriesStatsCollector);
+        public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+                QueriesRecorder queriesCollector) {
+            return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
         }
 
         @Bean

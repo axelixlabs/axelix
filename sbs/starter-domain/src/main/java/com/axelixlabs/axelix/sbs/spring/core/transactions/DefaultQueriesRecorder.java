@@ -17,31 +17,32 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This interface defines the contract for collecting and retrieving SQL query monitoring data.
+ * Service providing access to queries in transaction monitoring data and statistics.
  *
  * @author Sergey Cherkasov
  */
-public interface QueriesStatsCollector {
+public final class DefaultQueriesRecorder implements QueriesRecorder {
 
-    /**
-     * Records a query execution for statistics collection.
-     *
-     * @param transactionQueries the query execution record
-     */
-    void recordQueries(TransactionQueryRecord transactionQueries);
+    private final ThreadLocal<List<SqlQueryRecord>> threadLocal = ThreadLocal.withInitial(ArrayList::new);
 
-    /**
-     * Returns all query statistics collected within the particular transaction.
-     *
-     * @return list ща query statistics
-     */
-    List<TransactionQueryRecord> getAllStats();
+    @Override
+    public void recordQuery(SqlQueryRecord query) {
+        threadLocal.get().add(query);
+    }
 
-    /**
-     * Clears all collected query statistics.
-     */
-    void clearAllStats();
+    @Override
+    public List<SqlQueryRecord> popAllRecords() {
+        List<SqlQueryRecord> queries = new ArrayList<>(threadLocal.get());
+        threadLocal.remove();
+        return queries;
+    }
+
+    @Override
+    public void clearAll() {
+        threadLocal.remove();
+    }
 }
