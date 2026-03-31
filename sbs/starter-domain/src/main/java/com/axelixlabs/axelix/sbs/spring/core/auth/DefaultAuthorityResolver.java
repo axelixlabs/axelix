@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
@@ -35,23 +34,9 @@ import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
  */
 public class DefaultAuthorityResolver implements AuthorityResolver {
 
-    private final Map<ActuatorEndpoint, Authority> pathMappings;
-    private final BiFunction<String, String, Boolean> pathMatcher;
+    private static final Map<ActuatorEndpoint, Authority> PATH_MAPPINGS;
 
-    public DefaultAuthorityResolver(BiFunction<String, String, Boolean> pathMatcher) {
-        this.pathMatcher = pathMatcher;
-        this.pathMappings = buildPathMappings();
-    }
-
-    @Override
-    public Optional<Authority> resolve(String path) {
-        return pathMappings.entrySet().stream()
-                .filter(entry -> pathMatcher.apply(entry.getKey().path().originalUrl(), path))
-                .map(Map.Entry::getValue)
-                .findFirst();
-    }
-
-    private Map<ActuatorEndpoint, Authority> buildPathMappings() {
+    static {
         Map<ActuatorEndpoint, Authority> map = new LinkedHashMap<>();
 
         // ENV_VALUES_READ
@@ -89,6 +74,20 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
         map.put(ActuatorEndpoints.DISABLE_GC_LOGGING, DefaultAuthority.GARBAGE_COLLECTOR);
         map.put(ActuatorEndpoints.ENABLE_GC_LOGGING, DefaultAuthority.GARBAGE_COLLECTOR);
 
-        return Collections.unmodifiableMap(map);
+        PATH_MAPPINGS = Collections.unmodifiableMap(map);
+    }
+
+    private final EndpointPathMatcher pathMatcher;
+
+    public DefaultAuthorityResolver(EndpointPathMatcher pathMatcher) {
+        this.pathMatcher = pathMatcher;
+    }
+
+    @Override
+    public Optional<Authority> resolve(String path) {
+        return PATH_MAPPINGS.entrySet().stream()
+                .filter(entry -> pathMatcher.matches(entry.getKey().path().originalUrl(), path))
+                .map(Map.Entry::getValue)
+                .findFirst();
     }
 }

@@ -17,8 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
@@ -45,170 +49,82 @@ public class DefaultAuthorityResolverTest {
         });
     }
 
-    @Test
-    void shouldResolve_EnvValuesRead() {
-        assertThat(authorityResolver.resolve("/axelix-env")).contains(DefaultAuthority.ENV_VALUES_READ);
+    @ParameterizedTest
+    @MethodSource("defaultAuthority")
+    void shouldResolveAuthority(String path, DefaultAuthority authority) {
+        assertThat(authorityResolver.resolve(path)).contains(authority);
     }
 
-    @Test
-    void shouldResolve_ConfiPropsValuesRead() {
-        assertThat(authorityResolver.resolve("/axelix-configprops"))
-                .contains(DefaultAuthority.CONFIG_PROPS_VALUES_READ);
+    private static Stream<Arguments> defaultAuthority() {
+        return Stream.of(
+                // ENV_VALUES_READ
+                Arguments.of("/axelix-env", DefaultAuthority.ENV_VALUES_READ),
+
+                // CONFIG_PROPS_VALUES_READ
+                Arguments.of("/axelix-configprops", DefaultAuthority.CONFIG_PROPS_VALUES_READ),
+
+                // CONDITIONS_READ
+                Arguments.of("/axelix-conditions", DefaultAuthority.CONDITIONS_READ),
+
+                // PROPERTY_VALUE_MUTATE
+                Arguments.of("/axelix-property-management", DefaultAuthority.PROPERTY_VALUE_MUTATE),
+
+                // SCHEDULED_TASKS_MODIFY
+                Arguments.of("/axelix-scheduled-tasks/modify/cron-expression", DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of("/axelix-scheduled-tasks/modify/interval", DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of("/axelix-scheduled-tasks/enable", DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of("/axelix-scheduled-tasks/disable", DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of("/axelix-scheduled-tasks/execute", DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+
+                // CACHES_CLEAR
+                Arguments.of("/axelix-caches/clear", DefaultAuthority.CACHES_CLEAR),
+                Arguments.of("/axelix-caches/{cacheManagerName}/{cacheName}/clear", DefaultAuthority.CACHES_CLEAR),
+                Arguments.of("/axelix-caches/cacheManager/cacheName/clear", DefaultAuthority.CACHES_CLEAR),
+                Arguments.of("/axelix-caches/cacheManager/clear-all", DefaultAuthority.CACHES_CLEAR),
+
+                // CACHES_TOGGLE
+                Arguments.of("/axelix-caches/{cacheManagerName}/{cacheName}/enable", DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/axelix-caches/cacheManager/cacheName/enable", DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/axelix-caches/{cacheManagerName}/{cacheName}/disable", DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/axelix-caches/cacheManager/cacheName/disable", DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/axelix-caches/cacheManager/enable", DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/axelix-caches/cacheManager/disable", DefaultAuthority.CACHES_TOGGLE),
+
+                // GC
+                Arguments.of("/axelix-gc/trigger", DefaultAuthority.GARBAGE_COLLECTOR),
+                Arguments.of("/axelix-gc/log/enable", DefaultAuthority.GARBAGE_COLLECTOR),
+                Arguments.of("/axelix-gc/log/disable", DefaultAuthority.GARBAGE_COLLECTOR));
     }
 
-    @Test
-    void shouldResolve_PropertyValueMutate() {
-        assertThat(authorityResolver.resolve("/axelix-property-management"))
-                .contains(DefaultAuthority.PROPERTY_VALUE_MUTATE);
+    @ParameterizedTest
+    @MethodSource("pathsAvailableToEveryone")
+    void shouldResolveToEmpty(String path) {
+        assertThat(authorityResolver.resolve(path)).isEmpty();
     }
 
-    @Test
-    void shouldResolve_ScheduledTaskModify() {
-        // Cron Expression
-        assertThat(authorityResolver.resolve("/axelix-scheduled-tasks/modify/cron-expression"))
-                .contains(DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-
-        // Interval
-        assertThat(authorityResolver.resolve("/axelix-scheduled-tasks/modify/interval"))
-                .contains(DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-
-        // Enable
-        assertThat(authorityResolver.resolve("/axelix-scheduled-tasks/enable"))
-                .contains(DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-
-        // Disable
-        assertThat(authorityResolver.resolve("/axelix-scheduled-tasks/disable"))
-                .contains(DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-
-        // Execute
-        assertThat(authorityResolver.resolve("/axelix-scheduled-tasks/execute"))
-                .contains(DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-    }
-
-    @Test
-    void shouldResolve_ConditionRead() {
-        assertThat(authorityResolver.resolve("/axelix-conditions")).contains(DefaultAuthority.CONDITIONS_READ);
-    }
-
-    @Test
-    void shouldResolve_CachesClear() {
-        // All cache clear
-        assertThat(authorityResolver.resolve("/axelix-caches/clear")).contains(DefaultAuthority.CACHES_CLEAR);
-
-        // Single cache clear
-        assertThat(authorityResolver.resolve("/axelix-caches/{cacheManagerName}/{cacheName}/clear"))
-                .contains(DefaultAuthority.CACHES_CLEAR);
-        assertThat(authorityResolver.resolve("/axelix-caches/cacheManager/cacheName/clear"))
-                .contains(DefaultAuthority.CACHES_CLEAR);
-
-        // Single cache manager clear
-        assertThat(authorityResolver.resolve("/axelix-caches/cacheManager/clear-all"))
-                .contains(DefaultAuthority.CACHES_CLEAR);
-    }
-
-    @Test
-    void shouldResolve_CachesToggle() {
-        // Single cache
-        assertThat(authorityResolver.resolve("/axelix-caches/{cacheManagerName}/{cacheName}/enable"))
-                .contains(DefaultAuthority.CACHES_TOGGLE);
-        assertThat(authorityResolver.resolve("/axelix-caches/cacheManager/cacheName/enable"))
-                .contains(DefaultAuthority.CACHES_TOGGLE);
-        assertThat(authorityResolver.resolve("/axelix-caches/{cacheManagerName}/{cacheName}/disable"))
-                .contains(DefaultAuthority.CACHES_TOGGLE);
-        assertThat(authorityResolver.resolve("/axelix-caches/cacheManager/cacheName/disable"))
-                .contains(DefaultAuthority.CACHES_TOGGLE);
-
-        // Single cache manager
-        assertThat(authorityResolver.resolve("/axelix-caches/cacheManager/enable"))
-                .contains(DefaultAuthority.CACHES_TOGGLE);
-        assertThat(authorityResolver.resolve("/axelix-caches/cacheManager/disable"))
-                .contains(DefaultAuthority.CACHES_TOGGLE);
-    }
-
-    @Test
-    void shouldResolve_GarbageCollector() {
-        // Trigger
-        assertThat(authorityResolver.resolve("/axelix-gc/trigger")).contains(DefaultAuthority.GARBAGE_COLLECTOR);
-
-        // GC Logs monitoring
-        assertThat(authorityResolver.resolve("/axelix-gc/log/enable")).contains(DefaultAuthority.GARBAGE_COLLECTOR);
-        assertThat(authorityResolver.resolve("/axelix-gc/log/disable")).contains(DefaultAuthority.GARBAGE_COLLECTOR);
-    }
-
-    @Test
-    void shouldReturnEmpty_ScheduledTasksRead() {
-        assertThat(authorityResolver.resolve("/axelix-scheduled-tasks")).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_Caches() {
-        assertThat(authorityResolver.resolve("/axelix-caches")).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_GarbageCollector() {
-        assertThat(authorityResolver.resolve("/axelix-gc")).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_GarbageCollectorRead() {
-        assertThat(authorityResolver.resolve("/axelix-gc/log/status")).isEmpty();
-        assertThat(authorityResolver.resolve("/axelix-gc/log/file")).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_BeansRead() {
-        assertThat(authorityResolver.resolve("/axelix-beans")).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_HeapDumpRead() {
-        assertThat(authorityResolver.resolve("/axelix-heap-dump")).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_DetailsRead() {
-        assertThat(authorityResolver.resolve("/axelix-details")).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_MetadataRead() {
-        assertThat(authorityResolver.resolve("/axelix-metadata")).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_Loggers() {
-        assertThat(authorityResolver.resolve("/axelix-loggers")).isEmpty();
-        assertThat(authorityResolver.resolve("/axelix-loggers/{logger.name}")).isEmpty();
-        assertThat(authorityResolver.resolve("/axelix-loggers/logger.name")).isEmpty();
-        assertThat(authorityResolver.resolve("/axelix-loggers/reset/{logger.name}"))
-                .isEmpty();
-        assertThat(authorityResolver.resolve("/axelix-loggers/reset/logger.name"))
-                .isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_Metrics() {
-        assertThat(authorityResolver.resolve("/axelix-metrics")).isEmpty();
-        assertThat(authorityResolver.resolve("/axelix-metrics/{metric.name}")).isEmpty();
-        assertThat(authorityResolver.resolve("/axelix-metrics/jvm.buffer.count"))
-                .isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_ThreadDump() {
-        assertThat(authorityResolver.resolve("/axelix-thread-dump")).isEmpty();
-        assertThat(authorityResolver.resolve("/axelix-thread-dump/enable")).isEmpty();
-        assertThat(authorityResolver.resolve("/axelix-thread-dump/disable")).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_TransactionMonitoring() {
-        assertThat(authorityResolver.resolve("/axelix-transactions-monitoring")).isEmpty();
-    }
-
-    @Test
-    void shouldReturnEmpty_FeignClient() {
-        assertThat(authorityResolver.resolve("/axelix-feign")).isEmpty();
+    private static Stream<Arguments> pathsAvailableToEveryone() {
+        return Stream.of(
+                Arguments.of("/axelix-scheduled-tasks"),
+                Arguments.of("/axelix-caches"),
+                Arguments.of("/axelix-gc"),
+                Arguments.of("/axelix-gc/log/status"),
+                Arguments.of("/axelix-gc/log/file"),
+                Arguments.of("/axelix-beans"),
+                Arguments.of("/axelix-heap-dump"),
+                Arguments.of("/axelix-details"),
+                Arguments.of("/axelix-metadata"),
+                Arguments.of("/axelix-loggers"),
+                Arguments.of("/axelix-loggers/{logger.name}"),
+                Arguments.of("/axelix-loggers/logger.name"),
+                Arguments.of("/axelix-loggers/reset/{logger.name}"),
+                Arguments.of("/axelix-loggers/reset/logger.name"),
+                Arguments.of("/axelix-metrics"),
+                Arguments.of("/axelix-metrics/{metric.name}"),
+                Arguments.of("/axelix-metrics/jvm.buffer.count"),
+                Arguments.of("/axelix-thread-dump"),
+                Arguments.of("/axelix-thread-dump/enable"),
+                Arguments.of("/axelix-thread-dump/disable"),
+                Arguments.of("/axelix-transactions-monitoring"),
+                Arguments.of("/axelix-feign"));
     }
 }
