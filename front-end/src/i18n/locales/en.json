@@ -274,6 +274,13 @@
         "durationTooltip": "Aggregated information about the duration of this transactional method execution"
     },
     "MCP": {
-        "accessLog": "Access Log"
+        "accessLog": "Access Log",
+        "user": "User",
+        "serviceName": "Service Name",
+        "statusCode": "Status Code",
+        "requestBody": "Request body",
+        "responseBody": "Response body",
+        "expandAll": "Expand all",
+        "collapseAll": "Collapse all"
     }
 }
