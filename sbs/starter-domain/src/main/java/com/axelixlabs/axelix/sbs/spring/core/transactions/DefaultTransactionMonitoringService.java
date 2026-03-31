@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.ExecutionStats;
+import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.Query;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.TransactionExecution;
 import com.axelixlabs.axelix.common.api.TransactionMonitoringFeed.TransactionalEntrypoint;
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
@@ -109,6 +110,19 @@ public class DefaultTransactionMonitoringService implements TransactionMonitorin
     }
 
     private TransactionExecution convertToTransactionExecution(TransactionRecord record) {
-        return new TransactionExecution(record.getDurationMs(), record.getStartTimestamp());
+        List<Query> queries = convertToQueries(record.getQueries());
+        long startTimestamp = record.getStartTimestamp();
+        long endTimestamp = startTimestamp + record.getDurationMs();
+        return new TransactionExecution(startTimestamp, endTimestamp, queries);
+    }
+
+    private List<Query> convertToQueries(List<SqlQueryRecord> queriesRecords) {
+        return queriesRecords.stream()
+                .map(queries -> {
+                    long startTimestamp = queries.getStartTimestampMs();
+                    long endTimestamp = queries.getDurationMs() + startTimestamp;
+                    return new Query(queries.getSql(), queries.getStartTimestampMs(), endTimestamp);
+                })
+                .collect(Collectors.toList());
     }
 }

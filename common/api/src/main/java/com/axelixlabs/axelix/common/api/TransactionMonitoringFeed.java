@@ -26,6 +26,7 @@ import java.util.Objects;
  * @since 20.01.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public final class TransactionMonitoringFeed {
 
@@ -153,48 +154,115 @@ public final class TransactionMonitoringFeed {
      */
     public static final class TransactionExecution {
 
-        private final long durationMs;
-        private final long timestamp;
+        private final long startTimestampMs;
+        private final long endTimestampMs;
+        private final List<Query> queries;
 
         /**
          * Creates a new TransactionExecution.
          *
-         * @param durationMs transaction execution duration in milliseconds
-         * @param timestamp   unix timestamp (milliseconds from epoch) when transaction started
+         * @param startTimestampMs   unix timestamp (milliseconds from epoch) when transaction started
+         * @param endTimestampMs     unix timestamp (milliseconds from epoch) when transaction finished
+         * @param queries            the list of queries executed during a particular transaction
          */
-        public TransactionExecution(long durationMs, long timestamp) {
-            this.durationMs = durationMs;
-            this.timestamp = timestamp;
+        public TransactionExecution(long startTimestampMs, long endTimestampMs, List<Query> queries) {
+            this.startTimestampMs = startTimestampMs;
+            this.endTimestampMs = endTimestampMs;
+            this.queries = queries;
         }
 
-        public long getDurationMs() {
-            return durationMs;
+        public long getStartTimestampMs() {
+            return startTimestampMs;
         }
 
-        public long getTimestamp() {
-            return timestamp;
+        public long getEndTimestampMs() {
+            return endTimestampMs;
+        }
+
+        public List<Query> getQueries() {
+            return queries;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
             TransactionExecution that = (TransactionExecution) o;
-            return durationMs == that.durationMs && timestamp == that.timestamp;
+            return startTimestampMs == that.startTimestampMs
+                    && endTimestampMs == that.endTimestampMs
+                    && Objects.equals(queries, that.queries);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(durationMs, timestamp);
+            return Objects.hash(startTimestampMs, endTimestampMs, queries);
         }
 
         @Override
         public String toString() {
-            return "TransactionExecution{" + "durationMs=" + durationMs + ", timestamp=" + timestamp + '}';
+            return "TransactionExecution{" + "startTimestampMs="
+                    + startTimestampMs + ", endTimestampMs="
+                    + endTimestampMs + ", queriesCount="
+                    + queries + '}';
+        }
+    }
+
+    /**
+     * The query executed during a particular transaction.
+     */
+    public static final class Query {
+        private final String sql;
+        private final Long startTimestampMs;
+        private final Long endTimestampMs;
+
+        /**
+         * Creates a new Query.
+         *
+         * @param sql               the executed SQL statement
+         * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started
+         * @param endTimestampMs    unix timestamp (milliseconds since epoch) when the query finished
+         */
+        public Query(String sql, Long startTimestampMs, Long endTimestampMs) {
+            this.sql = sql;
+            this.startTimestampMs = startTimestampMs;
+            this.endTimestampMs = endTimestampMs;
+        }
+
+        public String getSql() {
+            return sql;
+        }
+
+        public Long getStartTimestampMs() {
+            return startTimestampMs;
+        }
+
+        public Long getEndTimestampMs() {
+            return endTimestampMs;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Query that = (Query) o;
+            return Objects.equals(sql, that.sql)
+                    && Objects.equals(startTimestampMs, that.startTimestampMs)
+                    && Objects.equals(endTimestampMs, that.endTimestampMs);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(sql, startTimestampMs, endTimestampMs);
+        }
+
+        @Override
+        public String toString() {
+            return "Query{" + "sql='"
+                    + sql + '\'' + ", durationMs="
+                    + startTimestampMs + ", endTimestampMs="
+                    + endTimestampMs + '}';
         }
     }
 

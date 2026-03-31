@@ -24,8 +24,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.TransactionMonitoringConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultQueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionMonitoringService;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.DefaultTransactionStatsCollector;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.ProxyingDataSourceBeanPostProcessor;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.QueriesRecorder;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringBeanPostProcessor;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringService;
@@ -36,6 +39,7 @@ import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionStatsCollec
  *
  * @since 21.01.2026
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @AutoConfiguration
 @ConditionalOnAvailableEndpoint(endpoint = TransactionMonitoringEndpoint.class)
@@ -73,7 +77,20 @@ public class TransactionMonitoringAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-            TransactionStatsCollector transactionStatsCollector) {
-        return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector);
+            TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
+        return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public QueriesRecorder queriesStatsCollector() {
+        return new DefaultQueriesRecorder();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+            QueriesRecorder queriesCollector) {
+        return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
     }
 }

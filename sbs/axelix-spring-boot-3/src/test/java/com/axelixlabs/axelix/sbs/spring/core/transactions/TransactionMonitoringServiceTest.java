@@ -293,8 +293,19 @@ public class TransactionMonitoringServiceTest {
 
         @Bean
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
-                TransactionStatsCollector transactionStatsCollector) {
-            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector);
+                TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
+            return new TransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
+        }
+
+        @Bean
+        public QueriesRecorder queriesStatsCollector() {
+            return new DefaultQueriesRecorder();
+        }
+
+        @Bean
+        public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+                QueriesRecorder queriesCollector) {
+            return new ProxyingDataSourceBeanPostProcessor(queriesCollector);
         }
 
         @Bean
