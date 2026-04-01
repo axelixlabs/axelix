@@ -86,6 +86,8 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
 
     @Override
     public Optional<Authority> resolve(String path, HttpMethod httpMethod) {
+
+        // TODO: well, technically we probably can resolve via simple map lookup, I guess...
         return PATH_MAPPINGS.entrySet().stream()
                 .filter(entry -> entry.getKey().httpMethod().equals(httpMethod))
                 .filter(entry -> pathMatcher.matches(entry.getKey().path().originalUrl(), path))
