@@ -263,7 +263,6 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
-        @SuppressWarnings("removal") // TODO: https://github.com/axelixlabs/axelix/issues/757
         public AuthorityResolver authorityResolver() {
             return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
                 PathPattern parse = new PathPatternParser().parse(pathTemplate);

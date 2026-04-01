@@ -29,6 +29,7 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,80 +52,107 @@ public class DefaultAuthorityResolverTest {
 
     @ParameterizedTest
     @MethodSource("defaultAuthority")
-    void shouldResolveAuthority(String path, DefaultAuthority authority) {
-        assertThat(authorityResolver.resolve(path)).contains(authority);
+    void shouldResolveAuthority(String path, HttpMethod httpMethod, DefaultAuthority authority) {
+        assertThat(authorityResolver.resolve(path, httpMethod)).contains(authority);
     }
 
     private static Stream<Arguments> defaultAuthority() {
         return Stream.of(
                 // ENV_VALUES_READ
-                Arguments.of("/axelix-env", DefaultAuthority.ENV_VALUES_READ),
+                Arguments.of("/axelix-env", HttpMethod.GET, DefaultAuthority.ENV_VALUES_READ),
 
                 // CONFIG_PROPS_VALUES_READ
-                Arguments.of("/axelix-configprops", DefaultAuthority.CONFIG_PROPS_VALUES_READ),
+                Arguments.of("/axelix-configprops", HttpMethod.GET, DefaultAuthority.CONFIG_PROPS_VALUES_READ),
 
                 // CONDITIONS_READ
-                Arguments.of("/axelix-conditions", DefaultAuthority.CONDITIONS_READ),
+                Arguments.of("/axelix-conditions", HttpMethod.GET, DefaultAuthority.CONDITIONS_READ),
 
                 // PROPERTY_VALUE_MUTATE
-                Arguments.of("/axelix-property-management", DefaultAuthority.PROPERTY_VALUE_MUTATE),
+                Arguments.of("/axelix-property-management", HttpMethod.POST, DefaultAuthority.PROPERTY_VALUE_MUTATE),
 
                 // SCHEDULED_TASKS_MODIFY
-                Arguments.of("/axelix-scheduled-tasks/modify/cron-expression", DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of("/axelix-scheduled-tasks/modify/interval", DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of("/axelix-scheduled-tasks/enable", DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of("/axelix-scheduled-tasks/disable", DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of("/axelix-scheduled-tasks/execute", DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of(
+                        "/axelix-scheduled-tasks/modify/cron-expression",
+                        HttpMethod.POST,
+                        DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of(
+                        "/axelix-scheduled-tasks/modify/interval",
+                        HttpMethod.POST,
+                        DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of(
+                        "/axelix-scheduled-tasks/enable", HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of(
+                        "/axelix-scheduled-tasks/disable", HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of(
+                        "/axelix-scheduled-tasks/execute", HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY),
 
                 // CACHES_CLEAR
-                Arguments.of("/axelix-caches/clear", DefaultAuthority.CACHES_CLEAR),
-                Arguments.of("/axelix-caches/{cacheManagerName}/{cacheName}/clear", DefaultAuthority.CACHES_CLEAR),
-                Arguments.of("/axelix-caches/cacheManager/cacheName/clear", DefaultAuthority.CACHES_CLEAR),
-                Arguments.of("/axelix-caches/cacheManager/clear-all", DefaultAuthority.CACHES_CLEAR),
+                Arguments.of("/axelix-caches/clear", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
+                Arguments.of(
+                        "/axelix-caches/{cacheManagerName}/{cacheName}/clear",
+                        HttpMethod.DELETE,
+                        DefaultAuthority.CACHES_CLEAR),
+                Arguments.of(
+                        "/axelix-caches/cacheManager/cacheName/clear",
+                        HttpMethod.DELETE,
+                        DefaultAuthority.CACHES_CLEAR),
+                Arguments.of("/axelix-caches/cacheManager/clear-all", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
 
                 // CACHES_TOGGLE
-                Arguments.of("/axelix-caches/{cacheManagerName}/{cacheName}/enable", DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/axelix-caches/cacheManager/cacheName/enable", DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/axelix-caches/{cacheManagerName}/{cacheName}/disable", DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/axelix-caches/cacheManager/cacheName/disable", DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/axelix-caches/cacheManager/enable", DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of("/axelix-caches/cacheManager/disable", DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of(
+                        "/axelix-caches/{cacheManagerName}/{cacheName}/enable",
+                        HttpMethod.POST,
+                        DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of(
+                        "/axelix-caches/cacheManager/cacheName/enable",
+                        HttpMethod.POST,
+                        DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of(
+                        "/axelix-caches/{cacheManagerName}/{cacheName}/disable",
+                        HttpMethod.POST,
+                        DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of(
+                        "/axelix-caches/cacheManager/cacheName/disable",
+                        HttpMethod.POST,
+                        DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/axelix-caches/cacheManager/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/axelix-caches/cacheManager/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
 
                 // GC
-                Arguments.of("/axelix-gc/trigger", DefaultAuthority.GARBAGE_COLLECTOR),
-                Arguments.of("/axelix-gc/log/enable", DefaultAuthority.GARBAGE_COLLECTOR),
-                Arguments.of("/axelix-gc/log/disable", DefaultAuthority.GARBAGE_COLLECTOR));
+                Arguments.of("/axelix-gc/trigger", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
+                Arguments.of("/axelix-gc/log/enable", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
+                Arguments.of("/axelix-gc/log/disable", HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR));
     }
 
     @ParameterizedTest
     @MethodSource("pathsAvailableToEveryone")
-    void shouldResolveToEmpty(String path) {
-        assertThat(authorityResolver.resolve(path)).isEmpty();
+    void shouldResolveToEmpty(String path, HttpMethod httpMethod) {
+        assertThat(authorityResolver.resolve(path, httpMethod)).isEmpty();
     }
 
     private static Stream<Arguments> pathsAvailableToEveryone() {
         return Stream.of(
-                Arguments.of("/axelix-scheduled-tasks"),
-                Arguments.of("/axelix-caches"),
-                Arguments.of("/axelix-gc"),
-                Arguments.of("/axelix-gc/log/status"),
-                Arguments.of("/axelix-gc/log/file"),
-                Arguments.of("/axelix-beans"),
-                Arguments.of("/axelix-heap-dump"),
-                Arguments.of("/axelix-details"),
-                Arguments.of("/axelix-metadata"),
-                Arguments.of("/axelix-loggers"),
-                Arguments.of("/axelix-loggers/{logger.name}"),
-                Arguments.of("/axelix-loggers/logger.name"),
-                Arguments.of("/axelix-loggers/reset/{logger.name}"),
-                Arguments.of("/axelix-loggers/reset/logger.name"),
-                Arguments.of("/axelix-metrics"),
-                Arguments.of("/axelix-metrics/{metric.name}"),
-                Arguments.of("/axelix-metrics/jvm.buffer.count"),
-                Arguments.of("/axelix-thread-dump"),
-                Arguments.of("/axelix-thread-dump/enable"),
-                Arguments.of("/axelix-thread-dump/disable"),
-                Arguments.of("/axelix-transactions-monitoring"),
-                Arguments.of("/axelix-feign"));
+                Arguments.of("/axelix-scheduled-tasks", HttpMethod.GET),
+                Arguments.of("/axelix-caches", HttpMethod.GET),
+                Arguments.of("/axelix-gc", HttpMethod.GET),
+                Arguments.of("/axelix-gc/log/status", HttpMethod.GET),
+                Arguments.of("/axelix-gc/log/file", HttpMethod.GET),
+                Arguments.of("/axelix-beans", HttpMethod.GET),
+                Arguments.of("/axelix-heap-dump", HttpMethod.GET),
+                Arguments.of("/axelix-details", HttpMethod.GET),
+                Arguments.of("/axelix-metadata", HttpMethod.GET),
+                Arguments.of("/axelix-loggers", HttpMethod.GET),
+                Arguments.of("/axelix-loggers/{logger.name}", HttpMethod.GET),
+                Arguments.of("/axelix-loggers/logger.name", HttpMethod.GET),
+                Arguments.of("/axelix-loggers/reset/{logger.name}", HttpMethod.GET),
+                Arguments.of("/axelix-loggers/reset/logger.name", HttpMethod.GET),
+                Arguments.of("/axelix-metrics", HttpMethod.GET),
+                Arguments.of("/axelix-metrics/{metric.name}", HttpMethod.GET),
+                Arguments.of("/axelix-metrics/jvm.buffer.count", HttpMethod.GET),
+                Arguments.of("/axelix-thread-dump", HttpMethod.GET),
+                Arguments.of("/axelix-thread-dump/enable", HttpMethod.GET),
+                Arguments.of("/axelix-thread-dump/disable", HttpMethod.GET),
+                Arguments.of("/axelix-transactions-monitoring", HttpMethod.GET),
+                Arguments.of("/axelix-feign", HttpMethod.GET));
     }
 }

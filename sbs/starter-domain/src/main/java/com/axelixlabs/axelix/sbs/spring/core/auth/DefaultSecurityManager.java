@@ -29,11 +29,13 @@ import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.DecodedUser;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
  * Default {@link SecurityManager}. First it authenticates the request, and then authorizes it.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public class DefaultSecurityManager implements SecurityManager {
 
@@ -54,7 +56,7 @@ public class DefaultSecurityManager implements SecurityManager {
     }
 
     @Override
-    public void authorizeInternal(String requestPath, @Nullable String token)
+    public void authorizeInternal(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
             throws AuthorizationException, JwtProcessingException {
 
         if (token == null || token.isEmpty()) {
@@ -63,7 +65,7 @@ public class DefaultSecurityManager implements SecurityManager {
 
         DecodedUser user = jwtDecoderService.decodeTokenToUser(token);
 
-        Optional<Authority> requiredAuthority = authorityResolver.resolve(requestPath);
+        Optional<Authority> requiredAuthority = authorityResolver.resolve(requestPath, requestHttpMethod);
 
         AuthorizationRequest authorizationRequest =
                 new AuthorizationRequest(requiredAuthority.map(Set::of).orElse(Collections.emptySet()));

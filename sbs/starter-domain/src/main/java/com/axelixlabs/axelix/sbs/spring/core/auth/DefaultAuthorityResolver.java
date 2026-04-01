@@ -26,6 +26,7 @@ import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
  * Default {@link AuthorityResolver}. Determines the required {@link Authority} based on the request path.
@@ -84,8 +85,9 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
     }
 
     @Override
-    public Optional<Authority> resolve(String path) {
+    public Optional<Authority> resolve(String path, HttpMethod httpMethod) {
         return PATH_MAPPINGS.entrySet().stream()
+                .filter(entry -> entry.getKey().httpMethod().equals(httpMethod))
                 .filter(entry -> pathMatcher.matches(entry.getKey().path().originalUrl(), path))
                 .map(Map.Entry::getValue)
                 .findFirst();
