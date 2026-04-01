@@ -45,3 +45,8 @@ export enum EIgnoredErrors {
     INVALID_JWT_EXCEPTION = "INVALID_JWT_EXCEPTION",
     INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
 }
+
+export enum EEdition {
+    ENTERPRISE = "enterprise",
+    COMMUNITY = "community",
+}

@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { type ReactNode } from "react";
 
-export const extensions: Record<string, ReactNode> = {};
+// TODO: Fix types in future
+export const extensions: Record<string, any> = {};
 
-export const registerExtension = (id: string, value: ReactNode): void => {
+export const registerExtension = (id: string, value: any): void => {
     extensions[id] = value;
 };
 
-export const getExtension = (id: string): ReactNode => {
-    return extensions[id] || null;
-}
+export const getExtension = (id: string): any | null => {
+    return extensions[id] ?? null;
+};

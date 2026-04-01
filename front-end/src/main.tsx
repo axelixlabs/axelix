@@ -18,13 +18,23 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
+import { EEdition } from "models";
+
 import { App } from "./App";
 
 import "./index.css";
 import "./customizedTable.css";
 
-if (import.meta.env.VITE_NNN === "enterprise") {
-    await import("../../../index");
+if (import.meta.env.VITE_EDITION === EEdition.ENTERPRISE) {
+    const modules = import.meta.glob("../enterprise/src/index.ts");
+
+    const path = "../enterprise/src/index.ts";
+
+    const enterpriseModule = modules[path];
+
+    if (enterpriseModule) {
+        await enterpriseModule();
+    }
 }
 
 createRoot(document.getElementById("root")!).render(

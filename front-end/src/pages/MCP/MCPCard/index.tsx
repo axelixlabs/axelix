@@ -16,15 +16,15 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Badge, Tooltip } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 import { EMCPToolStatus, type IMCPTool } from "models";
 
+import { getExtension } from "../../../../extensions.ts";
 import { MCPCardDescription } from "../MCPCardDescription";
 import { MCPCardFooter } from "../MCPCardFooter";
 
 import styles from "./styles.module.css";
-import { getExtension } from "../../../../extensions";
 
 interface IProps {
     /**
@@ -34,7 +34,7 @@ interface IProps {
 }
 
 export const MCPCard = ({ mcpTool }: IProps) => {
-    const MCPAccessLogComponent = getExtension("MCPAccessLog") ?? <></>;
+    const MCPAccessLogComponent = getExtension("MCPAccessLog") ?? Fragment;
 
     const textRef = useRef<HTMLDivElement>(null);
 
