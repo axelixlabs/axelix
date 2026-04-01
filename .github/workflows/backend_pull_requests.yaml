@@ -15,7 +15,7 @@ jobs:
       - name: Check for linked issues
         uses: nearform-actions/github-action-check-linked-issues@v1
         with:
-          exclude-labels: "refactoring"
+          exclude-labels: "refactoring, dependencies"
 
   backend-build:
     runs-on: ubuntu-latest
