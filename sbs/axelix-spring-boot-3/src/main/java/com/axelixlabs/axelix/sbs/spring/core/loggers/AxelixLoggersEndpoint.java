@@ -46,11 +46,13 @@ import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 public class AxelixLoggersEndpoint {
 
     private final LoggingSystem loggingSystem;
+    private final LoggerGroups loggerGroups;
     private final LoggersEndpoint delegate;
     private final ConcurrentMap<String, LogLevel> cacheLoggers;
 
     public AxelixLoggersEndpoint(LoggingSystem loggingSystem, LoggerGroups loggerGroups) {
         this.loggingSystem = loggingSystem;
+        this.loggerGroups = loggerGroups;
         this.delegate = new LoggersEndpoint(loggingSystem, loggerGroups);
 
         Map<String, LoggerLevelsDescriptor> loggers = delegate.loggers().getLoggers();
@@ -65,23 +67,61 @@ public class AxelixLoggersEndpoint {
         return delegate.loggers();
     }
 
-    @GetMapping("/{name}")
-    public LoggerLevelsDescriptor loggerLevels(@PathVariable String name) {
-        return delegate.loggerLevels(name);
+    @GetMapping("/logger/{name}")
+    public ResponseEntity<LoggerLevelsDescriptor> loggerLevels(@PathVariable String name) {
+        if (!cacheLoggers.containsKey(name)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(delegate.loggerLevels(name));
     }
 
-    @PostMapping("/{name}")
-    public ResponseEntity<Void> configureLogLevel(
+    @GetMapping("/group/{name}")
+    public ResponseEntity<LoggerLevelsDescriptor> getGroup(@PathVariable String name) {
+        if (loggerGroups.get(name) == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(delegate.loggerLevels(name));
+    }
+
+    @PostMapping("/logger/{name}/change-level")
+    public ResponseEntity<Void> changeLogLevelByLoggerName(
             @PathVariable String name, @RequestBody LogLevelChangeRequest request) {
+
+        if (!cacheLoggers.containsKey(name)) {
+            return ResponseEntity.badRequest().build();
+        }
+
         LogLevel logLevel = LogLevel.valueOf(request.getConfiguredLevel().toUpperCase(Locale.ROOT));
         delegate.configureLogLevel(name, logLevel);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/reset/{name}")
+    @PostMapping("/group/{name}/change-level")
+    public ResponseEntity<Void> changeLogLevelByGroupName(
+            @PathVariable String name, @RequestBody LogLevelChangeRequest request) {
+        if (loggerGroups.get(name) == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        LogLevel logLevel = LogLevel.valueOf(request.getConfiguredLevel().toUpperCase(Locale.ROOT));
+        delegate.configureLogLevel(name, logLevel);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/logger/{name}/reset")
     public ResponseEntity<Void> resetLogLevel(@PathVariable String name) {
+        if (!cacheLoggers.containsKey(name)) {
+            return ResponseEntity.badRequest().build();
+        }
+
         LogLevel level = cacheLoggers.get(name);
-        loggingSystem.setLogLevel(name, level);
+
+        if (!loggingSystem.getLoggerConfiguration(name).getEffectiveLevel().equals(level)) {
+            loggingSystem.setLogLevel(name, level);
+        }
+
         return ResponseEntity.noContent().build();
     }
 }

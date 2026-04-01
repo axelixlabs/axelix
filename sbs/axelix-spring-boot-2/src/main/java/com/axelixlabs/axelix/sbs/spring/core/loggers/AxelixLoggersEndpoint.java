@@ -17,46 +17,111 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-import org.springframework.boot.actuate.endpoint.annotation.Selector;
-import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
 import org.springframework.boot.actuate.logging.LoggersEndpoint;
+import org.springframework.boot.actuate.logging.LoggersEndpoint.LoggerLevels;
 import org.springframework.boot.logging.LogLevel;
-import org.springframework.lang.Nullable;
+import org.springframework.boot.logging.LoggerConfiguration;
+import org.springframework.boot.logging.LoggerGroups;
+import org.springframework.boot.logging.LoggingSystem;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
 
 /**
  * Custom Spring Boot Actuator endpoint exposing the application's loggers.
  *
  * @author Sergey Cherkasov
  */
-@Endpoint(id = "axelix-loggers")
+@RestControllerEndpoint(id = "axelix-loggers")
 public class AxelixLoggersEndpoint {
 
     private final LoggersEndpoint delegate;
+    private final LoggingSystem loggingSystem;
+    private final LoggerGroups loggerGroups;
+    private final ConcurrentMap<String, LogLevel> cacheLoggers;
 
-    public AxelixLoggersEndpoint(LoggersEndpoint delegate) {
-        this.delegate = delegate;
+    public AxelixLoggersEndpoint(LoggingSystem loggingSystem, LoggerGroups loggerGroups) {
+        this.loggingSystem = loggingSystem;
+        this.loggerGroups = loggerGroups;
+        this.delegate = new LoggersEndpoint(loggingSystem, loggerGroups);
+
+        List<LoggerConfiguration> configurations = loggingSystem.getLoggerConfigurations();
+        this.cacheLoggers = new ConcurrentHashMap<>(configurations.size(), 1.1f);
+
+        configurations.forEach(config -> cacheLoggers.put(config.getName(), config.getEffectiveLevel()));
     }
 
-    @ReadOperation
+    @GetMapping
     public Map<String, Object> loggers() {
         return delegate.loggers();
     }
 
-    @ReadOperation
-    public LoggersEndpoint.LoggerLevels loggerLevels(@Selector String name) {
-        return delegate.loggerLevels(name);
+    @GetMapping("/logger/{name}")
+    public ResponseEntity<LoggerLevels> loggerLevels(@PathVariable String name) {
+        if (!cacheLoggers.containsKey(name)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(delegate.loggerLevels(name));
     }
 
-    // IMPORTANT!
-    // For Spring Actuator endpoints @Endpoint, we must use org.springframework.lang.Nullable.
-    // Spring Boot 3 does not recognize the Jspecify's @Nullable here, but we still need to tell
-    // Spring that tags are optional
-    @WriteOperation
-    public void configureLogLevel(@Selector String name, @Nullable LogLevel configuredLevel) {
-        delegate.configureLogLevel(name, configuredLevel);
+    @GetMapping("/group/{name}")
+    public ResponseEntity<LoggerLevels> getGroup(@PathVariable String name) {
+        if (loggerGroups.get(name) == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(delegate.loggerLevels(name));
+    }
+
+    @PostMapping("/logger/{name}/change-level")
+    public ResponseEntity<Void> changeLogLevelByLoggerName(
+            @PathVariable String name, @RequestBody LogLevelChangeRequest request) {
+
+        if (!cacheLoggers.containsKey(name)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        LogLevel logLevel = LogLevel.valueOf(request.getConfiguredLevel().toUpperCase(Locale.ROOT));
+        delegate.configureLogLevel(name, logLevel);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/group/{name}/change-level")
+    public ResponseEntity<Void> changeLogLevelByGroupName(
+            @PathVariable String name, @RequestBody LogLevelChangeRequest request) {
+        if (loggerGroups.get(name) == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        LogLevel logLevel = LogLevel.valueOf(request.getConfiguredLevel().toUpperCase(Locale.ROOT));
+        delegate.configureLogLevel(name, logLevel);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/logger/{name}/reset")
+    public ResponseEntity<Void> resetLogLevel(@PathVariable String name) {
+        if (!cacheLoggers.containsKey(name)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        LogLevel level = cacheLoggers.get(name);
+
+        if (!loggingSystem.getLoggerConfiguration(name).getEffectiveLevel().equals(level)) {
+            loggingSystem.setLogLevel(name, level);
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }

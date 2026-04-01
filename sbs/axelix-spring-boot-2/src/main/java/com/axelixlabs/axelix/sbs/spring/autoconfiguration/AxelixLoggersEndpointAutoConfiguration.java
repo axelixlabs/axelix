@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.actuate.logging.LoggersEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -45,7 +44,6 @@ public class AxelixLoggersEndpointAutoConfiguration {
     @ConditionalOnMissingBean
     public AxelixLoggersEndpoint axelixLoggersEndpoint(
             LoggingSystem loggingSystem, ObjectProvider<LoggerGroups> loggerGroups) {
-        return new AxelixLoggersEndpoint(
-                new LoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new)));
+        return new AxelixLoggersEndpoint(loggingSystem, loggerGroups.getIfAvailable(LoggerGroups::new));
     }
 }

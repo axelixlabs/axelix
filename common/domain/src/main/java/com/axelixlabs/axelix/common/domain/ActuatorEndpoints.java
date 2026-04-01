@@ -105,13 +105,14 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
 
     // Loggers
     public static final ActuatorEndpoint GET_ALL_LOGGERS = endpoint("/axelix-loggers", HttpMethod.GET);
-    public static final ActuatorEndpoint GET_ONE_LOGGER = endpoint("/axelix-loggers/{logger.name}", HttpMethod.GET);
-    public static final ActuatorEndpoint GET_LOGGER_GROUP = endpoint("/axelix-loggers/{group.name}", HttpMethod.GET);
-    public static final ActuatorEndpoint SET_ONE_LOGGER = endpoint("/axelix-loggers/{logger.name}", HttpMethod.POST);
+    public static final ActuatorEndpoint GET_ONE_LOGGER = endpoint("/axelix-loggers/logger/{name}", HttpMethod.GET);
+    public static final ActuatorEndpoint GET_LOGGER_GROUP = endpoint("/axelix-loggers/group/{name}", HttpMethod.GET);
+    public static final ActuatorEndpoint SET_ONE_LOGGER =
+            endpoint("/axelix-loggers/logger/{name}/change-level", HttpMethod.POST);
     public static final ActuatorEndpoint SET_FOR_LOGGER_GROUP =
-            endpoint("/axelix-loggers/{group.name}", HttpMethod.POST);
+            endpoint("/axelix-loggers/group/{name}/change-level", HttpMethod.POST);
     public static final ActuatorEndpoint RESET_FOR_LOGGER =
-            endpoint("/axelix-loggers/reset/{logger.name}", HttpMethod.POST);
+            endpoint("/axelix-loggers/logger/{name}/reset", HttpMethod.POST);
 
     // Metadata
     public static final ActuatorEndpoint METADATA = endpoint("/axelix-metadata", HttpMethod.GET);
