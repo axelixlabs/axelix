@@ -26,6 +26,7 @@ dependencies {
     // Test
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootTestPlatformVersion"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework:spring-web")
 }
 
 tasks.withType<JavaCompile> {

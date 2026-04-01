@@ -37,6 +37,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
@@ -269,9 +272,11 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
-        @SuppressWarnings("removal") // TODO: https://github.com/axelixlabs/axelix/issues/757
         public AuthorityResolver authorityResolver() {
-            return new PassthroughAuthorityResolver();
+            return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
+                PathPattern parse = new PathPatternParser().parse(pathTemplate);
+                return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
+            });
         }
 
         @Bean

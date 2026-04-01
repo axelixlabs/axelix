@@ -34,6 +34,7 @@ import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
  * A custom servlet filter that restricts access to Actuator endpoints based on JWT token presence, validity,
@@ -64,8 +65,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         try {
             String token = resolveToken(request);
             String requestPath = request.getRequestURI();
+            HttpMethod requestHttpMethod = HttpMethod.valueOf(request.getMethod());
 
-            securityManager.authorize(requestPath, token);
+            securityManager.authorize(requestPath, requestHttpMethod, token);
 
             filterChain.doFilter(request, response);
 

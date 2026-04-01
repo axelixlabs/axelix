@@ -50,6 +50,10 @@ public final class HttpUrl {
         this.originalUrl = url;
     }
 
+    public String originalUrl() {
+        return originalUrl;
+    }
+
     /**
      * Expand the given url, meaning, replace all variables in the path with given values
      * and add {@link QueryParameter query parameters}.

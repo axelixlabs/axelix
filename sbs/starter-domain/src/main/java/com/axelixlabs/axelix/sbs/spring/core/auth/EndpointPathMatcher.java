@@ -17,37 +17,21 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * Unit tests for {@link PassthroughAuthorityResolver}.
+ * Interface for matching request paths against endpoint URL patterns.
  *
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-@SuppressWarnings("removal")
-class PassthroughAuthorityResolverTest {
+public interface EndpointPathMatcher {
 
-    private final PassthroughAuthorityResolver resolver = new PassthroughAuthorityResolver();
-
-    @Test
-    void resolve_returnsEmpty_forAnyPath() {
-        // given.
-        String path = "/actuator/axelix-beans";
-        // when.
-        var result = resolver.resolve(path);
-        // then.
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void resolve_returnsEmpty_forActuatorEnvPath() {
-        // given.
-        String path = "/actuator/axelix-env";
-        // when.
-        var result = resolver.resolve(path);
-        // then.
-        assertThat(result).isEmpty();
-    }
+    /**
+     * Determines whether the given request path matches the specified endpoint pattern.
+     *
+     * @param endpointPattern the URL pattern defined for an endpoint
+     *                        (e.g., {@code "/actuator/env/**"})
+     * @param requestPath     the actual incoming request path to evaluate
+     *                        (e.g., {@code "/actuator/env/spring.datasource.url"})
+     * @return {@code true} if the request path matches the endpoint pattern, {@code false} otherwise.
+     */
+    boolean matches(String endpointPattern, String requestPath);
 }

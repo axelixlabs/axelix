@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 import java.util.Optional;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
  * Interface for resolving a required {@link Authority}
@@ -27,15 +28,17 @@ import com.axelixlabs.axelix.common.auth.core.Authority;
  *
  * @since 28.07.2025
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 public interface AuthorityResolver {
 
     /**
      * Resolves the required {@link Authority} for the given request path.
      *
-     * @param path the request path (e.g. "/actuator/axelix-beans")
+     * @param path        the request path (e.g. "/actuator/axelix-beans")
+     * @param httpMethod  the HTTP method (e.g. {@link HttpMethod#GET})
      * @return an {@link Optional} containing the required {@link Authority},
      * or {@link Optional#empty()} if no authority is associated with the path
      */
-    Optional<Authority> resolve(String path);
+    Optional<Authority> resolve(String path, HttpMethod httpMethod);
 }

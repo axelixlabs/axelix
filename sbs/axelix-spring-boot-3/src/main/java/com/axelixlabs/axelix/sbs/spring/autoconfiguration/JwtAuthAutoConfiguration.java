@@ -24,15 +24,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.Authorizer;
+import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultSecurityManager;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
-import com.axelixlabs.axelix.sbs.spring.core.auth.PassthroughAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.SecurityManager;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 
@@ -64,9 +67,11 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @SuppressWarnings("removal") // TODO: https://github.com/axelixlabs/axelix/issues/757
     public AuthorityResolver authorityResolver() {
-        return new PassthroughAuthorityResolver();
+        return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
+            PathPattern parse = new PathPatternParser().parse(pathTemplate);
+            return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
+        });
     }
 
     @Bean

@@ -32,6 +32,7 @@ import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.Authorizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorizer;
@@ -164,7 +165,7 @@ class JwtAuthAutoConfigurationTest {
     static class CustomAuthorityResolver implements AuthorityResolver {
 
         @Override
-        public Optional<Authority> resolve(String path) {
+        public Optional<Authority> resolve(String path, HttpMethod httpMethod) {
             return Optional.empty();
         }
     }

@@ -54,7 +54,7 @@ public class AxelixCachesEndpoint {
         return dispatcher.getAll();
     }
 
-    @DeleteMapping
+    @DeleteMapping("/clear")
     public void clearAllCaches() {
         dispatcher.clearAll();
     }

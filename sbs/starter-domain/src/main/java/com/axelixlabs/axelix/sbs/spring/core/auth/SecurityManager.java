@@ -20,24 +20,26 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
  * The main entrypoint for evaluating the possibility of processing the request (both Authentication
  * and Authorization).
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public interface SecurityManager {
 
     boolean shouldAuthorize(String requestPath);
 
-    default void authorize(String requestPath, @Nullable String token)
+    default void authorize(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
             throws AuthorizationException, JwtProcessingException {
         if (shouldAuthorize(requestPath)) {
-            authorizeInternal(requestPath, token);
+            authorizeInternal(requestPath, requestHttpMethod, token);
         }
     }
 
-    void authorizeInternal(String requestPath, @Nullable String token)
+    void authorizeInternal(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
             throws AuthorizationException, JwtProcessingException;
 }
