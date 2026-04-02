@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.sbs.spring.core.loggers;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -63,12 +62,12 @@ public class AxelixLoggersEndpoint {
     }
 
     @GetMapping
-    public Map<String, Object> loggers() {
+    public Map<String, Object> getAllLoggers() {
         return delegate.loggers();
     }
 
     @GetMapping("/logger/{name}")
-    public ResponseEntity<LoggerLevels> loggerLevels(@PathVariable String name) {
+    public ResponseEntity<LoggerLevels> getSingleLogger(@PathVariable String name) {
         if (!cacheLoggers.containsKey(name)) {
             return ResponseEntity.badRequest().build();
         }
@@ -77,7 +76,7 @@ public class AxelixLoggersEndpoint {
     }
 
     @GetMapping("/group/{name}")
-    public ResponseEntity<LoggerLevels> getGroup(@PathVariable String name) {
+    public ResponseEntity<LoggerLevels> getSingleGroup(@PathVariable String name) {
         if (loggerGroups.get(name) == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -93,7 +92,7 @@ public class AxelixLoggersEndpoint {
             return ResponseEntity.badRequest().build();
         }
 
-        LogLevel logLevel = LogLevel.valueOf(request.getConfiguredLevel().toUpperCase(Locale.ROOT));
+        LogLevel logLevel = LogLevel.valueOf(request.getConfiguredLevel().toUpperCase());
         delegate.configureLogLevel(name, logLevel);
         return ResponseEntity.noContent().build();
     }
@@ -105,13 +104,13 @@ public class AxelixLoggersEndpoint {
             return ResponseEntity.badRequest().build();
         }
 
-        LogLevel logLevel = LogLevel.valueOf(request.getConfiguredLevel().toUpperCase(Locale.ROOT));
+        LogLevel logLevel = LogLevel.valueOf(request.getConfiguredLevel().toUpperCase());
         delegate.configureLogLevel(name, logLevel);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/logger/{name}/reset")
-    public ResponseEntity<Void> resetLogLevel(@PathVariable String name) {
+    public ResponseEntity<Void> resetLogLevelByLoggerName(@PathVariable String name) {
         if (!cacheLoggers.containsKey(name)) {
             return ResponseEntity.badRequest().build();
         }

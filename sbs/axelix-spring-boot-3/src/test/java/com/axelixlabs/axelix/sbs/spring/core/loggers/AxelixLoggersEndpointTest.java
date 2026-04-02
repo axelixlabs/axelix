@@ -93,7 +93,6 @@ public class AxelixLoggersEndpointTest {
     void shouldReturnAllLoggers() {
         // when.
         ResponseEntity<String> response = testRestTemplate.getForEntity("/actuator/axelix-loggers", String.class);
-        System.out.println(response.getBody());
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
