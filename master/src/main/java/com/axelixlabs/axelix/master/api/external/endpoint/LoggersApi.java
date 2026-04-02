@@ -114,7 +114,7 @@ public class LoggersApi {
     @GetMapping(path = ApiPaths.LoggersApi.GROUP_NAME)
     public GroupProfileResponse getGroupByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("groupName") String groupName) {
-        HttpPayload payload = new DefaultHttpPayload(Map.of("group.name", groupName));
+        HttpPayload payload = new DefaultHttpPayload(Map.of("name", groupName));
         LoggerGroup group =
                 endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_LOGGER_GROUP, payload);
 
@@ -134,7 +134,7 @@ public class LoggersApi {
     @GetMapping(path = ApiPaths.LoggersApi.LOGGER_NAME)
     public LoggerProfileResponse getLoggerByName(
             @PathVariable("instanceId") String instanceId, @PathVariable("loggerName") String loggerName) {
-        HttpPayload payload = new DefaultHttpPayload(Map.of("logger.name", loggerName));
+        HttpPayload payload = new DefaultHttpPayload(Map.of("name", loggerName));
         LoggerLevels logger =
                 endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_ONE_LOGGER, payload);
 
@@ -154,8 +154,8 @@ public class LoggersApi {
             @PathVariable("loggerName") String loggerName,
             @RequestBody LogLevelChangeRequest request) {
 
-        HttpPayload payload = HttpPayload.json(
-                Map.of("logger.name", loggerName), jacksonMessageSerializationStrategy.serialize(request));
+        HttpPayload payload =
+                HttpPayload.json(Map.of("name", loggerName), jacksonMessageSerializationStrategy.serialize(request));
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_ONE_LOGGER, payload);
     }
 
@@ -172,8 +172,8 @@ public class LoggersApi {
             @PathVariable("groupName") String groupName,
             @RequestBody LogLevelChangeRequest request) {
 
-        HttpPayload payload = HttpPayload.json(
-                Map.of("group.name", groupName), jacksonMessageSerializationStrategy.serialize(request));
+        HttpPayload payload =
+                HttpPayload.json(Map.of("name", groupName), jacksonMessageSerializationStrategy.serialize(request));
         endpointInvoker.invokeNoValue(InstanceId.of(instanceId), ActuatorEndpoints.SET_FOR_LOGGER_GROUP, payload);
     }
 
@@ -188,7 +188,7 @@ public class LoggersApi {
         endpointInvoker.invokeNoValue(
                 InstanceId.of(instanceId),
                 ActuatorEndpoints.RESET_FOR_LOGGER,
-                new DefaultHttpPayload(Map.of("logger.name", loggerName)));
+                new DefaultHttpPayload(Map.of("name", loggerName)));
 
         return ResponseEntity.noContent().build();
     }

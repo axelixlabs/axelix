@@ -107,11 +107,11 @@ public class LoggersApiLoggerByNameTest {
                 String path = request.getPath();
                 assert path != null;
 
-                if (path.equals("/" + activeInstanceId + "/axelix-loggers/com.example")) {
+                if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger/com.example")) {
                     return new MockResponse()
                             .setBody(jsonLoggerNameComExampleResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
-                } else if (path.equals("/" + activeInstanceId + "/axelix-loggers/org.springframework.web")) {
+                } else if (path.equals("/" + activeInstanceId + "/axelix-loggers/logger/org.springframework.web")) {
                     return new MockResponse()
                             .setBody(jsonLoggerNameSpringframeworkResponse)
                             .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
