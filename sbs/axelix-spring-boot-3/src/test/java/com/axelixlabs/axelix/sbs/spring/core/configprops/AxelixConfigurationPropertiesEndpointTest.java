@@ -21,26 +21,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationPropertiesTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpointTest.AxelixMutateConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.properties.DefaultPropertyNameDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.properties.PropertyNameDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.properties.SmartSanitizingFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,8 +65,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
         properties = {
             "axelix.prop.test.tags.forSanitization=toBeSanitized",
@@ -68,8 +84,16 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.http-client.requests[1].methods[0].type=PUT",
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].count=2",
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
+            "AXELIX_MUTATE_PROP_TEST_TAGS_VERSION=1.0.0",
+            "AXELIX_MUTATE_PROP_TEST_ENABLED_CONTEXTS=user-service, payment-service",
+            "AXELIX_MUTATE_PROP_TEST_ENABLED=true",
+            "AXELIX_MUTATE_PROP_TEST_COUNT=1"
         })
-@EnableConfigurationProperties({AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.class})
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "management.endpoint.env.show-values=always")
+@EnableConfigurationProperties({AxelixConfigurationProperties.class, AxelixMutateConfigurationProperties.class})
+@Import(AxelixConfigurationPropertiesTestConfiguration.class)
 public class AxelixConfigurationPropertiesEndpointTest {
 
     @Autowired
@@ -114,6 +138,151 @@ public class AxelixConfigurationPropertiesEndpointTest {
                 Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level", "DEBUG"));
     }
 
+    @DynamicPropertySource
+    static void registerDynamic(DynamicPropertyRegistry registry) {
+        registry.add("axelix.prop.test.dynamicProperties", () -> "new-dynamic-value");
+    }
+
+    @ParameterizedTest
+    @MethodSource("mutateProperty")
+    void mutate_shouldUpdatePropertyValue(String envProperty, String mutateProperty, String newValue) {
+        mutateProperty(mutateProperty, newValue);
+
+        Map<?, ?> updatedResponse = restTemplate.getForObject("/actuator/env/" + envProperty, Map.class);
+
+        assertThat(updatedResponse)
+                .isNotNull()
+                .extracting("property")
+                .isInstanceOf(Map.class)
+                .extracting("value")
+                .isEqualTo(newValue);
+    }
+
+    private static Stream<Arguments> mutateProperty() {
+        return Stream.of(
+                Arguments.of(
+                        "AXELIX_MUTATE_PROP_TEST_ENABLED_CONTEXTS",
+                        "axelix.mutate.prop.test.enabled-contexts",
+                        "new-service, test-service"),
+                Arguments.of("AXELIX_MUTATE_PROP_TEST_TAGS_VERSION", "axelix.mutate.prop.test.tags.version", "1.0.0"),
+                Arguments.of("AXELIX_MUTATE_PROP_TEST_ENABLED", "axelix.mutate.prop.test.enabled", "false"),
+                Arguments.of("AXELIX_MUTATE_PROP_TEST_COUNT", "axelix.mutate.prop.test.count", "1"));
+    }
+
+    @Test
+    void mutate_shouldReturnBadRequest_whenNewPropertyValueIsNull() {
+        ConfigurationPropertyMutationRequest request = new ConfigurationPropertyMutationRequest("property", null);
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
+    @ParameterizedTest
+    @MethodSource("emptyPropertyName")
+    void mutate_shouldReturnBadRequest_whenPropertyNameIsEmpty(String emptyProperty) {
+        ConfigurationPropertyMutationRequest request =
+                new ConfigurationPropertyMutationRequest(emptyProperty, "someValue");
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidMutateValue")
+    void mutate_shouldReturnBadRequest_whenPropertyValueHasInvalidType(String propertyName, String invalidValue) {
+        ConfigurationPropertyMutationRequest request =
+                new ConfigurationPropertyMutationRequest(propertyName, invalidValue);
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
+    private static Stream<Arguments> invalidMutateValue() {
+        return Stream.of(
+                Arguments.of("axelix.mutate.prop.test.enabled", "maybe"),
+                Arguments.of("axelix.mutate.prop.test.count", "not-a-number"));
+    }
+
+    @Test
+    void mutate_shouldReturnBadRequest_whenPropertyDoesNotExist() {
+        ConfigurationPropertyMutationRequest request =
+                new ConfigurationPropertyMutationRequest("axelix.mutate.prop.test.unknown-field", "value");
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
+    }
+
+    private static Stream<Arguments> emptyPropertyName() {
+        return Stream.of(Arguments.of(""), Arguments.of(" "), Arguments.of("\t"));
+    }
+
+    private void mutateProperty(String propertyName, String newValue) {
+        ConfigurationPropertyMutationRequest request = new ConfigurationPropertyMutationRequest(propertyName, newValue);
+
+        ResponseEntity<Void> response = restTemplate.postForEntity(path(), defaultEntity(request), Void.class);
+
+        assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
+    }
+
+    private HttpEntity<ConfigurationPropertyMutationRequest> defaultEntity(
+            ConfigurationPropertyMutationRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(request, headers);
+    }
+
+    private String path() {
+        return "/actuator/axelix-configprops";
+    }
+
+    @ConfigurationProperties(prefix = "axelix.mutate.prop.test")
+    public static class AxelixMutateConfigurationProperties {
+
+        private Map<String, String> tags;
+
+        private List<String> enabledContexts;
+
+        private boolean enabled;
+
+        private int count;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+
+        public Map<String, String> getTags() {
+            return tags;
+        }
+
+        public void setTags(Map<String, String> tags) {
+            this.tags = tags;
+        }
+
+        public List<String> getEnabledContexts() {
+            return enabledContexts;
+        }
+
+        public void setEnabledContexts(List<String> enabledContexts) {
+            this.enabledContexts = enabledContexts;
+        }
+    }
+
     @ConfigurationProperties(prefix = "axelix.prop.test")
     public record AxelixConfigurationProperties(
             Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
@@ -154,6 +323,7 @@ public class AxelixConfigurationPropertiesEndpointTest {
         }
 
         @Bean
+        @ConditionalOnMissingBean
         public ConfigurationPropertiesCache configurationPropertiesCache(
                 SmartSanitizingFunction smartSanitizingFunction,
                 ApplicationContext applicationContext,
@@ -163,9 +333,54 @@ public class AxelixConfigurationPropertiesEndpointTest {
         }
 
         @Bean
+        @ConditionalOnMissingBean
+        public ConfigurationPropertiesBeansCache configurationPropertiesBeansCache(
+                ConfigurableApplicationContext applicationContext) {
+            return new ConfigurationPropertiesBeansCache(applicationContext);
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public PropertyNameDiscoverer propertyNameDiscoverer(
+                ConfigurableApplicationContext applicationContext, PropertyNameNormalizer propertyNameNormalizer) {
+            return new DefaultPropertyNameDiscoverer(applicationContext, propertyNameNormalizer);
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ConfigurationPropertiesRuntimeValidator configurationPropertiesRuntimeValidator() {
+            return new ConfigurationPropertiesRuntimeValidator();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ConfigurationPropertiesMutabilityChecker configurationPropertiesMutabilityChecker() {
+            return new ConfigurationPropertiesMutabilityChecker();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public ConfigurationPropertiesMutator configurationPropertiesMutator(
+                ConfigurableEnvironment configurableEnvironment,
+                PropertyNameDiscoverer propertyNameDiscoverer,
+                ConfigurationPropertiesRuntimeValidator configurationPropertiesRuntimeValidator,
+                ConfigurationPropertiesBeansCache configurationPropertiesBeansCache,
+                ConfigurationPropertiesMutabilityChecker configurationPropertiesMutabilityChecker) {
+            return new RebindingConfigurationPropertiesMutator(
+                    configurableEnvironment,
+                    propertyNameDiscoverer,
+                    configurationPropertiesRuntimeValidator,
+                    configurationPropertiesBeansCache,
+                    configurationPropertiesMutabilityChecker);
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
         public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-                ConfigurationPropertiesCache configurationPropertiesCache) {
-            return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesCache);
+                ConfigurationPropertiesCache configurationPropertiesCache,
+                ConfigurationPropertiesMutator configurationPropertiesMutator) {
+            return new AxelixConfigurationPropertiesEndpoint(
+                    configurationPropertiesCache, configurationPropertiesMutator);
         }
     }
 }

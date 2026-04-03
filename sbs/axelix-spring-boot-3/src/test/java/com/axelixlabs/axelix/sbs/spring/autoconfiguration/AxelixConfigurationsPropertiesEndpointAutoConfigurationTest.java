@@ -28,14 +28,21 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesBeansCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesMutabilityChecker;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesMutator;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesRuntimeValidator;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.RebindingConfigurationPropertiesMutator;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.properties.PropertyNameDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.properties.SmartSanitizingFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -102,6 +109,9 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
                         CustomPropertyNameNormalizerConfig.class,
                         CustomSmartSanitizingFunctionConfig.class,
                         CustomConfigurationPropertiesCacheConfig.class,
+                        CustomConfigurationPropertiesMutatorConfig.class,
+                        CustomConfigurationPropertiesMutabilityCheckerConfig.class,
+                        CustomConfigurationPropertiesRuntimeValidator.class,
                         CustomAxelixConfigurationPropertiesEndpointConfig.class)
                 .run(context -> {
                     assertThat(context.getBean(ConfigurationPropertiesConverter.class))
@@ -114,6 +124,12 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
                             .isExactlyInstanceOf(CustomConfigurationPropertiesCache.class);
                     assertThat(context.getBean(AxelixConfigurationPropertiesEndpoint.class))
                             .isExactlyInstanceOf(CustomAxelixConfigurationPropertiesEndpoint.class);
+                    assertThat(context.getBean(CustomConfigurationPropertiesMutator.class))
+                            .isExactlyInstanceOf(CustomConfigurationPropertiesMutator.class);
+                    assertThat(context.getBean(CustomConfigurationPropertiesRuntimeValidator.class))
+                            .isExactlyInstanceOf(CustomConfigurationPropertiesRuntimeValidator.class);
+                    assertThat(context.getBean(CustomConfigurationPropertiesMutabilityChecker.class))
+                            .isExactlyInstanceOf(CustomConfigurationPropertiesMutabilityChecker.class);
                 });
     }
 
@@ -159,8 +175,47 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
     static class CustomAxelixConfigurationPropertiesEndpointConfig {
         @Bean
         public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-                ConfigurationPropertiesCache configurationPropertiesCache) {
-            return new CustomAxelixConfigurationPropertiesEndpoint(configurationPropertiesCache);
+                ConfigurationPropertiesCache configurationPropertiesCache,
+                ConfigurationPropertiesMutator configurationPropertiesMutator) {
+            return new CustomAxelixConfigurationPropertiesEndpoint(
+                    configurationPropertiesCache, configurationPropertiesMutator);
+        }
+    }
+
+    @TestConfiguration
+    static class CustomConfigurationPropertiesMutabilityCheckerConfig {
+
+        @Bean
+        public ConfigurationPropertiesMutabilityChecker configurationPropertiesMutabilityChecker() {
+            return new CustomConfigurationPropertiesMutabilityChecker();
+        }
+    }
+
+    @TestConfiguration
+    static class CustomConfigurationPropertiesRuntimeValidatorConfig {
+
+        @Bean
+        public ConfigurationPropertiesRuntimeValidator configurationPropertiesRuntimeValidator() {
+            return new CustomConfigurationPropertiesRuntimeValidator();
+        }
+    }
+
+    @TestConfiguration
+    static class CustomConfigurationPropertiesMutatorConfig {
+
+        @Bean
+        public CustomConfigurationPropertiesMutator configurationPropertiesMutator(
+                ConfigurableEnvironment configurableEnvironment,
+                PropertyNameDiscoverer propertyNameDiscoverer,
+                ConfigurationPropertiesRuntimeValidator configurationPropertiesRuntimeValidator,
+                ConfigurationPropertiesBeansCache configurationPropertiesBeansCache,
+                ConfigurationPropertiesMutabilityChecker configurationPropertiesMutabilityChecker) {
+            return new CustomConfigurationPropertiesMutator(
+                    configurableEnvironment,
+                    propertyNameDiscoverer,
+                    configurationPropertiesRuntimeValidator,
+                    configurationPropertiesBeansCache,
+                    configurationPropertiesMutabilityChecker);
         }
     }
 
@@ -193,6 +248,18 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
         }
     }
 
+    static class CustomConfigurationPropertiesMutabilityChecker extends ConfigurationPropertiesMutabilityChecker {
+        public CustomConfigurationPropertiesMutabilityChecker() {
+            super();
+        }
+    }
+
+    static class CustomConfigurationPropertiesRuntimeValidator extends ConfigurationPropertiesRuntimeValidator {
+        public CustomConfigurationPropertiesRuntimeValidator() {
+            super();
+        }
+    }
+
     static class CustomConfigurationPropertiesCache extends ConfigurationPropertiesCache {
         public CustomConfigurationPropertiesCache(
                 SmartSanitizingFunction smartSanitizingFunction,
@@ -202,9 +269,27 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
         }
     }
 
+    static class CustomConfigurationPropertiesMutator extends RebindingConfigurationPropertiesMutator {
+        public CustomConfigurationPropertiesMutator(
+                ConfigurableEnvironment configurableEnvironment,
+                PropertyNameDiscoverer propertyNameDiscoverer,
+                ConfigurationPropertiesRuntimeValidator configurationPropertiesRuntimeValidator,
+                ConfigurationPropertiesBeansCache configurationPropertiesBeansCache,
+                ConfigurationPropertiesMutabilityChecker configurationPropertiesMutabilityChecker) {
+            super(
+                    configurableEnvironment,
+                    propertyNameDiscoverer,
+                    configurationPropertiesRuntimeValidator,
+                    configurationPropertiesBeansCache,
+                    configurationPropertiesMutabilityChecker);
+        }
+    }
+
     static class CustomAxelixConfigurationPropertiesEndpoint extends AxelixConfigurationPropertiesEndpoint {
-        public CustomAxelixConfigurationPropertiesEndpoint(ConfigurationPropertiesCache configurationPropertiesCache) {
-            super(configurationPropertiesCache);
+        public CustomAxelixConfigurationPropertiesEndpoint(
+                ConfigurationPropertiesCache configurationPropertiesCache,
+                ConfigurationPropertiesMutator configurationPropertiesMutator) {
+            super(configurationPropertiesCache, configurationPropertiesMutator);
         }
     }
 }

@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.common.api.KeyValue;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.properties.SmartSanitizingFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,7 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 public class ConfigurationPropertiesCacheTest {
 
     @Autowired

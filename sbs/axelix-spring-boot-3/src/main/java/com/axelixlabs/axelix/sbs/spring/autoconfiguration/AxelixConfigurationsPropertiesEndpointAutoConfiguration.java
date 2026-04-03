@@ -21,18 +21,27 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.condition.Conditi
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesBeansCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesMutabilityChecker;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesMutator;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesRuntimeValidator;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.RebindingConfigurationPropertiesMutator;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.properties.DefaultPropertyNameDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.properties.PropertyNameDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.properties.SmartSanitizingFunction;
 
 /**
  * Auto-configuration for the {@link AxelixConfigurationPropertiesEndpoint}.
@@ -43,19 +52,6 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 @AutoConfiguration(after = EndpointsConfigurationPropertiesAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixConfigurationPropertiesEndpoint.class)
 public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
-        return new DefaultConfigurationPropertiesFlattener();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ConfigurationPropertiesConverter configurationPropertiesConverter(
-            ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
-        return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
-    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -74,6 +70,19 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
+        return new DefaultConfigurationPropertiesFlattener();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConfigurationPropertiesConverter configurationPropertiesConverter(
+            ConfigurationPropertiesFlattener configurationPropertiesFlattener) {
+        return new DefaultConfigurationPropertiesConverter(configurationPropertiesFlattener);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public ConfigurationPropertiesCache configurationPropertiesCache(
             SmartSanitizingFunction smartSanitizingFunction,
             ApplicationContext applicationContext,
@@ -84,8 +93,51 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public ConfigurationPropertiesBeansCache configurationPropertiesBeansCache(
+            ConfigurableApplicationContext applicationContext) {
+        return new ConfigurationPropertiesBeansCache(applicationContext);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PropertyNameDiscoverer propertyNameDiscoverer(
+            ConfigurableApplicationContext applicationContext, PropertyNameNormalizer propertyNameNormalizer) {
+        return new DefaultPropertyNameDiscoverer(applicationContext, propertyNameNormalizer);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConfigurationPropertiesRuntimeValidator configurationPropertiesRuntimeValidator() {
+        return new ConfigurationPropertiesRuntimeValidator();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConfigurationPropertiesMutabilityChecker configurationPropertiesMutabilityChecker() {
+        return new ConfigurationPropertiesMutabilityChecker();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConfigurationPropertiesMutator configurationPropertiesMutator(
+            ConfigurableEnvironment configurableEnvironment,
+            PropertyNameDiscoverer propertyNameDiscoverer,
+            ConfigurationPropertiesRuntimeValidator configurationPropertiesRuntimeValidator,
+            ConfigurationPropertiesBeansCache configurationPropertiesBeansCache,
+            ConfigurationPropertiesMutabilityChecker configurationPropertiesMutabilityChecker) {
+        return new RebindingConfigurationPropertiesMutator(
+                configurableEnvironment,
+                propertyNameDiscoverer,
+                configurationPropertiesRuntimeValidator,
+                configurationPropertiesBeansCache,
+                configurationPropertiesMutabilityChecker);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-            ConfigurationPropertiesCache configurationPropertiesCache) {
-        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesCache);
+            ConfigurationPropertiesCache configurationPropertiesCache,
+            ConfigurationPropertiesMutator configurationPropertiesMutator) {
+        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesCache, configurationPropertiesMutator);
     }
 }

@@ -14,7 +14,6 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoCon
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryDiscovererAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ProfileManagementAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.PropertyManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.SelfRegistrationAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ShortBuildInfoProviderAutoConfiguration

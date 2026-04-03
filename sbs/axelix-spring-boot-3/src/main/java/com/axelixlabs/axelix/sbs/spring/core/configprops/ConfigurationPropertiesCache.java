@@ -26,6 +26,7 @@ import org.springframework.boot.actuate.endpoint.Show;
 import org.springframework.context.ApplicationContext;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.sbs.spring.core.properties.SmartSanitizingFunction;
 
 /**
  * Service caching the application's {@code @ConfigurationProperties}

@@ -15,16 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.properties;
+package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
 /**
- * Represents a request to update (mutate) a specific configuration property
- * in the application.
+ * The interface that is capable to modify the configuration property value.
  *
- * @param propertyName the name of the property to update. Must not be {@code null}.
- * @param newValue the new value to assign to the property.  May be {@code null} or empty.
- *
- * @since 26.09.2025
+ * @since 07.04.25
+ * @author Mikhail Polivakha
  * @author Nikita Kirillov
  */
-public record PropertyMutationRequest(String propertyName, String newValue) {}
+public interface ConfigurationPropertiesMutator {
+
+    /**
+     * Mutate the property
+     *
+     * @param propertyName the configuration property name to be mutated
+     * @param newValue the new value of the configuration property
+     */
+    void mutate(String propertyName, String newValue) throws ConfigurationPropertyMutationException;
+}

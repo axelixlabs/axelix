@@ -27,7 +27,6 @@ import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvPropertyEnricher;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyMetadataExtractor;
@@ -36,6 +35,7 @@ import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadataExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostProcessor;
+import com.axelixlabs.axelix.sbs.spring.core.properties.SmartSanitizingFunction;
 
 /**
  * Auto-configuration for the {@link AxelixEnvironmentEndpoint}.

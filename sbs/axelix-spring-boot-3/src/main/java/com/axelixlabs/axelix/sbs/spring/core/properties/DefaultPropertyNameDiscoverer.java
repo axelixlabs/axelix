@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.properties;
 
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
@@ -30,39 +31,56 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
  * Default {@link PropertyNameDiscoverer}.
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 public class DefaultPropertyNameDiscoverer implements PropertyNameDiscoverer {
 
-    private final ConfigurableEnvironment configurableEnvironment;
     private final PropertyNameNormalizer propertyNameNormalizer;
 
+    private final ConfigurableApplicationContext applicationContext;
+
     public DefaultPropertyNameDiscoverer(
-            ConfigurableEnvironment configurableEnvironment, PropertyNameNormalizer propertyNameNormalizer) {
-        this.configurableEnvironment = configurableEnvironment;
+            ConfigurableApplicationContext applicationContext, PropertyNameNormalizer propertyNameNormalizer) {
+        this.applicationContext = applicationContext;
         this.propertyNameNormalizer = propertyNameNormalizer;
     }
 
     @Override
     @Nullable
     public String discover(String propertyName) {
+        String normalizedPropertyName = propertyNameNormalizer.normalize(propertyName);
 
-        for (PropertySource<?> source : configurableEnvironment.getPropertySources()) {
-            String foundPropertyName = extractPropertyNames(source, propertyNameNormalizer.normalize(propertyName));
+        ConfigurableApplicationContext ctx = applicationContext;
+        while (ctx != null) {
+            String foundPropertyName = discoverInEnvironment(ctx.getEnvironment(), normalizedPropertyName);
             if (foundPropertyName != null) {
                 return foundPropertyName;
             }
+
+            ctx = (ConfigurableApplicationContext) ctx.getParent();
         }
 
         return null;
     }
 
+    @Nullable
+    private String discoverInEnvironment(ConfigurableEnvironment environment, String normalizedPropertyName) {
+        for (PropertySource<?> source : environment.getPropertySources()) {
+            String foundPropertyName = extractPropertyName(source, normalizedPropertyName);
+            if (foundPropertyName != null) {
+                return foundPropertyName;
+            }
+        }
+        return null;
+    }
+
     // We rely on the priority order of property sources in PropertySource,
     // from highest to lowest priority.
-    private @Nullable String extractPropertyNames(PropertySource<?> source, String normalizedPropertyName) {
+    private @Nullable String extractPropertyName(PropertySource<?> source, String normalizedPropertyName) {
 
         if (source instanceof CompositePropertySource composite) {
             for (PropertySource<?> nest : composite.getPropertySources()) {
-                String foundPropertyName = extractPropertyNames(nest, normalizedPropertyName);
+                String foundPropertyName = extractPropertyName(nest, normalizedPropertyName);
                 if (foundPropertyName != null) {
                     return foundPropertyName;
                 }

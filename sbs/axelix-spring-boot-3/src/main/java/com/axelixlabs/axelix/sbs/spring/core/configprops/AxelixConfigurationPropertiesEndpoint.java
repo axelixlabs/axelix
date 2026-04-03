@@ -17,8 +17,14 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 
@@ -29,17 +35,48 @@ import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
  * @since 13.11.2025
  * @author Sergey Cherkasov
  */
-@Endpoint(id = "axelix-configprops")
+@RestControllerEndpoint(id = "axelix-configprops")
 public class AxelixConfigurationPropertiesEndpoint {
+
+    private static final Logger log = LoggerFactory.getLogger(AxelixConfigurationPropertiesEndpoint.class);
 
     private final ConfigurationPropertiesCache configurationPropertiesCache;
 
-    public AxelixConfigurationPropertiesEndpoint(ConfigurationPropertiesCache cache) {
+    private final ConfigurationPropertiesMutator configurationPropertiesMutator;
+
+    public AxelixConfigurationPropertiesEndpoint(
+            ConfigurationPropertiesCache cache, ConfigurationPropertiesMutator configurationPropertiesMutator) {
         this.configurationPropertiesCache = cache;
+        this.configurationPropertiesMutator = configurationPropertiesMutator;
     }
 
-    @ReadOperation
-    public ConfigurationPropertiesFeed configurationProperties() {
+    @GetMapping
+    public ConfigurationPropertiesFeed getConfigurationProperties() {
         return configurationPropertiesCache.getConfigProps();
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> mutateConfigurationProperties(
+            @RequestBody ConfigurationPropertyMutationRequest request) {
+        String propertyName = request.propertyName();
+
+        if (propertyName == null || propertyName.isBlank()) {
+            log.warn("Received ConfigurationProperty mutation request with blank/empty/null property name");
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (request.newValue() == null) {
+            log.warn(
+                    "Received ConfigurationProperty mutation request for property '{}' with null newValue",
+                    propertyName);
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            configurationPropertiesMutator.mutate(propertyName, request.newValue());
+            return ResponseEntity.noContent().build();
+        } catch (ConfigurationPropertyMutationException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

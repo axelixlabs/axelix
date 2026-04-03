@@ -15,25 +15,28 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.properties;
+package com.axelixlabs.axelix.sbs.spring.core.utils;
 
-import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.AbstractEnvironment;
 
 /**
- * The interface that is capable to modify the {@link Property} value.
+ * A simplified version analogous to Spring's org.springframework.mock.env.MockEnvironment.
  * <p>
- * The implementations must reload all necessary {@link ApplicationContext} components that rely on this property.
+ * Used as a lightweight alternative to {@code StandardEnvironment} specifically
+ * for isolated property validation tasks.
  *
- * @since 07.04.25
- * @author Mikhail Polivakha
+ * @see MockPropertySource
+ * @author Nikita Kirillov
  */
-public interface PropertyMutator {
+public class MockEnvironment extends AbstractEnvironment {
 
-    /**
-     * Mutate the property
-     *
-     * @param propertyName the property name to be mutated
-     * @param newValue the new value of the property
-     */
-    void mutate(String propertyName, String newValue);
+    private final MockPropertySource propertySource = new MockPropertySource();
+
+    public MockEnvironment() {
+        this.getPropertySources().addFirst(propertySource);
+    }
+
+    public void addProperty(String key, Object value) {
+        this.propertySource.setProperty(key, value);
+    }
 }

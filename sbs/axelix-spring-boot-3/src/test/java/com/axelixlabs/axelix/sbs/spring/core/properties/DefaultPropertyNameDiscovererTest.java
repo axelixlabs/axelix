@@ -26,8 +26,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
@@ -124,8 +124,8 @@ public class DefaultPropertyNameDiscovererTest {
 
         @Bean
         public PropertyNameDiscoverer propertyNameDiscoverer(
-                ConfigurableEnvironment configurableEnvironment, PropertyNameNormalizer propertyNameNormalizer) {
-            return new DefaultPropertyNameDiscoverer(configurableEnvironment, propertyNameNormalizer);
+                ConfigurableApplicationContext applicationContext, PropertyNameNormalizer propertyNameNormalizer) {
+            return new DefaultPropertyNameDiscoverer(applicationContext, propertyNameNormalizer);
         }
     }
 }

@@ -113,21 +113,13 @@ public class DefaultConfigurationPropertiesConverterTest {
 
     @ConfigurationProperties(prefix = "axelix.prop.test")
     public record AxelixConfigurationProperties(
-            Map<String, String> tags,
-            List<String> enabledContexts,
-            AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.HttpClient httpClient) {
+            Map<String, String> tags, List<String> enabledContexts, HttpClient httpClient) {
 
-        public record HttpClient(
-                List<AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.Request> requests) {}
+        public record HttpClient(List<Request> requests) {}
 
-        public record Request(
-                String name,
-                String baseUrl,
-                List<AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.Method> methods) {}
+        public record Request(String name, String baseUrl, List<Method> methods) {}
 
-        public record Method(
-                String type,
-                List<AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.Retry> retries) {}
+        public record Method(String type, List<Retry> retries) {}
 
         public record Retry(Integer count, Map<String, Object> parameters) {}
     }

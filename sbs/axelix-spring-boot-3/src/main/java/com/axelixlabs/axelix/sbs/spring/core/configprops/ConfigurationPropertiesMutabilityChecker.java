@@ -15,18 +15,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.properties;
+package com.axelixlabs.axelix.sbs.spring.core.configprops;
+
+import org.springframework.boot.context.properties.ConfigurationPropertiesBean;
 
 /**
- * An unchecked exception thrown when a requested property cannot be found
- * in any of the available {@link org.springframework.core.env.PropertySource}s.
+ * Checks whether a configuration properties bean can be mutated at runtime.
  *
- * @since 27.08.2025
  * @author Nikita Kirillov
  */
-public class PropertyNotFoundException extends RuntimeException {
+public class ConfigurationPropertiesMutabilityChecker {
 
-    public PropertyNotFoundException(String message) {
-        super(message);
+    /**
+     * Determines whether the given configuration properties bean should be considered
+     * immutable and excluded from runtime modifications.
+     */
+    public boolean isNotMutable(ConfigurationPropertiesBean bean) {
+        String name = bean.getInstance().getClass().getName();
+        return name.startsWith("org.springframework") && !name.startsWith("org.springframework.samples")
+                || name.startsWith("com.zaxxer");
     }
 }

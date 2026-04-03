@@ -15,17 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.properties;
+package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
 /**
- * An unchecked exception thrown when a requested property has an invalid name.
+ * Base exception for configuration property mutation failures.
  *
- * @since 13.10.2025
- * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
-public class PropertyNameIsNotValidException extends RuntimeException {
+public class ConfigurationPropertyMutationException extends RuntimeException {
 
-    public PropertyNameIsNotValidException(String message) {
+    public ConfigurationPropertyMutationException(String message) {
         super(message);
     }
 }

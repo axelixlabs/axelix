@@ -31,13 +31,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadata;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadataExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostProcessor;
+import com.axelixlabs.axelix.sbs.spring.core.properties.SmartSanitizingFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
