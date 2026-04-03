@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
@@ -38,7 +37,6 @@ import com.axelixlabs.axelix.master.service.DashboardService;
  */
 @Tag(name = "Dashboard API", description = "API for rendering the dashboard")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.DashboardApi.MAIN)
 public class DashboardApi {
 
     private final DashboardService dashboardService;
@@ -55,7 +53,7 @@ public class DashboardApi {
                     @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = DashboardResponse.class)))
-    @GetMapping
+    @GetMapping(path = ApiPaths.DashboardApi.MAIN)
     public DashboardResponse getDashboard() {
         return dashboardService.getDashboardInfo();
     }

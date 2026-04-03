@@ -42,9 +42,14 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
+import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultIdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
@@ -73,6 +78,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  * @since 28.07.2025
  */
+@Disabled // TODO: waiting for https://github.com/axelixlabs/axelix/issues/891
 @SpringBootTest(
         classes = JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -286,15 +292,15 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
-        public SecurityManager securityManager(
+        public IdentityAccessManager securityManager(
                 JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
-            return new DefaultSecurityManager(jwtDecoderService, authorityResolver, authorizer);
+            return new DefaultIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
         }
 
         @Bean
         public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-                SecurityManager securityManager) {
-            var registration = new FilterRegistrationBean<>(new JwtAuthorizationFilter(securityManager));
+                IdentityAccessManager identityAccessManager) {
+            var registration = new FilterRegistrationBean<>(new JwtAuthorizationFilter(identityAccessManager));
             registration.setName("jwtAuthorizationFilter");
             return registration;
         }

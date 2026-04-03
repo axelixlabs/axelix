@@ -287,7 +287,7 @@ class BeansApiTest {
     void shouldReturnJSONBeansFeed() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/beans/feed/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -304,7 +304,7 @@ class BeansApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
@@ -317,7 +317,7 @@ class BeansApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/beans/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.

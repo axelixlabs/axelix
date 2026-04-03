@@ -106,7 +106,7 @@ public class CachesClearApiTest {
     @Test
     void shouldClearAllCaches() throws InterruptedException {
         // when
-        restTemplate.withoutAuthorities().delete("/api/external/caches/{instanceId}", activeInstanceId);
+        restTemplate.asEditor().delete("/api/external/caches/{instanceId}", activeInstanceId);
 
         // then.
         RecordedRequest recordedRequest = mockWebServer.takeRequest(10, TimeUnit.SECONDS);
@@ -120,7 +120,7 @@ public class CachesClearApiTest {
 
         // when
         restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .delete(
                         "/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=testCacheManager",
                         Map.of("instanceId", activeInstanceId, "cacheName", cacheName));

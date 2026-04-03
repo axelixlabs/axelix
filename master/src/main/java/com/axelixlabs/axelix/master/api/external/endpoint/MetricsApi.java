@@ -32,7 +32,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.axelixlabs.axelix.common.api.metrics.MetricProfile;
@@ -57,7 +56,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  */
 @Tag(name = "Metrics API Controller", description = "The endpoint that provides access to the metrics of the instances")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.MetricsApi.MAIN)
 public class MetricsApi {
 
     private final EndpointInvoker endpointInvoker;

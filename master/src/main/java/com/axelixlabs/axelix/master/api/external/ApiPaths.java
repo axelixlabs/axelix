@@ -32,126 +32,64 @@ public final class ApiPaths {
 
     public static final class SettingsApi {
 
-        public static final String MAIN = "/settings";
-
-        public static final String AUTH = "/auth";
+        public static final String AUTH = "/settings/auth";
     }
 
     public static final class UsersApi {
 
-        public static final String MAIN = "/users";
+        public static final String LOGIN = "/users/login";
 
-        public static final String LOGIN = "/login";
-
-        public static final String LOGOUT = "/logout";
+        public static final String LOGOUT = "/users/logout";
     }
 
     public static final class OAuth2Api {
 
-        public static final String MAIN = "/oauth2";
-
-        public static final String CALLBACK = "/callback";
+        public static final String CALLBACK = "/oauth2/callback";
     }
 
     public static final class InstancesApi {
 
-        public static final String MAIN = "/applications";
-
-        public static final String GRID = "/grid";
+        public static final String GRID = "/applications/grid";
     }
 
     public static final class BeansApi {
 
         /**
-         * Base path for all beans APIs.
-         */
-        public static final String MAIN = "/beans";
-
-        /**
          * The Beans Feed used in the single instance
          */
-        public static final String FEED = "/feed/{instanceId}";
+        public static final String FEED = "/beans/feed/{instanceId}";
     }
 
     public static final class EnvironmentApi {
 
         /**
-         * Base path for all environment APIs.
-         */
-        public static final String MAIN = "/env";
-
-        /**
          * Environment feed for a single instance, providing all environment properties.
          */
-        public static final String FEED = "/feed/{instanceId}";
+        public static final String FEED = "/env/feed/{instanceId}";
     }
 
     public static final class StateExportApi {
 
         /**
-         * Base path for state export API.
-         */
-        public static final String MAIN = "/export-state";
-
-        /**
          * Endpoint to export the state of the given application instance.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
-    }
-
-    public static final class SoftwareApi {
-
-        /**
-         * Base path for all software APIs.
-         */
-        public static final String MAIN = "/software";
-
-        /**
-         * Core software components used in the entire deployment.
-         */
-        public static final String CORE_SUMMARY = "/core/summary";
-
-        /**
-         * Core software components used in the application.
-         */
-        public static final String CORE = "/core/{instanceId}";
-    }
-
-    public static final class InfoApi {
-
-        /**
-         * Base path for info APIs.
-         */
-        public static final String MAIN = "/info";
-        /**
-         * Info endpoint with instance ID
-         */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/export-state/{instanceId}";
     }
 
     public static final class ConditionsApi {
 
         /**
-         * Base path for conditions APIs.
-         */
-        public static final String MAIN = "/conditions";
-
-        /**
          * Instance id for conditions Endpoint.
          */
-        public static final String FEED = "/feed/{instanceId}";
+        public static final String FEED = "/conditions/feed/{instanceId}";
     }
 
     public static final class ConfigPropsApi {
 
         /**
-         * Base path for configprops APIs.
+         * The Config-props Feed used in the single instance
          */
-        public static final String MAIN = "/configprops";
-        /**
-         * The Configprops Feed used in the single instance
-         */
-        public static final String FEED = "/feed/{instanceId}";
+        public static final String FEED = "/configprops/feed/{instanceId}";
     }
 
     public static final class DashboardApi {
@@ -165,254 +103,204 @@ public final class ApiPaths {
     public static final class LoggersApi {
 
         /**
-         * Base path for loggers APIs.
-         */
-        public static final String MAIN = "/loggers";
-        /**
          * Loggers endpoint with instance ID.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/loggers/{instanceId}";
+
         /**
          * Endpoint to retrieve a specific logger by name from an instance.
          */
-        public static final String LOGGER_NAME = "/{instanceId}/logger/{loggerName}";
+        public static final String LOGGER_NAME = "/loggers/{instanceId}/logger/{loggerName}";
+
         /**
          * Endpoint to retrieve a specific logger group by name from an instance.
          */
-        public static final String GROUP_NAME = "/{instanceId}/group/{groupName}";
+        public static final String GROUP_NAME = "/loggers/{instanceId}/group/{groupName}";
+
         /**
          * Endpoint to reset the logging level of a logger by its name from an instance.
          */
-        public static final String RESET_FOR_LOGGER = "/{instanceId}/logger/{loggerName}/reset";
+        public static final String RESET_FOR_LOGGER = "/loggers/{instanceId}/logger/{loggerName}/reset";
     }
 
     public static final class GcLogFileApi {
 
         /**
-         * Base path for GcLogFileApi.
-         */
-        public static final String MAIN = "/garbage-collector";
-
-        /**
          * GcLogfile endpoint with instance ID.
          */
-        public static final String INSTANCE_ID = "/logs/{instanceId}/file";
+        public static final String INSTANCE_ID = "/garbage-collector/logs/{instanceId}/file";
 
         /**
          * GC logging status endpoint with instance ID.
          */
-        public static final String STATUS_GC_LOGGING = "/logs/{instanceId}/status";
+        public static final String STATUS_GC_LOGGING = "/garbage-collector/logs/{instanceId}/status";
 
         /**
          * Manual GC trigger endpoint with instance ID.
          */
-        public static final String TRIGGER_GC = "/{instanceId}/trigger";
+        public static final String TRIGGER_GC = "/garbage-collector/{instanceId}/trigger";
 
         /**
          * Enable GC logging endpoint with instance ID.
          */
-        public static final String ENABLE_GC_LOGGING = "/logs/{instanceId}/enable";
+        public static final String ENABLE_GC_LOGGING = "/garbage-collector/logs/{instanceId}/enable";
 
         /**
          * Disable GC logging endpoint with instance ID.
          */
-        public static final String DISABLE_GC_LOGGING = "/logs/{instanceId}/disable";
+        public static final String DISABLE_GC_LOGGING = "/garbage-collector/logs/{instanceId}/disable";
     }
 
     public static final class HeapDumpApi {
 
         /**
-         * Base path for heap-dump API.
-         */
-        public static final String MAIN = "/heapdump";
-
-        /**
          * Heap-dump endpoint with instance ID.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/heapdump/{instanceId}";
     }
 
     public static final class ProfileManagementApi {
 
         /**
-         * Base path for profile management APIs.
-         */
-        public static final String MAIN = "/profile-management";
-
-        /**
          * Endpoint to replace the active Spring profiles of a given application instance.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/profile-management/{instanceId}";
     }
 
     public static final class PropertyManagementApi {
 
         /**
-         * Base path for property management APIs.
-         */
-        public static final String MAIN = "/property-management";
-
-        /**
          * Endpoint to update property of a given application instance.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/property-management/{instanceId}";
     }
 
     public static final class CachesApi {
 
         /**
-         * Base path for caches APIs.
-         */
-        public static final String MAIN = "/caches";
-        /**
          * Caches endpoint with instance ID.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/caches/{instanceId}";
+
         /**
          * Endpoint to retrieve a specific cache by name from an instance.
          */
-        public static final String CACHE_NAME = "/{instanceId}/cache/{cacheName}";
+        public static final String CACHE_NAME = "/caches/{instanceId}/cache/{cacheName}";
 
         /**
          * Endpoint to enable a specific cache in a cache manager.
          */
-        public static final String ENABLE_CACHE = "/{instanceId}/{cacheManagerName}/{cacheName}/enable";
+        public static final String ENABLE_CACHE = "/caches/{instanceId}/{cacheManagerName}/{cacheName}/enable";
 
         /**
          * Endpoint to disable a specific cache in a cache manager.
          */
-        public static final String DISABLE_CACHE = "/{instanceId}/{cacheManagerName}/{cacheName}/disable";
+        public static final String DISABLE_CACHE = "/caches/{instanceId}/{cacheManagerName}/{cacheName}/disable";
 
         /**
          * Endpoint to enable all caches in a cache manager.
          */
-        public static final String ENABLE_CACHE_MANAGER = "/{instanceId}/{cacheManagerName}/enable";
+        public static final String ENABLE_CACHE_MANAGER = "/caches/{instanceId}/{cacheManagerName}/enable";
 
         /**
          * Endpoint to disable all caches in a cache manager.
          */
-        public static final String DISABLE_CACHE_MANAGER = "/{instanceId}/{cacheManagerName}/disable";
+        public static final String DISABLE_CACHE_MANAGER = "/caches/{instanceId}/{cacheManagerName}/disable";
     }
 
     public static final class MetricsApi {
 
         /**
-         * Base path for metrics APIs.
-         */
-        public static final String MAIN = "/metrics";
-
-        /**
          * Retrieve metrics within a given {@link Instance}.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/metrics/{instanceId}";
 
         /**
          * Retrieve a given metric within a given {@link Instance}.
          */
-        public static final String METRIC_NAME = "/{instanceId}/{metric}";
+        public static final String METRIC_NAME = "/metrics/{instanceId}/{metric}";
     }
 
     public static final class ScheduledTasksApi {
 
         /**
-         * Base path for {@link com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi} APIs.
-         *
-         */
-        public static final String MAIN = "/scheduled-tasks";
-        /**
          * ScheduledTasks endpoint with instance ID.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/scheduled-tasks/{instanceId}";
+
         /**
          * Endpoint allows enabling a scheduled task.
          */
-        public static final String ENABLE_TASK = "/{instanceId}/enable";
+        public static final String ENABLE_TASK = "/scheduled-tasks/{instanceId}/enable";
 
         /**
          * Endpoint allows disabling a scheduled task.
          */
-        public static final String DISABLE_TASK = "/{instanceId}/disable";
+        public static final String DISABLE_TASK = "/scheduled-tasks/{instanceId}/disable";
         /**
          * Endpoint allows modification of the cron expression for a scheduled task.
          */
-        public static final String MODIFY_CRON_EXPRESSION = "/{instanceId}/modify/cron-expression";
+        public static final String MODIFY_CRON_EXPRESSION = "/scheduled-tasks/{instanceId}/modify/cron-expression";
         /**
          * Endpoint validates cron expression syntax.
          */
-        public static final String VALIDATE_CRON_EXPRESSION = "/validate-cron-expression";
+        public static final String VALIDATE_CRON_EXPRESSION = "/scheduled-tasks/validate-cron-expression";
         /**
          * Endpoint allows modification of the interval for a scheduled task.
          */
-        public static final String MODIFY_INTERVAL = "/{instanceId}/modify/interval";
+        public static final String MODIFY_INTERVAL = "/scheduled-tasks/{instanceId}/modify/interval";
         /**
          * Endpoint allows forcing a scheduled task to execute.
          */
-        public static final String EXECUTE = "/{instanceId}/execute";
+        public static final String EXECUTE = "/scheduled-tasks/{instanceId}/execute";
     }
 
     public static final class DetailsApi {
 
         /**
-         * Base path for details APIs.
-         */
-        public static final String MAIN = "/details";
-        /**
          * Details endpoint with instance ID.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/details/{instanceId}";
     }
 
     public static final class TransactionMonitoringApi {
 
-        public static final String MAIN = "/transaction-monitoring";
-
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/transaction-monitoring/{instanceId}";
     }
 
     public static final class ThreadDumpApi {
 
         /**
-         * Base path for thread dump APIs.
-         */
-        public static final String MAIN = "/thread-dump";
-        /**
          * Thread dump endpoint with instance ID.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/thread-dump/{instanceId}";
 
         /**
          * Endpoint allows enabling thread contention monitoring.
          */
-        public static final String ENABLE_CONTENTION_MONITORING = "/{instanceId}/thread-contention-monitoring/enable";
+        public static final String ENABLE_CONTENTION_MONITORING =
+                "/thread-dump/{instanceId}/thread-contention-monitoring/enable";
 
         /**
          * Endpoint allows disabling thread contention monitoring.
          */
-        public static final String DISABLE_CONTENTION_MONITORING = "/{instanceId}/thread-contention-monitoring/disable";
+        public static final String DISABLE_CONTENTION_MONITORING =
+                "/thread-dump/{instanceId}/thread-contention-monitoring/disable";
     }
 
     public static final class FeignClientApi {
 
         /**
-         * Base path for feign client APIs.
-         */
-        public static final String MAIN = "/feign";
-        /**
          * Feign Client endpoint with instance ID.
          */
-        public static final String INSTANCE_ID = "/{instanceId}";
+        public static final String INSTANCE_ID = "/feign/{instanceId}";
     }
 
     public static final class McpToolApi {
 
         /**
-         * Base path for all MCP APIs.
-         */
-        public static final String MAIN = "/mcp";
-
-        /**
          * The feed of MCP tools configured in the master service.
          */
-        public static final String TOOLS_LIST = "/tools-feed";
+        public static final String TOOLS_LIST = "/mcp/tools-feed";
     }
 }

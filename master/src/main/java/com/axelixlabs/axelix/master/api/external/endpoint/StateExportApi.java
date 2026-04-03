@@ -30,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
@@ -50,7 +49,6 @@ import com.axelixlabs.axelix.master.service.export.ZipArchiveInstanceStateExport
  * @since 27.10.2025
  */
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.StateExportApi.MAIN)
 public class StateExportApi {
 
     private final ZipArchiveInstanceStateExporter exportService;

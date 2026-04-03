@@ -15,21 +15,30 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.provider;
+package com.axelixlabs.axelix.common.auth.service;
 
-import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
+import java.nio.charset.StandardCharsets;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 /**
- * {@link UserProvider} that is capable to load user from LDAP directory servers.
+ * {@link JwtVerificationStrategy} implementation that verifies and parses JWT tokens
+ * using HMAC-SHA signing algorithms.
  *
- * @since 16.07.25
- * @author Mikhail Polivakha
+ * @since 25.07.2025
+ * @author Nikita Kirillov
  */
-public class LdapUserProvider implements UserProvider {
+public class HmacVerificationStrategy implements JwtVerificationStrategy {
 
     @Override
-    public User load(String username) throws UserNotFoundException {
-        throw new UnsupportedOperationException();
+    public Jws<Claims> verifyAndParse(String token, String signingKey) throws JwtException {
+        return Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(signingKey.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseSignedClaims(token);
     }
 }

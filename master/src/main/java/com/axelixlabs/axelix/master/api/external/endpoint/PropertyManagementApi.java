@@ -24,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
@@ -49,7 +48,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
         name = "Property Management API",
         description = "Provides operations for managing Spring properties of application instances.")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.PropertyManagementApi.MAIN)
 public class PropertyManagementApi {
 
     private final EndpointInvoker endpointInvoker;

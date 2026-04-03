@@ -225,7 +225,7 @@ public class MetricsApiTest {
     void shouldReturnJSONMetricsGroupResponse() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/metrics/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -242,7 +242,7 @@ public class MetricsApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/metrics/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
@@ -255,7 +255,7 @@ public class MetricsApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/metrics/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.

@@ -85,7 +85,7 @@ public class SelfRegisteredApiTest {
     void shouldRegistryServiceInstance() {
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withAuthorities()
+                .asViewer()
                 .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
 
         // then.

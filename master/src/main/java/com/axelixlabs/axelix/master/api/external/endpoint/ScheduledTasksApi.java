@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.ServiceScheduledTasks;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressionModifyRequest;
@@ -62,7 +61,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
         name = "ScheduledTasks API",
         description = "The scheduled-tasks endpoint provides information about the application’s scheduled tasks.")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.ScheduledTasksApi.MAIN)
 public class ScheduledTasksApi {
 
     private final EndpointInvoker endpointInvoker;

@@ -144,7 +144,7 @@ class HeapDumpApiTest {
     void shouldReturnHeapDumpAsAttachment() {
         // when.
         ResponseEntity<byte[]> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/heapdump/{instanceId}", byte[].class, activeInstanceId);
 
         // then.
@@ -167,7 +167,7 @@ class HeapDumpApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/heapdump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
@@ -180,7 +180,7 @@ class HeapDumpApiTest {
 
         // when.
         ResponseEntity<InstanceNotFoundException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/heapdump/{instanceId}", InstanceNotFoundException.class, instanceId);
 
         // then.

@@ -15,31 +15,35 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.auth;
+package com.axelixlabs.axelix.common.auth.service;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
  * The main entrypoint for evaluating the possibility of processing the request (both Authentication
- * and Authorization).
+ * and Authorization). So essentially this service is the entrypoint for IAM checks.
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public interface SecurityManager {
+public interface IdentityAccessManager {
 
-    boolean shouldAuthorize(String requestPath);
-
-    default void authorize(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
-            throws AuthorizationException, JwtProcessingException {
-        if (shouldAuthorize(requestPath)) {
-            authorizeInternal(requestPath, requestHttpMethod, token);
-        }
-    }
-
-    void authorizeInternal(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
+    /**
+     * Main entrypoint for IAM. In case any problem is encountered, then the corresponding exception is thrown.
+     * The method normal exit signifies that user, identified by the bearer access token has been granted access.
+     *
+     * @param requestPath the context path of the request, e.g. {@code /api/external/anything} or {@code /actuator/axelix-beans}.
+     * @param requestHttpMethod the HTTP method of the request.
+     * @param token the Bearer access token of the user.
+     *
+     * @throws AuthorizationException in case the user is not authorized to access the given API.
+     * @throws JwtProcessingException in case the implementation is unable to verify the validity
+     *                                of the token or if the token is deemed invalid.
+     */
+    void verifyAccess(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
             throws AuthorizationException, JwtProcessingException;
 }

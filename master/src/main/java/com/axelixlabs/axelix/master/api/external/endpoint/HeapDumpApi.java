@@ -29,7 +29,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
@@ -49,7 +48,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  * @author Nikita Kirillov
  */
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.HeapDumpApi.MAIN)
 public class HeapDumpApi {
 
     private final EndpointInvoker endpointInvoker;

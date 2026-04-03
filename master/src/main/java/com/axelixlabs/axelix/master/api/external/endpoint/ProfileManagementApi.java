@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.ProfileMutationResult;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
@@ -55,7 +54,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
         name = "Profile Management API",
         description = "Provides operations for managing Spring profiles of application instances.")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.ProfileManagementApi.MAIN)
 public class ProfileManagementApi {
 
     private final EndpointInvoker endpointInvoker;

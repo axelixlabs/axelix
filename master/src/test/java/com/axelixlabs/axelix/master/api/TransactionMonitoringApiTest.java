@@ -205,7 +205,7 @@ class TransactionMonitoringApiTest {
     @Test
     void shouldReturnJSONTransactionsMonitoringFeed() throws InterruptedException {
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/transaction-monitoring/{instanceId}", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -224,7 +224,7 @@ class TransactionMonitoringApiTest {
     @Test
     void shouldClearTransactionsMonitoringStats() throws InterruptedException {
         restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .delete("/api/external/transaction-monitoring/{instanceId}", Map.of("instanceId", activeInstanceId));
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest(10l, TimeUnit.SECONDS);

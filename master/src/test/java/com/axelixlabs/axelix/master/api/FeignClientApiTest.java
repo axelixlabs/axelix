@@ -246,7 +246,7 @@ class FeignClientApiTest {
     void shouldReturnJSONFeign() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/feign/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -263,7 +263,7 @@ class FeignClientApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/feign/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
@@ -276,7 +276,7 @@ class FeignClientApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/feign/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.

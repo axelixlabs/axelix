@@ -145,7 +145,7 @@ class GcLogFileApiTest {
     @Test
     void shouldReturnGcLogFileAsPlainText() {
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/garbage-collector/logs/{instanceId}/file", String.class, activeInstanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -156,7 +156,7 @@ class GcLogFileApiTest {
     @Test
     void shouldReturnStatusGcLogging() {
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/garbage-collector/logs/{instanceId}/status", String.class, activeInstanceId);
 
@@ -168,7 +168,7 @@ class GcLogFileApiTest {
     @Test
     void shouldTriggerGc() {
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/garbage-collector/{instanceId}/trigger",
                         HttpEntity.EMPTY,
@@ -182,7 +182,7 @@ class GcLogFileApiTest {
     void shouldEnableGcLogging() {
         GcLogEnableRequest requestBody = new GcLogEnableRequest("info");
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/garbage-collector/logs/{instanceId}/enable",
                         requestBody,
@@ -195,7 +195,7 @@ class GcLogFileApiTest {
     @Test
     void shouldDisableGcLogging() {
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/garbage-collector/logs/{instanceId}/disable",
                         HttpEntity.EMPTY,
@@ -213,7 +213,7 @@ class GcLogFileApiTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/garbage-collector/logs/{instanceId}/file", String.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -224,7 +224,7 @@ class GcLogFileApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/garbage-collector/logs/{instanceId}/file", String.class, instanceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

@@ -116,7 +116,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
         // when.
         ResponseEntity<String> body = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/group/{groupName}",
                         requestBody,
@@ -135,7 +135,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
         // when.
         ResponseEntity<String> body = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         requestBody,
@@ -153,7 +153,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
         // when
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
                         null,
@@ -175,7 +175,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
         // when.
         ResponseEntity<?> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/group/{groupName}",
                         requestBody,
@@ -197,7 +197,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
         // when.
         ResponseEntity<?> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         requestBody,
@@ -218,7 +218,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
         // when.
         ResponseEntity<?> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
                         null,
@@ -238,7 +238,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/group/{groupName}",
                         requestBody,
@@ -258,7 +258,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         requestBody,
@@ -277,7 +277,7 @@ public class LoggersApiManagementLoggingLevelTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
                         null,

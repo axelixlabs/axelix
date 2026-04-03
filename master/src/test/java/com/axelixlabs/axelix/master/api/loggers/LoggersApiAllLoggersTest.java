@@ -207,7 +207,7 @@ public class LoggersApiAllLoggersTest {
     void shouldReturnJSONAllLoggers() {
         // when
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/loggers/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -223,9 +223,8 @@ public class LoggersApiAllLoggersTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<?> response = restTemplate
-                .withoutAuthorities()
-                .getForEntity("/api/external/loggers/{instanceId}", Void.class, instanceId);
+        ResponseEntity<?> response =
+                restTemplate.asViewer().getForEntity("/api/external/loggers/{instanceId}", Void.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -237,7 +236,7 @@ public class LoggersApiAllLoggersTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/loggers/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.

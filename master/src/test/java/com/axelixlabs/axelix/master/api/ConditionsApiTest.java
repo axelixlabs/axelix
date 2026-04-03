@@ -231,7 +231,7 @@ class ConditionsApiTest {
     void shouldReturnJSONConditionsFeed() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/conditions/feed/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -248,7 +248,7 @@ class ConditionsApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/conditions/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
@@ -262,7 +262,7 @@ class ConditionsApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/conditions/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 

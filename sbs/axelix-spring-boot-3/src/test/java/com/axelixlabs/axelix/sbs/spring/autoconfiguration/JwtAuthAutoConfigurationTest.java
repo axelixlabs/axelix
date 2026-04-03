@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
 import java.util.Optional;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -28,16 +29,16 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
+import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.sbs.spring.core.auth.AuthorityResolver;
-import com.axelixlabs.axelix.sbs.spring.core.auth.Authorizer;
-import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorizer;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
-import com.axelixlabs.axelix.sbs.spring.core.auth.SecurityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,7 +65,7 @@ class JwtAuthAutoConfigurationTest {
             assertThat(context).hasSingleBean(JwtDecoderService.class);
             assertThat(context).hasSingleBean(AuthorityResolver.class);
             assertThat(context).hasSingleBean(Authorizer.class);
-            assertThat(context).hasSingleBean(SecurityManager.class);
+            assertThat(context).hasSingleBean(IdentityAccessManager.class);
             assertThat(context).hasSingleBean(FilterRegistrationBean.class);
         });
     }
@@ -151,8 +152,8 @@ class JwtAuthAutoConfigurationTest {
     @TestConfiguration
     static class CustomJwtAuthorizationFilterConfig {
         @Bean
-        public JwtAuthorizationFilter jwtAuthorizationFilter(SecurityManager securityManager) {
-            return new CustomJwtAuthorizationFilter(securityManager);
+        public JwtAuthorizationFilter jwtAuthorizationFilter(IdentityAccessManager identityAccessManager) {
+            return new CustomJwtAuthorizationFilter(identityAccessManager);
         }
     }
 
@@ -162,6 +163,7 @@ class JwtAuthAutoConfigurationTest {
         }
     }
 
+    @NullMarked
     static class CustomAuthorityResolver implements AuthorityResolver {
 
         @Override
@@ -173,8 +175,8 @@ class JwtAuthAutoConfigurationTest {
     static class CustomAuthorizer extends DefaultAuthorizer {}
 
     static class CustomJwtAuthorizationFilter extends JwtAuthorizationFilter {
-        public CustomJwtAuthorizationFilter(SecurityManager securityManager) {
-            super(securityManager);
+        public CustomJwtAuthorizationFilter(IdentityAccessManager identityAccessManager) {
+            super(identityAccessManager);
         }
     }
 }

@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.InstanceDetails;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
@@ -51,7 +50,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
         name = "Details API",
         description = "The details endpoint provides general information about the particular Spring Boot instance")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.DetailsApi.MAIN)
 public class DetailsApi {
 
     private final EndpointInvoker endpointInvoker;

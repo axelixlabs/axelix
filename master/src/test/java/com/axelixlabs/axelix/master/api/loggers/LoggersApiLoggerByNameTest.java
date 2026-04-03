@@ -143,7 +143,7 @@ public class LoggersApiLoggerByNameTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         String.class,
@@ -170,7 +170,7 @@ public class LoggersApiLoggerByNameTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         String.class,
@@ -193,7 +193,7 @@ public class LoggersApiLoggerByNameTest {
 
         // when.
         ResponseEntity<?> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}", Void.class, instanceId, loggerName);
 
@@ -208,7 +208,7 @@ public class LoggersApiLoggerByNameTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         EndpointInvocationException.class,

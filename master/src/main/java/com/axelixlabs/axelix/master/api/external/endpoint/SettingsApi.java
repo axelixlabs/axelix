@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.api.external.endpoint;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
@@ -34,7 +33,6 @@ import com.axelixlabs.axelix.master.api.external.response.settings.Authenticatio
  * @author Nikita Kirillov
  */
 @ExternalApiRestController
-@RequestMapping(ApiPaths.SettingsApi.MAIN)
 public class SettingsApi {
 
     private final List<AuthenticationOption> authSettings;

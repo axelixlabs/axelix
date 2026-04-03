@@ -275,7 +275,7 @@ class EnvironmentApiTest {
     void shouldReturnJSONEnvironmentFeed() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/env/feed/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -292,7 +292,7 @@ class EnvironmentApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
@@ -305,7 +305,7 @@ class EnvironmentApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/env/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.

@@ -123,7 +123,7 @@ class CachesManagementApiTest {
     void shouldEnableOrDisableSpecificCache(String cacheStatus) {
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,
@@ -145,7 +145,7 @@ class CachesManagementApiTest {
     void shouldEnableOrDisableCacheManager(String cacheStatus) {
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/caches/{instanceId}/{cacheManagerName}/" + cacheStatus,
                         null,
@@ -165,7 +165,7 @@ class CachesManagementApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,
@@ -181,7 +181,7 @@ class CachesManagementApiTest {
     void shouldReturnBadRequestForUnregisteredInstance_OnEnableOrDisableCacheName(String cacheStatus) {
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,

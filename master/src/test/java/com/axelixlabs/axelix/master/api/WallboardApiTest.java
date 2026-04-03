@@ -139,7 +139,7 @@ public class WallboardApiTest {
                     """.formatted(instance1Id, instance2Id);
 
             // when.
-            ResponseEntity<String> response = restTemplate.withoutAuthorities().getForEntity(GRID_URL, String.class);
+            ResponseEntity<String> response = restTemplate.asViewer().getForEntity(GRID_URL, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -161,7 +161,7 @@ public class WallboardApiTest {
                     """;
 
             // when.
-            ResponseEntity<String> response = restTemplate.withoutAuthorities().getForEntity(GRID_URL, String.class);
+            ResponseEntity<String> response = restTemplate.asViewer().getForEntity(GRID_URL, String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
