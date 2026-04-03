@@ -181,7 +181,7 @@ class PropertyManagementApiTest {
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
             path = "/api/external/property-management/00000000-0000-0000-0000-000000000001",
-            requiredAuthority = DefaultAuthority.PROPERTY_VALUE_MUTATE,
+            requiredAuthority = DefaultAuthority.CONFIGURATION_PROPERTY_VALUE_MUTATE,
             jsonBody =
                     // language=json
                     """

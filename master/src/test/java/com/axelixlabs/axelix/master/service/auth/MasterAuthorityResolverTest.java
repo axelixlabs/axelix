@@ -87,7 +87,7 @@ public class MasterAuthorityResolverTest {
 
                 // PROPERTY_VALUE_MUTATE
                 Arguments.of(
-                        "/api/external/property-management/i", HttpMethod.POST, DefaultAuthority.PROPERTY_VALUE_MUTATE),
+                        "/api/external/property-management/i", HttpMethod.POST, DefaultAuthority.CONFIGURATION_PROPERTY_VALUE_MUTATE),
 
                 // SCHEDULED_TASKS_MODIFY
                 Arguments.of(

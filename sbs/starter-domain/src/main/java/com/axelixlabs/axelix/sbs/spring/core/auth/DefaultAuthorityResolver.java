@@ -51,7 +51,7 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
         map.put(ActuatorEndpoints.GET_CONFIG_PROPS, DefaultAuthority.CONFIG_PROPS_VALUES_READ);
 
         // PROPERTY_VALUE_MUTATE
-        map.put(ActuatorEndpoints.PROPERTY_MANAGEMENT, DefaultAuthority.PROPERTY_VALUE_MUTATE);
+        map.put(ActuatorEndpoints.PROPERTY_MANAGEMENT, DefaultAuthority.CONFIGURATION_PROPERTY_VALUE_MUTATE);
 
         // SCHEDULED_TASKS_MODIFY
         map.put(ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);

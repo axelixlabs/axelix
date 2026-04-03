@@ -30,6 +30,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 
 /**
  * Implementation of {@link AuthorityResolver} that is supposed to handle master endpoints.
@@ -59,7 +60,7 @@ public class MasterAuthorityResolver implements AuthorityResolver {
         put(ApiPaths.GcLogFileApi.TRIGGER_GC, HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR);
 
         // @ConfigurationProperties value mutation
-        put(ApiPaths.PropertyManagementApi.INSTANCE_ID, HttpMethod.POST, DefaultAuthority.PROPERTY_VALUE_MUTATE);
+        put(ApiPaths.PropertyManagementApi.INSTANCE_ID, HttpMethod.POST, DefaultAuthority.CONFIGURATION_PROPERTY_VALUE_MUTATE);
 
         // ScheduledTasks
         put(ApiPaths.ScheduledTasksApi.DISABLE_TASK, HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
@@ -74,6 +75,10 @@ public class MasterAuthorityResolver implements AuthorityResolver {
 
     @Override
     public Optional<Authority> resolve(String path, HttpMethod httpMethod) {
+
+        if (path.startsWith(WebAutoConfiguration.EXTERNAL_API_PATH)) {
+            path = path.substring(WebAutoConfiguration.EXTERNAL_API_PATH.length());
+        }
 
         PathContainer pathContainer = PathContainer.parsePath(path);
 
