@@ -24,6 +24,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -59,7 +60,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Sergey Cherkasov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-transactions-monitoring"})
+@TestPropertySource(
+        properties = {
+            "management.endpoints.web.exposure.include=axelix-transactions-monitoring",
+            "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1"
+        })
 @Import(TransactionMonitoringEndpointTest.TransactionMonitoringEndpointTestConfiguration.class)
 class TransactionMonitoringEndpointTest {
 
@@ -106,6 +111,20 @@ class TransactionMonitoringEndpointTest {
                 .isNumber();
         assertThatJson(responseBody)
                 .node("entrypoints[0].executions[0].startTimestampMs")
+                .isNumber();
+
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries")
+                .isArray()
+                .isNotEmpty();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].sql")
+                .isString();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].startTimestampMs")
+                .isNumber();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].endTimestampMs")
                 .isNumber();
 
         assertThatJson(responseBody).node("entrypoints[0].executionStats").isObject();
@@ -186,6 +205,7 @@ class TransactionMonitoringEndpointTest {
     }
 
     @Entity
+    @Table(name = "owner_endpoint_test")
     static class Owner {
 
         @Id
@@ -207,7 +227,13 @@ class TransactionMonitoringEndpointTest {
 
         @Transactional
         default Owner findByLastName(String lastName) {
-            return new Owner();
+            try {
+                this.save(new Owner());
+                Thread.sleep(100);
+                return new Owner();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Transactional(propagation = Propagation.SUPPORTS)

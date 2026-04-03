@@ -112,6 +112,8 @@ class TransactionMonitoringAutoConfigurationTest {
                             .isExactlyInstanceOf(CustomTransactionMonitoringEndpoint.class);
                     assertThat(context.getBean(TransactionMonitoringBeanPostProcessor.class))
                             .isExactlyInstanceOf(CustomTransactionMonitoringBeanPostProcessor.class);
+                    assertThat(context.getBean(ProxyingDataSourceBeanPostProcessor.class))
+                            .isExactlyInstanceOf(CustomProxyingDataSourceBeanPostProcessor.class);
                 });
     }
 
@@ -144,6 +146,12 @@ class TransactionMonitoringAutoConfigurationTest {
         public TransactionMonitoringBeanPostProcessor transactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
             return new CustomTransactionMonitoringBeanPostProcessor(transactionStatsCollector, queriesCollector);
+        }
+
+        @Bean
+        public ProxyingDataSourceBeanPostProcessor transactionMonitoringDataSourceBeanPostProcessor(
+                QueriesRecorder queriesCollector) {
+            return new CustomProxyingDataSourceBeanPostProcessor(queriesCollector);
         }
     }
 
@@ -187,6 +195,12 @@ class TransactionMonitoringAutoConfigurationTest {
         public CustomTransactionMonitoringBeanPostProcessor(
                 TransactionStatsCollector transactionStatsCollector, QueriesRecorder queriesCollector) {
             super(transactionStatsCollector, queriesCollector);
+        }
+    }
+
+    static class CustomProxyingDataSourceBeanPostProcessor extends ProxyingDataSourceBeanPostProcessor {
+        public CustomProxyingDataSourceBeanPostProcessor(QueriesRecorder queriesCollector) {
+            super(queriesCollector);
         }
     }
 }

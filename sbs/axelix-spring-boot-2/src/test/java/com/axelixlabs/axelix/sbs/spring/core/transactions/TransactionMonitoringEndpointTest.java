@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -106,6 +107,20 @@ class TransactionMonitoringEndpointTest {
                 .isNumber();
         assertThatJson(responseBody)
                 .node("entrypoints[0].executions[0].startTimestampMs")
+                .isNumber();
+
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries")
+                .isArray()
+                .isNotEmpty();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].sql")
+                .isString();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].startTimestampMs")
+                .isNumber();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].endTimestampMs")
                 .isNumber();
 
         assertThatJson(responseBody).node("entrypoints[0].executionStats").isObject();
@@ -205,9 +220,17 @@ class TransactionMonitoringEndpointTest {
 
     interface OwnerRepository extends JpaRepository<Owner, Long> {
 
+        Optional<Owner> findFirstByLastName(String lastName);
+
         @Transactional
         default Owner findByLastName(String lastName) {
-            return new Owner();
+            try {
+                this.findFirstByLastName(lastName);
+                Thread.sleep(100);
+                return new Owner();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Transactional(propagation = Propagation.SUPPORTS)

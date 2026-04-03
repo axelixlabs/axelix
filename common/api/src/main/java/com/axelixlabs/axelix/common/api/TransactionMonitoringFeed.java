@@ -20,6 +20,9 @@ package com.axelixlabs.axelix.common.api;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * The feed of transactions inside a given application.
  *
@@ -37,7 +40,8 @@ public final class TransactionMonitoringFeed {
      *
      * @param entrypoints the list of transactional entrypoints.
      */
-    public TransactionMonitoringFeed(List<TransactionalEntrypoint> entrypoints) {
+    @JsonCreator
+    public TransactionMonitoringFeed(@JsonProperty("entrypoints") List<TransactionalEntrypoint> entrypoints) {
         this.entrypoints = entrypoints;
     }
 
@@ -85,11 +89,12 @@ public final class TransactionMonitoringFeed {
          * @param executions     currently recorded executions of this transaction entrypoint.
          * @param executionStats the execution statistics.
          */
+        @JsonCreator
         public TransactionalEntrypoint(
-                String className,
-                String methodName,
-                List<TransactionExecution> executions,
-                ExecutionStats executionStats) {
+                @JsonProperty("className") String className,
+                @JsonProperty("methodName") String methodName,
+                @JsonProperty("executions") List<TransactionExecution> executions,
+                @JsonProperty("executionStats") ExecutionStats executionStats) {
             this.className = className;
             this.methodName = methodName;
             this.executions = executions;
@@ -165,7 +170,11 @@ public final class TransactionMonitoringFeed {
          * @param endTimestampMs     unix timestamp (milliseconds from epoch) when transaction finished
          * @param queries            the list of queries executed during a particular transaction
          */
-        public TransactionExecution(long startTimestampMs, long endTimestampMs, List<Query> queries) {
+        @JsonCreator
+        public TransactionExecution(
+                @JsonProperty("startTimestampMs") long startTimestampMs,
+                @JsonProperty("endTimestampMs") long endTimestampMs,
+                @JsonProperty("queries") List<Query> queries) {
             this.startTimestampMs = startTimestampMs;
             this.endTimestampMs = endTimestampMs;
             this.queries = queries;
@@ -223,7 +232,11 @@ public final class TransactionMonitoringFeed {
          * @param startTimestampMs  unix timestamp (milliseconds from epoch) when the query started
          * @param endTimestampMs    unix timestamp (milliseconds since epoch) when the query finished
          */
-        public Query(String sql, Long startTimestampMs, Long endTimestampMs) {
+        @JsonCreator
+        public Query(
+                @JsonProperty("sql") String sql,
+                @JsonProperty("startTimestampMs") Long startTimestampMs,
+                @JsonProperty("endTimestampMs") Long endTimestampMs) {
             this.sql = sql;
             this.startTimestampMs = startTimestampMs;
             this.endTimestampMs = endTimestampMs;
@@ -282,7 +295,11 @@ public final class TransactionMonitoringFeed {
          * @param maxDurationMs     maximum execution duration in milliseconds
          * @param medianDurationMs  median execution duration in milliseconds
          */
-        public ExecutionStats(long averageDurationMs, long maxDurationMs, long medianDurationMs) {
+        @JsonCreator
+        public ExecutionStats(
+                @JsonProperty("averageDurationMs") long averageDurationMs,
+                @JsonProperty("maxDurationMs") long maxDurationMs,
+                @JsonProperty("medianDurationMs") long medianDurationMs) {
             this.averageDurationMs = averageDurationMs;
             this.maxDurationMs = maxDurationMs;
             this.medianDurationMs = medianDurationMs;
