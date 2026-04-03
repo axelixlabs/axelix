@@ -3,5 +3,5 @@ com.axelixlabs.axelix.master.autoconfiguration.probers.EndpointProbersAutoConfig
 com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.MemoryTransformerAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.AxelixAutoConfiguration
-com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfigurationConfiguration
+com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration
 com.axelixlabs.axelix.master.autoconfiguration.PersistenceAutoConfiguration

@@ -36,7 +36,10 @@ import com.axelixlabs.axelix.master.filter.SpaStaticResourcesServingFilter;
  * @author Mikhail Polivakha
  */
 @AutoConfiguration
-public class WebAutoConfigurationConfiguration {
+public class WebAutoConfiguration {
+
+    public static final String EXTERNAL_API_PATH = "/api/external";
+    public static final String INTERNAL_API_PATH = "/api/internal";
 
     @Bean
     @ConfigurationProperties(prefix = "axelix.master.web.static-resources")
@@ -62,9 +65,9 @@ public class WebAutoConfigurationConfiguration {
 
             // prefixes for various types of API
             configurer.addPathPrefix(
-                    "/api/external", HandlerTypePredicate.forAnnotation(ExternalApiRestController.class));
+                    EXTERNAL_API_PATH, HandlerTypePredicate.forAnnotation(ExternalApiRestController.class));
             configurer.addPathPrefix(
-                    "/api/internal", HandlerTypePredicate.forAnnotation(InternalApiRestController.class));
+                    INTERNAL_API_PATH, HandlerTypePredicate.forAnnotation(InternalApiRestController.class));
         }
     }
 }
