@@ -31,8 +31,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,13 +39,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
@@ -351,30 +350,11 @@ public class CachesReadApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnCachesResponse(InvalidAuthScenario scenario) {
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/api/external/caches/00000000-0000-0000-0000-000000000001")
+    void negativeAuthTests_OnCachesResponse() {}
 
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .getForEntity("/api/external/caches/{instanceId}", Void.class, activeInstanceId);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnCacheProfileResponse(InvalidAuthScenario scenario) {
-        String cacheName = "cities";
-
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .getForEntity(
-                        "/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
-                        Void.class,
-                        activeInstanceId,
-                        cacheName);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(
+            method = HttpMethod.GET,
+            path = "/api/external/caches/00000000-0000-0000-0000-000000000001/cache/cities?cacheManager=cacheManager")
+    void negativeAuthTests_OnCacheProfileResponse() {}
 }

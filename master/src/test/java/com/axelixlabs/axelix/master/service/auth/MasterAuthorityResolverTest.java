@@ -27,7 +27,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
-import com.axelixlabs.axelix.master.api.external.ApiPaths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,46 +60,54 @@ public class MasterAuthorityResolverTest {
 
     private static Stream<Arguments> mappedEndpoints() {
         return Stream.of(
-                // CACHES_TOGGLE
-                Arguments.of(ApiPaths.CachesApi.DISABLE_CACHE, HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of(ApiPaths.CachesApi.ENABLE_CACHE, HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of(ApiPaths.CachesApi.DISABLE_CACHE_MANAGER, HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
-                Arguments.of(ApiPaths.CachesApi.ENABLE_CACHE_MANAGER, HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                // CACHES_TOGGLE (servlet paths include /api/external; patterns are registered without it)
+                Arguments.of("/api/external/caches/i/cm/cn/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/api/external/caches/i/cm/cn/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/api/external/caches/i/cm/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/api/external/caches/i/cm/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
+                Arguments.of("/caches/i/cm/cn/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
 
                 // CACHES_CLEAR
-                Arguments.of(ApiPaths.CachesApi.CACHE_NAME, HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
-                Arguments.of(ApiPaths.CachesApi.INSTANCE_ID, HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
+                Arguments.of("/api/external/caches/i/cache/cn", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
+                Arguments.of("/api/external/caches/i", HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR),
 
                 // GARBAGE_COLLECTOR
                 Arguments.of(
-                        ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING, HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
+                        "/api/external/garbage-collector/logs/i/disable",
+                        HttpMethod.POST,
+                        DefaultAuthority.GARBAGE_COLLECTOR),
                 Arguments.of(
-                        ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING, HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
-                Arguments.of(ApiPaths.GcLogFileApi.TRIGGER_GC, HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR),
+                        "/api/external/garbage-collector/logs/i/enable",
+                        HttpMethod.POST,
+                        DefaultAuthority.GARBAGE_COLLECTOR),
+                Arguments.of(
+                        "/api/external/garbage-collector/i/trigger",
+                        HttpMethod.POST,
+                        DefaultAuthority.GARBAGE_COLLECTOR),
 
                 // PROPERTY_VALUE_MUTATE
                 Arguments.of(
-                        ApiPaths.PropertyManagementApi.INSTANCE_ID,
-                        HttpMethod.POST,
-                        DefaultAuthority.PROPERTY_VALUE_MUTATE),
+                        "/api/external/property-management/i", HttpMethod.POST, DefaultAuthority.PROPERTY_VALUE_MUTATE),
 
                 // SCHEDULED_TASKS_MODIFY
                 Arguments.of(
-                        ApiPaths.ScheduledTasksApi.DISABLE_TASK,
+                        "/api/external/scheduled-tasks/i/disable",
                         HttpMethod.POST,
                         DefaultAuthority.SCHEDULED_TASKS_MODIFY),
                 Arguments.of(
-                        ApiPaths.ScheduledTasksApi.ENABLE_TASK,
+                        "/api/external/scheduled-tasks/i/enable",
                         HttpMethod.POST,
                         DefaultAuthority.SCHEDULED_TASKS_MODIFY),
                 Arguments.of(
-                        ApiPaths.ScheduledTasksApi.EXECUTE, HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY),
-                Arguments.of(
-                        ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION,
+                        "/api/external/scheduled-tasks/i/execute",
                         HttpMethod.POST,
                         DefaultAuthority.SCHEDULED_TASKS_MODIFY),
                 Arguments.of(
-                        ApiPaths.ScheduledTasksApi.MODIFY_INTERVAL,
+                        "/api/external/scheduled-tasks/i/modify/cron-expression",
+                        HttpMethod.POST,
+                        DefaultAuthority.SCHEDULED_TASKS_MODIFY),
+                Arguments.of(
+                        "/api/external/scheduled-tasks/i/modify/interval",
                         HttpMethod.POST,
                         DefaultAuthority.SCHEDULED_TASKS_MODIFY));
     }
@@ -108,12 +115,12 @@ public class MasterAuthorityResolverTest {
     private static Stream<Arguments> unmappedEndpoints() {
         return Stream.of(
                 // wrong method for known path
-                Arguments.of(ApiPaths.CachesApi.DISABLE_CACHE, HttpMethod.GET),
-                Arguments.of(ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION, HttpMethod.GET),
+                Arguments.of("/api/external/caches/i/cm/cn/disable", HttpMethod.GET),
+                Arguments.of("/api/external/scheduled-tasks/i/modify/cron-expression", HttpMethod.GET),
 
                 // known but public endpoints
-                Arguments.of(ApiPaths.CachesApi.INSTANCE_ID, HttpMethod.GET),
-                Arguments.of(ApiPaths.GcLogFileApi.STATUS_GC_LOGGING, HttpMethod.GET),
+                Arguments.of("/api/external/caches/i", HttpMethod.GET),
+                Arguments.of("/api/external/garbage-collector/logs/i/status", HttpMethod.GET),
 
                 // unknown endpoint
                 Arguments.of("/unknown/path", HttpMethod.POST));

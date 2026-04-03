@@ -17,9 +17,13 @@
  */
 package com.axelixlabs.axelix.master.service.auth;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
@@ -34,77 +38,58 @@ import com.axelixlabs.axelix.master.api.external.ApiPaths;
  */
 public class MasterAuthorityResolver implements AuthorityResolver {
 
-    private static final Map<ApiEndpointKey, Authority> AUTHORITIES_MAPPINGS;
+    private static final PathPatternParser PATH_PATTERN_PARSER;
+    private static final List<RegisteredPattern> REGISTERED_PATTERNS;
 
     static {
-        // It is okay to use HashMap, since map is not modified under contention
-        AUTHORITIES_MAPPINGS = new HashMap<>();
+        PATH_PATTERN_PARSER = new PathPatternParser();
+        REGISTERED_PATTERNS = new ArrayList<>();
 
         // Caches
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.CachesApi.DISABLE_CACHE, HttpMethod.POST), DefaultAuthority.CACHES_TOGGLE);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.CachesApi.ENABLE_CACHE, HttpMethod.POST), DefaultAuthority.CACHES_TOGGLE);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.CachesApi.DISABLE_CACHE_MANAGER, HttpMethod.POST),
-                DefaultAuthority.CACHES_TOGGLE);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.CachesApi.ENABLE_CACHE_MANAGER, HttpMethod.POST),
-                DefaultAuthority.CACHES_TOGGLE);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.CachesApi.CACHE_NAME, HttpMethod.DELETE), DefaultAuthority.CACHES_CLEAR);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.CachesApi.INSTANCE_ID, HttpMethod.DELETE), DefaultAuthority.CACHES_CLEAR);
+        put(ApiPaths.CachesApi.DISABLE_CACHE, HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE);
+        put(ApiPaths.CachesApi.ENABLE_CACHE, HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE);
+        put(ApiPaths.CachesApi.DISABLE_CACHE_MANAGER, HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE);
+        put(ApiPaths.CachesApi.ENABLE_CACHE_MANAGER, HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE);
+        put(ApiPaths.CachesApi.CACHE_NAME, HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR);
+        put(ApiPaths.CachesApi.INSTANCE_ID, HttpMethod.DELETE, DefaultAuthority.CACHES_CLEAR);
 
         // Garbage Collector
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING, HttpMethod.POST),
-                DefaultAuthority.GARBAGE_COLLECTOR);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING, HttpMethod.POST),
-                DefaultAuthority.GARBAGE_COLLECTOR);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.GcLogFileApi.TRIGGER_GC, HttpMethod.POST),
-                DefaultAuthority.GARBAGE_COLLECTOR);
+        put(ApiPaths.GcLogFileApi.DISABLE_GC_LOGGING, HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR);
+        put(ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING, HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR);
+        put(ApiPaths.GcLogFileApi.TRIGGER_GC, HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR);
 
         // @ConfigurationProperties value mutation
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.PropertyManagementApi.INSTANCE_ID, HttpMethod.POST),
-                DefaultAuthority.PROPERTY_VALUE_MUTATE);
+        put(ApiPaths.PropertyManagementApi.INSTANCE_ID, HttpMethod.POST, DefaultAuthority.PROPERTY_VALUE_MUTATE);
 
         // ScheduledTasks
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.ScheduledTasksApi.DISABLE_TASK, HttpMethod.POST),
+        put(ApiPaths.ScheduledTasksApi.DISABLE_TASK, HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
+        put(ApiPaths.ScheduledTasksApi.ENABLE_TASK, HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
+        put(ApiPaths.ScheduledTasksApi.EXECUTE, HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
+        put(
+                ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION,
+                HttpMethod.POST,
                 DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.ScheduledTasksApi.ENABLE_TASK, HttpMethod.POST),
-                DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.ScheduledTasksApi.EXECUTE, HttpMethod.POST),
-                DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.ScheduledTasksApi.MODIFY_CRON_EXPRESSION, HttpMethod.POST),
-                DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-        AUTHORITIES_MAPPINGS.put(
-                ApiEndpointKey.of(ApiPaths.ScheduledTasksApi.MODIFY_INTERVAL, HttpMethod.POST),
-                DefaultAuthority.SCHEDULED_TASKS_MODIFY);
+        put(ApiPaths.ScheduledTasksApi.MODIFY_INTERVAL, HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
     }
 
     @Override
     public Optional<Authority> resolve(String path, HttpMethod httpMethod) {
-        return Optional.ofNullable(AUTHORITIES_MAPPINGS.get(ApiEndpointKey.of(path, httpMethod)));
-    }
 
-    /**
-     * The unique key by which, we assume, each external endpoint on the master side can be uniquely identified.
-     *
-     * @param path the servlet path to the endpoint (e.g. /beans/feed/{instanceId})
-     * @param method the HTTP method that endpoint is supposed to process (POST, GET etc.)
-     */
-    record ApiEndpointKey(String path, HttpMethod method) {
+        PathContainer pathContainer = PathContainer.parsePath(path);
 
-        public static ApiEndpointKey of(String path, HttpMethod method) {
-            return new ApiEndpointKey(path, method);
+        for (RegisteredPattern registered : REGISTERED_PATTERNS) {
+            if (registered.method == httpMethod && registered.pathPattern.matches(pathContainer)) {
+                return Optional.of(registered.authority);
+            }
         }
+
+        return Optional.empty();
     }
+
+    private static void put(String apiPathPattern, HttpMethod method, Authority authority) {
+        PathPattern pathPattern = PATH_PATTERN_PARSER.parse(apiPathPattern);
+        REGISTERED_PATTERNS.add(new RegisteredPattern(method, pathPattern, authority));
+    }
+
+    private record RegisteredPattern(HttpMethod method, PathPattern pathPattern, Authority authority) {}
 }

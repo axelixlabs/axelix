@@ -35,7 +35,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +43,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.ThreadDumpApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
@@ -388,49 +388,21 @@ class ThreadDumpApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .getForEntity("/api/external/thread-dump/{instanceId}", Void.class, activeInstanceId);
+    @ProtectedEndpointTests(
+            method = HttpMethod.GET,
+            path = "/api/external/thread-dump/00000000-0000-0000-0000-000000000001")
+    void negativeAuthTests_OnThreadDump() {}
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path = "/api/external/thread-dump/00000000-0000-0000-0000-000000000001/thread-contention-monitoring/enable")
+    void negativeAuthTests_OnEnableContentionMonitoring() {}
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnEnableContentionMonitoring(InvalidAuthScenario scenario) {
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity(
-                        "/api/external/thread-dump/{instanceId}/thread-contention-monitoring/enable",
-                        null,
-                        Void.class,
-                        Map.of("instanceId", activeInstanceId));
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnDisableContentionMonitoring(InvalidAuthScenario scenario) {
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity(
-                        "/api/external/thread-dump/{instanceId}/thread-contention-monitoring/disable",
-                        null,
-                        Void.class,
-                        Map.of("instanceId", activeInstanceId));
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path =
+                    "/api/external/thread-dump/00000000-0000-0000-0000-000000000001/thread-contention-monitoring/disable")
+    void negativeAuthTests_OnDisableContentionMonitoring() {}
 
     private static Stream<Arguments> managementCachesContentionMonitoring() {
         return Stream.of(Arguments.of("/enable"), Arguments.of("/disable"));
