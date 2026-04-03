@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
@@ -41,7 +40,6 @@ import com.axelixlabs.axelix.master.service.McpToolsService;
         name = "MCP Tools API",
         description = "The endpoints related to rendering MCP tools configured in the master service.")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.McpToolApi.MAIN)
 public class McpToolApi {
 
     private final McpToolsService mcpToolsService;

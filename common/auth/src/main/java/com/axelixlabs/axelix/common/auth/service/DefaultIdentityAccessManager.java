@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.auth;
+package com.axelixlabs.axelix.common.auth.service;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -23,27 +23,27 @@ import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.DecodedUser;
+import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
- * Default {@link SecurityManager}. First it authenticates the request, and then authorizes it.
+ * Default {@link IdentityAccessManager}. Handles the entire IAM.
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public class DefaultSecurityManager implements SecurityManager {
+public class DefaultIdentityAccessManager implements IdentityAccessManager {
 
     private final JwtDecoderService jwtDecoderService;
     private final AuthorityResolver authorityResolver;
     private final Authorizer authorizer;
 
-    public DefaultSecurityManager(
+    public DefaultIdentityAccessManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
         this.jwtDecoderService = jwtDecoderService;
         this.authorityResolver = authorityResolver;
@@ -51,12 +51,7 @@ public class DefaultSecurityManager implements SecurityManager {
     }
 
     @Override
-    public boolean shouldAuthorize(String requestPath) {
-        return requestPath.startsWith("/actuator/axelix-");
-    }
-
-    @Override
-    public void authorizeInternal(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
+    public void verifyAccess(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
             throws AuthorizationException, JwtProcessingException {
 
         if (token == null || token.isEmpty()) {

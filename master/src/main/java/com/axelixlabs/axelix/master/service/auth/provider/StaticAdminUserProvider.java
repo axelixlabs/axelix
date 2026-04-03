@@ -34,8 +34,6 @@ import com.axelixlabs.axelix.master.service.auth.UserLoginService;
  */
 public class StaticAdminUserProvider implements UserProvider {
 
-    private static final String ADMIN_ROLE = "ADMIN";
-
     private final StaticAdminCredentialsProperties staticCredentialsConfig;
 
     public StaticAdminUserProvider(StaticAdminCredentialsProperties staticCredentialsConfig) {

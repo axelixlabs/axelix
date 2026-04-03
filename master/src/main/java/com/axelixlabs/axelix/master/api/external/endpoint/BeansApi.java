@@ -26,7 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
@@ -45,7 +44,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  */
 @Tag(name = "Beans API", description = "The beans endpoint provides information about the application’s beans.")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.BeansApi.MAIN)
 public class BeansApi {
 
     private final EndpointInvoker endpointInvoker;

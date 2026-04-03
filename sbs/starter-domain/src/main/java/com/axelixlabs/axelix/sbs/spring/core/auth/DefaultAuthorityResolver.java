@@ -22,8 +22,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jspecify.annotations.NullMarked;
+
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
@@ -33,6 +36,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  *
  * @author Sergey Cherkasov
  */
+@NullMarked
 public class DefaultAuthorityResolver implements AuthorityResolver {
 
     private static final Map<ActuatorEndpoint, Authority> PATH_MAPPINGS;
@@ -55,9 +59,6 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
         map.put(ActuatorEndpoints.EXECUTE_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
         map.put(ActuatorEndpoints.ENABLE_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
         map.put(ActuatorEndpoints.DISABLE_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
-
-        // CONDITIONS_READ
-        map.put(ActuatorEndpoints.GET_CONDITIONS, DefaultAuthority.CONDITIONS_READ);
 
         // CACHES_CLEAR
         map.put(ActuatorEndpoints.CLEAR_ALL_CACHES, DefaultAuthority.CACHES_CLEAR);

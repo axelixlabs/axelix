@@ -29,9 +29,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
-import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
+import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
@@ -83,20 +83,21 @@ public class TestRestTemplateBuilder {
                 jwtProperties.getAlgorithm(), jwtProperties.getSigningKey(), Duration.ZERO);
     }
 
-    // Just a convenient method to communicate to the reader the intent.
-    public TestRestTemplate withoutAuthorities() {
-        return withAuthorities();
-    }
-
-    public TestRestTemplate withAuthorities(Authority... authorities) {
-        String token = generateToken(authorities);
+    public TestRestTemplate asViewer() {
+        String token = generateToken(new Role[] {DefaultRole.VIEWER});
 
         return buildWithToken(token);
     }
 
-    // Bad token auth scenarios start
-    TestRestTemplate withExpiredToken(Authority... authorities) {
-        String expiredToken = generateExpiredToken(authorities);
+    public TestRestTemplate asEditor() {
+        String token = generateToken(new Role[] {DefaultRole.EDITOR});
+
+        return buildWithToken(token);
+    }
+
+    // START: Bad token auth scenarios
+    TestRestTemplate withExpiredToken() {
+        String expiredToken = generateExpiredToken();
 
         return buildWithToken(expiredToken);
     }
@@ -110,7 +111,7 @@ public class TestRestTemplateBuilder {
     TestRestTemplate withoutAuthCookie() {
         return new TestRestTemplate(new RestTemplateBuilder().rootUri(HOST + testTomcatServerPort));
     }
-    // Bad token auth scenarios end
+    // END: Bad token auth scenarios
 
     private TestRestTemplate buildWithToken(String expiredToken) {
         return new TestRestTemplate(new RestTemplateBuilder()
@@ -118,17 +119,12 @@ public class TestRestTemplateBuilder {
                 .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(cookieProperties.getName(), expiredToken)));
     }
 
-    private String generateToken(Authority[] authorities) {
-        return defaultJwtEncoderService.generateToken(new DefaultUser(
-                USERNAME,
-                PASSWORD,
-                Set.of(new DefaultRole(ROLE_NAME, Arrays.stream(authorities).collect(Collectors.toSet()), Set.of()))));
+    private String generateToken(Role[] roles) {
+        return defaultJwtEncoderService.generateToken(
+                new DefaultUser(USERNAME, PASSWORD, Arrays.stream(roles).collect(Collectors.toSet())));
     }
 
-    private String generateExpiredToken(Authority[] authorities) {
-        return expiredJwtEncoderService.generateToken(new DefaultUser(
-                USERNAME,
-                PASSWORD,
-                Set.of(new DefaultRole(ROLE_NAME, Arrays.stream(authorities).collect(Collectors.toSet()), Set.of()))));
+    private String generateExpiredToken() {
+        return expiredJwtEncoderService.generateToken(new DefaultUser(USERNAME, PASSWORD, Set.of()));
     }
 }

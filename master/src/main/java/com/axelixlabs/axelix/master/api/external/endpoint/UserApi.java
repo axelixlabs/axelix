@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,12 +28,10 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
-import com.axelixlabs.axelix.master.api.external.response.UserProfileResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.UserLoginService;
@@ -48,7 +44,6 @@ import com.axelixlabs.axelix.master.service.auth.UserLoginService;
  */
 @Tag(name = "API for working with Users", description = "The endpoints for user login and authentication")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.UsersApi.MAIN)
 @ConditionalOnProperty(prefix = "axelix.master.auth.options.static-admin", name = "enabled", havingValue = "true")
 public class UserApi {
 
@@ -109,14 +104,5 @@ public class UserApi {
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
-    }
-
-    /**
-     * Extracts the profile from the HTTP Request.
-     *
-     * @return the profile of the given user.
-     */
-    public UserProfileResponse getProfile(HttpServletRequest request) {
-        throw new UnsupportedOperationException();
     }
 }

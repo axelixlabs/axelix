@@ -42,11 +42,6 @@ public enum DefaultAuthority implements Authority {
     SCHEDULED_TASKS_MODIFY,
 
     /**
-     * Grants authority to view auto-configuration conditions.
-     */
-    CONDITIONS_READ,
-
-    /**
      * Grants the right to clear caches.
      * <p>Allows clearing individual caches, cache managers, and all app cache at runtime.</p>
      */

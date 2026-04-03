@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth;
+package com.axelixlabs.axelix.common.auth.service;
 
 import java.util.List;
 import java.util.Map;
@@ -33,8 +33,8 @@ import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DecodedUser;
+import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.GlobalAuthority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.TokenClaim;
@@ -119,9 +119,9 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
     }
 
     @Nullable
-    private GlobalAuthority safeAuthoritiesFromString(String name) {
+    private DefaultAuthority safeAuthoritiesFromString(String name) {
         try {
-            return GlobalAuthority.valueOf(name);
+            return DefaultAuthority.valueOf(name);
         } catch (IllegalArgumentException ignored) {
             return null;
         }

@@ -295,7 +295,7 @@ class ThreadDumpApiTest {
     @Test
     void shouldReturnJSONThreadDumpFeed() {
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/thread-dump/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -312,7 +312,7 @@ class ThreadDumpApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
@@ -324,7 +324,7 @@ class ThreadDumpApiTest {
         String instanceId = UUID.randomUUID().toString();
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
@@ -336,7 +336,7 @@ class ThreadDumpApiTest {
     void shouldEnableOrDisableContentionMonitoring(String contentionMonitoringStatus) throws InterruptedException {
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
@@ -356,7 +356,7 @@ class ThreadDumpApiTest {
         registry.register(createInstance(instanceId));
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
@@ -376,7 +376,7 @@ class ThreadDumpApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,

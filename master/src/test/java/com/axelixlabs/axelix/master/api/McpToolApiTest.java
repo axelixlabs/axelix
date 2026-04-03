@@ -159,7 +159,7 @@ public class McpToolApiTest {
     void shouldReturnMcpToolsFeed() {
         // when.
         ResponseEntity<String> response =
-                restTemplate.withoutAuthorities().getForEntity("/api/external/mcp/tools-feed", String.class);
+                restTemplate.asViewer().getForEntity("/api/external/mcp/tools-feed", String.class);
 
         // then.
         assertThatJson(response.getBody())

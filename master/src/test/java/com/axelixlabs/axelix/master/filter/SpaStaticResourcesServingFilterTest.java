@@ -55,7 +55,7 @@ class SpaStaticResourcesServingFilterTest {
         String expected =
                 StreamUtils.copyToString(new ClassPathResource(SPA_DIST + "/assets/main.js").getInputStream(), UTF_8);
 
-        TestRestTemplate rest = restTemplateBuilder.withoutAuthorities();
+        TestRestTemplate rest = restTemplateBuilder.asViewer();
         ResponseEntity<String> response = rest.getForEntity("/assets/main.js", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -68,7 +68,7 @@ class SpaStaticResourcesServingFilterTest {
         String expected =
                 StreamUtils.copyToString(new ClassPathResource(SPA_DIST + "/assets/style.css").getInputStream(), UTF_8);
 
-        TestRestTemplate rest = restTemplateBuilder.withoutAuthorities();
+        TestRestTemplate rest = restTemplateBuilder.asViewer();
         ResponseEntity<String> response = rest.getForEntity("/assets/style.css", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -82,7 +82,7 @@ class SpaStaticResourcesServingFilterTest {
         String expected =
                 StreamUtils.copyToString(new ClassPathResource(SPA_DIST + "/index.html").getInputStream(), UTF_8);
 
-        TestRestTemplate rest = restTemplateBuilder.withoutAuthorities();
+        TestRestTemplate rest = restTemplateBuilder.asViewer();
         ResponseEntity<String> response = rest.getForEntity(contextPath, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

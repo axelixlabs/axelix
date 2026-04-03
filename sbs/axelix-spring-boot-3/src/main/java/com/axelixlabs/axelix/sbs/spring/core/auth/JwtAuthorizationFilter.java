@@ -31,9 +31,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
+import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
@@ -49,10 +51,15 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 @SuppressWarnings("NullAway") // TODO: Pending issue GH-42 – introduce exception translator and refactor this filter
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final SecurityManager securityManager;
+    private final IdentityAccessManager identityAccessManager;
 
-    public JwtAuthorizationFilter(SecurityManager securityManager) {
-        this.securityManager = securityManager;
+    public JwtAuthorizationFilter(IdentityAccessManager identityAccessManager) {
+        this.identityAccessManager = identityAccessManager;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getServletPath().startsWith("/actuator/axelix-");
     }
 
     @Override
@@ -67,7 +74,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             String requestPath = request.getRequestURI();
             HttpMethod requestHttpMethod = HttpMethod.valueOf(request.getMethod());
 
-            securityManager.authorize(requestPath, requestHttpMethod, token);
+            identityAccessManager.verifyAccess(requestPath, requestHttpMethod, token);
 
             filterChain.doFilter(request, response);
 

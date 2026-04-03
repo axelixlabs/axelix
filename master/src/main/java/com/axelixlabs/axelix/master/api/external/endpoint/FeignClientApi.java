@@ -26,7 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.integration.FeignIntegration;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
@@ -48,7 +47,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
         description =
                 "The Feign endpoint provides information about the Spring Cloud OpenFeign components of the application.")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.FeignClientApi.MAIN)
 public class FeignClientApi {
 
     private final EndpointInvoker endpointInvoker;
@@ -64,7 +62,7 @@ public class FeignClientApi {
             content =
                     @Content(mediaType = "application/json", schema = @Schema(implementation = FeignIntegration.class)))
     @InstanceIdParameter
-    @GetMapping(path = ApiPaths.DetailsApi.INSTANCE_ID)
+    @GetMapping(path = ApiPaths.FeignClientApi.INSTANCE_ID)
     public ResponseEntity<byte[]> getFeignClientFeed(@PathVariable("instanceId") String instanceId) {
         byte[] body = endpointInvoker.invoke(
                 InstanceId.of(instanceId), ActuatorEndpoints.GET_FEIGN_CLIENT, NoHttpPayload.INSTANCE);

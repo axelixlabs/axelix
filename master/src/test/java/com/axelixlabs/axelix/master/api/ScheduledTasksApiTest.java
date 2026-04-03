@@ -329,7 +329,7 @@ public class ScheduledTasksApiTest {
     void shouldReturnJSONScheduledTasksResponse() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -346,7 +346,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<String> body = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
@@ -365,7 +365,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
@@ -383,7 +383,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<ScheduledTaskCronExpressionValidationResponse> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/validate-cron-expression",
                         requestBody,
@@ -403,7 +403,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<ScheduledTaskCronExpressionValidationResponse> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/validate-cron-expression",
                         requestBody,
@@ -432,7 +432,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
@@ -453,7 +453,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
@@ -472,7 +472,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/execute",
                         requestBody,
@@ -491,7 +491,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
@@ -505,7 +505,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
 
@@ -525,7 +525,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
@@ -546,7 +546,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
@@ -568,7 +568,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
@@ -587,7 +587,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/cron-expression",
                         requestBody,
@@ -609,7 +609,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
@@ -628,7 +628,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
@@ -650,7 +650,7 @@ public class ScheduledTasksApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,
@@ -669,7 +669,7 @@ public class ScheduledTasksApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}/modify/interval",
                         requestBody,

@@ -144,7 +144,7 @@ class ProfileManagementApiTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/profile-management/{instanceId}",
                         defaultEntity(request),
@@ -171,7 +171,7 @@ class ProfileManagementApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/profile-management/{instanceId}",
                         defaultEntity(request),
@@ -189,7 +189,7 @@ class ProfileManagementApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/profile-management/{instanceId}",
                         request,

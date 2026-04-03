@@ -29,6 +29,7 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,9 +64,6 @@ public class DefaultAuthorityResolverTest {
 
                 // CONFIG_PROPS_VALUES_READ
                 Arguments.of("/axelix-configprops", HttpMethod.GET, DefaultAuthority.CONFIG_PROPS_VALUES_READ),
-
-                // CONDITIONS_READ
-                Arguments.of("/axelix-conditions", HttpMethod.GET, DefaultAuthority.CONDITIONS_READ),
 
                 // PROPERTY_VALUE_MUTATE
                 Arguments.of("/axelix-property-management", HttpMethod.POST, DefaultAuthority.PROPERTY_VALUE_MUTATE),

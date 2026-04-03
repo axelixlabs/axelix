@@ -303,7 +303,7 @@ public class DetailsApiTest {
     void shouldReturnJSONDetailsResponse() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/details/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -316,7 +316,7 @@ public class DetailsApiTest {
     void shouldReturnJSONDetailsResponseWithoutPlugin() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/details/{instanceId}", String.class, instanceWithoutPluginId);
 
         // then.
@@ -333,7 +333,7 @@ public class DetailsApiTest {
         // when.
         registry.register(createInstance(instanceId));
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/details/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.
@@ -346,7 +346,7 @@ public class DetailsApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/details/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then.

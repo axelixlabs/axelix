@@ -124,7 +124,7 @@ class PropertyManagementApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/property-management/{instanceId}",
                         defaultEntity(request),
@@ -148,7 +148,7 @@ class PropertyManagementApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/property-management/{instanceId}",
                         defaultEntity(request),
@@ -166,7 +166,7 @@ class PropertyManagementApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .postForEntity(
                         "/api/external/property-management/{instanceId}",
                         request,

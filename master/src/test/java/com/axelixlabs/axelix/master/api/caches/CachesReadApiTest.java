@@ -62,6 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CachesReadApiTest {
+
     private static final String activeInstanceId = UUID.randomUUID().toString();
     private static final String activeInstanceIdEmptyCaches = UUID.randomUUID().toString();
 
@@ -227,7 +228,7 @@ public class CachesReadApiTest {
     void shouldReturnJSONAllCachesResponse() {
         // when
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/caches/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -252,7 +253,7 @@ public class CachesReadApiTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=" + requestedCacheManagerName,
                         String.class,
@@ -276,7 +277,7 @@ public class CachesReadApiTest {
 
         // when
         ResponseEntity<CachesFeed> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/caches/{instanceId}", CachesFeed.class, activeInstanceIdEmptyCaches);
 
         // then.
@@ -292,9 +293,8 @@ public class CachesReadApiTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<?> response = restTemplate
-                .withoutAuthorities()
-                .getForEntity("/api/external/caches/{instanceId}", Void.class, instanceId);
+        ResponseEntity<?> response =
+                restTemplate.asViewer().getForEntity("/api/external/caches/{instanceId}", Void.class, instanceId);
 
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -306,7 +306,7 @@ public class CachesReadApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/caches/{instanceId}", EndpointInvocationException.class, instanceId);
 
         // then
@@ -322,7 +322,7 @@ public class CachesReadApiTest {
 
         // when.
         ResponseEntity<?> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
                         Void.class,
@@ -340,7 +340,7 @@ public class CachesReadApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/caches/{instanceId}/cache/{cacheName}?cacheManager=cacheManager",
                         EndpointInvocationException.class,

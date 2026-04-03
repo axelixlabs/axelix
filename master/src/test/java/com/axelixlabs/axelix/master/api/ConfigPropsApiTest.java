@@ -320,7 +320,7 @@ public class ConfigPropsApiTest {
     void shouldReturnJSONConfigPropsFeed() {
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity("/api/external/configprops/feed/{instanceId}", String.class, activeInstanceId);
 
         // then.
@@ -338,7 +338,7 @@ public class ConfigPropsApiTest {
         registry.register(createInstance(instanceId));
 
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 
@@ -352,7 +352,7 @@ public class ConfigPropsApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/configprops/feed/{instanceId}", EndpointInvocationException.class, instanceId);
 

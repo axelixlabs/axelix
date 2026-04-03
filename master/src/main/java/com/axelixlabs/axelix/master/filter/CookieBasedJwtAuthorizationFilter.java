@@ -30,11 +30,12 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.axelixlabs.axelix.common.auth.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
+import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
  * Auth filter that is based on the {@link org.springframework.http.HttpHeaders#SET_COOKIE Set-Cookie} header.
@@ -45,12 +46,12 @@ import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 @SuppressWarnings("NullAway")
 public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final JwtDecoderService jwtDecoderService;
     private final String authCookieName;
+    private final IdentityAccessManager identityAccessManager;
 
-    public CookieBasedJwtAuthorizationFilter(JwtDecoderService jwtDecoderService, String authCookieName) {
-        this.jwtDecoderService = jwtDecoderService;
+    public CookieBasedJwtAuthorizationFilter(String authCookieName, IdentityAccessManager identityAccessManager) {
         this.authCookieName = authCookieName;
+        this.identityAccessManager = identityAccessManager;
     }
 
     @Override
@@ -83,7 +84,8 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         try {
-            jwtDecoderService.decodeTokenToUser(token);
+            identityAccessManager.verifyAccess(
+                    request.getServletPath(), HttpMethod.valueOf(request.getMethod()), token);
 
             filterChain.doFilter(request, response);
 

@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.common.api.gclog.GcLogEnableRequest;
 import com.axelixlabs.axelix.common.api.gclog.GcLogStatusResponse;
@@ -53,7 +52,6 @@ import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
  */
 @Tag(name = "GC Log File API", description = "API for managing GC logging and retrieving GC logs")
 @ExternalApiRestController
-@RequestMapping(path = ApiPaths.GcLogFileApi.MAIN)
 public class GcLogFileApi {
 
     private final EndpointInvoker endpointInvoker;

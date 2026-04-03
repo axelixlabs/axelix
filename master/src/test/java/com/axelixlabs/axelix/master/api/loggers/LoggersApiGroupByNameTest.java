@@ -142,7 +142,7 @@ public class LoggersApiGroupByNameTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/group/{groupName}",
                         String.class,
@@ -169,7 +169,7 @@ public class LoggersApiGroupByNameTest {
 
         // when.
         ResponseEntity<String> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/group/{groupName}",
                         String.class,
@@ -192,7 +192,7 @@ public class LoggersApiGroupByNameTest {
 
         // when.
         ResponseEntity<?> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/group/{groupName}", Void.class, instanceId, groupName);
 
@@ -207,7 +207,7 @@ public class LoggersApiGroupByNameTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .withoutAuthorities()
+                .asViewer()
                 .getForEntity(
                         "/api/external/loggers/{instanceId}/group/{groupName}",
                         EndpointInvocationException.class,

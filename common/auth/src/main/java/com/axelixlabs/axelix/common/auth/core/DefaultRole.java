@@ -32,10 +32,24 @@ import java.util.stream.Collectors;
  */
 public final class DefaultRole implements Role {
 
-    private static final String ADMIN_ROLE_NAME = "ADMIN";
+    public static final Role ADMIN;
+    public static final Role EDITOR;
+    public static final Role VIEWER;
 
-    public static final Role ADMIN = new DefaultRole(
-            ADMIN_ROLE_NAME, Arrays.stream(GlobalAuthority.values()).collect(Collectors.toSet()));
+    static {
+        VIEWER = new DefaultRole("VIEWER", Set.of());
+
+        EDITOR = new DefaultRole(
+                "EDITOR",
+                Set.of(
+                        DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+                        DefaultAuthority.CACHES_CLEAR,
+                        DefaultAuthority.CACHES_TOGGLE,
+                        DefaultAuthority.GARBAGE_COLLECTOR));
+
+        ADMIN = new DefaultRole(
+                "ADMIN", Arrays.stream(DefaultAuthority.values()).collect(Collectors.toSet()));
+    }
 
     private final String name;
     private final Set<Authority> authorities;

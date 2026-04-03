@@ -206,8 +206,7 @@ public class DashboardApiTest {
     @Test
     void shouldReturnJSONDashboardResponse() {
         // when.
-        ResponseEntity<String> response =
-                restTemplate.withoutAuthorities().getForEntity("/api/external/dashboard", String.class);
+        ResponseEntity<String> response = restTemplate.asViewer().getForEntity("/api/external/dashboard", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -221,8 +220,7 @@ public class DashboardApiTest {
         deRegisterAll();
 
         // when.
-        ResponseEntity<String> response =
-                restTemplate.withoutAuthorities().getForEntity("/api/external/dashboard", String.class);
+        ResponseEntity<String> response = restTemplate.asViewer().getForEntity("/api/external/dashboard", String.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -240,7 +238,7 @@ public class DashboardApiTest {
         try {
             // when.
             ResponseEntity<String> response =
-                    restTemplate.withoutAuthorities().getForEntity("/api/external/dashboard", String.class);
+                    restTemplate.asViewer().getForEntity("/api/external/dashboard", String.class);
 
             // then.
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

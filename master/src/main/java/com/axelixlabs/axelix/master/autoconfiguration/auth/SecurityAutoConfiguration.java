@@ -27,8 +27,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClient;
 
-import com.axelixlabs.axelix.common.auth.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.common.auth.JwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
+import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultIdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.LoginPasswordAuthenticationOption;
@@ -41,6 +46,7 @@ import com.axelixlabs.axelix.master.filter.CookieBasedJwtAuthorizationFilter;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultUserLoginService;
+import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
 import com.axelixlabs.axelix.master.service.auth.UserLoginService;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
@@ -61,6 +67,22 @@ public class SecurityAutoConfiguration {
 
     public static final String OAUTH_PROPERTIES_PREFIX = "axelix.master.auth.options.oauth2";
     public static final String STATIC_ADMIN_PROPERTIES_PREFIX = "axelix.master.auth.options.static-admin";
+
+    @Bean
+    public MasterAuthorityResolver masterAuthorityResolver() {
+        return new MasterAuthorityResolver();
+    }
+
+    @Bean
+    public IdentityAccessManager identityAccessManager(
+            JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
+        return new DefaultIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
+    }
+
+    @Bean
+    public Authorizer authorizer() {
+        return new DefaultAuthorizer();
+    }
 
     /**
      * Autoconfiguration for the JWT-related part.
@@ -106,8 +128,8 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public CookieBasedJwtAuthorizationFilter cookieBasedJwtAuthorizationFilter(
-                JwtDecoderService jwtDecoderService, CookieProperties cookieProperties) {
-            return new CookieBasedJwtAuthorizationFilter(jwtDecoderService, cookieProperties.getName());
+                IdentityAccessManager identityAccessManager, CookieProperties cookieProperties) {
+            return new CookieBasedJwtAuthorizationFilter(cookieProperties.getName(), identityAccessManager);
         }
     }
 
