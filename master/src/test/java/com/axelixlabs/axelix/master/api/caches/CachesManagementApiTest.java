@@ -203,13 +203,13 @@ class CachesManagementApiTest {
             method = HttpMethod.POST,
             path = "/api/external/caches/00000000-0000-0000-0000-000000000001/cacheManager/vets/enable",
             requiredAuthority = DefaultAuthority.CACHES_TOGGLE)
-    void negativeAuthTests_OnEnableCache() {}
+    void negativeAuthTestsOnEnableCache() {}
 
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
             path = "/api/external/caches/00000000-0000-0000-0000-000000000001/cacheManager/vets/disable",
             requiredAuthority = DefaultAuthority.CACHES_TOGGLE)
-    void negativeAuthTests_OnDisableCache() {}
+    void negativeAuthTestsOnDisableCache() {}
 
     private static Stream<Arguments> cacheOperations() {
         return Stream.of("enable", "disable").map(Arguments::of);

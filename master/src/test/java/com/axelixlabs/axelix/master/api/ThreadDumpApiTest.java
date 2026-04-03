@@ -391,18 +391,18 @@ class ThreadDumpApiTest {
     @ProtectedEndpointTests(
             method = HttpMethod.GET,
             path = "/api/external/thread-dump/00000000-0000-0000-0000-000000000001")
-    void negativeAuthTests_OnThreadDump() {}
+    void negativeAuthTestsOnThreadDump() {}
 
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
             path = "/api/external/thread-dump/00000000-0000-0000-0000-000000000001/thread-contention-monitoring/enable")
-    void negativeAuthTests_OnEnableContentionMonitoring() {}
+    void negativeAuthTestsOnEnableContentionMonitoring() {}
 
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
             path =
                     "/api/external/thread-dump/00000000-0000-0000-0000-000000000001/thread-contention-monitoring/disable")
-    void negativeAuthTests_OnDisableContentionMonitoring() {}
+    void negativeAuthTestsOnDisableContentionMonitoring() {}
 
     private static Stream<Arguments> managementCachesContentionMonitoring() {
         return Stream.of(Arguments.of("/enable"), Arguments.of("/disable"));

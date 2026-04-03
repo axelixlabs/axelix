@@ -48,21 +48,21 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class BadAuthorityEndpointInvocationContext implements TestTemplateInvocationContext {
 
-    private final DefaultAuthority authority;
+    private final DefaultAuthority accessAuthority;
 
     /**
-     * @param authority  the authority that is required to access the given endpoint. The assumption is that for
-     *                   any given endpoint there will be just one authority required. Therefore, everything else,
-     *                   any other authority except this one MUST produce 403 from the backend.
+     * @param accessAuthority  the authority that is required to access the given endpoint. The assumption is that for
+     *                         any given endpoint there will be just one authority required. Therefore, everything else,
+     *                         any other authority except this one MUST produce 403 from the backend.
      */
-    public BadAuthorityEndpointInvocationContext(DefaultAuthority authority) {
-        this.authority = authority;
+    public BadAuthorityEndpointInvocationContext(DefaultAuthority accessAuthority) {
+        this.accessAuthority = accessAuthority;
     }
 
     @Override
     public @NonNull List<Extension> getAdditionalExtensions() {
 
-        EnumSet<DefaultAuthority> allTheOtherAuthorities = EnumSet.complementOf(EnumSet.of(authority));
+        EnumSet<DefaultAuthority> allTheOtherAuthorities = EnumSet.complementOf(EnumSet.of(accessAuthority));
 
         return allTheOtherAuthorities.stream()
                 .map(defaultAuthority -> (Extension) new TestInvocationCallback(defaultAuthority))

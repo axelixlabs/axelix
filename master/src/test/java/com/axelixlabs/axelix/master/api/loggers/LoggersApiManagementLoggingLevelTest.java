@@ -297,16 +297,16 @@ public class LoggersApiManagementLoggingLevelTest {
             method = HttpMethod.POST,
             path = "/api/external/loggers/00000000-0000-0000-0000-000000000001/group/groupName",
             jsonBody = LOG_LEVEL_GROUP_AUTH_JSON)
-    void negativeAuthTests_OnGroupName() {}
+    void negativeAuthTestsOnGroupName() {}
 
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
             path = "/api/external/loggers/00000000-0000-0000-0000-000000000001/logger/logger.name",
             jsonBody = LOG_LEVEL_LOGGER_AUTH_JSON)
-    void negativeAuthTests_OnLoggerName() {}
+    void negativeAuthTestsOnLoggerName() {}
 
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
             path = "/api/external/loggers/00000000-0000-0000-0000-000000000001/logger/clear.logger.name/clear")
-    void negativeAuthTests_OnClearLoggingLevelByLoggerName() {}
+    void negativeAuthTestsOnClearLoggingLevelByLoggerName() {}
 }

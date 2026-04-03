@@ -351,10 +351,10 @@ public class CachesReadApiTest {
     }
 
     @ProtectedEndpointTests(method = HttpMethod.GET, path = "/api/external/caches/00000000-0000-0000-0000-000000000001")
-    void negativeAuthTests_OnCachesResponse() {}
+    void negativeAuthTestsOnCachesResponse() {}
 
     @ProtectedEndpointTests(
             method = HttpMethod.GET,
             path = "/api/external/caches/00000000-0000-0000-0000-000000000001/cache/cities?cacheManager=cacheManager")
-    void negativeAuthTests_OnCacheProfileResponse() {}
+    void negativeAuthTestsOnCacheProfileResponse() {}
 }

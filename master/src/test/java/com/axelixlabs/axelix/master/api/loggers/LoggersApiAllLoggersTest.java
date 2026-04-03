@@ -245,5 +245,5 @@ public class LoggersApiAllLoggersTest {
     @ProtectedEndpointTests(
             method = HttpMethod.GET,
             path = "/api/external/loggers/00000000-0000-0000-0000-000000000001")
-    void negativeAuthTests_OnAllLoggers() {}
+    void negativeAuthTestsOnAllLoggers() {}
 }

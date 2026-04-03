@@ -692,21 +692,21 @@ public class ScheduledTasksApiTest {
     @ProtectedEndpointTests(
             method = HttpMethod.GET,
             path = "/api/external/scheduled-tasks/00000000-0000-0000-0000-000000000001")
-    void negativeAuthTests_OnGetAllScheduledTasks() {}
+    void negativeAuthTestsOnGetAllScheduledTasks() {}
 
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
             path = "/api/external/scheduled-tasks/00000000-0000-0000-0000-000000000001/enable",
             requiredAuthority = DefaultAuthority.SCHEDULED_TASKS_MODIFY,
             jsonBody = SCHEDULED_TASK_TOGGLE_AUTH_JSON)
-    void negativeAuthTests_OnEnableSingleScheduledTask() {}
+    void negativeAuthTestsOnEnableSingleScheduledTask() {}
 
     @ProtectedEndpointTests(
             method = HttpMethod.POST,
             path = "/api/external/scheduled-tasks/00000000-0000-0000-0000-000000000001/disable",
             requiredAuthority = DefaultAuthority.SCHEDULED_TASKS_MODIFY,
             jsonBody = SCHEDULED_TASK_TOGGLE_AUTH_JSON)
-    void negativeAuthTests_OnDisableSingleScheduledTask() {}
+    void negativeAuthTestsOnDisableSingleScheduledTask() {}
 
     private static Stream<Arguments> managementScheduledTask() {
         return Stream.of(Arguments.of("/enable"), Arguments.of("/disable"));
