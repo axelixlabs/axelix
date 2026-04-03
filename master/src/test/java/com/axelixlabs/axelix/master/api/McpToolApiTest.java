@@ -18,23 +18,20 @@
 package com.axelixlabs.axelix.master.api;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.McpToolApi;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_EXTRA_ARRAY_ITEMS;
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for {@link McpToolApi}.
@@ -168,14 +165,6 @@ public class McpToolApiTest {
                 .isEqualTo(EXPECTED_MCP_TOOLS_FEED);
     }
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
-        // when.
-        ResponseEntity<Void> response =
-                scenario.getModifier().apply(restTemplate).getForEntity("/api/external/mcp/tools-feed", Void.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/api/external/mcp/tools-feed")
+    void negativeAuthTests() {}
 }

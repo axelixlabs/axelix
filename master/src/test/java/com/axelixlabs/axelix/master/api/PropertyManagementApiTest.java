@@ -31,8 +31,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,6 +40,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.PropertyManagementApi;
 import com.axelixlabs.axelix.master.api.external.request.PropertyUpdatedRequest;
@@ -50,9 +50,9 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
@@ -64,6 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 28.08.2025
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PropertyManagementApiTest {
@@ -124,7 +125,7 @@ class PropertyManagementApiTest {
 
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asViewer()
+                .asEditor()
                 .postForEntity(
                         "/api/external/property-management/{instanceId}",
                         defaultEntity(request),
@@ -148,7 +149,7 @@ class PropertyManagementApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .asViewer()
+                .asEditor()
                 .postForEntity(
                         "/api/external/property-management/{instanceId}",
                         defaultEntity(request),
@@ -166,7 +167,7 @@ class PropertyManagementApiTest {
 
         // when.
         ResponseEntity<EndpointInvocationException> response = restTemplate
-                .asViewer()
+                .asEditor()
                 .postForEntity(
                         "/api/external/property-management/{instanceId}",
                         request,
@@ -177,23 +178,19 @@ class PropertyManagementApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
-        PropertyUpdatedRequest request = new PropertyUpdatedRequest("property.enabled", "false");
-
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity(
-                        "/api/external/property-management/{instanceId}",
-                        defaultEntity(request),
-                        Void.class,
-                        activeInstanceId);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path = "/api/external/property-management/00000000-0000-0000-0000-000000000001",
+            requiredAuthority = DefaultAuthority.CONFIGURATION_PROPERTY_VALUE_MUTATE,
+            jsonBody =
+                    // language=json
+                    """
+                {
+                    "propertyName" : "property.enabled",
+                    "newValue" : "false"
+                }
+                """)
+    void negativeAuthTests() {}
 
     private HttpEntity<PropertyUpdatedRequest> defaultEntity(PropertyUpdatedRequest request) {
         HttpHeaders headers = new HttpHeaders();

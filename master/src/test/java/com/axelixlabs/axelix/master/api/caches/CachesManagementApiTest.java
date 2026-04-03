@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.api.caches;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -42,14 +41,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.caches.CachesManagementApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -198,34 +199,19 @@ class CachesManagementApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @ParameterizedTest
-    @MethodSource("cacheOperationsAndScenarios")
-    void shouldReturnUnauthorized_OnAnyInvalidOperationForCache(String operation, InvalidAuthScenario scenario) {
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity(
-                        "/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + operation,
-                        null,
-                        Void.class,
-                        Map.of(
-                                "instanceId",
-                                activeInstanceId,
-                                "cacheManagerName",
-                                "cacheManager",
-                                "cacheName",
-                                "vets"));
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path = "/api/external/caches/00000000-0000-0000-0000-000000000001/cacheManager/vets/enable",
+            requiredAuthority = DefaultAuthority.CACHES_TOGGLE)
+    void negativeAuthTestsOnEnableCache() {}
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path = "/api/external/caches/00000000-0000-0000-0000-000000000001/cacheManager/vets/disable",
+            requiredAuthority = DefaultAuthority.CACHES_TOGGLE)
+    void negativeAuthTestsOnDisableCache() {}
 
     private static Stream<Arguments> cacheOperations() {
         return Stream.of("enable", "disable").map(Arguments::of);
-    }
-
-    private static Stream<Arguments> cacheOperationsAndScenarios() {
-        return Stream.of("enable", "disable")
-                .flatMap(s -> Arrays.stream(InvalidAuthScenario.values()).map(it -> Arguments.of(s, it)));
     }
 }

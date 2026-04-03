@@ -23,8 +23,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,14 +31,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.DashboardApi;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
@@ -251,16 +250,8 @@ public class DashboardApiTest {
         }
     }
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
-        // when.
-        ResponseEntity<Void> response =
-                scenario.getModifier().apply(restTemplate).getForEntity("/api/external/dashboard", Void.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/api/external/dashboard")
+    void negativeAuthTests() {}
 
     private void deRegisterAll() {
         jdbcTemplate.execute("DELETE FROM instances");

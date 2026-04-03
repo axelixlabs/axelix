@@ -31,8 +31,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,14 +38,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.loggers.LogLevelChangeRequest;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.LoggersApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,6 +58,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LoggersApiManagementLoggingLevelTest {
+
+    private static final String LOG_LEVEL_GROUP_AUTH_JSON = "{\"configuredLevel\":\"INFO\"}";
+
+    private static final String LOG_LEVEL_LOGGER_AUTH_JSON = "{\"configuredLevel\":\"DEBUG\"}";
+
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
     private static MockWebServer mockWebServer;
@@ -289,62 +293,20 @@ public class LoggersApiManagementLoggingLevelTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnGroupName(InvalidAuthScenario scenario) {
-        String groupName = "groupName";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path = "/api/external/loggers/00000000-0000-0000-0000-000000000001/group/groupName",
+            jsonBody = LOG_LEVEL_GROUP_AUTH_JSON)
+    void negativeAuthTestsOnGroupName() {}
 
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity(
-                        "/api/external/loggers/{instanceId}/group/{groupName}",
-                        requestBody,
-                        Void.class,
-                        activeInstanceId,
-                        groupName);
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path = "/api/external/loggers/00000000-0000-0000-0000-000000000001/logger/logger.name",
+            jsonBody = LOG_LEVEL_LOGGER_AUTH_JSON)
+    void negativeAuthTestsOnLoggerName() {}
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnLoggerName(InvalidAuthScenario scenario) {
-        String loggerName = "logger.name";
-        LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG");
-
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity(
-                        "/api/external/loggers/{instanceId}/logger/{loggerName}",
-                        requestBody,
-                        Void.class,
-                        activeInstanceId,
-                        loggerName);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnClearLoggingLevelByLoggerName(InvalidAuthScenario scenario) {
-        String loggerName = "clear.logger.name";
-
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity(
-                        "/api/external/loggers/{instanceId}/logger/{loggerName}/clear",
-                        null,
-                        Void.class,
-                        activeInstanceId,
-                        loggerName);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path = "/api/external/loggers/00000000-0000-0000-0000-000000000001/logger/clear.logger.name/clear")
+    void negativeAuthTestsOnClearLoggingLevelByLoggerName() {}
 }

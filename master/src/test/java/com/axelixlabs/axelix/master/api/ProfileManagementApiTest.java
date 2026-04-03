@@ -32,8 +32,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,6 +41,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.ProfileManagementApi;
 import com.axelixlabs.axelix.master.api.external.request.ProfileUpdatedRequest;
@@ -51,9 +50,9 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
@@ -78,6 +77,8 @@ class ProfileManagementApiTest {
           "reason": "New profiles have been activated"
         }
         """;
+
+    private static final String PROFILE_AUTH_NEGATIVE_JSON = "{\"effectiveProfiles\":[\"test-profile\"]}";
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
 
@@ -200,23 +201,11 @@ class ProfileManagementApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
-        ProfileUpdatedRequest request = new ProfileUpdatedRequest(List.of("test-profile"));
-
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity(
-                        "/api/external/profile-management/{instanceId}",
-                        defaultEntity(request),
-                        Void.class,
-                        activeInstanceId);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path = "/api/external/profile-management/00000000-0000-0000-0000-000000000001",
+            jsonBody = PROFILE_AUTH_NEGATIVE_JSON)
+    void negativeAuthTests() {}
 
     private HttpEntity<ProfileUpdatedRequest> defaultEntity(ProfileUpdatedRequest request) {
         HttpHeaders headers = new HttpHeaders();

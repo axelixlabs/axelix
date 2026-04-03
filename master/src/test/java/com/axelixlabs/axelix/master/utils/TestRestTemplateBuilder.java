@@ -57,7 +57,6 @@ public class TestRestTemplateBuilder {
     private static final String HOST = "http://localhost:";
     private static final String USERNAME = "testUser";
     private static final String PASSWORD = "testPassword";
-    private static final String ROLE_NAME = "testRole";
 
     // We cannot use @LocalServerPort here since at the time of this
     // bean initialization, the webserver is not yet started, so, we
@@ -84,13 +83,15 @@ public class TestRestTemplateBuilder {
     }
 
     public TestRestTemplate asViewer() {
-        String token = generateToken(new Role[] {DefaultRole.VIEWER});
-
-        return buildWithToken(token);
+        return withRole(DefaultRole.VIEWER);
     }
 
     public TestRestTemplate asEditor() {
-        String token = generateToken(new Role[] {DefaultRole.EDITOR});
+        return withRole(DefaultRole.EDITOR);
+    }
+
+    public TestRestTemplate withRole(Role role) {
+        String token = generateToken(new Role[] {role});
 
         return buildWithToken(token);
     }

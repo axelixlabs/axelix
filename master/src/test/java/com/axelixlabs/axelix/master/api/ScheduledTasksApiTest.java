@@ -34,7 +34,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +46,8 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressio
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
+import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.endpoint.ScheduledTasksApi;
@@ -55,9 +56,9 @@ import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpre
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
@@ -168,6 +169,14 @@ public class ScheduledTasksApiTest {
             }
           ]
         }
+        """;
+
+    private static final String SCHEDULED_TASK_TOGGLE_AUTH_JSON =
+            // language=json
+            """
+            {
+                "trigger" : "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask"
+            }
         """;
 
     private static final String activeInstanceId = UUID.randomUUID().toString();
@@ -680,52 +689,24 @@ public class ScheduledTasksApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnGetAllScheduledTasks(InvalidAuthScenario scenario) {
-        // when.
-        ResponseEntity<?> response = scenario.getModifier()
-                .apply(restTemplate)
-                .getForEntity("/api/external/scheduled-tasks/{instanceId}", Void.class, activeInstanceId);
+    @ProtectedEndpointTests(
+            method = HttpMethod.GET,
+            path = "/api/external/scheduled-tasks/00000000-0000-0000-0000-000000000001")
+    void negativeAuthTestsOnGetAllScheduledTasks() {}
 
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path = "/api/external/scheduled-tasks/00000000-0000-0000-0000-000000000001/enable",
+            requiredAuthority = DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+            jsonBody = SCHEDULED_TASK_TOGGLE_AUTH_JSON)
+    void negativeAuthTestsOnEnableSingleScheduledTask() {}
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnEnableSingleScheduledTask(InvalidAuthScenario scenario) {
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
-
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity(
-                        "/api/external/scheduled-tasks/{instanceId}/enable", requestBody, Void.class, activeInstanceId);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized_OnDisableSingleScheduledTask(InvalidAuthScenario scenario) {
-        ScheduledTaskToggleRequest requestBody = new ScheduledTaskToggleRequest(
-                "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
-
-        // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity(
-                        "/api/external/scheduled-tasks/{instanceId}/disable",
-                        requestBody,
-                        Void.class,
-                        activeInstanceId);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
+    @ProtectedEndpointTests(
+            method = HttpMethod.POST,
+            path = "/api/external/scheduled-tasks/00000000-0000-0000-0000-000000000001/disable",
+            requiredAuthority = DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+            jsonBody = SCHEDULED_TASK_TOGGLE_AUTH_JSON)
+    void negativeAuthTestsOnDisableSingleScheduledTask() {}
 
     private static Stream<Arguments> managementScheduledTask() {
         return Stream.of(Arguments.of("/enable"), Arguments.of("/disable"));

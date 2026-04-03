@@ -30,6 +30,7 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
@@ -89,6 +90,10 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
 
+        } catch (AuthorizationException e) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write(e.getMessage());
+            response.getWriter().flush();
         } catch (JwtParsingException | ExpiredJwtTokenException | InvalidJwtTokenException e) {
             throw new ServletException(e);
         }

@@ -60,11 +60,12 @@ public enum DefaultAuthority implements Authority {
     GARBAGE_COLLECTOR,
 
     /**
-     * Grants access to runtime property mutation operations.
+     * Grants access to runtime @ConfigurationProperties property mutation operations.
+     *
      * <p>Allows changing configuration properties at runtime.</p>
      * <p>Implemented by custom actuator endpoint: {@code PropertyManagementEndpoint}.</p>
      */
-    PROPERTY_VALUE_MUTATE;
+    CONFIGURATION_PROPERTY_VALUE_MUTATE;
 
     @Override
     public String getName() {
