@@ -8,12 +8,10 @@ com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixEnvironmentEndpointAuto
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.ContextRestarterAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryDiscovererAutoConfiguration
-com.axelixlabs.axelix.sbs.spring.autoconfiguration.ProfileManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.PropertyManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration
 com.axelixlabs.axelix.sbs.spring.autoconfiguration.SelfRegistrationAutoConfiguration

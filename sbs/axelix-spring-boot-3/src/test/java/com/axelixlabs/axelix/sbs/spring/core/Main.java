@@ -33,12 +33,10 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixGcEndpointAutoCo
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixHeapDumpEndpointAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetadataEndpointConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.AxelixMetricsAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ContextRestarterAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.EndpointsConfigurationPropertiesAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.GitInformationProviderAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.JwtAuthAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.LibraryDiscovererAutoConfiguration;
-import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ProfileManagementAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.PropertyManagementAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.ScheduledTaskManagementAutoConfiguration;
 import com.axelixlabs.axelix.sbs.spring.autoconfiguration.SelfRegistrationAutoConfiguration;
@@ -63,13 +61,11 @@ import com.axelixlabs.axelix.sbs.spring.autoconfiguration.TransactionMonitoringA
             AxelixHeapDumpEndpointAutoConfiguration.class,
             AxelixMetadataEndpointConfiguration.class,
             AxelixMetricsAutoConfiguration.class,
-            ContextRestarterAutoConfiguration.class,
             AxelixGcEndpointAutoConfiguration.class,
             AxelixFeignEndpointAutoConfiguration.class,
             GitInformationProviderAutoConfiguration.class,
             JwtAuthAutoConfiguration.class,
             LibraryDiscovererAutoConfiguration.class,
-            ProfileManagementAutoConfiguration.class,
             PropertyManagementAutoConfiguration.class,
             SelfRegistrationAutoConfiguration.class,
             ScheduledTaskManagementAutoConfiguration.class,

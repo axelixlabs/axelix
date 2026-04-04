@@ -121,9 +121,6 @@ public class ActuatorEndpoints implements Iterable<ActuatorEndpoint> {
     public static final ActuatorEndpoint GET_METRIC_GROUPS = endpoint("/axelix-metrics", HttpMethod.GET);
     public static final ActuatorEndpoint GET_SINGLE_METRIC = endpoint("/axelix-metrics/{metric.name}", HttpMethod.GET);
 
-    // ProfileManagement
-    public static final ActuatorEndpoint PROFILE_MANAGEMENT = endpoint("/axelix-profile-management", HttpMethod.POST);
-
     // PropertyManagement
     public static final ActuatorEndpoint PROPERTY_MANAGEMENT = endpoint("/axelix-property-management", HttpMethod.POST);
 

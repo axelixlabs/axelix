@@ -159,14 +159,6 @@ public final class ApiPaths {
         public static final String INSTANCE_ID = "/heapdump/{instanceId}";
     }
 
-    public static final class ProfileManagementApi {
-
-        /**
-         * Endpoint to replace the active Spring profiles of a given application instance.
-         */
-        public static final String INSTANCE_ID = "/profile-management/{instanceId}";
-    }
-
     public static final class PropertyManagementApi {
 
         /**

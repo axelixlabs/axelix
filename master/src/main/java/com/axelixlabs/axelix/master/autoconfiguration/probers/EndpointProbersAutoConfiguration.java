@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 
 import com.axelixlabs.axelix.common.api.InstanceDetails;
-import com.axelixlabs.axelix.common.api.ProfileMutationResult;
 import com.axelixlabs.axelix.common.api.loggers.LoggerGroup;
 import com.axelixlabs.axelix.common.api.loggers.LoggerLevels;
 import com.axelixlabs.axelix.common.api.loggers.ServiceLoggers;
@@ -30,7 +29,6 @@ import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.service.serde.DetailsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.GcLogFileMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.HeapDumpMessageDeserializationStrategy;
-import com.axelixlabs.axelix.master.service.serde.ProfileMutationJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.LoggerGroupJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.LoggerLevelsJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.serde.loggers.ServiceLoggersJacksonMessageDeserializationStrategy;
@@ -257,14 +255,6 @@ public class EndpointProbersAutoConfiguration {
     @Bean
     public DiscardingAbstractEndpointProber changePropertyValueEndpointProver() {
         return new DiscardingAbstractEndpointProber(instanceRegistry, ActuatorEndpoints.PROPERTY_MANAGEMENT);
-    }
-
-    // Profile Management
-    @Bean
-    public DefaultEndpointProber<ProfileMutationResult> replaceProfileEndpointProver(
-            ProfileMutationJacksonMessageDeserializationStrategy deserializationStrategy) {
-        return new DefaultEndpointProber<>(
-                instanceRegistry, deserializationStrategy, ActuatorEndpoints.PROFILE_MANAGEMENT);
     }
 
     // Conditions

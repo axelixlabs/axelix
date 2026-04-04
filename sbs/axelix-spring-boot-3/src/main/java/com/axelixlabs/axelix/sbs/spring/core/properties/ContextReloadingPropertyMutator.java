@@ -25,8 +25,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 
-import com.axelixlabs.axelix.sbs.spring.core.context.ContextRestarter;
-
 import static com.axelixlabs.axelix.sbs.spring.core.properties.AxelixPropertySource.AXELIX_PROPERTY_SOURCE_NAME;
 
 /**
@@ -39,12 +37,9 @@ import static com.axelixlabs.axelix.sbs.spring.core.properties.AxelixPropertySou
 public class ContextReloadingPropertyMutator implements PropertyMutator {
 
     private final ConfigurableEnvironment configurableEnvironment;
-    private final ContextRestarter contextRestarter;
 
-    public ContextReloadingPropertyMutator(
-            ConfigurableEnvironment configurableEnvironment, ContextRestarter contextRestarter) {
+    public ContextReloadingPropertyMutator(ConfigurableEnvironment configurableEnvironment) {
         this.configurableEnvironment = configurableEnvironment;
-        this.contextRestarter = contextRestarter;
     }
 
     @Override
@@ -61,7 +56,5 @@ public class ContextReloadingPropertyMutator implements PropertyMutator {
             var target = (AxelixPropertySource) potentiallyAxelixPropertySource;
             target.addProperty(propertyName, newValue);
         }
-
-        contextRestarter.restartContext();
     }
 }

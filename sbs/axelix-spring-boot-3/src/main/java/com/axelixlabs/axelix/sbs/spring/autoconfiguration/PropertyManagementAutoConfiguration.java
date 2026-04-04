@@ -17,12 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.ConfigurableEnvironment;
-
-import com.axelixlabs.axelix.sbs.spring.core.context.ContextRestarter;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.properties.ContextReloadingPropertyMutator;
@@ -31,19 +25,24 @@ import com.axelixlabs.axelix.sbs.spring.core.properties.PropertyManagementEndpoi
 import com.axelixlabs.axelix.sbs.spring.core.properties.PropertyMutator;
 import com.axelixlabs.axelix.sbs.spring.core.properties.PropertyNameDiscoverer;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.ConfigurableEnvironment;
+
 /**
  * Auto-configuration for property management operations via Spring Boot Actuator.
  *
  * @since 10.07.2025
  * @author Nikita Kirillov
  */
-@AutoConfiguration(after = ContextRestarterAutoConfiguration.class)
+@AutoConfiguration
 public class PropertyManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public PropertyMutator propertyMutator(ConfigurableEnvironment environment, ContextRestarter contextRestarter) {
-        return new ContextReloadingPropertyMutator(environment, contextRestarter);
+    public PropertyMutator propertyMutator(ConfigurableEnvironment environment) {
+        return new ContextReloadingPropertyMutator(environment);
     }
 
     @Bean
