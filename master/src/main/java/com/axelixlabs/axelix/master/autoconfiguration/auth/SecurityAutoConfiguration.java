@@ -45,16 +45,13 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.StaticAdmi
 import com.axelixlabs.axelix.master.filter.CookieBasedJwtAuthorizationFilter;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
-import com.axelixlabs.axelix.master.service.auth.DefaultUserLoginService;
 import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
-import com.axelixlabs.axelix.master.service.auth.UserLoginService;
 import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.provider.StaticAdminUserProvider;
-import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
 
 /**
  * Autoconfiguration for security.
@@ -144,11 +141,6 @@ public class SecurityAutoConfiguration {
         @Bean
         public AuthenticationOption authSettingsStaticAdmin() {
             return new LoginPasswordAuthenticationOption();
-        }
-
-        @Bean
-        public UserLoginService userLoginService(JwtEncoderService jwtEncoderService, UserProvider userProvider) {
-            return new DefaultUserLoginService(jwtEncoderService, userProvider);
         }
 
         @Bean

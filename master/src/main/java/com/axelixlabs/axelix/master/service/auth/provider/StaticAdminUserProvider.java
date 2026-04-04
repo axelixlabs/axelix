@@ -25,10 +25,9 @@ import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.StaticAdminCredentialsProperties;
 import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
-import com.axelixlabs.axelix.master.service.auth.UserLoginService;
 
 /**
- * {@link UserLoginService} that authenticates a given user by the static pair of the username/password.
+ * {@link UserProvider} that authenticates a given user by the static pair of the username/password.
  *
  * @author Mikhail Polivakha
  */

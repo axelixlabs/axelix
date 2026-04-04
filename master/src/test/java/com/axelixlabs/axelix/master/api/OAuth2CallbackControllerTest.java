@@ -17,6 +17,9 @@
  */
 package com.axelixlabs.axelix.master.api;
 
+import java.util.List;
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -65,6 +68,7 @@ class OAuth2CallbackControllerTest {
     private static final String ID_TOKEN = "test-id-token";
     private static final String USERNAME = "test-user";
     private static final String OUR_JWT_TOKEN = "our-jwt-token";
+    private static final String AUTHORITIES = "authorities_of_role";
 
     @LocalServerPort
     private int port;
@@ -82,17 +86,21 @@ class OAuth2CallbackControllerTest {
 
     @BeforeEach
     void prepare() {
-        ResponseCookie cookie = ResponseCookie.from("auth-token", OUR_JWT_TOKEN)
+        ResponseCookie authCookie = ResponseCookie.from("auth-token", OUR_JWT_TOKEN)
                 .path("/")
                 .httpOnly(true)
                 .build();
+
+        ResponseCookie authoritiesMetadataCookie =
+                ResponseCookie.from("authorities", AUTHORITIES).path("/").build();
 
         restTemplate = new TestRestTemplate(new RestTemplateBuilder().redirects(HttpRedirects.DONT_FOLLOW));
 
         when(oidcClient.exchangeCodeForIdToken(CODE)).thenReturn(ID_TOKEN);
         when(oidcClient.validateOAuth2JwtTokenAndExtractUsername(ID_TOKEN)).thenReturn(USERNAME);
         when(jwtEncoderService.generateToken(any())).thenReturn(OUR_JWT_TOKEN);
-        when(cookieService.buildAuthCookie(OUR_JWT_TOKEN)).thenReturn(cookie);
+        when(cookieService.buildAuthCookie(OUR_JWT_TOKEN)).thenReturn(authCookie);
+        when(cookieService.buildAuthoritiesMetadataCookie(any(Set.class))).thenReturn(authoritiesMetadataCookie);
     }
 
     @Test
@@ -102,7 +110,10 @@ class OAuth2CallbackControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         assertThat(response.getHeaders().getLocation()).hasToString("/wallboard");
-        assertThat(response.getHeaders().getFirst(HttpHeaders.SET_COOKIE)).contains("auth-token=" + OUR_JWT_TOKEN);
+
+        List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+        assertThat(cookies).anyMatch(c -> c.contains("auth-token=" + OUR_JWT_TOKEN));
+        assertThat(cookies).anyMatch(c -> c.contains("authorities=" + AUTHORITIES));
     }
 
     @Test

@@ -17,7 +17,12 @@
  */
 package com.axelixlabs.axelix.master.service.auth;
 
+import java.util.Set;
+
 import org.springframework.http.ResponseCookie;
+
+import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.core.User;
 
 /**
  * Service interface for authentication HTTP cookie operations.
@@ -37,6 +42,14 @@ public interface CookieService {
     ResponseCookie buildAuthCookie(String token);
 
     /**
+     * Builds an HTTP cookie file with available authorities.
+     *
+     * @param roles the {@link User} for retrieving authorities.
+     * @return configured ResponseCookie instance ready to be set in HTTP response.
+     */
+    ResponseCookie buildAuthoritiesMetadataCookie(Set<Role> roles);
+
+    /**
      * Builds an expired authentication HTTP cookie.
      * <p>
      * The value of the token
@@ -44,4 +57,13 @@ public interface CookieService {
      * @return configured ResponseCookie instance ready to be set in HTTP response
      */
     ResponseCookie buildExpiredAuthCookie();
+
+    /**
+     * Builds an expired authentication HTTP cookie.
+     * <p>
+     * The value of the token
+     *
+     * @return configured ResponseCookie instance ready to be set in HTTP response
+     */
+    ResponseCookie buildExpiredAuthMetdataCookie();
 }

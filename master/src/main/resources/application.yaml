@@ -57,4 +57,5 @@ axelix:
             password: admin
       cookie:
         name: auth_token
+        name-authority: authorities
         secure: false

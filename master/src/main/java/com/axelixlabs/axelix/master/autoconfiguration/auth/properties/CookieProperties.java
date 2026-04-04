@@ -27,6 +27,8 @@ public class CookieProperties {
 
     private String name = "auth_token";
 
+    private String nameAuthority = "authorities";
+
     /**
      * Secure attribute for cookies.
      * <p><b>Default:</b> true</p>
@@ -39,6 +41,14 @@ public class CookieProperties {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNameAuthority() {
+        return nameAuthority;
+    }
+
+    public void setNameAuthority(String nameAuthority) {
+        this.nameAuthority = nameAuthority;
     }
 
     public boolean isSecure() {
