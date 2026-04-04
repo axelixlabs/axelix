@@ -86,21 +86,21 @@ class OAuth2CallbackControllerTest {
 
     @BeforeEach
     void prepare() {
-        ResponseCookie cookie = ResponseCookie.from("auth-token", OUR_JWT_TOKEN)
+        ResponseCookie authCookie = ResponseCookie.from("auth-token", OUR_JWT_TOKEN)
                 .path("/")
                 .httpOnly(true)
                 .build();
 
-        ResponseCookie cookie2 =
-            ResponseCookie.from("authorities", AUTHORITIES).path("/").build();
+        ResponseCookie authoritiesMetadataCookie =
+                ResponseCookie.from("authorities", AUTHORITIES).path("/").build();
 
         restTemplate = new TestRestTemplate(new RestTemplateBuilder().redirects(HttpRedirects.DONT_FOLLOW));
 
         when(oidcClient.exchangeCodeForIdToken(CODE)).thenReturn(ID_TOKEN);
         when(oidcClient.validateOAuth2JwtTokenAndExtractUsername(ID_TOKEN)).thenReturn(USERNAME);
         when(jwtEncoderService.generateToken(any())).thenReturn(OUR_JWT_TOKEN);
-        when(cookieService.buildAuthCookie(OUR_JWT_TOKEN)).thenReturn(cookie);
-        when(cookieService.buildAuthoritiesCookie(any(Set.class))).thenReturn(cookie2);
+        when(cookieService.buildAuthCookie(OUR_JWT_TOKEN)).thenReturn(authCookie);
+        when(cookieService.buildAuthoritiesMetadataCookie(any(Set.class))).thenReturn(authoritiesMetadataCookie);
     }
 
     @Test

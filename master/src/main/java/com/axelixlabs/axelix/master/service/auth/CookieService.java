@@ -47,7 +47,7 @@ public interface CookieService {
      * @param roles the {@link User} for retrieving authorities.
      * @return configured ResponseCookie instance ready to be set in HTTP response.
      */
-    ResponseCookie buildAuthoritiesCookie(Set<Role> roles);
+    ResponseCookie buildAuthoritiesMetadataCookie(Set<Role> roles);
 
     /**
      * Builds an expired authentication HTTP cookie.
@@ -57,4 +57,13 @@ public interface CookieService {
      * @return configured ResponseCookie instance ready to be set in HTTP response
      */
     ResponseCookie buildExpiredAuthCookie();
+
+    /**
+     * Builds an expired authentication HTTP cookie.
+     * <p>
+     * The value of the token
+     *
+     * @return configured ResponseCookie instance ready to be set in HTTP response
+     */
+    ResponseCookie buildExpiredAuthMetdataCookie();
 }

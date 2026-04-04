@@ -1,6 +1,6 @@
 test-tokens:
   # valid token without Roles and Authorities
-  valid-token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0VXNlciIsImlhdCI6MTc1NDQ4Njc1NywiZXhwIjoyODY0NTE2NzU3fQ.57kPI4R7m8gxoF3Xcb6ifyGJS7GVOn-rQdTyNhMA4Z0"
+  valid-token: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0VXNlciIsImlhdCI6MTc3NTI4NTU3OSwiZXhwIjoxNzc1Mjk2Mzc5LCJyb2xlcyI6W119.kzMUf1a1waLERMSFvtw4YuTR7MiNIXXEvHIo_612I3m2r0akEAHkSzyO3oFBjtqA9Cw-MJMS6jfYd5jMo6L6yg"
 
   # testUser Set.of(ROLE_USER, ROLE_ENGINEER) -> ROLE_USER Set.of(ENV, INFO); ROLE_ENGINEER Set.of(BEANS, HEALTH)
   token-user-with-two-role: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0VXNlciIsImlhdCI6MTc1NDUwMjA4MCwiZXhwIjozMzMxMzAyMDgwLCJyb2xlcyI6W3sibmFtZSI6IlJPTEVfVVNFUiIsImF1dGhvcml0aWVzIjpbIkVOViIsIklORk8iXSwiY29tcG9uZW50cyI6W119LHsibmFtZSI6IlJPTEVfRU5HSU5FRVIiLCJhdXRob3JpdGllcyI6WyJCRUFOUyIsIkhFQUxUSCJdLCJjb21wb25lbnRzIjpbXX1dfQ.xLuprlFUgeslSlZEp1Btf20EjQ8w_-Dx3V0RM2xUjq-PU48iiXCZ2BT4EzzOCferYB9wCxV-LyX3DObiqg_X-A"

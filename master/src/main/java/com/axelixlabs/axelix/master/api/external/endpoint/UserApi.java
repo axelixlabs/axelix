@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
+import java.util.Objects;
+
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,13 +31,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.axelixlabs.axelix.common.auth.JwtDecoderService;
+import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
-import com.axelixlabs.axelix.master.service.auth.UserLoginService;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
 
 /**
  * The API for working with users.
@@ -49,14 +53,16 @@ import com.axelixlabs.axelix.master.service.auth.UserLoginService;
 @ConditionalOnProperty(prefix = "axelix.master.auth.options.static-admin", name = "enabled", havingValue = "true")
 public class UserApi {
 
-    private final UserLoginService userLoginService;
     private final CookieService cookieService;
-    private final JwtDecoderService decoderService;
+    private final UserProvider userProvider;
+    private final JwtEncoderService jwtEncoderService;
 
-    public UserApi(UserLoginService userLoginService, CookieService cookieService, JwtDecoderService decoderService) {
-        this.userLoginService = userLoginService;
+    private static final InvalidCredentialsException INVALID_CREDENTIALS_EXCEPTION = new InvalidCredentialsException();
+
+    public UserApi(CookieService cookieService, UserProvider userProvider, JwtEncoderService jwtEncoderService) {
         this.cookieService = cookieService;
-        this.decoderService = decoderService;
+        this.userProvider = userProvider;
+        this.jwtEncoderService = jwtEncoderService;
     }
 
     /**
@@ -81,16 +87,23 @@ public class UserApi {
     @ApiResponse(description = "Forbidden. The access into the system is forbidden", responseCode = "403")
     @PostMapping(path = ApiPaths.UsersApi.LOGIN)
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        String token = userLoginService.login(loginRequest.username(), loginRequest.password());
+        User user = userProvider.load(loginRequest.username());
 
-        ResponseCookie cookie = cookieService.buildAuthCookie(token);
-        ResponseCookie cookieAuthorities = cookieService.buildAuthoritiesCookie(
-                decoderService.decodeTokenToUser(token).getRoles());
+        // TODO: We need to think about possible hashing of passwords and the general
+        // strategy for handling that
+        if (Objects.equals(user.getPassword(), loginRequest.password())) {
+            String token = jwtEncoderService.generateToken(user);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .header(HttpHeaders.SET_COOKIE, cookieAuthorities.toString())
-                .build();
+            ResponseCookie cookie = cookieService.buildAuthCookie(token);
+            ResponseCookie cookieAuthorities = cookieService.buildAuthoritiesMetadataCookie(user.getRoles());
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, cookieAuthorities.toString())
+                    .build();
+        } else {
+            throw INVALID_CREDENTIALS_EXCEPTION;
+        }
     }
 
     /**
@@ -106,10 +119,12 @@ public class UserApi {
     @ApiResponse(description = "Unauthorized", responseCode = "401")
     @PostMapping(path = ApiPaths.UsersApi.LOGOUT)
     public ResponseEntity<?> logout() {
-        ResponseCookie cookie = cookieService.buildExpiredAuthCookie();
+        ResponseCookie authCookie = cookieService.buildExpiredAuthCookie();
+        ResponseCookie authoritiesCookie = cookieService.buildExpiredAuthCookie();
 
         return ResponseEntity.status(HttpStatus.OK)
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, authCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, authoritiesCookie.toString())
                 .build();
     }
 }

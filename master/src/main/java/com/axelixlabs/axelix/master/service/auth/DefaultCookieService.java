@@ -39,7 +39,6 @@ import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtPropert
 public class DefaultCookieService implements CookieService {
 
     private final CookieProperties cookieProperties;
-
     private final JwtProperties jwtProperties;
 
     public DefaultCookieService(CookieProperties cookieProperties, JwtProperties jwtProperties) {
@@ -49,40 +48,53 @@ public class DefaultCookieService implements CookieService {
 
     @Override
     public ResponseCookie buildAuthCookie(String token) {
-        return buildCookie(token, jwtProperties.getLifespan().toSeconds());
+        return buildAuthCookie(token, jwtProperties.getLifespan().toSeconds());
     }
 
-    public ResponseCookie buildAuthoritiesCookie(Set<Role> roles) {
-        String authoritiesRaw = roles.stream()
+    @Override
+    public ResponseCookie buildAuthoritiesMetadataCookie(Set<Role> roles) {
+        String authoritiesJsonArray = roles.stream()
                 .flatMap(role -> role.getAuthorities().stream())
                 .map(Authority::getName)
                 .distinct()
-                .collect(Collectors.joining("|"));
+                .collect(Collectors.joining(",", "[", "]"));
 
-        String authorities =
-                Base64.getUrlEncoder().withoutPadding().encodeToString(authoritiesRaw.getBytes(StandardCharsets.UTF_8));
+        String base64EncodedAuthoritiesMetadata = Base64.getEncoder()
+                .withoutPadding()
+                .encodeToString(authoritiesJsonArray.getBytes(StandardCharsets.UTF_8));
 
-        return ResponseCookie.from(cookieProperties.getNameAuthority(), authorities)
-                .httpOnly(false)
-                .secure(cookieProperties.isSecure())
-                .path("/")
-                .maxAge(jwtProperties.getLifespan().toSeconds())
-                .sameSite("Strict")
-                .build();
+        return buildAuthoritiesMetadataCookie(
+                base64EncodedAuthoritiesMetadata, jwtProperties.getLifespan().getSeconds());
     }
 
     @Override
     public ResponseCookie buildExpiredAuthCookie() {
         // The browser will expire the cookie anyway, so empty string is fine
-        return buildCookie("", 0L);
+        return buildAuthCookie("", 0L);
+    }
+
+    @Override
+    public ResponseCookie buildExpiredAuthMetdataCookie() {
+        // The browser will expire the cookie anyway, so empty string is fine
+        return buildAuthoritiesMetadataCookie("", 0L);
     }
 
     /**
      * zero in {@code cookieLifetimeInSeconds} means cookie will expire immediately.
      */
-    private ResponseCookie buildCookie(String token, long cookieLifetimeInSeconds) {
+    private ResponseCookie buildAuthCookie(String token, long cookieLifetimeInSeconds) {
         return ResponseCookie.from(cookieProperties.getName(), token)
                 .httpOnly(true)
+                .secure(cookieProperties.isSecure())
+                .path("/")
+                .maxAge(cookieLifetimeInSeconds)
+                .sameSite("Strict")
+                .build();
+    }
+
+    private ResponseCookie buildAuthoritiesMetadataCookie(String authoritiesJsonArray, long cookieLifetimeInSeconds) {
+        return ResponseCookie.from(cookieProperties.getNameAuthority(), authoritiesJsonArray)
+                .httpOnly(false)
                 .secure(cookieProperties.isSecure())
                 .path("/")
                 .maxAge(cookieLifetimeInSeconds)
