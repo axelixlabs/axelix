@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.common.auth.core;
 
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
@@ -37,7 +36,7 @@ public final class DefaultUser implements User {
     public DefaultUser(String username, String password, Set<Role> roles) {
         this.username = username;
         this.password = password;
-        this.roles = roles != null ? roles : Collections.emptySet();
+        this.roles = roles;
     }
 
     @Override

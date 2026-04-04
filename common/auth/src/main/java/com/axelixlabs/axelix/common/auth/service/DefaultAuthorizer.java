@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
-import com.axelixlabs.axelix.common.auth.core.DecodedUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 
 /**
@@ -36,7 +36,7 @@ import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 public class DefaultAuthorizer implements Authorizer {
 
     @Override
-    public void authorize(DecodedUser user, AuthorizationRequest authorizationRequest) throws AuthorizationException {
+    public void authorize(User user, AuthorizationRequest authorizationRequest) throws AuthorizationException {
         Set<Authority> requiredAuthorities = authorizationRequest.requiredAuthorities();
 
         if (requiredAuthorities.isEmpty()) {

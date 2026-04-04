@@ -71,10 +71,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         try {
             String token = resolveToken(request);
-            String requestPath = request.getRequestURI();
+
             HttpMethod requestHttpMethod = HttpMethod.valueOf(request.getMethod());
 
-            identityAccessManager.verifyAccess(requestPath, requestHttpMethod, token);
+            identityAccessManager.verifyAccess(request.getRequestURI(), requestHttpMethod, token);
 
             filterChain.doFilter(request, response);
 

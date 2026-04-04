@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.utils.Assert;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
@@ -89,8 +90,12 @@ public class UserApi {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         User user = userProvider.load(loginRequest.username());
 
-        // TODO: We need to think about possible hashing of passwords and the general
-        // strategy for handling that
+        // TODO:
+        //  We need to think about possible hashing of passwords and the general
+        //  strategy for handling that. Anyway, this code is going to change significantly
+        //  once we start to support the LDAP authentication.
+        Assert.notNull(user.getPassword(), "When using default login option the password is required");
+
         if (Objects.equals(user.getPassword(), loginRequest.password())) {
             String token = jwtEncoderService.generateToken(user);
 

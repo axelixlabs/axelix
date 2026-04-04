@@ -17,14 +17,11 @@
  */
 package com.axelixlabs.axelix.common.auth.exception;
 
-import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
-
 /**
  * Indicates that a provided JWT token is invalid.
  *
  * <p>This may occur due to tampering, incorrect signature, or structural issues in the token.</p>
  *
- * @see JwtDecoderService
  * @since 23.07.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha

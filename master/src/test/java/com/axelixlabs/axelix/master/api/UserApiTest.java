@@ -17,11 +17,12 @@
  */
 package com.axelixlabs.axelix.master.api;
 
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,10 +34,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.master.api.external.endpoint.UserApi;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 22.12.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestRestTemplate
@@ -65,8 +69,8 @@ class UserApiTest {
     @Autowired
     private JwtProperties jwtProperties;
 
-    @Value("${test-tokens.valid-token}")
-    private String validToken;
+    @Autowired
+    private JwtEncoderService jwtEncoderService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -116,7 +120,8 @@ class UserApiTest {
 
     @Test
     void logout_shouldClearCookie() {
-        String token = validToken;
+        // given.
+        String token = jwtEncoderService.generateToken(new PasswordlessUser("someUser", Set.of()));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -124,9 +129,11 @@ class UserApiTest {
 
         HttpEntity<Void> logoutEntity = new HttpEntity<>(headers);
 
+        // when.
         ResponseEntity<String> logoutResponse =
                 restTemplate.exchange("/api/external/users/logout", HttpMethod.POST, logoutEntity, String.class);
 
+        // then.
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         String logoutCookieHeader = logoutResponse.getHeaders().getFirst(HttpHeaders.SET_COOKIE);

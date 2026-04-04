@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.common.auth.core;
 
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * SPI interface of a User. The user, from a conceptual perspective, is
  * identified by his/her {@link #getUsername()} and a set of {@link #getRoles()}
@@ -35,8 +37,9 @@ public interface User {
     String getUsername();
 
     /**
-     * Password of the given user.
+     * Password of the given user. It might be null
      */
+    @Nullable
     String getPassword();
 
     /**

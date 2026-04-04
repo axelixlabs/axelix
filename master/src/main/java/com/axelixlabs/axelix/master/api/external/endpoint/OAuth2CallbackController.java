@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.DefaultUser;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
@@ -72,7 +72,7 @@ public class OAuth2CallbackController {
 
         String username = oidcClient.validateOAuth2JwtTokenAndExtractUsername(oidcToken);
 
-        User user = new DefaultUser(username, "", Set.of(DefaultRole.ADMIN));
+        User user = new PasswordlessUser(username, Set.of(DefaultRole.ADMIN));
 
         String ourToken = jwtEncoderService.generateToken(user);
 

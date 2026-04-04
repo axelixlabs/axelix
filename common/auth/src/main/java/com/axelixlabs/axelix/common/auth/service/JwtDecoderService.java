@@ -17,7 +17,7 @@
  */
 package com.axelixlabs.axelix.common.auth.service;
 
-import com.axelixlabs.axelix.common.auth.core.DecodedUser;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
@@ -40,6 +40,6 @@ public interface JwtDecoderService {
      * @throws InvalidJwtTokenException if the JWT token is invalid or tampered with
      * @throws JwtParsingException if the token cannot be parsed or contains insufficient data
      */
-    DecodedUser decodeTokenToUser(String token)
+    PasswordlessUser decodeTokenToUser(String token)
             throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtParsingException;
 }

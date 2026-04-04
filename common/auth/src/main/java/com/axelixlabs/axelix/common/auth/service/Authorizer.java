@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.common.auth.service;
 
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
-import com.axelixlabs.axelix.common.auth.core.DecodedUser;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 
@@ -37,5 +36,5 @@ public interface Authorizer {
      * @param authorizationRequest the request containing required authorities
      * @throws AuthorizationException if access is denied
      */
-    void authorize(DecodedUser user, AuthorizationRequest authorizationRequest) throws AuthorizationException;
+    void authorize(User user, AuthorizationRequest authorizationRequest) throws AuthorizationException;
 }

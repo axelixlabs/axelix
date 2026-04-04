@@ -32,10 +32,10 @@ import io.jsonwebtoken.lang.Assert;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DecodedUser;
 import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
@@ -63,12 +63,12 @@ public class DefaultJwtDecoderService implements JwtDecoderService {
     }
 
     @Override
-    public DecodedUser decodeTokenToUser(String token)
+    public PasswordlessUser decodeTokenToUser(String token)
             throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtParsingException {
 
         try {
             Claims claims = parseClaims(token).getPayload();
-            return new DecodedUser(claims.getSubject(), extractRoles(claims));
+            return new PasswordlessUser(claims.getSubject(), extractRoles(claims));
         } catch (JwtParsingException e) {
             throw new JwtParsingException(e);
         } catch (ExpiredJwtException e) {

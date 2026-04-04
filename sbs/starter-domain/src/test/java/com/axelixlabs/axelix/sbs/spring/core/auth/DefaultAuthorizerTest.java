@@ -23,9 +23,9 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
-import com.axelixlabs.axelix.common.auth.core.DecodedUser;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.GlobalAuthority;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
@@ -47,7 +47,7 @@ class DefaultAuthorizerTest {
     void shouldAuthorize_UserHasRequiredAuthorities() {
         Role role = new DefaultRole(
                 "testRole", Set.of(GlobalAuthority.BEANS, GlobalAuthority.HEALTH), Collections.emptySet());
-        DecodedUser user = new DecodedUser("testUser", Set.of(role));
+        PasswordlessUser user = new PasswordlessUser("testUser", Set.of(role));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.HEALTH));
 
@@ -59,7 +59,7 @@ class DefaultAuthorizerTest {
         Role role1 = new DefaultRole("firstTestRole", Set.of(GlobalAuthority.CACHE_DISPATCHER), Collections.emptySet());
         Role role2 =
                 new DefaultRole("secondTestRole", Set.of(GlobalAuthority.PROFILE_MANAGEMENT), Collections.emptySet());
-        DecodedUser user = new DecodedUser("testUser", Set.of(role1, role2));
+        PasswordlessUser user = new PasswordlessUser("testUser", Set.of(role1, role2));
 
         assertThatNoException()
                 .isThrownBy(() -> authorizer.authorize(
@@ -78,7 +78,7 @@ class DefaultAuthorizerTest {
         Role innerRole2 = new DefaultRole("secondInnerTestRole", Set.of(GlobalAuthority.PROFILE_MANAGEMENT), Set.of());
         Role role2 = new DefaultRole("secondTestRole", null, Set.of(innerRole2));
 
-        DecodedUser user = new DecodedUser("testUser", Set.of(role1, role2));
+        PasswordlessUser user = new PasswordlessUser("testUser", Set.of(role1, role2));
 
         assertThatNoException()
                 .isThrownBy(() -> authorizer.authorize(
@@ -93,7 +93,7 @@ class DefaultAuthorizerTest {
     void shouldAuthorize_UserWithEmptyAndValidRole_WhenValidRoleHasRequiredAuthority() {
         Role emptyRole = new DefaultRole("emptyRole", Set.of(), Collections.emptySet());
         Role role = new DefaultRole("testRole", Set.of(GlobalAuthority.HEALTH), Collections.emptySet());
-        DecodedUser user = new DecodedUser("testUser", Set.of(emptyRole, role));
+        PasswordlessUser user = new PasswordlessUser("testUser", Set.of(emptyRole, role));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.HEALTH));
 
@@ -103,7 +103,7 @@ class DefaultAuthorizerTest {
     @Test
     void shouldThrowAuthorizationException_UserWithoutRequiredAuthorities() {
         Role role = new DefaultRole("testRole", Set.of(GlobalAuthority.BEANS), Set.of());
-        DecodedUser user = new DecodedUser("testUser", Set.of(role));
+        PasswordlessUser user = new PasswordlessUser("testUser", Set.of(role));
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.METRICS));
 
@@ -114,7 +114,7 @@ class DefaultAuthorizerTest {
 
     @Test
     void shouldThrowAuthorizationException_WhenUserHasNoAuthoritiesAndRequestRequiresThem() {
-        DecodedUser user = new DecodedUser("testUserWithEmptyAuthorities", Set.of());
+        PasswordlessUser user = new PasswordlessUser("testUserWithEmptyAuthorities", Set.of());
 
         AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.CACHE_DISPATCHER));
 

@@ -108,9 +108,6 @@ class JwtAuthorizationFilterTest {
     @Value("${test-tokens.token-signed-with-wrong-key}")
     private String tokenSignedWithWrongKey;
 
-    @Value("${test-tokens.token-with-null-name-roles}")
-    private String tokenWithNullNameRoles;
-
     @Test
     void shouldAllowAccess_UserHasSingleRoleWithRequiredAuthorities() {
         HttpEntity<Void> entity = defaultEntity(tokenUserWithTwoRole);

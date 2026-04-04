@@ -28,10 +28,10 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 
-import com.axelixlabs.axelix.common.auth.core.DecodedUser;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.GlobalAuthority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
@@ -80,7 +80,7 @@ class DefaultJwtDecoderServiceTest {
 
     @Test
     void shouldDecodeValidJwtToken() {
-        DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithTwoRole);
+        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithTwoRole);
 
         Role userRole = decodedUser.getRoles().stream()
                 .filter(role -> role.getName().equals("ROLE_USER"))
@@ -98,7 +98,7 @@ class DefaultJwtDecoderServiceTest {
 
     @Test
     void shouldDecodeValidJwtToken_WithRoleHierarchy() {
-        DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithAdminRoleHierarchy);
+        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithAdminRoleHierarchy);
 
         Role rootRole = decodedUser.getRoles().stream()
                 .filter(role -> role.getName().equals("ROLE_ROOT"))
@@ -137,10 +137,10 @@ class DefaultJwtDecoderServiceTest {
         String key256 = "79912c6adb2a4f6c78a859807b072ce2a2c1140ac578f324cca983db22868b14";
         JwtDecoderService decoder256 = new DefaultJwtDecoderService(JwtAlgorithm.HMAC256, key256);
 
-        DecodedUser expectedUser = new DecodedUser(
+        PasswordlessUser expectedUser = new PasswordlessUser(
                 "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(GlobalAuthority.MAPPINGS), Set.of())));
 
-        DecodedUser decodedUser = decoder256.decodeTokenToUser(tokenWithHs256Algorithm);
+        PasswordlessUser decodedUser = decoder256.decodeTokenToUser(tokenWithHs256Algorithm);
 
         assertThat(decodedUser).usingRecursiveComparison().isEqualTo(expectedUser);
     }
@@ -151,17 +151,17 @@ class DefaultJwtDecoderServiceTest {
                 "bfa30eb1f16c07ba0a6a19a60f7c4bc02e1e10670411ae7a2f206b2bfe8801e2bb40741469d95fbbf4c86ae4b4a68437";
         JwtDecoderService decoder384 = new DefaultJwtDecoderService(JwtAlgorithm.HMAC384, key384);
 
-        DecodedUser expectedUser = new DecodedUser(
+        PasswordlessUser expectedUser = new PasswordlessUser(
                 "testUser", Set.of(new DefaultRole("ROLE_USER", Set.of(GlobalAuthority.BEANS), Set.of())));
 
-        DecodedUser decodedUser = decoder384.decodeTokenToUser(tokenWithHs384Algorithm);
+        PasswordlessUser decodedUser = decoder384.decodeTokenToUser(tokenWithHs384Algorithm);
 
         assertThat(decodedUser).usingRecursiveComparison().isEqualTo(expectedUser);
     }
 
     @Test
     void shouldOmitInvalidAuthority() {
-        DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithUnrecognizedAuthorities);
+        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenUserWithUnrecognizedAuthorities);
 
         assertThat(decodedUser.getRoles())
                 .first()
@@ -170,7 +170,7 @@ class DefaultJwtDecoderServiceTest {
 
     @Test
     void shouldDecodeValidJwtTokenWithoutUserRoles() {
-        DecodedUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenWithEmptyRoles);
+        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(tokenWithEmptyRoles);
 
         assertThat(decodedUser.getUsername()).isEqualTo("userWithEmptyRoles");
         assertThat(decodedUser.getRoles()).isEmpty();

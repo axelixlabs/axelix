@@ -233,7 +233,7 @@ class DefaultJwtEncoderServiceTest {
 
     @Test
     void shouldGenerateTokenForUserWithoutRoles() {
-        User user = new DefaultUser("userWithoutRoles", "testPassword", null);
+        User user = new DefaultUser("userWithoutRoles", "testPassword", Set.of());
 
         String token = jwtEncoderService.generateToken(user);
         String responsePayload = getPayload(token);

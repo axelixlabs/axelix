@@ -25,7 +25,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
-import com.axelixlabs.axelix.common.auth.core.DecodedUser;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
@@ -58,7 +58,7 @@ public class DefaultIdentityAccessManager implements IdentityAccessManager {
             throw new InvalidJwtTokenException("Authorization token is missing");
         }
 
-        DecodedUser user = jwtDecoderService.decodeTokenToUser(token);
+        PasswordlessUser user = jwtDecoderService.decodeTokenToUser(token);
 
         Optional<Authority> requiredAuthority = authorityResolver.resolve(requestPath, requestHttpMethod);
 

@@ -17,12 +17,9 @@
  */
 package com.axelixlabs.axelix.common.auth.exception;
 
-import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
-
 /**
  * Indicates that the JWT token has expired and can no longer be used.
  *
- * @see JwtDecoderService
  * @since 23.07.2025
  * @author Nikita Kirillov
  */

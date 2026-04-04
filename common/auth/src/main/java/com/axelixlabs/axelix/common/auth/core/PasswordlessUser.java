@@ -20,23 +20,32 @@ package com.axelixlabs.axelix.common.auth.core;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 /**
- * The user that gets decoded from JWT token.
+ * The representation of the user for which we do not know his password. That may happen
+ * because of different things, like when we decode user from JWT, or when we authenticate
+ * the user via OIDC for example.
  *
  * @author Mikhail Polivakha
  */
-public final class DecodedUser {
+public final class PasswordlessUser implements User {
 
     private final String username;
     private final Set<Role> roles;
 
-    public DecodedUser(String username, Set<Role> roles) {
+    public PasswordlessUser(String username, Set<Role> roles) {
         this.username = username;
         this.roles = roles;
     }
 
     public String getUsername() {
         return username;
+    }
+
+    @Override
+    public @Nullable String getPassword() {
+        return null;
     }
 
     public Set<Role> getRoles() {
@@ -51,7 +60,7 @@ public final class DecodedUser {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DecodedUser that = (DecodedUser) o;
+        PasswordlessUser that = (PasswordlessUser) o;
         return Objects.equals(username, that.username) && Objects.equals(roles, that.roles);
     }
 
