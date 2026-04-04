@@ -48,7 +48,6 @@ import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.ThreadDumpApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -311,9 +310,9 @@ class ThreadDumpApiTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
-                .getForEntity("/api/external/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/thread-dump/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -323,9 +322,9 @@ class ThreadDumpApiTest {
     void shouldReturnBadRequestForUnregisteredInstance() {
         String instanceId = UUID.randomUUID().toString();
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
-                .getForEntity("/api/external/thread-dump/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/thread-dump/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -355,13 +354,13 @@ class ThreadDumpApiTest {
         String instanceId = UUID.randomUUID().toString();
         registry.register(createInstance(instanceId));
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
                 .postForEntity(
                         "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
                         null,
-                        EndpointInvocationException.class,
+                        String.class,
                         Map.of("instanceId", instanceId));
 
         // then.
@@ -375,13 +374,13 @@ class ThreadDumpApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
                 .postForEntity(
                         "/api/external/thread-dump/{instanceId}/thread-contention-monitoring"
                                 + contentionMonitoringStatus,
                         null,
-                        EndpointInvocationException.class,
+                        String.class,
                         Map.of("instanceId", instanceId));
 
         // then.

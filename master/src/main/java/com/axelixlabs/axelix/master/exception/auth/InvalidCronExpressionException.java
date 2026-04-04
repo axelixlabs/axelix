@@ -15,38 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.error.handle;
+package com.axelixlabs.axelix.master.exception.auth;
 
 /**
- * The error codes that are be returned from the HTTP API.
+ * Thrown in case the cron expression is invalid.
  *
  * @author Mikhail Polivakha
  */
-public enum ApiErrorCodes {
+public class InvalidCronExpressionException extends RuntimeException {
 
-    // Server fault error codes
-    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR"),
-
-    // Auth related error codes
-    INVALID_CREDENTIALS("INVALID_CREDENTIALS"),
-    INVALID_JWT_EXCEPTION("INVALID_JWT_EXCEPTION"),
-    AUTHORIZATION_FAILURE("AUTHORIZATION_FAILURE"),
-
-    // Bad request related error codes
-    BAD_REQUEST("BAD_REQUEST"),
-    INSTANCE_NOT_FOUND("INSTANCE_NOT_FOUND"),
-    INVALID_CRON_EXPRESSION("INVALID_CRON_EXPRESSION");
-
-    /**
-     * actual code that is sent from the master backend.
-     */
-    private final String errorCode;
-
-    ApiErrorCodes(String errorCode) {
-        this.errorCode = errorCode;
-    }
-
-    public String getErrorCode() {
-        return errorCode;
+    public InvalidCronExpressionException(String cronExpression) {
+        super("Cron expression '%s' is invalid".formatted(cronExpression));
     }
 }

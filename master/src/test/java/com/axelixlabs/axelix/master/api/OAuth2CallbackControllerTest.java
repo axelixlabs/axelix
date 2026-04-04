@@ -121,8 +121,7 @@ class OAuth2CallbackControllerTest {
         ResponseEntity<Void> response =
                 restTemplate.getForEntity("http://localhost:" + port + "/api/external/oauth2/callback", Void.class);
 
-        // TODO: Are we sure that we need to respond with 500? I think 400 would be a better option
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test

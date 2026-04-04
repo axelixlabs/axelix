@@ -17,36 +17,30 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.master.api.error.ApiError;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.error.handle.ExceptionHandler;
 
 /**
- * The default {@link ExceptionHandler} where calls are forwarded when no specific
- * {@link ExceptionHandler ExceptionHandlers} are found.
+ * {@link ExceptionHandler} for {@link AuthorizationException}.
  *
  * @author Mikhail Polivakha
  */
-public class DefaultExceptionHandler implements ExceptionHandler<Exception> {
-
-    public static final DefaultExceptionHandler INSTANCE = new DefaultExceptionHandler();
-    private static final Logger log = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+@Component
+public class AuthorizationExceptionHandler implements ExceptionHandler<AuthorizationException> {
 
     @Override
-    public ApiError handle(Exception exception) {
-        log.warn("Default exception handler received an exception", exception);
-        return new SimpleApiError(
-                ApiErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+    public ApiError handle(AuthorizationException exception) {
+        return new SimpleApiError(ApiErrorCodes.AUTHORIZATION_FAILURE.getErrorCode(), HttpStatus.FORBIDDEN.value());
     }
 
     @Override
-    public Class<Exception> supported() {
-        return Exception.class;
+    public Class<AuthorizationException> supported() {
+        return AuthorizationException.class;
     }
 }

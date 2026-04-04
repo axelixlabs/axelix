@@ -36,7 +36,7 @@ public class InstanceNotFoundExceptionExceptionHandler implements ExceptionHandl
 
     @Override
     public ApiError handle(InstanceNotFoundException exception) {
-        return new SimpleApiError(ApiErrorCodes.INSTANCE_NOT_FOUND_CODE.getErrorCode(), HttpStatus.BAD_REQUEST.value());
+        return new SimpleApiError(ApiErrorCodes.INSTANCE_NOT_FOUND.getErrorCode(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Override

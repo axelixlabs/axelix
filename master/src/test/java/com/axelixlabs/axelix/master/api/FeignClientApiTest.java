@@ -42,7 +42,6 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -261,9 +260,8 @@ class FeignClientApiTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
-                .asViewer()
-                .getForEntity("/api/external/feign/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/api/external/feign/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -274,9 +272,8 @@ class FeignClientApiTest {
         String instanceId = "unregistered-env-instance";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
-                .asViewer()
-                .getForEntity("/api/external/feign/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/api/external/feign/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

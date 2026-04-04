@@ -43,7 +43,6 @@ import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.LoggersApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -234,9 +233,8 @@ public class LoggersApiAllLoggersTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
-                .asViewer()
-                .getForEntity("/api/external/loggers/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/api/external/loggers/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

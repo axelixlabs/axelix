@@ -106,7 +106,7 @@ class BasicDiscoveryMetadataEndpointProberTest {
     }
 
     @Test
-    void shouldReturnMetadata() throws EndpointInvocationException {
+    void shouldReturnMetadata() {
         String instanceUrl = mockWebServer.url(activeInstanceUrl).toString();
         BasicDiscoveryMetadata metadata =
                 metadataEndpointProber.invoke(instanceUrl + "/actuator", NoHttpPayload.INSTANCE);

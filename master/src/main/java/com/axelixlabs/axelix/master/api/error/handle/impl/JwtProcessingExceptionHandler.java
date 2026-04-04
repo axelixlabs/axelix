@@ -36,8 +36,7 @@ public class JwtProcessingExceptionHandler implements ExceptionHandler<JwtProces
 
     @Override
     public ApiError handle(JwtProcessingException exception) {
-        return new SimpleApiError(
-                ApiErrorCodes.INVALID_JWT_EXCEPTION_CODE.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
+        return new SimpleApiError(ApiErrorCodes.INVALID_JWT_EXCEPTION.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Override

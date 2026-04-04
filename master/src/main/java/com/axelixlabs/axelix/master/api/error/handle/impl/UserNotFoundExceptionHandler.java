@@ -36,8 +36,7 @@ public class UserNotFoundExceptionHandler implements ExceptionHandler<UserNotFou
 
     @Override
     public ApiError handle(UserNotFoundException exception) {
-        return new SimpleApiError(
-                ApiErrorCodes.INVALID_CREDENTIALS_CODE.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
+        return new SimpleApiError(ApiErrorCodes.INVALID_CREDENTIALS.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Override

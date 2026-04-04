@@ -39,8 +39,6 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
-import com.axelixlabs.axelix.master.api.error.SimpleApiError;
-import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpressionValidationRequest;
@@ -48,6 +46,7 @@ import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpre
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.InstanceIdParameter;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.exception.auth.InvalidCronExpressionException;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageSerializationStrategy;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
@@ -121,6 +120,7 @@ public class ScheduledTasksApi {
     @PostMapping(path = ApiPaths.ScheduledTasksApi.VALIDATE_CRON_EXPRESSION)
     public ScheduledTaskCronExpressionValidationResponse validateCronExpression(
             @RequestBody ScheduledTaskCronExpressionValidationRequest request) {
+
         return new ScheduledTaskCronExpressionValidationResponse(
                 CronExpression.isValidExpression(request.cronExpression()));
     }
@@ -135,14 +135,13 @@ public class ScheduledTasksApi {
             @RequestBody ScheduledTaskCronExpressionModifyRequest request) {
 
         if (!CronExpression.isValidExpression(request.getCronExpression())) {
-            // TODO: Again, that is bad to pass status code to SimpleApiError
-            return ResponseEntity.badRequest()
-                    .body(new SimpleApiError(ApiErrorCodes.INVALID_CRON_EXPRESSION.getErrorCode(), 400));
+            throw new InvalidCronExpressionException(request.getCronExpression());
         }
 
         HttpPayload payload = HttpPayload.json(jacksonMessageSerializationStrategy.serialize(request));
         endpointInvoker.invokeNoValue(
                 InstanceId.of(instanceId), ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK, payload);
+
         return ResponseEntity.noContent().build();
     }
 

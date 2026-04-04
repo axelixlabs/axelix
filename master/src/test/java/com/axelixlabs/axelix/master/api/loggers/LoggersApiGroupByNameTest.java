@@ -43,7 +43,6 @@ import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.LoggersApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -205,13 +204,10 @@ public class LoggersApiGroupByNameTest {
         String groupName = "test";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
                 .getForEntity(
-                        "/api/external/loggers/{instanceId}/group/{groupName}",
-                        EndpointInvocationException.class,
-                        instanceId,
-                        groupName);
+                        "/api/external/loggers/{instanceId}/group/{groupName}", String.class, instanceId, groupName);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

@@ -30,10 +30,6 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
-import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
-import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
-import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
@@ -81,22 +77,12 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
         String token = resolveToken(request.getCookies());
 
         if (token == null || token.isBlank()) {
-            throw new ServletException(new JwtProcessingException("Authorization token is missing"));
+            throw new JwtProcessingException("Authorization token is missing");
         }
 
-        try {
-            identityAccessManager.verifyAccess(
-                    request.getServletPath(), HttpMethod.valueOf(request.getMethod()), token);
+        identityAccessManager.verifyAccess(request.getServletPath(), HttpMethod.valueOf(request.getMethod()), token);
 
-            filterChain.doFilter(request, response);
-
-        } catch (AuthorizationException e) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write(e.getMessage());
-            response.getWriter().flush();
-        } catch (JwtParsingException | ExpiredJwtTokenException | InvalidJwtTokenException e) {
-            throw new ServletException(e);
-        }
+        filterChain.doFilter(request, response);
     }
 
     @Nullable

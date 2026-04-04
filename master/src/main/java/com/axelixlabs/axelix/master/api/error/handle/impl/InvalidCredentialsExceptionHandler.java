@@ -36,8 +36,7 @@ public class InvalidCredentialsExceptionHandler implements ExceptionHandler<Inva
 
     @Override
     public ApiError handle(InvalidCredentialsException exception) {
-        return new SimpleApiError(
-                ApiErrorCodes.INVALID_CREDENTIALS_CODE.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
+        return new SimpleApiError(ApiErrorCodes.INVALID_CREDENTIALS.getErrorCode(), HttpStatus.UNAUTHORIZED.value());
     }
 
     @Override

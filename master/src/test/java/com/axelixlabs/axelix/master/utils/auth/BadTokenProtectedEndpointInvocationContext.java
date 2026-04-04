@@ -67,8 +67,7 @@ public class BadTokenProtectedEndpointInvocationContext implements TestTemplateI
                                         ProtectedEndpointRequestSupport.httpEntity(meta),
                                         Void.class);
 
-                        assertThat(HttpStatus.UNAUTHORIZED.value())
-                                .isEqualTo(result.getStatusCode().value());
+                        assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
                     }
                 })
                 .toList();

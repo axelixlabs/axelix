@@ -49,7 +49,6 @@ import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -148,12 +147,12 @@ class PropertyManagementApiTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asEditor()
                 .postForEntity(
                         "/api/external/property-management/{instanceId}",
                         defaultEntity(request),
-                        EndpointInvocationException.class,
+                        String.class,
                         instanceId);
 
         // then.
@@ -166,13 +165,9 @@ class PropertyManagementApiTest {
         PropertyUpdatedRequest request = new PropertyUpdatedRequest("property.enabled", "false");
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asEditor()
-                .postForEntity(
-                        "/api/external/property-management/{instanceId}",
-                        request,
-                        EndpointInvocationException.class,
-                        instanceId);
+                .postForEntity("/api/external/property-management/{instanceId}", request, String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

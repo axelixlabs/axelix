@@ -43,7 +43,6 @@ import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.ConditionsApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -246,10 +245,9 @@ class ConditionsApiTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
-                .getForEntity(
-                        "/api/external/conditions/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/conditions/feed/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -260,10 +258,9 @@ class ConditionsApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
-                .getForEntity(
-                        "/api/external/conditions/feed/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/conditions/feed/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

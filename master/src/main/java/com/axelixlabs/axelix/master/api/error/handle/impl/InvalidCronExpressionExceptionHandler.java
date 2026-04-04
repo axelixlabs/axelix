@@ -17,36 +17,30 @@
  */
 package com.axelixlabs.axelix.master.api.error.handle.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 import com.axelixlabs.axelix.master.api.error.ApiError;
 import com.axelixlabs.axelix.master.api.error.SimpleApiError;
 import com.axelixlabs.axelix.master.api.error.handle.ApiErrorCodes;
 import com.axelixlabs.axelix.master.api.error.handle.ExceptionHandler;
+import com.axelixlabs.axelix.master.exception.auth.InvalidCronExpressionException;
 
 /**
- * The default {@link ExceptionHandler} where calls are forwarded when no specific
- * {@link ExceptionHandler ExceptionHandlers} are found.
+ * The exception handler for the {@link InvalidCronExpressionException}.
  *
  * @author Mikhail Polivakha
  */
-public class DefaultExceptionHandler implements ExceptionHandler<Exception> {
-
-    public static final DefaultExceptionHandler INSTANCE = new DefaultExceptionHandler();
-    private static final Logger log = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+@Component
+public class InvalidCronExpressionExceptionHandler implements ExceptionHandler<InvalidCronExpressionException> {
 
     @Override
-    public ApiError handle(Exception exception) {
-        log.warn("Default exception handler received an exception", exception);
-        return new SimpleApiError(
-                ApiErrorCodes.INTERNAL_SERVER_ERROR.getErrorCode(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+    public ApiError handle(InvalidCronExpressionException exception) {
+        return new SimpleApiError(ApiErrorCodes.INVALID_CRON_EXPRESSION.getErrorCode(), HttpStatus.BAD_REQUEST.value());
     }
 
     @Override
-    public Class<Exception> supported() {
-        return Exception.class;
+    public Class<InvalidCronExpressionException> supported() {
+        return InvalidCronExpressionException.class;
     }
 }

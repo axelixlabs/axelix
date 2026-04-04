@@ -24,8 +24,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import tools.jackson.databind.ObjectMapper;
-
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -34,9 +32,8 @@ import com.axelixlabs.axelix.master.api.error.ApiError;
 import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
 
 /**
- * The {@link OncePerRequestFilter} that is supposed to handle exceptions occurring
- * in the filter chain. All the other exceptions that propagate from the spring-web
- * endpoints will be already caught by {@link GlobalExceptionHandler}.
+ * The {@link OncePerRequestFilter} that is supposed to handle exceptions
+ * during processing HTTP requests.
  *
  * @author Mikhail Polivakha
  */
@@ -44,25 +41,37 @@ import com.axelixlabs.axelix.master.api.error.handle.ApiExceptionTranslator;
 public class ExceptionHandlingFilter extends OncePerRequestFilter {
 
     private final ApiExceptionTranslator apiExceptionTranslator;
-    private final ObjectMapper objectMapper;
 
-    public ExceptionHandlingFilter(ApiExceptionTranslator apiExceptionTranslator, ObjectMapper objectMapper) {
+    private static final String ERROR_RESPONSE_TEMPLATE =
+            // langauge=json
+            """
+        {
+            "errorCode" : "%s"
+        }
+        """;
+
+    public ExceptionHandlingFilter(ApiExceptionTranslator apiExceptionTranslator) {
         this.apiExceptionTranslator = apiExceptionTranslator;
-        this.objectMapper = objectMapper;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+            throws IOException {
         try {
             doFilter(request, response, filterChain);
         } catch (ServletException e) {
             handleApiError(response, deriveApiError(e));
-        } catch (IOException e) {
+        } catch (Exception e) {
             handleApiError(response, apiExceptionTranslator.translateException(e));
         }
     }
 
+    /**
+     * This code needs clarification. We need to process {@link ServletException} separately since
+     * Jakarta Servlet Specification requires that in case of any unrecognized/unkwon exception,
+     * the Servlet Container MUST wrap it up in the {@link ServletException}. So we have to unwrap it if
+     * necessary.
+     */
     private ApiError deriveApiError(ServletException e) {
         Throwable rootCause = e.getRootCause();
 
@@ -75,7 +84,7 @@ public class ExceptionHandlingFilter extends OncePerRequestFilter {
 
     private void handleApiError(HttpServletResponse response, ApiError apiError) throws IOException {
         response.setStatus(apiError.statusCode());
-        response.getWriter().write(objectMapper.writeValueAsString(apiError));
+        response.getWriter().write(ERROR_RESPONSE_TEMPLATE.formatted(apiError.errorCode()));
         response.getWriter().flush();
     }
 }

@@ -43,7 +43,6 @@ import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.LoggersApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -241,12 +240,12 @@ public class LoggersApiManagementLoggingLevelTest {
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("INFO");
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/group/{groupName}",
                         requestBody,
-                        EndpointInvocationException.class,
+                        String.class,
                         instanceId,
                         groupName);
 
@@ -261,12 +260,12 @@ public class LoggersApiManagementLoggingLevelTest {
         LogLevelChangeRequest requestBody = new LogLevelChangeRequest("DEBUG");
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}",
                         requestBody,
-                        EndpointInvocationException.class,
+                        String.class,
                         instanceId,
                         loggerName);
 
@@ -280,12 +279,12 @@ public class LoggersApiManagementLoggingLevelTest {
         String loggerName = "reset.logger.name";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
                 .postForEntity(
                         "/api/external/loggers/{instanceId}/logger/{loggerName}/reset",
                         null,
-                        EndpointInvocationException.class,
+                        String.class,
                         instanceId,
                         loggerName);
 

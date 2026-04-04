@@ -55,7 +55,6 @@ import com.axelixlabs.axelix.master.api.external.request.ScheduledTaskCronExpres
 import com.axelixlabs.axelix.master.api.external.response.ScheduledTaskCronExpressionValidationResponse;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -429,7 +428,7 @@ public class ScheduledTasksApiTest {
     @DisplayName("Should return 400 Bad Request for invalid cron expression")
     void shouldReturnBadRequest_OnModifyCronExpressionWithInvalidExpression(String invalidCronExpression) {
         // given.
-        ScheduledTaskCronExpressionModifyRequest requestBody = new ScheduledTaskCronExpressionModifyRequest(
+        var requestBody = new ScheduledTaskCronExpressionModifyRequest(
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.cronTask", invalidCronExpression);
 
         // and.
@@ -499,10 +498,9 @@ public class ScheduledTasksApiTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
-                .getForEntity(
-                        "/api/external/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -513,10 +511,9 @@ public class ScheduledTasksApiTest {
         String instanceId = "unregistered-axelix-scheduled-tasks-instance";
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asViewer()
-                .getForEntity(
-                        "/api/external/scheduled-tasks/{instanceId}", EndpointInvocationException.class, instanceId);
+                .getForEntity("/api/external/scheduled-tasks/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -533,12 +530,12 @@ public class ScheduledTasksApiTest {
 
         // when.
         registry.register(createInstance(instanceId));
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
-                        EndpointInvocationException.class,
+                        String.class,
                         instanceId);
 
         // then.
@@ -554,12 +551,12 @@ public class ScheduledTasksApiTest {
                 "org.springframework.samples.petclinic.scheduled.SchedulerTestConfig.fixedRateTask");
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asEditor()
                 .postForEntity(
                         "/api/external/scheduled-tasks/{instanceId}" + scheduledTaskStatus,
                         requestBody,
-                        EndpointInvocationException.class,
+                        String.class,
                         instanceId);
 
         // then.

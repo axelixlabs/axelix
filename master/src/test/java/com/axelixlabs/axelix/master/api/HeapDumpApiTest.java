@@ -47,10 +47,8 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.HeapDumpApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.export.HeapDumpAnonymizer;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -165,9 +163,8 @@ class HeapDumpApiTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
-                .asViewer()
-                .getForEntity("/api/external/heapdump/{instanceId}", EndpointInvocationException.class, instanceId);
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/api/external/heapdump/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -178,9 +175,8 @@ class HeapDumpApiTest {
         String instanceId = UUID.randomUUID().toString();
 
         // when.
-        ResponseEntity<InstanceNotFoundException> response = restTemplate
-                .asViewer()
-                .getForEntity("/api/external/heapdump/{instanceId}", InstanceNotFoundException.class, instanceId);
+        ResponseEntity<String> response =
+                restTemplate.asViewer().getForEntity("/api/external/heapdump/{instanceId}", String.class, instanceId);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

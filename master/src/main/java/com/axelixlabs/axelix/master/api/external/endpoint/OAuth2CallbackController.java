@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
+import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 
 /**
  * Controller handling the OAuth2 Authorization Code Flow callback.
@@ -66,7 +67,12 @@ public class OAuth2CallbackController {
     }
 
     @GetMapping(path = ApiPaths.OAuth2Api.CALLBACK)
-    public ResponseEntity<?> callback(@RequestParam String code) {
+    public ResponseEntity<?> callback(@RequestParam(required = false) String code) {
+
+        // TODO: handle it better
+        if (code == null) {
+            throw new BadRequestException("The authorization code is required");
+        }
 
         String oidcToken = oidcClient.exchangeCodeForIdToken(code);
 

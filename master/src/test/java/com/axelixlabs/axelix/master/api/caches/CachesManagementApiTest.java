@@ -47,7 +47,6 @@ import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.caches.CachesManagementApi;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
-import com.axelixlabs.axelix.master.service.transport.EndpointInvocationException;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
@@ -165,12 +164,12 @@ class CachesManagementApiTest {
         registry.register(createInstance(instanceId));
 
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asEditor()
                 .postForEntity(
                         "/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,
-                        EndpointInvocationException.class,
+                        String.class,
                         Map.of("instanceId", instanceId, "cacheManagerName", "unknown", "cacheName", "unknown"));
 
         // then.
@@ -181,12 +180,12 @@ class CachesManagementApiTest {
     @MethodSource("cacheOperations")
     void shouldReturnBadRequestForUnregisteredInstance_OnEnableOrDisableCacheName(String cacheStatus) {
         // when.
-        ResponseEntity<EndpointInvocationException> response = restTemplate
+        ResponseEntity<String> response = restTemplate
                 .asEditor()
                 .postForEntity(
                         "/api/external/caches/{instanceId}/{cacheManagerName}/{cacheName}/" + cacheStatus,
                         null,
-                        EndpointInvocationException.class,
+                        String.class,
                         Map.of(
                                 "instanceId",
                                 UUID.randomUUID().toString(),
