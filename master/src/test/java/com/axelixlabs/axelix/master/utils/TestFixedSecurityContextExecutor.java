@@ -20,13 +20,14 @@ package com.axelixlabs.axelix.master.utils;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.function.ThrowingCallable;
 import com.axelixlabs.axelix.common.domain.function.ThrowingRunnable;
-import org.jspecify.annotations.NullMarked;
 
 /**
  * {@link SecurityContextExecutor} for tests: always exposes a fixed token so actuator probers can build
@@ -38,7 +39,7 @@ import org.jspecify.annotations.NullMarked;
 public final class TestFixedSecurityContextExecutor implements SecurityContextExecutor {
 
     private static final SecurityContext CONTEXT =
-            new DefaultSecurityContext(new DefaultUser("test","", Set.of()), "test-token");
+            new DefaultSecurityContext(new DefaultUser("test", "", Set.of()), "test-token");
 
     @Override
     public <T extends Exception> void runWithinSecurityContext(
