@@ -32,10 +32,16 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
+import com.axelixlabs.axelix.master.utils.TestFixedSecurityContextExecutor;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +55,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Mikhail Polivakha
  */
 @SpringBootTest(classes = ApplicationEntrypoint.class)
+@Import(BasicDiscoveryMetadataEndpointProberTest.ProberTestSecurityConfiguration.class)
 class BasicDiscoveryMetadataEndpointProberTest {
+
+    @TestConfiguration
+    static class ProberTestSecurityConfiguration {
+
+        @Bean
+        @Primary
+        public SecurityContextExecutor testSecurityContextExecutor() {
+            return new TestFixedSecurityContextExecutor();
+        }
+    }
 
     private static final String activeInstanceUrl = UUID.randomUUID().toString();
 

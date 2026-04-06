@@ -26,6 +26,7 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
+import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
@@ -51,7 +52,7 @@ public class DefaultIdentityAccessManager implements IdentityAccessManager {
     }
 
     @Override
-    public void verifyAccess(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
+    public User verifyAccess(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
             throws AuthorizationException, JwtProcessingException {
 
         if (token == null || token.isEmpty()) {
@@ -66,5 +67,7 @@ public class DefaultIdentityAccessManager implements IdentityAccessManager {
                 new AuthorizationRequest(requiredAuthority.map(Set::of).orElse(Collections.emptySet()));
 
         authorizer.authorize(user, authorizationRequest);
+
+        return user;
     }
 }

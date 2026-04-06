@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.transport;
 
 import org.jspecify.annotations.NonNull;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
@@ -33,8 +34,11 @@ public class ProxyingEndpointProber extends AbstractEndpointProber<byte[]> {
 
     private final ActuatorEndpoint actuatorEndpoint;
 
-    public ProxyingEndpointProber(InstanceRegistry instanceRegistry, ActuatorEndpoint actuatorEndpoint) {
-        super(instanceRegistry, binary -> binary);
+    public ProxyingEndpointProber(
+            InstanceRegistry instanceRegistry,
+            ActuatorEndpoint actuatorEndpoint,
+            SecurityContextExecutor securityContextExecutor) {
+        super(instanceRegistry, binary -> binary, securityContextExecutor);
         this.actuatorEndpoint = actuatorEndpoint;
     }
 

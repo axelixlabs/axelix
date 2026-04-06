@@ -40,8 +40,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
@@ -50,6 +52,7 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.exception.InstanceNotFoundException;
 import com.axelixlabs.axelix.master.service.serde.JacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.TestFixedSecurityContextExecutor;
 import com.axelixlabs.axelix.master.utils.TestObjectFactory;
 
 import static com.axelixlabs.axelix.common.domain.ActuatorEndpoint.of;
@@ -239,26 +242,41 @@ public class DefaultEndpointInvokerTest {
     static class DefaultEndpointInvokerTestConfiguration {
 
         @Bean
-        public DiscardingAbstractEndpointProber invokeNoValueMethodEndpointProber(InstanceRegistry instanceRegistry) {
-            return new DiscardingAbstractEndpointProber(instanceRegistry, METHOD_INVOKE_NO_VALUE);
+        @Primary
+        public SecurityContextExecutor testSecurityContextExecutor() {
+            return new TestFixedSecurityContextExecutor();
+        }
+
+        @Bean
+        public DiscardingAbstractEndpointProber invokeNoValueMethodEndpointProber(
+                InstanceRegistry instanceRegistry, SecurityContextExecutor securityContextExecutor) {
+            return new DiscardingAbstractEndpointProber(
+                    instanceRegistry, METHOD_INVOKE_NO_VALUE, securityContextExecutor);
         }
 
         @Bean
         public DiscardingAbstractEndpointProber invokeNoValueMethodWithBadRequestEndpointProber(
-                InstanceRegistry instanceRegistry) {
-            return new DiscardingAbstractEndpointProber(instanceRegistry, METHOD_INVOKE_NO_VALUE_BAD_REQUEST);
+                InstanceRegistry instanceRegistry, SecurityContextExecutor securityContextExecutor) {
+            return new DiscardingAbstractEndpointProber(
+                    instanceRegistry, METHOD_INVOKE_NO_VALUE_BAD_REQUEST, securityContextExecutor);
         }
 
         @Bean
         public DefaultEndpointProber<JsonNode> invokeMethodEndpointProber(
-                InstanceRegistry instanceRegistry, TestJacksonMessageDeserializationStrategy deserializationStrategy) {
-            return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, METHOD_INVOKE);
+                InstanceRegistry instanceRegistry,
+                TestJacksonMessageDeserializationStrategy deserializationStrategy,
+                SecurityContextExecutor securityContextExecutor) {
+            return new DefaultEndpointProber<>(
+                    instanceRegistry, deserializationStrategy, securityContextExecutor, METHOD_INVOKE);
         }
 
         @Bean
         public DefaultEndpointProber<JsonNode> invokeMethodWithBadRequestEndpointProber(
-                InstanceRegistry instanceRegistry, TestJacksonMessageDeserializationStrategy deserializationStrategy) {
-            return new DefaultEndpointProber<>(instanceRegistry, deserializationStrategy, METHOD_INVOKE_BAD_REQUEST);
+                InstanceRegistry instanceRegistry,
+                TestJacksonMessageDeserializationStrategy deserializationStrategy,
+                SecurityContextExecutor securityContextExecutor) {
+            return new DefaultEndpointProber<>(
+                    instanceRegistry, deserializationStrategy, securityContextExecutor, METHOD_INVOKE_BAD_REQUEST);
         }
 
         @Component

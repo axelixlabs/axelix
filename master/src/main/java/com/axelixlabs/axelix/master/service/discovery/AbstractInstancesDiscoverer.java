@@ -102,7 +102,7 @@ public abstract class AbstractInstancesDiscoverer implements InstancesDiscoverer
     }
 
     private @Nullable InstanceIntermediateProfile getManagedServiceMetadata(@NonNull ServiceInstance serviceInstance) {
-        String actuatorUrl = serviceInstance.getUri().toString() + ACTUATOR_ENDPOINT_POSTFIX;
+        String actuatorUrl = serviceInstance.getUri() + ACTUATOR_ENDPOINT_POSTFIX;
 
         try {
             BasicDiscoveryMetadata metadata = managedServiceProber.invoke(actuatorUrl, NoHttpPayload.INSTANCE);

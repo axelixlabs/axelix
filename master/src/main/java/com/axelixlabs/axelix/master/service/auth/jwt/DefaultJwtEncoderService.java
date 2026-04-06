@@ -41,6 +41,7 @@ import com.axelixlabs.axelix.master.exception.auth.JwtTokenGenerationException;
  * @see JwtRole
  * @since 22.07.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public class DefaultJwtEncoderService implements JwtEncoderService {
 
@@ -58,6 +59,11 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
 
     @Override
     public String generateToken(User user) throws JwtTokenGenerationException {
+        return generateToken(user, lifespan);
+    }
+
+    @Override
+    public String generateToken(User user, Duration lifespan) throws JwtTokenGenerationException {
         validateUser(user);
 
         try {

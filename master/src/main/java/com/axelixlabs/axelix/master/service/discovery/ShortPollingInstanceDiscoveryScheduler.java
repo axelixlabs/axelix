@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.discovery;
 
+import java.time.Duration;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -24,8 +25,12 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.scheduling.annotation.Scheduled;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -40,19 +45,31 @@ public class ShortPollingInstanceDiscoveryScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(ShortPollingInstanceDiscoveryScheduler.class);
 
+    private static final PasswordlessUser TECH_USER = new PasswordlessUser("AXELIX.MASTER", Set.of());
+
     private final InstancesDiscoverer instancesDiscoverer;
     private final InstanceRegistry instanceRegistry;
+    private final JwtEncoderService jwtEncoderService;
+    private final SecurityContextExecutor securityContextExecutor;
 
     public ShortPollingInstanceDiscoveryScheduler(
-            InstancesDiscoverer instancesDiscoverer, InstanceRegistry instanceRegistry) {
+            InstancesDiscoverer instancesDiscoverer,
+            InstanceRegistry instanceRegistry,
+            JwtEncoderService jwtEncoderService,
+            SecurityContextExecutor securityContextExecutor) {
         this.instancesDiscoverer = instancesDiscoverer;
         this.instanceRegistry = instanceRegistry;
+        this.jwtEncoderService = jwtEncoderService;
+        this.securityContextExecutor = securityContextExecutor;
     }
 
     @Scheduled(fixedDelayString = "${axelix.master.discovery.polling.fixed-delay:60000}")
     public void performDiscovery() {
 
-        Set<Instance> discoveredInstances = instancesDiscoverer.discoverSafely();
+        String token = jwtEncoderService.generateToken(TECH_USER, Duration.ofSeconds(300));
+
+        Set<Instance> discoveredInstances = securityContextExecutor.callWithinSecurityContext(
+                instancesDiscoverer::discoverSafely, new DefaultSecurityContext(TECH_USER, token));
 
         if (discoveredInstances.isEmpty()) {
             logger.error("""

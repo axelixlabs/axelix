@@ -22,6 +22,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.master.service.serde.MessageDeserializationStrategy;
@@ -38,8 +39,9 @@ public class ManagedServiceMetadataEndpointProber extends AbstractEndpointProber
 
     public ManagedServiceMetadataEndpointProber(
             InstanceRegistry instanceRegistry,
-            MessageDeserializationStrategy<BasicDiscoveryMetadata> messageDeserializationStrategy) {
-        super(instanceRegistry, messageDeserializationStrategy);
+            MessageDeserializationStrategy<BasicDiscoveryMetadata> messageDeserializationStrategy,
+            SecurityContextExecutor securityContextExecutor) {
+        super(instanceRegistry, messageDeserializationStrategy, securityContextExecutor);
     }
 
     @Override

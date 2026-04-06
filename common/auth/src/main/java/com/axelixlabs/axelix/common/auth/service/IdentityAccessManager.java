@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.common.auth.service;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
@@ -34,16 +35,18 @@ public interface IdentityAccessManager {
 
     /**
      * Main entrypoint for IAM. In case any problem is encountered, then the corresponding exception is thrown.
-     * The method normal exit signifies that user, identified by the bearer access token has been granted access.
+     * In case access is granted, the method returns the user identified by the bearer access token has been granted access.
      *
-     * @param requestPath the context path of the request, e.g. {@code /api/external/anything} or {@code /actuator/axelix-beans}.
+     * @param requestPath       the context path of the request, e.g. {@code /api/external/anything} or {@code /actuator/axelix-beans}.
      * @param requestHttpMethod the HTTP method of the request.
-     * @param token the Bearer access token of the user.
+     * @param token             the Bearer access token of the user.
+     *
+     * @return the user that was granted access.
      *
      * @throws AuthorizationException in case the user is not authorized to access the given API.
      * @throws JwtProcessingException in case the implementation is unable to verify the validity
      *                                of the token or if the token is deemed invalid.
      */
-    void verifyAccess(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
+    User verifyAccess(String requestPath, HttpMethod requestHttpMethod, @Nullable String token)
             throws AuthorizationException, JwtProcessingException;
 }
