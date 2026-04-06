@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.transport;
 
 import org.jspecify.annotations.NonNull;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.master.service.serde.MessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -35,8 +36,9 @@ public class DefaultEndpointProber<O> extends AbstractEndpointProber<O> {
     public DefaultEndpointProber(
             InstanceRegistry instanceRegistry,
             MessageDeserializationStrategy<O> messageDeserializationStrategy,
+            SecurityContextExecutor securityContextExecutor,
             ActuatorEndpoint actuatorEndpoint) {
-        super(instanceRegistry, messageDeserializationStrategy);
+        super(instanceRegistry, messageDeserializationStrategy, securityContextExecutor);
         this.actuatorEndpoint = actuatorEndpoint;
     }
 

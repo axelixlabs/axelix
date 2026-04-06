@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.service.transport;
 
 import org.jspecify.annotations.NonNull;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
@@ -35,8 +36,11 @@ public class DiscardingAbstractEndpointProber extends AbstractEndpointProber<byt
 
     private final ActuatorEndpoint actuatorEndpoint;
 
-    public DiscardingAbstractEndpointProber(InstanceRegistry instanceRegistry, ActuatorEndpoint actuatorEndpoint) {
-        super(instanceRegistry, NoOpMessageDeserializationStrategy.INSTANCE);
+    public DiscardingAbstractEndpointProber(
+            InstanceRegistry instanceRegistry,
+            ActuatorEndpoint actuatorEndpoint,
+            SecurityContextExecutor securityContextExecutor) {
+        super(instanceRegistry, NoOpMessageDeserializationStrategy.INSTANCE, securityContextExecutor);
         this.actuatorEndpoint = actuatorEndpoint;
     }
 

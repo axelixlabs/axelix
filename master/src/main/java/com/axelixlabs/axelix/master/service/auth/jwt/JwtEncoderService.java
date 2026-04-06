@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.service.auth.jwt;
 
+import java.time.Duration;
+
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.exception.auth.JwtTokenGenerationException;
 
@@ -28,6 +30,7 @@ import com.axelixlabs.axelix.master.exception.auth.JwtTokenGenerationException;
  *
  * @since 23.07.2025
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 public interface JwtEncoderService {
 
@@ -40,6 +43,13 @@ public interface JwtEncoderService {
      * @return a signed JWT token as a string
      * @throws JwtTokenGenerationException if the user is invalid or token creation fails
      */
-    // TODO: add jspecify annotations for request/response
     String generateToken(User user) throws JwtTokenGenerationException;
+
+    /**
+     * Generates a signed JWT token from the given {@link User} object.
+     * <p>
+     * The contract is essentially the same as for {@link #generateToken(User)}, except
+     * this API provides the ability to override the lifespan of the token.
+     */
+    String generateToken(User user, Duration lifespan) throws JwtTokenGenerationException;
 }

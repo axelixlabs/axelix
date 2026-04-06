@@ -28,6 +28,10 @@ import java.time.Duration;
 
 import org.jspecify.annotations.NonNull;
 
+import org.springframework.http.HttpHeaders;
+
+import com.axelixlabs.axelix.common.auth.core.SecurityContext;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.master.domain.Instance;
@@ -45,14 +49,20 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  */
 public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
 
+    private static final String AUTHENTICATION_SCHEMA = "Bearer ";
+
     private final InstanceRegistry instanceRegistry;
     private final MessageDeserializationStrategy<O> messageDeserializationStrategy;
     private final HttpClient httpClient;
+    private final SecurityContextExecutor securityContextExecutor;
 
     protected AbstractEndpointProber(
-            InstanceRegistry instanceRegistry, MessageDeserializationStrategy<O> messageDeserializationStrategy) {
+            InstanceRegistry instanceRegistry,
+            MessageDeserializationStrategy<O> messageDeserializationStrategy,
+            SecurityContextExecutor securityContextExecutor) {
         this.instanceRegistry = instanceRegistry;
         this.messageDeserializationStrategy = messageDeserializationStrategy;
+        this.securityContextExecutor = securityContextExecutor;
         this.httpClient =
                 HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
     }
@@ -116,6 +126,13 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
                 builder.header(header.name(), header.valueAsString());
             }
         }
+
+        SecurityContext securityContext = securityContextExecutor
+                .getSecurityContext()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Security Context is expected to be bound before invoking actuator endpoint"));
+
+        builder.header(HttpHeaders.AUTHORIZATION, AUTHENTICATION_SCHEMA + securityContext.token());
 
         return builder.build();
     }

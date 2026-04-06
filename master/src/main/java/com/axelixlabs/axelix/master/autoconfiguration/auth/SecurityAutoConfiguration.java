@@ -27,6 +27,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClient;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
@@ -125,8 +126,11 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public CookieBasedJwtAuthorizationFilter cookieBasedJwtAuthorizationFilter(
-                IdentityAccessManager identityAccessManager, CookieProperties cookieProperties) {
-            return new CookieBasedJwtAuthorizationFilter(cookieProperties.getName(), identityAccessManager);
+                IdentityAccessManager identityAccessManager,
+                CookieProperties cookieProperties,
+                SecurityContextExecutor securityContextExecutor) {
+            return new CookieBasedJwtAuthorizationFilter(
+                    cookieProperties.getName(), identityAccessManager, securityContextExecutor);
         }
     }
 

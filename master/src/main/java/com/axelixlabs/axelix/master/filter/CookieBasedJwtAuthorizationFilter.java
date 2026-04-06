@@ -30,6 +30,9 @@ import org.jspecify.annotations.Nullable;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
@@ -45,10 +48,15 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final String authCookieName;
     private final IdentityAccessManager identityAccessManager;
+    private final SecurityContextExecutor securityContextExecutor;
 
-    public CookieBasedJwtAuthorizationFilter(String authCookieName, IdentityAccessManager identityAccessManager) {
+    public CookieBasedJwtAuthorizationFilter(
+            String authCookieName,
+            IdentityAccessManager identityAccessManager,
+            SecurityContextExecutor securityContextExecutor) {
         this.authCookieName = authCookieName;
         this.identityAccessManager = identityAccessManager;
+        this.securityContextExecutor = securityContextExecutor;
     }
 
     @Override
@@ -80,9 +88,17 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
             throw new JwtProcessingException("Authorization token is missing");
         }
 
-        identityAccessManager.verifyAccess(request.getServletPath(), HttpMethod.valueOf(request.getMethod()), token);
+        User user = identityAccessManager.verifyAccess(
+                request.getServletPath(), HttpMethod.valueOf(request.getMethod()), token);
 
-        filterChain.doFilter(request, response);
+        try {
+            securityContextExecutor.runWithinSecurityContext(
+                    () -> filterChain.doFilter(request, response), new DefaultSecurityContext(user, token));
+        } catch (ServletException | IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
     }
 
     @Nullable

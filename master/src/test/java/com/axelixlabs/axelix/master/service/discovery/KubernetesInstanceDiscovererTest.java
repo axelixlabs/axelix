@@ -46,6 +46,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.DefaultInstanceFactory;
@@ -54,6 +55,7 @@ import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInsta
 import com.axelixlabs.axelix.master.service.serde.MetadataJacksonMessageDeserializationStrategy;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndpointProber;
+import com.axelixlabs.axelix.master.utils.TestFixedSecurityContextExecutor;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -94,10 +96,17 @@ class KubernetesInstanceDiscovererTest {
     static class CurrentConfig {
 
         @Bean
+        public SecurityContextExecutor securityContextExecutor() {
+            return new TestFixedSecurityContextExecutor();
+        }
+
+        @Bean
         public ManagedServiceMetadataEndpointProber managedServiceMetadataEndpointProber(
                 InstanceRegistry instanceRegistry,
-                MetadataJacksonMessageDeserializationStrategy deserializationStrategy) {
-            return new ManagedServiceMetadataEndpointProber(instanceRegistry, deserializationStrategy);
+                MetadataJacksonMessageDeserializationStrategy deserializationStrategy,
+                SecurityContextExecutor securityContextExecutor) {
+            return new ManagedServiceMetadataEndpointProber(
+                    instanceRegistry, deserializationStrategy, securityContextExecutor);
         }
 
         @Bean

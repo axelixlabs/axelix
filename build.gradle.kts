@@ -60,13 +60,14 @@ subprojects {
                 "com.axelixlabs",
                 "\\#"
             )
-            removeUnusedImports("cleanthat-javaparser-unnecessaryimport")
             forbidWildcardImports()
             trimTrailingWhitespace()
 //            TODO:
 //             For some reason, toggling comments like spotless:off / spotless:on
 //             stopped working, disabled it for now
 //            toggleOffOn()
+            // TODO: removeUnusedImports may not always work https://github.com/diffplug/spotless/issues/2850
+            removeUnusedImports("cleanthat-javaparser-unnecessaryimport")
 
             licenseHeader(
                 Paths

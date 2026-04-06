@@ -71,6 +71,6 @@ public final class PasswordlessUser implements User {
 
     @Override
     public String toString() {
-        return "DecodedUser[" + "username=" + username + ", roles=" + roles + ']';
+        return "PasswordlessUser[" + "username=" + username + ", roles=" + roles + ']';
     }
 }
