@@ -39,7 +39,6 @@ import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Property;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription.PropertySourceDisplayData;
 
 /**
  * Default implementation {@link EnvPropertyEnricher}
@@ -139,7 +138,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
 
         PropertySourceDisplayData displayData = PropertySourceDescription.resolveDisplayData(source.getName());
 
-        return new PropertySource(displayData.displayName(), displayData.description(), enrichedProperties);
+        return new PropertySource(displayData.getDisplayName(), displayData.getDescription(), enrichedProperties);
     }
 
     @Nullable

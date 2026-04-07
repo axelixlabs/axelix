@@ -25,8 +25,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.core.env.StandardEnvironment;
 
-import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription.PropertySourceDisplayData;
-
 import static com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription.resolveDisplayData;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,8 +43,8 @@ class PropertySourceDescriptionTest {
 
         PropertySourceDisplayData result = resolveDisplayData(sourceName);
 
-        assertThat(result.displayName()).isEqualTo(expectedDisplayName);
-        assertThat(result.description()).isEqualTo(expectedDescription);
+        assertThat(result.getDisplayName()).isEqualTo(expectedDisplayName);
+        assertThat(result.getDescription()).isEqualTo(expectedDescription);
     }
 
     private static Stream<Arguments> configResourceSources() {
@@ -74,8 +72,8 @@ class PropertySourceDescriptionTest {
     void shouldReturnOriginalNameAndNullDescriptionForUnknownSources(String sourceName, String expectedDescription) {
         PropertySourceDisplayData result = resolveDisplayData(sourceName);
 
-        assertThat(result.displayName()).isEqualTo(sourceName);
-        assertThat(result.description()).isEqualTo(expectedDescription);
+        assertThat(result.getDisplayName()).isEqualTo(sourceName);
+        assertThat(result.getDescription()).isEqualTo(expectedDescription);
     }
 
     private static Stream<Arguments> unknownSources() {
@@ -84,7 +82,7 @@ class PropertySourceDescriptionTest {
                 // Starts with "Config resource", but not match
                 Arguments.of(
                         "Config resource 'unexpected format'",
-                        "Contains properties from the 'application*.properties/yaml' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources."));
+                        "Contains properties from 'application*.properties' or 'application*.yaml' configuration files"));
     }
 
     @ParameterizedTest
@@ -93,8 +91,8 @@ class PropertySourceDescriptionTest {
 
         PropertySourceDisplayData result = resolveDisplayData(sourceName);
 
-        assertThat(result.displayName()).isEqualTo(sourceName);
-        assertThat(result.description()).isEqualTo(expectedDescription);
+        assertThat(result.getDisplayName()).isEqualTo(sourceName);
+        assertThat(result.getDescription()).isEqualTo(expectedDescription);
     }
 
     private static Stream<Arguments> knownNonConfigResourceSources() {
