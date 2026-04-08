@@ -30,9 +30,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.master.api.internal.endpoint.SelfRegisteredApi;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
+import com.axelixlabs.axelix.master.utils.InvalidAuthScenarioWithTokenInAuthHeader;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link SelfRegisteredApi}
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"axelix.master.discovery.auto=false"})
@@ -85,7 +89,7 @@ public class SelfRegisteredApiTest {
     void shouldRegistryServiceInstance() {
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asViewer()
+                .withRoleTokenInAuthorizationHeader(DefaultRole.SELF_REGISTRAR)
                 .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
 
         // then.
@@ -93,8 +97,8 @@ public class SelfRegisteredApiTest {
     }
 
     @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
+    @EnumSource(InvalidAuthScenarioWithTokenInAuthHeader.class)
+    void shouldReturnUnauthorized(InvalidAuthScenarioWithTokenInAuthHeader scenario) {
         // when.
         ResponseEntity<Void> response = scenario.getModifier()
                 .apply(restTemplate)
@@ -103,6 +107,9 @@ public class SelfRegisteredApiTest {
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
+
+    @ProtectedEndpointTests(method = HttpMethod.POST, path = "/api/external/service/register")
+    void negativeAuthTests() {}
 
     private <T> HttpEntity<T> defaultJsonEntity(T request) {
         HttpHeaders headers = new HttpHeaders();

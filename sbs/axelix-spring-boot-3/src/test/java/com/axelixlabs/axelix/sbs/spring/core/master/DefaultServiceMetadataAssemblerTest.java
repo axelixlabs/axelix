@@ -45,9 +45,9 @@ import static org.assertj.core.api.Assertions.assertThat;
     CommitIdPluginGitInformationProvider.class,
     CommitIdPluginShortBuildInfoProvider.class,
     DefaultServiceMetadataAssembler.class,
-    DefaultBasicDiscoveryMetadataAssemblerTest.CurrentConfig.class
+    DefaultServiceMetadataAssemblerTest.CurrentConfig.class
 })
-class DefaultBasicDiscoveryMetadataAssemblerTest {
+class DefaultServiceMetadataAssemblerTest {
 
     @Autowired
     private DefaultServiceMetadataAssembler subject;

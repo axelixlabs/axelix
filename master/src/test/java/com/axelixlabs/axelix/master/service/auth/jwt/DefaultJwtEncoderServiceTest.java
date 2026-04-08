@@ -42,8 +42,10 @@ import com.axelixlabs.axelix.common.auth.core.GlobalAuthority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
-import com.axelixlabs.axelix.master.exception.auth.JwtTokenGenerationException;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;

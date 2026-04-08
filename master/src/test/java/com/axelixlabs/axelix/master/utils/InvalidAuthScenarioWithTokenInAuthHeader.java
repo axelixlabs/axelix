@@ -22,29 +22,29 @@ import java.util.function.Function;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 
 /**
- * This enum contains a set of invalid authentication scenarios used to parameterize API integration tests.
+ * This enum contains a set of invalid authentication scenarios with a token in the Authentication Header,
+ * used to parameterize API self-registration integration tests.
  *
- * @author Sergey Cherkasov
- * @author Mikhail Polivakha
+ * @author Nikita Kirillov
  */
-public enum InvalidAuthScenario {
+public enum InvalidAuthScenarioWithTokenInAuthHeader {
 
-    // Request without a cookies with an authentication token.
-    NO_COOKIE(TestRestTemplateBuilder::withoutToken),
+    // Request without a token in authorization header.
+    WITHOUT_TOKEN(TestRestTemplateBuilder::withoutToken),
 
     // Request with an expired authentication token.
-    EXPIRED_TOKEN(TestRestTemplateBuilder::withExpiredToken),
+    EXPIRED_TOKEN(TestRestTemplateBuilder::withExpiredTokenInAuthHeader),
 
     // Request with a malformed authentication token.
-    MALFORMED_TOKEN(TestRestTemplateBuilder::withMalformedToken);
+    MALFORMED_TOKEN(TestRestTemplateBuilder::withMalformedTokenInAuthHeader);
 
     /**
      * Modifier function that applies an invalid authentication scenario
-     * to {@link TestRestTemplateBuilder} and return {@link TestRestTemplate}.
+     * to {@link TestRestTemplateBuilder} and returns {@link TestRestTemplate}.
      */
     private final Function<TestRestTemplateBuilder, TestRestTemplate> modifier;
 
-    InvalidAuthScenario(Function<TestRestTemplateBuilder, TestRestTemplate> modifier) {
+    InvalidAuthScenarioWithTokenInAuthHeader(Function<TestRestTemplateBuilder, TestRestTemplate> modifier) {
         this.modifier = modifier;
     }
 

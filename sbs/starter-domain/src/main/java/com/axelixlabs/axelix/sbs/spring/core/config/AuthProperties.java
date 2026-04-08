@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.config;
 
+import java.time.Duration;
+
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.utils.Assert;
 
@@ -51,6 +53,11 @@ public class AuthProperties implements Validateable {
          */
         private String signingKey;
 
+        /**
+         * JWT token validity duration.
+         */
+        private Duration duration = Duration.ofSeconds(300);
+
         public JwtAlgorithm getAlgorithm() {
             return algorithm;
         }
@@ -67,6 +74,14 @@ public class AuthProperties implements Validateable {
         public Jwt setSigningKey(String signingKey) {
             this.signingKey = signingKey;
             return this;
+        }
+
+        public Duration getDuration() {
+            return duration;
+        }
+
+        public void setDuration(Duration duration) {
+            this.duration = duration;
         }
     }
 

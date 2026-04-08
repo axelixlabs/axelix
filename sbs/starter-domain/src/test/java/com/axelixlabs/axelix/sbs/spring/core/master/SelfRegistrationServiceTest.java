@@ -19,32 +19,32 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
-import com.axelixlabs.axelix.common.api.registration.GitInfo;
-import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
-import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
+import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -76,6 +76,9 @@ class SelfRegistrationServiceTest {
     @Autowired
     private SelfRegistrationService selfRegistrationService;
 
+    @Autowired
+    private JwtDecoderService jwtDecoderService;
+
     @TestConfiguration
     static class SelfRegistrationServiceTestConfiguration {
 
@@ -88,8 +91,18 @@ class SelfRegistrationServiceTest {
         @Bean
         public SelfRegistrationService selfRegistrationService(
                 SelfRegistrationConfigurationProperties properties,
+                ObjectMapper objectMapper,
+                SelfRegistrationMetadataAssembler metadataAssembler,
+                JwtEncoderService jwtEncoderService,
+                AuthProperties authProperties) {
                 SelfRegistrationMetadataAssembler metadataAssembler) {
             return new SelfRegistrationService(
+                    new SLF4JLogger(LoggerFactory.getLogger(SelfRegistrationService.class)),
+                    objectMapper::writeValueAsString,
+                    properties,
+                    metadataAssembler,
+                    jwtEncoderService,
+                    authProperties.getJwt().getDuration());
                     new NoOpLogger(), SelfRegistrationServiceTest::serialize, properties, metadataAssembler);
         }
 
@@ -174,6 +187,13 @@ class SelfRegistrationServiceTest {
         String body = request.getBody().readUtf8();
         assertThat(body).contains("testApp");
         assertThat(body).contains("http://localhost:8089/actuator");
+
+        String authHeader = request.getHeader("Authorization");
+        assertThat(authHeader).startsWith("Bearer ");
+
+        String token = authHeader.substring("Bearer ".length());
+
+        assertThatCode(() -> jwtDecoderService.decodeTokenToUser(token)).doesNotThrowAnyException();
     }
 
     private static String serialize(Object payload) {
@@ -185,15 +205,37 @@ class SelfRegistrationServiceTest {
                 + "\"}";
     }
 
-    private static final class NoOpLogger implements Logger {
+        private static final class NoOpLogger implements Logger {
 
-        @Override
-        public void trace(String message, Object... args) {}
+            @Override
+            public void trace(String message, Object... args) {}
 
-        @Override
-        public void info(String message, Object... args) {}
+            @Override
+            public void info(String message, Object... args) {}
 
-        @Override
-        public void debug(String message, Object... args) {}
+            @Override
+            public void debug(String message, Object... args) {}
+        }
+
+    @Test
+    void shouldHandleServerError() throws Exception {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+
+        selfRegistrationService.scheduleSelfRegistration();
+
+        RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
+        assertThat(request).isNotNull();
+        assertThat(request.getMethod()).isEqualTo("POST");
+    }
+
+    @Test
+    void shouldHandleTimeout() throws Exception {
+        mockWebServer.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
+
+        selfRegistrationService.scheduleSelfRegistration();
+
+        RecordedRequest request = mockWebServer.takeRequest(1, TimeUnit.SECONDS);
+        assertThat(request).isNotNull();
+        assertThat(request.getMethod()).isEqualTo("POST");
     }
 }

@@ -33,8 +33,10 @@ import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultIdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.utils.Lazy;
 import com.axelixlabs.axelix.master.api.external.response.settings.AuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.LoginPasswordAuthenticationOption;
@@ -47,8 +49,6 @@ import com.axelixlabs.axelix.master.filter.CookieBasedJwtAuthorizationFilter;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
@@ -90,12 +90,12 @@ public class SecurityAutoConfiguration {
 
         @Bean
         @ConfigurationProperties(prefix = "axelix.master.auth.jwt")
-        JwtProperties jwtProperties() {
+        public JwtProperties jwtProperties() {
             return new JwtProperties();
         }
 
         @Bean
-        JwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
+        public JwtEncoderService jwtEncoderService(JwtProperties jwtProperties) {
             return new DefaultJwtEncoderService(
                     jwtProperties.getAlgorithm(), jwtProperties.getSigningKey(), jwtProperties.getLifespan());
         }

@@ -32,9 +32,9 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.service.InstanceFactory;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 import com.axelixlabs.axelix.master.service.discovery.InstancesDiscoverer;
 import com.axelixlabs.axelix.master.service.discovery.ShortPollingInstanceDiscoveryScheduler;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesDiscoveryClient;

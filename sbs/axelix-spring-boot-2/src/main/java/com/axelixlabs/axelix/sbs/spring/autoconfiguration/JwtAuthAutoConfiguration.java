@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -33,8 +34,10 @@ import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultIdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
@@ -59,10 +62,18 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public JwtDecoderService jwtDecoderService(AuthProperties configurationProperties) {
+    public JwtDecoderService jwtDecoderService(AuthProperties authProperties) {
         return new DefaultJwtDecoderService(
-                configurationProperties.getJwt().getAlgorithm(),
-                configurationProperties.getJwt().getSigningKey());
+                authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JwtEncoderService jwtEncoderService(AuthProperties authProperties) {
+        return new DefaultJwtEncoderService(
+                authProperties.getJwt().getAlgorithm(),
+                authProperties.getJwt().getSigningKey(),
+                authProperties.getJwt().getDuration());
     }
 
     @Bean
@@ -89,10 +100,12 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-            IdentityAccessManager identityAccessManager) {
+            IdentityAccessManager identityAccessManager, WebEndpointProperties webEndpointProperties) {
         var jwtAuthorizationFilter = new JwtAuthorizationFilter(identityAccessManager);
         var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
+
         registration.setName("jwtAuthorizationFilter");
+        registration.addUrlPatterns(webEndpointProperties.getBasePath() + "/axelix*/**");
         return registration;
     }
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.jwt;
+package com.axelixlabs.axelix.common.auth.service;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,7 +33,7 @@ import com.axelixlabs.axelix.common.auth.core.JwtRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.TokenClaim;
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.master.exception.auth.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 
 /**
  * Service responsible for generating JWT tokens from {@link User} instances.
@@ -95,7 +95,7 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
     }
 
     private List<JwtRole> buildRoleClaims(User user) {
-        return user.getRoles().stream().map(this::toJwtRole).toList();
+        return user.getRoles().stream().map(this::toJwtRole).collect(Collectors.toList());
     }
 
     private JwtRole toJwtRole(Role role) {
@@ -103,7 +103,7 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
                 role.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
 
         List<JwtRole> components =
-                role.getComponents().stream().map(this::toJwtRole).toList();
+                role.getComponents().stream().map(this::toJwtRole).collect(Collectors.toList());
 
         return new JwtRole(role.getName(), authorities, components);
     }

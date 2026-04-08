@@ -21,13 +21,14 @@ import java.io.IOException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
@@ -38,23 +39,18 @@ import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
- * Auth filter that is based on the {@link org.springframework.http.HttpHeaders#SET_COOKIE Set-Cookie} header.
+ * Auth filter that is based on the {@link org.springframework.http.HttpHeaders#AUTHORIZATION} header.
  *
- * @author Nikita Kirillov
- * @author Mikhail Polivakha
+ * @author Nikita Kirilllov
  */
-@SuppressWarnings("NullAway")
-public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
+@Component
+public class SelfRegistrationJwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final String authCookieName;
     private final IdentityAccessManager identityAccessManager;
     private final SecurityContextExecutor securityContextExecutor;
 
-    public CookieBasedJwtAuthorizationFilter(
-            String authCookieName,
-            IdentityAccessManager identityAccessManager,
-            SecurityContextExecutor securityContextExecutor) {
-        this.authCookieName = authCookieName;
+    public SelfRegistrationJwtAuthorizationFilter(
+            IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
         this.identityAccessManager = identityAccessManager;
         this.securityContextExecutor = securityContextExecutor;
     }
@@ -63,17 +59,7 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
 
-        // Static content (/, /index.html, /assets/*, etc.) is served at root and does not require auth
-        // as well as actuator health endpoints
-        return !path.startsWith("/api/")
-                || path.startsWith("/api/actuator/health")
-                // Temporarily excluded /api/mcp, waiting for the mcp server authentication issue to be resolved
-                // https://github.com/axelixlabs/axelix/issues/758
-                || path.startsWith("/api/mcp")
-                || path.equalsIgnoreCase("/api/external/users/login")
-                || path.startsWith("/api/external/oauth2/callback")
-                || path.startsWith("/api/external/settings/auth")
-                || path.equalsIgnoreCase("/api/internal/service/register");
+        return !path.equalsIgnoreCase("/api/internal/service/register");
     }
 
     @Override
@@ -83,7 +69,7 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = resolveToken(request.getCookies());
+        String token = resolveToken(request);
 
         if (token == null || token.isBlank()) {
             throw new JwtProcessingException("Authorization token is missing");
@@ -103,13 +89,10 @@ public class CookieBasedJwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     @Nullable
-    private String resolveToken(Cookie[] cookies) {
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (authCookieName.equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
+    private String resolveToken(HttpServletRequest request) {
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
         }
         return null;
     }

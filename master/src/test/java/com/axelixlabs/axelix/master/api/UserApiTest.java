@@ -35,11 +35,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.api.external.endpoint.UserApi;
 import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
