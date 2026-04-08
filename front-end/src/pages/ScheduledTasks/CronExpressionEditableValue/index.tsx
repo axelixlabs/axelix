@@ -23,7 +23,8 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { getCronDescription } from "helpers";
-import { type ICron } from "models";
+import { useAuthority } from "hooks";
+import { EAuthorities, type ICron } from "models";
 import { changeCronExpression, checkCronExpressionValid } from "services";
 
 import styles from "./styles.module.css";
@@ -36,6 +37,7 @@ interface IProps {
 }
 
 export const CronExpressionEditableValue = ({ task }: IProps) => {
+    const scheduledTasksAccess = useAuthority(EAuthorities.SCHEDULED_TASKS_MODIFY);
     const { instanceId } = useParams();
 
     const { message } = App.useApp();
@@ -135,7 +137,7 @@ export const CronExpressionEditableValue = ({ task }: IProps) => {
                     }}
                     trigger="click"
                 >
-                    <Button icon={<EditOutlined />} type="primary" />
+                    <Button icon={<EditOutlined />} disabled={!scheduledTasksAccess} type="primary" />
                 </Popover>
             </div>
         </>

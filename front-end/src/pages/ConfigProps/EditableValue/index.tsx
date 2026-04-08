@@ -20,6 +20,9 @@ import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import { useState } from "react";
 
+import { useAuthority } from "hooks";
+import { EAuthorities } from "models";
+
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -51,6 +54,8 @@ export const EditableValue = ({
     className = styles.DefaultPropertyValueWrapper,
     editClassName = styles.DefaultEditPropertyWrapper,
 }: IProps) => {
+    const configPropsAccess = useAuthority(EAuthorities.CONFIGURATION_PROPERTY_VALUE_MUTATE);
+
     // TODO:
     //  We need to improve this component:
     //  1. Introduce loading of buttons for this component
@@ -69,6 +74,7 @@ export const EditableValue = ({
                         type="primary"
                         onClick={() => setEditingValue(true)}
                         className={styles.EditButton}
+                        disabled={!configPropsAccess}
                     />
                 </div>
             </>

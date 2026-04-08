@@ -22,7 +22,8 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { extractErrorCode } from "helpers";
-import { type IErrorResponse, StatelessRequest } from "models";
+import { useAuthority } from "hooks";
+import { EAuthorities, type IErrorResponse, StatelessRequest } from "models";
 import { forceRunTask } from "services";
 
 import { RunIcon } from "assets";
@@ -36,6 +37,7 @@ interface IProps {
 
 export const ForceRunTask = ({ trigger }: IProps) => {
     const { t } = useTranslation();
+    const scheduledTasksAccess = useAuthority(EAuthorities.SCHEDULED_TASKS_MODIFY);
 
     const { instanceId } = useParams();
     const { message } = App.useApp();
@@ -65,6 +67,7 @@ export const ForceRunTask = ({ trigger }: IProps) => {
                 type="primary"
                 onClick={forceRunClickHandler}
                 loading={forceRunTaskData.loading}
+                disabled={!scheduledTasksAccess}
             />
         </>
     );

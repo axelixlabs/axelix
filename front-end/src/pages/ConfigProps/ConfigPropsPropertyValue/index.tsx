@@ -15,11 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { useParams } from "react-router";
-
-import { EditableValue } from "components";
-import { useAppDispatch } from "hooks";
-import { updatePropertyThunk } from "store/thunks";
+import { EditableValue } from "../EditableValue";
 
 import styles from "./styles.module.css";
 
@@ -35,20 +31,7 @@ interface IProps {
     propertyName: string;
 }
 
-export const ConfigPropsPropertyValue = ({ propertyName, propertyValue }: IProps) => {
-    const dispatch = useAppDispatch();
-    const { instanceId } = useParams();
-
-    const updatePropertyClickHandler = (newValue: string): void => {
-        dispatch(
-            updatePropertyThunk({
-                instanceId: instanceId!,
-                propertyName: propertyName,
-                newValue: newValue,
-            }),
-        );
-    };
-
+export const ConfigPropsPropertyValue = ({ propertyValue }: IProps) => {
     return (
         <>
             <div className={styles.MainWrapper}>
@@ -56,7 +39,7 @@ export const ConfigPropsPropertyValue = ({ propertyName, propertyValue }: IProps
                     className={styles.PropertyValueWrapper}
                     editClassName={styles.EditPropertyWrapper}
                     initialValue={propertyValue || "null"}
-                    onNewValue={updatePropertyClickHandler}
+                    onNewValue={() => {}}
                 />
             </div>
         </>

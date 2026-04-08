@@ -15,24 +15,20 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-import { extractErrorCode } from "helpers";
-import type { IUpdatePropertyRequestData } from "models";
-import { updateProperty } from "services";
+import type { EAuthorities } from "models";
 
-// todo replace any with real type in future
-export const updatePropertyThunk = createAsyncThunk<void, IUpdatePropertyRequestData, { rejectValue: any }>(
-    "updatePropertyThunk",
-    async (data, { rejectWithValue }) => {
-        try {
-            await updateProperty(data);
+const initialState: EAuthorities[] = [];
 
-            // todo replace any with real type in future
-        } catch (error: any) {
-            return rejectWithValue({
-                code: extractErrorCode(error?.response?.data),
-            });
-        }
+export const AuthoritiesSlice = createSlice({
+    name: "authorities",
+    initialState: initialState,
+    reducers: {
+        setAuthorities: (_, action) => {
+            return action.payload;
+        },
     },
-);
+});
+
+export const { setAuthorities } = AuthoritiesSlice.actions;

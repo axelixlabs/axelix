@@ -23,7 +23,8 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { extractErrorCode } from "helpers";
-import { type ICacheData, type IErrorResponse, StatelessRequest } from "models";
+import { useAuthority } from "hooks";
+import { EAuthorities, type ICacheData, type IErrorResponse, StatelessRequest } from "models";
 import { disableCache, enableCache } from "services";
 
 interface IProps {
@@ -39,6 +40,8 @@ interface IProps {
 }
 
 export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
+    const cachesToggleAccess = useAuthority(EAuthorities.CACHES_TOGGLE);
+
     const { t } = useTranslation();
     const { instanceId } = useParams();
     const { message } = App.useApp();
@@ -73,6 +76,7 @@ export const CacheStatusSwitch = ({ cacheManagerName, cache }: IProps) => {
                 onChange={(checked, event) => switchTaskStatus(event)}
                 loading={mutationRequest.loading}
                 checked={cache.enabled}
+                disabled={!cachesToggleAccess}
             />
         </>
     );
