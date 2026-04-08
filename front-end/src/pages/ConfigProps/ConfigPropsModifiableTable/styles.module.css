@@ -24,3 +24,12 @@
     display: flex;
     justify-content: center;
 }
+
+.Prefix {
+    color: var(--axelix-bold-grey);
+    margin-top: 8px;
+}
+
+.PrefixTitle {
+    color: var(--axelix-primary-green);
+}

@@ -15,8 +15,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import type { PropsWithChildren } from "react";
-
 import { Accordion, Copy, EmptyHandler } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import type { ITableRow } from "models";
@@ -30,12 +28,17 @@ interface IProps {
     headerName: string;
 
     /**
+     * Config-props bean prefix
+     */
+    prefix: string;
+
+    /**
      * Table rows data
      */
     properties: ITableRow[];
 }
 
-export const ConfigPropsModifiableTable = ({ headerName, properties, children }: PropsWithChildren<IProps>) => {
+export const ConfigPropsModifiableTable = ({ headerName, prefix, properties }: IProps) => {
     return (
         <>
             <div id={normalizeHtmlElementId(headerName)}>
@@ -44,7 +47,9 @@ export const ConfigPropsModifiableTable = ({ headerName, properties, children }:
                         header={
                             <div className={styles.AccordionHeader}>
                                 <div>{headerName}</div>
-                                {children}
+                                <div className={styles.Prefix}>
+                                    <span className={styles.PrefixTitle}>Prefix:</span> {prefix}
+                                </div>
                             </div>
                         }
                         headerStyles={styles.HeaderStyles}

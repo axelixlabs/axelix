@@ -20,8 +20,6 @@ import type { IConfigPropsBean } from "models";
 
 import { ConfigPropsModifiableTable } from "../ConfigPropsModifiableTable";
 
-import styles from "./styles.module.css";
-
 interface IProps {
     /**
      * The list of config props
@@ -36,6 +34,7 @@ export const ConfigPropsTables = ({ effectiveConfigProps }: IProps) => {
                 {effectiveConfigProps.map(({ beanName, prefix, properties }) => (
                     <ConfigPropsModifiableTable
                         headerName={beanName}
+                        prefix={prefix}
                         properties={properties.map((property) => {
                             return {
                                 key: `${prefix}.${property.key}`,
@@ -44,13 +43,7 @@ export const ConfigPropsTables = ({ effectiveConfigProps }: IProps) => {
                             };
                         })}
                         key={beanName}
-                    >
-                        {prefix && (
-                            <div className={styles.Prefix}>
-                                <span className={styles.PrefixTitle}>Prefix:</span> {prefix}
-                            </div>
-                        )}
-                    </ConfigPropsModifiableTable>
+                    />
                 ))}
             </EmptyHandler>
         </>
