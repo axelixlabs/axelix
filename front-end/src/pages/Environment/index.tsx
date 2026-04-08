@@ -48,12 +48,13 @@ const Environment = () => {
         return <EmptyHandler isEmpty />;
     }
 
-    const activeProfiles = environment.response!.activeProfiles;
-    const propertySources = environment.response!.propertySources;
+    const respBody = environment.response!;
+    const eventualProfiles = [...respBody.defaultProfiles, ...respBody.activeProfiles];
+    const propertySources = respBody.propertySources;
 
     return (
         <>
-            {activeProfiles ?? <EnvironmentProfiles activeProfiles={activeProfiles} />}
+            {eventualProfiles.length !== 0 && <EnvironmentProfiles activeProfiles={eventualProfiles} />}
             <EnvironmentTables propertySources={propertySources} />
         </>
     );

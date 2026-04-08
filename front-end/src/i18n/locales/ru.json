@@ -59,7 +59,7 @@
         }
     },
     "Environments": {
-        "activeProfiles": "Профили",
+        "activeProfiles": "Профили:",
         "primaryProperty": "Актуальное значение",
         "deprecated": "Устаревшее",
         "description": "Описание",
