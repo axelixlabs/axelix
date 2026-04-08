@@ -5,23 +5,9 @@
     column-gap: 20px;
 }
 
-.PropertyValueWrapper {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    column-gap: 20px;
-}
-
 .IconPlaceholder {
     visibility: hidden;
     pointer-events: none;
-}
-
-.EditPropertyWrapper {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-    column-gap: 8px;
 }
 
 .PrimaryIcon {

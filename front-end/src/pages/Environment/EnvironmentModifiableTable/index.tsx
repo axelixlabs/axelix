@@ -74,7 +74,7 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
                                         <div className={styles.KeyChunk}>
                                             {property.name} <Copy text={property.name} />
                                         </div>
-                                        <div className={styles.ValueChunk}>
+                                        <div className={`${styles.ValueChunk}`}>
                                             <EnvironmentPropertyValue property={property} />
                                         </div>
                                     </div>

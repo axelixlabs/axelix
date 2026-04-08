@@ -21,8 +21,6 @@ import { Accordion, Copy, EmptyHandler } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import type { ITableRow } from "models";
 
-import { ConfigPropsPropertyValue } from "../ConfigPropsPropertyValue";
-
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -60,7 +58,7 @@ export const ConfigPropsModifiableTable = ({ headerName, properties, children }:
                                         {displayKey} <Copy text={displayKey} />
                                     </div>
                                     <div className={`RowChunk ${styles.ValueChunk}`}>
-                                        <ConfigPropsPropertyValue propertyName={key} propertyValue={displayValue} />
+                                        <div>{displayValue || "null"}</div>
                                     </div>
                                 </div>
                             ))}
