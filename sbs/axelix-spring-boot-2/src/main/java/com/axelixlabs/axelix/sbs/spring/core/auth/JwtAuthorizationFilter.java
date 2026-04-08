@@ -59,7 +59,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getServletPath().startsWith("/actuator/axelix-");
+        return !request.getServletPath().startsWith("/actuator/axelix-");
     }
 
     @Override
