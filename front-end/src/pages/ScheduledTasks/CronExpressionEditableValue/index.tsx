@@ -20,7 +20,7 @@ import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 import { Alert, App, Button, Input, Popover, Tooltip } from "antd";
 import { type ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { getCronDescription } from "helpers";
 import { type ICron } from "models";

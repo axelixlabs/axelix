@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { BeanAccordionLabels } from "pages/Beans/BeanAccordionLabels";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
 import { Accordion } from "components";
 import { normalizeHtmlElementId } from "helpers";

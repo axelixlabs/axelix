@@ -20,7 +20,7 @@ import type { AxiosError } from "axios";
 import { type MouseEvent, useState } from "react";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { extractErrorCode } from "helpers";
 import { type ICacheData, type IErrorResponse, StatelessRequest } from "models";

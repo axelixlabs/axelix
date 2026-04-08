@@ -20,7 +20,7 @@ import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 import { App, Button, Input, Popover } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { type IFixedTasks } from "models";
 import { changeScheduledTaskInterval } from "services";

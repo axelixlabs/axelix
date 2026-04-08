@@ -16,7 +16,16 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Fragment, type JSX } from "react";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+    CartesianGrid,
+    type DotItemDotProps,
+    Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts";
 
 import { getMetricsChartTicks, reduceDisplayedNumber, toFormattedTime } from "helpers";
 import type { IMeasurementsWithTimestamp } from "models";
@@ -36,7 +45,7 @@ interface IProps {
     startTime: number;
 }
 
-const renderDot = ({ cx, cy, index, points }: any): JSX.Element => {
+const renderDot = ({ cx, cy, index, points }: DotItemDotProps): JSX.Element => {
     // we're rendering the head of the line - render the dot.
     if (index === points.length - 1) {
         return <circle cx={cx} cy={cy} r={3} className={styles.Dot} />;

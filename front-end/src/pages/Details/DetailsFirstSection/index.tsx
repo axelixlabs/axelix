@@ -18,7 +18,7 @@
 import { Button, List, Switch } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { Loader, UniversalModal } from "components";
 import { downloadFile } from "helpers";

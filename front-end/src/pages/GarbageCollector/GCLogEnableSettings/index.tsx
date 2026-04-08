@@ -19,7 +19,7 @@ import { Select } from "antd";
 import type { AxiosError } from "axios";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { UniversalModal } from "components";
 import { extractErrorCode } from "helpers";

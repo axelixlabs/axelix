@@ -17,7 +17,7 @@
  */
 import type { AxiosError } from "axios";
 import type { Dispatch, MouseEvent, SetStateAction } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { TooltipWithCopy } from "components";
 import { extractErrorCode } from "helpers";

@@ -19,7 +19,7 @@ import { App, Button, Tooltip } from "antd";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { downloadFile, extractErrorCode } from "helpers";
 import { type IErrorResponse, StatelessRequest } from "models";

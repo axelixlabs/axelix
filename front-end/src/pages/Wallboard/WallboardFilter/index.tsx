@@ -18,7 +18,7 @@
 import { Button, Select } from "antd";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { SetURLSearchParams } from "react-router-dom";
+import type { SetURLSearchParams } from "react-router";
 
 import { createWallboardFilterId, createWallboardFilterSearchParam } from "helpers";
 import type { IInstanceCard, IWallboardLocalFilterBuilder, IWallboardSingleOperandFilter } from "models";

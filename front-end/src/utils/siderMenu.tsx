@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import type { TFunction } from "i18next";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import type { MenuItem as AntdMenuItem, IMenuItem } from "models";
 

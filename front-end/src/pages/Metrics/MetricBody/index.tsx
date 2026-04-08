@@ -17,7 +17,7 @@
  */
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { EmptyHandler, Loader } from "components";
 import { buildSelectedTagParams, createMeasurementsWithTimestamp, fetchData } from "helpers";
