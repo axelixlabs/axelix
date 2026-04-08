@@ -9,6 +9,12 @@
     padding-right: 16px;
 }
 
+.CopyableValue {
+    display: flex;
+    align-items: center;
+    column-gap: 6px;
+}
+
 .ValueChunk {
     display: flex;
     justify-content: flex-end;

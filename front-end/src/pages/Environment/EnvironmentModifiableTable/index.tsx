@@ -15,13 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { Accordion, Copy, EmptyHandler, InfoTooltip } from "components";
+import { Accordion, EmptyHandler, InfoTooltip } from "components";
 import { splitProperties } from "helpers";
 import type { IEnvironmentPropertySource } from "models";
 
-import { EnvironmentAccordionBody } from "../EnvironmentAccordionBody";
-import { EnvironmentAccordionHeader } from "../EnvironmentAccordionHeader";
-import { EnvironmentPropertyValue } from "../EnvironmentPropertyValue";
+import { EnvironmentProperty } from "../EnvironmentProperty";
+import { EnvironmentPropertyDetails } from "../EnvironmentPropertyDetails";
 
 import styles from "./styles.module.css";
 
@@ -60,25 +59,16 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
                             {[
                                 ...withDropDown.map((property) => (
                                     <Accordion
-                                        header={<EnvironmentAccordionHeader property={property} />}
+                                        header={<EnvironmentProperty property={property} />}
                                         headerStyles={
                                             property.deprecation ? styles.DeprecatedPropertyAccordionsHeader : ""
                                         }
                                         key={property.name}
                                     >
-                                        <EnvironmentAccordionBody property={property} />
+                                        <EnvironmentPropertyDetails property={property} />
                                     </Accordion>
                                 )),
-                                ...withoutDropDown.map((property) => (
-                                    <div className={styles.CommonPropertyWrapper} key={property.name}>
-                                        <div className={styles.KeyChunk}>
-                                            {property.name} <Copy text={property.name} />
-                                        </div>
-                                        <div className={`${styles.ValueChunk}`}>
-                                            <EnvironmentPropertyValue property={property} />
-                                        </div>
-                                    </div>
-                                )),
+                                ...withoutDropDown.map((property) => <EnvironmentProperty property={property} />),
                             ]}
                         </EmptyHandler>
                     </div>

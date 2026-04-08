@@ -33,7 +33,7 @@ interface IProps {
     property: IEnvProperty;
 }
 
-export const EnvironmentAccordionBody = ({ property }: IProps) => {
+export const EnvironmentPropertyDetails = ({ property }: IProps) => {
     const { t } = useTranslation();
     const { instanceId } = useParams();
 

@@ -29,16 +29,18 @@ interface IProps {
     property: IEnvProperty;
 }
 
-export const EnvironmentAccordionHeader = ({ property }: IProps) => {
+export const EnvironmentProperty = ({ property }: IProps) => {
     const { name } = property;
 
     return (
         <>
-            <div key={name} className={styles.MainWrapper}>
-                <div className={styles.KeyChunk}>
-                    {name} <Copy text={name} />
+            <div key={name} className={`TableRow ${styles.MainWrapper}`}>
+                <div className={`RowChunk ${styles.KeyChunk}`}>
+                    <div className={styles.CopyableValue}>
+                        {name} <Copy text={name} />
+                    </div>
                 </div>
-                <div className={styles.ValueChunk}>
+                <div className={`RowChunk ${styles.ValueChunk}`}>
                     <EnvironmentPropertyValue property={property} />
                 </div>
             </div>
