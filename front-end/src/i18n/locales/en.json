@@ -12,7 +12,7 @@
     "documentation": "Documentation",
     "value": "Value",
     "blog": "Blog",
-    "unknownError": "Unknown error. Try refreshing the page.",
+    "unknownError": "Unknown error. Try to refresh the page.",
     "Details": {
         "downloadState": "Download state",
         "exportConfigurationOptions": "List of state export components",

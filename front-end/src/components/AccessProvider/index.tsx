@@ -20,8 +20,8 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 
-import { getAvailableServices, getCookie } from "helpers";
-import { setAvailableServices } from "store/slices";
+import { getCookie, parseAuthorities } from "helpers";
+import { setAuthorities } from "store/slices";
 
 export const AccessProvider = () => {
     const { t } = useTranslation();
@@ -41,13 +41,13 @@ export const AccessProvider = () => {
 
         if (!parsedAuthorities) {
             message.error(t("unknownError"));
-            dispatch(setAvailableServices([]));
+            dispatch(setAuthorities([]));
             return;
         }
 
-        const availableServices = getAvailableServices(parsedAuthorities);
+        const authorities = parseAuthorities(parsedAuthorities);
 
-        dispatch(setAvailableServices(availableServices));
+        dispatch(setAuthorities(authorities));
     }, []);
 
     return null;

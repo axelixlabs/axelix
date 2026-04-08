@@ -20,7 +20,7 @@ import type { AxiosResponse } from "axios";
 import { t } from "i18next";
 
 import {
-    EAvailableServices,
+    EAuthorities,
     EMimeTypes,
     EWallboardFilterKey,
     EWallboardFilterOperator,
@@ -126,24 +126,24 @@ export const createWallboardFilterSearchParam = (
 };
 
 export const getCookie = (name: string): string | undefined => {
-    const cookie: Record<string, string> = {};
+    for (const cookie of document.cookie.split(";")) {
+        const separator = cookie.indexOf("=");
+        const cookieName = cookie.substring(0, separator);
 
-    document.cookie.split(";").forEach((el) => {
-        const [key, ...rest] = el.split("=");
-        const value = rest.join("=");
-        cookie[key.trim()] = value;
-    });
+        if (cookieName === name) {
+            return cookie.substring(separator + 1);
+        }
+    }
 
-    return cookie?.[name];
+    return undefined;
 };
 
-export const getAvailableServices = (authorities: string): EAvailableServices[] => {
+export const parseAuthorities = (authorities: string): EAuthorities[] => {
     const authoritiesWithoutBrackets = authorities.replaceAll("[", "").replaceAll("]", "");
     const authorityNames = authoritiesWithoutBrackets.split(",");
     const trimmedAuthorityNames = authorityNames.map((authorityName) => authorityName.trim());
-    const availableServices = trimmedAuthorityNames.map(
-        (authorityName) => EAvailableServices[authorityName as keyof typeof EAvailableServices],
-    );
 
-    return availableServices;
+    return trimmedAuthorityNames
+        .map((authorityName) => EAuthorities[authorityName as keyof typeof EAuthorities])
+        .filter((value) => value !== undefined && value !== null);
 };

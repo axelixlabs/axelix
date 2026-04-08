@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { canonicalize } from "helpers";
+import { canonicalize, getCookie, parseAuthorities } from "helpers";
+import { EAuthorities } from "models";
 
 describe("Canonicalize", () => {
     it("Converts a string to lowercase", () => {
@@ -38,5 +39,68 @@ describe("Canonicalize", () => {
 
     it("Correctly handles already normalized strings", () => {
         expect(canonicalize("abc123")).toBe("abc123");
+    });
+});
+
+describe("getCookie", () => {
+    let cookieStore = "";
+
+    beforeEach(() => {
+        cookieStore = "";
+
+        Object.defineProperty(globalThis, "document", {
+            configurable: true,
+            value: {
+                get cookie(): string {
+                    return cookieStore;
+                },
+                set cookie(value: string) {
+                    cookieStore = value;
+                },
+            },
+        });
+    });
+
+    afterEach(() => {
+        Object.defineProperty(globalThis, "document", {
+            value: undefined,
+            configurable: true,
+        });
+    });
+
+    it("Should handle both the JWT access cookie and the Authorities metadata cookie", () => {
+        document.cookie = "authorities=[SCHEDULED_TASKS_MODIFY,CACHES_TOGGLE];auth_token=jwt-token";
+
+        expect(getCookie("auth_token")).toBe("jwt-token");
+        expect(getCookie("authorities")).toBe("[SCHEDULED_TASKS_MODIFY,CACHES_TOGGLE]");
+    });
+
+    it("Should handle no requested cookie found", () => {
+        document.cookie = "auth_token=jwt-token";
+
+        expect(getCookie("authorities")).toBeUndefined();
+    });
+
+    it("Should handle empty cookie value", () => {
+        document.cookie = "authorities=";
+
+        expect(getCookie("authorities")).toBe("");
+    });
+});
+
+describe("parseAuthorities", () => {
+    it("Should handle common path", () => {
+        expect(parseAuthorities("[SCHEDULED_TASKS_MODIFY,CACHES_TOGGLE]")).toEqual([
+            EAuthorities.SCHEDULED_TASKS_MODIFY,
+            EAuthorities.CACHES_TOGGLE,
+        ]);
+    });
+
+    it("Should handle empty authorities", () => {
+        expect(parseAuthorities("")).toEqual([]);
+    });
+
+    it("Should handle unknown authorities", () => {
+        expect(parseAuthorities("[UNKNOWN_AUTHORITY]")).toEqual([]);
     });
 });

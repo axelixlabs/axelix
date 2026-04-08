@@ -21,7 +21,6 @@ export { LinearProgress } from "./LinearProgress";
 export { UniversalModal } from "./UniversalModal";
 export { AccessProvider } from "./AccessProvider";
 export { HashNavigable } from "./HashNavigable";
-export { EditableValue } from "./EditableValue";
 export { EmptyHandler } from "./EmptyHandler";
 export { InfoTooltip } from "./InfoTooltip";
 export { PageSearch } from "./PageSearch";

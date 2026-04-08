@@ -17,18 +17,18 @@
  */
 import { createSlice } from "@reduxjs/toolkit";
 
-import type { EAvailableServices } from "models";
+import type { EAuthorities } from "models";
 
-const initialState: EAvailableServices[] = [];
+const initialState: EAuthorities[] = [];
 
-export const ServicesSlice = createSlice({
-    name: "services",
+export const AuthoritiesSlice = createSlice({
+    name: "authorities",
     initialState: initialState,
     reducers: {
-        setAvailableServices: (_, action) => {
+        setAuthorities: (_, action) => {
             return action.payload;
         },
     },
 });
 
-export const { setAvailableServices } = ServicesSlice.actions;
+export const { setAuthorities } = AuthoritiesSlice.actions;

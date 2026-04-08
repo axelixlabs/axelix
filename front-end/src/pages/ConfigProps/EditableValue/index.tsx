@@ -20,8 +20,8 @@ import { CheckOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import { useState } from "react";
 
-import { useServiceAccess } from "hooks";
-import { EAvailableServices } from "models";
+import { useAuthority } from "hooks";
+import { EAuthorities } from "models";
 
 import styles from "./styles.module.css";
 
@@ -54,7 +54,7 @@ export const EditableValue = ({
     className = styles.DefaultPropertyValueWrapper,
     editClassName = styles.DefaultEditPropertyWrapper,
 }: IProps) => {
-    const configPropsAccess = useServiceAccess(EAvailableServices.CONFIGURATION_PROPERTY_VALUE_MUTATE);
+    const configPropsAccess = useAuthority(EAuthorities.CONFIGURATION_PROPERTY_VALUE_MUTATE);
 
     // TODO:
     //  We need to improve this component:

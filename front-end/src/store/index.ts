@@ -17,14 +17,12 @@
  */
 import { configureStore } from "@reduxjs/toolkit";
 
-import { ServicesSlice, UpdatePropertySlice } from "./slices";
+import { AuthoritiesSlice } from "./slices";
 
 export const store = configureStore({
     reducer: {
-        updateProperty: UpdatePropertySlice.reducer,
-        services: ServicesSlice.reducer,
+        authorities: AuthoritiesSlice.reducer,
     },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
