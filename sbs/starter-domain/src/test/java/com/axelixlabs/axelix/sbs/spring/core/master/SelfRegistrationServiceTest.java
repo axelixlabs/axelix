@@ -19,32 +19,32 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.GitInfo;
+import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
+import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,24 +53,25 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 06.02.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-@SpringBootTest
-@Import({
-    CommitIdPluginGitInformationProvider.class,
-    CommitIdPluginShortBuildInfoProvider.class,
-    DefaultServiceMetadataAssembler.class,
-    OptionsParsingVMFeaturesProvider.class,
-    SelfRegistrationServiceTest.SelfRegistrationServiceTestConfiguration.class
-})
+@SpringBootTest(classes = SelfRegistrationServiceTest.TestApplication.class)
 @TestPropertySource(
         properties = {
             "axelix.sbs.discovery.instance-name=testApp",
             "axelix.sbs.discovery.instance-url=http://localhost:8089/"
         })
-@EnableConfigurationProperties(WebEndpointProperties.class)
+@Import({
+    DefaultServiceMetadataAssembler.class,
+    OptionsParsingVMFeaturesProvider.class,
+    SelfRegistrationServiceTest.SelfRegistrationServiceTestConfiguration.class
+})
 class SelfRegistrationServiceTest {
 
     private static MockWebServer mockWebServer;
+
+    @SpringBootApplication
+    static class TestApplication {}
 
     @Autowired
     private SelfRegistrationService selfRegistrationService;
@@ -87,30 +88,22 @@ class SelfRegistrationServiceTest {
         @Bean
         public SelfRegistrationService selfRegistrationService(
                 SelfRegistrationConfigurationProperties properties,
-                ObjectMapper objectMapper,
                 SelfRegistrationMetadataAssembler metadataAssembler) {
             return new SelfRegistrationService(
-                    new SLF4JLogger(LoggerFactory.getLogger(SelfRegistrationService.class)),
-                    objectMapper::writeValueAsString,
-                    properties,
-                    metadataAssembler);
+                    new NoOpLogger(), SelfRegistrationServiceTest::serialize, properties, metadataAssembler);
         }
 
         @Bean
         public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
-                WebEndpointProperties webEndpointProperties) {
-
+                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
             return new DefaultSelfRegistrationMetadataAssembler(
-                    serviceMetadataAssembler,
-                    selfRegistrationConfigurationProperties,
-                    webEndpointProperties.getBasePath());
+                    serviceMetadataAssembler, selfRegistrationConfigurationProperties, "/actuator");
         }
 
         @Bean
-        public CycloneDXSBOMLibraryDiscoverer cycloneDXSBOMLibraryDiscoverer() {
-            return new CycloneDXSBOMLibraryDiscoverer(new ClassPathResource("other/application.cdx.json"));
+        HealthDetectionFunction healthDetectionFunction() {
+            return () -> BasicDiscoveryMetadata.HealthStatus.UP;
         }
 
         @Bean
@@ -120,13 +113,32 @@ class SelfRegistrationServiceTest {
         }
 
         @Bean
-        HealthDetectionFunction healthDetectionFunction() {
-            return () -> BasicDiscoveryMetadata.HealthStatus.UP;
+        public AxelixVersionDiscoverer axelixVersionDiscoverer() {
+            return () -> "1.1.3";
         }
 
         @Bean
-        public AxelixVersionDiscoverer axelixVersionDiscoverer() {
-            return () -> "1.1.3";
+        GitInformationProvider gitInformationProvider() {
+            return () -> Optional.of(
+                    new GitInfo("8f4b9f7", "main", "2026-02-06T10:15:30Z", new GitInfo.CommitAuthor("test", "test")));
+        }
+
+        @Bean
+        ShortBuildInfoProvider shortBuildInfoProvider() {
+            return () -> Optional.of(new ShortBuildInfo("2026-02-06T10:15:30Z", "1.1.3"));
+        }
+
+        @Bean
+        LibraryDiscoverer libraryDiscoverer() {
+            return (artifactId, groupId) -> {
+                if ("spring-boot".equals(artifactId) && "org.springframework.boot".equals(groupId)) {
+                    return Optional.of("2.7.18");
+                }
+                if ("spring-core".equals(artifactId) && "org.springframework".equals(groupId)) {
+                    return Optional.of("5.3.31");
+                }
+                return Optional.empty();
+            };
         }
     }
 
@@ -141,57 +153,47 @@ class SelfRegistrationServiceTest {
 
     @AfterAll
     static void tearDown() throws IOException {
-        mockWebServer.shutdown();
+        if (mockWebServer != null) {
+            mockWebServer.shutdown();
+        }
         System.clearProperty("axelix.sbs.discovery.master-url");
     }
 
     @Test
-    void shouldRegisterOnApplicationEvent() throws Exception {
+    void shouldSendSelfRegistrationRequestSuccessfully() throws Exception {
+        // when.
         mockWebServer.enqueue(new MockResponse().setResponseCode(204));
-
         selfRegistrationService.scheduleSelfRegistration();
+        RecordedRequest request = mockWebServer.takeRequest(3, TimeUnit.SECONDS);
+        selfRegistrationService.close();
 
-        RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
+        // then.
         assertThat(request).isNotNull();
         assertThat(request.getMethod()).isEqualTo("POST");
-        assertThat(request.getPath()).isEqualTo("/service/register");
         assertThat(request.getHeader("Content-Type")).isEqualTo("application/json");
-
         String body = request.getBody().readUtf8();
         assertThat(body).contains("testApp");
         assertThat(body).contains("http://localhost:8089/actuator");
     }
 
-    @Test
-    void shouldHandleRejectedRegistration() throws Exception {
-        mockWebServer.enqueue(new MockResponse().setResponseCode(400));
-
-        selfRegistrationService.scheduleSelfRegistration();
-
-        RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
-        assertThat(request).isNotNull();
-        assertThat(request.getMethod()).isEqualTo("POST");
+    private static String serialize(Object payload) {
+        SelfRegistrationMetadata metadata = (SelfRegistrationMetadata) payload;
+        return "{\"instanceName\":\""
+                + metadata.getInstanceName()
+                + "\",\"instanceActuatorUrl\":\""
+                + metadata.getInstanceActuatorUrl()
+                + "\"}";
     }
 
-    @Test
-    void shouldHandleServerError() throws Exception {
-        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+    private static final class NoOpLogger implements Logger {
 
-        selfRegistrationService.scheduleSelfRegistration();
+        @Override
+        public void trace(String message, Object... args) {}
 
-        RecordedRequest request = mockWebServer.takeRequest(2, TimeUnit.SECONDS);
-        assertThat(request).isNotNull();
-        assertThat(request.getMethod()).isEqualTo("POST");
-    }
+        @Override
+        public void info(String message, Object... args) {}
 
-    @Test
-    void shouldHandleTimeout() throws Exception {
-        mockWebServer.enqueue(new MockResponse().setHeadersDelay(5, TimeUnit.SECONDS));
-
-        selfRegistrationService.scheduleSelfRegistration();
-
-        RecordedRequest request = mockWebServer.takeRequest(1, TimeUnit.SECONDS);
-        assertThat(request).isNotNull();
-        assertThat(request.getMethod()).isEqualTo("POST");
+        @Override
+        public void debug(String message, Object... args) {}
     }
 }

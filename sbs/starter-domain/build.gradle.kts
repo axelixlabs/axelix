@@ -27,6 +27,7 @@ dependencies {
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootTestPlatformVersion"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework:spring-web")
+    testImplementation("com.squareup.okhttp3:mockwebserver")
 }
 
 tasks.withType<JavaCompile> {
