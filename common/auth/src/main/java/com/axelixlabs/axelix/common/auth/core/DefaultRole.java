@@ -37,7 +37,7 @@ public final class DefaultRole implements Role {
     public static final Role ADMIN;
     public static final Role EDITOR;
     public static final Role VIEWER;
-    public static final Role SELF_REGISTRAR;
+    public static final Role MANAGED_SERVICE;
 
     static {
         VIEWER = new DefaultRole("VIEWER", Set.of());
@@ -53,7 +53,7 @@ public final class DefaultRole implements Role {
         ADMIN = new DefaultRole(
                 "ADMIN", Arrays.stream(DefaultAuthority.values()).collect(Collectors.toSet()));
 
-        SELF_REGISTRAR = new DefaultRole("SELF_REGISTRAR", Set.of(SELF_REGISTER_AUTHORITY));
+        MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of(SELF_REGISTER_AUTHORITY));
     }
 
     private final String name;

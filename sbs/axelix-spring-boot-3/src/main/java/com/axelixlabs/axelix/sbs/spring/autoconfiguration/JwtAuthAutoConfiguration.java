@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -100,12 +99,11 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-            IdentityAccessManager identityAccessManager, WebEndpointProperties webEndpointProperties) {
+            IdentityAccessManager identityAccessManager) {
 
         var jwtAuthorizationFilter = new JwtAuthorizationFilter(identityAccessManager);
         var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
         registration.setName("jwtAuthorizationFilter");
-        registration.addUrlPatterns(webEndpointProperties.getBasePath() + "/axelix*/**");
         return registration;
     }
 }

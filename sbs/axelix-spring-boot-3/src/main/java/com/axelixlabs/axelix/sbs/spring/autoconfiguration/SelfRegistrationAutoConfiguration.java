@@ -29,7 +29,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationMetadataAssembler;
@@ -73,15 +72,13 @@ public class SelfRegistrationAutoConfiguration {
             SelfRegistrationConfigurationProperties properties,
             ObjectMapper objectMapper,
             SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler,
-            JwtEncoderService jwtEncoderService,
-            AuthProperties authProperties) {
+            JwtEncoderService jwtEncoderService) {
         return new SelfRegistrationService(
                 new SLF4JLogger(LoggerFactory.getLogger(SelfRegistrationService.class)),
                 objectMapper::writeValueAsString,
                 properties,
                 selfRegistrationMetadataAssembler,
-                jwtEncoderService,
-                authProperties.getJwt().getDuration());
+                jwtEncoderService);
     }
 
     @Bean

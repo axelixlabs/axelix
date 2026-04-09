@@ -23,7 +23,6 @@ import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -57,8 +56,7 @@ class JwtAuthAutoConfigurationTest {
                     "axelix.sbs.auth.jwt",
                     "axelix.sbs.auth.jwt.algorithm=HMAC512",
                     "axelix.sbs.auth.jwt.signing-key=secret")
-            .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class))
-            .withBean(WebEndpointProperties.class);
+            .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class));
 
     @Test
     void shouldCreateAllBeansInDefaultScenario() {

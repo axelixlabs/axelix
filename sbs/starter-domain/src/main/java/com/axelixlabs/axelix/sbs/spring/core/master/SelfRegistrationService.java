@@ -54,7 +54,7 @@ public class SelfRegistrationService implements Closeable {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String AUTHENTICATION_SCHEMA = "Bearer ";
     private static final PasswordlessUser TECH_USER =
-            new PasswordlessUser("AXELIX.STARTER", Set.of(DefaultRole.SELF_REGISTRAR));
+            new PasswordlessUser("AXELIX.STARTER", Set.of(DefaultRole.MANAGED_SERVICE));
 
     private final HttpClient httpClient;
     private final JsonSerializationFunction serializationFunction;
@@ -64,8 +64,6 @@ public class SelfRegistrationService implements Closeable {
     private final Logger logger;
     private final JwtEncoderService jwtEncoderService;
 
-    private final Duration tokenTtl;
-
     @SuppressWarnings("NullAway.Init")
     private volatile String currentToken;
 
@@ -74,8 +72,7 @@ public class SelfRegistrationService implements Closeable {
             JsonSerializationFunction serializationFunction,
             SelfRegistrationConfigurationProperties properties,
             SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler,
-            JwtEncoderService jwtEncoderService,
-            Duration tokenTtl) {
+            JwtEncoderService jwtEncoderService) {
 
         this.logger = logger;
         this.jwtEncoderService = jwtEncoderService;
@@ -84,7 +81,6 @@ public class SelfRegistrationService implements Closeable {
         this.properties = properties;
         this.serializationFunction = serializationFunction;
         this.selfRegistrationMetadataAssembler = selfRegistrationMetadataAssembler;
-        this.tokenTtl = tokenTtl;
 
         this.executor = Executors.newSingleThreadScheduledExecutor(runnable -> {
             Thread thread = new Thread(runnable);
@@ -94,16 +90,9 @@ public class SelfRegistrationService implements Closeable {
     }
 
     public void scheduleSelfRegistration() {
-        long heartBeatInterval = properties.getHeartbeatInterval().getSeconds();
-        long tokenRefreshInterval = Math.max(300, tokenTtl.getSeconds() - (heartBeatInterval * 2));
-
-        executor.scheduleAtFixedRate(this::refreshToken, 0, tokenRefreshInterval, TimeUnit.SECONDS);
-
-        executor.scheduleAtFixedRate(this::register, 0L, heartBeatInterval, TimeUnit.SECONDS);
-    }
-
-    private void refreshToken() {
-        currentToken = jwtEncoderService.generateToken(TECH_USER);
+        refreshToken();
+        executor.scheduleAtFixedRate(
+                this::register, 0L, properties.getHeartbeatInterval().getSeconds(), TimeUnit.SECONDS);
     }
 
     private void register() {
@@ -113,14 +102,20 @@ public class SelfRegistrationService implements Closeable {
             HttpResponse<Void> response = sendRequest(selfRegistrationMetadata, properties.getMasterUrl());
 
             int statusCode = response.statusCode();
+
             if (statusCode >= 200 && statusCode < 300) {
                 logger.trace("Heartbeat successful. Master URL: {}", properties.getMasterUrl());
             } else {
+                refreshToken();
                 logger.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
             }
         } catch (IOException | InterruptedException e) {
             logger.info("Error sending registration request or heartbeat to master: {}", e.getMessage());
         }
+    }
+
+    private void refreshToken() {
+        currentToken = jwtEncoderService.generateToken(TECH_USER);
     }
 
     private HttpResponse<Void> sendRequest(@NonNull SelfRegistrationMetadata selfRegistrationMetadata, String url)

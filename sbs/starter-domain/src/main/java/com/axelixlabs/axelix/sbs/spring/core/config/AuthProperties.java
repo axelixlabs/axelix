@@ -54,7 +54,7 @@ public class AuthProperties implements Validateable {
         private String signingKey;
 
         /**
-         * JWT token validity duration.
+         * JWT token validity duration to be set when constructing the token.
          */
         private Duration duration = Duration.ofSeconds(300);
 
