@@ -19,23 +19,24 @@ package com.axelixlabs.axelix.sbs.spring.core.master;
 
 import java.lang.management.ManagementFactory;
 import java.time.Instant;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
+import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
 
@@ -46,15 +47,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 06.02.2026
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-@SpringBootTest
-@Import({
-    CommitIdPluginGitInformationProvider.class,
-    CommitIdPluginShortBuildInfoProvider.class,
-    DefaultServiceMetadataAssembler.class,
-    WebEndpointAutoConfiguration.class,
-    DefaultSelfRegistrationMetadataAssemblerTest.CurrentConfig.class
-})
+@SpringBootTest(classes = DefaultSelfRegistrationMetadataAssemblerTest.TestApplication.class)
 @TestPropertySource(
         properties = {
             "axelix.sbs.discovery.instance-name=testApp",
@@ -63,11 +58,15 @@ import static org.assertj.core.api.Assertions.assertThat;
         })
 class DefaultSelfRegistrationMetadataAssemblerTest {
 
+    @SpringBootConfiguration
+    @EnableAutoConfiguration
+    @Import({DefaultServiceMetadataAssembler.class, CurrentConfig.class})
+    static class TestApplication {}
+
     @Autowired
     private SelfRegistrationMetadataAssembler subject;
 
     @TestConfiguration
-    @EnableConfigurationProperties(WebEndpointProperties.class)
     static class CurrentConfig {
 
         @Bean
@@ -79,18 +78,9 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         @Bean
         public SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler(
                 ServiceMetadataAssembler serviceMetadataAssembler,
-                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
-                WebEndpointProperties webEndpointProperties) {
-
+                SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties) {
             return new DefaultSelfRegistrationMetadataAssembler(
-                    serviceMetadataAssembler,
-                    selfRegistrationConfigurationProperties,
-                    webEndpointProperties.getBasePath());
-        }
-
-        @Bean
-        CycloneDXSBOMLibraryDiscoverer cycloneDXSBOMLibraryDiscoverer() {
-            return new CycloneDXSBOMLibraryDiscoverer(new ClassPathResource("other/application.cdx.json"));
+                    serviceMetadataAssembler, selfRegistrationConfigurationProperties, "/actuator");
         }
 
         @Bean
@@ -108,13 +98,37 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         AxelixVersionDiscoverer axelixVersionDiscoverer() {
             return () -> "1.1.3";
         }
+
+        @Bean
+        GitInformationProvider gitInformationProvider() {
+            return () -> Optional.of(
+                    new GitInfo("8f4b9f7", "main", "2026-02-06T10:15:30Z", new GitInfo.CommitAuthor("test", "test")));
+        }
+
+        @Bean
+        ShortBuildInfoProvider shortBuildInfoProvider() {
+            return () -> Optional.of(new ShortBuildInfo("2026-02-06T10:15:30Z", "1.1.3"));
+        }
+
+        @Bean
+        LibraryDiscoverer libraryDiscoverer() {
+            return (artifactId, groupId) -> {
+                if ("spring-boot".equals(artifactId) && "org.springframework.boot".equals(groupId)) {
+                    return Optional.of("2.7.18");
+                }
+                if ("spring-core".equals(artifactId) && "org.springframework".equals(groupId)) {
+                    return Optional.of("5.3.31");
+                }
+                return Optional.empty();
+            };
+        }
     }
 
     @Test
     void shouldAssembleTheSelfRegistrationMetadataAboutGivenService() {
-
         // when.
         SelfRegistrationMetadata metadata = subject.assemble();
+        BasicDiscoveryMetadata basicMetadata = metadata.getBasicDiscoveryMetadata();
 
         // then.
         assertThat(metadata.getInstanceId()).isNotBlank();
@@ -123,5 +137,11 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         assertThat(metadata.getDeploymentAt()).isNotBlank();
         assertThat(Instant.parse(metadata.getDeploymentAt()).isBefore(Instant.now()))
                 .isTrue();
+        assertThat(basicMetadata.getVersion()).isEqualTo("1.1.3");
+        assertThat(basicMetadata.getServiceVersion()).isEqualTo("1.1.3");
+        assertThat(basicMetadata.getCommitShortSha()).isEqualTo("8f4b9f7");
+        assertThat(basicMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
+        assertThat(basicMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo("2.7.18");
+        assertThat(basicMetadata.getSoftwareVersions().getSpringFramework()).isEqualTo("5.3.31");
     }
 }
