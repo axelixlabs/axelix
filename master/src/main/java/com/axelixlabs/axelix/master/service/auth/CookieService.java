@@ -65,5 +65,5 @@ public interface CookieService {
      *
      * @return configured ResponseCookie instance ready to be set in HTTP response
      */
-    ResponseCookie buildExpiredAuthMetdataCookie();
+    ResponseCookie buildExpiredAuthMetadataCookie();
 }

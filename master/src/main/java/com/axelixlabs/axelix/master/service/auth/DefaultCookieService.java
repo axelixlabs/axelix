@@ -74,7 +74,7 @@ public class DefaultCookieService implements CookieService {
     }
 
     @Override
-    public ResponseCookie buildExpiredAuthMetdataCookie() {
+    public ResponseCookie buildExpiredAuthMetadataCookie() {
         // The browser will expire the cookie anyway, so empty string is fine
         return buildAuthoritiesMetadataCookie("", 0L);
     }
