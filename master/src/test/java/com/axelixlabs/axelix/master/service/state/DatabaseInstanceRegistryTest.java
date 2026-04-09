@@ -39,13 +39,13 @@ import static com.axelixlabs.axelix.master.utils.TestObjectFactory.withName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link DatabaseInstanceRegistry}
+ * Base class for integration tests of {@link DatabaseInstanceRegistry}
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
 @SpringBootTest
-class DatabaseInstanceRegistryTest {
+abstract class DatabaseInstanceRegistryTest {
 
     @Autowired
     private InstanceRegistry instanceRegistry;

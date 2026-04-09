@@ -32,7 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.jdbc.core.dialect.JdbcDialect;
@@ -59,7 +63,8 @@ public class PersistenceAutoConfiguration {
      */
     @AutoConfiguration
     @ConditionalOnClass(name = "org.sqlite.JDBC")
-    public static class SQLiteAutoConfiguration extends AbstractJdbcConfiguration {
+    @Conditional(SQLiteJdbcUrlCondition.class)
+    public static class SQLiteAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
 
         @Autowired
         private JsonMapper jsonMapper;
@@ -77,6 +82,60 @@ public class PersistenceAutoConfiguration {
                     new StringToInstantConverter(),
                     new VmFeaturesReadingConverter(jsonMapper),
                     new VmFeaturesWritingConverter(jsonMapper));
+        }
+    }
+
+    public static class SQLiteJdbcUrlCondition implements Condition {
+
+        @Override
+        public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
+            String jdbcUrl = context.getEnvironment().getProperty("spring.datasource.url");
+            return jdbcUrl != null && jdbcUrl.startsWith("jdbc:sqlite:");
+        }
+    }
+
+    /**
+     * Autoconfiguration for PostgreSQL-based {@link com.axelixlabs.axelix.master.service.state.InstanceRegistry}.
+     */
+    @AutoConfiguration
+    @ConditionalOnClass(name = "org.postgresql.Driver")
+    @Conditional(PostgreSqlJdbcUrlCondition.class)
+    public static class PostgreSqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {}
+
+    public static class PostgreSqlJdbcUrlCondition implements Condition {
+
+        @Override
+        public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
+            String jdbcUrl = context.getEnvironment().getProperty("spring.datasource.url");
+            return jdbcUrl != null && jdbcUrl.startsWith("jdbc:postgresql:");
+        }
+    }
+
+    /**
+     * Autoconfiguration for MySQL-based {@link com.axelixlabs.axelix.master.service.state.InstanceRegistry}.
+     */
+    @AutoConfiguration
+    @ConditionalOnClass(name = "com.mysql.cj.jdbc.Driver")
+    @Conditional(MySqlJdbcUrlCondition.class)
+    public static class MySqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {}
+
+    public static class MySqlJdbcUrlCondition implements Condition {
+
+        @Override
+        public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
+            String jdbcUrl = context.getEnvironment().getProperty("spring.datasource.url");
+            return jdbcUrl != null && jdbcUrl.startsWith("jdbc:mysql:");
+        }
+    }
+
+    public static class BaseJdbcConvertersAutoConfiguration extends AbstractJdbcConfiguration {
+
+        @Autowired
+        protected JsonMapper jsonMapper;
+
+        @Override
+        protected @NonNull List<?> userConverters() {
+            return List.of(new VmFeaturesReadingConverter(jsonMapper), new VmFeaturesWritingConverter(jsonMapper));
         }
 
         /**
