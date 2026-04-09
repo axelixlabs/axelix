@@ -45,7 +45,6 @@ public final class DefaultRole implements Role {
                         DefaultAuthority.SCHEDULED_TASKS_MODIFY,
                         DefaultAuthority.CACHES_CLEAR,
                         DefaultAuthority.CACHES_TOGGLE,
-                        DefaultAuthority.CONFIGURATION_PROPERTY_VALUE_MUTATE,
                         DefaultAuthority.GARBAGE_COLLECTOR));
 
         ADMIN = new DefaultRole(

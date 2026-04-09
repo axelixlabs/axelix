@@ -85,12 +85,6 @@ public class MasterAuthorityResolverTest {
                         HttpMethod.POST,
                         DefaultAuthority.GARBAGE_COLLECTOR),
 
-                // PROPERTY_VALUE_MUTATE
-                Arguments.of(
-                        "/api/external/property-management/i",
-                        HttpMethod.POST,
-                        DefaultAuthority.CONFIGURATION_PROPERTY_VALUE_MUTATE),
-
                 // SCHEDULED_TASKS_MODIFY
                 Arguments.of(
                         "/api/external/scheduled-tasks/i/disable",

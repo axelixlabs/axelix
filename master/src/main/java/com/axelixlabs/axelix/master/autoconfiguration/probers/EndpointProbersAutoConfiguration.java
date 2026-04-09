@@ -280,13 +280,6 @@ public class EndpointProbersAutoConfiguration {
                 instanceRegistry, ActuatorEndpoints.MODIFY_INTERVAL_SCHEDULED_TASK, securityContextExecutor);
     }
 
-    // Property Management
-    @Bean
-    public DiscardingAbstractEndpointProber changePropertyValueEndpointProver() {
-        return new DiscardingAbstractEndpointProber(
-                instanceRegistry, ActuatorEndpoints.PROPERTY_MANAGEMENT, securityContextExecutor);
-    }
-
     // Conditions
     @Bean
     public ProxyingEndpointProber getConditionsProber() {

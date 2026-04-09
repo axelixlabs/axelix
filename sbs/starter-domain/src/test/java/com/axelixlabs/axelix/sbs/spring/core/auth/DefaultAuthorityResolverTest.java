@@ -65,12 +65,6 @@ public class DefaultAuthorityResolverTest {
                 // CONFIG_PROPS_VALUES_READ
                 Arguments.of("/axelix-configprops", HttpMethod.GET, DefaultAuthority.CONFIG_PROPS_VALUES_READ),
 
-                // PROPERTY_VALUE_MUTATE
-                Arguments.of(
-                        "/axelix-property-management",
-                        HttpMethod.POST,
-                        DefaultAuthority.CONFIGURATION_PROPERTY_VALUE_MUTATE),
-
                 // SCHEDULED_TASKS_MODIFY
                 Arguments.of(
                         "/axelix-scheduled-tasks/modify/cron-expression",

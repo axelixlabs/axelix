@@ -59,12 +59,6 @@ public class MasterAuthorityResolver implements AuthorityResolver {
         put(ApiPaths.GcLogFileApi.ENABLE_GC_LOGGING, HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR);
         put(ApiPaths.GcLogFileApi.TRIGGER_GC, HttpMethod.POST, DefaultAuthority.GARBAGE_COLLECTOR);
 
-        // @ConfigurationProperties value mutation
-        put(
-                ApiPaths.PropertyManagementApi.INSTANCE_ID,
-                HttpMethod.POST,
-                DefaultAuthority.CONFIGURATION_PROPERTY_VALUE_MUTATE);
-
         // ScheduledTasks
         put(ApiPaths.ScheduledTasksApi.DISABLE_TASK, HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
         put(ApiPaths.ScheduledTasksApi.ENABLE_TASK, HttpMethod.POST, DefaultAuthority.SCHEDULED_TASKS_MODIFY);

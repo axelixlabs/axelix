@@ -22,6 +22,7 @@ package com.axelixlabs.axelix.common.auth.core;
  *
  * @see Authority
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public enum DefaultAuthority implements Authority {
 
@@ -57,15 +58,7 @@ public enum DefaultAuthority implements Authority {
      * Grants permission to perform actions for garbage collector log monitoring.
      * <p>Allows triggering, enabling, and disabling garbage collector log monitoring at runtime.</p>
      */
-    GARBAGE_COLLECTOR,
-
-    /**
-     * Grants access to runtime @ConfigurationProperties property mutation operations.
-     *
-     * <p>Allows changing configuration properties at runtime.</p>
-     * <p>Implemented by custom actuator endpoint: {@code PropertyManagementEndpoint}.</p>
-     */
-    CONFIGURATION_PROPERTY_VALUE_MUTATE;
+    GARBAGE_COLLECTOR;
 
     @Override
     public String getName() {
