@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.sbs.spring.core.auth;
+package com.axelixlabs.axelix.common.auth.service;
 
 import java.util.Collections;
 import java.util.Set;
@@ -28,8 +28,6 @@ import com.axelixlabs.axelix.common.auth.core.GlobalAuthority;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
-import com.axelixlabs.axelix.common.auth.service.Authorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
