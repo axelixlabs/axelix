@@ -29,6 +29,7 @@ When applying refactoring or making an organizational changes to the code base i
 3. The general rule of thumb is the less code - the better. Less code generally means less bugs. 
 4. Refactoring must **NEVER** be massive. It involves large risks of breaking existing code, and it is difficult to review. If you can, then make as small and as atomic changes as possible, one at a time.
 5. Duplication of code is generally bad. Extracting common parts is generally a good thing to be doing.
+6. If you move source files around, please, preserve the author javadoc/tsdoc tags
 
 ## Refactoring Tests Code
 
