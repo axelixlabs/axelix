@@ -33,6 +33,9 @@ interface IProps {
 
 export const SQLBlock = ({ sql }: IProps) => {
     const formattedSQL = format(sql, {
+        // TODO:
+        //  Well, strictly speaking we do not know the RDMBS in use in the service, but we have to
+        //  select the dialect of the SQL so we kind of making the best guess here
         language: "postgresql",
         keywordCase: "upper",
         tabWidth: 2,

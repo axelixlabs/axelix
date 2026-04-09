@@ -65,7 +65,7 @@ export const QueryBar = ({ query, pxPerMs, executionStartTimestampMs, timelineWi
     const isQuerySelected = selectedQueryNum === queryNum;
     const queryDurationMs = endTimestampMs - startTimestampMs;
 
-    const handleBarClick = (query: IQueryData, isQuerySelected: boolean): void => {
+    const handleBarClick = (isQuerySelected: boolean): void => {
         if (isQuerySelected) {
             setSelectedQueryNum(null);
         } else {
@@ -117,7 +117,7 @@ export const QueryBar = ({ query, pxPerMs, executionStartTimestampMs, timelineWi
             >
                 <div
                     className={`${styles.Bar} ${isQuerySelected ? styles.SelectedBar : ""}`}
-                    onClick={() => handleBarClick(query, isQuerySelected)}
+                    onClick={() => handleBarClick(isQuerySelected)}
                     style={{
                         left: getQueryLeftPosition(startTimestampMs, executionStartTimestampMs, pxPerMs, timelineWidth),
                         width: getQueryBarWidth(queryDurationMs, pxPerMs),
