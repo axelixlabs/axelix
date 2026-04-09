@@ -29,25 +29,25 @@ export const AccessProvider = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const authoritiesCookie = getCookie("authorities") || "";
+        const authoritiesCookie = getCookie("authorities");
 
-        let parsedAuthorities: string;
+        if (!authoritiesCookie) {
+            return;
+        }
+
+        let parsedAuthorities = "";
 
         try {
             parsedAuthorities = atob(authoritiesCookie);
         } catch {
-            parsedAuthorities = "";
-        }
-
-        if (!parsedAuthorities) {
             message.error(t("unknownError"));
-            dispatch(setAuthorities([]));
             return;
         }
 
-        const authorities = parseAuthorities(parsedAuthorities);
-
-        dispatch(setAuthorities(authorities));
+        if (parsedAuthorities) {
+            const authorities = parseAuthorities(parsedAuthorities);
+            dispatch(setAuthorities(authorities));
+        }
     }, []);
 
     return null;
