@@ -17,6 +17,7 @@
  */
 import { notification } from "antd";
 import type { AxiosResponse } from "axios";
+import dayjs from "dayjs";
 import { t } from "i18next";
 
 import {
@@ -118,10 +119,7 @@ export const toFormattedTime = (value: number): string => {
 };
 
 export const toFormattedTimeWithMs = (value: number): string => {
-    const formattedTime = toFormattedTime(value);
-    const ms = new Date(value).getMilliseconds();
-
-    return `${formattedTime}.${ms}`;
+    return dayjs(value).format("HH:mm:ss.SSS");
 };
 
 export const createWallboardFilterSearchParam = (

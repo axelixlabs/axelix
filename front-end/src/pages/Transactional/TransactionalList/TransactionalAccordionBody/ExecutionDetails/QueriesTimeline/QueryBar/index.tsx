@@ -29,6 +29,11 @@ import styles from "./styles.module.css";
 
 interface IProps {
     /**
+     * The sequential number of the passed query inside the given transaction.
+     */
+    queryNum: number;
+
+    /**
      * The query executed during a particular transaction.
      */
     query: IQueryData;
@@ -49,29 +54,29 @@ interface IProps {
     timelineWidth: number;
 }
 
-export const QueryBar = ({ query, pxPerMs, executionStartTimestampMs, timelineWidth }: IProps) => {
+export const QueryBar = ({ query, pxPerMs, executionStartTimestampMs, timelineWidth, queryNum }: IProps) => {
     const { t } = useTranslation();
 
-    const [selectedQuery, setSelectedQuery] = useState<IQueryData | null>(null);
+    const [selectedQueryNum, setSelectedQueryNum] = useState<number | null>(null);
     const [isClosing, setIsClosing] = useState<boolean>(false);
 
-    const { endTimestampMs, startTimestampMs, sql, queryId } = query;
+    const { endTimestampMs, startTimestampMs, sql } = query;
 
-    const isQuerySelected = selectedQuery?.queryId === queryId;
-    const durationMs = endTimestampMs - startTimestampMs;
+    const isQuerySelected = selectedQueryNum === queryNum;
+    const queryDurationMs = endTimestampMs - startTimestampMs;
 
     const handleBarClick = (query: IQueryData, isQuerySelected: boolean): void => {
         if (isQuerySelected) {
-            setSelectedQuery(null);
+            setSelectedQueryNum(null);
         } else {
-            setSelectedQuery(query);
+            setSelectedQueryNum(queryNum);
         }
     };
 
     const handleOnOpenChange = (open: boolean): void => {
         if (!open) {
             setIsClosing(true);
-            setSelectedQuery(null);
+            setSelectedQueryNum(null);
             setTimeout(() => setIsClosing(false), 300);
         }
     };
@@ -95,7 +100,7 @@ export const QueryBar = ({ query, pxPerMs, executionStartTimestampMs, timelineWi
                 trigger="click"
                 title={
                     <div className={styles.TitleWrapper}>
-                        <div>{t("Transactional.totalTime", { durationMs })}</div>
+                        <div>{t("Transactional.totalTime", { durationMs: queryDurationMs })}</div>
                         <div>
                             {t("Transactional.startTime")}: {toDateTimeWithMs(startTimestampMs)}
                         </div>
@@ -115,7 +120,7 @@ export const QueryBar = ({ query, pxPerMs, executionStartTimestampMs, timelineWi
                     onClick={() => handleBarClick(query, isQuerySelected)}
                     style={{
                         left: getQueryLeftPosition(startTimestampMs, executionStartTimestampMs, pxPerMs, timelineWidth),
-                        width: getQueryBarWidth(durationMs, pxPerMs),
+                        width: getQueryBarWidth(queryDurationMs, pxPerMs),
                     }}
                 />
             </Popover>

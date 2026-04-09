@@ -18,7 +18,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { IQueryData, ITransactionalExecution } from "models";
+import type { ITransactionalExecution } from "models";
 
 import { QueryBar } from "./QueryBar";
 import styles from "./styles.module.css";
@@ -54,13 +54,6 @@ export const QueriesTimeline = ({ selectedExecution }: IProps) => {
 
     const timelineRange = executionEndTimestampMs - executionStartTimestampMs;
 
-    const queriesWithId: IQueryData[] = selectedExecution.queries.map((query) => {
-        return {
-            ...query,
-            queryId: query.sql,
-        };
-    });
-
     const pxPerMs = timelineWidth / timelineRange;
 
     return (
@@ -68,9 +61,10 @@ export const QueriesTimeline = ({ selectedExecution }: IProps) => {
             <div className={styles.MainWrapper}>
                 <div>
                     <div className={styles.Timeline} ref={timelineRef}>
-                        {queriesWithId.map((query) => (
+                        {selectedExecution.queries.map((query, index) => (
                             <QueryBar
-                                key={query.queryId}
+                                key={index}
+                                queryNum={index}
                                 query={query}
                                 pxPerMs={pxPerMs}
                                 executionStartTimestampMs={executionStartTimestampMs}

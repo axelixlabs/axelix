@@ -34,11 +34,6 @@ export interface IQueryData {
      * UNIX timestamp (milliseconds from epoch) when the query started
      */
     startTimestampMs: number;
-
-    /**
-     * The query's ID
-     */
-    queryId?: string;
 }
 
 /**
@@ -97,13 +92,25 @@ export interface ITransactionalEntryPoint {
      */
     executions: ITransactionalExecution[];
 
+    /**
+     * Accumulated statistics for the recorded transactions history
+     */
     executionStats: IExecutionStats;
 }
 
 export interface IExecutionStats {
+    /**
+     * Average duration of the transaction in milliseconds.
+     */
     averageDurationMs: number;
 
+    /**
+     * Max duration of the transaction in milliseconds.
+     */
     maxDurationMs: number;
 
+    /**
+     * Median duration of the transaction in milliseconds.
+     */
     medianDurationMs: number;
 }
