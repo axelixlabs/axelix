@@ -46,18 +46,19 @@ class ProxyingPreparedStatement(
     }
 
     private fun <T> execute(action: () -> T): T {
-        val startTime = System.nanoTime()
+        val startTimestampMs: Long = System.currentTimeMillis();
+        val txStartTime: Long = System.nanoTime()
 
         try {
             return action()
         } finally {
-            val duration: Long = System.nanoTime() - startTime
+            val duration: Long = System.nanoTime() - txStartTime
 
             statsCollector.recordQuery(
                 SqlQueryRecord(
                     sql,
                     duration / 1_000_000,
-                    startTime / 1_000_000
+                    startTimestampMs
                 )
             )
         }
