@@ -31,20 +31,12 @@ import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.web.context.support.StandardServletEnvironment;
 
-import com.axelixlabs.axelix.sbs.spring.core.properties.AxelixPropertySource;
-
 /**
  * This enum holds the name of the property source along with a custom description
  *
  * @author Sergey Cherkasov
  */
 public enum PropertySourceDescription {
-
-    // AxelixPropertySource
-    AXELIX_PROPERTY_SOURCE_NAME(
-            AxelixPropertySource.AXELIX_PROPERTY_SOURCE_NAME,
-            "A custom {@link MapPropertySource} implementation used to hold mutable property values, managed dynamically during application runtime, and having the highest priority"),
-
     SERVER_PORTS(
             "server.ports",
             "Contains the 'server.port' property from 'application.properties/yaml', which defines the web server port (8080 by default)."),
@@ -62,8 +54,8 @@ public enum PropertySourceDescription {
             "Contains application metadata extracted from the 'MANIFEST.MF' file and core Spring Boot properties 'spring.application.*'"),
 
     APPLICATION_PROPERTIES(
-        "Config resource",
-        "Contains properties from the 'application*.properties/yaml' configuration file loaded from the pre-defined location (often from the classpath or the file system)"),
+            "Config resource",
+            "Contains properties from the 'application*.properties/yaml' configuration file loaded from the pre-defined location (often from the classpath or the file system)"),
 
     // CommandLinePropertySource
     COMMAND_LINE_ARGS(

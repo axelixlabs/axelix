@@ -38,7 +38,6 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * @author Sergey Cherkasov
  */
 public enum PropertySourceDescription {
-
     SERVER_PORTS(
             "server.ports",
             "Contains the 'server.port' property from 'application.properties/yaml', which defines the web server port (8080 by default)."),
