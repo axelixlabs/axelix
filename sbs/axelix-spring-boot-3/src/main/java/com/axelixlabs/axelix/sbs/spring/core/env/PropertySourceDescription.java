@@ -61,11 +61,9 @@ public enum PropertySourceDescription {
             "applicationInfo",
             "Contains application metadata extracted from the 'MANIFEST.MF' file and core Spring Boot properties 'spring.application.*'"),
 
-    // TODO: simplify the description here. It is not true that the config file is necessarily loaded from the
-    // classpath.
     APPLICATION_PROPERTIES(
-            "Config resource",
-            "Contains properties from the 'application*.properties/yaml' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources."),
+        "Config resource",
+        "Contains properties from the 'application*.properties/yaml' configuration file loaded from the pre-defined location (often from the classpath or the file system)"),
 
     // CommandLinePropertySource
     COMMAND_LINE_ARGS(

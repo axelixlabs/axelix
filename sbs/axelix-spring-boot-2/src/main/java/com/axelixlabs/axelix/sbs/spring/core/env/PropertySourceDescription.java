@@ -39,12 +39,6 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  */
 public enum PropertySourceDescription {
 
-    // TODO: Remove this property source if context reload is not ported to the Spring Boot 2 starter.
-    /*  // AxelixPropertySource
-        AXELIX_PROPERTY_SOURCE_NAME(
-                AxelixPropertySource.AXELIX_PROPERTY_SOURCE_NAME,
-                "A custom {@link MapPropertySource} implementation used to hold mutable property values, managed dynamically during application runtime, and having the highest priority"),
-    */
     SERVER_PORTS(
             "server.ports",
             "Contains the 'server.port' property from 'application.properties/yaml', which defines the web server port (8080 by default)."),
@@ -61,11 +55,9 @@ public enum PropertySourceDescription {
             "applicationInfo",
             "Contains application metadata extracted from the 'MANIFEST.MF' file and core Spring Boot properties 'spring.application.*'"),
 
-    // TODO: simplify the description here. It is not true that the config file is necessarily loaded from the
-    // classpath.
     APPLICATION_PROPERTIES(
             "Config resource",
-            "Contains properties from the 'application*.properties/yaml' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources."),
+            "Contains properties from the 'application*.properties/yaml' configuration file loaded from the pre-defined location (often from the classpath or the file system)"),
 
     // CommandLinePropertySource
     COMMAND_LINE_ARGS(
