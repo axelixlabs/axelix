@@ -57,7 +57,7 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                             key={cache.name}
                             wrapperStyles={styles.WrapperStyles}
                             headerStyles={styles.HeaderStyles}
-                            contentWrapperStyles={styles.ContentStyles}
+                            contentWrapperStyles={styles.ContentWrapperStyles}
                         />
                     )),
                     ...withoutDropDown.map((cache) => (

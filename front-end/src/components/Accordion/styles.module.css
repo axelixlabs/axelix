@@ -3,14 +3,17 @@
 }
 
 .ContentWrapper {
-  display: none;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
 }
 
-.Open > .ContentWrapper {
-  display: block;
-  animation: slidein 0.4s;
-  animation-fill-mode: forwards;
-  height: 0%;
+.ContentWrapperOpened {
+  grid-template-rows: 1fr;
+}
+
+.ContentInner {
+  overflow: hidden;
 }
 
 .HeaderWrapper {
@@ -49,14 +52,4 @@
 
 .Content {
   padding: 16px;
-}
-
-@keyframes slidein {
-  from {
-    opacity: 0.3;
-  }
-
-  to {
-    opacity: 1;
-  }
 }

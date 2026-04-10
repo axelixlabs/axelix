@@ -44,7 +44,7 @@
     text-align: left;
 }
 
-.ContentStyles {
+.ContentWrapperStyles {
     grid-column: 1 / -1;
 }
 

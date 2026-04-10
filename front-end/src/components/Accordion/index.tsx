@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { type PropsWithChildren, type ReactNode, useState } from "react";
+import { type PropsWithChildren, type ReactNode, useEffect, useRef, useState } from "react";
 
 import styles from "./styles.module.css";
 
@@ -31,14 +31,19 @@ interface IProps {
     headerStyles?: string;
 
     /**
-     * CSS classes for the accordion content.
+     * CSS classes for the accordion content
      */
     contentStyles?: string;
 
     /**
-     * CSS classes for the main accordion wrapper.
+     * CSS classes for the main accordion wrapper
      */
     wrapperStyles?: string;
+
+    /**
+     * CSS classes for the content main wrapper
+     */
+    contentWrapperStyles?: string;
 
     /**
      * Indicates whether the accordion is expanded
@@ -46,16 +51,14 @@ interface IProps {
     accordionExpanded?: boolean;
 
     /**
-     * If true, the arrow icon will not be displayed.
+     * If true, the arrow icon will not be displayed
      */
     hideArrowIcon?: boolean;
 
     /**
-     * Function triggered when the accordion is closed.
+     * Function triggered when the accordion is closed
      */
     onClose?: () => void;
-
-    contentWrapperStyles?: string;
 }
 
 export const Accordion = ({
@@ -69,15 +72,50 @@ export const Accordion = ({
     hideArrowIcon = false,
     onClose,
 }: PropsWithChildren<IProps>) => {
-    /* TODO: Remove contentWrapperStyles in future */
     const [open, setOpen] = useState<boolean>(accordionExpanded);
+    const [isContentMounted, setIsContentMounted] = useState<boolean>(accordionExpanded);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
+
+    /*
+     * We use the isContentMounted pattern instead of a pure CSS approach (e.g. overflow: hidden)
+     * because accordion children can be heavy components that perform HTTP requests (e.g. metrics).
+     * In large lists, mounting all children at once would trigger a huge number of unnecessary requests
+     * for accordions the user never opens. By controlling isContentMounted, children are only mounted
+     * when the user explicitly opens the accordion, and unmounted after it closes.
+     *
+     * On open:  mount children first, then trigger animation after 10ms (one render cycle)
+     * On close: trigger animation immediately, then unmount children after 300ms (animation duration)
+     */
     const handlerClick = (): void => {
-        if (open && onClose) {
-            onClose();
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
         }
 
-        setOpen(!open);
+        if (open) {
+            setOpen(false);
+
+            if (onClose) {
+                onClose();
+            }
+
+            timeoutRef.current = setTimeout(() => {
+                setIsContentMounted(false);
+            }, 300);
+        } else {
+            setIsContentMounted(true);
+
+            timeoutRef.current = setTimeout(() => {
+                setOpen(true);
+            }, 10);
+        }
     };
 
     return (
@@ -89,11 +127,15 @@ export const Accordion = ({
                 >
                     {header}
                 </div>
-                {open && (
-                    <div className={`${styles.ContentWrapper} ${contentWrapperStyles}`}>
-                        <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
-                    </div>
-                )}
+                <div
+                    className={`${styles.ContentWrapper} ${open ? styles.ContentWrapperOpened : ""} ${contentWrapperStyles}`}
+                >
+                    {isContentMounted && (
+                        <div className={styles.ContentInner}>
+                            <div className={`${styles.Content} ${contentStyles}`}>{children}</div>
+                        </div>
+                    )}
+                </div>
             </div>
         </>
     );
