@@ -18,13 +18,18 @@
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -83,12 +88,8 @@ class TransactionMonitoringEndpointTest {
         ObjectMapper objectMapper = new ObjectMapper();
         propagationTestHelper.testRequiresNew("Smith");
 
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/actuator/axelix-transactions-monitoring", String.class);
+        String responseBody = getMonitoringResponse();
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        String responseBody = response.getBody();
         assertThat(responseBody).isNotNull();
         assertThatJson(responseBody).isObject().containsKey("entrypoints");
         assertThatJson(responseBody).node("entrypoints").isArray();
@@ -154,9 +155,103 @@ class TransactionMonitoringEndpointTest {
         assertThat(allStats).isEmpty();
     }
 
+    @Test
+    void shouldTrackSingleQueryInsideTransaction() {
+        propagationTestHelper.testSingleQuery();
+
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries")
+                .isArray()
+                .hasSize(1)
+                .isNotEmpty();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].sql")
+                .isString();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].startTimestampMs")
+                .isNumber();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].endTimestampMs")
+                .isNumber();
+    }
+
+    @Test
+    void shouldTrackMultipleQueriesInsideTransaction() {
+        propagationTestHelper.testMultipleQueries();
+
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries")
+                .isArray()
+                .hasSizeGreaterThanOrEqualTo(3);
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].sql")
+                .isString();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].startTimestampMs")
+                .isNumber();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].endTimestampMs")
+                .isNumber();
+    }
+
+    @Test
+    void shouldTrackNPlusOneInsideTransaction() {
+        propagationTestHelper.testNPlusOne();
+
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries")
+                .isArray()
+                .hasSizeGreaterThanOrEqualTo(6);
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].sql")
+                .isString();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].startTimestampMs")
+                .isNumber();
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries[0].endTimestampMs")
+                .isNumber();
+    }
+
+    @Test
+    void shouldTrackHibernateOnMerge() {
+        propagationTestHelper.testMerge();
+
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody)
+                .node("entrypoints[0].executions[0].queries")
+                .isArray()
+                .hasSizeGreaterThanOrEqualTo(3)
+                .anySatisfy(
+                        query -> assertThatJson(query).node("sql").asString().containsIgnoringCase("insert"))
+                .anySatisfy(
+                        query -> assertThatJson(query).node("sql").asString().containsIgnoringCase("select"))
+                .anySatisfy(
+                        query -> assertThatJson(query).node("sql").asString().containsIgnoringCase("update"))
+                .allSatisfy(query -> {
+                    assertThatJson(query).node("sql").isString();
+                    assertThatJson(query).node("startTimestampMs").isNumber();
+                    assertThatJson(query).node("endTimestampMs").isNumber();
+                });
+    }
+
+    private String getMonitoringResponse() {
+        ResponseEntity<String> response =
+                restTemplate.getForEntity("/actuator/axelix-transactions-monitoring", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        return response.getBody();
+    }
+
     @TestConfiguration
     @EnableJpaRepositories(basePackageClasses = OwnerRepository.class, considerNestedRepositories = true)
-    @EntityScan(basePackageClasses = Owner.class)
+    @EntityScan(basePackageClasses = {Owner.class, Pet.class})
     static class TransactionMonitoringEndpointTestConfiguration {
 
         @Bean
@@ -195,8 +290,11 @@ class TransactionMonitoringEndpointTest {
 
         @Bean
         public PropagationTestHelper propagationTestHelper(
-                OwnerRepository ownerRepository, @Lazy PropagationTestHelper self) {
-            return new PropagationTestHelper(ownerRepository, self);
+                OwnerRepository ownerRepository,
+                PetRepository petRepository,
+                @Lazy PropagationTestHelper self,
+                EntityManager entityManager) {
+            return new PropagationTestHelper(ownerRepository, petRepository, self, entityManager);
         }
     }
 
@@ -209,6 +307,13 @@ class TransactionMonitoringEndpointTest {
 
         private String lastName;
 
+        @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+        private List<Pet> pets = new ArrayList<>();
+
+        public List<Pet> getPets() {
+            return pets;
+        }
+
         public Long getId() {
             return id;
         }
@@ -216,21 +321,39 @@ class TransactionMonitoringEndpointTest {
         public String getLastName() {
             return lastName;
         }
+
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
+        }
+    }
+
+    @Entity
+    static class Pet {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String name;
+
+        @ManyToOne
+        @JoinColumn(name = "owner_id")
+        private Owner owner;
+
+        public Pet() {}
+
+        public Pet(String name, Owner owner) {
+            this.name = name;
+            this.owner = owner;
+        }
     }
 
     interface OwnerRepository extends JpaRepository<Owner, Long> {
 
-        Optional<Owner> findFirstByLastName(String lastName);
-
         @Transactional
         default Owner findByLastName(String lastName) {
-            try {
-                this.findFirstByLastName(lastName);
-                Thread.sleep(100);
-                return new Owner();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            this.save(new Owner());
+            return new Owner();
         }
 
         @Transactional(propagation = Propagation.SUPPORTS)
@@ -239,19 +362,59 @@ class TransactionMonitoringEndpointTest {
         }
     }
 
+    interface PetRepository extends JpaRepository<Pet, Long> {}
+
     static class PropagationTestHelper {
 
         private final OwnerRepository ownerRepository;
+        private final PetRepository petRepository;
         private final PropagationTestHelper self;
+        private final EntityManager entityManager;
 
-        public PropagationTestHelper(OwnerRepository ownerRepository, PropagationTestHelper self) {
+        public PropagationTestHelper(
+                OwnerRepository ownerRepository,
+                PetRepository petRepository,
+                PropagationTestHelper self,
+                EntityManager entityManager) {
             this.ownerRepository = ownerRepository;
             this.self = self;
+            this.entityManager = entityManager;
+            this.petRepository = petRepository;
         }
 
         @Transactional(propagation = Propagation.REQUIRES_NEW)
         public void testRequiresNew(String lastName) {
             ownerRepository.findByLastName(lastName);
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testSingleQuery() {
+            ownerRepository.save(new Owner());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testMultipleQueries() {
+            ownerRepository.save(new Owner());
+            ownerRepository.save(new Owner());
+            ownerRepository.save(new Owner());
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testMerge() {
+            Owner owner = ownerRepository.save(new Owner());
+            owner.setLastName("Smith");
+            entityManager.clear();
+            entityManager.merge(owner);
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void testNPlusOne() {
+            for (int i = 0; i < 3; i++) {
+                Owner owner = ownerRepository.save(new Owner());
+                petRepository.save(new Pet("pet" + i, owner));
+            }
+            entityManager.clear();
+            ownerRepository.findAll();
         }
     }
 }

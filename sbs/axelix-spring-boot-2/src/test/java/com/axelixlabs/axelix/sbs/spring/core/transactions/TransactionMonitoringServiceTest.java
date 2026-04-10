@@ -37,7 +37,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +54,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Sergey Cherkasov
  */
 @SpringBootTest
-@TestPropertySource(properties = {"spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1"})
 @Import(TransactionMonitoringServiceTest.TransactionMonitoringServiceTestConfiguration.class)
 public class TransactionMonitoringServiceTest {
 
@@ -95,6 +93,9 @@ public class TransactionMonitoringServiceTest {
         assertThat(testRequiredMethod).isPresent();
         assertThat(testRequiredMethod.get().getExecutionStats()).isNotNull();
         assertThat(testRequiredMethod.get().getExecutions().size()).isEqualTo(3);
+        assertThat(testRequiredMethod.get().getExecutions())
+                .isNotEmpty()
+                .allSatisfy(execution -> assertThat(execution.getQueries()).isEmpty());
 
         var nestedRequiresNewMethod = monitoringFeed.getEntrypoints().stream()
                 .filter(method -> PATH_PROPAGATION_TEST_HELPER.equals(method.getClassName())
@@ -102,8 +103,11 @@ public class TransactionMonitoringServiceTest {
                 .findFirst();
 
         assertThat(nestedRequiresNewMethod).isPresent();
-        assertThat(testRequiredMethod.get().getExecutionStats()).isNotNull();
-        assertThat(testRequiredMethod.get().getExecutions().size()).isEqualTo(3);
+        assertThat(nestedRequiresNewMethod.get().getExecutionStats()).isNotNull();
+        assertThat(nestedRequiresNewMethod.get().getExecutions().size()).isEqualTo(3);
+        assertThat(nestedRequiresNewMethod.get().getExecutions())
+                .isNotEmpty()
+                .allSatisfy(execution -> assertThat(execution.getQueries()).isNotEmpty());
 
         boolean hasRepositoryMethod = monitoringFeed.getEntrypoints().stream()
                 .anyMatch(method -> method.getMethodName().contains("findByLastName"));
@@ -345,6 +349,7 @@ public class TransactionMonitoringServiceTest {
 
         @Transactional
         default Owner findByLastName(String lastName) {
+            this.save(new Owner());
             return new Owner();
         }
 
@@ -423,6 +428,7 @@ public class TransactionMonitoringServiceTest {
         @Transactional(propagation = Propagation.REQUIRED)
         public void testRequired(String lastName) {
             ownerRepository.findByLastName(lastName);
+            ownerRepository.save(new Owner());
             helperService.testNestedRequiresNew();
         }
 
