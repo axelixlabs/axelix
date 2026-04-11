@@ -15,6 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { Fragment } from "react";
+
 import { Copy } from "components";
 import { normalizeHtmlElementId } from "helpers";
 import { EConditionStatus, type IConditionBeanPositive } from "models";
@@ -43,9 +45,9 @@ export const PositiveConditions = ({ positiveMatches }: IProps) => {
                 const id = normalizeHtmlElementId(`${className}${methodName ? methodName : ""}`);
 
                 return (
-                    <>
+                    <Fragment key={id}>
                         {/* TODO: There is a problem with scrolling here, fix it in the future */}
-                        <div id={id} className={styles.ScrollableWrapper} key={id}>
+                        <div id={id} className={styles.ScrollableWrapper}>
                             <div className={styles.ConditionHeaderWrapper}>
                                 <div className={styles.ConditionHeaderSection}>
                                     <div>Class:</div>
@@ -64,7 +66,7 @@ export const PositiveConditions = ({ positiveMatches }: IProps) => {
                             </div>
                         </div>
                         <ConditionsAccordionEntry items={items} />
-                    </>
+                    </Fragment>
                 );
             })}
         </>

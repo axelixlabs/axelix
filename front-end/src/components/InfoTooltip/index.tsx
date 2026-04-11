@@ -42,7 +42,7 @@ export const InfoTooltip = ({ children, text, placement = "right" }: PropsWithCh
                 title={
                     <div className={styles.TooltipContentWrapper}>
                         <div>
-                            <InfoIcon color="#fff" className={styles.InfoIcon} />
+                            <InfoIcon className={styles.InfoIcon} />
                         </div>
                         {text}
                     </div>

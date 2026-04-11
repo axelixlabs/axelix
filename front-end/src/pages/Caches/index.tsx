@@ -78,19 +78,19 @@ const Caches = () => {
 
     return (
         <>
-            <div className={styles.TopSection}>
-                <PageSearch setSearch={setSearch} />
-                <Button
-                    type="primary"
-                    onClick={clearAllCachesClickHandler}
-                    loading={clearAllCaches.loading}
-                    disabled={!cachesClearAccess}
-                >
-                    {t("Caches.clearAll")}
-                </Button>
-            </div>
-
             <EmptyHandler isEmpty={effectiveCacheManagers.length === 0}>
+                <div className={styles.TopSection}>
+                    <PageSearch setSearch={setSearch} />
+                    <Button
+                        type="primary"
+                        onClick={clearAllCachesClickHandler}
+                        loading={clearAllCaches.loading}
+                        disabled={!cachesClearAccess}
+                    >
+                        {t("Caches.clearAll")}
+                    </Button>
+                </div>
+
                 {effectiveCacheManagers.map((cacheManager) => (
                     <CacheManagerSection key={cacheManager.name} cacheManager={cacheManager} />
                 ))}

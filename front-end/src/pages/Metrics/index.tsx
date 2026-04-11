@@ -63,7 +63,11 @@ const Metrics = () => {
             <EmptyHandler isEmpty={!filteredMetricsCount}>
                 {effectiveMetricsGroups.map(({ groupName, metrics }) => (
                     <div className={`AccordionsWrapper ${styles.AccordionsWrapper}`} key={groupName}>
-                        <Accordion header={groupName} headerStyles={styles.HeaderStyles} accordionExpanded>
+                        <Accordion
+                            header={<span className={styles.GroupName}>{groupName}</span>}
+                            headerStyles={styles.HeaderStyles}
+                            accordionExpanded
+                        >
                             <div className="AccordionsWrapper">
                                 {metrics.map((metric) => (
                                     <Accordion header={<MetricHeader metric={metric} />} key={metric.metricName}>

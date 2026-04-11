@@ -16,6 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import { Popover, Tag } from "antd";
+import { Fragment } from "react";
 
 import type { IMCPAnnotation } from "models";
 
@@ -57,14 +58,14 @@ export const MCPCardFooter = ({ annotations }: IProps) => {
                 content={
                     <div className={styles.HiddenAnnotationWrapper}>
                         {annotationItems.map(({ label, value }) => (
-                            <>
+                            <Fragment key={label}>
                                 <div>{label}</div>
                                 <div className={styles.HiddenAnnotationValue}>
                                     <Tag className={`${getTagClass(value)} ${styles.AnnotationTag}`}>
                                         {String(value)}
                                     </Tag>
                                 </div>
-                            </>
+                            </Fragment>
                         ))}
                     </div>
                 }

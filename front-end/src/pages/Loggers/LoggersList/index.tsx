@@ -68,6 +68,7 @@ export const LoggersList = ({ effectiveLoggers, levels, setUpdateLoggerLevel, ha
                     {rowVirtualizer.getVirtualItems().map((virtualItem) => {
                         const { key, size, index, start } = virtualItem;
                         const logger = effectiveLoggers[index];
+
                         return (
                             <div
                                 className={styles.ItemWrapper}

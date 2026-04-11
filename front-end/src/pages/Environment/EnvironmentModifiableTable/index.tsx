@@ -68,7 +68,9 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
                                         <EnvironmentPropertyDetails property={property} />
                                     </Accordion>
                                 )),
-                                ...withoutDropDown.map((property) => <EnvironmentProperty property={property} />),
+                                ...withoutDropDown.map((property) => (
+                                    <EnvironmentProperty property={property} key={property.name} />
+                                )),
                             ]}
                         </EmptyHandler>
                     </div>

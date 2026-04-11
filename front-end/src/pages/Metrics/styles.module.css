@@ -6,3 +6,7 @@
 .AccordionsWrapper:not(:last-child) {
     margin-bottom: 40px;
 }
+
+.GroupName {
+    font-weight: 600;
+}

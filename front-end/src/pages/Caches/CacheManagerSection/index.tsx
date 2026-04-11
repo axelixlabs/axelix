@@ -61,7 +61,7 @@ export const CacheManagerSection = ({ cacheManager }: IProps) => {
                         />
                     )),
                     ...withoutDropDown.map((cache) => (
-                        <div className={styles.SingleCacheSimpleDataWrapper}>
+                        <div className={styles.SingleCacheSimpleDataWrapper} key={cache.name}>
                             <SingleCacheHeader cacheManagerName={cacheManager.name} cache={cache} />
                         </div>
                     )),

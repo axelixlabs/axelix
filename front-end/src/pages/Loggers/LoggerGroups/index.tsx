@@ -16,7 +16,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 import type { AxiosError } from "axios";
-import type { Dispatch, SetStateAction } from "react";
+import { type Dispatch, Fragment, type SetStateAction } from "react";
 import { useParams } from "react-router";
 
 import { Accordion, TooltipWithCopy } from "components";
@@ -75,7 +75,7 @@ export const LoggerGroups = ({ loggerGroups, levels, setUpdateLoggerGroupLevel }
                     };
 
                     return (
-                        <>
+                        <Fragment key={name}>
                             <Accordion
                                 header={
                                     <div className={styles.AccordionHeader}>
@@ -88,7 +88,6 @@ export const LoggerGroups = ({ loggerGroups, levels, setUpdateLoggerGroupLevel }
                                         />
                                     </div>
                                 }
-                                key={name}
                             >
                                 <>
                                     {members.map((member) => (
@@ -98,7 +97,7 @@ export const LoggerGroups = ({ loggerGroups, levels, setUpdateLoggerGroupLevel }
                                     ))}
                                 </>
                             </Accordion>
-                        </>
+                        </Fragment>
                     );
                 })}
             </div>

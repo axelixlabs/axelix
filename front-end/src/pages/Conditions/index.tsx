@@ -107,7 +107,10 @@ const Conditions = () => {
                     activeKey={activeKey}
                     onChange={handleTabChange}
                     size="small"
-                    items={tabs.map((tab) => ({ key: tab.key, label: tab.label }))}
+                    items={tabs.map((tab) => ({
+                        key: tab.key,
+                        label: tab.label,
+                    }))}
                 />
             </div>
 
