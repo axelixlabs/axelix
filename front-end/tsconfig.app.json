@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "baseUrl": "src",
+        "baseUrl": "./src",
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
         "target": "ES2023",
         "useDefineForClassFields": true,
@@ -21,7 +21,15 @@
         "noUnusedLocals": true,
         // "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "noUncheckedSideEffectImports": true
+        "noUncheckedSideEffectImports": true,
+
+        "paths": {
+            "enterprise-assets": ["./enterprise/src/assets"],
+            "enterprise-components": ["./enterprise/src/components"],
+            "enterprise-helpers": ["./enterprise/src/helpers"],
+            "enterprise-models": ["./enterprise/src/models"],
+            "enterprise-utils": ["./enterprise/src/utils"]
+        }
     },
-    "include": ["src"]
+    "include": ["./src", "./extensions.ts"]
 }

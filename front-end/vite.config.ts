@@ -59,6 +59,11 @@ export default defineConfig(() => {
                 store: path.resolve(__dirname, "./src/store"),
                 utils: path.resolve(__dirname, "./src/utils"),
                 helpers: path.resolve(__dirname, "./src/helpers"),
+                "enterprise-assets": path.resolve(__dirname, "./src/enterprise/src/assets"),
+                "enterprise-components": path.resolve(__dirname, "./src/enterprise/src/components"),
+                "enterprise-helpers": path.resolve(__dirname, "./src/enterprise/src/helpers"),
+                "enterprise-models": path.resolve(__dirname, "./src/enterprise/src/models"),
+                "enterprise-utils": path.resolve(__dirname, "./src/enterprise/src/utils"),
             },
         },
     };
