@@ -15,13 +15,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-import { CartesianGrid, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from "recharts";
+import { type JSX, useState } from "react";
+import { CartesianGrid, Scatter, ScatterChart, type ScatterPointItem, Tooltip, XAxis, YAxis } from "recharts";
+import type { ScatterShapeProps } from "recharts";
 
-import { formatTransactionDuration, toFormattedTime } from "helpers";
-import type { ITransactionalEntryPoint } from "models";
+import { formatTransactionDuration, toFormattedTime, toFormattedTimeWithMs } from "helpers";
+import type { IExecutionWithDurationMs, IQueryData, ITransactionalEntryPoint } from "models";
 
 import { TransactionalMethodExecutionStats } from "../TransactionalMethodExecutionStats";
 
+import { ExecutionDetails } from "./ExecutionDetails";
 import styles from "./styles.module.css";
 
 interface IProps {
@@ -32,38 +35,61 @@ interface IProps {
 }
 
 export const TransactionalAccordionBody = ({ transactional }: IProps) => {
-    const data = transactional.executions;
+    const [selectedExecution, setSelectedExecution] = useState<IExecutionWithDurationMs | null>(null);
+
+    const data: IExecutionWithDurationMs[] = transactional.executions.map((execution) => ({
+        ...execution,
+        durationMs: execution.endTimestampMs - execution.startTimestampMs,
+    }));
+
+    const handleShapeClick = (data: ScatterPointItem & IExecutionWithDurationMs): void => {
+        setSelectedExecution(data);
+    };
+
+    const renderShape = (props: ScatterShapeProps): JSX.Element => {
+        const data = props as ScatterShapeProps & IQueryData;
+        const isSelected = selectedExecution?.startTimestampMs === data?.startTimestampMs;
+
+        return (
+            <circle
+                cx={props.cx}
+                cy={props.cy}
+                r={5}
+                className={`${styles.ScatterShape} ${isSelected ? styles.ActiveScatterShape : ""}`}
+            />
+        );
+    };
 
     return (
         <>
             <div>
-                <ScatterChart data={data} responsive className={styles.MainWrapper}>
+                <ScatterChart data={data} responsive className={styles.ScatterChart}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="timestamp" tickFormatter={toFormattedTime} />
-                    <YAxis width="auto" tickFormatter={formatTransactionDuration} />
+                    <XAxis dataKey="startTimestampMs" tickFormatter={toFormattedTime} />
+                    <YAxis dataKey="durationMs" width="auto" tickFormatter={formatTransactionDuration} />
                     <Tooltip
-                        labelFormatter={(label) => {
-                            if (typeof label !== "number") {
-                                return label;
-                            }
-
-                            return toFormattedTime(label);
-                        }}
-                        itemStyle={{ color: "green" }}
                         formatter={(value, name) => {
                             const valueAsNum = Number(value);
 
-                            if (name == "timestamp") {
-                                return [toFormattedTime(valueAsNum), "Timestamp"];
+                            if (name === "startTimestampMs") {
+                                return [toFormattedTimeWithMs(valueAsNum), "Timestamp"];
                             } else {
                                 return [formatTransactionDuration(valueAsNum), "Duration"];
                             }
                         }}
                     />
-                    <Scatter dataKey="durationMs" fill="#00AB55FF" line lineType="joint" />
+                    <Scatter
+                        dataKey="durationMs"
+                        fill="#00ab55"
+                        line
+                        lineType="joint"
+                        onClick={handleShapeClick}
+                        shape={renderShape}
+                    />
                 </ScatterChart>
                 <TransactionalMethodExecutionStats stats={transactional.executionStats} />
             </div>
+            <ExecutionDetails selectedExecution={selectedExecution} setSelectedExecution={setSelectedExecution} />
         </>
     );
 };

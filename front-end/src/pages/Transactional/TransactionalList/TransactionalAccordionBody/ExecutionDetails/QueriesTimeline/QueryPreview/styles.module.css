@@ -1,0 +1,7 @@
+.MainWrapper {
+    color: var(--axelix-primary-green);
+}
+
+.MainWrapper > div {
+    padding-block: 4px;
+}

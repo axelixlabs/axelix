@@ -34,11 +34,13 @@ export const TransactionalList = ({ transactionEntryPoints }: IProps) => {
         <>
             <div>
                 {transactionEntryPoints.map((transactional) => (
-                    <div className={`AccordionsWrapper ${styles.TransactionEntry}`} id={transactional.methodName}>
+                    <div
+                        className={`AccordionsWrapper ${styles.TransactionEntry}`}
+                        key={transactional.className + transactional.methodName}
+                    >
                         <Accordion
                             header={<TransactionalAccordionHeader transactional={transactional} />}
                             children={<TransactionalAccordionBody transactional={transactional} />}
-                            key={transactional.className + transactional.methodName}
                             wrapperStyles={styles.AccordionWrapperStyles}
                             headerStyles={styles.HeaderStyles}
                             contentStyles={styles.ContentStyles}

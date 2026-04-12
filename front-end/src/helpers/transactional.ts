@@ -46,3 +46,39 @@ const formatTransactionalDuration = (value: number): string => {
 export const formatTransactionDuration = (value: number) => {
     return value < 1000 ? `${value} ms` : formatTransactionalDuration(value);
 };
+
+export const getQueryLeftPosition = (
+    startTimestampMs: number,
+    executionStartTimestampMs: number,
+    pxPerMs: number,
+    timelineWidth: number,
+): string => {
+    const msFromStart = startTimestampMs - executionStartTimestampMs;
+    const left = msFromStart * pxPerMs;
+    return `${Math.min(left, timelineWidth - 3)}px`;
+};
+
+export const getQueryBarWidth = (durationMs: number, pxPerMs: number): string => {
+    return `${Math.max(durationMs * pxPerMs, 3)}px`;
+};
+
+export const toDateTimeWithMs = (timestamp: number): string => {
+    const date = new Date(timestamp);
+
+    const datePart = date.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    });
+
+    const timePart = date.toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+    });
+
+    const msPart = date.getMilliseconds();
+
+    return `${datePart} / ${timePart}.${msPart}`;
+};

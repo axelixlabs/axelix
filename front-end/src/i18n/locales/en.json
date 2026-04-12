@@ -272,6 +272,14 @@
         "max": "Max",
         "average": "Average",
         "duration": "Duration",
-        "durationTooltip": "Aggregated information about the duration of this transactional method execution"
+        "durationTooltip": "Aggregated information about the duration of this transactional method execution",
+        "executionDetails": "Execution details",
+        "queriesCount": "Queries count",
+        "startTime": "Start time",
+        "endTime": "End time",
+        "totalTime": "Total time : {{durationMs}} ms",
+        "previewDuration": "Duration : {{durationMs}} ms",
+        "ms": "ms",
+        "noQueries": "No queries"
     }
 }

@@ -17,6 +17,7 @@
  */
 import { notification } from "antd";
 import type { AxiosResponse } from "axios";
+import dayjs from "dayjs";
 import { t } from "i18next";
 
 import {
@@ -115,6 +116,10 @@ export const toFormattedTime = (value: number): string => {
         minute: "2-digit",
         second: "2-digit",
     });
+};
+
+export const toFormattedTimeWithMs = (value: number): string => {
+    return dayjs(value).format("HH:mm:ss.SSS");
 };
 
 export const createWallboardFilterSearchParam = (
