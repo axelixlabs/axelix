@@ -42,7 +42,7 @@
   transition: transform 0.3s ease;
 }
 
-.MainWrapper.Open > .HeaderWrapper::before {
+.Open > .HeaderWrapper::before {
   transform: translateY(-50%) rotate(180deg);
 }
 

@@ -84,16 +84,6 @@ export const Accordion = ({
         };
     }, []);
 
-    /*
-     * We use the isContentMounted pattern instead of a pure CSS approach (e.g. overflow: hidden)
-     * because accordion children can be heavy components that perform HTTP requests (e.g. metrics).
-     * In large lists, mounting all children at once would trigger a huge number of unnecessary requests
-     * for accordions the user never opens. By controlling isContentMounted, children are only mounted
-     * when the user explicitly opens the accordion, and unmounted after it closes.
-     *
-     * On open:  mount children first, then trigger animation after 10ms (one render cycle)
-     * On close: trigger animation immediately, then unmount children after 300ms (animation duration)
-     */
     const handlerClick = (): void => {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
@@ -108,13 +98,10 @@ export const Accordion = ({
 
             timeoutRef.current = setTimeout(() => {
                 setIsContentMounted(false);
-            }, 300);
+            }, 400);
         } else {
             setIsContentMounted(true);
-
-            timeoutRef.current = setTimeout(() => {
-                setOpen(true);
-            }, 10);
+            setOpen(true);
         }
     };
 
