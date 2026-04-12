@@ -1,0 +1,57 @@
+name: "Playground: Feature Maven SB 3"
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'playgrounds/feature-maven-sb-3/**'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'playgrounds/feature-maven-sb-3/**'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [ playground-updated ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: playgrounds/feature-maven-sb-3
+    env:
+      NEXUS_USER: ${{ secrets.NEXUS_USER }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      NEXUS_HOST_PORT: ${{ secrets.NEXUS_HOST_PORT }}
+      STORE_PASS: ${{ secrets.STORE_PASS }}
+
+      DOCKER_CR_OAUTH_TOKEN: ${{ secrets.DOCKER_CR_OAUTH_TOKEN }}
+      CR_URL: ${{ vars.CR_URL }}
+      CR_REPOSITORY: ${{ vars.CR_MASTER_REPOSITORY }}
+      KUBE_CONFIG_BASE64: ${{ secrets.KUBE_CONFIG_BASE64 }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'liberica'
+          java-version: '24'
+          cache: maven
+
+      - name: Download and trust Nexus SSL certificate
+        run: |
+          openssl s_client -connect $NEXUS_HOST_PORT -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM > nexus.crt
+          sudo keytool -importcert -file nexus.crt -alias nexus-ssl -keystore $JAVA_HOME/lib/security/cacerts -storepass $STORE_PASS -noprompt
+
+      - name: Build with Maven
+        run: ./mvnw -B -s settings.xml clean package
+
+      - name: Deploy playground
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' }}
+        uses: ./.github/actions/deploy-playground
+        with:
+          working-directory: playgrounds/feature-maven-sb-3
+          image-tag: feature-maven-sb-3:0.0.2-SNAPSHOT
+          helm-release: feature-maven-sb-3
