@@ -58,7 +58,6 @@ export const QueryBar = ({ query, pxPerMs, executionStartTimestampMs, timelineWi
     const { t } = useTranslation();
 
     const [selectedQueryNum, setSelectedQueryNum] = useState<number | null>(null);
-    const [isClosing, setIsClosing] = useState<boolean>(false);
 
     const { endTimestampMs, startTimestampMs, sql } = query;
 
@@ -75,9 +74,7 @@ export const QueryBar = ({ query, pxPerMs, executionStartTimestampMs, timelineWi
 
     const handleOnOpenChange = (open: boolean): void => {
         if (!open) {
-            setIsClosing(true);
             setSelectedQueryNum(null);
-            setTimeout(() => setIsClosing(false), 300);
         }
     };
 
@@ -85,7 +82,7 @@ export const QueryBar = ({ query, pxPerMs, executionStartTimestampMs, timelineWi
         <Popover
             trigger="hover"
             content={<QueryPreview query={query} />}
-            open={isQuerySelected || isClosing ? false : undefined}
+            open={isQuerySelected ? false : undefined}
             arrow={false}
             styles={{
                 container: {
