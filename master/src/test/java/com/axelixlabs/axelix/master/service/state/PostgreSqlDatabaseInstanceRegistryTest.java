@@ -17,16 +17,43 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.testcontainers.containers.PostgreSQLContainer;
 
-import com.axelixlabs.axelix.master.utils.db.PostgreSqlTestContainerExtension;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 /**
  * MySQL integration tests for {@link DatabaseInstanceRegistry}.
  *
  * @see DatabaseInstanceRegistry
- * @see PostgreSqlTestContainerExtension
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-@ExtendWith(PostgreSqlTestContainerExtension.class)
-class PostgreSqlDatabaseInstanceRegistryTest extends DatabaseInstanceRegistryTest {}
+class PostgreSqlDatabaseInstanceRegistryTest extends DatabaseInstanceRegistryTest {
+
+    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
+            .withDatabaseName("axelix")
+            .withUsername("axelix")
+            .withPassword("axelix");
+
+    @BeforeAll
+    static void beforeAll() {
+        POSTGRES.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        POSTGRES.stop();
+    }
+
+    // We cannot go got @ServiceConnection since this mechanism bypasses the spring.datasource.* settings,
+    // and thus the wrong AutoConfiguration got fired
+    @DynamicPropertySource
+    static void register(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", () -> POSTGRES.getJdbcUrl());
+        registry.add("spring.datasource.username", () -> POSTGRES.getUsername());
+        registry.add("spring.datasource.password", () -> POSTGRES.getPassword());
+    }
+}

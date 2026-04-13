@@ -17,16 +17,45 @@
  */
 package com.axelixlabs.axelix.master.service.state;
 
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.testcontainers.containers.MySQLContainer;
 
-import com.axelixlabs.axelix.master.utils.db.MySqlTestContainerExtension;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 /**
  * MySQL integration tests for {@link DatabaseInstanceRegistry}.
  *
  * @see DatabaseInstanceRegistry
- * @see MySqlTestContainerExtension
  * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
-@ExtendWith(MySqlTestContainerExtension.class)
-class MySqlDatabaseInstanceRegistryTest extends DatabaseInstanceRegistryTest {}
+class MySqlDatabaseInstanceRegistryTest extends DatabaseInstanceRegistryTest {
+
+    @ServiceConnection
+    private static final MySQLContainer<?> MYSQL = new MySQLContainer<>("mysql:8.4")
+            .withDatabaseName("axelix")
+            .withUsername("axelix")
+            .withPassword("axelix");
+
+    @BeforeAll
+    static void beforeAll() {
+        MYSQL.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        MYSQL.stop();
+    }
+
+    // We cannot go got @ServiceConnection since this mechanism bypasses the spring.datasource.* settings,
+    // and thus the wrong AutoConfiguration got fired
+    @DynamicPropertySource
+    static void register(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", () -> MYSQL.getJdbcUrl());
+        registry.add("spring.datasource.username", () -> MYSQL.getUsername());
+        registry.add("spring.datasource.password", () -> MYSQL.getPassword());
+    }
+}

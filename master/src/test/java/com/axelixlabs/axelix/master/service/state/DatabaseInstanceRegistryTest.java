@@ -86,7 +86,7 @@ abstract class DatabaseInstanceRegistryTest {
         Optional<Instance> expectedInstance = instanceRegistry.get(InstanceId.of("test-id-1"));
         assertThat(expectedInstance).isPresent();
 
-        // When persisting an Instant, either the Spring Data or SQLite (I am not sure) truncates the Instant (which has
+        // When persisting an Instant, either the Spring Data truncates the Instant (which has
         // nano time precision) to the microseconds or something.
         assertThat(expectedInstance.get())
                 .usingRecursiveComparison()
@@ -140,7 +140,7 @@ abstract class DatabaseInstanceRegistryTest {
         Optional<Instance> found = instanceRegistry.get(InstanceId.of("test-id-2"));
         assertThat(found).isPresent();
 
-        // When persisting an Instant, either the Spring Data or SQLite (I am not sure) truncates the Instant (which has
+        // When persisting an Instant, either the Spring Data truncates the Instant (which has
         // nano time precision) to the microseconds or something.
         assertThat(found.get())
                 .usingRecursiveComparison()
@@ -247,7 +247,7 @@ abstract class DatabaseInstanceRegistryTest {
         assertThat(result).hasSize(1);
 
         // then.
-        // When persisting an Instant, either the Spring Data or SQLite (I am not sure) truncates the Instant (which has
+        // When persisting an Instant, either the Spring Data truncates the Instant (which has
         // nano time precision) to the microseconds or something.
         assertThat(result.iterator().next())
                 .usingRecursiveComparison()

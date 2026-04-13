@@ -17,10 +17,16 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
+import com.zaxxer.hikari.HikariConfig;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -30,11 +36,15 @@ import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
+import org.springframework.boot.liquibase.autoconfigure.LiquibaseProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.data.convert.ReadingConverter;
@@ -63,7 +73,7 @@ public class PersistenceAutoConfiguration {
      */
     @AutoConfiguration
     @ConditionalOnClass(name = "org.sqlite.JDBC")
-    @Conditional(SQLiteJdbcUrlCondition.class)
+    @ConditionalOnJdbcUrlPrefix(jdbcUrlPrefix = "jdbc:sqlite:")
     public static class SQLiteAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
 
         @Autowired
@@ -75,6 +85,25 @@ public class PersistenceAutoConfiguration {
             return new SQLiteDialect();
         }
 
+        @Bean
+        @Primary
+        public LiquibaseProperties sqliteLiquibaseProperties() {
+            LiquibaseProperties liquibaseProperties = new LiquibaseProperties();
+            liquibaseProperties.setChangeLog("db/changelog/sqlite/db.changelog.master.sqlite.xml");
+            return liquibaseProperties;
+        }
+
+        @Bean
+        @Primary
+        public HikariConfig sqliteHikariConfig() {
+            HikariConfig hikariConfig = new HikariConfig();
+            hikariConfig.setMaximumPoolSize(3);
+            hikariConfig.setMinimumIdle(2);
+            hikariConfig.setConnectionInitSql(
+                    "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;");
+            return hikariConfig;
+        }
+
         @Override
         protected @NonNull List<?> userConverters() {
             return List.of(
@@ -82,60 +111,6 @@ public class PersistenceAutoConfiguration {
                     new StringToInstantConverter(),
                     new VmFeaturesReadingConverter(jsonMapper),
                     new VmFeaturesWritingConverter(jsonMapper));
-        }
-    }
-
-    public static class SQLiteJdbcUrlCondition implements Condition {
-
-        @Override
-        public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
-            String jdbcUrl = context.getEnvironment().getProperty("spring.datasource.url");
-            return jdbcUrl != null && jdbcUrl.startsWith("jdbc:sqlite:");
-        }
-    }
-
-    /**
-     * Autoconfiguration for PostgreSQL-based {@link com.axelixlabs.axelix.master.service.state.InstanceRegistry}.
-     */
-    @AutoConfiguration
-    @ConditionalOnClass(name = "org.postgresql.Driver")
-    @Conditional(PostgreSqlJdbcUrlCondition.class)
-    public static class PostgreSqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {}
-
-    public static class PostgreSqlJdbcUrlCondition implements Condition {
-
-        @Override
-        public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
-            String jdbcUrl = context.getEnvironment().getProperty("spring.datasource.url");
-            return jdbcUrl != null && jdbcUrl.startsWith("jdbc:postgresql:");
-        }
-    }
-
-    /**
-     * Autoconfiguration for MySQL-based {@link com.axelixlabs.axelix.master.service.state.InstanceRegistry}.
-     */
-    @AutoConfiguration
-    @ConditionalOnClass(name = "com.mysql.cj.jdbc.Driver")
-    @Conditional(MySqlJdbcUrlCondition.class)
-    public static class MySqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {}
-
-    public static class MySqlJdbcUrlCondition implements Condition {
-
-        @Override
-        public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
-            String jdbcUrl = context.getEnvironment().getProperty("spring.datasource.url");
-            return jdbcUrl != null && jdbcUrl.startsWith("jdbc:mysql:");
-        }
-    }
-
-    public static class BaseJdbcConvertersAutoConfiguration extends AbstractJdbcConfiguration {
-
-        @Autowired
-        protected JsonMapper jsonMapper;
-
-        @Override
-        protected @NonNull List<?> userConverters() {
-            return List.of(new VmFeaturesReadingConverter(jsonMapper), new VmFeaturesWritingConverter(jsonMapper));
         }
 
         /**
@@ -169,6 +144,76 @@ public class PersistenceAutoConfiguration {
                     return null;
                 }
             }
+        }
+    }
+
+    @AutoConfiguration
+    @ConditionalOnClass(name = "org.postgresql.Driver")
+    @ConditionalOnJdbcUrlPrefix(jdbcUrlPrefix = "jdbc:postgresql:")
+    public static class PostgreSqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
+
+        @Bean
+        @Primary
+        public LiquibaseProperties postgresLiquibaseProperties() {
+            LiquibaseProperties liquibaseProperties = new LiquibaseProperties();
+            liquibaseProperties.setChangeLog("db/changelog/postgres/db.changelog.master.postgresql.xml");
+            return liquibaseProperties;
+        }
+    }
+
+    @AutoConfiguration
+    @ConditionalOnClass(name = "com.mysql.cj.jdbc.Driver")
+    @ConditionalOnJdbcUrlPrefix(jdbcUrlPrefix = "jdbc:mysql:")
+    public static class MySqlAutoConfiguration extends BaseJdbcConvertersAutoConfiguration {
+
+        @Bean
+        @Primary
+        public LiquibaseProperties mysqlLiquibaseProperties() {
+            LiquibaseProperties liquibaseProperties = new LiquibaseProperties();
+            liquibaseProperties.setChangeLog("db/changelog/mysql/db.changelog.master.mysql.xml");
+            return liquibaseProperties;
+        }
+    }
+
+    @Target({ElementType.TYPE, ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    @Conditional(OnJdbcUrlCondition.class)
+    public @interface ConditionalOnJdbcUrlPrefix {
+
+        /**
+         * @return JDBC url prefix
+         */
+        String jdbcUrlPrefix();
+    }
+
+    public static class OnJdbcUrlCondition extends SpringBootCondition {
+
+        @Override
+        public @NonNull ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+            String jdbcUrl = context.getEnvironment().getProperty("spring.datasource.url");
+            MergedAnnotation<ConditionalOnJdbcUrlPrefix> annotation =
+                    metadata.getAnnotations().get(ConditionalOnJdbcUrlPrefix.class);
+
+            String expectedJdbcUrlPrefix = annotation.getString("jdbcUrlPrefix");
+
+            if (jdbcUrl != null && jdbcUrl.startsWith(expectedJdbcUrlPrefix)) {
+                return ConditionOutcome.match();
+            } else {
+                return ConditionOutcome.noMatch("jdbcUrlPrefix was expected to be '%s', but JDBC url actually is '%s'"
+                        .formatted(expectedJdbcUrlPrefix, jdbcUrl));
+            }
+        }
+    }
+
+    public static class BaseJdbcConvertersAutoConfiguration extends AbstractJdbcConfiguration {
+
+        @Autowired
+        protected JsonMapper jsonMapper;
+
+        @Override
+        protected @NonNull List<?> userConverters() {
+            return List.of(new VmFeaturesReadingConverter(jsonMapper), new VmFeaturesWritingConverter(jsonMapper));
         }
 
         @WritingConverter
