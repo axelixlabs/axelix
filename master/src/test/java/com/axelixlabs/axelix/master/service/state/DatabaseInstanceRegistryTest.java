@@ -39,13 +39,13 @@ import static com.axelixlabs.axelix.master.utils.TestObjectFactory.withName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Integration tests for {@link DatabaseInstanceRegistry}
+ * Base class for integration tests of {@link DatabaseInstanceRegistry}
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
 @SpringBootTest
-class DatabaseInstanceRegistryTest {
+abstract class DatabaseInstanceRegistryTest {
 
     @Autowired
     private InstanceRegistry instanceRegistry;
@@ -86,7 +86,7 @@ class DatabaseInstanceRegistryTest {
         Optional<Instance> expectedInstance = instanceRegistry.get(InstanceId.of("test-id-1"));
         assertThat(expectedInstance).isPresent();
 
-        // When persisting an Instant, either the Spring Data or SQLite (I am not sure) truncates the Instant (which has
+        // When persisting an Instant, either the Spring Data truncates the Instant (which has
         // nano time precision) to the microseconds or something.
         assertThat(expectedInstance.get())
                 .usingRecursiveComparison()
@@ -140,7 +140,7 @@ class DatabaseInstanceRegistryTest {
         Optional<Instance> found = instanceRegistry.get(InstanceId.of("test-id-2"));
         assertThat(found).isPresent();
 
-        // When persisting an Instant, either the Spring Data or SQLite (I am not sure) truncates the Instant (which has
+        // When persisting an Instant, either the Spring Data truncates the Instant (which has
         // nano time precision) to the microseconds or something.
         assertThat(found.get())
                 .usingRecursiveComparison()
@@ -247,7 +247,7 @@ class DatabaseInstanceRegistryTest {
         assertThat(result).hasSize(1);
 
         // then.
-        // When persisting an Instant, either the Spring Data or SQLite (I am not sure) truncates the Instant (which has
+        // When persisting an Instant, either the Spring Data truncates the Instant (which has
         // nano time precision) to the microseconds or something.
         assertThat(result.iterator().next())
                 .usingRecursiveComparison()

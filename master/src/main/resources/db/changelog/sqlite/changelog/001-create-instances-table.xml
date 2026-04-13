@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="sqlite-001-create-instances-table" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="instances"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="instances">
+      <column name="instance_id" type="TEXT">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_instances"/>
+      </column>
+      <column name="name" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="service_version" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="java_version" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="spring_boot_version" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="spring_framework_version" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="kotlin_version" type="TEXT">
+        <constraints nullable="true"/>
+      </column>
+      <column name="jdk_vendor" type="TEXT">
+        <constraints nullable="true"/>
+      </column>
+      <column name="commit_sha_short" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="deployed_at" type="TEXT">
+        <constraints nullable="true"/>
+      </column>
+      <column name="status" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="heap" type="REAL">
+        <constraints nullable="false"/>
+      </column>
+      <column name="actuator_url" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="vm_features" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+</databaseChangeLog>
