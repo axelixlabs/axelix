@@ -84,7 +84,7 @@ class PropertySourceDescriptionTest {
                 // Starts with "Config resource", but not match
                 Arguments.of(
                         "Config resource 'unexpected format'",
-                        "Contains properties from the 'application*.properties/yaml' configuration file loaded from the classpath (optional:classpath:/) and serves as one of the primary Spring Boot configuration sources."));
+                        "Contains properties from the 'application*.properties/yaml' configuration file loaded from the pre-defined location (often from the classpath or the file system)"));
     }
 
     @ParameterizedTest
