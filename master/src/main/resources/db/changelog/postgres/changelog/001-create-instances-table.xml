@@ -14,7 +14,7 @@
     </preConditions>
 
     <createTable tableName="instances">
-      <column name="instance_id" type="VARCHAR(255)">
+      <column name="instance_id" type="TEXT">
         <constraints nullable="false" primaryKey="true" primaryKeyName="pk_instances"/>
       </column>
       <column name="name" type="TEXT">

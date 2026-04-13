@@ -14,46 +14,46 @@
     </preConditions>
 
     <createTable tableName="instances">
-      <column name="instance_id" type="VARCHAR(255)">
+      <column name="instance_id" type="VARCHAR(768)">
         <constraints nullable="false" primaryKey="true" primaryKeyName="pk_instances"/>
       </column>
-      <column name="name" type="TEXT">
+      <column name="name" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
-      <column name="service_version" type="TEXT">
+      <column name="service_version" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
-      <column name="java_version" type="TEXT">
+      <column name="java_version" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
-      <column name="spring_boot_version" type="TEXT">
+      <column name="spring_boot_version" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
-      <column name="spring_framework_version" type="TEXT">
+      <column name="spring_framework_version" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
-      <column name="kotlin_version" type="TEXT">
+      <column name="kotlin_version" type="VARCHAR(1000)">
         <constraints nullable="true"/>
       </column>
-      <column name="jdk_vendor" type="TEXT">
+      <column name="jdk_vendor" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
-      <column name="commit_sha_short" type="TEXT">
+      <column name="commit_sha_short" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
       <column name="deployed_at" type="DATETIME">
         <constraints nullable="true"/>
       </column>
-      <column name="status" type="TEXT">
+      <column name="status" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
       <column name="heap" type="DOUBLE">
         <constraints nullable="false"/>
       </column>
-      <column name="actuator_url" type="TEXT">
+      <column name="actuator_url" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
-      <column name="vm_features" type="TEXT">
+      <column name="vm_features" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
     </createTable>
