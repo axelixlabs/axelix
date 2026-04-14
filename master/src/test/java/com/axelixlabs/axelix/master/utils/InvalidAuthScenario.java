@@ -30,7 +30,7 @@ import org.springframework.boot.resttestclient.TestRestTemplate;
 public enum InvalidAuthScenario {
 
     // Request without a cookies with an authentication token.
-    NO_COOKIE(TestRestTemplateBuilder::withoutAuthCookie),
+    NO_COOKIE(TestRestTemplateBuilder::withoutToken),
 
     // Request with an expired authentication token.
     EXPIRED_TOKEN(TestRestTemplateBuilder::withExpiredToken),

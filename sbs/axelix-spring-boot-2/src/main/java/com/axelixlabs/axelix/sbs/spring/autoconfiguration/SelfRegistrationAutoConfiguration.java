@@ -28,9 +28,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.config.SelfRegistrationConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.log.SLF4JLogger;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultSelfRegistrationMetadataAssembler;
+import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationLifecycleListener;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.SelfRegistrationService;
 import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
@@ -59,6 +61,7 @@ public class SelfRegistrationAutoConfiguration {
             ServiceMetadataAssembler serviceMetadataAssembler,
             SelfRegistrationConfigurationProperties selfRegistrationConfigurationProperties,
             WebEndpointProperties webEndpointProperties) {
+
         return new DefaultSelfRegistrationMetadataAssembler(
                 serviceMetadataAssembler, selfRegistrationConfigurationProperties, webEndpointProperties.getBasePath());
     }
@@ -68,11 +71,20 @@ public class SelfRegistrationAutoConfiguration {
     public SelfRegistrationService selfRegistrationService(
             SelfRegistrationConfigurationProperties properties,
             ObjectMapper objectMapper,
-            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler) {
+            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler,
+            JwtEncoderService jwtEncoderService) {
         return new SelfRegistrationService(
                 new SLF4JLogger(LoggerFactory.getLogger(SelfRegistrationService.class)),
                 objectMapper::writeValueAsString,
                 properties,
-                selfRegistrationMetadataAssembler);
+                selfRegistrationMetadataAssembler,
+                jwtEncoderService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SelfRegistrationLifecycleListener selfRegistrationLifecycleListener(
+            SelfRegistrationService selfRegistrationService) {
+        return new SelfRegistrationLifecycleListener(selfRegistrationService);
     }
 }

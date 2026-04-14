@@ -78,7 +78,7 @@ public class BadAuthorityEndpointInvocationContext implements TestTemplateInvoca
         }
 
         @Override
-        public void beforeTestExecution(ExtensionContext context) throws Exception {
+        public void beforeTestExecution(ExtensionContext context) {
             ProtectedEndpointTests meta = context.getRequiredTestMethod().getAnnotation(ProtectedEndpointTests.class);
 
             ApplicationContext applicationContext = SpringExtension.getApplicationContext(context);

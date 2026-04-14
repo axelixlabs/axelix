@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.jwt;
+package com.axelixlabs.axelix.common.auth.service;
 
 import java.time.Duration;
 
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.master.exception.auth.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 
 /**
  * Contract for generating signed JWT tokens from {@link User} representations.

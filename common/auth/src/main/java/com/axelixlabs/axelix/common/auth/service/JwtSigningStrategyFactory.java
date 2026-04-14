@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.jwt;
+package com.axelixlabs.axelix.common.auth.service;
 
 import java.util.Objects;
 
@@ -40,12 +40,13 @@ public class JwtSigningStrategyFactory {
         String algorithmName = Objects.requireNonNull(algorithm.getAlgorithmName(), "Algorithm name cannot be null");
 
         switch (algorithm) {
-            case HMAC256, HMAC384, HMAC512 -> {
+            case HMAC256:
+            case HMAC384:
+            case HMAC512:
                 MacAlgorithm macAlgorithm = (MacAlgorithm) Jwts.SIG.get().get(algorithmName);
-
                 return new HmacSigningStrategy(macAlgorithm, algorithm.getMinKeyLength());
-            }
-            default ->
+
+            default:
                 throw new UnsupportedOperationException("Unsupported algorithm: " + algorithm.getAlgorithmName());
         }
     }

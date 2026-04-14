@@ -25,6 +25,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +33,9 @@ import java.util.concurrent.TimeUnit;
 import org.jspecify.annotations.NonNull;
 
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.http.HttpHeader;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
@@ -47,20 +51,31 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
  */
 public class SelfRegistrationService implements Closeable {
 
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String AUTHENTICATION_SCHEMA = "Bearer ";
+    private static final PasswordlessUser TECH_USER =
+            new PasswordlessUser("AXELIX.STARTER", Set.of(DefaultRole.MANAGED_SERVICE));
+
     private final HttpClient httpClient;
     private final JsonSerializationFunction serializationFunction;
     private final SelfRegistrationConfigurationProperties properties;
     private final SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler;
     private final ScheduledExecutorService executor;
     private final Logger logger;
+    private final JwtEncoderService jwtEncoderService;
+
+    @SuppressWarnings("NullAway.Init")
+    private volatile String currentToken;
 
     public SelfRegistrationService(
             Logger logger,
             JsonSerializationFunction serializationFunction,
             SelfRegistrationConfigurationProperties properties,
-            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler) {
+            SelfRegistrationMetadataAssembler selfRegistrationMetadataAssembler,
+            JwtEncoderService jwtEncoderService) {
 
         this.logger = logger;
+        this.jwtEncoderService = jwtEncoderService;
         this.httpClient =
                 HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
         this.properties = properties;
@@ -75,6 +90,7 @@ public class SelfRegistrationService implements Closeable {
     }
 
     public void scheduleSelfRegistration() {
+        currentToken = jwtEncoderService.generateToken(TECH_USER);
         executor.scheduleAtFixedRate(
                 this::register, 0L, properties.getHeartbeatInterval().getSeconds(), TimeUnit.SECONDS);
     }
@@ -86,14 +102,26 @@ public class SelfRegistrationService implements Closeable {
             HttpResponse<Void> response = sendRequest(selfRegistrationMetadata, properties.getMasterUrl());
 
             int statusCode = response.statusCode();
-            if (statusCode >= 200 && statusCode < 300) {
+
+            if (is2xxSuccessful(statusCode)) {
                 logger.trace("Heartbeat successful. Master URL: {}", properties.getMasterUrl());
+            } else if (isUnauthorized(statusCode)) {
+                logger.debug("Master heartbeat failed. Token expired. Re-generating token");
+                currentToken = jwtEncoderService.generateToken(TECH_USER);
             } else {
                 logger.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
             }
         } catch (IOException | InterruptedException e) {
             logger.info("Error sending registration request or heartbeat to master: {}", e.getMessage());
         }
+    }
+
+    private static boolean is2xxSuccessful(int statusCode) {
+        return statusCode >= 200 && statusCode < 300;
+    }
+
+    private static boolean isUnauthorized(int statusCode) {
+        return statusCode >= 200 && statusCode < 300;
     }
 
     private HttpResponse<Void> sendRequest(@NonNull SelfRegistrationMetadata selfRegistrationMetadata, String url)
@@ -117,6 +145,8 @@ public class SelfRegistrationService implements Closeable {
                 builder.header(header.name(), header.valueAsString());
             }
         }
+
+        builder.header(AUTHORIZATION_HEADER, AUTHENTICATION_SCHEMA + currentToken);
 
         return builder.build();
     }

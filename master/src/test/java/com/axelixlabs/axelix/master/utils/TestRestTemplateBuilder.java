@@ -32,10 +32,10 @@ import org.springframework.stereotype.Component;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
-import com.axelixlabs.axelix.master.service.auth.jwt.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
 
 /**
  * Configuration for the tests that cover the HTTP API side.
@@ -50,6 +50,7 @@ import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 @Component
 public class TestRestTemplateBuilder {
@@ -96,6 +97,12 @@ public class TestRestTemplateBuilder {
         return buildWithToken(token);
     }
 
+    public TestRestTemplate withRoleTokenInAuthorizationHeader(Role role) {
+        String token = generateToken(new Role[] {role});
+
+        return buildWithTokenInAuthorizationHeader(token);
+    }
+
     // START: Bad token auth scenarios
     TestRestTemplate withExpiredToken() {
         String expiredToken = generateExpiredToken();
@@ -109,15 +116,33 @@ public class TestRestTemplateBuilder {
         return buildWithToken(malformedToken);
     }
 
-    TestRestTemplate withoutAuthCookie() {
+    public TestRestTemplate withExpiredTokenInAuthHeader() {
+        String expiredToken = generateExpiredToken();
+
+        return buildWithTokenInAuthorizationHeader(expiredToken);
+    }
+
+    public TestRestTemplate withMalformedTokenInAuthHeader() {
+        String malformedToken = "malformed token";
+
+        return buildWithTokenInAuthorizationHeader(malformedToken);
+    }
+
+    public TestRestTemplate withoutToken() {
         return new TestRestTemplate(new RestTemplateBuilder().rootUri(HOST + testTomcatServerPort));
     }
     // END: Bad token auth scenarios
 
-    private TestRestTemplate buildWithToken(String expiredToken) {
+    private TestRestTemplate buildWithToken(String token) {
         return new TestRestTemplate(new RestTemplateBuilder()
                 .rootUri(HOST + testTomcatServerPort)
-                .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(cookieProperties.getName(), expiredToken)));
+                .defaultHeader(HttpHeaders.COOKIE, "%s=%s".formatted(cookieProperties.getName(), token)));
+    }
+
+    private TestRestTemplate buildWithTokenInAuthorizationHeader(String token) {
+        return new TestRestTemplate(new RestTemplateBuilder()
+                .rootUri(HOST + testTomcatServerPort)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token));
     }
 
     private String generateToken(Role[] roles) {

@@ -23,6 +23,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.axelixlabs.axelix.common.auth.core.InternalAuthorities.SELF_REGISTER_AUTHORITY;
+
 /**
  * Default {@link Role} backed by real {@link #authorities}.
  *
@@ -35,6 +37,7 @@ public final class DefaultRole implements Role {
     public static final Role ADMIN;
     public static final Role EDITOR;
     public static final Role VIEWER;
+    public static final Role MANAGED_SERVICE;
 
     static {
         VIEWER = new DefaultRole("VIEWER", Set.of());
@@ -49,6 +52,8 @@ public final class DefaultRole implements Role {
 
         ADMIN = new DefaultRole(
                 "ADMIN", Arrays.stream(DefaultAuthority.values()).collect(Collectors.toSet()));
+
+        MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of(SELF_REGISTER_AUTHORITY));
     }
 
     private final String name;

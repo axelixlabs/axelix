@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.exception.auth;
+package com.axelixlabs.axelix.common.auth.exception;
 
-import com.axelixlabs.axelix.master.service.auth.jwt.JwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 
 /**
  * The exception that happened during the JWT token generation process.

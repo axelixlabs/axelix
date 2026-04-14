@@ -17,11 +17,15 @@
  */
 package com.axelixlabs.axelix.master.api.internal;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -30,8 +34,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.api.internal.endpoint.SelfRegisteredApi;
-import com.axelixlabs.axelix.master.utils.InvalidAuthScenario;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests for {@link SelfRegisteredApi}
  *
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"axelix.master.discovery.auto=false"})
@@ -85,23 +90,29 @@ public class SelfRegisteredApiTest {
     void shouldRegistryServiceInstance() {
         // when.
         ResponseEntity<Void> response = restTemplate
-                .asViewer()
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
                 .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(HttpStatus.NO_CONTENT);
     }
 
-    @ParameterizedTest
-    @EnumSource(InvalidAuthScenario.class)
-    void shouldReturnUnauthorized(InvalidAuthScenario scenario) {
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("invalidTokens")
+    void shouldReturnUnauthorized(String scenario, TestRestTemplate testRestTemplate) {
         // when.
-        ResponseEntity<Void> response = scenario.getModifier()
-                .apply(restTemplate)
-                .postForEntity("/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
+        ResponseEntity<Void> response = testRestTemplate.postForEntity(
+                "/api/internal/service/register", defaultJsonEntity(JSON_REQUEST), Void.class);
 
         // then.
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    private static Stream<Arguments> invalidTokens(@Autowired TestRestTemplateBuilder builder) {
+        return Stream.of(
+                Arguments.of("without token", builder.withoutToken()),
+                Arguments.of("expired token", builder.withExpiredTokenInAuthHeader()),
+                Arguments.of("malformed token", builder.withMalformedTokenInAuthHeader()));
     }
 
     private <T> HttpEntity<T> defaultJsonEntity(T request) {

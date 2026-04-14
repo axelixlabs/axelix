@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.jwt;
+package com.axelixlabs.axelix.common.auth.service;
 
 import io.jsonwebtoken.JwtBuilder;
 
-import com.axelixlabs.axelix.master.exception.auth.JwtTokenGenerationException;
+import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 
 /**
  * Strategy interface for signing JWT tokens with a specific signing key.
