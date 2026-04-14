@@ -48,6 +48,13 @@ public interface InstanceRegistry {
     void register(Instance instance);
 
     /**
+     * Registers all provided {@linkplain Instance Instances} within the registry.
+     *
+     * @param instances the instances that need to be registered
+     */
+    void registerAll(Collection<Instance> instances);
+
+    /**
      * Reloads the registry.
      *
      * It essentially means that the entire database of Instances is wiped out, and after that

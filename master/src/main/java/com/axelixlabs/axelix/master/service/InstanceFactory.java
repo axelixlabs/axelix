@@ -17,6 +17,10 @@
  */
 package com.axelixlabs.axelix.master.service;
 
+import java.time.Instant;
+
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
@@ -44,6 +48,7 @@ public interface InstanceFactory {
             String instanceId,
             String instanceName,
             String deploymentAt,
+            @Nullable Instant latestHearthBeat,
             String instanceActuatorUrl,
             BasicDiscoveryMetadata metadata);
 }

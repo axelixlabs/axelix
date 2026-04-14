@@ -65,6 +65,7 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
                     k8sInstance.getInstanceId(),
                     k8sInstance.podName(),
                     k8sInstance.getDeploymentAt(),
+                    null,
                     serviceInstance.getUri() + ACTUATOR_ENDPOINT_POSTFIX,
                     profile.metadata());
         } else {

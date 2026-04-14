@@ -47,7 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {"axelix.master.discovery.auto.enabled=false"})
+@TestPropertySource(properties = {"axelix.master.discovery.self-registration=true"})
 public class SelfRegisteredApiTest {
 
     // language=json
