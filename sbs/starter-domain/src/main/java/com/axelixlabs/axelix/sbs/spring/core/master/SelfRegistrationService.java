@@ -90,7 +90,7 @@ public class SelfRegistrationService implements Closeable {
     }
 
     public void scheduleSelfRegistration() {
-        refreshToken();
+        currentToken = jwtEncoderService.generateToken(TECH_USER);
         executor.scheduleAtFixedRate(
                 this::register, 0L, properties.getHeartbeatInterval().getSeconds(), TimeUnit.SECONDS);
     }
@@ -103,10 +103,12 @@ public class SelfRegistrationService implements Closeable {
 
             int statusCode = response.statusCode();
 
-            if (statusCode >= 200 && statusCode < 300) {
+            if (is2xxSuccessful(statusCode)) {
                 logger.trace("Heartbeat successful. Master URL: {}", properties.getMasterUrl());
+            } else if (isUnauthorized(statusCode)) {
+                logger.debug("Master heartbeat failed. Token expired. Re-generating token");
+                currentToken = jwtEncoderService.generateToken(TECH_USER);
             } else {
-                refreshToken();
                 logger.info("Master heartbeat failed, HTTP status: {}\"", statusCode);
             }
         } catch (IOException | InterruptedException e) {
@@ -114,8 +116,12 @@ public class SelfRegistrationService implements Closeable {
         }
     }
 
-    private void refreshToken() {
-        currentToken = jwtEncoderService.generateToken(TECH_USER);
+    private static boolean is2xxSuccessful(int statusCode) {
+        return statusCode >= 200 && statusCode < 300;
+    }
+
+    private static boolean isUnauthorized(int statusCode) {
+        return statusCode >= 200 && statusCode < 300;
     }
 
     private HttpResponse<Void> sendRequest(@NonNull SelfRegistrationMetadata selfRegistrationMetadata, String url)
