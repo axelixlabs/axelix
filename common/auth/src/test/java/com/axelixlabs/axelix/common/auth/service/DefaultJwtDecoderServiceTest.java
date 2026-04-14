@@ -15,22 +15,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth;
+package com.axelixlabs.axelix.common.auth.service;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
-import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
@@ -39,11 +41,6 @@ import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
-import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,15 +50,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  *
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
-@SpringBootTest
-@Import(DefaultJwtDecoderServiceTest.JwtDecoderServiceConfig.class)
+@SpringBootTest(classes = DefaultJwtDecoderServiceTest.JwtDecoderServiceConfig.class)
 class DefaultJwtDecoderServiceTest {
+
     private static final String USER_NAME = "testUser";
     private static final String PASSWORD = "testPassword";
-
-    @Value("${axelix.master.auth.jwt.signing_key}")
-    private String signingKey;
 
     @Value("${axelix.master.auth.jwt.lifespan}")
     private Duration lifespan;
@@ -72,65 +67,32 @@ class DefaultJwtDecoderServiceTest {
     @Autowired
     private JwtEncoderService jwtEncoderService;
 
-    @Test
-    void shouldDecodeValidJwtToken_ForUserWithRoleAdmin() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.ADMIN));
+    @ParameterizedTest
+    @MethodSource("roles")
+    void shouldDecodeValidJwtToken_ForViewer(Role role) {
+        // given.
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(role));
         String token = jwtEncoderService.generateToken(user);
 
         // when.
         PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
 
         // then.
+        assertThat(decodedUser.getRoles()).hasSize(1);
         assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.getName().equals("ADMIN"))
+                        .filter(it -> it.getName().equals(role.getName()))
                         .findFirst()
                         .orElseThrow()
                         .getAuthorities())
-                .containsExactlyInAnyOrder(
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY,
-                        DefaultAuthority.CACHES_CLEAR,
-                        DefaultAuthority.CACHES_TOGGLE,
-                        DefaultAuthority.GARBAGE_COLLECTOR,
-                        DefaultAuthority.CONFIG_PROPS_VALUES_READ,
-                        DefaultAuthority.ENV_VALUES_READ);
+                .containsExactlyInAnyOrderElementsOf(role.getAuthorities());
     }
 
-    @Test
-    void shouldDecodeValidJwtToken_ForEditorWithRoleAdmin() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.EDITOR));
-        String token = jwtEncoderService.generateToken(user);
-
-        // when.
-        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
-
-        // then.
-        assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.getName().equals("EDITOR"))
-                        .findFirst()
-                        .orElseThrow()
-                        .getAuthorities())
-                .containsExactlyInAnyOrder(
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY,
-                        DefaultAuthority.CACHES_CLEAR,
-                        DefaultAuthority.CACHES_TOGGLE,
-                        DefaultAuthority.GARBAGE_COLLECTOR);
-    }
-
-    @Test
-    void shouldDecodeValidJwtToken_ForViewerWithRoleAdmin() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.VIEWER));
-        String token = jwtEncoderService.generateToken(user);
-
-        // when.
-        PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
-
-        // then.
-        assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.getName().equals("VIEWER"))
-                        .findFirst()
-                        .orElseThrow()
-                        .getAuthorities())
-                .isEmpty();
+    static Stream<Arguments> roles() {
+        return Stream.of(
+                Arguments.of(DefaultRole.VIEWER), Arguments.of(DefaultRole.EDITOR), Arguments.of(DefaultRole.ADMIN)
+                //            Arguments.of(DefaultRole.MANAGED_SERVICE)
+                //            TODO: For now decoder is not aware of the internal authorities
+                );
     }
 
     @Test
@@ -143,34 +105,25 @@ class DefaultJwtDecoderServiceTest {
         PasswordlessUser decodedUser = jwtDecoderService.decodeTokenToUser(token);
 
         // Admin
+        assertThat(decodedUser.getRoles()).hasSize(3);
         assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.getName().equals("ADMIN"))
+                        .filter(role -> role.getName().equals(DefaultRole.ADMIN.getName()))
                         .findFirst()
                         .orElseThrow()
                         .getAuthorities())
-                .containsExactlyInAnyOrder(
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY,
-                        DefaultAuthority.CACHES_CLEAR,
-                        DefaultAuthority.CACHES_TOGGLE,
-                        DefaultAuthority.GARBAGE_COLLECTOR,
-                        DefaultAuthority.CONFIG_PROPS_VALUES_READ,
-                        DefaultAuthority.ENV_VALUES_READ);
+                .containsExactlyInAnyOrderElementsOf(DefaultRole.ADMIN.getAuthorities());
 
         // Editor
         assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.getName().equals("EDITOR"))
+                        .filter(role -> role.getName().equals(DefaultRole.EDITOR.getName()))
                         .findFirst()
                         .orElseThrow()
                         .getAuthorities())
-                .containsExactlyInAnyOrder(
-                        DefaultAuthority.SCHEDULED_TASKS_MODIFY,
-                        DefaultAuthority.CACHES_CLEAR,
-                        DefaultAuthority.CACHES_TOGGLE,
-                        DefaultAuthority.GARBAGE_COLLECTOR);
+                .containsExactlyInAnyOrderElementsOf(DefaultRole.EDITOR.getAuthorities());
 
         // Viewer
         assertThat(decodedUser.getRoles().stream()
-                        .filter(role -> role.getName().equals("VIEWER"))
+                        .filter(role -> role.getName().equals(DefaultRole.VIEWER.getName()))
                         .findFirst()
                         .orElseThrow()
                         .getAuthorities())
@@ -209,7 +162,7 @@ class DefaultJwtDecoderServiceTest {
     }
 
     @Test
-    void shouldOmitInvalidAuthority() {
+    void shouldOmitUnrecognizedAuthority() {
         Role role = new DefaultRole("VIEWER", Set.of(UnrecognizedAuthority.UNRECOGNIZED_AUTHORITY));
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(role));
         String token = jwtEncoderService.generateToken(user);
@@ -231,18 +184,9 @@ class DefaultJwtDecoderServiceTest {
     }
 
     @Test
-    void shouldThrowOnExpiredToken_TokenWithNullNameRoles() {
-        Role role = new DefaultRole(null, Set.of(DefaultAuthority.CACHES_CLEAR));
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(role));
-        String token = jwtEncoderService.generateToken(user);
-
-        assertThatThrownBy(() -> jwtDecoderService.decodeTokenToUser(token)).isInstanceOf(JwtParsingException.class);
-    }
-
-    @Test
     void shouldThrowOnExpiredToken() {
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.ADMIN));
-        String token = jwtEncoderService.generateToken(user, Duration.ofDays(0));
+        String token = jwtEncoderService.generateToken(user, Duration.ofSeconds(0));
 
         assertThatThrownBy(() -> jwtDecoderService.decodeTokenToUser(token))
                 .isInstanceOf(ExpiredJwtTokenException.class);

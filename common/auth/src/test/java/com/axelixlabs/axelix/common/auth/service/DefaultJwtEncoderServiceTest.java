@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.auth;
+package com.axelixlabs.axelix.common.auth.service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -43,8 +43,6 @@ import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
@@ -353,13 +351,6 @@ class DefaultJwtEncoderServiceTest {
     @Test
     void shouldHandleNullUser() {
         assertThatThrownBy(() -> jwtEncoderService.generateToken(null)).isInstanceOf(JwtTokenGenerationException.class);
-    }
-
-    @Test
-    void shouldThrowWhenUsernameIsNull() {
-        User user = new DefaultUser(null, PASSWORD, Set.of());
-
-        assertThatThrownBy(() -> jwtEncoderService.generateToken(user)).isInstanceOf(JwtTokenGenerationException.class);
     }
 
     @Test

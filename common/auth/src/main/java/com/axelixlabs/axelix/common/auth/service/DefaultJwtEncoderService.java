@@ -89,7 +89,7 @@ public class DefaultJwtEncoderService implements JwtEncoderService {
             throw new JwtTokenGenerationException("User cannot be null");
         }
 
-        if (user.getUsername() == null || user.getUsername().isEmpty()) {
+        if (user.getUsername().isEmpty()) {
             throw new JwtTokenGenerationException("Username cannot be null or empty");
         }
     }
