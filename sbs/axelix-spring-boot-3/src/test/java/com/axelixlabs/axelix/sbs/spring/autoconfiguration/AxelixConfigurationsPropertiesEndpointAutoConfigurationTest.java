@@ -30,10 +30,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
+import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
@@ -56,11 +62,14 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
         contextRunner.run(context -> {
+            assertThat(context).hasSingleBean(ConfigurationPropertiesFlattener.class);
             assertThat(context).hasSingleBean(ConfigurationPropertiesConverter.class);
             assertThat(context).hasSingleBean(PropertyNameNormalizer.class);
             assertThat(context).hasSingleBean(SmartSanitizingFunction.class);
-            assertThat(context).hasSingleBean(ConfigurationPropertiesCache.class);
+            assertThat(context).hasSingleBean(ConfigurationPropertiesService.class);
             assertThat(context).hasSingleBean(AxelixConfigurationPropertiesEndpoint.class);
+            assertThat(context).hasSingleBean(RequiredAuthorityCheckService.class);
+            assertThat(context).hasSingleBean(SecurityContextExecutor.class);
         });
     }
 
@@ -71,10 +80,13 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(AxelixConfigurationsPropertiesEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(AxelixConfigurationPropertiesEndpoint.class);
-                    assertThat(context).doesNotHaveBean(ConfigurationPropertiesCache.class);
+                    assertThat(context).doesNotHaveBean(ConfigurationPropertiesService.class);
                     assertThat(context).doesNotHaveBean(SmartSanitizingFunction.class);
                     assertThat(context).doesNotHaveBean(PropertyNameNormalizer.class);
                     assertThat(context).doesNotHaveBean(ConfigurationPropertiesConverter.class);
+                    assertThat(context).doesNotHaveBean(ConfigurationPropertiesFlattener.class);
+                    assertThat(context).doesNotHaveBean(SecurityContextExecutor.class);
+                    assertThat(context).doesNotHaveBean(RequiredAuthorityCheckService.class);
                 });
     }
 
@@ -87,10 +99,13 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
         runnerWithoutRequiredConfig.run(context -> {
             assertThat(context).doesNotHaveBean(AxelixConfigurationsPropertiesEndpointAutoConfiguration.class);
             assertThat(context).doesNotHaveBean(AxelixConfigurationPropertiesEndpoint.class);
-            assertThat(context).doesNotHaveBean(ConfigurationPropertiesCache.class);
+            assertThat(context).doesNotHaveBean(ConfigurationPropertiesService.class);
             assertThat(context).doesNotHaveBean(SmartSanitizingFunction.class);
             assertThat(context).doesNotHaveBean(PropertyNameNormalizer.class);
             assertThat(context).doesNotHaveBean(ConfigurationPropertiesConverter.class);
+            assertThat(context).doesNotHaveBean(ConfigurationPropertiesFlattener.class);
+            assertThat(context).doesNotHaveBean(SecurityContextExecutor.class);
+            assertThat(context).doesNotHaveBean(RequiredAuthorityCheckService.class);
         });
     }
 
@@ -99,10 +114,13 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
         contextRunner
                 .withUserConfiguration(
                         CustomConfigurationPropertiesConverterConfig.class,
+                        CustomConfigurationPropertiesFlattenerConfig.class,
                         CustomPropertyNameNormalizerConfig.class,
                         CustomSmartSanitizingFunctionConfig.class,
-                        CustomConfigurationPropertiesCacheConfig.class,
-                        CustomAxelixConfigurationPropertiesEndpointConfig.class)
+                        CustomConfigurationPropertiesServiceConfig.class,
+                        CustomAxelixConfigurationPropertiesEndpointConfig.class,
+                        CustomSecurityContextExecutorConfig.class,
+                        CustomRequiredAuthorityCheckService.class)
                 .run(context -> {
                     assertThat(context.getBean(ConfigurationPropertiesConverter.class))
                             .isExactlyInstanceOf(CustomConfigurationPropertiesConverter.class);
@@ -110,10 +128,16 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
                             .isExactlyInstanceOf(CustomPropertyNameNormalizer.class);
                     assertThat(context.getBean(SmartSanitizingFunction.class))
                             .isExactlyInstanceOf(CustomSmartSanitizingFunction.class);
-                    assertThat(context.getBean(ConfigurationPropertiesCache.class))
-                            .isExactlyInstanceOf(CustomConfigurationPropertiesCache.class);
+                    assertThat(context.getBean(DefaultConfigurationPropertiesService.class))
+                            .isExactlyInstanceOf(CustomConfigurationPropertiesService.class);
                     assertThat(context.getBean(AxelixConfigurationPropertiesEndpoint.class))
                             .isExactlyInstanceOf(CustomAxelixConfigurationPropertiesEndpoint.class);
+                    assertThat(context.getBean(ConfigurationPropertiesFlattener.class))
+                            .isExactlyInstanceOf(CustomConfigurationPropertiesFlattener.class);
+                    assertThat(context.getBean(SecurityContextExecutor.class))
+                            .isExactlyInstanceOf(CustomSecurityContextExecutor.class);
+                    assertThat(context.getBean(RequiredAuthorityCheckService.class))
+                            .isExactlyInstanceOf(CustomRequiredAuthorityCheckService.class);
                 });
     }
 
@@ -144,14 +168,18 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
     }
 
     @TestConfiguration
-    static class CustomConfigurationPropertiesCacheConfig {
+    static class CustomConfigurationPropertiesServiceConfig {
         @Bean
-        public ConfigurationPropertiesCache configurationPropertiesCache(
+        public ConfigurationPropertiesService configurationPropertiesService(
                 SmartSanitizingFunction smartSanitizingFunction,
                 ApplicationContext applicationContext,
-                ConfigurationPropertiesConverter configurationPropertiesConverter) {
-            return new CustomConfigurationPropertiesCache(
-                    smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
+                ConfigurationPropertiesConverter configurationPropertiesConverter,
+                RequiredAuthorityCheckService requiredAuthorityCheckService) {
+            return new CustomConfigurationPropertiesService(
+                    smartSanitizingFunction,
+                    applicationContext,
+                    configurationPropertiesConverter,
+                    requiredAuthorityCheckService);
         }
     }
 
@@ -159,8 +187,33 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
     static class CustomAxelixConfigurationPropertiesEndpointConfig {
         @Bean
         public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-                ConfigurationPropertiesCache configurationPropertiesCache) {
-            return new CustomAxelixConfigurationPropertiesEndpoint(configurationPropertiesCache);
+                DefaultConfigurationPropertiesService configurationPropertiesService) {
+            return new CustomAxelixConfigurationPropertiesEndpoint(configurationPropertiesService);
+        }
+    }
+
+    @TestConfiguration
+    static class CustomConfigurationPropertiesFlattenerConfig {
+        @Bean
+        public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
+            return new CustomConfigurationPropertiesFlattener();
+        }
+    }
+
+    @TestConfiguration
+    static class CustomSecurityContextExecutorConfig {
+        @Bean
+        public SecurityContextExecutor securityContextExecutor() {
+            return new CustomSecurityContextExecutor();
+        }
+    }
+
+    @TestConfiguration
+    static class CustomRequiredAuthorityCheckServiceConfig {
+        @Bean
+        public RequiredAuthorityCheckService configurationPropertiesFlattener(
+                SecurityContextExecutor securityContextExecutor) {
+            return new CustomRequiredAuthorityCheckService(securityContextExecutor);
         }
     }
 
@@ -171,6 +224,16 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
             return null;
         }
     }
+
+    static class CustomSecurityContextExecutor extends ThreadLocalSecurityContextExecutor {}
+
+    static class CustomRequiredAuthorityCheckService extends RequiredAuthorityCheckService {
+        public CustomRequiredAuthorityCheckService(SecurityContextExecutor securityContextExecutor) {
+            super(securityContextExecutor);
+        }
+    }
+
+    static class CustomConfigurationPropertiesFlattener extends DefaultConfigurationPropertiesFlattener {}
 
     static class CustomPropertyNameNormalizer implements PropertyNameNormalizer {
 
@@ -193,18 +256,24 @@ class AxelixConfigurationsPropertiesEndpointAutoConfigurationTest {
         }
     }
 
-    static class CustomConfigurationPropertiesCache extends ConfigurationPropertiesCache {
-        public CustomConfigurationPropertiesCache(
+    static class CustomConfigurationPropertiesService extends DefaultConfigurationPropertiesService {
+        public CustomConfigurationPropertiesService(
                 SmartSanitizingFunction smartSanitizingFunction,
                 ApplicationContext applicationContext,
-                ConfigurationPropertiesConverter configurationPropertiesConverter) {
-            super(smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
+                ConfigurationPropertiesConverter configurationPropertiesConverter,
+                RequiredAuthorityCheckService requiredAuthorityCheckService) {
+            super(
+                    smartSanitizingFunction,
+                    applicationContext,
+                    configurationPropertiesConverter,
+                    requiredAuthorityCheckService);
         }
     }
 
     static class CustomAxelixConfigurationPropertiesEndpoint extends AxelixConfigurationPropertiesEndpoint {
-        public CustomAxelixConfigurationPropertiesEndpoint(ConfigurationPropertiesCache configurationPropertiesCache) {
-            super(configurationPropertiesCache);
+        public CustomAxelixConfigurationPropertiesEndpoint(
+                DefaultConfigurationPropertiesService configurationPropertiesService) {
+            super(configurationPropertiesService);
         }
     }
 }

@@ -62,6 +62,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
@@ -529,10 +530,9 @@ class JwtAuthorizationFilterTest {
 
         @Bean
         public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-                IdentityAccessManager identityAccessManager) {
-
-            var jwtAuthorizationFilter = new JwtAuthorizationFilter(identityAccessManager);
-            var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
+                IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
+            var registration = new FilterRegistrationBean<>(
+                    new JwtAuthorizationFilter(identityAccessManager, securityContextExecutor));
             registration.setName("jwtAuthorizationFilter");
             return registration;
         }

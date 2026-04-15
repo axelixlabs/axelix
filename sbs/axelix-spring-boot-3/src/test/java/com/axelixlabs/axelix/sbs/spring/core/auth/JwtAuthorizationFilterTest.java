@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -529,10 +530,9 @@ class JwtAuthorizationFilterTest {
 
         @Bean
         public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-                IdentityAccessManager identityAccessManager) {
-
-            var jwtAuthorizationFilter = new JwtAuthorizationFilter(identityAccessManager);
-            var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
+                IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
+            var registration = new FilterRegistrationBean<>(
+                    new JwtAuthorizationFilter(identityAccessManager, securityContextExecutor));
             registration.setName("jwtAuthorizationFilter");
             return registration;
         }

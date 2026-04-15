@@ -31,9 +31,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
+import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
+import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadata;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadataExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
@@ -65,6 +69,8 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
             assertThat(context).hasSingleBean(EnvPropertyEnricher.class);
             assertThat(context).hasSingleBean(AxelixEnvironmentEndpoint.class);
             assertThat(context).hasSingleBean(ValueInjectionTrackerBeanPostProcessor.class);
+            assertThat(context).hasSingleBean(EnvironmentService.class);
+            assertThat(context).hasSingleBean(RequiredAuthorityCheckService.class);
         });
     }
 
@@ -75,12 +81,14 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
                 .withConfiguration(AutoConfigurations.of(AxelixEnvironmentEndpointAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(AxelixEnvironmentEndpointAutoConfiguration.class);
+                    assertThat(context).doesNotHaveBean(PropertyNameNormalizer.class);
                     assertThat(context).doesNotHaveBean(PropertyMetadataExtractor.class);
                     assertThat(context).doesNotHaveBean(EnvPropertyEnricher.class);
+                    assertThat(context).doesNotHaveBean(SmartSanitizingFunction.class);
                     assertThat(context).doesNotHaveBean(AxelixEnvironmentEndpoint.class);
                     assertThat(context).doesNotHaveBean(ValueInjectionTrackerBeanPostProcessor.class);
-                    assertThat(context).doesNotHaveBean(SmartSanitizingFunction.class);
-                    assertThat(context).doesNotHaveBean(PropertyNameNormalizer.class);
+                    assertThat(context).doesNotHaveBean(EnvironmentService.class);
+                    assertThat(context).doesNotHaveBean(RequiredAuthorityCheckService.class);
                 });
     }
 
@@ -92,7 +100,9 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
                         CustomEnvPropertyEnricherConfig.class,
                         CustomPropertyNameNormalizerConfig.class,
                         CustomAxelixEnvironmentEndpointConfig.class,
-                        CustomValueInjectionTrackerBeanPostProcessorConfig.class)
+                        CustomValueInjectionTrackerBeanPostProcessorConfig.class,
+                        CustomRequiredAuthorityCheckServiceConfig.class,
+                        CustomEnvironmentServiceConfig.class)
                 .run(context -> {
                     assertThat(context.getBean(PropertyMetadataExtractor.class))
                             .isExactlyInstanceOf(CustomPropertyMetadataExtractor.class);
@@ -104,6 +114,10 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
                             .isExactlyInstanceOf(CustomAxelixEnvironmentEndpoint.class);
                     assertThat(context.getBean(ValueInjectionTrackerBeanPostProcessor.class))
                             .isExactlyInstanceOf(CustomValueInjectionTrackerBeanPostProcessor.class);
+                    assertThat(context.getBean(RequiredAuthorityCheckService.class))
+                            .isExactlyInstanceOf(CustomRequiredAuthorityCheckService.class);
+                    assertThat(context.getBean(EnvironmentService.class))
+                            .isExactlyInstanceOf(CustomEnvironmentService.class);
                 });
     }
 
@@ -134,11 +148,8 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
     @TestConfiguration
     static class CustomAxelixEnvironmentEndpointConfig {
         @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-                Environment environment,
-                EnvPropertyEnricher envPropertyEnricher,
-                SmartSanitizingFunction smartSanitizingFunction) {
-            return new CustomAxelixEnvironmentEndpoint(environment, envPropertyEnricher, smartSanitizingFunction);
+        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
+            return new CustomAxelixEnvironmentEndpoint(environmentService);
         }
     }
 
@@ -147,6 +158,28 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
         @Bean
         public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor() {
             return new CustomValueInjectionTrackerBeanPostProcessor(null);
+        }
+    }
+
+    @TestConfiguration
+    static class CustomRequiredAuthorityCheckServiceConfig {
+        @Bean
+        public RequiredAuthorityCheckService requiredAuthorityCheckService(
+                SecurityContextExecutor securityContextExecutor) {
+            return new CustomRequiredAuthorityCheckService(securityContextExecutor);
+        }
+    }
+
+    @TestConfiguration
+    static class CustomEnvironmentServiceConfig {
+        @Bean
+        public EnvironmentService environmentService(
+                Environment environment,
+                SmartSanitizingFunction smartSanitizingFunction,
+                EnvPropertyEnricher envPropertyEnricher,
+                RequiredAuthorityCheckService requiredAuthorityCheckService) {
+            return new CustomEnvironmentService(
+                    environment, smartSanitizingFunction, envPropertyEnricher, requiredAuthorityCheckService);
         }
     }
 
@@ -177,17 +210,30 @@ class AxelixEnvironmentEndpointAutoConfigurationTest {
     }
 
     static class CustomAxelixEnvironmentEndpoint extends AxelixEnvironmentEndpoint {
-        public CustomAxelixEnvironmentEndpoint(
-                Environment environment,
-                EnvPropertyEnricher envPropertyEnricher,
-                SmartSanitizingFunction smartSanitizingFunction) {
-            super(environment, smartSanitizingFunction, envPropertyEnricher);
+        public CustomAxelixEnvironmentEndpoint(EnvironmentService environmentService) {
+            super(environmentService);
         }
     }
 
     static class CustomValueInjectionTrackerBeanPostProcessor extends ValueInjectionTrackerBeanPostProcessor {
         public CustomValueInjectionTrackerBeanPostProcessor(PropertyNameNormalizer propertyNameNormalizer) {
             super(propertyNameNormalizer);
+        }
+    }
+
+    static class CustomRequiredAuthorityCheckService extends RequiredAuthorityCheckService {
+        public CustomRequiredAuthorityCheckService(SecurityContextExecutor securityContextExecutor) {
+            super(securityContextExecutor);
+        }
+    }
+
+    static class CustomEnvironmentService extends DefaultEnvironmentService {
+        public CustomEnvironmentService(
+                Environment environment,
+                SmartSanitizingFunction smartSanitizingFunction,
+                EnvPropertyEnricher envPropertyEnricher,
+                RequiredAuthorityCheckService requiredAuthorityCheckService) {
+            super(environment, smartSanitizingFunction, envPropertyEnricher, requiredAuthorityCheckService);
         }
     }
 }

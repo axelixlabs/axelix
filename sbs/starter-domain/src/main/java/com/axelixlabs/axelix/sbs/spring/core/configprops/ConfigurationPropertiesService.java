@@ -17,29 +17,25 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
+import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 
 /**
- * Custom Actuator endpoint exposing the application's {@code @ConfigurationProperties}
- * data from the standard Spring Boot Actuator endpoint.
+ * Service for retrieving configuration properties.
  *
- * @since 13.11.2025
- * @author Sergey Cherkasov
+ * @author Nikita Kirillov
  */
-@Endpoint(id = "axelix-configprops")
-public class AxelixConfigurationPropertiesEndpoint {
+public interface ConfigurationPropertiesService {
 
-    private final ConfigurationPropertiesService configurationPropertiesService;
-
-    public AxelixConfigurationPropertiesEndpoint(ConfigurationPropertiesService configurationPropertiesService) {
-        this.configurationPropertiesService = configurationPropertiesService;
-    }
-
-    @ReadOperation
-    public ConfigurationPropertiesFeed configurationProperties() {
-        return configurationPropertiesService.getConfigProps();
-    }
+    /**
+     * Retrieves the configuration properties feed.
+     * <p>
+     * Values may be sanitized based on the current user's access level.
+     * Users with {@link DefaultAuthority#CONFIG_PROPS_VALUES_READ} receive full (unsanitized) values.
+     * Others receive sanitized values according to the configured sanitization rules.
+     * </p>
+     *
+     * @return ConfigurationPropertiesFeed containing all configuration properties
+     */
+    ConfigurationPropertiesFeed getConfigProps();
 }

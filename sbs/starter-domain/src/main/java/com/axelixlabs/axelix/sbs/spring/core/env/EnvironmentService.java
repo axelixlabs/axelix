@@ -19,29 +19,20 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
-import org.springframework.web.bind.annotation.GetMapping;
-
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 
 /**
- * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.
+ * Service for retrieving EnvironmentFeed.
  *
- * @since 21.10.2025
  * @author Nikita Kirillov
- * @author Mikhail Polivakha
  */
-@RestControllerEndpoint(id = "axelix-env")
-public class AxelixEnvironmentEndpoint {
+public interface EnvironmentService {
 
-    private final EnvironmentService environmentService;
-
-    public AxelixEnvironmentEndpoint(EnvironmentService environmentService) {
-        this.environmentService = environmentService;
-    }
-
-    @GetMapping
-    public EnvironmentFeed environment(@Nullable String pattern) {
-        return environmentService.getEnvironmentFeed(pattern);
-    }
+    /**
+     * Retrieves environment properties filtered by the specified pattern.
+     *
+     * @param pattern optional pattern to filter property names
+     * @return environment feed containing matched properties with their values
+     */
+    EnvironmentFeed getEnvironmentFeed(@Nullable String pattern);
 }

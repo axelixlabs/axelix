@@ -23,6 +23,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,17 +35,21 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -73,16 +79,17 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
 @EnableConfigurationProperties({AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.class})
+@Import(JwtAuthTestConfiguration.class)
 public class AxelixConfigurationPropertiesEndpointTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @ParameterizedTest
     @MethodSource("propertyName")
     void shouldReturnPropertiesNameAndValue(String propertyName, String expectedValue) {
         ResponseEntity<ConfigurationPropertiesFeed> response =
-                restTemplate.getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
+                restTemplate.asViewer().getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
 
         List<KeyValue> properties = response.getBody().getBeans().stream()
                 .filter(bean -> bean.getPrefix().equals("axelix.prop.test"))
@@ -115,6 +122,21 @@ public class AxelixConfigurationPropertiesEndpointTest {
                 Arguments.of("httpClient.requests[1].methods[0].type", "PUT"),
                 Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2"),
                 Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level", "DEBUG"));
+    }
+
+    @Test
+    void shouldReturnNotSanitizedPropertiesValue_forAdminRole() {
+        ResponseEntity<ConfigurationPropertiesFeed> response =
+                restTemplate.asAdmin().getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        List<@Nullable String> properties = response.getBody().getBeans().stream()
+                .flatMap(bean -> bean.getProperties().stream())
+                .map(KeyValue::getValue)
+                .collect(Collectors.toList());
+
+        assertThat(properties).doesNotContain("******");
     }
 
     @ConstructorBinding
@@ -364,18 +386,28 @@ public class AxelixConfigurationPropertiesEndpointTest {
         }
 
         @Bean
-        public ConfigurationPropertiesCache configurationPropertiesCache(
+        public RequiredAuthorityCheckService requiredAuthorityCheckService(
+                SecurityContextExecutor securityContextExecutor) {
+            return new RequiredAuthorityCheckService(securityContextExecutor);
+        }
+
+        @Bean
+        public ConfigurationPropertiesService configurationPropertiesService(
                 SmartSanitizingFunction smartSanitizingFunction,
                 ApplicationContext applicationContext,
-                ConfigurationPropertiesConverter configurationPropertiesConverter) {
-            return new ConfigurationPropertiesCache(
-                    smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
+                ConfigurationPropertiesConverter configurationPropertiesConverter,
+                RequiredAuthorityCheckService requiredAuthorityCheckService) {
+            return new DefaultConfigurationPropertiesService(
+                    smartSanitizingFunction,
+                    applicationContext,
+                    configurationPropertiesConverter,
+                    requiredAuthorityCheckService);
         }
 
         @Bean
         public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-                ConfigurationPropertiesCache configurationPropertiesCache) {
-            return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesCache);
+                DefaultConfigurationPropertiesService configurationPropertiesService) {
+            return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService);
         }
     }
 }

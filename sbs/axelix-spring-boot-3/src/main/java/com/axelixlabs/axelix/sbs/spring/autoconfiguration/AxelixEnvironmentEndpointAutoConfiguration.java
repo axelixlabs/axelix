@@ -25,14 +25,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
+import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvPropertyEnricher;
+import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyMetadataExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
+import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyMetadataExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.ValueInjectionTrackerBeanPostProcessor;
@@ -72,33 +77,54 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public SecurityContextExecutor securityContextExecutor() {
+        return new ThreadLocalSecurityContextExecutor();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public EnvPropertyEnricher envPropertyEnricher(
             Environment environment,
             PropertyNameNormalizer propertyNameNormalizer,
-            ObjectProvider<ConfigurationPropertiesCache> configurationPropertiesCache,
+            ObjectProvider<ConfigurationPropertiesService> configurationPropertiesServiceProvider,
             PropertyMetadataExtractor propertyMetadataExtractor,
             ValueInjectionTrackerBeanPostProcessor injectionTracker) {
         return new DefaultEnvPropertyEnricher(
                 environment,
                 propertyNameNormalizer,
-                configurationPropertiesCache,
+                configurationPropertiesServiceProvider,
                 propertyMetadataExtractor,
                 injectionTracker);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-            Environment environment,
-            SmartSanitizingFunction smartSanitizingFunction,
-            EnvPropertyEnricher envPropertyEnricher) {
-        return new AxelixEnvironmentEndpoint(environment, smartSanitizingFunction, envPropertyEnricher);
+    public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor(
+            PropertyNameNormalizer propertyNameNormalizer, SecurityContextExecutor securityContextExecutor) {
+        return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public ValueInjectionTrackerBeanPostProcessor valueInjectionTrackerBeanPostProcessor(
-            PropertyNameNormalizer propertyNameNormalizer) {
-        return new ValueInjectionTrackerBeanPostProcessor(propertyNameNormalizer);
+    public RequiredAuthorityCheckService requiredAuthorityCheckService(
+            SecurityContextExecutor securityContextExecutor) {
+        return new RequiredAuthorityCheckService(securityContextExecutor);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public EnvironmentService environmentService(
+            Environment environment,
+            SmartSanitizingFunction smartSanitizingFunction,
+            EnvPropertyEnricher envPropertyEnricher,
+            RequiredAuthorityCheckService requiredAuthorityCheckService) {
+        return new DefaultEnvironmentService(
+                environment, smartSanitizingFunction, envPropertyEnricher, requiredAuthorityCheckService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
+        return new AxelixEnvironmentEndpoint(environmentService);
     }
 }

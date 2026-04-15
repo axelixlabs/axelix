@@ -42,9 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Sergey Cherkasov
  */
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "management.endpoint.configprops.show-values=always")
+@SpringBootTest(properties = "management.endpoint.configprops.show-values=always")
 @TestPropertySource(
         properties = {
             "axelix.prop.test.tags.environment=test",

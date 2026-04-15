@@ -32,14 +32,14 @@ import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 @Endpoint(id = "axelix-configprops")
 public class AxelixConfigurationPropertiesEndpoint {
 
-    private final ConfigurationPropertiesCache configurationPropertiesCache;
+    private final ConfigurationPropertiesService configurationPropertiesService;
 
-    public AxelixConfigurationPropertiesEndpoint(ConfigurationPropertiesCache cache) {
-        this.configurationPropertiesCache = cache;
+    public AxelixConfigurationPropertiesEndpoint(ConfigurationPropertiesService configurationPropertiesService) {
+        this.configurationPropertiesService = configurationPropertiesService;
     }
 
     @ReadOperation
     public ConfigurationPropertiesFeed configurationProperties() {
-        return configurationPropertiesCache.getConfigProps();
+        return configurationPropertiesService.getConfigProps();
     }
 }
