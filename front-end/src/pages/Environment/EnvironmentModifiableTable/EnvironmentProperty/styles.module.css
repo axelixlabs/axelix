@@ -4,9 +4,17 @@
     align-items: center;
 }
 
-.KeyChunk {
+.KeyChunk,
+.ValueChunk {
+    display: flex;
+    align-items: center;
+    padding: 16px;
     word-break: break-all;
+}
+
+.KeyChunk {
     padding-right: 16px;
+    border-right: 1px solid var(--axelix-light-grey);
 }
 
 .CopyableValue {
@@ -16,8 +24,11 @@
 }
 
 .ValueChunk {
-    display: flex;
     justify-content: flex-end;
-    word-break: break-all;
     padding-left: 16px;
+}
+
+/* Adds left padding to align with accordion rows that have an expand arrow */
+.AccordionAligned {
+    padding-left: 45px;
 }

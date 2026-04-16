@@ -1,0 +1,16 @@
+.EvenElement,
+.OddElement {
+    transition: background-color 0.3s;
+}
+
+.EvenElement {
+    background-color: #f9f9f9;
+}
+
+.OddElement {
+    background-color: var(--axelix-primary-white);
+}
+
+:is(.EvenElement, .OddElement):hover {
+    background-color: #f5f5f5;
+}
