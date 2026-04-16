@@ -27,6 +27,8 @@ import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 
+import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
+
 /**
  * Default implementation of {@link ServiceMetadataAssembler}.
  *
@@ -68,7 +70,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 axelixVersionDiscoverer.getVersion(),
                 shortBuildInfo.map(ShortBuildInfo::serviceVersion).orElse(""),
                 gitCommitInfo.map(GitInfo::commitShaShort).orElse(""),
-                System.getProperty("java.vendor"),
+                emptyIfNull(System.getProperty("java.vendor")),
                 buildSoftwareVersionInUse(),
                 healthDetectionFunction.get(),
                 new BasicDiscoveryMetadata.MemoryDetails(
@@ -101,12 +103,12 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     }
 
     private BasicDiscoveryMetadata.SoftwareVersions buildSoftwareVersionInUse() {
+        String javaVersion = emptyIfNull(System.getProperty("java.version"));
+        var springBootVersion = libraryDiscoverer.getLibraryVersion("spring-boot", "org.springframework.boot");
+        var springVersion = libraryDiscoverer.getLibraryVersion("spring-core", "org.springframework");
+        var kotlinVersion = libraryDiscoverer.getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin");
+
         return new BasicDiscoveryMetadata.SoftwareVersions(
-                System.getProperty("java.version"),
-                libraryDiscoverer.getRequiredLibraryVersion("spring-boot", "org.springframework.boot"),
-                libraryDiscoverer.getRequiredLibraryVersion("spring-core", "org.springframework"),
-                libraryDiscoverer
-                        .getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin")
-                        .orElse(null));
+                javaVersion, springBootVersion.orElse(""), springVersion.orElse(""), kotlinVersion.orElse(null));
     }
 }
