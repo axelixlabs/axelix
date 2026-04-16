@@ -1,0 +1,10 @@
+
+${AnsiColor.42} ██████╗   ${AnsiColor.75}██╗  ██╗  ${AnsiColor.75}███████╗  ${AnsiColor.75}██╗       ${AnsiColor.75}██╗  ${AnsiColor.75}██╗  ██╗${AnsiColor.DEFAULT}
+${AnsiColor.42} ██╔══██╗  ${AnsiColor.81}╚██╗██╔╝  ${AnsiColor.81}██╔════╝  ${AnsiColor.81}██║       ${AnsiColor.81}██║  ${AnsiColor.81}╚██╗██╔╝${AnsiColor.DEFAULT}
+${AnsiColor.42} ███████║  ${AnsiColor.117} ╚███╔╝   ${AnsiColor.117}█████╗    ${AnsiColor.117}██║       ${AnsiColor.117}██║  ${AnsiColor.117} ╚███╔╝ ${AnsiColor.DEFAULT}
+${AnsiColor.42} ██╔══██║  ${AnsiColor.153} ██╔██╗   ${AnsiColor.153}██╔══╝    ${AnsiColor.153}██║       ${AnsiColor.153}██║  ${AnsiColor.153} ██╔██╗ ${AnsiColor.DEFAULT}
+${AnsiColor.42} ██║  ██║  ${AnsiColor.195}██╔╝ ██╗  ${AnsiColor.195}███████╗  ${AnsiColor.195}███████╗  ${AnsiColor.195}██║  ${AnsiColor.195}██╔╝ ██╗${AnsiColor.DEFAULT}
+${AnsiColor.42} ╚═╝  ╚═╝  ${AnsiColor.231}╚═╝  ╚═╝  ${AnsiColor.231}╚══════╝  ${AnsiColor.231}╚══════╝  ${AnsiColor.231}╚═╝  ${AnsiColor.231}╚═╝  ╚═╝${AnsiColor.DEFAULT}
+
+${AnsiColor.75}  > ${AnsiColor.DEFAULT}Spring Boot ${AnsiColor.75}::${AnsiColor.DEFAULT} ${spring-boot.formatted-version}
+

@@ -14,6 +14,9 @@ spring:
           mcp-endpoint: "/api/mcp"
   datasource:
     url: jdbc:sqlite:axelix.db
+  output:
+    ansi:
+      enabled: ALWAYS # Color from Axelix Banner
 
 management:
   endpoint:
