@@ -71,8 +71,8 @@
     height: 20px;
   }
 
-  .Burger:before,
-  .Burger:after {
+  .Burger::before,
+  .Burger::after {
     content: "";
     position: absolute;
     left: 0;
@@ -81,12 +81,12 @@
     background-color: var(--axelix-primary-white);
   }
 
-  .Burger:before {
+  .Burger::before {
     top: 0;
     transition: all 0.3s;
   }
 
-  .Burger:after {
+  .Burger::after {
     bottom: 0;
     transition: all 0.3s;
   }
@@ -97,7 +97,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    top: 9px
+    top: 9px;
   }
 
   .MobileMenuWrapper {
@@ -122,17 +122,17 @@
     transition: all 0.3s;
   }
 
-  .OpenedBurger:before {
+  .OpenedBurger::before {
     transform: rotate(45deg);
     top: 9px;
   }
 
-  .OpenedBurger:after {
+  .OpenedBurger::after {
     transform: rotate(-45deg);
     bottom: 9px;
   }
 
-  .OpenedBurger>.BurgerCenterLine {
+  .OpenedBurger > .BurgerCenterLine {
     transform: scale(0);
   }
 }

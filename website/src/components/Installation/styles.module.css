@@ -26,11 +26,10 @@
     padding-block: 20px;
     background-color: transparent;
     font-size: inherit;
-    transition-duration: 0.3s;
     cursor: pointer;
     border: 1px solid var(--axelix-bold-grey);
     border-radius: var(--axelix-border-radius-large);
-    box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 0.3) inset, 2px 2px 24px 0px #ffffff0d;
+    box-shadow: 0 1px 0 0 rgb(255 255 255 / 30%) inset, 2px 2px 24px 0 #ffffff0d;
     color: var(--axelix-primary-white);
     transition-duration: 0.3s;
 }

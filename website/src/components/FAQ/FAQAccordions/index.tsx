@@ -1,10 +1,12 @@
-"use client"
-import { useState } from "react";
-import styles from "./styles.module.css";
+"use client";
 import { IFAQItem } from "@/models";
 
+import { useState } from "react";
+
+import styles from "./styles.module.css";
+
 interface IProps {
-    faqItems: IFAQItem[]
+    faqItems: IFAQItem[];
 }
 
 export const FAQAccordions = ({ faqItems }: IProps) => {
@@ -17,7 +19,9 @@ export const FAQAccordions = ({ faqItems }: IProps) => {
     return (
         <section className={`MainContainer ${styles.MainWrapper}`}>
             <div className={styles.InnerWrapper}>
-                <h2 id="faq-title" className={`TextMedium ${styles.Title}`}>Frequently asked questions</h2>
+                <h2 id="faq-title" className={`TextMedium ${styles.Title}`}>
+                    Frequently asked questions
+                </h2>
                 <dl>
                     {faqItems.map(({ question, answer }, index) => {
                         const isOpen = openedAccordionIndex === index;
@@ -37,17 +41,15 @@ export const FAQAccordions = ({ faqItems }: IProps) => {
                                             {isOpen ? "-" : "+"}
                                         </span>
                                     </button>
-                                </dt >
+                                </dt>
                                 <dd className={`${styles.ContentWrapper} ${isOpen ? styles.ActiveContentWrapper : ""}`}>
-                                    <div className={styles.Content}>
-                                        {answer}
-                                    </div>
+                                    <div className={styles.Content}>{answer}</div>
                                 </dd>
                             </div>
                         );
                     })}
-                </dl >
+                </dl>
             </div>
         </section>
     );
-}
+};

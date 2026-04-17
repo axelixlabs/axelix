@@ -1,5 +1,6 @@
-import { StaticImageData } from "next/image";
 import { ELanguage } from "@/models";
+
+import { StaticImageData } from "next/image";
 import { ReactNode } from "react";
 
 export interface IWhatCanDoCardData {
@@ -11,14 +12,13 @@ export interface IWhatCanDoCardData {
 }
 
 export interface IZigzagSectionData {
-    title: string,
+    title: string;
     description: string;
-    href: string,
-    image: StaticImageData
+    href: string;
+    image: StaticImageData;
 }
 
 export interface IInstallationStep {
-
     /**
      * The name of the step.
      */
@@ -31,7 +31,6 @@ export interface IInstallationStep {
 }
 
 export interface ICodeSampleGroup {
-
     /**
      * The group of the code samples is something that the elements in the provided array
      * of {@link codeSamples} have in common.
@@ -45,7 +44,6 @@ export interface ICodeSampleGroup {
 }
 
 export interface ICodeSample {
-
     /**
      * The title that should be used when displaying the code sample.
      */
@@ -71,12 +69,12 @@ export interface IInstallationInstructions {
     /**
      * The installation steps.
      */
-    steps: IInstallationStep[],
+    steps: IInstallationStep[];
 
     /**
      * The overall instructions about the given installation option.
      */
-    description: string,
+    description: string;
 }
 
 export interface IFAQItem {

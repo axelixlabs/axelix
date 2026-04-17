@@ -1,0 +1,8 @@
+node_modules
+dist
+*.log
+*.lock
+*.yaml
+.next/
+out/
+next-env.d.ts

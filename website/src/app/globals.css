@@ -24,6 +24,7 @@
 
 html {
     scroll-behavior: smooth;
+
     /* TODO: Fix this in the future */
     scroll-padding-top: calc(var(--axelix-scroll-margin-top) - var(--axelix-header-height));
 }
@@ -83,11 +84,10 @@ button {
     padding: 0;
     white-space: nowrap;
     clip-path: inset(100%);
-    clip: rect(0 0 0 0);
     overflow: hidden;
 }
 
-@media (max-width: 650px) {
+@media (width <= 650px) {
     :root {
         --axelix-section-margin-bottom: 80px;
     }

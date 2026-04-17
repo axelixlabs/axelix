@@ -1,23 +1,25 @@
-"use client"
-import { useState } from 'react';
-import styles from './styles.module.css';
-import { ICodeSampleGroup, IInstallationInstructions, IInstallationStep } from '@/models';
-import { Copy } from '@/components';
+"use client";
+import { Copy } from "@/components";
+import { getInstallationSelectOptions } from "@/helpers";
+import { ICodeSampleGroup, IInstallationInstructions, IInstallationStep } from "@/models";
+
+import { Select } from "antd";
+import { useState } from "react";
+
 import { CodeSnippet } from "./CodeSnippet";
-import { getInstallationSelectOptions } from '@/helpers';
-import { Select } from 'antd';
+import styles from "./styles.module.css";
 
 interface IProps {
-    instructions: IInstallationInstructions
+    instructions: IInstallationInstructions;
 }
 
 export const InstallationContent = ({ instructions }: IProps) => {
     const steps = instructions.steps;
 
-    const firstStep = steps[0]
+    const firstStep = steps[0];
 
     const [currentStep, setCurrentStep] = useState<IInstallationStep>(firstStep);
-    const [selectedGroup, setSelectedGroup] = useState<ICodeSampleGroup>(currentStep.codeSampleGroups[0])
+    const [selectedGroup, setSelectedGroup] = useState<ICodeSampleGroup>(currentStep.codeSampleGroups[0]);
 
     return (
         <div className={styles.MainWrapper}>
@@ -28,10 +30,10 @@ export const InstallationContent = ({ instructions }: IProps) => {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    setCurrentStep(step)
-                                    setSelectedGroup(step.codeSampleGroups[0])
+                                    setCurrentStep(step);
+                                    setSelectedGroup(step.codeSampleGroups[0]);
                                 }}
-                                className={`${styles.Tab} ${currentStep === step ? styles.ActiveTab : ''}`}
+                                className={`${styles.Tab} ${currentStep === step ? styles.ActiveTab : ""}`}
                             >
                                 {index + 1}. {step.name}
                             </button>
@@ -39,36 +41,32 @@ export const InstallationContent = ({ instructions }: IProps) => {
                     ))}
                 </ul>
 
-                {
-                    currentStep.codeSampleGroups.length > 1 && (
-                        <Select
-                            value={selectedGroup.group}
-                            onChange={(value) => {
-                                setSelectedGroup(
-                                    currentStep.codeSampleGroups.find(codeGroup => codeGroup.group === value)!
-                                )
-                            }}
-                            options={getInstallationSelectOptions(currentStep.codeSampleGroups)}
-                            className={styles.FormatSelect}
-                        />
-                    )
-                }
+                {currentStep.codeSampleGroups.length > 1 && (
+                    <Select
+                        value={selectedGroup.group}
+                        onChange={(value) => {
+                            setSelectedGroup(
+                                currentStep.codeSampleGroups.find((codeGroup) => codeGroup.group === value)!,
+                            );
+                        }}
+                        options={getInstallationSelectOptions(currentStep.codeSampleGroups)}
+                        className={styles.FormatSelect}
+                    />
+                )}
             </div>
 
             <div className={styles.CodeArea}>
-                {
-                    selectedGroup.codeSamples.map(({ codeSample, codeSampleTitle, language }) => {
-                        return (
-                            <div key={codeSampleTitle + language} className={styles.Container}>
-                                <header className={styles.CodeSamplesHeader}>
-                                    <h3 className={styles.CodeSampleTitle}>{codeSampleTitle}</h3>
-                                    <Copy text={codeSample} />
-                                </header>
-                                <CodeSnippet language={language} codeSnippet={codeSample} />
-                            </div>
-                        )
-                    })
-                }
+                {selectedGroup.codeSamples.map(({ codeSample, codeSampleTitle, language }) => {
+                    return (
+                        <div key={codeSampleTitle + language} className={styles.Container}>
+                            <header className={styles.CodeSamplesHeader}>
+                                <h3 className={styles.CodeSampleTitle}>{codeSampleTitle}</h3>
+                                <Copy text={codeSample} />
+                            </header>
+                            <CodeSnippet language={language} codeSnippet={codeSample} />
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

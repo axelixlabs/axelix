@@ -1,7 +1,7 @@
-import { ZigzagSectionRow } from "./ZigzagSectionRow";
 import { zigzagSectionsData } from "@/utils";
 
-import styles from "./styles.module.css"
+import { ZigzagSectionRow } from "./ZigzagSectionRow";
+import styles from "./styles.module.css";
 
 export const Zigzag = () => {
     return (
@@ -11,5 +11,5 @@ export const Zigzag = () => {
                 <ZigzagSectionRow section={section} key={section.title} index={index} />
             ))}
         </section>
-    )
-} 
+    );
+};
