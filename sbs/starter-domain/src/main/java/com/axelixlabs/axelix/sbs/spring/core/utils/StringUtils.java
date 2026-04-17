@@ -67,7 +67,7 @@ public class StringUtils {
         return false;
     }
 
-    public static String emptyIfNull(String target) {
+    public static String emptyIfNull(@Nullable String target) {
         return target != null ? target : "";
     }
 

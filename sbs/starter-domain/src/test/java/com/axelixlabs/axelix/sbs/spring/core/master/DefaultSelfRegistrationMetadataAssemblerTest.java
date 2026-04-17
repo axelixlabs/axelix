@@ -25,12 +25,14 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.SpringBootVersion;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.SpringVersion;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
@@ -111,16 +113,8 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         }
 
         @Bean
-        LibraryDiscoverer libraryDiscoverer() {
-            return (artifactId, groupId) -> {
-                if ("spring-boot".equals(artifactId) && "org.springframework.boot".equals(groupId)) {
-                    return Optional.of("2.7.18");
-                }
-                if ("spring-core".equals(artifactId) && "org.springframework".equals(groupId)) {
-                    return Optional.of("5.3.31");
-                }
-                return Optional.empty();
-            };
+        public LibraryInformationProvider libraryInformationProvider() {
+            return new TestLibraryInformationProvider();
         }
     }
 
@@ -141,7 +135,7 @@ class DefaultSelfRegistrationMetadataAssemblerTest {
         assertThat(basicMetadata.getServiceVersion()).isEqualTo("1.1.3");
         assertThat(basicMetadata.getCommitShortSha()).isEqualTo("8f4b9f7");
         assertThat(basicMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
-        assertThat(basicMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo("2.7.18");
-        assertThat(basicMetadata.getSoftwareVersions().getSpringFramework()).isEqualTo("5.3.31");
+        assertThat(basicMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
+        assertThat(basicMetadata.getSoftwareVersions().getSpringFramework()).isEqualTo(SpringVersion.getVersion());
     }
 }

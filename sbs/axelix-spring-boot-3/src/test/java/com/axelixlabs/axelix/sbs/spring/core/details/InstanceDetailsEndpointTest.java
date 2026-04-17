@@ -20,20 +20,15 @@ package com.axelixlabs.axelix.sbs.spring.core.details;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootVersion;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.SpringVersion;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import com.axelixlabs.axelix.common.api.InstanceDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.BuildDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.GitDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.OsDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.RuntimeDetails;
-import com.axelixlabs.axelix.common.api.InstanceDetails.SpringDetails;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -89,7 +84,9 @@ class InstanceDetailsEndpointTest {
         assertThatJson(responseBody)
                 .inPath("spring")
                 .isObject()
-                .contains(entry("springBootVersion", "3.5.0"), entry("springFrameworkVersion", "6.2.7"));
+                .contains(
+                        entry("springBootVersion", SpringBootVersion.getVersion()),
+                        entry("springFrameworkVersion", SpringVersion.getVersion()));
 
         assertThatJson(responseBody)
                 .inPath("runtime")
@@ -107,50 +104,6 @@ class InstanceDetailsEndpointTest {
                         entry("time", "2025-10-30T09:10:13.428Z"));
 
         assertThatJson(responseBody).inPath("os").isObject().containsOnlyKeys("name", "version", "arch");
-    }
-
-    @Test
-    void shouldContainValidDetails() {
-        ResponseEntity<InstanceDetails> response =
-                restTemplate.getForEntity("/actuator/axelix-details", InstanceDetails.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        InstanceDetails details = response.getBody();
-        assertThat(details).isNotNull();
-
-        GitDetails git = details.getGit();
-        assertThat(git).isNotNull();
-        assertThat(git.getCommitShaShort()).isEqualTo("a8b0929");
-        assertThat(git.getBranch()).isEqualTo("main");
-        assertThat(git.getCommitAuthor().getName()).isEqualTo("Mikhail Polivakha");
-        assertThat(git.getCommitAuthor().getEmail()).isEqualTo("mikhailpolivakha@email.com");
-        assertThat(git.getCommitTimestamp()).isNotNull();
-
-        SpringDetails spring = details.getSpring();
-        assertThat(spring.getSpringBootVersion()).isEqualTo("3.5.0");
-        assertThat(spring.getSpringFrameworkVersion()).isEqualTo("6.2.7");
-        assertThat(spring.getSpringCloudVersion()).isNull();
-
-        RuntimeDetails runtime = details.getRuntime();
-        assertThat(runtime).isNotNull();
-        assertThat(runtime.getJavaVersion()).isNotBlank();
-        assertThat(runtime.getJdkVendor()).isNotBlank();
-        assertThat(runtime.getGarbageCollector()).isNotBlank();
-        assertThat(runtime.getKotlinVersion()).isNull();
-
-        BuildDetails build = details.getBuild();
-        assertThat(build).isNotNull();
-        assertThat(build.getArtifact()).isEqualTo("axelix-sbs");
-        assertThat(build.getVersion()).isEqualTo("1.0.0-SNAPSHOT");
-        assertThat(build.getGroup()).isEqualTo("com.axelixlabs.axelix");
-        assertThat(build.getTime()).isEqualTo("2025-10-30T09:10:13.428Z");
-
-        OsDetails os = details.getOs();
-        assertThat(os).isNotNull();
-        assertThat(os.getName()).isNotBlank();
-        assertThat(os.getVersion()).isNotBlank();
-        assertThat(os.getArch()).isNotBlank();
     }
 
     @TestConfiguration

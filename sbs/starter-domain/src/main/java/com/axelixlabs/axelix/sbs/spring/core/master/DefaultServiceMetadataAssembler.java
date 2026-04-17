@@ -27,8 +27,6 @@ import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 
-import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
-
 /**
  * Default implementation of {@link ServiceMetadataAssembler}.
  *
@@ -42,23 +40,23 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     private final List<GitInformationProvider> gitInformationProvider;
     private final List<ShortBuildInfoProvider> shortBuildInfoProvider;
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
-    private final LibraryDiscoverer libraryDiscoverer;
     private final VMFeaturesProvider vmFeaturesProvider;
+    private final LibraryInformationProvider libraryInformationProvider;
 
     public DefaultServiceMetadataAssembler(
             HealthDetectionFunction healthDetectionFunction,
-            LibraryDiscoverer libraryDiscoverer,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
             List<ShortBuildInfoProvider> shortBuildInfoProviders,
-            VMFeaturesProvider vmFeaturesProvider) {
+            VMFeaturesProvider vmFeaturesProvider,
+            LibraryInformationProvider libraryInformationProvider) {
 
         this.healthDetectionFunction = healthDetectionFunction;
-        this.libraryDiscoverer = libraryDiscoverer;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
         this.gitInformationProvider = gitInformationProviders;
         this.shortBuildInfoProvider = shortBuildInfoProviders;
         this.vmFeaturesProvider = vmFeaturesProvider;
+        this.libraryInformationProvider = libraryInformationProvider;
     }
 
     @Override
@@ -70,7 +68,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 axelixVersionDiscoverer.getVersion(),
                 shortBuildInfo.map(ShortBuildInfo::serviceVersion).orElse(""),
                 gitCommitInfo.map(GitInfo::commitShaShort).orElse(""),
-                emptyIfNull(System.getProperty("java.vendor")),
+                libraryInformationProvider.getJdkVendorName(),
                 buildSoftwareVersionInUse(),
                 healthDetectionFunction.get(),
                 new BasicDiscoveryMetadata.MemoryDetails(
@@ -103,12 +101,10 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     }
 
     private BasicDiscoveryMetadata.SoftwareVersions buildSoftwareVersionInUse() {
-        String javaVersion = emptyIfNull(System.getProperty("java.version"));
-        var springBootVersion = libraryDiscoverer.getLibraryVersion("spring-boot", "org.springframework.boot");
-        var springVersion = libraryDiscoverer.getLibraryVersion("spring-core", "org.springframework");
-        var kotlinVersion = libraryDiscoverer.getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin");
-
         return new BasicDiscoveryMetadata.SoftwareVersions(
-                javaVersion, springBootVersion.orElse(""), springVersion.orElse(""), kotlinVersion.orElse(null));
+                libraryInformationProvider.getJavaVersion(),
+                libraryInformationProvider.getSpringBootVersion(),
+                libraryInformationProvider.getSpringVersion(),
+                libraryInformationProvider.getKotlinVersion());
     }
 }

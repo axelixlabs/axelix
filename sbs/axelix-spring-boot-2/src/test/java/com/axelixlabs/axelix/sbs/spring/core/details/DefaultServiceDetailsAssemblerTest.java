@@ -19,10 +19,12 @@ package com.axelixlabs.axelix.sbs.spring.core.details;
 
 import java.util.Properties;
 
+import kotlin.KotlinVersion;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootVersion;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +32,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.SpringVersion;
 
 import com.axelixlabs.axelix.common.api.InstanceDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.BuildDetails;
@@ -39,9 +41,9 @@ import com.axelixlabs.axelix.common.api.InstanceDetails.OsDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.RuntimeDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.SpringDetails;
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginGitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.CycloneDXSBOMLibraryDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.LibraryDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -73,16 +75,16 @@ class DefaultServiceDetailsAssemblerTest {
 
         SpringDetails spring = result.getSpring();
         assertThat(spring).isNotNull();
-        assertThat(spring.getSpringBootVersion()).isNotBlank();
-        assertThat(spring.getSpringFrameworkVersion()).isNotBlank();
+        assertThat(spring.getSpringBootVersion()).as("", SpringBootVersion.getVersion());
+        assertThat(spring.getSpringFrameworkVersion()).as("", SpringVersion.getVersion());
         assertThat(spring.getSpringCloudVersion()).isNull();
 
         RuntimeDetails runtime = result.getRuntime();
         assertThat(runtime).isNotNull();
-        assertThat(runtime.getJavaVersion()).isNotBlank();
-        assertThat(runtime.getJdkVendor()).isNotBlank();
+        assertThat(runtime.getJavaVersion()).as("", System.getProperty("java.version"));
+        assertThat(runtime.getJdkVendor()).as("", System.getProperty("java.vendor.version"));
         assertThat(runtime.getGarbageCollector()).isNotBlank();
-        assertThat(runtime.getKotlinVersion()).isNull();
+        assertThat(runtime.getKotlinVersion()).as(null, KotlinVersion.CURRENT.toString());
 
         BuildDetails build = result.getBuild();
         assertThat(build.getArtifact()).isEqualTo("axelix-sbs");
@@ -119,17 +121,17 @@ class DefaultServiceDetailsAssemblerTest {
         }
 
         @Bean
-        public LibraryDiscoverer libraryDiscoverer() {
-            return new CycloneDXSBOMLibraryDiscoverer(new ClassPathResource("other/application.cdx.json"));
+        public LibraryInformationProvider libraryInformationProvider() {
+            return new DefaultLibraryInformationProvider();
         }
 
         @Bean
         public ServiceDetailsAssembler serviceDetailsAssembler(
                 GitInformationProvider gitInformationProvider,
                 ObjectProvider<BuildProperties> providerBuildProperties,
-                LibraryDiscoverer libraryDiscoverer) {
+                LibraryInformationProvider libraryInformationProvider) {
             return new DefaultServiceDetailsAssembler(
-                    gitInformationProvider, providerBuildProperties, libraryDiscoverer);
+                    gitInformationProvider, providerBuildProperties, libraryInformationProvider);
         }
     }
 }

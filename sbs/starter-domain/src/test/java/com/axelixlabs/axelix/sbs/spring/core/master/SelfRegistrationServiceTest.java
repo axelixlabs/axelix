@@ -168,16 +168,8 @@ class SelfRegistrationServiceTest {
         }
 
         @Bean
-        LibraryDiscoverer libraryDiscoverer() {
-            return (artifactId, groupId) -> {
-                if ("spring-boot".equals(artifactId) && "org.springframework.boot".equals(groupId)) {
-                    return Optional.of("2.7.18");
-                }
-                if ("spring-core".equals(artifactId) && "org.springframework".equals(groupId)) {
-                    return Optional.of("5.3.31");
-                }
-                return Optional.empty();
-            };
+        public LibraryInformationProvider libraryInformationProvider() {
+            return new TestLibraryInformationProvider();
         }
     }
 

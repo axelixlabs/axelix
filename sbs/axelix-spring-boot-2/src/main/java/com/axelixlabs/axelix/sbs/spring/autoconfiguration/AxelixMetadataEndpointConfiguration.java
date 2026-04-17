@@ -34,9 +34,10 @@ import com.axelixlabs.axelix.sbs.spring.core.master.AxelixMetadataEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.master.CachingAxelixVersionDiscoverer;
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginGitInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.CommitIdPluginShortBuildInfoProvider;
+import com.axelixlabs.axelix.sbs.spring.core.master.DefaultLibraryInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.DefaultServiceMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.LibraryDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.OptionsParsingVMFeaturesProvider;
 import com.axelixlabs.axelix.sbs.spring.core.master.ServiceMetadataAssembler;
 import com.axelixlabs.axelix.sbs.spring.core.master.ShortBuildInfoProvider;
@@ -53,7 +54,6 @@ import com.axelixlabs.axelix.sbs.spring.core.master.VMFeaturesProvider;
             HealthEndpointAutoConfiguration.class,
             CommitIdPluginGitInformationProvider.class,
             CommitIdPluginShortBuildInfoProvider.class,
-            LibraryDiscovererAutoConfiguration.class
         })
 public class AxelixMetadataEndpointConfiguration {
 
@@ -72,21 +72,27 @@ public class AxelixMetadataEndpointConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public LibraryInformationProvider libraryInformationProvider() {
+        return new DefaultLibraryInformationProvider();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public ServiceMetadataAssembler serviceMetadataAssembler(
             HealthEndpoint healthEndpoint,
-            LibraryDiscoverer libraryDiscoverer,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
             List<ShortBuildInfoProvider> shortBuildInfoProviders,
-            VMFeaturesProvider vmFeaturesProvider) {
+            VMFeaturesProvider vmFeaturesProvider,
+            LibraryInformationProvider libraryInformationProvider) {
 
         return new DefaultServiceMetadataAssembler(
                 () -> getCurrentHealth(healthEndpoint),
-                libraryDiscoverer,
                 axelixVersionDiscoverer,
                 gitInformationProviders,
                 shortBuildInfoProviders,
-                vmFeaturesProvider);
+                vmFeaturesProvider,
+                libraryInformationProvider);
     }
 
     @Bean

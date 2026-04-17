@@ -21,17 +21,21 @@ import java.lang.management.ManagementFactory;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootVersion;
 import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.details.DefaultServiceDetailsAssembler;
+import com.axelixlabs.axelix.sbs.spring.core.details.ServiceDetailsAssembler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,11 +63,6 @@ class DefaultServiceMetadataAssemblerTest {
     static class CurrentConfig {
 
         @Bean
-        CycloneDXSBOMLibraryDiscoverer cycloneDXSBOMLibraryDiscoverer() {
-            return new CycloneDXSBOMLibraryDiscoverer(new ClassPathResource("other/application.cdx.json"));
-        }
-
-        @Bean
         VMFeaturesProvider vmFeaturesProvider() {
             return new OptionsParsingVMFeaturesProvider(
                     ManagementFactory.getRuntimeMXBean().getInputArguments());
@@ -78,6 +77,20 @@ class DefaultServiceMetadataAssemblerTest {
         AxelixVersionDiscoverer axelixVersionDiscoverer() {
             return () -> "1.1.3";
         }
+
+        @Bean
+        public LibraryInformationProvider libraryInformationProvider() {
+            return new DefaultLibraryInformationProvider();
+        }
+
+        @Bean
+        public ServiceDetailsAssembler serviceDetailsAssembler(
+                GitInformationProvider gitInformationProvider,
+                ObjectProvider<BuildProperties> providerBuildProperties,
+                LibraryInformationProvider libraryInformationProvider) {
+            return new DefaultServiceDetailsAssembler(
+                    gitInformationProvider, providerBuildProperties, libraryInformationProvider);
+        }
     }
 
     @Test
@@ -90,7 +103,7 @@ class DefaultServiceMetadataAssemblerTest {
         assertThat(serviceMetadata.getServiceVersion()).isEqualTo("3.5.0-SNAPSHOT");
         assertThat(serviceMetadata.getSoftwareVersions().getJava()).isEqualTo(System.getProperty("java.version"));
         assertThat(serviceMetadata.getVersion()).isEqualTo("1.1.3");
-        assertThat(serviceMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo("3.5.0");
+        assertThat(serviceMetadata.getSoftwareVersions().getSpringBoot()).isEqualTo(SpringBootVersion.getVersion());
         assertThat(serviceMetadata.getHealthStatus()).isEqualTo(BasicDiscoveryMetadata.HealthStatus.UP);
         assertThat(serviceMetadata.getMemoryDetails()).isNotNull();
     }
