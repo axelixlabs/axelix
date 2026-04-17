@@ -17,14 +17,18 @@
  */
 package com.axelixlabs.axelix.common.auth.service;
 
-import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.AuthorizationRequest;
+import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.GlobalAuthority;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
@@ -36,89 +40,135 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Unit tests for {@link DefaultAuthorizer}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 class DefaultAuthorizerTest {
 
-    private final Authorizer authorizer = new DefaultAuthorizer();
+    private static final String USER_NAME = "testUser";
+
+    private Authorizer authorizer;
+
+    @BeforeEach
+    void setUp() {
+        authorizer = new DefaultAuthorizer();
+    }
 
     @Test
-    void shouldAuthorize_UserHasRequiredAuthorities() {
-        Role role = new DefaultRole(
-                "testRole", Set.of(GlobalAuthority.BEANS, GlobalAuthority.HEALTH), Collections.emptySet());
-        PasswordlessUser user = new PasswordlessUser("testUser", Set.of(role));
+    void shouldAuthorize_UserAdminHasRequiredAuthorities() {
+        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.ADMIN));
 
-        AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.HEALTH));
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(
+                DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+                DefaultAuthority.CACHES_CLEAR,
+                DefaultAuthority.CACHES_TOGGLE,
+                DefaultAuthority.GARBAGE_COLLECTOR,
+                DefaultAuthority.CONFIG_PROPS_VALUES_READ,
+                DefaultAuthority.ENV_VALUES_READ));
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
 
     @Test
-    void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole() {
-        Role role1 = new DefaultRole("firstTestRole", Set.of(GlobalAuthority.CACHE_DISPATCHER), Collections.emptySet());
-        Role role2 =
-                new DefaultRole("secondTestRole", Set.of(GlobalAuthority.PROFILE_MANAGEMENT), Collections.emptySet());
-        PasswordlessUser user = new PasswordlessUser("testUser", Set.of(role1, role2));
+    void shouldAuthorize_UserEditorHasRequiredAuthorities() {
+        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.EDITOR));
 
-        assertThatNoException()
-                .isThrownBy(() -> authorizer.authorize(
-                        user, new AuthorizationRequest(Set.of(GlobalAuthority.PROFILE_MANAGEMENT))));
-
-        assertThatNoException()
-                .isThrownBy(() ->
-                        authorizer.authorize(user, new AuthorizationRequest(Set.of(GlobalAuthority.CACHE_DISPATCHER))));
-    }
-
-    @Test
-    void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInInnerRole() {
-        Role innerRole1 = new DefaultRole("firstInnerTestRole", Set.of(GlobalAuthority.PROPERTY_MANAGEMENT), Set.of());
-        Role role1 = new DefaultRole("firstTestRole", null, Set.of(innerRole1));
-
-        Role innerRole2 = new DefaultRole("secondInnerTestRole", Set.of(GlobalAuthority.PROFILE_MANAGEMENT), Set.of());
-        Role role2 = new DefaultRole("secondTestRole", null, Set.of(innerRole2));
-
-        PasswordlessUser user = new PasswordlessUser("testUser", Set.of(role1, role2));
-
-        assertThatNoException()
-                .isThrownBy(() -> authorizer.authorize(
-                        user, new AuthorizationRequest(Set.of(GlobalAuthority.PROPERTY_MANAGEMENT))));
-
-        assertThatNoException()
-                .isThrownBy(() -> authorizer.authorize(
-                        user, new AuthorizationRequest(Set.of(GlobalAuthority.PROFILE_MANAGEMENT))));
-    }
-
-    @Test
-    void shouldAuthorize_UserWithEmptyAndValidRole_WhenValidRoleHasRequiredAuthority() {
-        Role emptyRole = new DefaultRole("emptyRole", Set.of(), Collections.emptySet());
-        Role role = new DefaultRole("testRole", Set.of(GlobalAuthority.HEALTH), Collections.emptySet());
-        PasswordlessUser user = new PasswordlessUser("testUser", Set.of(emptyRole, role));
-
-        AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.HEALTH));
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(
+                DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+                DefaultAuthority.CACHES_CLEAR,
+                DefaultAuthority.CACHES_TOGGLE,
+                DefaultAuthority.GARBAGE_COLLECTOR));
 
         assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
     }
 
-    @Test
-    void shouldThrowAuthorizationException_UserWithoutRequiredAuthorities() {
-        Role role = new DefaultRole("testRole", Set.of(GlobalAuthority.BEANS), Set.of());
-        PasswordlessUser user = new PasswordlessUser("testUser", Set.of(role));
+    @ParameterizedTest
+    @MethodSource("allRoles")
+    void shouldAuthorizeEmptyRequestWithRole(Role role) {
+        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(role));
 
-        AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.METRICS));
-
-        assertThatThrownBy(() -> authorizer.authorize(user, request))
-                .isInstanceOf(AuthorizationException.class)
-                .hasMessageContaining("Access denied: missing required authorities " + Set.of(GlobalAuthority.METRICS));
+        assertThatNoException().isThrownBy(() -> authorizer.authorize(user, new AuthorizationRequest(Set.of())));
     }
 
     @Test
-    void shouldThrowAuthorizationException_WhenUserHasNoAuthoritiesAndRequestRequiresThem() {
-        PasswordlessUser user = new PasswordlessUser("testUserWithEmptyAuthorities", Set.of());
+    void shouldAuthorizeEmptyRequestWithNoRoles() {
+        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of());
 
-        AuthorizationRequest request = new AuthorizationRequest(Set.of(GlobalAuthority.CACHE_DISPATCHER));
+        assertThatNoException().isThrownBy(() -> authorizer.authorize(user, new AuthorizationRequest(Set.of())));
+    }
 
-        assertThatThrownBy(() -> authorizer.authorize(user, request))
-                .isInstanceOf(AuthorizationException.class)
-                .hasMessageContaining(
-                        "Access denied: missing required authorities " + Set.of(GlobalAuthority.CACHE_DISPATCHER));
+    @Test
+    void shouldThrowAuthorizationException_UserEditorRequiredAuthorities() {
+        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.EDITOR));
+
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(
+                DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+                DefaultAuthority.CACHES_CLEAR,
+                DefaultAuthority.CACHES_TOGGLE,
+                DefaultAuthority.GARBAGE_COLLECTOR,
+                DefaultAuthority.CONFIG_PROPS_VALUES_READ,
+                DefaultAuthority.ENV_VALUES_READ));
+
+        assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
+    }
+
+    @Test
+    void shouldThrowAuthorizationException_UserViewerRequiredAuthorities() {
+        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.VIEWER));
+
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(
+                DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+                DefaultAuthority.CACHES_CLEAR,
+                DefaultAuthority.CACHES_TOGGLE,
+                DefaultAuthority.GARBAGE_COLLECTOR));
+
+        assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
+    }
+
+    @Test
+    void shouldThrowAuthorizationException_WhenRequestContainsUnrecognizedAuthority() {
+        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.ADMIN));
+
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(
+                DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+                DefaultAuthority.CACHES_CLEAR,
+                DefaultAuthority.CACHES_TOGGLE,
+                DefaultAuthority.GARBAGE_COLLECTOR,
+                DefaultAuthority.CONFIG_PROPS_VALUES_READ,
+                DefaultAuthority.ENV_VALUES_READ,
+                UnrecognizedAuthority.UNRECOGNIZED_AUTHORITY));
+
+        assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("adminAuthorities")
+    void shouldAuthorize_UserWithMultipleRoles_WhenAuthorityPresentInAnyRole(DefaultAuthority authority) {
+        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.ADMIN, DefaultRole.EDITOR));
+
+        assertThatNoException()
+                .isThrownBy(() -> authorizer.authorize(user, new AuthorizationRequest(Set.of(authority))));
+    }
+
+    static Stream<DefaultAuthority> adminAuthorities() {
+        return Stream.of(
+                DefaultAuthority.ENV_VALUES_READ,
+                DefaultAuthority.CONFIG_PROPS_VALUES_READ,
+                DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+                DefaultAuthority.CACHES_CLEAR,
+                DefaultAuthority.CACHES_TOGGLE,
+                DefaultAuthority.GARBAGE_COLLECTOR);
+    }
+
+    static Stream<Role> allRoles() {
+        return Stream.of(DefaultRole.ADMIN, DefaultRole.EDITOR, DefaultRole.MANAGED_SERVICE, DefaultRole.VIEWER);
+    }
+
+    enum UnrecognizedAuthority implements Authority {
+        UNRECOGNIZED_AUTHORITY;
+
+        @Override
+        public String getName() {
+            return name();
+        }
     }
 }

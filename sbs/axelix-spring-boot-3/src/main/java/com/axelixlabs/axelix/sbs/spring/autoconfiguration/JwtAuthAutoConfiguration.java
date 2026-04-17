@@ -80,7 +80,7 @@ public class JwtAuthAutoConfiguration {
     public AuthorityResolver authorityResolver() {
         return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
             PathPattern parse = new PathPatternParser().parse(pathTemplate);
-            return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
+            return parse.matchAndExtract(PathContainer.parsePath("/actuator" + actualPath)) != null;
         });
     }
 

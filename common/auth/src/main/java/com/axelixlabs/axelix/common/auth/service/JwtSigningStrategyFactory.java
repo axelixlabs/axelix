@@ -45,7 +45,6 @@ public class JwtSigningStrategyFactory {
             case HMAC512:
                 MacAlgorithm macAlgorithm = (MacAlgorithm) Jwts.SIG.get().get(algorithmName);
                 return new HmacSigningStrategy(macAlgorithm, algorithm.getMinKeyLength());
-
             default:
                 throw new UnsupportedOperationException("Unsupported algorithm: " + algorithm.getAlgorithmName());
         }
