@@ -13,6 +13,9 @@ spring:
         streamable-http:
           mcp-endpoint: "/api/mcp"
   datasource:
+    # TODO:
+    #  We need to decide on how the end users will provide
+    #  the location of the SQLite database along with the actual database choice and credentials for it.
     url: jdbc:sqlite:axelix.db
 
 management:

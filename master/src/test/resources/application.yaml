@@ -6,7 +6,8 @@ spring:
     # 1. This JDBC connection URL for SQLite still uses the in-memory db (see mode=memory) despite having 'file:memdb'.
     # This is intentional since we do not want the tests to produce any persistent artifacts.
     # 2. Typically, in case of a RAM-backed db SQLite creates a brand new in-memory db per every connection. That is not
-    # what we want since we re-use the connections from the Hikari CP even in tests. Although again. So, we use 'cache=shared'
+    # what we want since we re-use the connections from the Hikari CP inside the single test (setup code relies that the
+    # changes it made will be seen by the actual test code). So, we use 'cache=shared'
     # in order to force all the connections to use the shared database.
     url: "jdbc:sqlite:file:memdb?mode=memory&cache=shared"
 
