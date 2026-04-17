@@ -13,21 +13,21 @@
     "antd": "^6.3.5",
     "dedent": "^1.7.2",
     "motion": "^12.38.0",
-    "next": "^16.2.2",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "next": "^16.2.3",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "react-syntax-highlighter": "^16.1.1",
     "react-type-animation": "^3.2.0"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
-    "@types/node": "^25.5.2",
+    "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "19.2.3",
     "@types/react-syntax-highlighter": "^15.5.13",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.2.2",
+    "eslint-config-next": "16.2.3",
     "typescript": "^5.9.3"
   }
 }
