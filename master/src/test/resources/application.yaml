@@ -1,8 +1,6 @@
 spring:
   application:
     name: axelix
-  config:
-    import: "classpath:tokens.yml"
   datasource:
     # So, a couple of things here:
     # 1. This JDBC connection URL for SQLite still uses the in-memory db (see mode=memory) despite having 'file:memdb'.
