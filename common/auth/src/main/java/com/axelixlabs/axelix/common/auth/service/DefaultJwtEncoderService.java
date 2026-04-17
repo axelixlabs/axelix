@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
+import org.jspecify.annotations.NullMarked;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
@@ -43,6 +44,7 @@ import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
+@NullMarked
 public class DefaultJwtEncoderService implements JwtEncoderService {
 
     private final JwtSigningStrategy signingStrategy;

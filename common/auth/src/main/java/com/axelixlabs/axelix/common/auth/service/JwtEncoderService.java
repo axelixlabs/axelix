@@ -19,6 +19,8 @@ package com.axelixlabs.axelix.common.auth.service;
 
 import java.time.Duration;
 
+import org.jspecify.annotations.NullMarked;
+
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 
@@ -32,6 +34,7 @@ import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
+@NullMarked
 public interface JwtEncoderService {
 
     /**

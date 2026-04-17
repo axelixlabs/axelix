@@ -19,12 +19,10 @@ package com.axelixlabs.axelix.common.auth.service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Set;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -41,6 +39,7 @@ import org.springframework.context.annotation.Import;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtTokenGenerationException;
 
@@ -59,11 +58,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @Import(DefaultJwtEncoderServiceTest.DefaultJwtEncoderServiceTestConfiguration.class)
 class DefaultJwtEncoderServiceTest {
+
     private static final String USER_NAME = "testUser";
     private static final String PASSWORD = "testPassword";
 
     @Value("${axelix.master.auth.jwt.signing_key}")
     private String signingKey;
+
+    @Value("${axelix.master.auth.jwt.algorithm}")
+    private String algorithm;
 
     @Value("${axelix.master.auth.jwt.lifespan}")
     private Duration lifespan;
@@ -73,7 +76,9 @@ class DefaultJwtEncoderServiceTest {
 
     @Test
     void shouldGenerateTokenWithRequiredClaims() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.VIEWER));
+        // given.
+        Role viewer = DefaultRole.VIEWER;
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(viewer));
 
         // when.
         String token = jwtEncoderService.generateToken(user);
@@ -85,13 +90,14 @@ class DefaultJwtEncoderServiceTest {
                 .parseSignedClaims(token);
 
         // header
-        assertThat(claims.getHeader().getAlgorithm()).isEqualTo(JwtAlgorithm.HMAC512.getAlgorithmName());
+        assertThat(claims.getHeader().getAlgorithm())
+                .isEqualTo(JwtAlgorithm.parse(algorithm).getAlgorithmName());
 
         // payload
         assertThat(claims.getPayload().getSubject()).isEqualTo(USER_NAME);
-        assertThat(claims.getPayload().getExpiration()).isNotNull();
-        assertThat(claims.getPayload().getIssuedAt()).isNotNull();
-        assertThat(claims.getPayload().getIssuedAt()).isNotNull();
+        assertThat(claims.getPayload().getIssuedAt()).isCloseTo(Instant.now(), 1000);
+        assertThat(claims.getPayload().getExpiration())
+                .isEqualTo(claims.getPayload().getIssuedAt().toInstant().plus(lifespan));
 
         // signature
         assertThat(claims.getDigest()).isNotNull();
@@ -155,7 +161,10 @@ class DefaultJwtEncoderServiceTest {
                         + "}",
                 USER_NAME);
 
-        assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat").isEqualTo(expectedPayload);
+        assertThatJson(getPayload(token))
+                .whenIgnoringPaths("exp", "iat")
+                .when(IGNORING_ARRAY_ORDER)
+                .isEqualTo(expectedPayload);
     }
 
     @Test
@@ -179,7 +188,10 @@ class DefaultJwtEncoderServiceTest {
                         + "}",
                 USER_NAME);
 
-        assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat").isEqualTo(expectedPayload);
+        assertThatJson(getPayload(token))
+                .whenIgnoringPaths("exp", "iat")
+                .when(IGNORING_ARRAY_ORDER)
+                .isEqualTo(expectedPayload);
     }
 
     @Test
@@ -244,22 +256,6 @@ class DefaultJwtEncoderServiceTest {
         String expectedPayload = String.format("{" + "  \"sub\": \"%s\"," + "  \"roles\": []" + "}", USER_NAME);
 
         assertThatJson(getPayload(token)).whenIgnoringPaths("exp", "iat").isEqualTo(expectedPayload);
-    }
-
-    @Test
-    void shouldContainCorrectExpirationTime() throws JsonProcessingException {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of());
-
-        // when.
-        String token = jwtEncoderService.generateToken(user);
-
-        // then.
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.readTree(getPayload(token));
-
-        long actualExpiration = node.get("exp").asLong() - node.get("iat").asLong();
-
-        assertThat(actualExpiration).isEqualTo(lifespan.toSeconds());
     }
 
     @Test
@@ -346,11 +342,6 @@ class DefaultJwtEncoderServiceTest {
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.EDITOR));
 
         assertThatThrownBy(() -> invalidService.generateToken(user)).isInstanceOf(JwtTokenGenerationException.class);
-    }
-
-    @Test
-    void shouldHandleNullUser() {
-        assertThatThrownBy(() -> jwtEncoderService.generateToken(null)).isInstanceOf(JwtTokenGenerationException.class);
     }
 
     @Test
