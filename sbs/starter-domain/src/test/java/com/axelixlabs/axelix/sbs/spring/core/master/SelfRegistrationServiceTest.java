@@ -210,7 +210,7 @@ class SelfRegistrationServiceTest {
         assertThat(body).contains("testApp");
         assertThat(body).contains("http://localhost:8089/actuator");
 
-        String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader(SelfRegistrationService.AUTHORIZATION_HEADER);
         assertThat(authHeader).startsWith(AuthenticationSchemes.BEARER.code() + " ");
 
         String token = authHeader.substring(AuthenticationSchemes.BEARER.code().length() + 1);

@@ -37,8 +37,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
-import com.axelixlabs.axelix.master.service.auth.UserLoginService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
+import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
@@ -87,7 +87,7 @@ class McpAuthenticationFilterTest {
     private McpSyncServer mcpSyncServer;
 
     @Autowired
-    private UserLoginService userLoginService;
+    private UserProvider userProvider;
 
     @MockitoBean
     private OidcClient oidcClient;
@@ -99,7 +99,7 @@ class McpAuthenticationFilterTest {
         String encodedCredentials = encoder.encodeToString(CREDENTIALS.getBytes());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic " + encodedCredentials);
+        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + encodedCredentials);
         headers.set("Accept", "text/event-stream, application/json");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -116,7 +116,7 @@ class McpAuthenticationFilterTest {
         String encodedCredentials = encoder.encodeToString(credentials.getBytes());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic " + encodedCredentials);
+        headers.set(HttpHeaders.AUTHORIZATION, "Basic " + encodedCredentials);
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
@@ -131,7 +131,7 @@ class McpAuthenticationFilterTest {
         String validToken = "valid-jwt-token";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + validToken);
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + validToken);
         headers.set("Accept", "text/event-stream, application/json");
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -147,7 +147,7 @@ class McpAuthenticationFilterTest {
         String invalidToken = "invalid-token";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + invalidToken);
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + invalidToken);
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
@@ -174,7 +174,7 @@ class McpAuthenticationFilterTest {
     @Test
     void shouldRejectUnsupportedAuthScheme() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Any token");
+        headers.set(HttpHeaders.AUTHORIZATION, "Any token");
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
 

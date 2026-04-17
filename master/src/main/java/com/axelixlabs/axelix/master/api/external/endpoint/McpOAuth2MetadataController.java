@@ -22,13 +22,11 @@ import java.util.Map;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
-
-import static com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfigurationConfiguration.API_EXTERNAL_PATH;
+import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 
 /**
  * Exposes OAuth2 Protected Resource Metadata for MCP authentication discovery.
@@ -37,7 +35,6 @@ import static com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfigur
  */
 @ExternalApiRestController
 @ConditionalOnProperty(prefix = "axelix.master.auth.options.oauth2", name = "enabled", havingValue = "true")
-@RequestMapping(ApiPaths.McpOAuth2Api.MAIN)
 public class McpOAuth2MetadataController {
 
     private final String issuerUri;
@@ -45,7 +42,7 @@ public class McpOAuth2MetadataController {
     private final String scopes;
 
     public McpOAuth2MetadataController(OAuth2Properties oAuth2Properties) {
-        this.mcpServerFullPath = oAuth2Properties.baseUrl() + API_EXTERNAL_PATH + "/mcp";
+        this.mcpServerFullPath = oAuth2Properties.baseUrl() + WebAutoConfiguration.EXTERNAL_API_PATH + "/mcp";
         this.issuerUri = oAuth2Properties.issuerUri();
         this.scopes = oAuth2Properties.scopes();
     }

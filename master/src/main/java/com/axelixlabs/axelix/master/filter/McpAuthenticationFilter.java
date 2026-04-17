@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.filter;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Base64.Decoder;
+import java.util.Objects;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,16 +32,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 import com.axelixlabs.axelix.master.exception.auth.McpAuthenticationException;
-import com.axelixlabs.axelix.master.service.auth.UserLoginService;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
-
-import static com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfigurationConfiguration.API_EXTERNAL_PATH;
+import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
 
 /**
  * Filter that authenticates requests to MCP endpoints using either OAuth2 Bearer tokens
@@ -57,7 +59,7 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
     private final OidcClient oidcClient;
 
     @Nullable
-    private final UserLoginService userLoginService;
+    private final UserProvider userProvider;
 
     private final Decoder decoder;
 
@@ -67,15 +69,14 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
     public McpAuthenticationFilter(
             ObjectProvider<OidcClient> oidcClientProvider,
             ObjectProvider<OAuth2Properties> oAuth2PropertiesProvider,
-            ObjectProvider<UserLoginService> userLoginServiceProvider) {
+            ObjectProvider<UserProvider> userProviderObject) {
         this.oidcClient = oidcClientProvider.getIfAvailable();
-        this.userLoginService = userLoginServiceProvider.getIfAvailable();
+        this.userProvider = userProviderObject.getIfAvailable();
 
         OAuth2Properties oAuth2Properties = oAuth2PropertiesProvider.getIfAvailable();
         if (oAuth2Properties != null) {
             this.resourceMetadata = oAuth2Properties.baseUrl()
-                    + API_EXTERNAL_PATH
-                    + ApiPaths.McpOAuth2Api.MAIN
+                    + WebAutoConfiguration.EXTERNAL_API_PATH
                     + ApiPaths.McpOAuth2Api.PROTECTED_RESOURCE_METADATA;
         }
 
@@ -95,7 +96,7 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader == null) {
             sendUnauthorized(response);
@@ -138,21 +139,27 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain,
             HttpServletRequest request)
             throws IOException {
-        if (userLoginService == null) {
-            log.warn("Basic auth received but UserLoginService is unavailable. Check authentication configuration.");
+
+        if (userProvider == null) {
+            log.warn("Basic auth received but no User Provider is available. Check authentication configuration.");
             sendForbidden(response, "Basic auth is not configured");
             return;
         }
 
         try {
             String[] parts = new String(decoder.decode(base64LoginPassword)).split(":", 2);
+
             if (parts.length != 2) {
                 throw new McpAuthenticationException("Invalid basic auth format");
             }
 
-            // Now we just ignore the token returned from userLoginService.
-            userLoginService.login(parts[0], parts[1]);
-            filterChain.doFilter(request, response);
+            User user = userProvider.load(parts[0]);
+
+            if (Objects.equals(parts[1], user.getPassword())) {
+                filterChain.doFilter(request, response);
+            } else {
+                sendUnauthorized(response);
+            }
         } catch (Exception e) {
             log.debug("Basic auth validation failed: {}", e.getMessage());
             sendForbidden(response, "Invalid username or password");
