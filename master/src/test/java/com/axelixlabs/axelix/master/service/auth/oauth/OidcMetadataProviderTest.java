@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.service.auth.oauth;
 import java.io.IOException;
 import java.util.Objects;
 
+import com.jayway.jsonpath.JsonPath;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -63,7 +64,10 @@ class OidcMetadataProviderTest {
 
     @BeforeEach
     void prepare() {
-        String jsonResponse = TestResourceReader.readResource("other/google-oidc-configuration.json");
+
+        Object jsonResponse = JsonPath.parse(TestResourceReader.readResource("other/google-oidc-configuration.json"))
+                .set(JsonPath.compile("$.issuer"), mockWebServer.url("").toString())
+                .jsonString();
 
         mockWebServer.setDispatcher(new Dispatcher() {
             @Override
@@ -72,14 +76,17 @@ class OidcMetadataProviderTest {
                 assert path != null;
 
                 if (path.equals("/.well-known/openid-configuration") && Objects.equals(request.getMethod(), "GET")) {
-                    return new MockResponse().setBody(jsonResponse).addHeader("Content-Type", APPLICATION_JSON_VALUE);
+                    return new MockResponse()
+                            .setBody(jsonResponse.toString())
+                            .addHeader("Content-Type", APPLICATION_JSON_VALUE);
                 } else {
                     return new MockResponse().setResponseCode(404);
                 }
             }
         });
 
-        subject = new OidcMetadataProvider(RestClient.builder().build(), "https://accounts.google.com");
+        subject = new OidcMetadataProvider(
+                RestClient.builder().build(), mockWebServer.url("").toString());
     }
 
     @Test
