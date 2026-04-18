@@ -71,15 +71,15 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
                             {allProperties.map(({ property, hasDropdown }, index) => {
                                 const isEvenElement = index % 2 === 0;
 
-                                const headerStyles = [
-                                    styles.ListAccordionStyles,
-                                    property.deprecation && styles.DeprecatedPropertyAccordionsHeader,
-                                    isEvenElement ? sharedStyles.EvenElement : sharedStyles.OddElement,
-                                ]
-                                    .filter(Boolean)
-                                    .join(" ");
-
                                 if (hasDropdown) {
+                                    const headerStyles = [
+                                        styles.ListAccordionStyles,
+                                        property.deprecation && styles.DeprecatedPropertyAccordionsHeader,
+                                        isEvenElement ? sharedStyles.EvenElement : sharedStyles.OddElement,
+                                    ]
+                                        .filter(Boolean)
+                                        .join(" ");
+
                                     return (
                                         <Accordion
                                             header={
