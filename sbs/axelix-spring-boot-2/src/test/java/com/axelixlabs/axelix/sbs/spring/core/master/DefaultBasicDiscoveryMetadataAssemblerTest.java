@@ -21,10 +21,8 @@ import java.lang.management.ManagementFactory;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootVersion;
-import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -32,8 +30,6 @@ import org.springframework.context.annotation.Import;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
-import com.axelixlabs.axelix.sbs.spring.core.details.DefaultServiceDetailsAssembler;
-import com.axelixlabs.axelix.sbs.spring.core.details.ServiceDetailsAssembler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -76,15 +72,6 @@ class DefaultBasicDiscoveryMetadataAssemblerTest {
         @Bean
         public LibraryInformationProvider libraryInformationProvider() {
             return new DefaultLibraryInformationProvider();
-        }
-
-        @Bean
-        public ServiceDetailsAssembler serviceDetailsAssembler(
-                GitInformationProvider gitInformationProvider,
-                ObjectProvider<BuildProperties> providerBuildProperties,
-                LibraryInformationProvider libraryInformationProvider) {
-            return new DefaultServiceDetailsAssembler(
-                    gitInformationProvider, providerBuildProperties, libraryInformationProvider);
         }
     }
 

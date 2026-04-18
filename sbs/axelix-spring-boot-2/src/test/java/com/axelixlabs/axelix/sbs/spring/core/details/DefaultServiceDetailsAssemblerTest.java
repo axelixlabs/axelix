@@ -75,16 +75,16 @@ class DefaultServiceDetailsAssemblerTest {
 
         SpringDetails spring = result.getSpring();
         assertThat(spring).isNotNull();
-        assertThat(spring.getSpringBootVersion()).as("", SpringBootVersion.getVersion());
-        assertThat(spring.getSpringFrameworkVersion()).as("", SpringVersion.getVersion());
+        assertThat(spring.getSpringBootVersion()).isEqualTo(SpringBootVersion.getVersion());
+        assertThat(spring.getSpringFrameworkVersion()).isEqualTo(SpringVersion.getVersion());
         assertThat(spring.getSpringCloudVersion()).isNull();
 
         RuntimeDetails runtime = result.getRuntime();
         assertThat(runtime).isNotNull();
-        assertThat(runtime.getJavaVersion()).as("", System.getProperty("java.version"));
-        assertThat(runtime.getJdkVendor()).as("", System.getProperty("java.vendor.version"));
+        assertThat(runtime.getJavaVersion()).isEqualTo(System.getProperty("java.version"));
+        assertThat(runtime.getJdkVendor()).isEqualTo(System.getProperty("java.vendor.version"));
         assertThat(runtime.getGarbageCollector()).isNotBlank();
-        assertThat(runtime.getKotlinVersion()).as(null, KotlinVersion.CURRENT.toString());
+        assertThat(runtime.getKotlinVersion()).isEqualTo(KotlinVersion.CURRENT.toString());
 
         BuildDetails build = result.getBuild();
         assertThat(build.getArtifact()).isEqualTo("axelix-sbs");
