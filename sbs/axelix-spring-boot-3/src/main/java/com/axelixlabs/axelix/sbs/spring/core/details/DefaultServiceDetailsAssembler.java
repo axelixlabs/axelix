@@ -17,8 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.details;
 
-import java.util.Optional;
-
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +33,7 @@ import com.axelixlabs.axelix.common.api.InstanceDetails.RuntimeDetails;
 import com.axelixlabs.axelix.common.api.InstanceDetails.SpringDetails;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.sbs.spring.core.master.GitInformationProvider;
-import com.axelixlabs.axelix.sbs.spring.core.master.LibraryDiscoverer;
+import com.axelixlabs.axelix.sbs.spring.core.master.LibraryInformationProvider;
 
 import static com.axelixlabs.axelix.sbs.spring.core.details.GarbageCollectorInfoAssembler.getGarbageCollectorInfo;
 import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
@@ -52,15 +50,15 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
 
     private final GitInformationProvider gitInformationProvider;
     private final @Nullable BuildProperties buildProperties;
-    private final LibraryDiscoverer libraryDiscoverer;
+    private final LibraryInformationProvider libraryInformationProvider;
 
     public DefaultServiceDetailsAssembler(
             GitInformationProvider gitInformationProvider,
             ObjectProvider<BuildProperties> providerBuildProperties,
-            LibraryDiscoverer libraryDiscoverer) {
+            LibraryInformationProvider libraryInformationProvider) {
         this.gitInformationProvider = gitInformationProvider;
         this.buildProperties = providerBuildProperties.getIfAvailable();
-        this.libraryDiscoverer = libraryDiscoverer;
+        this.libraryInformationProvider = libraryInformationProvider;
     }
 
     @Override
@@ -89,23 +87,18 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
     }
 
     private SpringDetails getSpringDetails() {
-        var springBootVersion = libraryDiscoverer.getLibraryVersion("spring-boot", "org.springframework.boot");
-        var springVersion = libraryDiscoverer.getLibraryVersion("spring-core", "org.springframework");
-        var springCloudVersion =
-                libraryDiscoverer.getLibraryVersion("spring-cloud-commons", "org.springframework.cloud");
         return new SpringDetails(
-                springBootVersion.orElse(""), springVersion.orElse(""), springCloudVersion.orElse(null));
+                libraryInformationProvider.getSpringBootVersion(),
+                libraryInformationProvider.getSpringVersion(),
+                libraryInformationProvider.getSpringCloudVersion());
     }
 
     private RuntimeDetails getRuntimeDetails() {
-        String javaVersion = emptyIfNull(System.getProperty("java.version"));
-        String jdkVendorFromVersion = System.getProperty("java.vendor.version");
-        String jdkVendor =
-                emptyIfNull(jdkVendorFromVersion != null ? jdkVendorFromVersion : System.getProperty("java.vendor"));
-        String garbageCollector = getGarbageCollectorInfo();
-        Optional<String> kotlinVersion = libraryDiscoverer.getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin");
-
-        return new RuntimeDetails(javaVersion, jdkVendor, garbageCollector, kotlinVersion.orElse(null));
+        return new RuntimeDetails(
+                libraryInformationProvider.getJavaVersion(),
+                libraryInformationProvider.getJdkVendorVersion(),
+                getGarbageCollectorInfo(),
+                libraryInformationProvider.getKotlinVersion());
     }
 
     private BuildDetails getBuildDetails() {

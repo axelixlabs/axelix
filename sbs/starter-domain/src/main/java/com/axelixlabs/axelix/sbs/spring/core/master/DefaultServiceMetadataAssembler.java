@@ -40,23 +40,23 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
     private final List<GitInformationProvider> gitInformationProvider;
     private final List<ShortBuildInfoProvider> shortBuildInfoProvider;
     private final AxelixVersionDiscoverer axelixVersionDiscoverer;
-    private final LibraryDiscoverer libraryDiscoverer;
     private final VMFeaturesProvider vmFeaturesProvider;
+    private final LibraryInformationProvider libraryInformationProvider;
 
     public DefaultServiceMetadataAssembler(
             HealthDetectionFunction healthDetectionFunction,
-            LibraryDiscoverer libraryDiscoverer,
             AxelixVersionDiscoverer axelixVersionDiscoverer,
             List<GitInformationProvider> gitInformationProviders,
             List<ShortBuildInfoProvider> shortBuildInfoProviders,
-            VMFeaturesProvider vmFeaturesProvider) {
+            VMFeaturesProvider vmFeaturesProvider,
+            LibraryInformationProvider libraryInformationProvider) {
 
         this.healthDetectionFunction = healthDetectionFunction;
-        this.libraryDiscoverer = libraryDiscoverer;
         this.axelixVersionDiscoverer = axelixVersionDiscoverer;
         this.gitInformationProvider = gitInformationProviders;
         this.shortBuildInfoProvider = shortBuildInfoProviders;
         this.vmFeaturesProvider = vmFeaturesProvider;
+        this.libraryInformationProvider = libraryInformationProvider;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
                 axelixVersionDiscoverer.getVersion(),
                 shortBuildInfo.map(ShortBuildInfo::serviceVersion).orElse(""),
                 gitCommitInfo.map(GitInfo::commitShaShort).orElse(""),
-                System.getProperty("java.vendor"),
+                libraryInformationProvider.getJdkVendorName(),
                 buildSoftwareVersionInUse(),
                 healthDetectionFunction.get(),
                 new BasicDiscoveryMetadata.MemoryDetails(
@@ -102,11 +102,9 @@ public class DefaultServiceMetadataAssembler implements ServiceMetadataAssembler
 
     private BasicDiscoveryMetadata.SoftwareVersions buildSoftwareVersionInUse() {
         return new BasicDiscoveryMetadata.SoftwareVersions(
-                System.getProperty("java.version"),
-                libraryDiscoverer.getRequiredLibraryVersion("spring-boot", "org.springframework.boot"),
-                libraryDiscoverer.getRequiredLibraryVersion("spring-core", "org.springframework"),
-                libraryDiscoverer
-                        .getLibraryVersion("kotlin-stdlib", "org.jetbrains.kotlin")
-                        .orElse(null));
+                libraryInformationProvider.getJavaVersion(),
+                libraryInformationProvider.getSpringBootVersion(),
+                libraryInformationProvider.getSpringVersion(),
+                libraryInformationProvider.getKotlinVersion());
     }
 }

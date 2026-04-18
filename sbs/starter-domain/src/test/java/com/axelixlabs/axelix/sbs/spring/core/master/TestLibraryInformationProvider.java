@@ -17,18 +17,25 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.master;
 
-import java.util.Optional;
+import org.springframework.boot.SpringBootVersion;
+import org.springframework.core.SpringVersion;
+
+import static com.axelixlabs.axelix.sbs.spring.core.utils.StringUtils.emptyIfNull;
 
 /**
- * The No-Op implementation of {@link LibraryDiscoverer}. Mainly serves as a fallback
- * in case of no other valid {@link LibraryDiscoverer} found.
+ * Test object implementation {@link LibraryInformationProvider}.
  *
- * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
-public class NoOpLibraryDiscoverer implements LibraryDiscoverer {
+public class TestLibraryInformationProvider implements LibraryInformationProvider {
 
     @Override
-    public Optional<String> getLibraryVersion(String artifactId, String groupId) {
-        return Optional.empty();
+    public String getSpringBootVersion() {
+        return emptyIfNull(SpringBootVersion.getVersion());
+    }
+
+    @Override
+    public String getSpringVersion() {
+        return emptyIfNull(SpringVersion.getVersion());
     }
 }

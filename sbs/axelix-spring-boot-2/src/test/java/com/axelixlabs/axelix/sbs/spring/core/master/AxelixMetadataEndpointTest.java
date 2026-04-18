@@ -28,7 +28,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
@@ -58,11 +57,6 @@ class AxelixMetadataEndpointTest {
     static class CurrentConfig {
 
         @Bean
-        CycloneDXSBOMLibraryDiscoverer cycloneDXSBOMLibraryDiscoverer() {
-            return new CycloneDXSBOMLibraryDiscoverer(new ClassPathResource("other/application.cdx.json"));
-        }
-
-        @Bean
         VMFeaturesProvider vmFeaturesProvider() {
             return new OptionsParsingVMFeaturesProvider(
                     ManagementFactory.getRuntimeMXBean().getInputArguments());
@@ -76,6 +70,11 @@ class AxelixMetadataEndpointTest {
         @Bean
         AxelixVersionDiscoverer axelixVersionDiscoverer() {
             return () -> "1.1.3";
+        }
+
+        @Bean
+        public LibraryInformationProvider libraryInformationProvider() {
+            return new DefaultLibraryInformationProvider();
         }
     }
 
