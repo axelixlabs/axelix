@@ -18,7 +18,8 @@
 import { Copy } from "components";
 import type { IEnvProperty } from "models";
 
-import { EnvironmentPropertyValue } from "../EnvironmentPropertyValue";
+import { EnvironmentPropertyValue } from "../../EnvironmentPropertyValue";
+import sharedStyles from "../shared.module.css";
 
 import styles from "./styles.module.css";
 
@@ -27,20 +28,34 @@ interface IProps {
      * Single property
      */
     property: IEnvProperty;
+
+    /**
+     * Whether this row is in an even position in the shared list
+     */
+    isEvenElement: boolean;
+
+    /**
+     * Adds left padding to align with accordion rows that have an expand arrow
+     */
+    accordionAligned?: boolean;
 }
 
-export const EnvironmentProperty = ({ property }: IProps) => {
+export const EnvironmentProperty = ({ property, isEvenElement, accordionAligned }: IProps) => {
     const { name } = property;
+
+    const rowBackgroundStyle = isEvenElement ? sharedStyles.EvenElement : sharedStyles.OddElement;
 
     return (
         <>
-            <div key={name} className={`TableRow ${styles.MainWrapper}`}>
-                <div className={`RowChunk ${styles.KeyChunk}`}>
+            <div
+                className={`${styles.MainWrapper} ${rowBackgroundStyle} ${accordionAligned ? styles.AccordionAligned : ""}`}
+            >
+                <div className={styles.KeyChunk}>
                     <div className={styles.CopyableValue}>
                         {name} <Copy text={name} />
                     </div>
                 </div>
-                <div className={`RowChunk ${styles.ValueChunk}`}>
+                <div className={styles.ValueChunk}>
                     <EnvironmentPropertyValue property={property} />
                 </div>
             </div>

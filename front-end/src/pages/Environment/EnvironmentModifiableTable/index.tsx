@@ -19,9 +19,10 @@ import { Accordion, EmptyHandler, InfoTooltip } from "components";
 import { splitProperties } from "helpers";
 import type { IEnvironmentPropertySource } from "models";
 
-import { EnvironmentProperty } from "../EnvironmentProperty";
 import { EnvironmentPropertyDetails } from "../EnvironmentPropertyDetails";
 
+import { EnvironmentProperty } from "./EnvironmentProperty";
+import sharedStyles from "./shared.module.css";
 import styles from "./styles.module.css";
 
 import { InfoIcon } from "assets";
@@ -36,6 +37,17 @@ interface IProps {
 export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
     const { name, properties, description } = propertySource;
     const [withDropDown, withoutDropDown] = splitProperties(properties);
+
+    const allProperties = [
+        ...withDropDown.map((property) => ({
+            property,
+            hasDropdown: true,
+        })),
+        ...withoutDropDown.map((property) => ({
+            property,
+            hasDropdown: false,
+        })),
+    ];
 
     return (
         <>
@@ -56,22 +68,43 @@ export const EnvironmentModifiableTable = ({ propertySource }: IProps) => {
                 >
                     <div className="AccordionsWrapper">
                         <EmptyHandler isEmpty={!properties.length}>
-                            {[
-                                ...withDropDown.map((property) => (
-                                    <Accordion
-                                        header={<EnvironmentProperty property={property} />}
-                                        headerStyles={
-                                            property.deprecation ? styles.DeprecatedPropertyAccordionsHeader : ""
-                                        }
+                            {allProperties.map(({ property, hasDropdown }, index) => {
+                                const isEvenElement = index % 2 === 0;
+
+                                if (hasDropdown) {
+                                    const headerStyles = [
+                                        styles.ListAccordionStyles,
+                                        property.deprecation && styles.DeprecatedPropertyAccordionsHeader,
+                                        isEvenElement ? sharedStyles.EvenElement : sharedStyles.OddElement,
+                                    ]
+                                        .filter(Boolean)
+                                        .join(" ");
+
+                                    return (
+                                        <Accordion
+                                            header={
+                                                <EnvironmentProperty
+                                                    property={property}
+                                                    isEvenElement={isEvenElement}
+                                                />
+                                            }
+                                            headerStyles={headerStyles}
+                                            key={property.name}
+                                        >
+                                            <EnvironmentPropertyDetails property={property} />
+                                        </Accordion>
+                                    );
+                                }
+
+                                return (
+                                    <EnvironmentProperty
+                                        property={property}
+                                        isEvenElement={isEvenElement}
+                                        accordionAligned
                                         key={property.name}
-                                    >
-                                        <EnvironmentPropertyDetails property={property} />
-                                    </Accordion>
-                                )),
-                                ...withoutDropDown.map((property) => (
-                                    <EnvironmentProperty property={property} key={property.name} />
-                                )),
-                            ]}
+                                    />
+                                );
+                            })}
                         </EmptyHandler>
                     </div>
                 </Accordion>
