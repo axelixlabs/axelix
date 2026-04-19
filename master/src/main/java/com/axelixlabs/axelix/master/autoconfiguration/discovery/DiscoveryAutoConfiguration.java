@@ -48,7 +48,7 @@ import com.axelixlabs.axelix.master.service.transport.ManagedServiceMetadataEndp
  * @author Mikhail Polivakha
  */
 @AutoConfiguration
-@ConditionalOnProperty(prefix = "axelix.master.discovery", name = "auto", havingValue = "true")
+@ConditionalOnProperty(prefix = "axelix.master.discovery.auto", name = "enabled", havingValue = "true")
 public class DiscoveryAutoConfiguration {
 
     @Bean
@@ -62,11 +62,11 @@ public class DiscoveryAutoConfiguration {
     }
 
     @AutoConfiguration
-    @ConditionalOnProperty(prefix = "axelix.master.discovery", name = "platform", havingValue = "kubernetes")
+    @ConditionalOnProperty(prefix = "axelix.master.discovery.auto", name = "platform", havingValue = "kubernetes")
     static class KubernetesDiscoveryAutoConfiguration {
 
         @Bean
-        @ConfigurationProperties(prefix = "axelix.master.discovery.kubernetes")
+        @ConfigurationProperties(prefix = "axelix.master.discovery.auto.kubernetes")
         public KubernetesDiscoveryProperties kubernetesDiscoveryProperties() {
             return new KubernetesDiscoveryProperties();
         }

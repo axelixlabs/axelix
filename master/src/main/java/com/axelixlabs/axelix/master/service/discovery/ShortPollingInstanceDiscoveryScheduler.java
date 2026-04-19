@@ -63,7 +63,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
         this.securityContextExecutor = securityContextExecutor;
     }
 
-    @Scheduled(fixedDelayString = "${axelix.master.discovery.polling.fixed-delay:60000}")
+    @Scheduled(fixedDelayString = "${axelix.master.discovery.auto.broadcast.interval}")
     public void performDiscovery() {
 
         String token = jwtEncoderService.generateToken(TECH_USER, Duration.ofSeconds(300));

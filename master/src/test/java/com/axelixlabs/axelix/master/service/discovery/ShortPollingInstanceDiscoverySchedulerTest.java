@@ -61,10 +61,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(
         properties = {
-            "axelix.master.discovery.auto=true",
-            "axelix.master.discovery.platform=kubernetes",
-            "axelix.master.discovery.polling.fixed-delay=1000",
-            "axelix.master.discovery.polling.initial-delay=0"
+            "axelix.master.discovery.auto.enabled=true",
+            "axelix.master.discovery.auto.platform=kubernetes",
+            "axelix.master.discovery.auto.broadcast.interval=1000"
         })
 class ShortPollingInstanceDiscoverySchedulerTest {
 

@@ -32,14 +32,17 @@ management:
 axelix:
   master:
     discovery:
-      auto: true
-      platform: kubernetes
-      kubernetes:
-        kube-apiserver-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}
-        sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
-        ca-cert-path: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        filters:
-          namespaces: default
+      auto:
+        enabled: true
+        broadcast:
+          interval: 60000
+        platform: kubernetes
+        kubernetes:
+          kube-apiserver-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}
+          sa-token-path: /var/run/secrets/kubernetes.io/serviceaccount/token
+          ca-cert-path: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          filters:
+            namespaces: default
     auth:
       jwt:
         lifespan: 12h
