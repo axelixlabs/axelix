@@ -23,7 +23,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jspecify.annotations.Nullable;
+import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,12 +51,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
-
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -132,44 +132,20 @@ class AxelixEnvironmentEndpointTest {
                 .isEqualTo(expectedValue);
     }
 
-    private static Stream<Arguments> propertyExpectations() {
-        return Stream.of(
-                Arguments.of("axelix.env.test.prop1", "fromTestSource"),
-                Arguments.of("axelix.env.test.prop2", "dynamicValue"),
-                Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
-    }
-
-    @ParameterizedTest(name = "Property ''{0}'' should have sanitized value")
+    @ParameterizedTest(name = "Property ''{0}'' should have value ''{1}'' for ''{2}''")
     @MethodSource("sanitizationArgsSource")
-    void shouldSanitizeAllAppearancesOfTheGivenProperty(String propertyName) {
+    void shouldSanitizeAllAppearancesOfTheGivenProperty(String propertyName, String value, Role role) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+                restTemplate.withRole(role).getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         var propertyAppearances = findPropertyAppearances(propertyName, response);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(propertyAppearances)
+                .filteredOn(it -> Objects.equals(it.getValue().getName(), propertyName))
+                .first()
                 .extracting(it -> it.getValue().getValue())
-                .containsOnly("******");
-    }
-
-    public static Stream<Arguments> sanitizationArgsSource() {
-        return Stream.of(Arguments.of("axelix.env.test.toBeSanitized"), Arguments.of("AXELIX_FOR_SANITIZATION"));
-    }
-
-    @Test
-    void shouldReturnNotSanitizedEnvValue_forAdminRole() {
-        ResponseEntity<EnvironmentFeed> response =
-                restTemplate.asAdmin().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        List<@Nullable String> properties = response.getBody().getPropertySources().stream()
-                .flatMap(bean -> bean.getProperties().stream())
-                .map(EnvironmentFeed.Property::getValue)
-                .collect(Collectors.toList());
-
-        assertThat(properties).doesNotContain("******");
+                .isEqualTo(value);
     }
 
     @Test
@@ -228,24 +204,6 @@ class AxelixEnvironmentEndpointTest {
                 .containsOnly(AxelixPropTest.class.getName());
     }
 
-    private static Stream<Arguments> propertyName() {
-        return Stream.of(
-                Arguments.of("axelix.prop.test.tags.environment"),
-                Arguments.of("axelix.prop.test.tags.version"),
-                Arguments.of("axelix.prop.test.enabled-contexts"),
-                Arguments.of("axelix.prop.test.http-client.requests[0].name"),
-                Arguments.of("axelix.prop.test.http-client.requests[0].base-url"),
-                Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].type"),
-                Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].retries[0].count"),
-                Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout"),
-                Arguments.of("axelix.prop.test.http-client.requests[0].methods[1].type"),
-                Arguments.of("axelix.prop.test.http-client.requests[1].name"),
-                Arguments.of("axelix.prop.test.http-client.requests[1].base-url"),
-                Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].type"),
-                Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].count"),
-                Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
-    }
-
     @ParameterizedTest
     @MethodSource("propertySourceDescription")
     void shouldReturnDescriptionKnownPropertySource(String sourceName, String sourceDescription) {
@@ -256,6 +214,42 @@ class AxelixEnvironmentEndpointTest {
                 .filteredOn(e -> e.getName().equals(sourceName))
                 .first()
                 .satisfies(e -> e.getDescription().equals(sourceDescription));
+    }
+
+    private static Stream<Arguments> propertyExpectations() {
+        return Stream.of(
+            Arguments.of("axelix.env.test.prop1", "fromTestSource"),
+            Arguments.of("axelix.env.test.prop2", "dynamicValue"),
+            Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
+    }
+
+    public static Stream<Arguments> sanitizationArgsSource() {
+        return Stream.of(
+            Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.EDITOR),
+            Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.EDITOR),
+            Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.VIEWER),
+            Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.VIEWER),
+            Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", DefaultRole.ADMIN),
+            Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", DefaultRole.ADMIN)
+        );
+    }
+
+    private static Stream<Arguments> propertyName() {
+        return Stream.of(
+            Arguments.of("axelix.prop.test.tags.environment"),
+            Arguments.of("axelix.prop.test.tags.version"),
+            Arguments.of("axelix.prop.test.enabled-contexts"),
+            Arguments.of("axelix.prop.test.http-client.requests[0].name"),
+            Arguments.of("axelix.prop.test.http-client.requests[0].base-url"),
+            Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].type"),
+            Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].retries[0].count"),
+            Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout"),
+            Arguments.of("axelix.prop.test.http-client.requests[0].methods[1].type"),
+            Arguments.of("axelix.prop.test.http-client.requests[1].name"),
+            Arguments.of("axelix.prop.test.http-client.requests[1].base-url"),
+            Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].type"),
+            Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].count"),
+            Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
     }
 
     private static Stream<Arguments> propertySourceDescription() {
@@ -303,33 +297,6 @@ class AxelixEnvironmentEndpointTest {
             return httpClient;
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (obj == null || obj.getClass() != this.getClass()) {
-                return false;
-            }
-            var that = (AxelixPropTest) obj;
-            return Objects.equals(this.tags, that.tags)
-                    && Objects.equals(this.enabledContexts, that.enabledContexts)
-                    && Objects.equals(this.httpClient, that.httpClient);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(tags, enabledContexts, httpClient);
-        }
-
-        @Override
-        public String toString() {
-            return "AxelixPropTest[" + "tags="
-                    + tags + ", " + "enabledContexts="
-                    + enabledContexts + ", " + "httpClient="
-                    + httpClient + ']';
-        }
-
         @ConstructorBinding
         public static final class HttpClient {
             private final List<Request> requests;
@@ -340,28 +307,6 @@ class AxelixEnvironmentEndpointTest {
 
             public List<Request> getRequests() {
                 return requests;
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj == this) {
-                    return true;
-                }
-                if (obj == null || obj.getClass() != this.getClass()) {
-                    return false;
-                }
-                var that = (HttpClient) obj;
-                return Objects.equals(this.requests, that.requests);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(requests);
-            }
-
-            @Override
-            public String toString() {
-                return "HttpClient[" + "requests=" + requests + ']';
             }
         }
 
@@ -388,30 +333,6 @@ class AxelixEnvironmentEndpointTest {
             public List<Method> getMethods() {
                 return methods;
             }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj == this) {
-                    return true;
-                }
-                if (obj == null || obj.getClass() != this.getClass()) {
-                    return false;
-                }
-                var that = (Request) obj;
-                return Objects.equals(this.name, that.name)
-                        && Objects.equals(this.baseUrl, that.baseUrl)
-                        && Objects.equals(this.methods, that.methods);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(name, baseUrl, methods);
-            }
-
-            @Override
-            public String toString() {
-                return "Request[" + "name=" + name + ", " + "baseUrl=" + baseUrl + ", " + "methods=" + methods + ']';
-            }
         }
 
         @ConstructorBinding
@@ -431,28 +352,6 @@ class AxelixEnvironmentEndpointTest {
             public List<Retry> getRetries() {
                 return retries;
             }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj == this) {
-                    return true;
-                }
-                if (obj == null || obj.getClass() != this.getClass()) {
-                    return false;
-                }
-                var that = (Method) obj;
-                return Objects.equals(this.type, that.type) && Objects.equals(this.retries, that.retries);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(type, retries);
-            }
-
-            @Override
-            public String toString() {
-                return "Method[" + "type=" + type + ", " + "retries=" + retries + ']';
-            }
         }
 
         @ConstructorBinding
@@ -471,28 +370,6 @@ class AxelixEnvironmentEndpointTest {
 
             public Map<String, Object> getParameters() {
                 return parameters;
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj == this) {
-                    return true;
-                }
-                if (obj == null || obj.getClass() != this.getClass()) {
-                    return false;
-                }
-                var that = (Retry) obj;
-                return Objects.equals(this.count, that.count) && Objects.equals(this.parameters, that.parameters);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(count, parameters);
-            }
-
-            @Override
-            public String toString() {
-                return "Retry[" + "count=" + count + ", " + "parameters=" + parameters + ']';
             }
         }
     }

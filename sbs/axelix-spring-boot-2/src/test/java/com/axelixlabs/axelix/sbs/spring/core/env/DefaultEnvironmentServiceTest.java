@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -109,7 +110,7 @@ class DefaultEnvironmentServiceTest {
 
         @Bean
         public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-            return new SmartSanitizingFunction(List.of("*"), propertyNameNormalizer);
+            return new SmartSanitizingFunction(EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
         }
     }
 

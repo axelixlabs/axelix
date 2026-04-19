@@ -55,7 +55,6 @@ public class DefaultEnvironmentService implements EnvironmentService {
         this.requiredAuthorityCheckService = requiredAuthorityCheckService;
 
         // Spring Boot 2.7 has default sanitization keys (password, secret, key, token, etc.)
-        // management.endpoint.env.keys-to-sanitize property only ADDS to this list, never replaces it.
         // To rely purely on our SmartSanitizingFunction and ensure identical behavior for both
         // delegates, we explicitly clear the default list with setKeysToSanitize().
         this.delegate.setKeysToSanitize();

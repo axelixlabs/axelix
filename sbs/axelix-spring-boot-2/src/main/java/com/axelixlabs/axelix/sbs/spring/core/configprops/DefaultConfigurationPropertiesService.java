@@ -57,7 +57,6 @@ public class DefaultConfigurationPropertiesService implements ConfigurationPrope
         this.sanitizedDelegate.setApplicationContext(applicationContext);
 
         // Spring Boot 2.7 has default sanitization keys (password, secret, key, token, etc.).
-        // management.endpoint.env.keys-to-sanitize property only ADDS to this list, never replaces it.
         // To rely purely on our SmartSanitizingFunction and ensure identical behavior for all delegates
         // and across all versions of our starter, we explicitly clear the default list with setKeysToSanitize().
         this.delegate.setKeysToSanitize();

@@ -19,10 +19,11 @@ package com.axelixlabs.axelix.sbs.spring.core.configprops;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.Role;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -58,6 +59,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
@@ -86,10 +89,10 @@ public class AxelixConfigurationPropertiesEndpointTest {
     private TestRestTemplateBuilder restTemplate;
 
     @ParameterizedTest
-    @MethodSource("propertyName")
-    void shouldReturnPropertiesNameAndValue(String propertyName, String expectedValue) {
+    @MethodSource("propertiesFeed")
+    void shouldReturnPropertiesNameAndValue_forNonAdminRoles(String propertyName, String expectedValue, Role role) {
         ResponseEntity<ConfigurationPropertiesFeed> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
+                restTemplate.withRole(role).getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
 
         List<KeyValue> properties = response.getBody().getBeans().stream()
                 .filter(bean -> bean.getPrefix().equals("axelix.prop.test"))
@@ -104,44 +107,42 @@ public class AxelixConfigurationPropertiesEndpointTest {
                 .containsExactly(expectedValue);
     }
 
-    private static Stream<Arguments> propertyName() {
-        return Stream.of(
-                Arguments.of("tags.forSanitization", "******"),
-                Arguments.of("tags.FOR_SANITIZATION", "******"),
-                Arguments.of("tags.version", "1.0.0"),
-                Arguments.of("enabledContexts[0]", "user-service"),
-                Arguments.of("enabledContexts[1]", "payment-service"),
-                Arguments.of("httpClient.requests[0].name", "user-api"),
-                Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1"),
-                Arguments.of("httpClient.requests[0].methods[0].type", "GET"),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3"),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000"),
-                Arguments.of("httpClient.requests[0].methods[1].type", "POST"),
-                Arguments.of("httpClient.requests[1].name", "payment-api"),
-                Arguments.of("httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2"),
-                Arguments.of("httpClient.requests[1].methods[0].type", "PUT"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level", "DEBUG"));
+    private static Stream<Arguments> propertiesFeed() {
+        return Stream.concat(
+            Stream.of(
+                Arguments.of("tags.forSanitization", "******", DefaultRole.VIEWER),
+                Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.VIEWER),
+                Arguments.of("tags.forSanitization", "******", DefaultRole.EDITOR),
+                Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.EDITOR),
+                Arguments.of("tags.forSanitization", "toBeSanitized", DefaultRole.ADMIN),
+                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", DefaultRole.ADMIN)
+            ),
+            alwaysUnsanitizedProperties()
+        );
     }
 
-    @Test
-    void shouldReturnNotSanitizedPropertiesValue_forAdminRole() {
-        ResponseEntity<ConfigurationPropertiesFeed> response =
-                restTemplate.asAdmin().getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        List<@Nullable String> properties = response.getBody().getBeans().stream()
-                .flatMap(bean -> bean.getProperties().stream())
-                .map(KeyValue::getValue)
-                .collect(Collectors.toList());
-
-        assertThat(properties).doesNotContain("******");
+    private static Stream<Arguments> alwaysUnsanitizedProperties() {
+        return Stream.of(
+            Arguments.of("tags.version", "1.0.0", DefaultRole.VIEWER),
+            Arguments.of("enabledContexts[0]", "user-service", DefaultRole.VIEWER),
+            Arguments.of("enabledContexts[1]", "payment-service", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[0].name", "user-api", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[0].methods[0].type", "GET", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[0].methods[1].type", "POST", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[1].name", "payment-api", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[1].methods[0].type", "PUT", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2", DefaultRole.VIEWER),
+            Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level", "DEBUG", DefaultRole.VIEWER));
     }
 
     @ConstructorBinding
     @ConfigurationProperties(prefix = "axelix.prop.test")
     public static final class AxelixConfigurationProperties {
+
         private final Map<String, String> tags;
         private final List<String> enabledContexts;
         private final HttpClient httpClient;
@@ -165,35 +166,9 @@ public class AxelixConfigurationPropertiesEndpointTest {
             return httpClient;
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (obj == null || obj.getClass() != this.getClass()) {
-                return false;
-            }
-            var that = (AxelixConfigurationProperties) obj;
-            return Objects.equals(this.tags, that.tags)
-                    && Objects.equals(this.enabledContexts, that.enabledContexts)
-                    && Objects.equals(this.httpClient, that.httpClient);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(tags, enabledContexts, httpClient);
-        }
-
-        @Override
-        public String toString() {
-            return "AxelixConfigurationProperties[" + "tags="
-                    + tags + ", " + "enabledContexts="
-                    + enabledContexts + ", " + "httpClient="
-                    + httpClient + ']';
-        }
-
         @ConstructorBinding
         public static final class HttpClient {
+
             private final List<Request> requests;
 
             public HttpClient(List<Request> requests) {
@@ -203,32 +178,11 @@ public class AxelixConfigurationPropertiesEndpointTest {
             public List<Request> getRequests() {
                 return requests;
             }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj == this) {
-                    return true;
-                }
-                if (obj == null || obj.getClass() != this.getClass()) {
-                    return false;
-                }
-                var that = (HttpClient) obj;
-                return Objects.equals(this.requests, that.requests);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(requests);
-            }
-
-            @Override
-            public String toString() {
-                return "HttpClient[" + "requests=" + requests + ']';
-            }
         }
 
         @ConstructorBinding
         public static final class Request {
+
             private final String name;
             private final String baseUrl;
             private final List<Method> methods;
@@ -250,34 +204,11 @@ public class AxelixConfigurationPropertiesEndpointTest {
             public List<Method> getMethods() {
                 return methods;
             }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj == this) {
-                    return true;
-                }
-                if (obj == null || obj.getClass() != this.getClass()) {
-                    return false;
-                }
-                var that = (Request) obj;
-                return Objects.equals(this.name, that.name)
-                        && Objects.equals(this.baseUrl, that.baseUrl)
-                        && Objects.equals(this.methods, that.methods);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(name, baseUrl, methods);
-            }
-
-            @Override
-            public String toString() {
-                return "Request[" + "name=" + name + ", " + "baseUrl=" + baseUrl + ", " + "methods=" + methods + ']';
-            }
         }
 
         @ConstructorBinding
         public static final class Method {
+
             private final String type;
             private final List<Retry> retries;
 
@@ -294,31 +225,11 @@ public class AxelixConfigurationPropertiesEndpointTest {
                 return retries;
             }
 
-            @Override
-            public boolean equals(Object obj) {
-                if (obj == this) {
-                    return true;
-                }
-                if (obj == null || obj.getClass() != this.getClass()) {
-                    return false;
-                }
-                var that = (Method) obj;
-                return Objects.equals(this.type, that.type) && Objects.equals(this.retries, that.retries);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(type, retries);
-            }
-
-            @Override
-            public String toString() {
-                return "Method[" + "type=" + type + ", " + "retries=" + retries + ']';
-            }
         }
 
         @ConstructorBinding
         public static final class Retry {
+
             private final Integer count;
             private final Map<String, Object> parameters;
 
@@ -333,28 +244,6 @@ public class AxelixConfigurationPropertiesEndpointTest {
 
             public Map<String, Object> getParameters() {
                 return parameters;
-            }
-
-            @Override
-            public boolean equals(Object obj) {
-                if (obj == this) {
-                    return true;
-                }
-                if (obj == null || obj.getClass() != this.getClass()) {
-                    return false;
-                }
-                var that = (Retry) obj;
-                return Objects.equals(this.count, that.count) && Objects.equals(this.parameters, that.parameters);
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(count, parameters);
-            }
-
-            @Override
-            public String toString() {
-                return "Retry[" + "count=" + count + ", " + "parameters=" + parameters + ']';
             }
         }
     }

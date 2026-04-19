@@ -37,6 +37,11 @@ import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
  * <p>Typically, only the specific specified properties are sanitized, see {@link #toBeSanitized}. However,
  * there is a universal placeholder {@link EndpointsConfigurationProperties#SANITIZE_ALL} which implies that
  * all properties values must be sanitized.
+ * <p>
+ * @implNote Now, there is a long story behind this, but in general, although Spring Boot 2.x had the property that allowed to achieve
+ *           somewhat similar behavior to what this function does, the problem is that the sanitization mechanism was revisited
+ *           multiple times in the Spring Boot 3 and then in Spring Boot 4 release. We want to provide the consistent way of sanitizing
+ *           properties in all the versions of the Axelix starter
  *
  * @author Mikhail Polivakha
  */
