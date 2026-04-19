@@ -44,6 +44,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
+// TODO:
+//  Checks for an Instant fields are not performed in these tests, they are omitted there.
+//  And I think this can lead to problems in the future. AssertJ provides the way to test the
+//  Instant and other datetime fields with closeTo method that we should probably utilize
 @SpringBootTest
 abstract class DatabaseInstanceRegistryTest {
 
@@ -131,7 +135,7 @@ abstract class DatabaseInstanceRegistryTest {
                 "Axiom JDK",
                 "new-sha",
                 instant,
-                null,
+                Instant.now(),
                 Instance.InstanceStatus.DOWN,
                 new MemoryUsage(1200d),
                 instance.actuatorUrl(),

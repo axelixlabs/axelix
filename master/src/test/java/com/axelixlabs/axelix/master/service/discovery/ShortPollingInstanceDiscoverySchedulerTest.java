@@ -356,7 +356,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     @Test
     void shouldKeepSelfRegistrationInstance() {
         // language=json
-        String requestJson = """
+        String selfRegistrationRequest = """
             {
            "basicDiscoveryMetadata" : {
              "version": "1.0.0-SNAPSHOT",
@@ -390,7 +390,8 @@ class ShortPollingInstanceDiscoverySchedulerTest {
 
         restTemplate
                 .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
-                .postForEntity("/api/internal/service/register", defaultJsonEntity(requestJson), Void.class);
+                .postForEntity(
+                        "/api/internal/service/register", defaultJsonEntity(selfRegistrationRequest), Void.class);
 
         assertThat(instanceRegistry.getAll()).hasSize(1);
 
@@ -404,7 +405,7 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     @Test
     void shouldKeepSelfRegistrationAndDeregisterK8sInstance() {
         // language=json
-        String requestJson = """
+        String selfRegistrationRequest = """
             {
            "basicDiscoveryMetadata" : {
              "version": "1.0.0-SNAPSHOT",
@@ -438,7 +439,8 @@ class ShortPollingInstanceDiscoverySchedulerTest {
 
         restTemplate
                 .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
-                .postForEntity("/api/internal/service/register", defaultJsonEntity(requestJson), Void.class);
+                .postForEntity(
+                        "/api/internal/service/register", defaultJsonEntity(selfRegistrationRequest), Void.class);
 
         String serviceId = "test-service";
         String instanceId = UUID.randomUUID().toString();
@@ -494,8 +496,8 @@ class ShortPollingInstanceDiscoverySchedulerTest {
                 .create();
 
         Mockito.when(discoveryClient.getServices())
-                .thenReturn(List.of(serviceId))
-                .thenReturn(List.of());
+                .thenReturn(List.of(serviceId)) // discovered at first
+                .thenReturn(List.of()); // and then not disocovered
 
         Mockito.when(discoveryClient.getInstances(serviceId)).thenReturn(List.of(k8sServiceInstance));
 
@@ -507,7 +509,11 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         subject.performDiscovery();
 
         // then.
-        assertThat(instanceRegistry.getAll()).hasSize(1);
+        assertThat(instanceRegistry.getAll())
+                .hasSize(1)
+                .first()
+                .extracting(instance -> instance.id().instanceId())
+                .isEqualTo("3c994958-924f-4a12-87d0-a8782e97af10");
     }
 
     @Test
