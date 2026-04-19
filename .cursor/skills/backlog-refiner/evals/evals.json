@@ -1,0 +1,23 @@
+{
+  "skill_name": "backlog-refiner",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Use the backlog refiner workflow: resolve the repo from git remote, list open issues on axelixlabs/axelix, and identify up to 5 likely-stale issues with codebase evidence.",
+      "expected_output": "Report follows the skill template with owner/repo from origin, GH API or gh usage, filtered issues-only, staleness justified by code exploration—not only dates—including any superseded-solution cases.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Our backlog has issues that propose migrating to library X, but we chose library Y instead. Walk through how you'd mark those issues stale and what evidence you'd cite from the repo.",
+      "expected_output": "Explains superseded-approach criterion, concrete search strategy in codebase, report fields (evidence paths, suggested close reason).",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Fetch only open issues updated before 2025-01-01 for this repo's origin and flag any that look stale after checking related code.",
+      "expected_output": "Uses API filtering or client-side filter by updated_at; still requires code verification for staleness; notes undetermined when evidence is missing.",
+      "files": []
+    }
+  ]
+}
