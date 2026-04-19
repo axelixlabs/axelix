@@ -17,19 +17,12 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.env;
 
-import java.util.List;
-
 import org.jspecify.annotations.Nullable;
 
-import org.springframework.boot.actuate.endpoint.Show;
 import org.springframework.boot.actuate.endpoint.web.annotation.RestControllerEndpoint;
-import org.springframework.boot.actuate.env.EnvironmentEndpoint;
-import org.springframework.boot.actuate.env.EnvironmentEndpoint.EnvironmentDescriptor;
-import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
 /**
  * Custom Spring Boot Actuator endpoint providing an extended view of the application's environment.
@@ -41,21 +34,14 @@ import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction
 @RestControllerEndpoint(id = "axelix-env")
 public class AxelixEnvironmentEndpoint {
 
-    private final EnvironmentEndpoint delegate;
-    private final EnvPropertyEnricher envPropertyEnricher;
+    private final EnvironmentService environmentService;
 
-    public AxelixEnvironmentEndpoint(
-            Environment environment,
-            SmartSanitizingFunction smartSanitizingFunction,
-            EnvPropertyEnricher envPropertyEnricher) {
-        this.delegate = new EnvironmentEndpoint(environment, List.of(smartSanitizingFunction), Show.ALWAYS);
-        this.envPropertyEnricher = envPropertyEnricher;
+    public AxelixEnvironmentEndpoint(EnvironmentService environmentService) {
+        this.environmentService = environmentService;
     }
 
     @GetMapping
     public EnvironmentFeed environment(@Nullable String pattern) {
-        EnvironmentDescriptor originalDescriptor = delegate.environment(pattern);
-
-        return envPropertyEnricher.enrich(originalDescriptor);
+        return environmentService.getEnvironmentFeed(pattern);
     }
 }

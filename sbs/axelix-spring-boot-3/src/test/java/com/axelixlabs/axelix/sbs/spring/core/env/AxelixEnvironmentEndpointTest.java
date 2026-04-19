@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,11 +33,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +44,12 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -89,11 +92,11 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
 @EnableConfigurationProperties(AxelixEnvironmentEndpointTest.AxelixPropTest.class)
-@Import({EnvironmentTestConfig.class})
+@Import({EnvironmentTestConfig.class, JwtAuthTestConfiguration.class})
 class AxelixEnvironmentEndpointTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private ConfigurableEnvironment environment;
@@ -115,7 +118,7 @@ class AxelixEnvironmentEndpointTest {
     @MethodSource("propertyExpectations")
     void shouldSelectPrimaryPropertyFromHighestPrecedenceSource(String propertyName, String expectedValue) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+                restTemplate.asViewer().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         var propertyAppearances = findPropertyAppearances(propertyName, response);
 
@@ -129,34 +132,25 @@ class AxelixEnvironmentEndpointTest {
                 .isEqualTo(expectedValue);
     }
 
-    private static Stream<Arguments> propertyExpectations() {
-        return Stream.of(
-                Arguments.of("axelix.env.test.prop1", "fromTestSource"),
-                Arguments.of("axelix.env.test.prop2", "dynamicValue"),
-                Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
-    }
-
-    @ParameterizedTest(name = "Property ''{0}'' should have sanitized value")
+    @ParameterizedTest(name = "Property ''{0}'' should have value ''{1}'' for ''{2}''")
     @MethodSource("sanitizationArgsSource")
-    void shouldSanitizeAllAppearancesOfTheGivenProperty(String propertyName) {
+    void shouldReturnACorrectValueForTheGivenPropertyConsideringTheRole(String propertyName, String value, Role role) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+                restTemplate.withRole(role).getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         var propertyAppearances = findPropertyAppearances(propertyName, response);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(propertyAppearances)
+                .filteredOn(it -> Objects.equals(it.getValue().getName(), propertyName))
+                .first()
                 .extracting(it -> it.getValue().getValue())
-                .containsOnly("******");
-    }
-
-    public static Stream<Arguments> sanitizationArgsSource() {
-        return Stream.of(Arguments.of("axelix.env.test.toBeSanitized"), Arguments.of("AXELIX_FOR_SANITIZATION"));
+                .isEqualTo(value);
     }
 
     @Test
     void shouldReturnValidJsonStructure() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-env", String.class);
+        ResponseEntity<String> response = restTemplate.asViewer().getForEntity("/actuator/axelix-env", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -201,13 +195,42 @@ class AxelixEnvironmentEndpointTest {
     @MethodSource("propertyName")
     void shouldReturnTheBeanNameThatMatchesTheConfigProps(String propertyName) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+                restTemplate.asEditor().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         var propertyAppearances = findPropertyAppearances(propertyName, response);
 
         assertThat(propertyAppearances)
                 .extracting(e -> e.getValue().getConfigPropsBeanName())
                 .containsOnly(AxelixPropTest.class.getName());
+    }
+
+    @ParameterizedTest
+    @MethodSource("propertySourceDescription")
+    void shouldReturnDescriptionKnownPropertySource(String sourceName, String sourceDescription) {
+        ResponseEntity<EnvironmentFeed> response =
+                restTemplate.asViewer().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+
+        assertThat(response.getBody().getPropertySources())
+                .filteredOn(e -> e.getName().equals(sourceName))
+                .first()
+                .satisfies(e -> e.getDescription().equals(sourceDescription));
+    }
+
+    private static Stream<Arguments> propertyExpectations() {
+        return Stream.of(
+                Arguments.of("axelix.env.test.prop1", "fromTestSource"),
+                Arguments.of("axelix.env.test.prop2", "dynamicValue"),
+                Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
+    }
+
+    public static Stream<Arguments> sanitizationArgsSource() {
+        return Stream.of(
+                Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.EDITOR),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.EDITOR),
+                Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.VIEWER),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.VIEWER),
+                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", DefaultRole.ADMIN),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", DefaultRole.ADMIN));
     }
 
     private static Stream<Arguments> propertyName() {
@@ -226,18 +249,6 @@ class AxelixEnvironmentEndpointTest {
                 Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].type"),
                 Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].count"),
                 Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("propertySourceDescription")
-    void shouldReturnDescriptionKnownPropertySource(String sourceName, String sourceDescription) {
-        ResponseEntity<EnvironmentFeed> response =
-                restTemplate.getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
-
-        assertThat(response.getBody().getPropertySources())
-                .filteredOn(e -> e.getName().equals(sourceName))
-                .first()
-                .satisfies(e -> e.getDescription().equals(sourceDescription));
     }
 
     private static Stream<Arguments> propertySourceDescription() {
@@ -282,11 +293,8 @@ class AxelixEnvironmentEndpointTest {
         }
 
         @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-                Environment environment,
-                SmartSanitizingFunction smartSanitizingFunction,
-                EnvPropertyEnricher envPropertyEnricher) {
-            return new AxelixEnvironmentEndpoint(environment, smartSanitizingFunction, envPropertyEnricher);
+        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
+            return new AxelixEnvironmentEndpoint(environmentService);
         }
 
         @Bean

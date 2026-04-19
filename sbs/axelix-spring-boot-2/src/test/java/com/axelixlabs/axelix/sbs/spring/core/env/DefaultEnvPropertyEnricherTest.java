@@ -36,9 +36,13 @@ import org.springframework.core.env.StandardEnvironment;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Property;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
+import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
+import com.axelixlabs.axelix.common.auth.core.SecurityContext;
+import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 
+import static com.axelixlabs.axelix.sbs.spring.core.utils.UserUtils.createUserWithAuthorities;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -51,6 +55,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(args = "--fooBar=fromArgs")
 @Import({EnvironmentTestConfig.class, DefaultEnvPropertyEnricherTest.CurrentTestConfig.class})
 class DefaultEnvPropertyEnricherTest {
+
+    private final ThreadLocalSecurityContextExecutor securityContextExecutor = new ThreadLocalSecurityContextExecutor();
+
+    private final SecurityContext securityContext =
+            new DefaultSecurityContext(createUserWithAuthorities(), "testToken");
 
     @Autowired
     private EnvironmentEndpoint environmentEndpoint;
@@ -82,7 +91,8 @@ class DefaultEnvPropertyEnricherTest {
     void shouldEnrichAllPropertiesWithPrimaryField() {
         EnvironmentDescriptor defaultDescriptor = environmentEndpoint.environment(null);
 
-        EnvironmentFeed environmentFeed = enricher.enrich(defaultDescriptor);
+        EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
+                () -> enricher.enrich(defaultDescriptor), securityContext);
 
         assertThat(environmentFeed).isNotNull();
         assertThat(environmentFeed.getActiveProfiles()).isNotNull();
@@ -103,7 +113,8 @@ class DefaultEnvPropertyEnricherTest {
     void shouldNormalizeConfigResourcePropertySourceNameAndDescription() {
         EnvironmentDescriptor defaultDescriptor = environmentEndpoint.environment(null);
 
-        EnvironmentFeed environmentFeed = enricher.enrich(defaultDescriptor);
+        EnvironmentFeed environmentFeed = securityContextExecutor.callWithinSecurityContext(
+                () -> enricher.enrich(defaultDescriptor), securityContext);
 
         List<PropertySource> configResourceSources = environmentFeed.getPropertySources().stream()
                 .filter(it -> it.getName().endsWith(".yaml"))

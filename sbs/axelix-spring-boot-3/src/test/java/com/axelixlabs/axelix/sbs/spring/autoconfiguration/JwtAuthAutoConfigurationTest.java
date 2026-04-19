@@ -31,14 +31,17 @@ import org.springframework.context.annotation.Bean;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
+import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,10 +66,12 @@ class JwtAuthAutoConfigurationTest {
         contextRunner.run(context -> {
             assertThat(context).hasSingleBean(JwtAuthAutoConfiguration.class);
             assertThat(context).hasSingleBean(JwtDecoderService.class);
+            assertThat(context).hasSingleBean(JwtEncoderService.class);
             assertThat(context).hasSingleBean(AuthorityResolver.class);
             assertThat(context).hasSingleBean(Authorizer.class);
             assertThat(context).hasSingleBean(IdentityAccessManager.class);
             assertThat(context).hasSingleBean(FilterRegistrationBean.class);
+            assertThat(context).hasSingleBean(SecurityContextExecutor.class);
         });
     }
 
@@ -115,13 +120,16 @@ class JwtAuthAutoConfigurationTest {
                 .withUserConfiguration(
                         CustomJwtDecoderServiceConfig.class,
                         CustomAuthorityResolverConfig.class,
-                        CustomAuthorizerConfig.class)
+                        CustomAuthorizerConfig.class,
+                        CustomSecurityContextExecutorConfig.class)
                 .run(context -> {
                     assertThat(context.getBean(JwtDecoderService.class))
                             .isExactlyInstanceOf(CustomJwtDecoderService.class);
                     assertThat(context.getBean(AuthorityResolver.class))
                             .isExactlyInstanceOf(CustomAuthorityResolver.class);
                     assertThat(context.getBean(Authorizer.class)).isExactlyInstanceOf(CustomAuthorizer.class);
+                    assertThat(context.getBean(SecurityContextExecutor.class))
+                            .isExactlyInstanceOf(CustomSecurityContextExecutor.class);
                 });
     }
 
@@ -150,10 +158,19 @@ class JwtAuthAutoConfigurationTest {
     }
 
     @TestConfiguration
+    static class CustomSecurityContextExecutorConfig {
+        @Bean
+        public SecurityContextExecutor securityContextExecutor() {
+            return new CustomSecurityContextExecutor();
+        }
+    }
+
+    @TestConfiguration
     static class CustomJwtAuthorizationFilterConfig {
         @Bean
-        public JwtAuthorizationFilter jwtAuthorizationFilter(IdentityAccessManager identityAccessManager) {
-            return new CustomJwtAuthorizationFilter(identityAccessManager);
+        public JwtAuthorizationFilter jwtAuthorizationFilter(
+                IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
+            return new CustomJwtAuthorizationFilter(identityAccessManager, securityContextExecutor);
         }
     }
 
@@ -174,9 +191,12 @@ class JwtAuthAutoConfigurationTest {
 
     static class CustomAuthorizer extends DefaultAuthorizer {}
 
+    static class CustomSecurityContextExecutor extends ThreadLocalSecurityContextExecutor {}
+
     static class CustomJwtAuthorizationFilter extends JwtAuthorizationFilter {
-        public CustomJwtAuthorizationFilter(IdentityAccessManager identityAccessManager) {
-            super(identityAccessManager);
+        public CustomJwtAuthorizationFilter(
+                IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
+            super(identityAccessManager, securityContextExecutor);
         }
     }
 }

@@ -30,17 +30,23 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,6 +55,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
@@ -70,23 +78,25 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level=DEBUG",
         })
 @EnableConfigurationProperties({AxelixConfigurationPropertiesEndpointTest.AxelixConfigurationProperties.class})
+@Import(JwtAuthTestConfiguration.class)
 public class AxelixConfigurationPropertiesEndpointTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @ParameterizedTest
-    @MethodSource("propertyName")
-    void shouldReturnPropertiesNameAndValue(String propertyName, String expectedValue) {
-        ResponseEntity<ConfigurationPropertiesFeed> response =
-                restTemplate.getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
+    @MethodSource("propertiesFeed")
+    void shouldReturnPropertiesNameAndValue_forNonAdminRoles(String propertyName, String expectedValue, Role role) {
+        ResponseEntity<ConfigurationPropertiesFeed> response = restTemplate
+                .withRole(role)
+                .getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         List<KeyValue> properties = response.getBody().getBeans().stream()
                 .filter(beans -> beans.getPrefix().equals("axelix.prop.test"))
                 .flatMap(bean -> bean.getProperties().stream())
                 .toList();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         assertThat(properties)
                 .filteredOn(e -> e.getKey().equals(propertyName))
@@ -94,24 +104,33 @@ public class AxelixConfigurationPropertiesEndpointTest {
                 .containsExactly(expectedValue);
     }
 
-    private static Stream<Arguments> propertyName() {
+    private static Stream<Arguments> propertiesFeed() {
         return Stream.of(
-                Arguments.of("tags.forSanitization", "******"),
-                Arguments.of("tags.FOR_SANITIZATION", "******"),
-                Arguments.of("tags.version", "1.0.0"),
-                Arguments.of("enabledContexts[0]", "user-service"),
-                Arguments.of("enabledContexts[1]", "payment-service"),
-                Arguments.of("httpClient.requests[0].name", "user-api"),
-                Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1"),
-                Arguments.of("httpClient.requests[0].methods[0].type", "GET"),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3"),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000"),
-                Arguments.of("httpClient.requests[0].methods[1].type", "POST"),
-                Arguments.of("httpClient.requests[1].name", "payment-api"),
-                Arguments.of("httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2"),
-                Arguments.of("httpClient.requests[1].methods[0].type", "PUT"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level", "DEBUG"));
+                Arguments.of("tags.forSanitization", "******", DefaultRole.VIEWER),
+                Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.VIEWER),
+                Arguments.of("tags.forSanitization", "******", DefaultRole.EDITOR),
+                Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.EDITOR),
+                Arguments.of("tags.forSanitization", "toBeSanitized", DefaultRole.ADMIN),
+                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", DefaultRole.ADMIN),
+                Arguments.of("tags.version", "1.0.0", DefaultRole.VIEWER),
+                Arguments.of("enabledContexts[0]", "user-service", DefaultRole.VIEWER),
+                Arguments.of("enabledContexts[1]", "payment-service", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].name", "user-api", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[0].type", "GET", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3", DefaultRole.VIEWER),
+                Arguments.of(
+                        "httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[1].type", "POST", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[1].name", "payment-api", DefaultRole.VIEWER),
+                Arguments.of(
+                        "httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[1].methods[0].type", "PUT", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2", DefaultRole.VIEWER),
+                Arguments.of(
+                        "httpClient.requests[1].methods[0].retries[0].parameters.log-level",
+                        "DEBUG",
+                        DefaultRole.VIEWER));
     }
 
     @ConfigurationProperties(prefix = "axelix.prop.test")
@@ -128,7 +147,7 @@ public class AxelixConfigurationPropertiesEndpointTest {
     }
 
     @TestConfiguration
-    static class AxelixConfigurationPropertiesTestConfiguration {
+    static class AxelixConfigurationPropertiesEndpointTestConfiguration {
 
         @Bean
         public ConfigurationPropertiesFlattener configurationPropertiesFlattener() {
@@ -154,18 +173,28 @@ public class AxelixConfigurationPropertiesEndpointTest {
         }
 
         @Bean
-        public ConfigurationPropertiesCache configurationPropertiesCache(
+        public RequiredAuthorityCheckService requiredAuthorityCheckService(
+                SecurityContextExecutor securityContextExecutor) {
+            return new RequiredAuthorityCheckService(securityContextExecutor);
+        }
+
+        @Bean
+        public DefaultConfigurationPropertiesService configurationPropertiesCache(
                 SmartSanitizingFunction smartSanitizingFunction,
                 ApplicationContext applicationContext,
-                ConfigurationPropertiesConverter configurationPropertiesConverter) {
-            return new ConfigurationPropertiesCache(
-                    smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
+                ConfigurationPropertiesConverter configurationPropertiesConverter,
+                RequiredAuthorityCheckService requiredAuthorityCheckService) {
+            return new DefaultConfigurationPropertiesService(
+                    smartSanitizingFunction,
+                    applicationContext,
+                    configurationPropertiesConverter,
+                    requiredAuthorityCheckService);
         }
 
         @Bean
         public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-                ConfigurationPropertiesCache configurationPropertiesCache) {
-            return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesCache);
+                DefaultConfigurationPropertiesService configurationPropertiesService) {
+            return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService);
         }
     }
 }

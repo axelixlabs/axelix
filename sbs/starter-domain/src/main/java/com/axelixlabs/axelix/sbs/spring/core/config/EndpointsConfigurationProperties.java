@@ -36,7 +36,7 @@ public class EndpointsConfigurationProperties {
     private List<String> sanitizedProperties = List.of();
 
     public List<String> getSanitizedProperties() {
-        return sanitizedProperties;
+        return sanitizedProperties.isEmpty() ? SANITIZE_ALL : sanitizedProperties;
     }
 
     public EndpointsConfigurationProperties setSanitizedProperties(List<String> sanitizedProperties) {

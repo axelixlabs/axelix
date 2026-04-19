@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Deprecation;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.InjectionPoint;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.Property;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed.PropertySource;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertySourceDescription.PropertySourceDisplayData;
 
 /**
@@ -54,7 +54,7 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     private final Environment environment;
 
     @Nullable
-    private final ConfigurationPropertiesCache configurationPropertiesCache;
+    private final ConfigurationPropertiesService configurationPropertiesService;
 
     private final PropertyNameNormalizer propertyNameNormalizer;
 
@@ -65,10 +65,10 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     public DefaultEnvPropertyEnricher(
             Environment environment,
             PropertyNameNormalizer propertyNameNormalizer,
-            ObjectProvider<ConfigurationPropertiesCache> cache,
+            ObjectProvider<ConfigurationPropertiesService> configurationPropertiesServiceProvider,
             PropertyMetadataExtractor metadataExtractor,
             ValueInjectionTrackerBeanPostProcessor valueInjectionTracker) {
-        this.configurationPropertiesCache = cache.getIfAvailable();
+        this.configurationPropertiesService = configurationPropertiesServiceProvider.getIfAvailable();
         this.propertyNameNormalizer = propertyNameNormalizer;
         this.environment = environment;
         this.metadataExtractor = metadataExtractor;
@@ -153,13 +153,13 @@ public class DefaultEnvPropertyEnricher implements EnvPropertyEnricher {
     }
 
     private Map<String, String> buildConfigPropsMappingMap() {
-        if (configurationPropertiesCache == null) {
+        if (configurationPropertiesService == null) {
             return Map.of();
         }
 
         Map<String, String> configPropsMapping = new HashMap<>();
 
-        configurationPropertiesCache
+        configurationPropertiesService
                 .getConfigProps()
                 .getBeans()
                 .forEach((bean) -> applyPrefixAndProperty(

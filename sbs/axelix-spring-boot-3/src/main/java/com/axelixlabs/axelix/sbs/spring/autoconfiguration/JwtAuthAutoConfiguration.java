@@ -28,6 +28,7 @@ import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
@@ -39,6 +40,7 @@ import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.DefaultAuthorityResolver;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilter;
+import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 
 /**
@@ -98,10 +100,16 @@ public class JwtAuthAutoConfiguration {
     }
 
     @Bean
-    public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-            IdentityAccessManager identityAccessManager) {
+    @ConditionalOnMissingBean
+    public SecurityContextExecutor securityContextExecutor() {
+        return new ThreadLocalSecurityContextExecutor();
+    }
 
-        var jwtAuthorizationFilter = new JwtAuthorizationFilter(identityAccessManager);
+    @Bean
+    public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
+            IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
+
+        var jwtAuthorizationFilter = new JwtAuthorizationFilter(identityAccessManager, securityContextExecutor);
         var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
         registration.setName("jwtAuthorizationFilter");
         return registration;

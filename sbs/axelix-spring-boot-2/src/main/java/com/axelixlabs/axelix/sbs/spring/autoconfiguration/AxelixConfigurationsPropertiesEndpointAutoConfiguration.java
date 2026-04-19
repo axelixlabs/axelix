@@ -23,13 +23,17 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
+import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.AxelixConfigurationPropertiesEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesCache;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.ConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesConverter;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesFlattener;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.DefaultConfigurationPropertiesService;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
@@ -74,18 +78,35 @@ public class AxelixConfigurationsPropertiesEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ConfigurationPropertiesCache configurationPropertiesCache(
+    public SecurityContextExecutor securityContextExecutor() {
+        return new ThreadLocalSecurityContextExecutor();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RequiredAuthorityCheckService requiredAuthorityCheckService(
+            SecurityContextExecutor securityContextExecutor) {
+        return new RequiredAuthorityCheckService(securityContextExecutor);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConfigurationPropertiesService configurationPropertiesService(
             SmartSanitizingFunction smartSanitizingFunction,
             ApplicationContext applicationContext,
-            ConfigurationPropertiesConverter configurationPropertiesConverter) {
-        return new ConfigurationPropertiesCache(
-                smartSanitizingFunction, applicationContext, configurationPropertiesConverter);
+            ConfigurationPropertiesConverter configurationPropertiesConverter,
+            RequiredAuthorityCheckService requiredAuthorityCheckService) {
+        return new DefaultConfigurationPropertiesService(
+                smartSanitizingFunction,
+                applicationContext,
+                configurationPropertiesConverter,
+                requiredAuthorityCheckService);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public AxelixConfigurationPropertiesEndpoint axelixConfigurationPropertiesEndpoint(
-            ConfigurationPropertiesCache configurationPropertiesCache) {
-        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesCache);
+            ConfigurationPropertiesService configurationPropertiesService) {
+        return new AxelixConfigurationPropertiesEndpoint(configurationPropertiesService);
     }
 }

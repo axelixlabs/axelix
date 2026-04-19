@@ -31,6 +31,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.axelixlabs.axelix.common.auth.core.Authority;
+import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
+import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
@@ -52,9 +55,12 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final IdentityAccessManager identityAccessManager;
+    private final SecurityContextExecutor securityContextExecutor;
 
-    public JwtAuthorizationFilter(IdentityAccessManager identityAccessManager) {
+    public JwtAuthorizationFilter(
+            IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
         this.identityAccessManager = identityAccessManager;
+        this.securityContextExecutor = securityContextExecutor;
     }
 
     @Override
@@ -72,16 +78,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         try {
             String token = resolveToken(request);
 
+            String requestPath = request.getRequestURI();
             HttpMethod requestHttpMethod = HttpMethod.valueOf(request.getMethod());
 
-            identityAccessManager.verifyAccess(request.getRequestURI(), requestHttpMethod, token);
+            User user = identityAccessManager.verifyAccess(requestPath, requestHttpMethod, token);
 
-            filterChain.doFilter(request, response);
+            securityContextExecutor.runWithinSecurityContext(
+                    () -> filterChain.doFilter(request, response), new DefaultSecurityContext(user, token));
 
         } catch (JwtParsingException | ExpiredJwtTokenException | InvalidJwtTokenException e) {
             respondWith(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } catch (AuthorizationException e) {
             respondWith(response, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+        } catch (Exception e) {
+            throw new ServletException(e);
         }
     }
 
