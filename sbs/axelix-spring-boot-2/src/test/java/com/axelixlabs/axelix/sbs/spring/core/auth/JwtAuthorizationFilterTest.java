@@ -41,7 +41,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -61,8 +60,8 @@ import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
 import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
@@ -88,7 +87,7 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRe
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.env.EnvPropertyEnricher;
+import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentService;
 import com.axelixlabs.axelix.sbs.spring.core.env.EnvironmentTestConfig;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 
@@ -543,11 +542,8 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
-        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(
-                Environment environment,
-                SmartSanitizingFunction smartSanitizingFunction,
-                EnvPropertyEnricher envPropertyEnricher) {
-            return new AxelixEnvironmentEndpoint(environment, smartSanitizingFunction, envPropertyEnricher);
+        public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
+            return new AxelixEnvironmentEndpoint(environmentService);
         }
 
         @Bean
