@@ -42,7 +42,7 @@ public class McpOAuth2MetadataController {
     private final String scopes;
 
     public McpOAuth2MetadataController(OAuth2Properties oAuth2Properties) {
-        this.mcpServerFullPath = oAuth2Properties.baseUrl() + WebAutoConfiguration.EXTERNAL_API_PATH + "/mcp";
+        this.mcpServerFullPath = oAuth2Properties.baseUrl() + WebAutoConfiguration.EXTERNAL_API_PATH + "/api/mcp";
         this.issuerUri = oAuth2Properties.issuerUri();
         this.scopes = oAuth2Properties.scopes();
     }
