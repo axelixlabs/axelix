@@ -64,6 +64,9 @@ dependencies {
     testImplementation("com.mysql:mysql-connector-j")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
+
+    // annotation processor
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$springBootVersion")
 }
 
 configurations.all {
