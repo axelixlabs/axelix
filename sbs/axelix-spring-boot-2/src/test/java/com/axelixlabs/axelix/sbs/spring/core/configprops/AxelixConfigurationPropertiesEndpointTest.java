@@ -22,10 +22,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.Role;
-import org.jspecify.annotations.Nullable;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -45,6 +41,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
@@ -91,8 +89,9 @@ public class AxelixConfigurationPropertiesEndpointTest {
     @ParameterizedTest
     @MethodSource("propertiesFeed")
     void shouldReturnPropertiesNameAndValue_forNonAdminRoles(String propertyName, String expectedValue, Role role) {
-        ResponseEntity<ConfigurationPropertiesFeed> response =
-                restTemplate.withRole(role).getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
+        ResponseEntity<ConfigurationPropertiesFeed> response = restTemplate
+                .withRole(role)
+                .getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
 
         List<KeyValue> properties = response.getBody().getBeans().stream()
                 .filter(bean -> bean.getPrefix().equals("axelix.prop.test"))
@@ -108,35 +107,32 @@ public class AxelixConfigurationPropertiesEndpointTest {
     }
 
     private static Stream<Arguments> propertiesFeed() {
-        return Stream.concat(
-            Stream.of(
+        return Stream.of(
                 Arguments.of("tags.forSanitization", "******", DefaultRole.VIEWER),
                 Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.VIEWER),
                 Arguments.of("tags.forSanitization", "******", DefaultRole.EDITOR),
                 Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.EDITOR),
                 Arguments.of("tags.forSanitization", "toBeSanitized", DefaultRole.ADMIN),
-                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", DefaultRole.ADMIN)
-            ),
-            alwaysUnsanitizedProperties()
-        );
-    }
-
-    private static Stream<Arguments> alwaysUnsanitizedProperties() {
-        return Stream.of(
-            Arguments.of("tags.version", "1.0.0", DefaultRole.VIEWER),
-            Arguments.of("enabledContexts[0]", "user-service", DefaultRole.VIEWER),
-            Arguments.of("enabledContexts[1]", "payment-service", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[0].name", "user-api", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[0].methods[0].type", "GET", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[0].methods[1].type", "POST", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[1].name", "payment-api", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[1].methods[0].type", "PUT", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2", DefaultRole.VIEWER),
-            Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level", "DEBUG", DefaultRole.VIEWER));
+                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", DefaultRole.ADMIN),
+                Arguments.of("tags.version", "1.0.0", DefaultRole.VIEWER),
+                Arguments.of("enabledContexts[0]", "user-service", DefaultRole.VIEWER),
+                Arguments.of("enabledContexts[1]", "payment-service", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].name", "user-api", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[0].type", "GET", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3", DefaultRole.VIEWER),
+                Arguments.of(
+                        "httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[1].type", "POST", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[1].name", "payment-api", DefaultRole.VIEWER),
+                Arguments.of(
+                        "httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[1].methods[0].type", "PUT", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2", DefaultRole.VIEWER),
+                Arguments.of(
+                        "httpClient.requests[1].methods[0].retries[0].parameters.log-level",
+                        "DEBUG",
+                        DefaultRole.VIEWER));
     }
 
     @ConstructorBinding
@@ -224,7 +220,6 @@ public class AxelixConfigurationPropertiesEndpointTest {
             public List<Retry> getRetries() {
                 return retries;
             }
-
         }
 
         @ConstructorBinding

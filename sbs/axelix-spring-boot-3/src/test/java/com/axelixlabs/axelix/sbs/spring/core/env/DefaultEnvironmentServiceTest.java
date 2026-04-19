@@ -41,6 +41,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvironmentServiceTest.WithExplicitSanitizationProperties.AxelixConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultEnvironmentServiceTest.WithExplicitSanitizationProperties.TestConfigWithExplicitSanitizationProperties;
@@ -81,7 +82,6 @@ class DefaultEnvironmentServiceTest {
                     .collect(Collectors.toSet());
 
             assertThat(values).containsOnly("******");
-            assertThat(environmentFeed).isNotNull().isInstanceOf(EnvironmentFeed.class);
         }
 
         @Test
@@ -99,7 +99,6 @@ class DefaultEnvironmentServiceTest {
                     .collect(Collectors.toSet());
 
             assertThat(values).doesNotContain("******");
-            assertThat(environmentFeed).isNotNull().isInstanceOf(EnvironmentFeed.class);
         }
 
         @TestConfiguration
@@ -108,7 +107,8 @@ class DefaultEnvironmentServiceTest {
 
             @Bean
             public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-                return new SmartSanitizingFunction(List.of("*"), propertyNameNormalizer);
+                return new SmartSanitizingFunction(
+                        EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
             }
         }
     }
@@ -143,8 +143,6 @@ class DefaultEnvironmentServiceTest {
             assertThat(sanitizedProperties)
                     .containsOnlyKeys("axelix.prop.test.tags.forSanitization", "axelix.prop.test.tags.FOR_SANITIZATION")
                     .containsValues("******", "******");
-
-            assertThat(environmentFeed).isNotNull().isInstanceOf(EnvironmentFeed.class);
         }
 
         @Test
@@ -162,7 +160,6 @@ class DefaultEnvironmentServiceTest {
                     .collect(Collectors.toSet());
 
             assertThat(values).doesNotContain("******");
-            assertThat(environmentFeed).isNotNull().isInstanceOf(EnvironmentFeed.class);
         }
 
         @TestConfiguration

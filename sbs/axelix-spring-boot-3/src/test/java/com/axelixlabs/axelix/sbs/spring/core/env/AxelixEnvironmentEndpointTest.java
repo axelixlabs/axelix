@@ -19,9 +19,9 @@ package com.axelixlabs.axelix.sbs.spring.core.env;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -44,6 +44,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
@@ -130,44 +132,20 @@ class AxelixEnvironmentEndpointTest {
                 .isEqualTo(expectedValue);
     }
 
-    private static Stream<Arguments> propertyExpectations() {
-        return Stream.of(
-                Arguments.of("axelix.env.test.prop1", "fromTestSource"),
-                Arguments.of("axelix.env.test.prop2", "dynamicValue"),
-                Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
-    }
-
-    @ParameterizedTest(name = "Property ''{0}'' should have sanitized value")
+    @ParameterizedTest(name = "Property ''{0}'' should have value ''{1}'' for ''{2}''")
     @MethodSource("sanitizationArgsSource")
-    void shouldSanitizeAllAppearancesOfTheGivenProperty(String propertyName) {
+    void shouldReturnACorrectValueForTheGivenPropertyConsideringTheRole(String propertyName, String value, Role role) {
         ResponseEntity<EnvironmentFeed> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+                restTemplate.withRole(role).getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
         var propertyAppearances = findPropertyAppearances(propertyName, response);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(propertyAppearances)
+                .filteredOn(it -> Objects.equals(it.getValue().getName(), propertyName))
+                .first()
                 .extracting(it -> it.getValue().getValue())
-                .containsOnly("******");
-    }
-
-    public static Stream<Arguments> sanitizationArgsSource() {
-        return Stream.of(Arguments.of("axelix.env.test.toBeSanitized"), Arguments.of("AXELIX_FOR_SANITIZATION"));
-    }
-
-    @Test
-    void shouldReturnNotSanitizedEnvValue_forAdminRole() {
-        ResponseEntity<EnvironmentFeed> response =
-                restTemplate.asAdmin().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        List<@Nullable String> properties = response.getBody().getPropertySources().stream()
-                .flatMap(bean -> bean.getProperties().stream())
-                .map(EnvironmentFeed.Property::getValue)
-                .toList();
-
-        assertThat(properties).doesNotContain("******");
+                .isEqualTo(value);
     }
 
     @Test
@@ -226,6 +204,35 @@ class AxelixEnvironmentEndpointTest {
                 .containsOnly(AxelixPropTest.class.getName());
     }
 
+    @ParameterizedTest
+    @MethodSource("propertySourceDescription")
+    void shouldReturnDescriptionKnownPropertySource(String sourceName, String sourceDescription) {
+        ResponseEntity<EnvironmentFeed> response =
+                restTemplate.asViewer().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
+
+        assertThat(response.getBody().getPropertySources())
+                .filteredOn(e -> e.getName().equals(sourceName))
+                .first()
+                .satisfies(e -> e.getDescription().equals(sourceDescription));
+    }
+
+    private static Stream<Arguments> propertyExpectations() {
+        return Stream.of(
+                Arguments.of("axelix.env.test.prop1", "fromTestSource"),
+                Arguments.of("axelix.env.test.prop2", "dynamicValue"),
+                Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
+    }
+
+    public static Stream<Arguments> sanitizationArgsSource() {
+        return Stream.of(
+                Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.EDITOR),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.EDITOR),
+                Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.VIEWER),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.VIEWER),
+                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", DefaultRole.ADMIN),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", DefaultRole.ADMIN));
+    }
+
     private static Stream<Arguments> propertyName() {
         return Stream.of(
                 Arguments.of("axelix.prop.test.tags.environment"),
@@ -242,18 +249,6 @@ class AxelixEnvironmentEndpointTest {
                 Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].type"),
                 Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].count"),
                 Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("propertySourceDescription")
-    void shouldReturnDescriptionKnownPropertySource(String sourceName, String sourceDescription) {
-        ResponseEntity<EnvironmentFeed> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
-
-        assertThat(response.getBody().getPropertySources())
-                .filteredOn(e -> e.getName().equals(sourceName))
-                .first()
-                .satisfies(e -> e.getDescription().equals(sourceDescription));
     }
 
     private static Stream<Arguments> propertySourceDescription() {

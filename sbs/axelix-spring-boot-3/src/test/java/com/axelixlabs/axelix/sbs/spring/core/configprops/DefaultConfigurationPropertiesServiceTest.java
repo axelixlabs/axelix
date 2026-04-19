@@ -93,7 +93,6 @@ public class DefaultConfigurationPropertiesServiceTest {
             // that it makes sense to sanitize them as well, but currently it is not possible due
             // to internal implementation of the Spring Boot Actuator native config props endpoint.
             assertThat(values).containsOnly(null, "******");
-            assertThat(configProps).isNotNull().isInstanceOf(ConfigurationPropertiesFeed.class);
         }
 
         @Test
@@ -111,7 +110,6 @@ public class DefaultConfigurationPropertiesServiceTest {
                     .collect(Collectors.toSet());
 
             assertThat(values).doesNotContain("******");
-            assertThat(configProps).isNotNull().isInstanceOf(ConfigurationPropertiesFeed.class);
         }
 
         @TestConfiguration
@@ -120,7 +118,8 @@ public class DefaultConfigurationPropertiesServiceTest {
 
             @Bean
             public SmartSanitizingFunction smartSanitizingFunction(PropertyNameNormalizer propertyNameNormalizer) {
-                return new SmartSanitizingFunction(List.of("*"), propertyNameNormalizer);
+                return new SmartSanitizingFunction(
+                        EndpointsConfigurationProperties.SANITIZE_ALL, propertyNameNormalizer);
             }
         }
     }
@@ -165,8 +164,6 @@ public class DefaultConfigurationPropertiesServiceTest {
             assertThat(nonSanitizedProps)
                     .allMatch(prop -> !prop.getKey().contains("forSanitization")
                             && !prop.getKey().contains("FOR_SANITIZATION"));
-
-            assertThat(configProps).isNotNull().isInstanceOf(ConfigurationPropertiesFeed.class);
         }
 
         @Test
@@ -184,7 +181,6 @@ public class DefaultConfigurationPropertiesServiceTest {
                     .collect(Collectors.toSet());
 
             assertThat(values).doesNotContain("******");
-            assertThat(configProps).isNotNull().isInstanceOf(ConfigurationPropertiesFeed.class);
         }
 
         @TestConfiguration

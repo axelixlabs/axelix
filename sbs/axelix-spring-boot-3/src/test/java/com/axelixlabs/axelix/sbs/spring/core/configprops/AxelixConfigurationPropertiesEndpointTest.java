@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.jspecify.annotations.Nullable;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -41,6 +39,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.ConfigurationPropertiesFeed;
 import com.axelixlabs.axelix.common.api.KeyValue;
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
@@ -55,6 +55,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 13.11.2025
  * @author Sergey Cherkasov
+ * @author Nikita Kirillov
+ * @author Mikhail Polivakha
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
@@ -83,10 +85,11 @@ public class AxelixConfigurationPropertiesEndpointTest {
     private TestRestTemplateBuilder restTemplate;
 
     @ParameterizedTest
-    @MethodSource("propertyName")
-    void shouldReturnPropertiesNameAndValue(String propertyName, String expectedValue) {
-        ResponseEntity<ConfigurationPropertiesFeed> response =
-                restTemplate.asViewer().getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
+    @MethodSource("propertiesFeed")
+    void shouldReturnPropertiesNameAndValue_forNonAdminRoles(String propertyName, String expectedValue, Role role) {
+        ResponseEntity<ConfigurationPropertiesFeed> response = restTemplate
+                .withRole(role)
+                .getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -101,41 +104,33 @@ public class AxelixConfigurationPropertiesEndpointTest {
                 .containsExactly(expectedValue);
     }
 
-    @Test
-    void shouldReturnNotSanitizedPropertiesValue_forAdminRole() {
-        ResponseEntity<ConfigurationPropertiesFeed> response =
-                restTemplate.asAdmin().getForEntity("/actuator/axelix-configprops", ConfigurationPropertiesFeed.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        List<@Nullable String> properties = response.getBody().getBeans().stream()
-                .flatMap(bean -> bean.getProperties().stream())
-                .map(KeyValue::getValue)
-                .toList();
-
-        assertThat(properties).doesNotContain("******");
-    }
-
-    private static Stream<Arguments> propertyName() {
+    private static Stream<Arguments> propertiesFeed() {
         return Stream.of(
-                // These should be sanitized (explicitly configured)
-                Arguments.of("tags.forSanitization", "******"),
-                Arguments.of("tags.FOR_SANITIZATION", "******"),
-                // These should NOT be sanitized (not in sanitization list)
-                Arguments.of("tags.version", "1.0.0"),
-                Arguments.of("enabledContexts[0]", "user-service"),
-                Arguments.of("enabledContexts[1]", "payment-service"),
-                Arguments.of("httpClient.requests[0].name", "user-api"),
-                Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1"),
-                Arguments.of("httpClient.requests[0].methods[0].type", "GET"),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3"),
-                Arguments.of("httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000"),
-                Arguments.of("httpClient.requests[0].methods[1].type", "POST"),
-                Arguments.of("httpClient.requests[1].name", "payment-api"),
-                Arguments.of("httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2"),
-                Arguments.of("httpClient.requests[1].methods[0].type", "PUT"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2"),
-                Arguments.of("httpClient.requests[1].methods[0].retries[0].parameters.log-level", "DEBUG"));
+                Arguments.of("tags.forSanitization", "******", DefaultRole.VIEWER),
+                Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.VIEWER),
+                Arguments.of("tags.forSanitization", "******", DefaultRole.EDITOR),
+                Arguments.of("tags.FOR_SANITIZATION", "******", DefaultRole.EDITOR),
+                Arguments.of("tags.forSanitization", "toBeSanitized", DefaultRole.ADMIN),
+                Arguments.of("tags.FOR_SANITIZATION", "toBeSanitized", DefaultRole.ADMIN),
+                Arguments.of("tags.version", "1.0.0", DefaultRole.VIEWER),
+                Arguments.of("enabledContexts[0]", "user-service", DefaultRole.VIEWER),
+                Arguments.of("enabledContexts[1]", "payment-service", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].name", "user-api", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].baseUrl", "https://api.users.example.com/v1", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[0].type", "GET", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[0].retries[0].count", "3", DefaultRole.VIEWER),
+                Arguments.of(
+                        "httpClient.requests[0].methods[0].retries[0].parameters.timeout", "5000", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[0].methods[1].type", "POST", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[1].name", "payment-api", DefaultRole.VIEWER),
+                Arguments.of(
+                        "httpClient.requests[1].baseUrl", "https://api.payments.example.com/v2", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[1].methods[0].type", "PUT", DefaultRole.VIEWER),
+                Arguments.of("httpClient.requests[1].methods[0].retries[0].count", "2", DefaultRole.VIEWER),
+                Arguments.of(
+                        "httpClient.requests[1].methods[0].retries[0].parameters.log-level",
+                        "DEBUG",
+                        DefaultRole.VIEWER));
     }
 
     @ConfigurationProperties(prefix = "axelix.prop.test")

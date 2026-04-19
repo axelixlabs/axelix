@@ -23,13 +23,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
-import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
-import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
-import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
-import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,6 +44,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
+
+import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
+import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
+import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -134,7 +135,7 @@ class AxelixEnvironmentEndpointTest {
 
     @ParameterizedTest(name = "Property ''{0}'' should have value ''{1}'' for ''{2}''")
     @MethodSource("sanitizationArgsSource")
-    void shouldSanitizeAllAppearancesOfTheGivenProperty(String propertyName, String value, Role role) {
+    void shouldReturnACorrectValueForTheGivenPropertyConsideringTheRole(String propertyName, String value, Role role) {
         ResponseEntity<EnvironmentFeed> response =
                 restTemplate.withRole(role).getForEntity("/actuator/axelix-env", EnvironmentFeed.class);
 
@@ -218,38 +219,37 @@ class AxelixEnvironmentEndpointTest {
 
     private static Stream<Arguments> propertyExpectations() {
         return Stream.of(
-            Arguments.of("axelix.env.test.prop1", "fromTestSource"),
-            Arguments.of("axelix.env.test.prop2", "dynamicValue"),
-            Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
+                Arguments.of("axelix.env.test.prop1", "fromTestSource"),
+                Arguments.of("axelix.env.test.prop2", "dynamicValue"),
+                Arguments.of("axelix.env.test.prop3", "fromCommandLine"));
     }
 
     public static Stream<Arguments> sanitizationArgsSource() {
         return Stream.of(
-            Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.EDITOR),
-            Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.EDITOR),
-            Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.VIEWER),
-            Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.VIEWER),
-            Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", DefaultRole.ADMIN),
-            Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", DefaultRole.ADMIN)
-        );
+                Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.EDITOR),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.EDITOR),
+                Arguments.of("axelix.env.test.toBeSanitized", "******", DefaultRole.VIEWER),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "******", DefaultRole.VIEWER),
+                Arguments.of("axelix.env.test.toBeSanitized", "shouldBeSanitized", DefaultRole.ADMIN),
+                Arguments.of("AXELIX_FOR_SANITIZATION", "shouldBeSanitized", DefaultRole.ADMIN));
     }
 
     private static Stream<Arguments> propertyName() {
         return Stream.of(
-            Arguments.of("axelix.prop.test.tags.environment"),
-            Arguments.of("axelix.prop.test.tags.version"),
-            Arguments.of("axelix.prop.test.enabled-contexts"),
-            Arguments.of("axelix.prop.test.http-client.requests[0].name"),
-            Arguments.of("axelix.prop.test.http-client.requests[0].base-url"),
-            Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].type"),
-            Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].retries[0].count"),
-            Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout"),
-            Arguments.of("axelix.prop.test.http-client.requests[0].methods[1].type"),
-            Arguments.of("axelix.prop.test.http-client.requests[1].name"),
-            Arguments.of("axelix.prop.test.http-client.requests[1].base-url"),
-            Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].type"),
-            Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].count"),
-            Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
+                Arguments.of("axelix.prop.test.tags.environment"),
+                Arguments.of("axelix.prop.test.tags.version"),
+                Arguments.of("axelix.prop.test.enabled-contexts"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].name"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].base-url"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].type"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].retries[0].count"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].methods[0].retries[0].parameters.timeout"),
+                Arguments.of("axelix.prop.test.http-client.requests[0].methods[1].type"),
+                Arguments.of("axelix.prop.test.http-client.requests[1].name"),
+                Arguments.of("axelix.prop.test.http-client.requests[1].base-url"),
+                Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].type"),
+                Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].count"),
+                Arguments.of("axelix.prop.test.http-client.requests[1].methods[0].retries[0].parameters.log-level"));
     }
 
     private static Stream<Arguments> propertySourceDescription() {
