@@ -5,16 +5,19 @@ axelix:
       static-resources:
         location: /application/dist/
     discovery:
-      auto: true
-      platform: kubernetes
-      kubernetes:
-        # Should be provided by the local-launch configuration
-        kube-apiserver-url:
-        # Should be set-up in local .env file or by any other means
-        sa-token-path: ${SA_TOKEN_PATH:}
-        ca-cert-path: ${CA_CERT_PATH:}
-        filters:
-          namespaces: default
+      auto:
+        enabled: true
+        broadcast:
+          interval: 60000
+        platform: kubernetes
+        kubernetes:
+          # Should be provided by the local-launch configuration
+          kube-apiserver-url:
+          # Should be set-up in local .env file or by any other means
+          sa-token-path: ${SA_TOKEN_PATH:}
+          ca-cert-path: ${CA_CERT_PATH:}
+          filters:
+            namespaces: default
     auth:
       jwt:
         algorithm: HMAC512
