@@ -65,6 +65,8 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
                     k8sInstance.getInstanceId(),
                     k8sInstance.podName(),
                     k8sInstance.getDeploymentAt(),
+                    // An instance deregistered through KubernetesDiscoveryClient
+                    // should not retain the last registration timestamp
                     null,
                     serviceInstance.getUri() + ACTUATOR_ENDPOINT_POSTFIX,
                     profile.metadata());

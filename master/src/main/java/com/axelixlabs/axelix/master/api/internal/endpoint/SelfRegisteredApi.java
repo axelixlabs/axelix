@@ -43,8 +43,8 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 @InternalApiRestController
 @RequestMapping(path = ApiPaths.SelfRegistryApi.MAIN)
 @ConditionalOnProperty(
-        prefix = "axelix.master.discovery",
-        name = "self-registration",
+        prefix = "axelix.master.discovery.self-registration",
+        name = "enabled",
         havingValue = "true",
         matchIfMissing = true)
 public class SelfRegisteredApi {

@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.repository;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -32,6 +33,7 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public interface InstanceRepository extends ListCrudRepository<Instance, InstanceId> {
 
@@ -45,4 +47,8 @@ public interface InstanceRepository extends ListCrudRepository<Instance, Instanc
     List<String> findAllIds();
 
     Set<Instance> findByNameLikeIgnoreCase(@Param("query") String query);
+
+    @Modifying
+    @Query("DELETE FROM instances WHERE latest_hearth_beat IS NULL")
+    void deleteAllWithoutHeartbeat();
 }

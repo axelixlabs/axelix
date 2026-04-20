@@ -38,6 +38,7 @@ import com.axelixlabs.axelix.master.repository.InstanceRepository;
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @Service
 @NullMarked
@@ -64,13 +65,9 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
         }
     }
 
-    public void registerAll(Collection<Instance> instances) {
-        jdbcAggregateTemplate.insertAll(instances);
-    }
-
     @Override
     public void reload(Collection<Instance> instances) {
-        jdbcAggregateTemplate.deleteAll(Instance.class);
+        instanceRepository.deleteAllWithoutHeartbeat();
         jdbcAggregateTemplate.insertAll(instances);
     }
 

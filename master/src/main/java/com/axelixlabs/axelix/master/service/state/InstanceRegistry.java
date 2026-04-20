@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
  * @see Instance
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @NullMarked
 public interface InstanceRegistry {
@@ -48,20 +49,11 @@ public interface InstanceRegistry {
     void register(Instance instance);
 
     /**
-     * Registers all provided {@linkplain Instance Instances} within the registry.
+     * Reloads the registry, removing instances with latestHeartbeat == {@code null}
+     * while preserving the passed Set&lt;{@link Instance}&gt;. Instances with non-{@code null}
+     * latestHeartbeat remain unchanged.
      *
-     * @param instances the instances that need to be registered
-     */
-    void registerAll(Collection<Instance> instances);
-
-    /**
-     * Reloads the registry.
-     *
-     * It essentially means that the entire database of Instances is wiped out, and after that
-     * only the provided Instances are persisted. So the passed collection of instances is effectively
-     * the new state of this Instance Registry
-     *
-     * @param instances the instances to replace all the existing onces
+     * @param instances Instances to register (those with latestHeartbeat == {@code null})
      */
     void reload(Collection<Instance> instances);
 

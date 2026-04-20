@@ -18,9 +18,7 @@
 package com.axelixlabs.axelix.master.service.discovery;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,15 +78,9 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 """, this.getClass().getSimpleName());
         }
 
-        List<Instance> currentlyRegisteredIds = instanceRegistry.getAll();
+        Set<InstanceId> currentlyRegisteredIds = instanceRegistry.getAllIds();
 
-        Set<InstanceId> autoDiscoveryInstancesIds = currentlyRegisteredIds.stream()
-                .filter(instance -> instance.latestHearthBeat() == null)
-                .map(Instance::id)
-                .collect(Collectors.toSet());
-
-        instanceRegistry.deRegisterAll(autoDiscoveryInstancesIds);
-        instanceRegistry.registerAll(discoveredInstances);
+        instanceRegistry.reload(discoveredInstances);
 
         logger.debug("Registered instances: {}", currentlyRegisteredIds.size());
     }
