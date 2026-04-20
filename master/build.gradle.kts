@@ -26,7 +26,6 @@ dependencies {
     implementation(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
 
     // Boot Starters
-    implementation("org.springframework.boot:spring-boot-starter-jdbc") // TODO: Do we still need plain JDBC starter? I think no...
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
@@ -40,6 +39,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.paypal:heap-dump-tool:${heapDumpToolVersion}")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
+    implementation("com.jayway.jsonpath:json-path")
 
     // Runtime
     runtimeOnly("ch.qos.logback:logback-classic")

@@ -1,0 +1,12 @@
+{
+  "sub": "2d23e6c3-dec0-4b2a-b5d2-ba1cee156b03",
+  "email_verified": true,
+  "roles": [
+    "admin"
+  ],
+  "name": "John Doe",
+  "preferred_username": "user",
+  "given_name": "John",
+  "family_name": "Doe",
+  "email": "example@mail.com"
+}

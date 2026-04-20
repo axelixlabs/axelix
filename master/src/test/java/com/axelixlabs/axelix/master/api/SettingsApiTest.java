@@ -109,7 +109,7 @@ class SettingsApiTest {
                 "axelix.master.auth.options.oauth2.issuer-uri=http://placeholder.will.be.overridden",
                 "axelix.master.auth.options.oauth2.client-id=test-client",
                 "axelix.master.auth.options.oauth2.client-secret=test-secret",
-                "axelix.master.auth.options.oauth2.redirect-uri=http://localhost:3000/api/external/oauth2/callback"
+                "axelix.master.auth.options.oauth2.base-url=http://localhost:3000"
             })
     @Nested
     class WhenOAuth2Enabled {
@@ -164,7 +164,7 @@ class SettingsApiTest {
                 "axelix.master.auth.options.oauth2.issuer-uri=http://placeholder.will.be.overridden",
                 "axelix.master.auth.options.oauth2.client-id=test-client",
                 "axelix.master.auth.options.oauth2.client-secret=test-secret",
-                "axelix.master.auth.options.oauth2.redirect-uri=http://localhost:3000/api/external/oauth2/callback"
+                "axelix.master.auth.options.oauth2.base-url=http://localhost:3000"
             })
     @Nested
     class WhenStaticAdminAndOAuth2Enabled {

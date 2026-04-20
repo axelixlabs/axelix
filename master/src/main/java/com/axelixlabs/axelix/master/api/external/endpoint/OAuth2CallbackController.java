@@ -27,14 +27,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
+import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
+import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient.Tokens;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 
 /**
@@ -58,12 +60,17 @@ public class OAuth2CallbackController {
     private final OidcClient oidcClient;
     private final CookieService cookieService;
     private final JwtEncoderService jwtEncoderService;
+    private final OidcRoleExtractor oidcRoleExtractor;
 
     public OAuth2CallbackController(
-            OidcClient oidcClient, CookieService cookieService, JwtEncoderService jwtEncoderService) {
+            OidcClient oidcClient,
+            CookieService cookieService,
+            JwtEncoderService jwtEncoderService,
+            OidcRoleExtractor oidcRoleExtractor) {
         this.oidcClient = oidcClient;
         this.cookieService = cookieService;
         this.jwtEncoderService = jwtEncoderService;
+        this.oidcRoleExtractor = oidcRoleExtractor;
     }
 
     @GetMapping(path = ApiPaths.OAuth2Api.CALLBACK)
@@ -74,11 +81,13 @@ public class OAuth2CallbackController {
             throw new BadRequestException("The authorization code is required");
         }
 
-        String oidcToken = oidcClient.exchangeCodeForIdToken(code);
+        Tokens tokens = oidcClient.exchangeCodeForTokens(code);
 
-        String username = oidcClient.validateOAuth2JwtTokenAndExtractUsername(oidcToken);
+        String username = oidcClient.validateIdTokenAndExtractUsername(tokens.idToken());
 
-        User user = new PasswordlessUser(username, Set.of(DefaultRole.ADMIN));
+        Role role = oidcRoleExtractor.extractRole(tokens);
+
+        User user = new PasswordlessUser(username, Set.of(role));
 
         String ourToken = jwtEncoderService.generateToken(user);
 

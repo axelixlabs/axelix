@@ -40,6 +40,7 @@ import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.api.external.endpoint.OAuth2CallbackController;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
+import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,13 +60,14 @@ import static org.mockito.Mockito.when;
             "axelix.master.auth.options.oauth2.issuer-uri=http://placeholder.will.be.overridden",
             "axelix.master.auth.options.oauth2.client-id=test-client",
             "axelix.master.auth.options.oauth2.client-secret=test-secret",
-            "axelix.master.auth.options.oauth2.redirect-uri=http://localhost:3000/api/external/oauth2/callback"
+            "axelix.master.auth.options.oauth2.base-url=http://localhost:3000",
+            "axelix.master.auth.options.oauth2.role-attribute-path=\"$.roles[*]\""
         })
-@TestPropertySource(properties = "axelix.master.auth.static-admin.enabled=true")
 class OAuth2CallbackControllerTest {
 
     private static final String CODE = "test-code";
     private static final String ID_TOKEN = "test-id-token";
+    private static final String ACCESS_TOKEN = "test-access-token";
     private static final String USERNAME = "test-user";
     private static final String OUR_JWT_TOKEN = "our-jwt-token";
     private static final String AUTHORITIES = "authorities_of_role";
@@ -86,7 +88,7 @@ class OAuth2CallbackControllerTest {
 
     @BeforeEach
     void prepare() {
-        ResponseCookie authCookie = ResponseCookie.from("auth-token", OUR_JWT_TOKEN)
+        ResponseCookie authCookie = ResponseCookie.from("auth_token", OUR_JWT_TOKEN)
                 .path("/")
                 .httpOnly(true)
                 .build();
@@ -96,8 +98,8 @@ class OAuth2CallbackControllerTest {
 
         restTemplate = new TestRestTemplate(new RestTemplateBuilder().redirects(HttpRedirects.DONT_FOLLOW));
 
-        when(oidcClient.exchangeCodeForIdToken(CODE)).thenReturn(ID_TOKEN);
-        when(oidcClient.validateOAuth2JwtTokenAndExtractUsername(ID_TOKEN)).thenReturn(USERNAME);
+        when(oidcClient.exchangeCodeForTokens(CODE)).thenReturn(new DefaultOidcClient.Tokens(ID_TOKEN, ACCESS_TOKEN));
+        when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN)).thenReturn(USERNAME);
         when(jwtEncoderService.generateToken(any())).thenReturn(OUR_JWT_TOKEN);
         when(cookieService.buildAuthCookie(OUR_JWT_TOKEN)).thenReturn(authCookie);
         when(cookieService.buildAuthoritiesMetadataCookie(any(Set.class))).thenReturn(authoritiesMetadataCookie);
@@ -112,7 +114,7 @@ class OAuth2CallbackControllerTest {
         assertThat(response.getHeaders().getLocation()).hasToString("/wallboard");
 
         List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-        assertThat(cookies).anyMatch(c -> c.contains("auth-token=" + OUR_JWT_TOKEN));
+        assertThat(cookies).anyMatch(c -> c.contains("auth_token=" + OUR_JWT_TOKEN));
         assertThat(cookies).anyMatch(c -> c.contains("authorities=" + AUTHORITIES));
     }
 
@@ -126,7 +128,7 @@ class OAuth2CallbackControllerTest {
 
     @Test
     void shouldReturn401WhenCodeExchangeFails() {
-        when(oidcClient.exchangeCodeForIdToken(CODE)).thenThrow(new OidcTokenExchangeException("exchange failed"));
+        when(oidcClient.exchangeCodeForTokens(CODE)).thenThrow(new OidcTokenExchangeException("exchange failed"));
 
         ResponseEntity<Void> response = restTemplate.getForEntity(
                 "http://localhost:" + port + "/api/external/oauth2/callback?code=" + CODE, Void.class);
@@ -136,7 +138,7 @@ class OAuth2CallbackControllerTest {
 
     @Test
     void shouldReturn401WhenTokenValidationFails() {
-        when(oidcClient.validateOAuth2JwtTokenAndExtractUsername(ID_TOKEN))
+        when(oidcClient.validateIdTokenAndExtractUsername(ID_TOKEN))
                 .thenThrow(new InvalidJwtTokenException("invalid token"));
 
         ResponseEntity<Void> response = restTemplate.getForEntity(

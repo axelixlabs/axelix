@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
@@ -60,6 +61,7 @@ import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
+import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient.Tokens;
 import com.axelixlabs.axelix.master.utils.TestResourceReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -105,14 +107,15 @@ class DefaultOidcClientTest {
 
     @BeforeEach
     void prepare() {
-        String baseUrl = mockWebServer.url("").toString();
+        String issuerUri = mockWebServer.url("").toString();
 
         OAuth2Properties oAuth2Properties =
-                new OAuth2Properties(baseUrl, CLIENT_ID, CLIENT_SECRET, baseUrl + "/oauth2/callback", null, null);
+                new OAuth2Properties(issuerUri, CLIENT_ID, CLIENT_SECRET, issuerUri, null, null, null, null);
 
         OidcMetadataProvider oidcMetadataProvider = mock(OidcMetadataProvider.class);
-        when(oidcMetadataProvider.getTokenEndpoint()).thenReturn(baseUrl + "/token");
-        when(oidcMetadataProvider.getJwksUri()).thenReturn(baseUrl + "/certs");
+        when(oidcMetadataProvider.getTokenEndpoint()).thenReturn(issuerUri + "/token");
+        when(oidcMetadataProvider.getJwksUri()).thenReturn(issuerUri + "/certs");
+        when(oidcMetadataProvider.getUserInfoEndpoint()).thenReturn(issuerUri + "/userinfo");
 
         oidcClient = new DefaultOidcClient(
                 RestClient.builder().build(), oAuth2Properties, oidcMetadataProvider, new ObjectMapper());
@@ -137,17 +140,22 @@ class DefaultOidcClientTest {
         });
 
         // when.
-        String data = oidcClient.exchangeCodeForIdToken(AUTH_CODE);
+        Tokens data = oidcClient.exchangeCodeForTokens(AUTH_CODE);
 
         // then.
         String idToken =
                 new ObjectMapper().readTree(jsonResponse).get("id_token").asString();
-        assertThat(data).isEqualTo(idToken);
+        assertThat(data.idToken()).isEqualTo(idToken);
+
+        // and then.
+        String accessToken =
+                new ObjectMapper().readTree(jsonResponse).get("access_token").asString();
+        assertThat(data.accessToken()).isEqualTo(accessToken);
 
         // and then.
         RecordedRequest tokenRequest = mockWebServer.takeRequest();
         Map<String, String> formParams = parseFormBody(tokenRequest.getBody().readUtf8());
-        String expectedRedirectUri = mockWebServer.url("") + "/oauth2/callback";
+        String expectedRedirectUri = mockWebServer.url("") + "/api/external/oauth2/callback";
 
         assertThat(formParams)
                 .containsEntry("grant_type", "authorization_code")
@@ -178,7 +186,7 @@ class DefaultOidcClientTest {
         });
 
         // when/then
-        assertThatThrownBy(() -> oidcClient.exchangeCodeForIdToken(AUTH_CODE))
+        assertThatThrownBy(() -> oidcClient.exchangeCodeForTokens(AUTH_CODE))
                 .isInstanceOf(OidcTokenExchangeException.class);
     }
 
@@ -190,7 +198,7 @@ class DefaultOidcClientTest {
             setupJwksDispatcher();
             String token = buildIdToken(RSA_KEY_ID, rsaKey.toPrivateKey(), "preferred-user", null);
 
-            String result = oidcClient.validateOAuth2JwtTokenAndExtractUsername(token);
+            String result = oidcClient.validateIdTokenAndExtractUsername(token);
 
             assertThat(result).isEqualTo("preferred-user");
         }
@@ -200,7 +208,7 @@ class DefaultOidcClientTest {
             setupJwksDispatcher();
             String token = buildIdToken(EC_KEY_ID, ecKey.toPrivateKey(), "ec-user", null);
 
-            String result = oidcClient.validateOAuth2JwtTokenAndExtractUsername(token);
+            String result = oidcClient.validateIdTokenAndExtractUsername(token);
 
             assertThat(result).isEqualTo("ec-user");
         }
@@ -211,7 +219,7 @@ class DefaultOidcClientTest {
             String subject = UUID.randomUUID().toString();
             String token = buildIdToken(RSA_KEY_ID, rsaKey.toPrivateKey(), null, subject);
 
-            String result = oidcClient.validateOAuth2JwtTokenAndExtractUsername(token);
+            String result = oidcClient.validateIdTokenAndExtractUsername(token);
 
             assertThat(result).isEqualTo(subject);
         }
@@ -221,7 +229,7 @@ class DefaultOidcClientTest {
             setupJwksDispatcher();
             String token = buildExpiredToken();
 
-            assertThatThrownBy(() -> oidcClient.validateOAuth2JwtTokenAndExtractUsername(token))
+            assertThatThrownBy(() -> oidcClient.validateIdTokenAndExtractUsername(token))
                     .isInstanceOf(ExpiredJwtTokenException.class);
         }
 
@@ -233,7 +241,7 @@ class DefaultOidcClientTest {
             String token = buildIdToken(RSA_KEY_ID, differentRsaKey.toPrivateKey(), "user", null);
 
             // when/then.
-            assertThatThrownBy(() -> oidcClient.validateOAuth2JwtTokenAndExtractUsername(token))
+            assertThatThrownBy(() -> oidcClient.validateIdTokenAndExtractUsername(token))
                     .isInstanceOf(InvalidJwtTokenException.class);
         }
 
@@ -244,7 +252,7 @@ class DefaultOidcClientTest {
             String token = buildIdToken("unknown-key-id", rsaKey.toPrivateKey(), "user", null);
 
             // when/then.
-            assertThatThrownBy(() -> oidcClient.validateOAuth2JwtTokenAndExtractUsername(token))
+            assertThatThrownBy(() -> oidcClient.validateIdTokenAndExtractUsername(token))
                     .isInstanceOf(JwtParsingException.class);
         }
 
@@ -304,6 +312,65 @@ class DefaultOidcClientTest {
                     .expiration(Date.from(past.plus(Duration.ofMinutes(1))))
                     .signWith(rsaKey.toPrivateKey())
                     .compact();
+        }
+    }
+
+    @Nested
+    class AccessTokenValidation {
+
+        @BeforeEach
+        void drainStaleRecordedRequests() throws InterruptedException {
+            while (mockWebServer.takeRequest(1, TimeUnit.MILLISECONDS) != null) {
+                // Clear recorded requests.
+                // Other test do not always consume MockWebServer's recorded requests.
+            }
+        }
+
+        @Test
+        void shouldCompleteWhenUserInfoReturnsOk() throws Exception {
+            String accessToken = "test-access-token";
+
+            String jsonResponse = TestResourceReader.readResource("other/user-info-response.json");
+
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
+                    if ("/userinfo".equals(request.getPath()) && "GET".equals(request.getMethod())) {
+                        String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
+                        if (("Bearer " + accessToken).equals(auth)) {
+                            return new MockResponse()
+                                    .setBody(jsonResponse)
+                                    .addHeader("Content-Type", APPLICATION_JSON_VALUE)
+                                    .setResponseCode(200);
+                        }
+                    }
+                    return new MockResponse().setResponseCode(404);
+                }
+            });
+
+            String userInfoJson = oidcClient.validateAccessTokenAndExtractUserInfo(accessToken);
+
+            assertThat(userInfoJson).isEqualTo(jsonResponse);
+            RecordedRequest userInfoRequest = mockWebServer.takeRequest();
+            assertThat(userInfoRequest.getPath()).isEqualTo("/userinfo");
+            assertThat(userInfoRequest.getMethod()).isEqualTo("GET");
+            assertThat(userInfoRequest.getHeader(HttpHeaders.AUTHORIZATION)).isEqualTo("Bearer " + accessToken);
+        }
+
+        @Test
+        void shouldThrowWhenUserInfoReturnsUnauthorized() {
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
+                    if ("/userinfo".equals(request.getPath()) && "GET".equals(request.getMethod())) {
+                        return new MockResponse().setResponseCode(401);
+                    }
+                    return new MockResponse().setResponseCode(404);
+                }
+            });
+
+            assertThatThrownBy(() -> oidcClient.validateAccessTokenAndExtractUserInfo("invalid-token"))
+                    .isInstanceOf(OidcTokenExchangeException.class);
         }
     }
 

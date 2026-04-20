@@ -17,10 +17,16 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
 
+import java.util.List;
+import java.util.Map;
+
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.Assert;
+
+import com.axelixlabs.axelix.master.api.external.ApiPaths;
+import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
 
 import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration.OAUTH_PROPERTIES_PREFIX;
 
@@ -31,7 +37,7 @@ import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoCo
  *                      via {@code /.well-known/openid-configuration}
  * @param clientId      the client identifier issued during registration with the OIDC provider
  * @param clientSecret  the client secret issued during registration.
- * @param redirectUri   the URI to redirect to after successful authentication.
+ * @param baseUrl       the base URL of this application.
  * @param usernameClaim the JWT claim to use as the username. If not specified,
  *                      falls back to {@code preferred_username}, then {@code name}, then {@code sub}
  *
@@ -44,22 +50,33 @@ public record OAuth2Properties(
         String issuerUri,
         String clientId,
         String clientSecret,
-        String redirectUri,
+        String baseUrl,
         @Nullable String usernameClaim,
-        String scopes) {
+        String scopes,
+        @Nullable String roleAttributePath,
+        Map<String, List<String>> roleMapping) {
 
     private static final String DEFAULT_SCOPE = "openid";
+    private static final Map<String, List<String>> DEFAULT_ROLE_MAPPING =
+            Map.of("admin", List.of("admin"), "editor", List.of("editor"));
 
     public OAuth2Properties {
         Assert.notNull(issuerUri, "OAuth2 issuer-uri is required. Set " + OAUTH_PROPERTIES_PREFIX + ".issuer-uri");
         Assert.notNull(clientId, "OAuth2 client-id is required. Set " + OAUTH_PROPERTIES_PREFIX + ".client-id");
         Assert.notNull(
                 clientSecret, "OAuth2 client-secret is required. Set " + OAUTH_PROPERTIES_PREFIX + ".client-secret");
-        Assert.notNull(
-                redirectUri, "OAuth2 redirect-uri is required. Set " + OAUTH_PROPERTIES_PREFIX + ".redirect-uri");
+        Assert.notNull(baseUrl, "OAuth2 base-url is required. Set " + OAUTH_PROPERTIES_PREFIX + ".base-url");
 
         if (scopes == null) {
             scopes = DEFAULT_SCOPE;
         }
+
+        if (roleMapping == null) {
+            roleMapping = DEFAULT_ROLE_MAPPING;
+        }
+    }
+
+    public String redirectUri() {
+        return baseUrl + WebAutoConfiguration.EXTERNAL_API_PATH + ApiPaths.OAuth2Api.CALLBACK;
     }
 }

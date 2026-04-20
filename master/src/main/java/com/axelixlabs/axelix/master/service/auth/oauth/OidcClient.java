@@ -17,10 +17,13 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
+import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient.Tokens;
 
 /**
  * OIDC client for authorization code exchange and public key retrieval.
@@ -35,10 +38,10 @@ public interface OidcClient {
      * Authorization Code Flow as defined in RFC 6749 Section 4.1.3.
      *
      * @param code the authorization code received from the OIDC provider
-     * @return the ID Token string
+     * @return the Tokens object containing id token and access token
      * @throws OidcTokenExchangeException if the exchange fails or the response is invalid
      */
-    String exchangeCodeForIdToken(String code) throws OidcTokenExchangeException;
+    Tokens exchangeCodeForTokens(String code) throws OidcTokenExchangeException;
 
     /**
      * Validates the given OIDC ID Token and extracts the username from its claims.
@@ -51,12 +54,27 @@ public interface OidcClient {
      * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation">
      *      OpenID Connect Core 1.0 - ID Token Validation</a>
      *
-     * @param token the OIDC ID Token to validate and process
+     * @param idToken the OIDC ID Token to validate and process
      * @return the extracted username
      * @throws ExpiredJwtTokenException if the token has expired
      * @throws InvalidJwtTokenException if the token signature is invalid or tampered
      * @throws JwtProcessingException   if the token cannot be parsed
      */
-    String validateOAuth2JwtTokenAndExtractUsername(String token)
+    String validateIdTokenAndExtractUsername(String idToken)
             throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtProcessingException;
+
+    /**
+     * Verifies the given OAuth2 access token by calling the OIDC provider's userinfo_endpoint.
+     *
+     * <p><b>Note:</b> This method requires the provider to support the userinfo_endpoint,
+     * which is RECOMMENDED but not mandatory in OpenID Connect Discovery 1.0.
+     * If the endpoint is not available, a {@link OidcTokenExchangeException} will be thrown.</p>
+     *
+     * @param accessToken access token to verify
+     * @return userInfo json
+     * @throws OidcTokenExchangeException if the token is invalid, expired, malformed,
+     *                                    or the userinfo_endpoint is unavailable
+     */
+    @Nullable
+    String validateAccessTokenAndExtractUserInfo(String accessToken) throws OidcTokenExchangeException;
 }
