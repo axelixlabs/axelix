@@ -58,15 +58,6 @@ public interface LibraryInformationProvider {
     }
 
     /**
-     * Returns the JDK vendor version.
-     *
-     * @return value of {@code java.vendor.version}, or an empty string when the property is absent
-     */
-    default String getJdkVendorVersion() {
-        return emptyIfNull(System.getProperty("java.vendor.version"));
-    }
-
-    /**
      * Returns the Spring Boot version.
      *
      * @return Spring Boot version, or an empty string when it is not available
