@@ -27,7 +27,7 @@ RUN java \
     -Daxelix.master.web.static-resources.location=file:/application/dist/ \
     -Daxelix.master.auth.jwt.algorithm=HMAC256 \
     -Daxelix.master.auth.jwt.signing-key=8DrZJSOJ8vkbxdjUB3sSsyeiG4Xidf1sDNmJq1Slkkn \
-    -Daxelix.master.discovery.auto=false \
+    -Daxelix.master.discovery.auto.enabled=false \
     -Dspring.context.exit=onRefresh \
     org.springframework.boot.loader.launch.JarLauncher
 
