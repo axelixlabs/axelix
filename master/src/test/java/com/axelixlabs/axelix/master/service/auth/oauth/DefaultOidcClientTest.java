@@ -141,7 +141,7 @@ class DefaultOidcClientTest {
 
         // then.
         String idToken =
-                new ObjectMapper().readTree(jsonResponse).get("id_token").asText();
+                new ObjectMapper().readTree(jsonResponse).get("id_token").asString();
         assertThat(data).isEqualTo(idToken);
 
         // and then.
@@ -248,7 +248,7 @@ class DefaultOidcClientTest {
                     .isInstanceOf(JwtParsingException.class);
         }
 
-        private void setupJwksDispatcher() throws Exception {
+        private void setupJwksDispatcher() {
             String jwksJson = new ObjectMapper().writeValueAsString(new JWKSet(List.of(rsaKey, ecKey)).toJSONObject());
 
             mockWebServer.setDispatcher(new Dispatcher() {

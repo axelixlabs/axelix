@@ -96,7 +96,7 @@ public class DefaultServiceDetailsAssembler implements ServiceDetailsAssembler {
     private RuntimeDetails getRuntimeDetails() {
         return new RuntimeDetails(
                 libraryInformationProvider.getJavaVersion(),
-                libraryInformationProvider.getJdkVendorVersion(),
+                libraryInformationProvider.getJdkVendorName(),
                 getGarbageCollectorInfo(),
                 libraryInformationProvider.getKotlinVersion());
     }

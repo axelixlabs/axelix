@@ -63,7 +63,6 @@ class DefaultServiceDetailsAssemblerTest {
     @Test
     void shouldAssembleCompleteServiceDetails() {
         InstanceDetails result = serviceDetailsAssembler.assemble();
-        System.out.println(result);
 
         assertThat(result).isNotNull();
 
@@ -83,7 +82,7 @@ class DefaultServiceDetailsAssemblerTest {
         RuntimeDetails runtime = result.getRuntime();
         assertThat(runtime).isNotNull();
         assertThat(runtime.getJavaVersion()).isEqualTo(System.getProperty("java.version"));
-        assertThat(runtime.getJdkVendor()).isEqualTo(System.getProperty("java.vendor.version"));
+        assertThat(runtime.getJdkVendor()).isNotBlank().isEqualTo(System.getProperty("java.vendor"));
         assertThat(runtime.getGarbageCollector()).isNotBlank();
         assertThat(runtime.getKotlinVersion()).isEqualTo(KotlinVersion.CURRENT.toString());
 
