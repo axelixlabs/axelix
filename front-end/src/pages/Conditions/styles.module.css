@@ -5,6 +5,23 @@
     column-gap: 20px;
 }
 
+.ConditionsMainWrapper {
+    /* TODO: Remove this magic number after layout improvement */
+    height: calc(100vh - 281px);
+    overflow: auto;
+}
+
+.ConditionsInnerWrapper {
+    position: relative;
+}
+
+.VirtualItem {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
 .ConditionHeaderWrapper {
     display: flex;
     flex-direction: column;
@@ -17,10 +34,6 @@
     border: 1px solid var(--axelix-medium-grey);
     border-bottom: none;
     word-break: break-all;
-}
-
-.ConditionsMainTitle {
-    margin-bottom: 20px;
 }
 
 .ConditionHeaderSection {
