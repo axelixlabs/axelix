@@ -50,6 +50,12 @@ public record User(
         Instant createdAt,
         @Nullable Instant lastLoginAt) {
 
+    /**
+     * Creates a copy of this User with the provided lastLoginAt timestamp.
+     *
+     * @param lastLoginAt the timestamp of the user's most recent successful login, or {@code null} if unknown
+     * @return a new User instance identical to this one except with {@code lastLoginAt} set to the given value
+     */
     public User withLastLoginAt(Instant lastLoginAt) {
         return new User(
                 this.id,

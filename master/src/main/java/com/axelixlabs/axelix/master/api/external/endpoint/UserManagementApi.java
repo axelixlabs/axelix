@@ -56,6 +56,11 @@ import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 @ExternalApiRestController
 public class UserManagementApi {
 
+    /**
+     * Provide a users feed containing sample UserResponse entries.
+     *
+     * @return a ResponseEntity with HTTP 200 and a list of UserResponse objects representing sample users
+     */
     @DefaultApiResponse(summary = "Retrieve all users feed")
     @ApiResponse(
             description = "OK",
@@ -77,6 +82,12 @@ public class UserManagementApi {
         return ResponseEntity.ok(users);
     }
 
+    /**
+     * Create a new user account from the provided request payload.
+     *
+     * @param request the payload containing the new user's details
+     * @return HTTP 201 Created with an empty response body
+     */
     @DefaultApiResponse(summary = "Create a new user")
     @ApiResponse(description = "Created", responseCode = "201")
     @PostMapping(path = ApiPaths.UsersManagementApi.USERS_CREATE)
@@ -85,6 +96,12 @@ public class UserManagementApi {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    /**
+     * Deletes the user identified in the request.
+     *
+     * @param request the delete request containing the username of the user to remove
+     * @return a 204 No Content response when the deletion request is accepted
+     */
     @DefaultApiResponse(summary = "Delete a user by username")
     @ApiResponse(description = "No Content", responseCode = "204")
     @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DELETE)
@@ -93,6 +110,12 @@ public class UserManagementApi {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Replace a user's username.
+     *
+     * @param request the request containing the target user's identifier and the new username
+     * @return a ResponseEntity with HTTP 204 No Content
+     */
     @DefaultApiResponse(summary = "Replace the username of a user")
     @ApiResponse(description = "No Content", responseCode = "204")
     @PostMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE_USERNAME)
@@ -101,6 +124,12 @@ public class UserManagementApi {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Replace a user's email address.
+     *
+     * @param request the request payload containing the user identifier and the new email address
+     * @return `204 No Content` response indicating the update was accepted
+     */
     @DefaultApiResponse(summary = "Replace the email of a user")
     @ApiResponse(description = "No Content", responseCode = "204")
     @PostMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE_EMAIL)
@@ -109,6 +138,12 @@ public class UserManagementApi {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Replaces a user's password.
+     *
+     * @param request the request containing the user's identifier and the new password
+     * @return a ResponseEntity with HTTP 204 No Content when the password has been replaced
+     */
     @DefaultApiResponse(summary = "Replace the password of a user")
     @ApiResponse(description = "No Content", responseCode = "204")
     @PostMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE_PASSWORD)
@@ -117,6 +152,12 @@ public class UserManagementApi {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Replaces the role assigned to a user.
+     *
+     * @param request contains the identifier of the user and the new role to apply
+     * @return an empty response with HTTP status 204 (No Content)
+     */
     @DefaultApiResponse(summary = "Replace the role of a user")
     @ApiResponse(description = "No Content", responseCode = "204")
     @PostMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE_ROLE)

@@ -73,6 +73,11 @@ public enum DefaultAuthority implements Authority {
      */
     USERS_MANAGEMENT;
 
+    /**
+     * Provides the authority's identifier.
+     *
+     * @return the enum constant's identifier (the result of name())
+     */
     @Override
     public String getName() {
         return name();

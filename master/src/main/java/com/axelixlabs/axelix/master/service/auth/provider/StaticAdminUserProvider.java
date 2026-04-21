@@ -39,6 +39,13 @@ public class StaticAdminUserProvider implements UserProvider {
         this.staticCredentialsConfig = staticCredentialsConfig;
     }
 
+    /**
+     * Loads the static admin user when the supplied username matches the configured static admin username.
+     *
+     * @param username the username to load
+     * @return the configured admin User populated with the static credentials and the `SUPER_ADMIN` role
+     * @throws UserNotFoundException if the supplied username does not match the configured static admin username
+     */
     @Override
     public User load(String username) throws UserNotFoundException {
         if (Objects.equals(staticCredentialsConfig.getUsername(), username)) {

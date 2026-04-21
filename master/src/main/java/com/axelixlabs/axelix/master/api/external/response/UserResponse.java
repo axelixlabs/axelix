@@ -44,6 +44,12 @@ public record UserResponse(
         String provider,
         @Nullable Instant lastLoginAt) {
 
+    /**
+     * Create a UserResponse from a domain User by copying its public properties.
+     *
+     * @param user the domain User whose id, username, email, roles, provider and lastLoginAt are used
+     * @return a UserResponse containing the user's id, username, email, roles, provider, and lastLoginAt
+     */
     public static UserResponse from(User user) {
         return new UserResponse(
                 user.id(), user.username(), user.email(), user.roles(), user.provider(), user.lastLoginAt());
