@@ -30,7 +30,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  *
  * @author Sergey Cherkasov
  */
-public final class ProxyingDataSourceBeanPostProcessor implements BeanPostProcessor {
+public class ProxyingDataSourceBeanPostProcessor implements BeanPostProcessor {
 
     private final QueriesRecorder queriesCollector;
 
