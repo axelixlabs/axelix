@@ -12,6 +12,7 @@ val springDocSwaggerVersion = "3.0.1"
 val heapDumpToolVersion = "1.3.3"
 val sqliteVersion = "3.51.2.0"
 val nimbusJoseJwt ="10.8"
+val jmesPathVersion = "0.6.0"
 
 dependencies {
     // Self
@@ -26,7 +27,6 @@ dependencies {
     implementation(platform("org.springframework.ai:spring-ai-bom:${springAiVersion}"))
 
     // Boot Starters
-    implementation("org.springframework.boot:spring-boot-starter-jdbc") // TODO: Do we still need plain JDBC starter? I think no...
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
@@ -40,6 +40,13 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.paypal:heap-dump-tool:${heapDumpToolVersion}")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
+
+    // TODO:
+    //  This library is archived, and it only supports Jackson 2.x
+    //  For now we're gonna get away with it, but Spring Boot 4 already
+    //  establishes a baseline for Jackson 3, but it still ca work with Jackson 2.
+    //  So, we need to decide how are we going to work with this.
+    implementation("io.burt:jmespath-jackson:${jmesPathVersion}")
 
     // Runtime
     runtimeOnly("ch.qos.logback:logback-classic")

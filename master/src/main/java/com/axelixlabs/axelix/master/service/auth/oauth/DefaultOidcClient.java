@@ -21,6 +21,7 @@ import java.security.PublicKey;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Set;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
@@ -29,20 +30,26 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 
 /**
@@ -85,7 +92,7 @@ public class DefaultOidcClient implements OidcClient {
      * @see <a href="https://datatracker.ietf.org/doc/html/rfc6749#section-3.2.1">RFC 6749 Section 3.2.1 Client Authentication</a>
      */
     @Override
-    public String exchangeCodeForIdToken(String code) throws OidcTokenExchangeException {
+    public Tokens exchangeCodeForTokens(String code) throws OidcTokenExchangeException {
         try {
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
             body.add("grant_type", "authorization_code");
@@ -102,16 +109,7 @@ public class DefaultOidcClient implements OidcClient {
                     .retrieve()
                     .body(new ParameterizedTypeReference<>() {});
 
-            if (response == null) {
-                throw new OidcTokenExchangeException("OIDC token endpoint returned empty response");
-            }
-
-            Object idTokenObj = response.get("id_token");
-            if (!(idTokenObj instanceof String idToken)) {
-                throw new OidcTokenExchangeException("Invalid or missing id_token in response from OIDC provider");
-            }
-
-            return idToken;
+            return validateAndExtractTokens(response);
 
         } catch (OidcTokenExchangeException e) {
             throw e;
@@ -130,10 +128,10 @@ public class DefaultOidcClient implements OidcClient {
      * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation"> OpenID Connect Core 1.0 - ID Token Validation</a>
      */
     @Override
-    public String validateOAuth2JwtTokenAndExtractUsername(String token)
+    public String validateIdTokenAndExtractUsername(String idToken)
             throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtParsingException {
         try {
-            String kid = extractPublicKeyId(token);
+            String kid = extractPublicKeyId(idToken);
             PublicKey publicKey = fetchPublicKey(kid);
 
             Claims claims = Jwts.parser()
@@ -141,7 +139,7 @@ public class DefaultOidcClient implements OidcClient {
                     .requireIssuer(oAuth2Properties.issuerUri())
                     .requireAudience(oAuth2Properties.clientId())
                     .build()
-                    .parseSignedClaims(token)
+                    .parseSignedClaims(idToken)
                     .getPayload();
 
             return extractUsername(claims);
@@ -153,6 +151,59 @@ public class DefaultOidcClient implements OidcClient {
         } catch (Exception e) {
             throw new JwtParsingException("Unexpected error while decoding OAuth2Jwt token", e);
         }
+    }
+
+    @Override
+    @Nullable
+    @SuppressWarnings({"PMD.CyclomaticComplexity"})
+    public String validateAccessTokenAndExtractUserInfo(String accessToken)
+            throws OidcTokenExchangeException, OidcMetadataUnavailableException {
+
+        try {
+            String userInfoEndpoint = oidcMetadataProvider.getUserInfoEndpoint();
+
+            String userInfoBody = restClient
+                    .get()
+                    .uri(userInfoEndpoint)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    .retrieve()
+                    .body(String.class);
+
+            if (userInfoBody == null) {
+                throw new OidcMetadataUnavailableException(
+                        "Failed to decode the response from user_info OIDC endpoint");
+            }
+
+            return userInfoBody;
+        } catch (HttpClientErrorException e) {
+            if (Set.of((HttpStatusCode) HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN)
+                    .contains(e.getStatusCode())) {
+                throw new OidcTokenExchangeException(
+                        "Failed to validate access token via user_info endpoint: %s".formatted(e.getMessage()), e);
+            }
+
+            throw new OidcMetadataUnavailableException("Failed to decode the response from user_info OIDC endpoint", e);
+        } catch (OidcMetadataUnavailableException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new OidcMetadataUnavailableException("Failed to decode the response from user_info OIDC endpoint", e);
+        }
+    }
+
+    private Tokens validateAndExtractTokens(@Nullable Map<String, Object> response) {
+        if (response == null) {
+            throw new OidcTokenExchangeException("OIDC token endpoint returned empty response");
+        }
+
+        if (!(response.get("id_token") instanceof String idToken)) {
+            throw new OidcTokenExchangeException("Invalid or missing id_token in response from OIDC provider");
+        }
+
+        if (!(response.get("access_token") instanceof String accessToken)) {
+            throw new OidcTokenExchangeException("Invalid or missing access_token in response from OIDC provider");
+        }
+
+        return new Tokens(idToken, accessToken);
     }
 
     private String extractPublicKeyId(String token) {

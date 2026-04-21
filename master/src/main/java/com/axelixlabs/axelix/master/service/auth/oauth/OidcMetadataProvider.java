@@ -68,6 +68,17 @@ public class OidcMetadataProvider {
         return oidcMetadata.require().authorizationEndpoint();
     }
 
+    public String getUserInfoEndpoint() {
+        String userInfoEndpoint = oidcMetadata.require().userInfoEndpoint();
+
+        if (userInfoEndpoint != null) {
+            return userInfoEndpoint;
+        }
+
+        throw new OidcMetadataUnavailableException("OIDC provider at " + issuerUri
+                + " does not provide a userinfo_endpoint. This endpoint is required for our authentication flow.");
+    }
+
     private OidcMetadata fetchOidcMetadata() {
         try {
             Map<String, Object> body = restClient
@@ -98,6 +109,7 @@ public class OidcMetadataProvider {
         String issuer = getStringValue(body, "issuer");
         String jwksUri = getStringValue(body, "jwks_uri");
         String tokenEndpoint = getStringValue(body, "token_endpoint");
+        String userInfoEndpoint = getStringValue(body, "userinfo_endpoint");
         String authorizationEndpoint = getStringValue(body, "authorization_endpoint");
 
         if (ObjectUtils.anyNull(issuer, jwksUri, tokenEndpoint, authorizationEndpoint)) {
@@ -112,12 +124,19 @@ public class OidcMetadataProvider {
             throw new OidcMetadataUnavailableException(issuerUri);
         }
 
+        if (userInfoEndpoint == null) {
+            log.warn(
+                    "OIDC provider at {} does not provide a userinfo_endpoint. "
+                            + "MCP server OAuth2 authentication via userinfo_endpoint will not be available.",
+                    issuerUri);
+        }
+
         if (!Objects.equals(issuer, issuerUri)) {
             log.error("OIDC issuer mismatch: expected '{}' but got '{}'", issuerUri, issuer);
             throw new OidcMetadataUnavailableException(issuerUri);
         }
 
-        return new OidcMetadata(jwksUri, tokenEndpoint, authorizationEndpoint);
+        return new OidcMetadata(jwksUri, tokenEndpoint, authorizationEndpoint, userInfoEndpoint);
     }
 
     @Nullable
@@ -132,6 +151,14 @@ public class OidcMetadataProvider {
      * @param jwksUri               URL of the OIDC provider's JWK Set, used to fetch public keys for token verification
      * @param tokenEndpoint         URL of the token endpoint, used to exchange the authorization code for an ID Token
      * @param authorizationEndpoint URL of the authorization endpoint, used to initiate the OAuth2 login flow.
+     * @param userInfoEndpoint      URL of the userinfo_endpoint, used to obtain claims about the authenticated user.
+     *                              This field is <b>OPTIONAL</b> per OpenID Connect Discovery 1.0 and may be {@code null}.
+     *
+     * See: <a href="https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata">OpenID Provider Metadata</a>
      */
-    public record OidcMetadata(String jwksUri, String tokenEndpoint, String authorizationEndpoint) {}
+    public record OidcMetadata(
+            String jwksUri,
+            String tokenEndpoint,
+            String authorizationEndpoint,
+            @Nullable String userInfoEndpoint) {}
 }
