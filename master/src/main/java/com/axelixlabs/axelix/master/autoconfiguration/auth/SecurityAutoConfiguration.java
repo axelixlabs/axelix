@@ -50,6 +50,7 @@ import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.DefaultCookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient;
+import com.axelixlabs.axelix.master.service.auth.oauth.JmesPathOidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
@@ -189,7 +190,7 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public OidcRoleExtractor oidcRoleExtractor(OidcClient oidcClient, OAuth2Properties oAuth2Properties) {
-            return new OidcRoleExtractor(oidcClient, oAuth2Properties.roleAttributePath());
+            return new JmesPathOidcRoleExtractor(oidcClient, oAuth2Properties.roleAttributePath());
         }
     }
 }

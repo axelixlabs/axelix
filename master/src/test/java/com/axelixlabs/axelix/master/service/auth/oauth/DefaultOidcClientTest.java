@@ -60,8 +60,8 @@ import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
-import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient.Tokens;
 import com.axelixlabs.axelix.master.utils.TestResourceReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -358,7 +358,7 @@ class DefaultOidcClientTest {
         }
 
         @Test
-        void shouldThrowWhenUserInfoReturnsUnauthorized() {
+        void shouldThrowTokenExchangeExceptionWhenUserInfoReturnsUnauthorized() {
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override
                 public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
@@ -371,6 +371,20 @@ class DefaultOidcClientTest {
 
             assertThatThrownBy(() -> oidcClient.validateAccessTokenAndExtractUserInfo("invalid-token"))
                     .isInstanceOf(OidcTokenExchangeException.class);
+        }
+
+        @Test
+        void shouldThrowOidcMetadataUnavailableExceptionWhenUserInfoReturnsUnauthorized() {
+
+            mockWebServer.setDispatcher(new Dispatcher() {
+                @Override
+                public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
+                    return new MockResponse().setResponseCode(404);
+                }
+            });
+
+            assertThatThrownBy(() -> oidcClient.validateAccessTokenAndExtractUserInfo("invalid-token"))
+                    .isInstanceOf(OidcMetadataUnavailableException.class);
         }
     }
 

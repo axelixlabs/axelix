@@ -40,6 +40,12 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.paypal:heap-dump-tool:${heapDumpToolVersion}")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
+
+    // TODO:
+    //  This library is archived, and it only supports Jackson 2.x
+    //  For now we're gonna get away with it, but Spring Boot 4 already
+    //  establishes a baseline for Jackson 3, but it still ca work with Jackson 2.
+    //  So, we need to decide how are we going to work with this.
     implementation("io.burt:jmespath-jackson:${jmesPathVersion}")
 
     // Runtime

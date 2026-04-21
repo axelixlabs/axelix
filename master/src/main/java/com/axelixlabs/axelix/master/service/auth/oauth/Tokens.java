@@ -17,20 +17,13 @@
  */
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
-import com.axelixlabs.axelix.common.auth.core.Role;
-
 /**
- * The component that is capable to extract the role that belongs to current user based on the pair of {@link Tokens}.
+ * The pair of tokens that we care about in OIDC flow.
  *
+ * @param idToken     the ID token (JWT) containing user identity claims.
+ * @param accessToken the access token for accessing UserInfo endpoint and protected resources.
+ *
+ * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public interface OidcRoleExtractor {
-
-    /**
-     * Determine the {@link Role} of the user identified by the {@link Tokens provided tokens pair}.
-     *
-     * @param tokens the pair of tokens.
-     * @return the role that is extracted. Never {@code null}.
-     */
-    Role extractRole(Tokens tokens);
-}
+public record Tokens(String idToken, String accessToken) {}

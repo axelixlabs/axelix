@@ -24,7 +24,6 @@ import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
-import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient.Tokens;
 
 /**
  * OIDC client for authorization code exchange and public key retrieval.

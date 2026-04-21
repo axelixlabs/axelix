@@ -21,6 +21,7 @@ import java.security.PublicKey;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Set;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
@@ -36,15 +37,19 @@ import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
+import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 
 /**
@@ -150,20 +155,36 @@ public class DefaultOidcClient implements OidcClient {
 
     @Override
     @Nullable
-    public String validateAccessTokenAndExtractUserInfo(String accessToken) throws OidcTokenExchangeException {
+    public String validateAccessTokenAndExtractUserInfo(String accessToken)
+            throws OidcTokenExchangeException, OidcMetadataUnavailableException {
+
         try {
             String userInfoEndpoint = oidcMetadataProvider.getUserInfoEndpoint();
 
-            return restClient
+            String userInfoBody = restClient
                     .get()
                     .uri(userInfoEndpoint)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                     .retrieve()
                     .body(String.class);
 
+            if (userInfoBody == null) {
+                throw new OidcMetadataUnavailableException(
+                        "Failed to decode the response from user_info OIDC endpoint");
+            }
+
+            return userInfoBody;
+        } catch (HttpClientErrorException e) {
+            if (Set.of((HttpStatusCode) HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN)
+                    .contains(e.getStatusCode())) {
+                throw new OidcTokenExchangeException(
+                        "Failed to validate access token via user_info endpoint: %s".formatted(e.getMessage()), e);
+            }
+
+            throw new OidcMetadataUnavailableException("Failed to decode the response from user_info OIDC endpoint");
         } catch (Exception e) {
-            throw new OidcTokenExchangeException(
-                    "Failed to validate access token via user_info endpoint: %s".formatted(e.getMessage()), e);
+
+            throw new OidcMetadataUnavailableException("Failed to decode the response from user_info OIDC endpoint");
         }
     }
 
@@ -272,10 +293,4 @@ public class DefaultOidcClient implements OidcClient {
 
         return claims.getSubject();
     }
-
-    /**
-     * @param idToken    the ID token (JWT) containing user identity claims
-     * @param accessToken the access token for accessing UserInfo endpoint and protected resources
-     */
-    public record Tokens(String idToken, String accessToken) {}
 }

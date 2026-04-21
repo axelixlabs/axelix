@@ -33,7 +33,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
-import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient.Tokens;
 import com.axelixlabs.axelix.master.utils.TestResourceReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,11 +43,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link OidcRoleExtractor}
+ * Tests for {@link JmesPathOidcRoleExtractor}
  *
  * @author Nikita Kirillov
  */
-class OidcRoleExtractorTest {
+class JmesPathOidcRoleExtractorTest {
 
     private OidcClient MOCK_OIDC_CLIENT;
 
@@ -70,12 +69,12 @@ class OidcRoleExtractorTest {
         private static final String ACCESS_TOKEN = "test-access-token";
         private static final String USER_INFO_JSON = TestResourceReader.readResource("other/user-info-response.json");
 
-        private OidcRoleExtractor extractor;
+        private JmesPathOidcRoleExtractor extractor;
 
         @Test
         void shouldExtractRoleFromIdTokenWhenPresent() {
             Tokens tokens = new Tokens(ID_TOKEN, ACCESS_TOKEN);
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -92,7 +91,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenReturn(USER_INFO_JSON);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -108,7 +107,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenReturn(USER_INFO_JSON);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -124,7 +123,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenThrow(new OidcTokenExchangeException("UserInfo endpoint failed"));
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -147,7 +146,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenReturn(userInfoWithoutRoles);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -169,7 +168,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenReturn(userInfoWithEditor);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -180,7 +179,7 @@ class OidcRoleExtractorTest {
         void shouldReturnViewerWhenRoleAttributePathIsBlank() {
             Tokens tokens = new Tokens(ID_TOKEN, ACCESS_TOKEN);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "");
 
             Role role = extractor.extractRole(tokens);
 
@@ -192,7 +191,7 @@ class OidcRoleExtractorTest {
         void shouldReturnViewerWhenRoleAttributePathIsNull() {
             Tokens tokens = new Tokens(ID_TOKEN, ACCESS_TOKEN);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, null);
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, null);
 
             Role role = extractor.extractRole(tokens);
 
@@ -209,7 +208,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenReturn(USER_INFO_JSON);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -225,7 +224,7 @@ class OidcRoleExtractorTest {
                     + ".signature";
             Tokens tokens = new Tokens(idTokenWithMultipleRoles, ACCESS_TOKEN);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -234,7 +233,7 @@ class OidcRoleExtractorTest {
     }
 
     /**
-     * Unit tests for {@link OidcRoleExtractor#extractRoleFromJson(String json)}
+     * Unit tests for {@link JmesPathOidcRoleExtractor#extractRoleFromJson(String json)}
      *
      * @author Nikita Kirillov
      */
@@ -242,11 +241,12 @@ class OidcRoleExtractorTest {
     class ExtractRoleFromJsonPrivateMethodTest {
 
         private Method extractRoleFromJsonMethod;
-        private OidcRoleExtractor extractor;
+        private JmesPathOidcRoleExtractor extractor;
 
         @BeforeEach
         void setUp() throws NoSuchMethodException {
-            extractRoleFromJsonMethod = OidcRoleExtractor.class.getDeclaredMethod("extractRoleFromJson", String.class);
+            extractRoleFromJsonMethod =
+                    JmesPathOidcRoleExtractor.class.getDeclaredMethod("extractRoleFromJson", String.class);
             extractRoleFromJsonMethod.setAccessible(true);
         }
 
@@ -254,7 +254,7 @@ class OidcRoleExtractorTest {
         @NullAndEmptySource
         @ValueSource(strings = {"", "   ", "\t", "\n", "  \t  "})
         void shouldReturnNullWhenRoleAttributePathIsBlank(String path) throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, path);
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, path);
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, "{\"role\": \"admin\"}");
 
@@ -265,7 +265,7 @@ class OidcRoleExtractorTest {
         @MethodSource("provideJsonAndExpectedRole")
         void shouldExtractCorrectRoleFromJson(String json, String roleAttributePath, DefaultRole expectedRole)
                 throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, roleAttributePath);
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, roleAttributePath);
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, json);
 
@@ -283,9 +283,7 @@ class OidcRoleExtractorTest {
                     // Nested paths
                     Arguments.of("{\"user\": {\"access\": \"admin\"}}", "user.access", DefaultRole.ADMIN),
                     Arguments.of(
-                            "{\"data\": {\"info\": {\"level\": \"editor\"}}}",
-                            "data.info.level",
-                            DefaultRole.EDITOR),
+                            "{\"data\": {\"info\": {\"level\": \"editor\"}}}", "data.info.level", DefaultRole.EDITOR),
 
                     // Array handling
                     Arguments.of("{\"roles\": [\"admin\", \"user\"]}", "roles[0]", DefaultRole.ADMIN),
@@ -304,7 +302,7 @@ class OidcRoleExtractorTest {
         @ParameterizedTest
         @MethodSource("provideEdgeCaseJson")
         void shouldHandleEdgeCasesGracefully(String json, String path, DefaultRole expectedRole) throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, path);
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, path);
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, json);
 
@@ -326,7 +324,7 @@ class OidcRoleExtractorTest {
 
         @Test
         void shouldHandleDeeplyNestedArrays() throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "data[0].users[1].roles[0]");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "data[0].users[1].roles[0]");
 
             String json = """
                 {
@@ -348,7 +346,7 @@ class OidcRoleExtractorTest {
         @ParameterizedTest
         @MethodSource("provideDifferentPathFormats")
         void shouldHandleDifferentJmesPathFormats(String path, String json, DefaultRole expectedRole) throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, path);
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, path);
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, json);
 
@@ -371,7 +369,7 @@ class OidcRoleExtractorTest {
 
         @Test
         void shouldReturnNullWhenPathDoesNotExist() throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "nonexistent");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "nonexistent");
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, "{\"role\": \"admin\"}");
 
@@ -380,7 +378,7 @@ class OidcRoleExtractorTest {
 
         @Test
         void shouldReturnNullWhenJsonIsNull() throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "role");
+            extractor = new JmesPathOidcRoleExtractor(MOCK_OIDC_CLIENT, "role");
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, (Object) null);
 

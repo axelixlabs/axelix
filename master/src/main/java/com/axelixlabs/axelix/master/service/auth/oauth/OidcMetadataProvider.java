@@ -74,6 +74,7 @@ public class OidcMetadataProvider {
         if (userInfoEndpoint != null) {
             return userInfoEndpoint;
         }
+
         throw new OidcMetadataUnavailableException("OIDC provider at " + issuerUri
                 + " does not provide a userinfo_endpoint. This endpoint is required for our authentication flow.");
     }
