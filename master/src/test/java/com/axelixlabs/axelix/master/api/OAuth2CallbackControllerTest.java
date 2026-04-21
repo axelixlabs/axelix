@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.api;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +44,8 @@ import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.master.api.external.endpoint.OAuth2CallbackController;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
-import com.axelixlabs.axelix.master.service.auth.oauth.JmesPathOidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.auth.oauth.Tokens;
 
 import static org.assertj.core.api.Assertions.assertThat;
