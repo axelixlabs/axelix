@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.api;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,7 +83,7 @@ class OAuth2CallbackControllerTest {
     private OidcClient oidcClient;
 
     @MockitoBean
-    private JmesPathOidcRoleExtractor oidcRoleExtractor;
+    private OidcRoleExtractor oidcRoleExtractor;
 
     @Autowired
     private JwtDecoderService jwtDecoderService;
