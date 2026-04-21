@@ -46,6 +46,17 @@ public class MasterAuthorityResolver implements AuthorityResolver {
         PATH_PATTERN_PARSER = new PathPatternParser();
         REGISTERED_PATTERNS = new ArrayList<>();
 
+        // Users -> USERS_MANAGEMENT
+        put(ApiPaths.UsersManagementApi.USERS_CREATE, HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT);
+        put(ApiPaths.UsersManagementApi.USERS_DROP, HttpMethod.DELETE, DefaultAuthority.USERS_MANAGEMENT);
+        put(ApiPaths.UsersManagementApi.USERS_UPDATE_USERNAME, HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT);
+        put(ApiPaths.UsersManagementApi.USERS_UPDATE_EMAIL, HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT);
+        put(ApiPaths.UsersManagementApi.USERS_UPDATE_PASSWORD, HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT);
+        put(ApiPaths.UsersManagementApi.USERS_UPDATE_ROLE, HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT);
+
+        // Users -> USERS_VIEW
+        put(ApiPaths.UsersManagementApi.USERS_VIEW, HttpMethod.GET, DefaultAuthority.USERS_VIEW);
+
         // Caches
         put(ApiPaths.CachesApi.DISABLE_CACHE, HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE);
         put(ApiPaths.CachesApi.ENABLE_CACHE, HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE);

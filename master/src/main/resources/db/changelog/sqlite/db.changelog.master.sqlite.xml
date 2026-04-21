@@ -7,4 +7,5 @@
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
   <include relativeToChangelogFile="true" file="changelog/001-create-instances-table.xml"/>
+  <include relativeToChangelogFile="true" file="changelog/002-create-users-table.xml"/>
 </databaseChangeLog>

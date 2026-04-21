@@ -60,6 +60,17 @@ public class MasterAuthorityResolverTest {
 
     private static Stream<Arguments> mappedEndpoints() {
         return Stream.of(
+                // USERS_MANAGEMENT
+                Arguments.of("/users-management/create", HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT),
+                Arguments.of("/users-management/delete", HttpMethod.DELETE, DefaultAuthority.USERS_MANAGEMENT),
+                Arguments.of("/users-management/update/username", HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT),
+                Arguments.of("/users-management/update/email", HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT),
+                Arguments.of("/users-management/update/password", HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT),
+                Arguments.of("/users-management/update/role", HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT),
+
+                // USERS_VIEW
+                Arguments.of("/users-management/view", HttpMethod.GET, DefaultAuthority.USERS_VIEW),
+
                 // CACHES_TOGGLE (servlet paths include /api/external; patterns are registered without it)
                 Arguments.of("/api/external/caches/i/cm/cn/disable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
                 Arguments.of("/api/external/caches/i/cm/cn/enable", HttpMethod.POST, DefaultAuthority.CACHES_TOGGLE),
