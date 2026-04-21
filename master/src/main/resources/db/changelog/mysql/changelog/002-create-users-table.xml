@@ -18,7 +18,7 @@
         <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
       </column>
       <column name="username" type="VARCHAR(255)">
-        <constraints nullable="false"/>
+        <constraints nullable="false" unique="true" uniqueConstraintName="uq_users_username"/>
       </column>
       <column name="email" type="VARCHAR(255)">
         <constraints nullable="false" unique="true" uniqueConstraintName="uq_users_email"/>

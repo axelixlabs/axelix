@@ -25,4 +25,10 @@ package com.axelixlabs.axelix.master.api.external.request;
  *
  * @author Sergey Cherkasov
  */
-public record UserUpdatePasswordRequest(String id, String password) {}
+public record UserUpdatePasswordRequest(String id, String password) {
+
+    @Override
+    public String toString() {
+        return "UserUpdatePasswordRequest[id=" + id + ", password=[REDACTED]]";
+    }
+}

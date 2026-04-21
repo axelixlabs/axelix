@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
-import com.axelixlabs.axelix.master.domain.User;
+import com.axelixlabs.axelix.master.domain.UserEntity;
 
 /**
  * Public view of a managed user.
@@ -44,7 +44,7 @@ public record UserResponse(
         String provider,
         @Nullable Instant lastLoginAt) {
 
-    public static UserResponse from(User user) {
+    public static UserResponse from(UserEntity user) {
         return new UserResponse(
                 user.id(), user.username(), user.email(), user.roles(), user.provider(), user.lastLoginAt());
     }

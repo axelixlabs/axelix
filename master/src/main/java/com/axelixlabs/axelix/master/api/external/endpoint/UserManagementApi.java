@@ -52,7 +52,7 @@ import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
  */
 @Tag(
         name = "Users Management API",
-        description = "The endpoints for viewing, creating, deleting managed users and modifying")
+        description = "The endpoints for viewing, creating, deleting, and modifying managed users")
 @ExternalApiRestController
 public class UserManagementApi {
 
@@ -85,7 +85,7 @@ public class UserManagementApi {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DefaultApiResponse(summary = "Delete a user by username")
+    @DefaultApiResponse(summary = "Delete a user")
     @ApiResponse(description = "No Content", responseCode = "204")
     @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DELETE)
     public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteRequest request) {

@@ -62,7 +62,7 @@ public final class DefaultRole implements Role {
                         DefaultAuthority.CONFIG_PROPS_VALUES_READ));
 
         SUPER_ADMIN = new DefaultRole(
-                "SUPER_ADMIN", Arrays.stream(DefaultAuthority.values()).collect(Collectors.toSet()));
+                "SUPER_ADMIN", Arrays.stream(DefaultAuthority.values()).collect(Collectors.toUnmodifiableSet()));
 
         MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of(SELF_REGISTER_AUTHORITY));
     }

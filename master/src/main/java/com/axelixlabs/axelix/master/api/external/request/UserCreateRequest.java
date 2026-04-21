@@ -27,4 +27,10 @@ package com.axelixlabs.axelix.master.api.external.request;
  *
  * @author Sergey Cherkasov
  */
-public record UserCreateRequest(String name, String email, String password, String role) {}
+public record UserCreateRequest(String name, String email, String password, String role) {
+
+    @Override
+    public String toString() {
+        return "UserCreateRequest[name=" + name + ", email=" + email + ", password=[REDACTED], role=" + role + ']';
+    }
+}
