@@ -155,6 +155,7 @@ public class DefaultOidcClient implements OidcClient {
 
     @Override
     @Nullable
+    @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public String validateAccessTokenAndExtractUserInfo(String accessToken)
             throws OidcTokenExchangeException, OidcMetadataUnavailableException {
 
