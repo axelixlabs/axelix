@@ -10,3 +10,6 @@ reviews:
     enabled: true
     drafts: false
     base_branches: ["master"]
+  finishing_touches:
+    docstrings:
+      enabled: false
