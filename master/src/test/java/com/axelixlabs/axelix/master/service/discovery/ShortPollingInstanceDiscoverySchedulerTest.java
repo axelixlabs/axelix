@@ -66,10 +66,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-// TODO This test is currently failing, and a ticket has already been opened to track the
-// fix https://github.com/axelixlabs/axelix/issues/944
-@Disabled
 @SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
             "axelix.master.discovery.auto.enabled=true",
             "axelix.master.discovery.auto.platform=kubernetes",
@@ -123,6 +121,10 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
+    // TODO
+    //  This test is currently failing, and a ticket has already been opened to
+    //  track the fix https://github.com/axelixlabs/axelix/issues/944
+    @Disabled
     void shouldRegisterNewK8sInstancesWhenDiscovered() {
         String service1 = "service-1";
         String service2 = "service-2";

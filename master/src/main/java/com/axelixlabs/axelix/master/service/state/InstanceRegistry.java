@@ -49,11 +49,11 @@ public interface InstanceRegistry {
     void register(Instance instance);
 
     /**
-     * Reloads the registry, removing instances with latestHeartbeat == {@code null}
-     * while preserving the passed Set&lt;{@link Instance}&gt;. Instances with non-{@code null}
-     * latestHeartbeat remain unchanged.
+     * Reloads the registry, by removing all previously auto-discovered Instances,
+     * and inserts the following discovered instances instead. The Instances that have
+     * self-registered are not removed by this call.
      *
-     * @param instances Instances to register (those with latestHeartbeat == {@code null})
+     * @param instances Instances to register as a replacement of previously auto-discovered instances.
      */
     void reload(Collection<Instance> instances);
 
