@@ -17,9 +17,6 @@
  */
 package com.axelixlabs.axelix.master.autoconfiguration.auth.properties;
 
-import java.util.List;
-import java.util.Map;
-
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -33,13 +30,23 @@ import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoCo
 /**
  * Configuration properties for OAuth2/OIDC authentication.
  *
- * @param issuerUri     the base URL of the OIDC provider. Used to discover endpoints
- *                      via {@code /.well-known/openid-configuration}
- * @param clientId      the client identifier issued during registration with the OIDC provider
- * @param clientSecret  the client secret issued during registration.
- * @param baseUrl       the base URL of this application.
- * @param usernameClaim the JWT claim to use as the username. If not specified,
- *                      falls back to {@code preferred_username}, then {@code name}, then {@code sub}
+ * @param issuerUri         the base URL of the OIDC provider. Used to discover endpoints
+ *                          via {@code /.well-known/openid-configuration}
+ *
+ * @param clientId          the client identifier issued during registration with the OIDC provider
+ *
+ * @param clientSecret      the client secret issued during registration.
+ *
+ * @param baseUrl           the base URL of this application.
+ *
+ * @param usernameClaim     the JWT claim to use as the username. If not specified,
+ *                          falls back to {@code preferred_username}, then {@code name}, then {@code sub}.
+ *
+ * @param scopes            OAuth2 scopes requested during authorization code flow.
+ *
+ * @param roleAttributePath JMESPath expression evaluated against the ID token claims first,
+ *                          and then against the userinfo endpoint response if needed. The expression
+ *                          should resolve to an Axelix role name like {@code admin} or {@code editor}
  *
  * @since 27.02.2026
  * @author Nikita Kirillov
@@ -53,12 +60,9 @@ public record OAuth2Properties(
         String baseUrl,
         @Nullable String usernameClaim,
         String scopes,
-        @Nullable String roleAttributePath,
-        Map<String, List<String>> roleMapping) {
+        @Nullable String roleAttributePath) {
 
     private static final String DEFAULT_SCOPE = "openid";
-    private static final Map<String, List<String>> DEFAULT_ROLE_MAPPING =
-            Map.of("admin", List.of("admin"), "editor", List.of("editor"));
 
     public OAuth2Properties {
         Assert.notNull(issuerUri, "OAuth2 issuer-uri is required. Set " + OAUTH_PROPERTIES_PREFIX + ".issuer-uri");
@@ -69,10 +73,6 @@ public record OAuth2Properties(
 
         if (scopes == null) {
             scopes = DEFAULT_SCOPE;
-        }
-
-        if (roleMapping == null) {
-            roleMapping = DEFAULT_ROLE_MAPPING;
         }
     }
 

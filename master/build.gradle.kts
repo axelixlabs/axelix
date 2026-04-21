@@ -12,6 +12,7 @@ val springDocSwaggerVersion = "3.0.1"
 val heapDumpToolVersion = "1.3.3"
 val sqliteVersion = "3.51.2.0"
 val nimbusJoseJwt ="10.8"
+val jmesPathVersion = "0.6.0"
 
 dependencies {
     // Self
@@ -39,7 +40,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocSwaggerVersion}")
     implementation("com.paypal:heap-dump-tool:${heapDumpToolVersion}")
     implementation("com.nimbusds:nimbus-jose-jwt:${nimbusJoseJwt}")
-    implementation("com.jayway.jsonpath:json-path")
+    implementation("io.burt:jmespath-jackson:${jmesPathVersion}")
 
     // Runtime
     runtimeOnly("ch.qos.logback:logback-classic")

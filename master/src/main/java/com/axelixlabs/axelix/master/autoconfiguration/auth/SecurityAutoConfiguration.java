@@ -189,8 +189,7 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public OidcRoleExtractor oidcRoleExtractor(OidcClient oidcClient, OAuth2Properties oAuth2Properties) {
-            return new OidcRoleExtractor(
-                    oidcClient, oAuth2Properties.roleAttributePath(), oAuth2Properties.roleMapping());
+            return new OidcRoleExtractor(oidcClient, oAuth2Properties.roleAttributePath());
         }
     }
 }

@@ -19,27 +19,32 @@ package com.axelixlabs.axelix.master.service.auth.oauth;
 
 import java.util.Base64;
 import java.util.Base64.Decoder;
-import java.util.List;
-import java.util.Map;
 
-import com.jayway.jsonpath.JsonPath;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.burt.jmespath.Expression;
+import io.burt.jmespath.JmesPath;
+import io.burt.jmespath.jackson.JacksonRuntime;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient.Tokens;
 
 /**
- * Extracts user role from OIDC tokens.
+ * Extracts user role from OIDC tokens using a JMESPath expression.
  *
  * @author Nikita Kirillov
  */
 public class OidcRoleExtractor {
 
     private static final Logger log = LoggerFactory.getLogger(OidcRoleExtractor.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final JmesPath<JsonNode> JMES_PATH = new JacksonRuntime();
 
     private final Decoder decoder = Base64.getUrlDecoder();
     private final OidcClient oidcClient;
@@ -47,18 +52,14 @@ public class OidcRoleExtractor {
     @Nullable
     private final String roleAttributePath;
 
-    private final Map<String, List<String>> roleMapping;
-
-    public OidcRoleExtractor(
-            OidcClient oidcClient, @Nullable String roleAttributePath, Map<String, List<String>> roleMapping) {
+    public OidcRoleExtractor(OidcClient oidcClient, @Nullable String roleAttributePath) {
         this.oidcClient = oidcClient;
         this.roleAttributePath = roleAttributePath;
-        this.roleMapping = roleMapping;
     }
 
     /**
-     * First we try to extract the role from the idToken,
-     * then we try to extract the role from the userInfo endpoint.
+     * First tries to evaluate the configured JMESPath expression against ID token claims,
+     * then evaluates it against the userInfo endpoint response if needed.
      *
      * @return extracted role, or DefaultRole.VIEWER (fallback).
      */
@@ -91,38 +92,30 @@ public class OidcRoleExtractor {
     private Role extractRoleFromUserInfo(String accessToken) {
         try {
             String userInfo = oidcClient.validateAccessTokenAndExtractUserInfo(accessToken);
+
             if (userInfo == null) {
                 return null;
             }
             return extractRoleFromJson(userInfo);
-        } catch (OidcTokenExchangeException e) {
+        } catch (OidcTokenExchangeException | OidcMetadataUnavailableException e) {
             log.debug("Failed to extract role from UserInfo: {}", e.getMessage());
         }
+
         return null;
     }
 
     @Nullable
     private Role extractRoleFromJson(String json) {
         try {
-            Object readData = JsonPath.read(json, roleAttributePath);
-            List<String> externalRoles = (readData instanceof List<?> list)
-                    ? list.stream().map(Object::toString).toList()
-                    : List.of(readData.toString());
+            JsonNode jsonNode = OBJECT_MAPPER.readTree(json);
+            Expression<JsonNode> expression = JMES_PATH.compile(roleAttributePath);
+            JsonNode jmesResult = expression.search(jsonNode);
 
-            for (String externalRole : externalRoles) {
-                String targetName = roleMapping.entrySet().stream()
-                        .filter(entry ->
-                                entry.getValue().stream().anyMatch(value -> value.equalsIgnoreCase(externalRole)))
-                        .map(Map.Entry::getKey)
-                        .findFirst()
-                        .orElse(externalRole);
-
-                Role role = stringToRole(targetName);
-
-                if (role != null) {
-                    return role;
-                }
+            if (jmesResult == null || jmesResult.isNull() || !jmesResult.isTextual()) {
+                return null;
             }
+
+            return stringToRole(jmesResult.asText());
         } catch (Exception e) {
             log.warn("Failed to extract role from JSON: {}", e.getMessage());
         }

@@ -19,8 +19,6 @@ package com.axelixlabs.axelix.master.service.auth.oauth;
 
 import java.lang.reflect.Method;
 import java.util.Base64;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -77,7 +75,7 @@ class OidcRoleExtractorTest {
         @Test
         void shouldExtractRoleFromIdTokenWhenPresent() {
             Tokens tokens = new Tokens(ID_TOKEN, ACCESS_TOKEN);
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.roles", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -94,7 +92,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenReturn(USER_INFO_JSON);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.roles", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -110,7 +108,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenReturn(USER_INFO_JSON);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.roles", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -126,7 +124,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenThrow(new OidcTokenExchangeException("UserInfo endpoint failed"));
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.roles", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -149,48 +147,11 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenReturn(userInfoWithoutRoles);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.roles", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
             assertThat(role).isEqualTo(DefaultRole.VIEWER);
-        }
-
-        @Test
-        void shouldApplyRoleMappingFromIdToken() {
-            Tokens tokens = new Tokens(ID_TOKEN, ACCESS_TOKEN);
-            Map<String, List<String>> roleMapping = Map.of(
-                    "admin", List.of("super_admin", "root"),
-                    "editor", List.of("writer"));
-
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.roles", roleMapping);
-
-            Role role = extractor.extractRole(tokens);
-
-            assertThat(role).isEqualTo(DefaultRole.ADMIN);
-        }
-
-        @Test
-        void shouldApplyRoleMappingFromUserInfoWhenIdTokenHasNoRole() {
-            String idTokenWithoutRoles = "header."
-                    + Base64.getUrlEncoder().encodeToString("{\"sub\": \"user123\"}".getBytes()) + ".signature";
-            String userInfoWithMappedRole = """
-            {
-                "role": "super_admin"
-            }
-            """;
-
-            Tokens tokens = new Tokens(idTokenWithoutRoles, ACCESS_TOKEN);
-
-            when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
-                    .thenReturn(userInfoWithMappedRole);
-
-            Map<String, List<String>> roleMapping = Map.of("admin", List.of("super_admin", "root"));
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.role", roleMapping);
-
-            Role role = extractor.extractRole(tokens);
-
-            assertThat(role).isEqualTo(DefaultRole.ADMIN);
         }
 
         @Test
@@ -208,7 +169,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenReturn(userInfoWithEditor);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.roles", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -219,7 +180,7 @@ class OidcRoleExtractorTest {
         void shouldReturnViewerWhenRoleAttributePathIsBlank() {
             Tokens tokens = new Tokens(ID_TOKEN, ACCESS_TOKEN);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "");
 
             Role role = extractor.extractRole(tokens);
 
@@ -231,7 +192,7 @@ class OidcRoleExtractorTest {
         void shouldReturnViewerWhenRoleAttributePathIsNull() {
             Tokens tokens = new Tokens(ID_TOKEN, ACCESS_TOKEN);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, null, Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, null);
 
             Role role = extractor.extractRole(tokens);
 
@@ -248,7 +209,7 @@ class OidcRoleExtractorTest {
             when(MOCK_OIDC_CLIENT.validateAccessTokenAndExtractUserInfo(ACCESS_TOKEN))
                     .thenReturn(USER_INFO_JSON);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.roles", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -264,7 +225,7 @@ class OidcRoleExtractorTest {
                     + ".signature";
             Tokens tokens = new Tokens(idTokenWithMultipleRoles, ACCESS_TOKEN);
 
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.roles[0]", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "roles[0]");
 
             Role role = extractor.extractRole(tokens);
 
@@ -293,7 +254,7 @@ class OidcRoleExtractorTest {
         @NullAndEmptySource
         @ValueSource(strings = {"", "   ", "\t", "\n", "  \t  "})
         void shouldReturnNullWhenRoleAttributePathIsBlank(String path) throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, path, Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, path);
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, "{\"role\": \"admin\"}");
 
@@ -302,10 +263,9 @@ class OidcRoleExtractorTest {
 
         @ParameterizedTest
         @MethodSource("provideJsonAndExpectedRole")
-        void shouldExtractCorrectRoleFromJson(
-                String json, String roleAttributePath, Map<String, List<String>> roleMapping, DefaultRole expectedRole)
+        void shouldExtractCorrectRoleFromJson(String json, String roleAttributePath, DefaultRole expectedRole)
                 throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, roleAttributePath, roleMapping);
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, roleAttributePath);
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, json);
 
@@ -315,85 +275,36 @@ class OidcRoleExtractorTest {
         private static Stream<Arguments> provideJsonAndExpectedRole() {
             return Stream.of(
                     // Basic role extraction
-                    Arguments.of("{\"role\": \"admin\"}", "$.role", Map.of(), DefaultRole.ADMIN),
-                    Arguments.of("{\"role\": \"editor\"}", "$.role", Map.of(), DefaultRole.EDITOR),
-                    Arguments.of("{\"role\": \"viewer\"}", "$.role", Map.of(), null),
-                    Arguments.of("{\"role\": \"unknown\"}", "$.role", Map.of(), null),
+                    Arguments.of("{\"role\": \"admin\"}", "role", DefaultRole.ADMIN),
+                    Arguments.of("{\"role\": \"editor\"}", "role", DefaultRole.EDITOR),
+                    Arguments.of("{\"role\": \"viewer\"}", "role", null),
+                    Arguments.of("{\"role\": \"unknown\"}", "role", null),
 
                     // Nested paths
-                    Arguments.of("{\"user\": {\"access\": \"admin\"}}", "$.user.access", Map.of(), DefaultRole.ADMIN),
+                    Arguments.of("{\"user\": {\"access\": \"admin\"}}", "user.access", DefaultRole.ADMIN),
                     Arguments.of(
                             "{\"data\": {\"info\": {\"level\": \"editor\"}}}",
-                            "$.data.info.level",
-                            Map.of(),
+                            "data.info.level",
                             DefaultRole.EDITOR),
 
                     // Array handling
-                    Arguments.of("{\"roles\": [\"admin\", \"user\"]}", "$.roles", Map.of(), DefaultRole.ADMIN),
-                    Arguments.of("{\"roles\": [\"viewer\", \"editor\"]}", "$.roles", Map.of(), DefaultRole.EDITOR),
-                    Arguments.of("{\"roles\": [\"guest\", \"user\"]}", "$.roles", Map.of(), null),
-                    Arguments.of("{\"roles\": [\"editor\"]}", "$.roles", Map.of(), DefaultRole.EDITOR),
+                    Arguments.of("{\"roles\": [\"admin\", \"user\"]}", "roles[0]", DefaultRole.ADMIN),
+                    Arguments.of("{\"roles\": [\"viewer\", \"editor\"]}", "roles[1]", DefaultRole.EDITOR),
+                    Arguments.of("{\"roles\": [\"guest\", \"user\"]}", "roles[0]", null),
+                    Arguments.of("{\"roles\": [\"editor\"]}", "roles[0]", DefaultRole.EDITOR),
 
                     // Case insensitivity
-                    Arguments.of("{\"role\": \"ADMIN\"}", "$.role", Map.of(), DefaultRole.ADMIN),
-                    Arguments.of("{\"role\": \"Admin\"}", "$.role", Map.of(), DefaultRole.ADMIN),
-                    Arguments.of("{\"role\": \"EDITOR\"}", "$.role", Map.of(), DefaultRole.EDITOR),
-                    Arguments.of("{\"role\": \"EdItOr\"}", "$.role", Map.of(), DefaultRole.EDITOR),
-                    Arguments.of("{\"role\": \"ViEwEr\"}", "$.role", Map.of(), null),
-
-                    // Role mapping
-                    Arguments.of(
-                            "{\"role\": \"superuser\"}",
-                            "$.role",
-                            Map.of("admin", List.of("superuser", "root")),
-                            DefaultRole.ADMIN),
-                    Arguments.of(
-                            "{\"role\": \"power_user\"}",
-                            "$.role",
-                            Map.of("editor", List.of("power_user", "content_creator")),
-                            DefaultRole.EDITOR),
-                    Arguments.of(
-                            "{\"role\": \"SUPERUSER\"}",
-                            "$.role",
-                            Map.of("admin", List.of("superuser", "root")),
-                            DefaultRole.ADMIN),
-                    Arguments.of("{\"role\": \"unknown\"}", "$.role", Map.of("admin", List.of("superuser")), null),
-                    Arguments.of(
-                            "{\"role\": \"editor\"}",
-                            "$.role",
-                            Map.of("admin", List.of("superuser")),
-                            DefaultRole.EDITOR));
-        }
-
-        @ParameterizedTest
-        @MethodSource("provideRoleMappingWithMultipleValues")
-        void shouldApplyRoleMappingWithMultipleValues(
-                String json, Map<String, List<String>> roleMapping, DefaultRole expectedRole) throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.role", roleMapping);
-
-            Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, json);
-
-            assertThat(role).isEqualTo(expectedRole);
-        }
-
-        private static Stream<Arguments> provideRoleMappingWithMultipleValues() {
-            Map<String, List<String>> roleMapping = Map.of(
-                    "admin", List.of("super_admin", "root", "sysadmin"),
-                    "editor", List.of("content_editor", "blog_writer"));
-
-            return Stream.of(
-                    Arguments.of("{\"role\": \"super_admin\"}", roleMapping, DefaultRole.ADMIN),
-                    Arguments.of("{\"role\": \"root\"}", roleMapping, DefaultRole.ADMIN),
-                    Arguments.of("{\"role\": \"sysadmin\"}", roleMapping, DefaultRole.ADMIN),
-                    Arguments.of("{\"role\": \"content_editor\"}", roleMapping, DefaultRole.EDITOR),
-                    Arguments.of("{\"role\": \"blog_writer\"}", roleMapping, DefaultRole.EDITOR),
-                    Arguments.of("{\"role\": \"unknown\"}", roleMapping, null));
+                    Arguments.of("{\"role\": \"ADMIN\"}", "role", DefaultRole.ADMIN),
+                    Arguments.of("{\"role\": \"Admin\"}", "role", DefaultRole.ADMIN),
+                    Arguments.of("{\"role\": \"EDITOR\"}", "role", DefaultRole.EDITOR),
+                    Arguments.of("{\"role\": \"EdItOr\"}", "role", DefaultRole.EDITOR),
+                    Arguments.of("{\"role\": \"ViEwEr\"}", "role", null));
         }
 
         @ParameterizedTest
         @MethodSource("provideEdgeCaseJson")
         void shouldHandleEdgeCasesGracefully(String json, String path, DefaultRole expectedRole) throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, path, Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, path);
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, json);
 
@@ -402,24 +313,20 @@ class OidcRoleExtractorTest {
 
         private static Stream<Arguments> provideEdgeCaseJson() {
             return Stream.of(
-                    Arguments.of("{}", "$.role", null),
-                    Arguments.of("{\"role\": null}", "$.role", null),
-                    Arguments.of("{\"role\": 1}", "$.role", null),
-                    Arguments.of("{\"role\": 123}", "$.role", null),
-                    Arguments.of("{\"role\": 0}", "$.role", null),
-                    Arguments.of("{\"role\": true}", "$.role", null),
-                    Arguments.of("{\"role\": false}", "$.role", null),
-                    Arguments.of("{\"roles\": []}", "$.roles", null),
-                    Arguments.of("{invalid json}", "$.role", null),
-                    Arguments.of("plain string", "$.role", null),
-                    Arguments.of("12345", "$.role", null),
-                    Arguments.of("{\"user\": \"admin\"}", "$.role", null),
-                    Arguments.of("{\"data\": {\"value\": \"admin\"}}", "$.role", null));
+                    Arguments.of("{}", "role", null),
+                    Arguments.of("{\"role\": null}", "role", null),
+                    Arguments.of("{\"role\": 1}", "role", null),
+                    Arguments.of("{\"role\": true}", "role", null),
+                    Arguments.of("{\"roles\": []}", "roles[0]", null),
+                    Arguments.of("{invalid json}", "role", null),
+                    Arguments.of("plain string", "role", null),
+                    Arguments.of("{\"user\": \"admin\"}", "role", null),
+                    Arguments.of("{\"data\": {\"value\": \"admin\"}}", "role", null));
         }
 
         @Test
         void shouldHandleDeeplyNestedArrays() throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.data[0].users[1].roles[0]", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "data[0].users[1].roles[0]");
 
             String json = """
                 {
@@ -438,29 +345,10 @@ class OidcRoleExtractorTest {
             assertThat(role).isEqualTo(DefaultRole.ADMIN);
         }
 
-        @Test
-        void shouldHandleCaseInsensitiveInRoleMapping() throws Exception {
-            Map<String, List<String>> roleMapping = Map.of(
-                    "admin", List.of("SuperAdmin", "ROOT"),
-                    "editor", List.of("ContentEditor"));
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.role", roleMapping);
-
-            assertThat((Role) extractRoleFromJsonMethod.invoke(extractor, "{\"role\": \"superadmin\"}"))
-                    .isEqualTo(DefaultRole.ADMIN);
-            assertThat((Role) extractRoleFromJsonMethod.invoke(extractor, "{\"role\": \"root\"}"))
-                    .isEqualTo(DefaultRole.ADMIN);
-            assertThat((Role) extractRoleFromJsonMethod.invoke(extractor, "{\"role\": \"ROOT\"}"))
-                    .isEqualTo(DefaultRole.ADMIN);
-            assertThat((Role) extractRoleFromJsonMethod.invoke(extractor, "{\"role\": \"contenteditor\"}"))
-                    .isEqualTo(DefaultRole.EDITOR);
-            assertThat((Role) extractRoleFromJsonMethod.invoke(extractor, "{\"role\": \"ContentEditor\"}"))
-                    .isEqualTo(DefaultRole.EDITOR);
-        }
-
         @ParameterizedTest
         @MethodSource("provideDifferentPathFormats")
-        void shouldHandleDifferentJsonPathFormats(String path, String json, DefaultRole expectedRole) throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, path, Map.of());
+        void shouldHandleDifferentJmesPathFormats(String path, String json, DefaultRole expectedRole) throws Exception {
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, path);
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, json);
 
@@ -469,21 +357,21 @@ class OidcRoleExtractorTest {
 
         private static Stream<Arguments> provideDifferentPathFormats() {
             return Stream.of(
-                    Arguments.of("$.data.role", "{\"data\": {\"role\": \"admin\"}}", DefaultRole.ADMIN),
-                    Arguments.of("$.roles[0]", "{\"roles\": [\"admin\", \"editor\"]}", DefaultRole.ADMIN),
-                    Arguments.of("$.roles[1]", "{\"roles\": [\"admin\", \"editor\"]}", DefaultRole.EDITOR),
-                    Arguments.of("$.roles[*]", "{\"roles\": [\"editor\", \"admin\"]}", DefaultRole.EDITOR),
+                    Arguments.of("data.role", "{\"data\": {\"role\": \"admin\"}}", DefaultRole.ADMIN),
+                    Arguments.of("roles[0]", "{\"roles\": [\"admin\", \"editor\"]}", DefaultRole.ADMIN),
+                    Arguments.of("roles[1]", "{\"roles\": [\"admin\", \"editor\"]}", DefaultRole.EDITOR),
+                    Arguments.of("roles | [0]", "{\"roles\": [\"editor\", \"admin\"]}", DefaultRole.EDITOR),
                     Arguments.of(
-                            "$.user.info.role", "{\"user\": {\"info\": {\"role\": \"editor\"}}}", DefaultRole.EDITOR),
+                            "user.info.role", "{\"user\": {\"info\": {\"role\": \"editor\"}}}", DefaultRole.EDITOR),
                     Arguments.of(
-                            "$.data[0].roles[1]",
+                            "data[0].roles[1]",
                             "{\"data\": [{\"roles\": [\"viewer\", \"admin\"]}]}",
                             DefaultRole.ADMIN));
         }
 
         @Test
         void shouldReturnNullWhenPathDoesNotExist() throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.nonexistent", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "nonexistent");
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, "{\"role\": \"admin\"}");
 
@@ -492,7 +380,7 @@ class OidcRoleExtractorTest {
 
         @Test
         void shouldReturnNullWhenJsonIsNull() throws Exception {
-            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "$.role", Map.of());
+            extractor = new OidcRoleExtractor(MOCK_OIDC_CLIENT, "role");
 
             Role role = (Role) extractRoleFromJsonMethod.invoke(extractor, (Object) null);
 

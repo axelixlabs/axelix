@@ -22,6 +22,7 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
+import com.axelixlabs.axelix.master.exception.auth.OidcMetadataUnavailableException;
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.service.auth.oauth.DefaultOidcClient.Tokens;
 
@@ -72,8 +73,8 @@ public interface OidcClient {
      *
      * @param accessToken access token to verify
      * @return userInfo json
-     * @throws OidcTokenExchangeException if the token is invalid, expired, malformed,
-     *                                    or the userinfo_endpoint is unavailable
+     * @throws OidcTokenExchangeException       if the token is invalid, expired or malformed
+     * @throws OidcMetadataUnavailableException if userinfo_endpoint is unavailable
      */
     @Nullable
     String validateAccessTokenAndExtractUserInfo(String accessToken) throws OidcTokenExchangeException;
