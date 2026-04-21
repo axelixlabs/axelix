@@ -46,7 +46,7 @@ public final class ApiPaths {
 
         public static final String USERS_CREATE = "/users-management/create";
 
-        public static final String USERS_DROP = "/users-management/delete";
+        public static final String USERS_DELETE = "/users-management/delete";
 
         public static final String USERS_VIEW = "/users-management/view";
 

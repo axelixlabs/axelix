@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.UserCreateRequest;
-import com.axelixlabs.axelix.master.api.external.request.UserDropRequest;
+import com.axelixlabs.axelix.master.api.external.request.UserDeleteRequest;
 import com.axelixlabs.axelix.master.api.external.request.UserUpdateEmailRequest;
 import com.axelixlabs.axelix.master.api.external.request.UserUpdatePasswordRequest;
 import com.axelixlabs.axelix.master.api.external.request.UserUpdateRoleRequest;
@@ -87,8 +87,8 @@ public class UserManagementApi {
 
     @DefaultApiResponse(summary = "Delete a user by username")
     @ApiResponse(description = "No Content", responseCode = "204")
-    @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DROP)
-    public ResponseEntity<Void> dropUser(@RequestBody UserDropRequest request) {
+    @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DELETE)
+    public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteRequest request) {
 
         return ResponseEntity.noContent().build();
     }
