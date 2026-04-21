@@ -18,7 +18,6 @@
 package com.axelixlabs.axelix.master.api;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +65,7 @@ import static org.mockito.Mockito.when;
             "axelix.master.auth.options.oauth2.client-id=test-client",
             "axelix.master.auth.options.oauth2.client-secret=test-secret",
             "axelix.master.auth.options.oauth2.base-url=http://localhost:3000",
-            "axelix.master.auth.options.oauth2.role-attribute-path=\"$.roles[*]\""
+            "axelix.master.auth.options.oauth2.role-attribute-path=roles[0]"
         })
 class OAuth2CallbackControllerTest {
 
@@ -123,15 +122,17 @@ class OAuth2CallbackControllerTest {
         assertThat(decodedTokenToUser.getUsername()).isEqualTo(username);
         assertThat(decodedTokenToUser.getRoles()).hasSize(1).first().isEqualTo(DefaultRole.EDITOR);
 
-        assertThat(
+        String decodedAuthorities = assertThat(
                         // trying to extract an actual token from the cookie value
                         authoritiesCookie.substring(authoritiesCookie.indexOf("=") + 1, authoritiesCookie.indexOf(";")))
                 .isBase64()
                 .asBase64Decoded()
                 .asString()
-                .contains(DefaultRole.EDITOR.getAuthorities().stream()
-                        .map(Authority::getName)
-                        .collect(Collectors.toSet()));
+                .actual();
+
+        DefaultRole.EDITOR.getAuthorities().stream()
+                .map(Authority::getName)
+                .forEach(name -> assertThat(decodedAuthorities).contains(name));
 
         assertThat(authoritiesCookie)
                 .doesNotContain(

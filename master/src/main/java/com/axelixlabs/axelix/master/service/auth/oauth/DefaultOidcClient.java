@@ -181,10 +181,11 @@ public class DefaultOidcClient implements OidcClient {
                         "Failed to validate access token via user_info endpoint: %s".formatted(e.getMessage()), e);
             }
 
-            throw new OidcMetadataUnavailableException("Failed to decode the response from user_info OIDC endpoint");
+            throw new OidcMetadataUnavailableException("Failed to decode the response from user_info OIDC endpoint", e);
+        } catch (OidcMetadataUnavailableException e) {
+            throw e;
         } catch (Exception e) {
-
-            throw new OidcMetadataUnavailableException("Failed to decode the response from user_info OIDC endpoint");
+            throw new OidcMetadataUnavailableException("Failed to decode the response from user_info OIDC endpoint", e);
         }
     }
 

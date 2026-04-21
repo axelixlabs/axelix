@@ -374,7 +374,7 @@ class DefaultOidcClientTest {
         }
 
         @Test
-        void shouldThrowOidcMetadataUnavailableExceptionWhenUserInfoReturnsUnauthorized() {
+        void shouldThrowOidcMetadataUnavailableExceptionWhenUserInfoReturnsNotFound() {
 
             mockWebServer.setDispatcher(new Dispatcher() {
                 @Override

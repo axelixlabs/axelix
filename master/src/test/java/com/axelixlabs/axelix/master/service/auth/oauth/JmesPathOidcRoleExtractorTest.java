@@ -169,7 +169,7 @@ class JmesPathOidcRoleExtractorTest {
 
     private Tokens tokens(String idTokenPayloadJson) {
         // header and signature are also supposed to be base64 encoded, but we're not really interested in them in this
-        // test clas
+        // test class
         String idToken =
                 "header." + Base64.getUrlEncoder().encodeToString(idTokenPayloadJson.getBytes()) + ".signature";
         return new Tokens(idToken, "test-access-token");

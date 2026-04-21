@@ -76,5 +76,6 @@ public interface OidcClient {
      * @throws OidcMetadataUnavailableException if userinfo_endpoint is unavailable
      */
     @Nullable
-    String validateAccessTokenAndExtractUserInfo(String accessToken) throws OidcTokenExchangeException;
+    String validateAccessTokenAndExtractUserInfo(String accessToken)
+            throws OidcTokenExchangeException, OidcMetadataUnavailableException;
 }
