@@ -1,0 +1,12 @@
+language: en-US
+tone_instructions: "Focus on logic, bugs, and security."
+early_access: true
+enable_free_tier: true
+reviews:
+  profile: assertive
+  poem: false
+  changed_files_summary: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches: ["master"]
