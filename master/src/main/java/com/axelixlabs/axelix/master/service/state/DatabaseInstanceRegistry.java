@@ -38,6 +38,7 @@ import com.axelixlabs.axelix.master.repository.InstanceRepository;
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @Service
 @NullMarked
@@ -66,7 +67,8 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
 
     @Override
     public void reload(Collection<Instance> instances) {
-        jdbcAggregateTemplate.deleteAll(Instance.class);
+        // The assumption is that every Instance without the heartbeat has come from auto-discovery
+        instanceRepository.deleteAllWithoutHeartbeat();
         jdbcAggregateTemplate.insertAll(instances);
     }
 

@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
  * @see Instance
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @NullMarked
 public interface InstanceRegistry {
@@ -48,13 +49,11 @@ public interface InstanceRegistry {
     void register(Instance instance);
 
     /**
-     * Reloads the registry.
+     * Reloads the registry, by removing all previously auto-discovered Instances,
+     * and inserts the following discovered instances instead. The Instances that have
+     * self-registered are not removed by this call.
      *
-     * It essentially means that the entire database of Instances is wiped out, and after that
-     * only the provided Instances are persisted. So the passed collection of instances is effectively
-     * the new state of this Instance Registry
-     *
-     * @param instances the instances to replace all the existing onces
+     * @param instances Instances to register as a replacement of previously auto-discovered instances.
      */
     void reload(Collection<Instance> instances);
 

@@ -44,6 +44,9 @@
       <column name="deployed_at" type="TIMESTAMP WITH TIME ZONE">
         <constraints nullable="true"/>
       </column>
+      <column name="latest_hearth_beat" type="TIMESTAMP WITH TIME ZONE">
+        <constraints nullable="true"/>
+      </column>
       <column name="status" type="TEXT">
         <constraints nullable="false"/>
       </column>

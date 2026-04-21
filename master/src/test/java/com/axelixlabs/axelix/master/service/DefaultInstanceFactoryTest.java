@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,7 @@ public class DefaultInstanceFactoryTest {
                 "3c994958-924f-4a12-87d0-a8782e97af10",
                 "petclinic",
                 "2025-02-03T13:29:29Z",
+                Instant.parse("2025-04-03T13:29:29Z"),
                 "http://localhost:8080/actuator",
                 mapMetadata());
 
@@ -57,6 +59,7 @@ public class DefaultInstanceFactoryTest {
         assertThat(instance.jdkVendor()).isEqualTo("BellSoft");
         assertThat(instance.commitShaShort()).isEqualTo("a8b0929");
         assertThat(instance.deployedAt()).isEqualTo("2025-02-03T13:29:29Z");
+        assertThat(instance.latestHearthBeat().toString()).isEqualTo("2025-04-03T13:29:29Z");
         assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
         assertThat(instance.memoryUsage().heap()).isEqualTo(12000.0);
         assertThat(instance.actuatorUrl()).isEqualTo("http://localhost:8080/actuator");

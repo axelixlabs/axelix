@@ -17,6 +17,8 @@
  */
 package com.axelixlabs.axelix.master.api.internal.endpoint;
 
+import java.time.Instant;
+
 import io.swagger.v3.oas.annotations.Hidden;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -40,7 +42,11 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 @Hidden
 @InternalApiRestController
 @RequestMapping(path = ApiPaths.SelfRegistryApi.MAIN)
-@ConditionalOnProperty(prefix = "axelix.master.discovery.auto", name = "enabled", havingValue = "false")
+@ConditionalOnProperty(
+        prefix = "axelix.master.discovery.self-registration",
+        name = "enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public class SelfRegisteredApi {
 
     private final InstanceRegistry instanceRegistry;
@@ -58,6 +64,7 @@ public class SelfRegisteredApi {
                 request.getInstanceId(),
                 request.getInstanceName(),
                 request.getDeploymentAt(),
+                Instant.now(),
                 request.getInstanceActuatorUrl(),
                 request.getBasicDiscoveryMetadata());
         instanceRegistry.register(instance);

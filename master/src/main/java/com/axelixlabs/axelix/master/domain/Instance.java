@@ -39,8 +39,11 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param jdkVendor               Vendor of JDK distribution used inside the service.
  * @param commitShaShort          Short git commit hash from which this instance's {@link #serviceVersion version} was build
  * @param deployedAt              Timestamp when the service was deployed
+ * @param latestHearthBeat        Stores the instance last registration time for self-registered instance, and {@code null} in other cases
  * @param status                  The status of the given instance from the Master standpoint.
+ * @param memoryUsage             Memory usage of the given instance
  * @param actuatorUrl             The URL of the actuator root, e.g. {@code https://my-app:6061/actuator}
+ * @param vmFeatures              Status of various useful JVM features for this service, like AOT Cache, AppCDS etc.
  */
 @Table("instances")
 public record Instance(
@@ -54,6 +57,7 @@ public record Instance(
         String jdkVendor,
         String commitShaShort,
         @Nullable Instant deployedAt,
+        @Nullable Instant latestHearthBeat,
         InstanceStatus status,
         @Embedded.Empty MemoryUsage memoryUsage,
         String actuatorUrl,
@@ -95,6 +99,7 @@ public record Instance(
                 this.jdkVendor,
                 this.commitShaShort,
                 this.deployedAt,
+                this.latestHearthBeat,
                 instanceStatus,
                 this.memoryUsage,
                 this.actuatorUrl,

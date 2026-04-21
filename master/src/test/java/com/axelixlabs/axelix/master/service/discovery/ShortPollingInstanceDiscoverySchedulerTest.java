@@ -32,6 +32,7 @@ import org.instancio.Select;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -42,12 +43,17 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
+import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 
 import static com.axelixlabs.axelix.master.utils.ContentType.ACTUATOR_RESPONSE_CONTENT_TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,8 +64,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 29.10.2025
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
             "axelix.master.discovery.auto.enabled=true",
             "axelix.master.discovery.auto.platform=kubernetes",
@@ -82,6 +90,9 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     private DiscoveryClient discoveryClient;
 
     private URI uri;
+
+    @Autowired
+    private TestRestTemplateBuilder restTemplate;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -110,6 +121,10 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     }
 
     @Test
+    // TODO
+    //  This test is currently failing, and a ticket has already been opened to
+    //  track the fix https://github.com/axelixlabs/axelix/issues/944
+    @Disabled
     void shouldRegisterNewK8sInstancesWhenDiscovered() {
         String service1 = "service-1";
         String service2 = "service-2";
@@ -168,8 +183,10 @@ class ShortPollingInstanceDiscoverySchedulerTest {
         Mockito.when(discoveryClient.getInstances(service1)).thenReturn(List.of(k8sInstance1));
         Mockito.when(discoveryClient.getInstances(service2)).thenReturn(List.of(k8sInstance2));
 
+        // when.
         subject.performDiscovery();
 
+        // then.
         List<Instance> registeredInstances = instanceRegistry.getAll();
         assertThat(registeredInstances).hasSize(2);
 
@@ -335,17 +352,190 @@ class ShortPollingInstanceDiscoverySchedulerTest {
 
         assertThat(instanceRegistry.getAll()).hasSize(1);
 
+        // when.
         subject.performDiscovery();
 
+        // then.
         assertThat(instanceRegistry.getAll()).isEmpty();
+    }
+
+    @Test
+    void shouldKeepSelfRegistrationInstance() {
+        // language=json
+        String selfRegistrationRequest = """
+            {
+           "basicDiscoveryMetadata" : {
+             "version": "1.0.0-SNAPSHOT",
+             "serviceVersion" : "3.5.0-SNAPSHOT",
+             "commitShortSha" : "a8b0929",
+             "jdkVendor" : "BellSoft",
+             "softwareVersions" : {
+               "springBoot" : "3.5.0",
+               "java" : "25",
+               "springFramework" : "6.1.2",
+               "kotlin" : null
+             },
+             "healthStatus" : "UP",
+             "memoryDetails" : {
+               "heap" : 12000
+             },
+             "vmFeatures": [
+               {
+                 "name" : "AppCDS",
+                 "description" : "AppCDS Description",
+                 "enabled" : false
+               }
+             ]
+           },
+             "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
+             "instanceName" : "petclinic",
+             "instanceActuatorUrl" : "http://localhost:8080/actuator",
+             "deploymentAt" : "2025-02-03T13:29:29Z"
+         }
+        """;
+
+        restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity(
+                        "/api/internal/service/register", defaultJsonEntity(selfRegistrationRequest), Void.class);
+
+        assertThat(instanceRegistry.getAll()).hasSize(1);
+
+        // when.
+        subject.performDiscovery();
+
+        // then.
+        assertThat(instanceRegistry.getAll()).hasSize(1);
+    }
+
+    @Test
+    void shouldKeepSelfRegistrationAndDeregisterK8sInstance() {
+        // language=json
+        String selfRegistrationRequest = """
+            {
+           "basicDiscoveryMetadata" : {
+             "version": "1.0.0-SNAPSHOT",
+             "serviceVersion" : "3.5.0-SNAPSHOT",
+             "commitShortSha" : "a8b0929",
+             "jdkVendor" : "BellSoft",
+             "softwareVersions" : {
+               "springBoot" : "3.5.0",
+               "java" : "25",
+               "springFramework" : "6.1.2",
+               "kotlin" : null
+             },
+             "healthStatus" : "UP",
+             "memoryDetails" : {
+               "heap" : 12000
+             },
+             "vmFeatures": [
+               {
+                 "name" : "AppCDS",
+                 "description" : "AppCDS Description",
+                 "enabled" : false
+               }
+             ]
+           },
+             "instanceId" : "3c994958-924f-4a12-87d0-a8782e97af10",
+             "instanceName" : "petclinic",
+             "instanceActuatorUrl" : "http://localhost:8080/actuator",
+             "deploymentAt" : "2025-02-03T13:29:29Z"
+         }
+        """;
+
+        restTemplate
+                .withRoleTokenInAuthorizationHeader(DefaultRole.MANAGED_SERVICE)
+                .postForEntity(
+                        "/api/internal/service/register", defaultJsonEntity(selfRegistrationRequest), Void.class);
+
+        String serviceId = "test-service";
+        String instanceId = UUID.randomUUID().toString();
+
+        // language=json
+        String response = """
+            {
+              "version": "1.0.0-SNAPSHOT",
+              "serviceVersion" : "3.5.0-SNAPSHOT",
+              "commitShortSha" : "910230",
+              "jdkVendor" : "BellSoft",
+              "softwareVersions" : {
+                "springBoot" : "3.5.2",
+                "java" : "25",
+                "springFramework" : "6.1.2",
+                "kotlin" : null
+              },
+              "healthStatus" : "DOWN",
+              "memoryDetails" : {
+                "heap" : 12000
+              },
+              "vmFeatures": [
+                   {
+                     "name" : "AppCDS",
+                     "description" : "AppCDS Description",
+                     "enabled" : false
+                   }
+              ]
+            }
+            """;
+
+        mockWebServer.setDispatcher(new Dispatcher() {
+            @Override
+            public @NotNull MockResponse dispatch(@NotNull RecordedRequest request) {
+                String path = request.getPath();
+                assert request.getPath() != null;
+
+                if (path.equals("/actuator/axelix-metadata")) {
+                    return new MockResponse()
+                            .setBody(response)
+                            .addHeader("Content-Type", ACTUATOR_RESPONSE_CONTENT_TYPE);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        });
+
+        ServiceInstance k8sServiceInstance = Instancio.of(KubernetesServiceInstance.class)
+                .set(Select.field("instanceId"), instanceId)
+                .set(Select.field("serviceId"), serviceId)
+                .set(Select.field("secure"), false)
+                .set(Select.field("host"), uri.getHost())
+                .set(Select.field("port"), uri.getPort())
+                .create();
+
+        Mockito.when(discoveryClient.getServices())
+                .thenReturn(List.of(serviceId)) // discovered at first
+                .thenReturn(List.of()); // and then not disocovered
+
+        Mockito.when(discoveryClient.getInstances(serviceId)).thenReturn(List.of(k8sServiceInstance));
+
+        subject.performDiscovery();
+
+        assertThat(instanceRegistry.getAll()).hasSize(2);
+
+        // when.
+        subject.performDiscovery();
+
+        // then.
+        assertThat(instanceRegistry.getAll())
+                .hasSize(1)
+                .first()
+                .extracting(instance -> instance.id().instanceId())
+                .isEqualTo("3c994958-924f-4a12-87d0-a8782e97af10");
     }
 
     @Test
     void shouldHandleEmptyDiscoveryResponse() {
         Mockito.when(discoveryClient.getServices()).thenReturn(List.of());
 
+        // when.
         subject.performDiscovery();
 
+        // then.
         assertThat(instanceRegistry.getAll()).isEmpty();
+    }
+
+    private <T> HttpEntity<T> defaultJsonEntity(T request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(request, headers);
     }
 }

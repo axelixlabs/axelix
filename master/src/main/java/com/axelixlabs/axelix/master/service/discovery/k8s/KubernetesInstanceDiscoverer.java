@@ -65,6 +65,9 @@ public class KubernetesInstanceDiscoverer extends AbstractInstancesDiscoverer {
                     k8sInstance.getInstanceId(),
                     k8sInstance.podName(),
                     k8sInstance.getDeploymentAt(),
+                    // Instances that are discovered by DiscoveryClient
+                    // should not have the heartbeat timestamp
+                    null,
                     serviceInstance.getUri() + ACTUATOR_ENDPOINT_POSTFIX,
                     profile.metadata());
         } else {

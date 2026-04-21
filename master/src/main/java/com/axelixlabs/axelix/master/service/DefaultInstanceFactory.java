@@ -53,6 +53,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
             String instanceId,
             String instanceName,
             String deploymentAt,
+            @Nullable Instant latestHearthBeat,
             String instanceActuatorUrl,
             BasicDiscoveryMetadata metadata) {
         return new Instance(
@@ -66,6 +67,7 @@ public class DefaultInstanceFactory implements InstanceFactory {
                 metadata.getJdkVendor(),
                 metadata.getCommitShortSha(),
                 extractDeployTimestamp(deploymentAt, instanceId, instanceName),
+                latestHearthBeat,
                 convertServiceStatus(metadata.getHealthStatus()),
                 new MemoryUsage(metadata.getMemoryDetails().getHeap()),
                 instanceActuatorUrl,
