@@ -42,6 +42,23 @@ public final class ApiPaths {
         public static final String LOGOUT = "/users/logout";
     }
 
+    public static final class UsersManagementApi {
+
+        public static final String USERS_CREATE = "/users-management/create";
+
+        public static final String USERS_DROP = "/users-management/delete";
+
+        public static final String USERS_VIEW = "/users-management/view";
+
+        public static final String USERS_UPDATE_USERNAME = "/users-management/update/username";
+
+        public static final String USERS_UPDATE_EMAIL = "/users-management/update/email";
+
+        public static final String USERS_UPDATE_PASSWORD = "/users-management/update/password";
+
+        public static final String USERS_UPDATE_ROLE = "/users-management/update/role";
+    }
+
     public static final class OAuth2Api {
 
         public static final String CALLBACK = "/oauth2/callback";

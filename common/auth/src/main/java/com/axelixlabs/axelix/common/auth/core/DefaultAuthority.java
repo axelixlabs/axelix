@@ -58,7 +58,20 @@ public enum DefaultAuthority implements Authority {
      * Grants permission to perform actions for garbage collector log monitoring.
      * <p>Allows triggering, enabling, and disabling garbage collector log monitoring at runtime.</p>
      */
-    GARBAGE_COLLECTOR;
+    GARBAGE_COLLECTOR,
+
+    /**
+     * Grants the right to view managed users.
+     * <p>Reserved for the {@code DefaultRole.SUPER_ADMIN} role.</p>
+     */
+    USERS_VIEW,
+
+    /**
+     * Grants the right to manage users.
+     * <p>Allows creating, updating, and deleting managed users at runtime.</p>
+     * <p>Reserved for the {@code DefaultRole.SUPER_ADMIN} role.</p>
+     */
+    USERS_MANAGEMENT;
 
     @Override
     public String getName() {

@@ -78,7 +78,7 @@ public class OAuth2CallbackController {
 
         String username = oidcClient.validateOAuth2JwtTokenAndExtractUsername(oidcToken);
 
-        User user = new PasswordlessUser(username, Set.of(DefaultRole.ADMIN));
+        User user = new PasswordlessUser(username, Set.of(DefaultRole.SUPER_ADMIN));
 
         String ourToken = jwtEncoderService.generateToken(user);
 
