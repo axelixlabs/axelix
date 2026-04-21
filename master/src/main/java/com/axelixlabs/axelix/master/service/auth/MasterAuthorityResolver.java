@@ -48,7 +48,7 @@ public class MasterAuthorityResolver implements AuthorityResolver {
 
         // Users -> USERS_MANAGEMENT
         put(ApiPaths.UsersManagementApi.USERS_CREATE, HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT);
-        put(ApiPaths.UsersManagementApi.USERS_DROP, HttpMethod.DELETE, DefaultAuthority.USERS_MANAGEMENT);
+        put(ApiPaths.UsersManagementApi.USERS_DELETE, HttpMethod.DELETE, DefaultAuthority.USERS_MANAGEMENT);
         put(ApiPaths.UsersManagementApi.USERS_UPDATE_USERNAME, HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT);
         put(ApiPaths.UsersManagementApi.USERS_UPDATE_EMAIL, HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT);
         put(ApiPaths.UsersManagementApi.USERS_UPDATE_PASSWORD, HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT);

@@ -24,4 +24,4 @@ package com.axelixlabs.axelix.master.api.external.request;
  *
  * @author Sergey Cherkasov
  */
-public record UserDropRequest(String id) {}
+public record UserDeleteRequest(String id) {}

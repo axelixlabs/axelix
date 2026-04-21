@@ -40,7 +40,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Sergey Cherkasov
  */
 @Table("users")
-public record Users(
+public record User(
         @Id String id,
         String username,
         String email,
@@ -50,8 +50,8 @@ public record Users(
         Instant createdAt,
         @Nullable Instant lastLoginAt) {
 
-    public Users withLastLoginAt(Instant lastLoginAt) {
-        return new Users(
+    public User withLastLoginAt(Instant lastLoginAt) {
+        return new User(
                 this.id,
                 this.username,
                 this.email,
