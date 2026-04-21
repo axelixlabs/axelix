@@ -20,9 +20,10 @@ package com.axelixlabs.axelix.sbs.spring.core.transactions;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.EntityManager;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,10 +31,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +44,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
@@ -53,9 +52,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Integration test for {@link TransactionMonitoringEndpoint}
@@ -78,51 +79,57 @@ class TransactionMonitoringEndpointTest {
     @Autowired
     private TransactionStatsCollector transactionStatsCollector;
 
+    @Autowired
+    private OwnerRepository ownerRepository;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
     @BeforeEach
     void cleanUp() {
         transactionStatsCollector.clearAllStats();
     }
 
     @Test
-    void shouldReturnsStatsAfterTransactionExecution() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        propagationTestHelper.testRequiresNew("Smith");
+    void shouldReturnsStatsAfterTransactionExecution() {
+        propagationTestHelper.saveRequiresNew("Smith");
 
         String responseBody = getMonitoringResponse();
 
-        assertThat(responseBody).isNotNull();
-        assertThatJson(responseBody).isObject().containsKey("entrypoints");
-        assertThatJson(responseBody).node("entrypoints").isArray();
+        assertThatJson(responseBody)
+                .isEqualTo(
+                        // language=json
+                        "{\n" + "  \"entrypoints\" : [ {\n"
+                                + "    \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                                + "    \"methodName\" : \"saveRequiresNew\",\n"
+                                + "    \"executions\" : [ {\n"
+                                + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"queries\" : [ {\n"
+                                + "        \"sql\" : \"insert into owner (id, last_name) values (default, ?)\",\n"
+                                + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                                + "      } ]\n"
+                                + "    } ],\n"
+                                + "    \"executionStats\" : {\n"
+                                + "      \"averageDurationMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"maxDurationMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"medianDurationMs\" : \"#{json-unit.ignore}\"\n"
+                                + "    }\n"
+                                + "  } ]\n"
+                                + "}");
 
-        JsonNode json = objectMapper.readTree(responseBody);
-        assertThat(json.get("entrypoints").size()).isGreaterThan(0);
+        Long executionStartTimestampMs = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].startTimestampMs");
+        Long executionEndTimestampMs = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].endTimestampMs");
+        Long queryStartTimestampMs =
+                JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries[0].startTimestampMs");
+        Long queryEndTimestampMs =
+                JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries[0].endTimestampMs");
 
-        assertThatJson(responseBody).node("entrypoints[0]").isObject();
-        assertThatJson(responseBody).node("entrypoints[0].className").isEqualTo(PropagationTestHelper.class.getName());
-        assertThatJson(responseBody).node("entrypoints[0].methodName").isEqualTo("testRequiresNew");
-
-        assertThatJson(responseBody).node("entrypoints[0].executions").isArray();
-        assertThatJson(responseBody).node("entrypoints[0].executions[0]").isObject();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].endTimestampMs")
-                .isNumber();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].startTimestampMs")
-                .isNumber();
-
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries")
-                .isArray()
-                .isNotEmpty();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].sql")
-                .isString();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].startTimestampMs")
-                .isNumber();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].endTimestampMs")
-                .isNumber();
+        assertThat(executionStartTimestampMs).isLessThanOrEqualTo(executionEndTimestampMs);
+        assertThat(queryStartTimestampMs).isLessThanOrEqualTo(queryEndTimestampMs);
+        assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+        assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
 
         assertThatJson(responseBody).node("entrypoints[0].executionStats").isObject();
         assertThatJson(responseBody)
@@ -139,7 +146,7 @@ class TransactionMonitoringEndpointTest {
     @Test
     void shouldClearsAllTransactionMonitoringStats() {
         for (int i = 0; i < 3; i++) {
-            propagationTestHelper.testRequiresNew("Johnson");
+            propagationTestHelper.saveRequiresNew("Johnson");
         }
 
         var allStats = transactionStatsCollector.getAllStats();
@@ -156,90 +163,258 @@ class TransactionMonitoringEndpointTest {
     }
 
     @Test
-    void shouldTrackSingleQueryInsideTransaction() {
-        propagationTestHelper.testSingleQuery();
-
-        String responseBody = getMonitoringResponse();
-
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries")
-                .isArray()
-                .hasSize(1)
-                .isNotEmpty();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].sql")
-                .isString();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].startTimestampMs")
-                .isNumber();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].endTimestampMs")
-                .isNumber();
-    }
-
-    @Test
     void shouldTrackMultipleQueriesInsideTransaction() {
-        propagationTestHelper.testMultipleQueries();
+        propagationTestHelper.saveMultipleOwners();
 
         String responseBody = getMonitoringResponse();
 
         assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries")
-                .isArray()
-                .hasSizeGreaterThanOrEqualTo(3);
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].sql")
-                .isString();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].startTimestampMs")
-                .isNumber();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].endTimestampMs")
-                .isNumber();
+                .isEqualTo(
+                        // language=json
+                        "{\n" + "  \"entrypoints\" : [ {\n"
+                                + "    \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                                + "    \"methodName\" : \"saveMultipleOwners\",\n"
+                                + "    \"executions\" : [ {\n"
+                                + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"queries\" : [ {\n"
+                                + "        \"sql\" : \"insert into owner (id, last_name) values (default, ?)\",\n"
+                                + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                                + "      }, {\n"
+                                + "        \"sql\" : \"insert into owner (id, last_name) values (default, ?)\",\n"
+                                + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                                + "      }, {\n"
+                                + "        \"sql\" : \"insert into owner (id, last_name) values (default, ?)\",\n"
+                                + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                                + "      } ]\n"
+                                + "    } ],\n"
+                                + "    \"executionStats\" : {\n"
+                                + "      \"averageDurationMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"maxDurationMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"medianDurationMs\" : \"#{json-unit.ignore}\"\n"
+                                + "    }\n"
+                                + "  } ]\n"
+                                + "}");
+
+        Long executionStartTimestampMs = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].startTimestampMs");
+        Long executionEndTimestampMs = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].endTimestampMs");
+        List<Map<String, Number>> queries = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries");
+
+        assertThat(executionStartTimestampMs).isLessThanOrEqualTo(executionEndTimestampMs);
+        assertThat(queries).isNotEmpty();
+
+        for (Map<String, Number> query : queries) {
+            Long queryStartTimestampMs = query.get("startTimestampMs").longValue();
+            Long queryEndTimestampMs = query.get("endTimestampMs").longValue();
+
+            assertThat(queryStartTimestampMs).isLessThanOrEqualTo(queryEndTimestampMs);
+            assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+            assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+        }
     }
 
     @Test
     void shouldTrackNPlusOneInsideTransaction() {
-        propagationTestHelper.testNPlusOne();
+        // given.
+        Owner owner = new Owner();
+        owner.addPet(new Pet("pet1", owner)).addPet(new Pet("pet2", owner)).addPet(new Pet("pet3", owner));
 
+        Owner save = ownerRepository.save(owner);
+
+        // when. (will cause N + 1)
+        propagationTestHelper.findOwnerById(save.getId());
+
+        // then.
         String responseBody = getMonitoringResponse();
 
         assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries")
-                .isArray()
-                .hasSizeGreaterThanOrEqualTo(6);
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].sql")
-                .isString();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].startTimestampMs")
-                .isNumber();
-        assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries[0].endTimestampMs")
-                .isNumber();
+                .isEqualTo(
+                        // language=json
+                        "{\n" + "  \"entrypoints\" : [ {\n"
+                                + "    \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                                + "    \"methodName\" : \"findOwnerById\",\n"
+                                + "    \"executions\" : [ {\n"
+                                + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"queries\" : [ {\n"
+                                + "        \"sql\" : \"select transactio0_.id as id1_0_0_, transactio0_.last_name as last_nam2_0_0_ from owner transactio0_ where transactio0_.id=?\",\n"
+                                + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                                + "      }, {\n"
+                                + "        \"sql\" : \"select pets0_.owner_id as owner_id3_1_0_, pets0_.id as id1_1_0_, pets0_.id as id1_1_1_, pets0_.name as name2_1_1_, pets0_.owner_id as owner_id3_1_1_ from pet pets0_ where pets0_.owner_id=?\",\n"
+                                + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                                + "      } ]\n"
+                                + "    } ],\n"
+                                + "    \"executionStats\" : {\n"
+                                + "      \"averageDurationMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"maxDurationMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"medianDurationMs\" : \"#{json-unit.ignore}\"\n"
+                                + "    }\n"
+                                + "  } ]\n"
+                                + "}");
+
+        Long executionStartTimestampMs = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].startTimestampMs");
+        Long executionEndTimestampMs = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].endTimestampMs");
+        List<Map<String, Number>> queries = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries");
+
+        assertThat(executionStartTimestampMs).isLessThanOrEqualTo(executionEndTimestampMs);
+        assertThat(queries).isNotEmpty();
+
+        for (Map<String, Number> query : queries) {
+            Long queryStartTimestampMs = query.get("startTimestampMs").longValue();
+            Long queryEndTimestampMs = query.get("endTimestampMs").longValue();
+
+            assertThat(queryStartTimestampMs).isLessThanOrEqualTo(queryEndTimestampMs);
+            assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+            assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+        }
     }
 
     @Test
     void shouldTrackHibernateOnMerge() {
-        propagationTestHelper.testMerge();
+        // given.
+        Owner owner = new Owner();
+        Owner saved = ownerRepository.save(owner);
+        saved.setLastName("newLastName");
+
+        // when. (will cause entityManager.merge)
+        propagationTestHelper.updateOwner(saved);
 
         String responseBody = getMonitoringResponse();
 
         assertThatJson(responseBody)
-                .node("entrypoints[0].executions[0].queries")
-                .isArray()
-                .hasSizeGreaterThanOrEqualTo(3)
-                .anySatisfy(
-                        query -> assertThatJson(query).node("sql").asString().containsIgnoringCase("insert"))
-                .anySatisfy(
-                        query -> assertThatJson(query).node("sql").asString().containsIgnoringCase("select"))
-                .anySatisfy(
-                        query -> assertThatJson(query).node("sql").asString().containsIgnoringCase("update"))
-                .allSatisfy(query -> {
-                    assertThatJson(query).node("sql").isString();
-                    assertThatJson(query).node("startTimestampMs").isNumber();
-                    assertThatJson(query).node("endTimestampMs").isNumber();
-                });
+                .isEqualTo(
+                        // language=json
+                        "{\n" + "  \"entrypoints\" : [ {\n"
+                                + "    \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                                + "    \"methodName\" : \"updateOwner\",\n"
+                                + "    \"executions\" : [ {\n"
+                                + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"queries\" : [ {\n"
+                                + "        \"sql\" : \"select transactio0_.id as id1_0_0_, transactio0_.last_name as last_nam2_0_0_ from owner transactio0_ where transactio0_.id=?\",\n"
+                                + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                                + "      }, {\n"
+                                + "        \"sql\" : \"update owner set last_name=? where id=?\",\n"
+                                + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                                + "      } ]\n"
+                                + "    } ],\n"
+                                + "    \"executionStats\" : {\n"
+                                + "      \"averageDurationMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"maxDurationMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"medianDurationMs\" : \"#{json-unit.ignore}\"\n"
+                                + "    }\n"
+                                + "  } ]\n"
+                                + "}");
+
+        Long executionStartTimestampMs = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].startTimestampMs");
+        Long executionEndTimestampMs = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].endTimestampMs");
+        List<Map<String, Number>> queries = JsonPath.read(responseBody, "$.entrypoints[0].executions[0].queries");
+
+        assertThat(executionStartTimestampMs).isLessThanOrEqualTo(executionEndTimestampMs);
+        assertThat(queries).isNotEmpty();
+
+        for (Map<String, Number> query : queries) {
+            Long queryStartTimestampMs = query.get("startTimestampMs").longValue();
+            Long queryEndTimestampMs = query.get("endTimestampMs").longValue();
+
+            assertThat(queryStartTimestampMs).isLessThanOrEqualTo(queryEndTimestampMs);
+            assertThat(queryStartTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+            assertThat(queryEndTimestampMs).isBetween(executionStartTimestampMs, executionEndTimestampMs);
+        }
+    }
+
+    @Test
+    void rollbackScenarioIsMonitored() {
+        // given.
+        assertThatThrownBy(() -> propagationTestHelper.testRollbackScenario("Rodriquez"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Test rollback");
+
+        // when.
+        String responseBody = getMonitoringResponse();
+
+        assertThatJson(responseBody)
+                .isEqualTo(
+                        // language=json
+                        "{\n" + "  \"entrypoints\" : [ {\n"
+                                + "    \"className\" : \"com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest$PropagationTestHelper\",\n"
+                                + "    \"methodName\" : \"testRollbackScenario\",\n"
+                                + "    \"executions\" : [ {\n"
+                                + "      \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"endTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"queries\" : [ {\n"
+                                + "        \"sql\" : \"select transactio0_.id as id1_0_, transactio0_.last_name as last_nam2_0_ from owner transactio0_ where transactio0_.last_name=?\",\n"
+                                + "        \"startTimestampMs\" : \"#{json-unit.ignore}\",\n"
+                                + "        \"endTimestampMs\" : \"#{json-unit.ignore}\"\n"
+                                + "      } ]\n"
+                                + "    } ],\n"
+                                + "    \"executionStats\" : {\n"
+                                + "      \"averageDurationMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"maxDurationMs\" : \"#{json-unit.ignore}\",\n"
+                                + "      \"medianDurationMs\" : \"#{json-unit.ignore}\"\n"
+                                + "    }\n"
+                                + "  } ]\n"
+                                + "}");
+    }
+
+    @Test
+    void notSupportedPropagationIsNotMonitored() {
+        // given.
+        propagationTestHelper.testNotSupported("Rodriquez");
+
+        // when.
+        String responseBody = getMonitoringResponse();
+        List<String> methodNames = JsonPath.read(responseBody, "$.entrypoints[*].methodName");
+
+        // then.
+        assertThat(methodNames).doesNotContain("testNotSupported");
+        assertThat(methodNames).contains("findByLastName"); // Spring Data repository opens transaction
+    }
+
+    @Test
+    void supportsPropagationWithExistingTransaction() {
+        // given.
+        transactionTemplate.executeWithoutResult(status -> {
+            propagationTestHelper.testSupports("Rodriquez");
+        });
+
+        // when.
+        String responseBody = getMonitoringResponse();
+
+        // then.
+        assertThatJson(responseBody).node("entrypoints").isArray().isEmpty();
+    }
+
+    @Test
+    void supportsWithoutTransactionIsNotMonitored() {
+        // given.
+        propagationTestHelper.testSupportsWithoutTransaction();
+
+        // when.
+        String responseBody = getMonitoringResponse();
+
+        // then.
+        assertThatJson(responseBody).node("entrypoints").isArray().isEmpty();
+    }
+
+    @Test
+    void nestedPropagationIsMonitored() {
+        // given.
+        propagationTestHelper.testNested();
+
+        // when.
+        String responseBody = getMonitoringResponse();
+        List<String> methodNames = JsonPath.read(responseBody, "$.entrypoints[*].methodName");
+
+        // then.
+        assertThat(methodNames).contains("testNested");
     }
 
     private String getMonitoringResponse() {
@@ -289,16 +464,13 @@ class TransactionMonitoringEndpointTest {
         }
 
         @Bean
-        public PropagationTestHelper propagationTestHelper(
-                OwnerRepository ownerRepository,
-                PetRepository petRepository,
-                @Lazy PropagationTestHelper self,
-                EntityManager entityManager) {
-            return new PropagationTestHelper(ownerRepository, petRepository, self, entityManager);
+        public PropagationTestHelper propagationTestHelper(OwnerRepository ownerRepository) {
+            return new PropagationTestHelper(ownerRepository);
         }
     }
 
     @Entity
+    @Table(name = "owner")
     static class Owner {
 
         @Id
@@ -307,7 +479,7 @@ class TransactionMonitoringEndpointTest {
 
         private String lastName;
 
-        @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+        @OneToMany(mappedBy = "owner", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
         private List<Pet> pets = new ArrayList<>();
 
         public List<Pet> getPets() {
@@ -322,12 +494,19 @@ class TransactionMonitoringEndpointTest {
             return lastName;
         }
 
-        public void setLastName(String lastName) {
+        public Owner setLastName(String lastName) {
             this.lastName = lastName;
+            return this;
+        }
+
+        public Owner addPet(Pet pet) {
+            this.pets.add(pet);
+            return this;
         }
     }
 
     @Entity
+    @Table(name = "pet")
     static class Pet {
 
         @Id
@@ -351,70 +530,61 @@ class TransactionMonitoringEndpointTest {
     interface OwnerRepository extends JpaRepository<Owner, Long> {
 
         @Transactional
-        default Owner findByLastName(String lastName) {
-            this.save(new Owner());
-            return new Owner();
-        }
-
-        @Transactional(propagation = Propagation.SUPPORTS)
-        default List<Owner> findAll() {
-            return List.of(new Owner());
-        }
+        Owner findByLastName(String lastName);
     }
-
-    interface PetRepository extends JpaRepository<Pet, Long> {}
 
     static class PropagationTestHelper {
 
         private final OwnerRepository ownerRepository;
-        private final PetRepository petRepository;
-        private final PropagationTestHelper self;
-        private final EntityManager entityManager;
 
-        public PropagationTestHelper(
-                OwnerRepository ownerRepository,
-                PetRepository petRepository,
-                PropagationTestHelper self,
-                EntityManager entityManager) {
+        public PropagationTestHelper(OwnerRepository ownerRepository) {
             this.ownerRepository = ownerRepository;
-            this.self = self;
-            this.entityManager = entityManager;
-            this.petRepository = petRepository;
         }
 
         @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void testRequiresNew(String lastName) {
+        public void saveRequiresNew(String lastName) {
+            ownerRepository.save(new Owner().setLastName(lastName));
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void saveMultipleOwners() {
+            ownerRepository.saveAll(List.of(new Owner(), new Owner(), new Owner()));
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void updateOwner(Owner owner) {
+            // will cause entityManager.merge --> new SELECT, since Owner has an id
+            ownerRepository.save(owner);
+        }
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void findOwnerById(Long id) {
+            Owner owner = ownerRepository.findById(id).orElseThrow();
+            owner.getPets().size(); // will cause n + 1
+        }
+
+        @Transactional(propagation = Propagation.NESTED)
+        public void testNested() {
+            ownerRepository.findByLastName("Schroeder");
+        }
+
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        public void testNotSupported(String lastName) {
             ownerRepository.findByLastName(lastName);
         }
 
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void testSingleQuery() {
-            ownerRepository.save(new Owner());
+        @Transactional(propagation = Propagation.SUPPORTS)
+        public void testSupports(String lastName) {
+            ownerRepository.findByLastName(lastName);
         }
 
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void testMultipleQueries() {
-            ownerRepository.save(new Owner());
-            ownerRepository.save(new Owner());
-            ownerRepository.save(new Owner());
-        }
+        @Transactional(propagation = Propagation.SUPPORTS)
+        public void testSupportsWithoutTransaction() {}
 
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void testMerge() {
-            Owner owner = ownerRepository.save(new Owner());
-            owner.setLastName("Smith");
-            entityManager.clear();
-            entityManager.merge(owner);
-        }
-
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        public void testNPlusOne() {
-            for (int i = 0; i < 3; i++) {
-                Owner owner = ownerRepository.save(new Owner());
-                petRepository.save(new Pet("pet" + i, owner));
-            }
-            entityManager.clear();
-            ownerRepository.findAll();
+        @Transactional
+        public void testRollbackScenario(String lastName) {
+            ownerRepository.findByLastName(lastName);
+            throw new RuntimeException("Test rollback");
         }
     }
 }
