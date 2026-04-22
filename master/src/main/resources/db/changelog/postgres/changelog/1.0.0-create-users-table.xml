@@ -6,7 +6,7 @@
             http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <changeSet id="sqlite-002-create-users-table" author="Axelix Team">
+  <changeSet id="postgresql-1.0.0-create-users-table" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <tableExists tableName="users"/>
@@ -21,10 +21,10 @@
         <constraints nullable="false" unique="true" uniqueConstraintName="uq_users_username"/>
       </column>
       <column name="email" type="TEXT">
-        <constraints nullable="false" unique="true" uniqueConstraintName="uq_users_email"/>
+        <constraints nullable="true" unique="true" uniqueConstraintName="uq_users_email"/>
       </column>
       <column name="password" type="TEXT">
-        <constraints nullable="false"/>
+        <constraints nullable="true"/>
       </column>
       <column name="roles" type="TEXT">
         <constraints nullable="false"/>
@@ -32,10 +32,7 @@
       <column name="provider" type="TEXT">
         <constraints nullable="false"/>
       </column>
-      <column name="created_at" type="TEXT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="last_login_at" type="TEXT">
+      <column name="last_login_at" type="TIMESTAMP WITH TIME ZONE">
         <constraints nullable="true"/>
       </column>
     </createTable>

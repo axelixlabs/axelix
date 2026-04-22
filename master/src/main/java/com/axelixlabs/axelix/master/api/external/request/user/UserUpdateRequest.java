@@ -15,22 +15,29 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.request;
+package com.axelixlabs.axelix.master.api.external.request.user;
+
+import java.util.Set;
+
+import org.jspecify.annotations.Nullable;
 
 /**
- * Request payload to create a new managed user via the Users Management API.
+ * Request payload to update an existing managed user via the Users Management API.
  *
- * @param name     Login name of the user to create.
- * @param email    Email address of the user.
- * @param password Plain-text password supplied by the SUPER_ADMIN. Hashed server-side before persistence.
- * @param role     Name of the role to grant to the user.
+ * @param id       Unique identifier of the user to update
+ * @param username The new username must be unique
+ * @param email    The user’s email address. {@code null} if no email address is associated with the account. Must be unique.
+ * @param roles    Names of the roles granted to this user.
+ * @param password Plain-text password. Hashed server-side before persistence.
  *
  * @author Sergey Cherkasov
  */
-public record UserCreateRequest(String name, String email, String password, String role) {
+public record UserUpdateRequest(
+        String id, String username, @Nullable String email, Set<String> roles, String password) {
 
     @Override
     public String toString() {
-        return "UserCreateRequest[name=" + name + ", email=" + email + ", password=[REDACTED], role=" + role + ']';
+        return "UserUpdateRequest[id=" + id + ", username=" + username + ", email=" + email + ", roles=" + roles
+                + ", password=[REDACTED]" + ']';
     }
 }

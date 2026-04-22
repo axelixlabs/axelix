@@ -44,19 +44,25 @@ public final class ApiPaths {
 
     public static final class UsersManagementApi {
 
+        /**
+         * Endpoint to create a new managed user.
+         */
         public static final String USERS_CREATE = "/users-management/create";
 
+        /**
+         * Endpoint to delete a managed user.
+         */
         public static final String USERS_DELETE = "/users-management/delete";
 
+        /**
+         * Endpoint to retrieve the feed of managed users.
+         */
         public static final String USERS_VIEW = "/users-management/view";
 
-        public static final String USERS_UPDATE_USERNAME = "/users-management/update/username";
-
-        public static final String USERS_UPDATE_EMAIL = "/users-management/update/email";
-
-        public static final String USERS_UPDATE_PASSWORD = "/users-management/update/password";
-
-        public static final String USERS_UPDATE_ROLE = "/users-management/update/role";
+        /**
+         * Endpoint to update a managed user.
+         */
+        public static final String USERS_UPDATE = "/users-management/update";
     }
 
     public static final class OAuth2Api {

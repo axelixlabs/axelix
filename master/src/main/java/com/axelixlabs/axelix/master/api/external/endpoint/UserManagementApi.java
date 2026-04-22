@@ -31,17 +31,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
-import com.axelixlabs.axelix.master.api.external.request.UserCreateRequest;
-import com.axelixlabs.axelix.master.api.external.request.UserDeleteRequest;
-import com.axelixlabs.axelix.master.api.external.request.UserUpdateEmailRequest;
-import com.axelixlabs.axelix.master.api.external.request.UserUpdatePasswordRequest;
-import com.axelixlabs.axelix.master.api.external.request.UserUpdateRoleRequest;
-import com.axelixlabs.axelix.master.api.external.request.UserUpdateUsernameRequest;
+import com.axelixlabs.axelix.master.api.external.request.user.UserCreateRequest;
+import com.axelixlabs.axelix.master.api.external.request.user.UserDeleteRequest;
+import com.axelixlabs.axelix.master.api.external.request.user.UserUpdateRequest;
 import com.axelixlabs.axelix.master.api.external.response.UserResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 
@@ -93,34 +91,10 @@ public class UserManagementApi {
         return ResponseEntity.noContent().build();
     }
 
-    @DefaultApiResponse(summary = "Replace the username of a user")
+    @DefaultApiResponse(summary = "Update a user")
     @ApiResponse(description = "No Content", responseCode = "204")
-    @PostMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE_USERNAME)
-    public ResponseEntity<Void> updateUsername(@RequestBody UserUpdateUsernameRequest request) {
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @DefaultApiResponse(summary = "Replace the email of a user")
-    @ApiResponse(description = "No Content", responseCode = "204")
-    @PostMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE_EMAIL)
-    public ResponseEntity<Void> updateEmail(@RequestBody UserUpdateEmailRequest request) {
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @DefaultApiResponse(summary = "Replace the password of a user")
-    @ApiResponse(description = "No Content", responseCode = "204")
-    @PostMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE_PASSWORD)
-    public ResponseEntity<Void> updatePassword(@RequestBody UserUpdatePasswordRequest request) {
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @DefaultApiResponse(summary = "Replace the role of a user")
-    @ApiResponse(description = "No Content", responseCode = "204")
-    @PostMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE_ROLE)
-    public ResponseEntity<Void> updateRole(@RequestBody UserUpdateRoleRequest request) {
+    @PatchMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE)
+    public ResponseEntity<Void> updateUser(@RequestBody UserUpdateRequest request) {
 
         return ResponseEntity.noContent().build();
     }

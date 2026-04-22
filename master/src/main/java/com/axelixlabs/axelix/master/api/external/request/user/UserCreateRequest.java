@@ -15,14 +15,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.request;
+package com.axelixlabs.axelix.master.api.external.request.user;
+
+import org.jspecify.annotations.Nullable;
 
 /**
- * Request payload to replace the username of a managed user.
+ * Request payload to create a new managed user via the Users Management API.
  *
- * @param id       Unique identifier of the user to update.
- * @param username New login name to set for the user.
+ * @param name     Login name of the user to create.  Must be unique.
+ * @param email    The user’s email address, which may be {@code null}. Must be unique.
+ * @param password Plain-text password. Hashed server-side before persistence.
+ * @param role     Name of the role to grant to the user.
  *
  * @author Sergey Cherkasov
  */
-public record UserUpdateUsernameRequest(String id, String username) {}
+public record UserCreateRequest(String name, @Nullable String email, String password, String role) {
+
+    @Override
+    public String toString() {
+        return "UserCreateRequest[name=" + name + ", email=" + email + ", password=[REDACTED], role=" + role + ']';
+    }
+}

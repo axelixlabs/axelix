@@ -6,7 +6,7 @@
             http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-  <changeSet id="postgresql-002-create-users-table" author="Axelix Team">
+  <changeSet id="mysql-1.0.0-create-users-table" author="Axelix Team">
     <preConditions onFail="MARK_RAN" onError="HALT">
       <not>
         <tableExists tableName="users"/>
@@ -14,28 +14,25 @@
     </preConditions>
 
     <createTable tableName="users">
-      <column name="id" type="TEXT">
+      <column name="id" type="VARCHAR(36)">
         <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
       </column>
-      <column name="username" type="TEXT">
+      <column name="username" type="VARCHAR(255)">
         <constraints nullable="false" unique="true" uniqueConstraintName="uq_users_username"/>
       </column>
-      <column name="email" type="TEXT">
-        <constraints nullable="false" unique="true" uniqueConstraintName="uq_users_email"/>
+      <column name="email" type="VARCHAR(255)">
+        <constraints nullable="true" unique="true" uniqueConstraintName="uq_users_email"/>
       </column>
-      <column name="password" type="TEXT">
+      <column name="password" type="VARCHAR(255)">
+        <constraints nullable="true"/>
+      </column>
+      <column name="roles" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="roles" type="TEXT">
+      <column name="provider" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="provider" type="TEXT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
-        <constraints nullable="false"/>
-      </column>
-      <column name="last_login_at" type="TIMESTAMP WITH TIME ZONE">
+      <column name="last_login_at" type="DATETIME">
         <constraints nullable="true"/>
       </column>
     </createTable>

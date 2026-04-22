@@ -104,6 +104,40 @@ class DefaultJwtEncoderServiceTest {
     }
 
     @Test
+    void shouldGenerateValidJwtToken_ForUserWithRoleSuperAdmin() {
+        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.SUPER_ADMIN));
+
+        // when.
+        String token = jwtEncoderService.generateToken(user);
+
+        // then.
+        // language=json
+        String expectedPayload = String.format(
+                "{" + "  \"sub\": \"%s\","
+                        + "  \"roles\": [{"
+                        + "    \"name\": \"SUPER_ADMIN\","
+                        + "    \"authorities\": ["
+                        + "      \"SCHEDULED_TASKS_MODIFY\","
+                        + "      \"USERS_VIEW\","
+                        + "      \"USERS_MANAGEMENT\","
+                        + "      \"CACHES_CLEAR\","
+                        + "      \"GARBAGE_COLLECTOR\","
+                        + "      \"ENV_VALUES_READ\","
+                        + "      \"CONFIG_PROPS_VALUES_READ\","
+                        + "      \"CACHES_TOGGLE\""
+                        + "    ],"
+                        + "    \"components\": []"
+                        + "  }]"
+                        + "}",
+                USER_NAME);
+
+        assertThatJson(getPayload(token))
+                .whenIgnoringPaths("exp", "iat")
+                .when(IGNORING_ARRAY_ORDER)
+                .isEqualTo(expectedPayload);
+    }
+
+    @Test
     void shouldGenerateValidJwtToken_ForUserWithRoleAdmin() {
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.ADMIN));
 

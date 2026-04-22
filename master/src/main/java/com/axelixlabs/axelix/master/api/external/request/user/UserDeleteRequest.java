@@ -15,20 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.request;
+package com.axelixlabs.axelix.master.api.external.request.user;
 
 /**
- * Request payload to replace the password of a managed user.
+ * Request payload to delete a managed user by id.
  *
- * @param id       Unique identifier of the user to update.
- * @param password New plain-text password supplied by the SUPER_ADMIN. Hashed server-side before persistence.
+ * @param id Unique identifier of the user to delete.
  *
  * @author Sergey Cherkasov
  */
-public record UserUpdatePasswordRequest(String id, String password) {
-
-    @Override
-    public String toString() {
-        return "UserUpdatePasswordRequest[id=" + id + ", password=[REDACTED]]";
-    }
-}
+public record UserDeleteRequest(String id) {}

@@ -54,6 +54,23 @@ class DefaultAuthorizerTest {
     }
 
     @Test
+    void shouldAuthorize_UserSuperAdminHasRequiredAuthorities() {
+        PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.SUPER_ADMIN));
+
+        AuthorizationRequest request = new AuthorizationRequest(Set.of(
+                DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+                DefaultAuthority.CACHES_CLEAR,
+                DefaultAuthority.CACHES_TOGGLE,
+                DefaultAuthority.GARBAGE_COLLECTOR,
+                DefaultAuthority.CONFIG_PROPS_VALUES_READ,
+                DefaultAuthority.ENV_VALUES_READ,
+                DefaultAuthority.USERS_MANAGEMENT,
+                DefaultAuthority.USERS_VIEW));
+
+        assertThatNoException().isThrownBy(() -> authorizer.authorize(user, request));
+    }
+
+    @Test
     void shouldAuthorize_UserAdminHasRequiredAuthorities() {
         PasswordlessUser user = new PasswordlessUser(USER_NAME, Set.of(DefaultRole.ADMIN));
 
@@ -106,7 +123,9 @@ class DefaultAuthorizerTest {
                 DefaultAuthority.CACHES_TOGGLE,
                 DefaultAuthority.GARBAGE_COLLECTOR,
                 DefaultAuthority.CONFIG_PROPS_VALUES_READ,
-                DefaultAuthority.ENV_VALUES_READ));
+                DefaultAuthority.ENV_VALUES_READ,
+                DefaultAuthority.USERS_MANAGEMENT,
+                DefaultAuthority.USERS_VIEW));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
     }
@@ -119,7 +138,11 @@ class DefaultAuthorizerTest {
                 DefaultAuthority.SCHEDULED_TASKS_MODIFY,
                 DefaultAuthority.CACHES_CLEAR,
                 DefaultAuthority.CACHES_TOGGLE,
-                DefaultAuthority.GARBAGE_COLLECTOR));
+                DefaultAuthority.GARBAGE_COLLECTOR,
+                DefaultAuthority.CONFIG_PROPS_VALUES_READ,
+                DefaultAuthority.ENV_VALUES_READ,
+                DefaultAuthority.USERS_MANAGEMENT,
+                DefaultAuthority.USERS_VIEW));
 
         assertThatThrownBy(() -> authorizer.authorize(user, request)).isInstanceOf(AuthorizationException.class);
     }

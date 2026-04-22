@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.master.domain.UserEntity;
 public record UserResponse(
         String id,
         String username,
-        String email,
+        @Nullable String email,
         Set<String> roles,
         String provider,
         @Nullable Instant lastLoginAt) {

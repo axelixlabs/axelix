@@ -34,7 +34,6 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param password     Hash of the user's password.
  * @param roles        Names of the roles granted to this user (e.g. {@code ADMIN}, {@code EDITOR}, {@code VIEWER}).
  * @param provider     Origin of the user account (e.g. OIDC/OAuth2 provider name, or {@code LOCAL} for login/password).
- * @param createdAt    Timestamp when the user was created.
  * @param lastLoginAt  Timestamp of the most recent successful login. {@code null} until the user logs in for the first time.
  *
  * @author Sergey Cherkasov
@@ -43,29 +42,21 @@ import org.springframework.data.relational.core.mapping.Table;
 public record UserEntity(
         @Id String id,
         String username,
-        String email,
-        String password,
+        @Nullable String email,
+        @Nullable String password,
         Set<String> roles,
         String provider,
-        Instant createdAt,
         @Nullable Instant lastLoginAt) {
 
     public UserEntity withLastLoginAt(Instant lastLoginAt) {
         return new UserEntity(
-                this.id,
-                this.username,
-                this.email,
-                this.password,
-                this.roles,
-                this.provider,
-                this.createdAt,
-                lastLoginAt);
+                this.id, this.username, this.email, this.password, this.roles, this.provider, lastLoginAt);
     }
 
     @Override
     public String toString() {
         return "User[id=" + id + ", username=" + username + ", email=" + email
                 + ", password=[REDACTED], roles=" + roles + ", provider=" + provider
-                + ", createdAt=" + createdAt + ", lastLoginAt=" + lastLoginAt + ']';
+                + ", lastLoginAt=" + lastLoginAt + ']';
     }
 }
