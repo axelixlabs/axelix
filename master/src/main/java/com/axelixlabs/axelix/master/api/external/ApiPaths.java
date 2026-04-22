@@ -57,7 +57,7 @@ public final class ApiPaths {
         /**
          * Endpoint to retrieve the feed of managed users.
          */
-        public static final String USERS_VIEW = "/users-management/view";
+        public static final String USERS_FEED = "/users-management/feed";
 
         /**
          * Endpoint to update a managed user.

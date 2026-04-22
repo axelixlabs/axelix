@@ -62,7 +62,7 @@ public class UserManagementApi {
                     @Content(
                             mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
-    @GetMapping(path = ApiPaths.UsersManagementApi.USERS_VIEW)
+    @GetMapping(path = ApiPaths.UsersManagementApi.USERS_FEED)
     public ResponseEntity<List<UserResponse>> getUsersFeed() {
         Instant lastLoginAt = Instant.now();
         List<UserResponse> users = List.of(
