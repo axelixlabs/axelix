@@ -45,7 +45,7 @@ jobs:
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ISSUER_URI: ${{ secrets.OIDC_GOOGLE_ISSUER_URL }}
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_ID: ${{ secrets.OIDC_GOOGLE_CLIENT_ID }}
       AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_SECRET: ${{ secrets.OIDC_GOOGLE_CLIENT_SECRET }}
-      AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_REDIRECT_URI: ${{ secrets.OIDC_GOOGLE_REDIRECT_URL }}
+      AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL: ${{ secrets.OIDC_GOOGLE_REDIRECT_URL }}
 
       GRADLE_CACHE_ENCRYPTION_KEY: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
     steps:
@@ -122,7 +122,7 @@ jobs:
             --set app.auth.oauth2.issuerUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_ISSUER_URI }} \
             --set app.auth.oauth2.clientId=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_ID }} \
             --set app.auth.oauth2.clientSecret=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_CLIENT_SECRET }} \
-            --set app.auth.oauth2.appUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_REDIRECT_URI }} \
+            --set app.auth.oauth2.appUri=${{ env.AXELIX_MASTER_AUTH_OPTIONS_OAUTH2_BASE_URL }} \
             --install axelix-master . \
             -f values.yaml
 
