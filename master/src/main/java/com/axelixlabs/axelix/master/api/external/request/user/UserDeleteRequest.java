@@ -15,16 +15,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.common.domain.http;
+package com.axelixlabs.axelix.master.api.external.request.user;
 
 /**
- * Possible HTTP methods that we care about.
+ * Request payload to delete a managed user by id.
  *
- * @author Mikhail Polivakha
+ * @param id Unique identifier of the user to delete.
+ *
+ * @author Sergey Cherkasov
  */
-public enum HttpMethod {
-    GET,
-    POST,
-    DELETE,
-    PATCH
-}
+public record UserDeleteRequest(String id) {}

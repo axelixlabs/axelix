@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+            http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="sqlite-1.0.0-create-users-table" author="Axelix Team">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+      <not>
+        <tableExists tableName="users"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="users">
+      <column name="id" type="TEXT">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
+      </column>
+      <column name="username" type="TEXT">
+        <constraints nullable="false" unique="true" uniqueConstraintName="uq_users_username"/>
+      </column>
+      <column name="email" type="TEXT">
+        <constraints nullable="true" unique="true" uniqueConstraintName="uq_users_email"/>
+      </column>
+      <column name="password" type="TEXT">
+        <constraints nullable="true"/>
+      </column>
+      <column name="roles" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="provider" type="TEXT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="last_login_at" type="TEXT">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+  </changeSet>
+</databaseChangeLog>

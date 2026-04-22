@@ -42,6 +42,29 @@ public final class ApiPaths {
         public static final String LOGOUT = "/users/logout";
     }
 
+    public static final class UsersManagementApi {
+
+        /**
+         * Endpoint to create a new managed user.
+         */
+        public static final String USERS_CREATE = "/users-management/create";
+
+        /**
+         * Endpoint to delete a managed user.
+         */
+        public static final String USERS_DELETE = "/users-management/delete";
+
+        /**
+         * Endpoint to retrieve the feed of managed users.
+         */
+        public static final String USERS_FEED = "/users-management/feed";
+
+        /**
+         * Endpoint to update a managed user.
+         */
+        public static final String USERS_UPDATE = "/users-management/update";
+    }
+
     public static final class OAuth2Api {
 
         public static final String CALLBACK = "/oauth2/callback";

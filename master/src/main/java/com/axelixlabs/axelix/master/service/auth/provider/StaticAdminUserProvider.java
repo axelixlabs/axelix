@@ -45,7 +45,7 @@ public class StaticAdminUserProvider implements UserProvider {
             return new DefaultUser(
                     staticCredentialsConfig.getUsername(),
                     staticCredentialsConfig.getPassword(),
-                    Set.of(DefaultRole.ADMIN));
+                    Set.of(DefaultRole.SUPER_ADMIN));
         } else {
             throw new UserNotFoundException(username);
         }

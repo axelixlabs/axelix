@@ -34,6 +34,7 @@ import static com.axelixlabs.axelix.common.auth.core.InternalAuthorities.SELF_RE
  */
 public final class DefaultRole implements Role {
 
+    public static final Role SUPER_ADMIN;
     public static final Role ADMIN;
     public static final Role EDITOR;
     public static final Role VIEWER;
@@ -51,7 +52,17 @@ public final class DefaultRole implements Role {
                         DefaultAuthority.GARBAGE_COLLECTOR));
 
         ADMIN = new DefaultRole(
-                "ADMIN", Arrays.stream(DefaultAuthority.values()).collect(Collectors.toSet()));
+                "ADMIN",
+                Set.of(
+                        DefaultAuthority.SCHEDULED_TASKS_MODIFY,
+                        DefaultAuthority.CACHES_CLEAR,
+                        DefaultAuthority.CACHES_TOGGLE,
+                        DefaultAuthority.GARBAGE_COLLECTOR,
+                        DefaultAuthority.ENV_VALUES_READ,
+                        DefaultAuthority.CONFIG_PROPS_VALUES_READ));
+
+        SUPER_ADMIN = new DefaultRole(
+                "SUPER_ADMIN", Arrays.stream(DefaultAuthority.values()).collect(Collectors.toUnmodifiableSet()));
 
         MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of(SELF_REGISTER_AUTHORITY));
     }
