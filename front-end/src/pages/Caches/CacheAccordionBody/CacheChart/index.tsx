@@ -58,7 +58,7 @@ export const CacheChart = ({ singleCacheData }: IProps) => {
                         type="monotone"
                         dataKey="count"
                         name={t("Caches.ratio")}
-                        stroke="#95de64"
+                        stroke="#00ab55"
                         dot={false}
                         strokeWidth={3}
                     />
