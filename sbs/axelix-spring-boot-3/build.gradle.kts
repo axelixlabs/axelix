@@ -1,5 +1,5 @@
 plugins {
-    id("sbs")
+    id("shared")
     id("com.axelixlabs.axelix-internal")
 }
 

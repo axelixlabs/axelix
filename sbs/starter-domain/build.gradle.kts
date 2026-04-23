@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("sbs")
+    id("shared")
     id("com.axelixlabs.axelix-internal")
     kotlin("jvm") version "2.2.21"
 }
