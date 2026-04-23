@@ -54,10 +54,12 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.domain.UserEntity;
 import com.axelixlabs.axelix.master.repository.dialect.SQLiteDialect;
+import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
- * Autoconfiguration for {@link com.axelixlabs.axelix.master.service.state.InstanceRegistry} persistence layer.
+ * Autoconfiguration for {@link InstanceRegistry} persistence layer.
  *
  * @since 12.03.2026
  * @author Nikita Kirillov
@@ -69,7 +71,7 @@ public class PersistenceAutoConfiguration {
     private static final Logger log = LoggerFactory.getLogger(PersistenceAutoConfiguration.class);
 
     /**
-     * Autoconfiguration for SQLite-based {@link com.axelixlabs.axelix.master.service.state.InstanceRegistry}.
+     * Autoconfiguration for SQLite-based {@link InstanceRegistry}.
      */
     @AutoConfiguration
     @ConditionalOnClass(name = "org.sqlite.JDBC")
@@ -110,7 +112,9 @@ public class PersistenceAutoConfiguration {
                     new InstantToStringConverter(),
                     new StringToInstantConverter(),
                     new VmFeaturesReadingConverter(jsonMapper),
-                    new VmFeaturesWritingConverter(jsonMapper));
+                    new VmFeaturesWritingConverter(jsonMapper),
+                    new RolesWritingConverter(jsonMapper),
+                    new RolesReadingConverter(jsonMapper));
         }
 
         /**
@@ -213,7 +217,46 @@ public class PersistenceAutoConfiguration {
 
         @Override
         protected @NonNull List<?> userConverters() {
-            return List.of(new VmFeaturesReadingConverter(jsonMapper), new VmFeaturesWritingConverter(jsonMapper));
+            return List.of(
+                    new VmFeaturesReadingConverter(jsonMapper),
+                    new VmFeaturesWritingConverter(jsonMapper),
+                    new RolesWritingConverter(jsonMapper),
+                    new RolesReadingConverter(jsonMapper));
+        }
+
+        @WritingConverter
+        public static class RolesWritingConverter implements Converter<UserEntity.Roles, String> {
+
+            private final JsonMapper jsonMapper;
+
+            public RolesWritingConverter(JsonMapper jsonMapper) {
+                this.jsonMapper = jsonMapper;
+            }
+
+            @Override
+            public String convert(UserEntity.Roles source) {
+                Set<String> roles = source == null ? Set.of() : source.values();
+                return jsonMapper.writeValueAsString(roles);
+            }
+        }
+
+        @ReadingConverter
+        public static class RolesReadingConverter implements Converter<String, UserEntity.Roles> {
+
+            private final JsonMapper jsonMapper;
+
+            public RolesReadingConverter(JsonMapper jsonMapper) {
+                this.jsonMapper = jsonMapper;
+            }
+
+            @Override
+            public UserEntity.Roles convert(String source) {
+                if (source == null || source.isBlank()) {
+                    return new UserEntity.Roles(Set.of());
+                }
+                Set<String> roles = jsonMapper.readValue(source, new TypeReference<>() {});
+                return new UserEntity.Roles(roles);
+            }
         }
 
         @WritingConverter

@@ -15,26 +15,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.request.user;
+package com.axelixlabs.axelix.master.exception.auth;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.common.auth.core.Role;
+
 /**
- * Request payload to create a new managed user via the Users Management API.
+ * Thrown in case the role name is not found by {@link Role}.
  *
- * @param username   Login name of the user to create.  Must be unique.
- * @param email      The user email address, which may be {@code null}. Must be unique.
- * @param password   Plain-text password, which may be {@code null}. Hashed server-side before persistence.
- * @param role       Name of the role to grant to the user.
- *
+ * @see Role
  * @author Sergey Cherkasov
  */
-public record UserCreateRequest(
-        String username, @Nullable String email, @Nullable String password, String role) {
+public class RoleNotPresentException extends RuntimeException {
 
-    @Override
-    public String toString() {
-        return "UserCreateRequest[username=" + username + ", email=" + email + ", password=[REDACTED], role=" + role
-                + ']';
+    public RoleNotPresentException(@Nullable String role) {
+        super("Role '%s' is not allowed".formatted(role));
+    }
+
+    public RoleNotPresentException(final String role, final Throwable cause) {
+        super(role, cause);
     }
 }
