@@ -3,13 +3,13 @@ import net.ltgt.gradle.errorprone.errorprone
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import kotlin.io.path.readText
-import Dependencies.junitPlatformLauncherVersion
 
 plugins {
     id("java")
     id("maven-publish")
     id("com.diffplug.spotless") version "8.1.0"
     id("pmd")
+    id("signing")
     id("net.ltgt.errorprone") version "4.2.0"
 }
 
@@ -39,7 +39,7 @@ subprojects {
     plugins.withType<JavaPlugin> {
 
         dependencies {
-            testRuntimeOnly("org.junit.platform:junit-platform-launcher:${junitPlatformLauncherVersion}")
+            testRuntimeOnly("org.junit.platform:junit-platform-launcher:${Dependencies.junitPlatformLauncherVersion}")
         }
 
         tasks.withType<Test>().configureEach {
@@ -67,7 +67,7 @@ subprojects {
 //             stopped working, disabled it for now
 //            toggleOffOn()
             // TODO: removeUnusedImports may not always work https://github.com/diffplug/spotless/issues/2850
-            removeUnusedImports("cleanthat-javaparser-unnecessaryimport")
+//            removeUnusedImports("cleanthat-javaparser-unnecessaryimport")
 
             licenseHeader(
                 Paths
@@ -77,7 +77,7 @@ subprojects {
         }
     }
 
-    configure<PublishingExtension> {
+    publishing {
         repositories {
 
             val nexusUrl = project.findProperty("nexus.url") as String? ?: System.getenv("NEXUS_URL")
@@ -173,35 +173,7 @@ subprojects {
         }
     }
 
-    pmd {
-        isIgnoreFailures = false
-        isConsoleOutput = true
-        toolVersion = "7.16.0"
-        ruleSetFiles = files("${rootDir}/pmd.ruleset.xml")
-    }
-
-    tasks.named("check") {
-        dependsOn("pmdMain", "pmdTest")
-    }
-
-    tasks.named<JavaCompile>("compileJava") {
-        options.errorprone {
-            // TODO Consider enable compilation warnings on first milestone release
-            disableAllChecks = true
-
-            check("NullAway", CheckSeverity.ERROR)
-            option("NullAway:AnnotatedPackages", "com.axelixlabs.axelix")
-            option("NullAway:JSpecifyMode", true)
-            option("NullAway:CheckOptionalEmptiness", true)
-        }
-    }
-    tasks.named<JavaCompile>("compileTestJava") { // disable NullAway on test classes
-        options.errorprone {
-            disableAllChecks = true
-        }
-    }
-
-    configure<SigningExtension> {
+    signing {
         // Signing artifacts only in case publishGprPublicationToGitHubPackagesRepository is present
         if (gradle.taskGraph.hasTask(":publishGprPublicationToGitHubPackagesRepository")) {
 
@@ -223,12 +195,41 @@ subprojects {
         }
     }
 
-    // Enable custom Javadoc tags
-    tasks.withType<Javadoc> {
-        val options = options as StandardJavadocDocletOptions
-        options.tags(
-            "apiNote:a:API Note:",
-            "implNote:a:Implementation Note:"
-        )
+    pmd {
+        isIgnoreFailures = false
+        isConsoleOutput = true
+        toolVersion = "7.16.0"
+        ruleSetFiles = files("${rootDir}/pmd.ruleset.xml")
+    }
+
+    tasks {
+        // Enable custom Javadoc tags
+        withType<Javadoc> {
+            val options = options as StandardJavadocDocletOptions
+            options.tags(
+                "apiNote:a:API Note:",
+                "implNote:a:Implementation Note:"
+            )
+        }
+
+        withType(JavaCompile::class.java) {
+            options.errorprone {
+                // TODO Consider enable compilation warnings on first milestone release
+                disableAllChecks = true
+            }
+        }
+
+        named<JavaCompile>("compileJava") {
+            options.errorprone {
+                check("NullAway", CheckSeverity.ERROR)
+                option("NullAway:AnnotatedPackages", "com.axelixlabs.axelix")
+                option("NullAway:JSpecifyMode", true)
+                option("NullAway:CheckOptionalEmptiness", true)
+            }
+        }
+
+        check {
+            dependsOn("pmdMain", "pmdTest")
+        }
     }
 }
