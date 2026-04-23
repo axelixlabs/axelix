@@ -17,9 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,14 +25,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.api.external.ExternalApiRestController;
 import com.axelixlabs.axelix.master.api.external.request.user.UserCreateRequest;
@@ -42,6 +43,10 @@ import com.axelixlabs.axelix.master.api.external.request.user.UserDeleteRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserUpdateRequest;
 import com.axelixlabs.axelix.master.api.external.response.UserResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.exception.auth.RoleNotPresentException;
+import com.axelixlabs.axelix.master.exception.auth.UserIdNotFoundException;
+import com.axelixlabs.axelix.master.service.auth.Provider;
+import com.axelixlabs.axelix.master.service.state.UserManaged;
 
 /**
  * The API to manage users (view, create, delete, update).
@@ -54,6 +59,12 @@ import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 @ExternalApiRestController
 public class UserManagementApi {
 
+    private final UserManaged userManaged;
+
+    public UserManagementApi(UserManaged userManaged) {
+        this.userManaged = userManaged;
+    }
+
     @DefaultApiResponse(summary = "Retrieve all users feed")
     @ApiResponse(
             description = "OK",
@@ -64,13 +75,8 @@ public class UserManagementApi {
                             array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
     @GetMapping(path = ApiPaths.UsersManagementApi.USERS_FEED)
     public ResponseEntity<List<UserResponse>> getUsersFeed() {
-        Instant lastLoginAt = Instant.now();
-        List<UserResponse> users = List.of(
-                new UserResponse("id-0", "alice", "alice@gmail.com", Set.of("ADMIN"), "OIDC/OAuth2", lastLoginAt),
-                new UserResponse("id-1", "bob", "bob@gmail.com", Set.of("EDITOR"), "Static", lastLoginAt),
-                new UserResponse("id-2", "carol", "carol@gmail.com", Set.of("VIEWER"), "OIDC/OAuth2", lastLoginAt),
-                new UserResponse("id-3", "dave", "dave@gmail.com", Set.of("ADMIN", "EDITOR"), "Static", lastLoginAt),
-                new UserResponse("id-4", "eve", "eve@gmail.com", Set.of("VIEWER"), "OIDC/OAuth2", lastLoginAt));
+        List<UserResponse> users =
+                userManaged.getAll().stream().map(UserResponse::from).toList();
 
         return ResponseEntity.ok(users);
     }
@@ -79,15 +85,25 @@ public class UserManagementApi {
     @ApiResponse(description = "Created", responseCode = "201")
     @PostMapping(path = ApiPaths.UsersManagementApi.USERS_CREATE)
     public ResponseEntity<Void> createUser(@RequestBody UserCreateRequest request) {
+        try {
+            String role = request.role();
+            if (role == null || role.isBlank() || role.trim().toUpperCase().equals(DefaultRole.SUPER_ADMIN.getName())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+            userManaged.create(request, Provider.LOCAL);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        } catch (RoleNotPresentException | UncategorizedSQLException | DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @DefaultApiResponse(summary = "Delete a user")
     @ApiResponse(description = "No Content", responseCode = "204")
     @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DELETE)
     public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteRequest request) {
-
+        userManaged.delete(request.id());
         return ResponseEntity.noContent().build();
     }
 
@@ -95,7 +111,30 @@ public class UserManagementApi {
     @ApiResponse(description = "No Content", responseCode = "204")
     @PatchMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE)
     public ResponseEntity<Void> updateUser(@RequestBody UserUpdateRequest request) {
+        try {
+            if (request.roles() != null) {
+                if (request.roles().stream().anyMatch(role -> role == null || role.isBlank())) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
 
-        return ResponseEntity.noContent().build();
+                if (request.roles().stream()
+                        .map(String::trim)
+                        .map(String::toUpperCase)
+                        .anyMatch(DefaultRole.SUPER_ADMIN.getName()::equals)) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
+            }
+
+            userManaged.updateUserPatch(
+                    request.id(), request.username(), request.email(), request.roles(), request.password());
+
+            return ResponseEntity.noContent().build();
+
+        } catch (RoleNotPresentException
+                | UserIdNotFoundException
+                | UncategorizedSQLException
+                | DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 }

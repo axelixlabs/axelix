@@ -15,26 +15,21 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.request.user;
+package com.axelixlabs.axelix.master.repository;
 
-import org.jspecify.annotations.Nullable;
+import java.util.Optional;
+
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
+
+import com.axelixlabs.axelix.master.domain.UserEntity;
 
 /**
- * Request payload to create a new managed user via the Users Management API.
- *
- * @param username   Login name of the user to create.  Must be unique.
- * @param email      The user email address, which may be {@code null}. Must be unique.
- * @param password   Plain-text password, which may be {@code null}. Hashed server-side before persistence.
- * @param role       Name of the role to grant to the user.
+ * Repository for {@link UserEntity} aggregate.
  *
  * @author Sergey Cherkasov
  */
-public record UserCreateRequest(
-        String username, @Nullable String email, @Nullable String password, String role) {
+public interface UserRepository extends ListCrudRepository<UserEntity, String> {
 
-    @Override
-    public String toString() {
-        return "UserCreateRequest[username=" + username + ", email=" + email + ", password=[REDACTED], role=" + role
-                + ']';
-    }
+    Optional<UserEntity> findByUsername(@Param("username") String username);
 }

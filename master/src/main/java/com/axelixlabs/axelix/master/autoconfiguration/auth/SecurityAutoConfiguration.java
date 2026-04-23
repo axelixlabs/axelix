@@ -25,6 +25,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
@@ -55,6 +57,7 @@ import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
 import com.axelixlabs.axelix.master.service.auth.provider.StaticAdminUserProvider;
+import com.axelixlabs.axelix.master.service.state.UserManaged;
 
 /**
  * Autoconfiguration for security.
@@ -82,6 +85,11 @@ public class SecurityAutoConfiguration {
     @Bean
     public Authorizer authorizer() {
         return new DefaultAuthorizer();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     /**
@@ -151,8 +159,8 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public StaticAdminUserProvider staticCredentialsUserProvider(
-                StaticAdminCredentialsProperties staticCredentialsConfig) {
-            return new StaticAdminUserProvider(staticCredentialsConfig);
+                StaticAdminCredentialsProperties staticCredentialsConfig, UserManaged userManaged) {
+            return new StaticAdminUserProvider(staticCredentialsConfig, userManaged);
         }
     }
 

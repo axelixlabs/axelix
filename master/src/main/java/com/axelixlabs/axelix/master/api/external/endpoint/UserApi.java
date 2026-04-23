@@ -28,6 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -41,6 +42,7 @@ import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
+import com.axelixlabs.axelix.master.service.state.UserManaged;
 
 /**
  * The API for working with users.
@@ -57,13 +59,22 @@ public class UserApi {
     private final CookieService cookieService;
     private final UserProvider userProvider;
     private final JwtEncoderService jwtEncoderService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserManaged userManaged;
 
     private static final InvalidCredentialsException INVALID_CREDENTIALS_EXCEPTION = new InvalidCredentialsException();
 
-    public UserApi(CookieService cookieService, UserProvider userProvider, JwtEncoderService jwtEncoderService) {
+    public UserApi(
+            CookieService cookieService,
+            UserProvider userProvider,
+            JwtEncoderService jwtEncoderService,
+            PasswordEncoder passwordEncoder,
+            UserManaged userManaged) {
         this.cookieService = cookieService;
         this.userProvider = userProvider;
         this.jwtEncoderService = jwtEncoderService;
+        this.passwordEncoder = passwordEncoder;
+        this.userManaged = userManaged;
     }
 
     /**
@@ -96,19 +107,24 @@ public class UserApi {
         //  once we start to support the LDAP authentication.
         Assert.notNull(user.getPassword(), "When using default login option the password is required");
 
+        String token;
+
         if (Objects.equals(user.getPassword(), loginRequest.password())) {
-            String token = jwtEncoderService.generateToken(user);
-
-            ResponseCookie cookie = cookieService.buildAuthCookie(token);
-            ResponseCookie cookieAuthorities = cookieService.buildAuthoritiesMetadataCookie(user.getRoles());
-
-            return ResponseEntity.status(HttpStatus.OK)
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .header(HttpHeaders.SET_COOKIE, cookieAuthorities.toString())
-                    .build();
+            token = jwtEncoderService.generateToken(user);
+        } else if (passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
+            token = jwtEncoderService.generateToken(user);
+            userManaged.updateLastLoginAt(user.getUsername());
         } else {
             throw INVALID_CREDENTIALS_EXCEPTION;
         }
+
+        ResponseCookie cookie = cookieService.buildAuthCookie(token);
+        ResponseCookie cookieAuthorities = cookieService.buildAuthoritiesMetadataCookie(user.getRoles());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, cookieAuthorities.toString())
+                .build();
     }
 
     /**

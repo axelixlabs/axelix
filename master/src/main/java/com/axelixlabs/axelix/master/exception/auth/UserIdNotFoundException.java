@@ -15,26 +15,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.request.user;
+package com.axelixlabs.axelix.master.exception.auth;
 
-import org.jspecify.annotations.Nullable;
+import com.axelixlabs.axelix.master.repository.UserRepository;
 
 /**
- * Request payload to create a new managed user via the Users Management API.
+ * Thrown in case the user id is not found by {@link UserRepository}.
  *
- * @param username   Login name of the user to create.  Must be unique.
- * @param email      The user email address, which may be {@code null}. Must be unique.
- * @param password   Plain-text password, which may be {@code null}. Hashed server-side before persistence.
- * @param role       Name of the role to grant to the user.
- *
+ * @see UserRepository
  * @author Sergey Cherkasov
  */
-public record UserCreateRequest(
-        String username, @Nullable String email, @Nullable String password, String role) {
+public class UserIdNotFoundException extends RuntimeException {
 
-    @Override
-    public String toString() {
-        return "UserCreateRequest[username=" + username + ", email=" + email + ", password=[REDACTED], role=" + role
-                + ']';
+    public UserIdNotFoundException(String id) {
+        super("User with id '%s' is not found".formatted(id));
+    }
+
+    public UserIdNotFoundException(final String id, final Throwable cause) {
+        super(id, cause);
     }
 }

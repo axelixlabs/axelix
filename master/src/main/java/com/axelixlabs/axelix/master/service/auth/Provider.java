@@ -15,26 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.request.user;
-
-import org.jspecify.annotations.Nullable;
+package com.axelixlabs.axelix.master.service.auth;
 
 /**
- * Request payload to create a new managed user via the Users Management API.
- *
- * @param username   Login name of the user to create.  Must be unique.
- * @param email      The user email address, which may be {@code null}. Must be unique.
- * @param password   Plain-text password, which may be {@code null}. Hashed server-side before persistence.
- * @param role       Name of the role to grant to the user.
+ * Origin of a managed user account.
  *
  * @author Sergey Cherkasov
  */
-public record UserCreateRequest(
-        String username, @Nullable String email, @Nullable String password, String role) {
+public enum Provider {
+    OIDC("OIDC/OAUTH2"),
+    LOCAL("LOCAL");
 
-    @Override
-    public String toString() {
-        return "UserCreateRequest[username=" + username + ", email=" + email + ", password=[REDACTED], role=" + role
-                + ']';
+    private final String display;
+
+    Provider(String display) {
+        this.display = display;
+    }
+
+    /**
+     * Returns the human-readable label of this provider, suitable for display in the UI.
+     */
+    public String getDisplay() {
+        return display;
     }
 }
