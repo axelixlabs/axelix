@@ -46,10 +46,12 @@ import org.springframework.test.context.TestPropertySource;
 import com.axelixlabs.axelix.common.api.env.EnvironmentFeed;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -215,6 +217,9 @@ class AxelixEnvironmentEndpointTest {
                 .first()
                 .satisfies(e -> e.getDescription().equals(sourceDescription));
     }
+
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-env")
+    void negativeAuthTests() {}
 
     private static Stream<Arguments> propertyExpectations() {
         return Stream.of(

@@ -40,7 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -51,6 +50,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.transactions.TransactionMonitoringEndpointTest.TransactionMonitoringEndpointTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,11 +70,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-transactions-monitoring"})
-@Import(TransactionMonitoringEndpointTest.TransactionMonitoringEndpointTestConfiguration.class)
+@Import({TransactionMonitoringEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
 class TransactionMonitoringEndpointTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Autowired
     private PropagationTestHelper propagationTestHelper;
@@ -151,8 +155,9 @@ class TransactionMonitoringEndpointTest {
 
         assertThat(allStats.size()).isGreaterThan(0);
 
-        ResponseEntity<Void> deleteResponse =
-                restTemplate.exchange("/actuator/axelix-transactions-monitoring", HttpMethod.DELETE, null, Void.class);
+        ResponseEntity<Void> deleteResponse = restTemplate
+                .asViewer()
+                .exchange("/actuator/axelix-transactions-monitoring", HttpMethod.DELETE, null, Void.class);
 
         assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
@@ -438,9 +443,14 @@ class TransactionMonitoringEndpointTest {
             """);
     }
 
+    @ProtectedEndpointTests(
+            method = com.axelixlabs.axelix.common.domain.http.HttpMethod.GET,
+            path = "/actuator/axelix-transactions-monitoring")
+    void negativeAuthTests() {}
+
     private String getMonitoringResponse() {
         ResponseEntity<String> response =
-                restTemplate.getForEntity("/actuator/axelix-transactions-monitoring", String.class);
+                restTemplate.asViewer().getForEntity("/actuator/axelix-transactions-monitoring", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         return response.getBody();
     }

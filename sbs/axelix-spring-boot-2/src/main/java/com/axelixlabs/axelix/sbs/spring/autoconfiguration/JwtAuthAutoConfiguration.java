@@ -53,7 +53,6 @@ import com.axelixlabs.axelix.sbs.spring.core.validate.ValidationListener;
  * @since 22.07.2025
  */
 @AutoConfiguration
-@ConditionalOnProperty(name = "axelix.sbs.auth.jwt")
 @EnableConfigurationProperties(WebEndpointProperties.class)
 public class JwtAuthAutoConfiguration {
 
@@ -102,7 +101,7 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public WebIdentityAccessManager securityManager(
+    public WebIdentityAccessManager webIdentityAccessManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
         return new DefaultWebIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
     }

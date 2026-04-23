@@ -49,6 +49,7 @@ import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.env.DefaultPropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.env.PropertyNameNormalizer;
 import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -105,6 +106,11 @@ public class AxelixConfigurationPropertiesEndpointTest {
                 .extracting(KeyValue::getValue)
                 .containsExactly(expectedValue);
     }
+
+    @ProtectedEndpointTests(
+            method = com.axelixlabs.axelix.common.domain.http.HttpMethod.GET,
+            path = "/actuator/axelix-configprops")
+    void negativeAuthTests() {}
 
     private static Stream<Arguments> propertiesFeed() {
         return Stream.of(

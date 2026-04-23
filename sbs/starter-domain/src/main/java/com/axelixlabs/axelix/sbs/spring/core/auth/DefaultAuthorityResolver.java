@@ -80,6 +80,12 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
         this.actuatorPathPrefix = actuatorPathPrefix;
     }
 
+    /**
+     * Important: The path parameter is expected to be relative to the actuator base path
+     * WebEndpointProperties#getBasePath().
+     * <p>
+     * For example, if the full request is "/actuator/axelix-beans", the path passed here should be "/axelix-beans".
+     */
     @Override
     public Optional<Authority> resolve(String requestPath, HttpMethod httpMethod) {
 

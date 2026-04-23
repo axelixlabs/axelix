@@ -28,7 +28,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -36,8 +35,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
@@ -51,11 +54,12 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
         classes = AxelixBeansEndpointTest.CurrentConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"axelix.prop.test.name=axelix-beans"})
-@Import({BeansEndpoint.class, AxelixBeansEndpoint.class, ConditionsReportEndpoint.class})
+@Import({BeansEndpoint.class, AxelixBeansEndpoint.class, ConditionsReportEndpoint.class, JwtAuthTestConfiguration.class
+})
 class AxelixBeansEndpointTest {
 
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    private TestRestTemplateBuilder testRestTemplate;
 
     @TestConfiguration(value = "testCurrentConfiguration")
     @EnableConfigurationProperties(AxelixPropTest.class)
@@ -113,7 +117,8 @@ class AxelixBeansEndpointTest {
     void shouldReturnEnrichedBeansFeed() {
 
         // when.
-        ResponseEntity<BeansFeed> response = testRestTemplate.getForEntity("/actuator/axelix-beans", BeansFeed.class);
+        ResponseEntity<BeansFeed> response =
+                testRestTemplate.asViewer().getForEntity("/actuator/axelix-beans", BeansFeed.class);
 
         // then.
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -125,6 +130,9 @@ class AxelixBeansEndpointTest {
         assertCustomBeanSupplier(beanNameToBeanProfile);
         assertConfigPropsBeanName(beanNameToBeanProfile);
     }
+
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-beans")
+    void negativeAuthTests() {}
 
     private static void assertQualifiersPostProcessorBean(BeansFeed beanNameToBeanFeed) {
         BeansFeed.Bean bean = getBean(beanNameToBeanFeed, CurrentConfiguration.QUALIFIERS_PERSISTENCE_POST_PROCESSOR);

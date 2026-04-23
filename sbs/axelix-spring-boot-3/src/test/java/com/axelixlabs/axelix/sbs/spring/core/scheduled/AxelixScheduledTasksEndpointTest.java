@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
@@ -51,6 +50,11 @@ import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskCronExpressio
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskExecuteRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskIntervalModifyRequest;
 import com.axelixlabs.axelix.common.api.scheduledtask.ScheduledTaskToggleRequest;
+import com.axelixlabs.axelix.common.domain.http.HttpMethod;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.scheduled.AxelixScheduledTasksEndpointTest.AxelixScheduledTasksEndpointTestConfiguration;
+import com.axelixlabs.axelix.sbs.spring.core.utils.TestRestTemplateBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.utils.auth.ProtectedEndpointTests;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,8 +69,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 14.10.2025
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(AxelixScheduledTasksEndpointTest.AxelixScheduledTasksEndpointTestConfiguration.class)
 @TestPropertySource(properties = {"management.endpoints.web.exposure.include=axelix-scheduled-tasks"})
+@Import({AxelixScheduledTasksEndpointTestConfiguration.class, JwtAuthTestConfiguration.class})
 class AxelixScheduledTasksEndpointTest {
 
     // Cron
@@ -106,7 +110,7 @@ class AxelixScheduledTasksEndpointTest {
     private static volatile boolean customTaskFlag = false;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private TestRestTemplateBuilder restTemplate;
 
     @Test
     void shouldEnableDisabledTask_testCronTask() throws InterruptedException {
@@ -280,8 +284,12 @@ class AxelixScheduledTasksEndpointTest {
         ScheduledTaskCronExpressionModifyRequest request =
                 new ScheduledTaskCronExpressionModifyRequest(CRON_TASK_ID_FOR_MODIFY, newCronExpression);
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/modify/cron-expression", defaultJsonEntity(request), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/cron-expression",
+                        defaultJsonEntity(request),
+                        Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("cron").isArray().anySatisfy(task -> {
@@ -300,8 +308,12 @@ class AxelixScheduledTasksEndpointTest {
             }
             """.formatted(CRON_TASK_ID_FOR_MODIFY);
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/modify/cron-expression", defaultJsonEntity(request), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/cron-expression",
+                        defaultJsonEntity(request),
+                        Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
     }
@@ -313,8 +325,10 @@ class AxelixScheduledTasksEndpointTest {
         ScheduledTaskIntervalModifyRequest request =
                 new ScheduledTaskIntervalModifyRequest(FIXED_DELAY_TASK_ID_FOR_MODIFY, newInterval);
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .asAdmin()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
@@ -333,8 +347,10 @@ class AxelixScheduledTasksEndpointTest {
                 }
                 """.formatted(FIXED_DELAY_TASK_ID_FOR_MODIFY);
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .asAdmin()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
     }
@@ -346,8 +362,10 @@ class AxelixScheduledTasksEndpointTest {
         ScheduledTaskIntervalModifyRequest request =
                 new ScheduledTaskIntervalModifyRequest(FIXED_RATE_TASK_ID_FOR_MODIFY, newInterval);
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
@@ -366,8 +384,10 @@ class AxelixScheduledTasksEndpointTest {
                 }
                 """.formatted(FIXED_RATE_TASK_ID_FOR_MODIFY);
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/modify/interval", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode);
     }
@@ -377,8 +397,9 @@ class AxelixScheduledTasksEndpointTest {
         forceDisableTask(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
         ScheduledTaskExecuteRequest request = new ScheduledTaskExecuteRequest(FIXED_DELAY_TASK_ID_FOR_EXECUTE);
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/execute", defaultJsonEntity(request), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity("/actuator/axelix-scheduled-tasks/execute", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedDelay").isArray().anySatisfy(task -> {
@@ -393,8 +414,9 @@ class AxelixScheduledTasksEndpointTest {
     void shouldExecuteTask_testFixedRate() {
         ScheduledTaskExecuteRequest request = new ScheduledTaskExecuteRequest(FIXED_RATE_TASK_ID_FOR_EXECUTE);
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/execute", defaultJsonEntity(request), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity("/actuator/axelix-scheduled-tasks/execute", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
         assertThatJson(getScheduledTasks()).node("fixedRate").isArray().anySatisfy(task -> {
@@ -405,11 +427,15 @@ class AxelixScheduledTasksEndpointTest {
         assertThat(fixedRateFlag).isTrue();
     }
 
+    @ProtectedEndpointTests(method = HttpMethod.GET, path = "/actuator/axelix-scheduled-tasks")
+    void negativeAuthTests() {}
+
     private void enableScheduledTask(String target) {
         ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(target);
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/enable", defaultJsonEntity(request), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .asEditor()
+                .postForEntity("/actuator/axelix-scheduled-tasks/enable", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
@@ -417,14 +443,17 @@ class AxelixScheduledTasksEndpointTest {
     private void forceDisableTask(String targetScheduledTask) {
         ScheduledTaskToggleRequest request = new ScheduledTaskToggleRequest(targetScheduledTask);
 
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                "/actuator/axelix-scheduled-tasks/disable?force=true", defaultJsonEntity(request), Void.class);
+        ResponseEntity<Void> response = restTemplate
+                .asAdmin()
+                .postForEntity(
+                        "/actuator/axelix-scheduled-tasks/disable?force=true", defaultJsonEntity(request), Void.class);
 
         assertThat(response).isNotNull().returns(HttpStatus.NO_CONTENT, ResponseEntity::getStatusCode);
     }
 
     private String getScheduledTasks() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/actuator/axelix-scheduled-tasks", String.class);
+        ResponseEntity<String> response =
+                restTemplate.asEditor().getForEntity("/actuator/axelix-scheduled-tasks", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);

@@ -45,7 +45,7 @@ public class DefaultAuthorityResolverTest {
 
     @BeforeEach
     void setUp() {
-        authorityResolver = new DefaultAuthorityResolver("/actuator", (pathTemplate, actualPath) -> {
+        authorityResolver = new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
             PathPattern pattern = new PathPatternParser().parse(pathTemplate);
             return pattern.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
         });
@@ -59,6 +59,7 @@ public class DefaultAuthorityResolverTest {
 
     private static Stream<Arguments> defaultAuthority() {
         return Stream.of(
+
                 // SCHEDULED_TASKS_MODIFY
                 Arguments.of(
                         "/axelix-scheduled-tasks/modify/cron-expression",
