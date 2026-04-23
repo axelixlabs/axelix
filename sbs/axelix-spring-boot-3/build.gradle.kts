@@ -3,10 +3,6 @@ plugins {
     id("com.axelixlabs.axelix-internal")
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    options.release = 17
-}
-
 val springBootVersion = "3.0.13"
 val springCloudVersion = "2022.0.4"
 
@@ -44,14 +40,9 @@ dependencies {
     testImplementation("com.squareup.okhttp3:okhttp")
 }
 
-tasks.withType<JavaCompile> {
+tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-parameters")
-}
-
-tasks {
-    test {
-        useJUnitPlatform()
-    }
+    options.release = 17
 }
 
 axelix {
