@@ -36,17 +36,6 @@ subprojects {
         errorprone("com.uber.nullaway:nullaway:0.12.9")
     }
 
-    plugins.withType<JavaPlugin> {
-
-        dependencies {
-            testRuntimeOnly("org.junit.platform:junit-platform-launcher:${Dependencies.junitPlatformLauncherVersion}")
-        }
-
-        tasks.withType<Test>().configureEach {
-            useJUnitPlatform()
-        }
-    }
-
     spotless {
         java {
             palantirJavaFormat("2.87.0")
@@ -204,7 +193,7 @@ subprojects {
 
     tasks {
         // Enable custom Javadoc tags
-        withType<Javadoc> {
+        withType(Javadoc::class.java).configureEach {
             val options = options as StandardJavadocDocletOptions
             options.tags(
                 "apiNote:a:API Note:",
@@ -212,11 +201,15 @@ subprojects {
             )
         }
 
-        withType(JavaCompile::class.java) {
+        withType(JavaCompile::class.java).configureEach {
             options.errorprone {
                 // TODO Consider enable compilation warnings on first milestone release
                 disableAllChecks = true
             }
+        }
+
+        withType(Test::class.java).configureEach {
+            useJUnitPlatform()
         }
 
         named<JavaCompile>("compileJava") {

@@ -39,6 +39,12 @@ dependencies {
     testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.squareup.okhttp3:mockwebserver")
     testImplementation("com.squareup.okhttp3:okhttp")
+
+    // Test Runtime
+
+    // Gradle needs it to launch the Junit tests, and, unfortunately, spring-boot-starter-test in 2.x
+    // does NOT include the launcher, however, it includes the Junit engine, so, we need the launcher only
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<JavaCompile>().configureEach {

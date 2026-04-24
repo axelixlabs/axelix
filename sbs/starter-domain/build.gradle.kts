@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("shared")
@@ -7,14 +8,6 @@ plugins {
 }
 
 val springBootTestPlatformVersion = "2.7.18"
-
-tasks.withType<JavaCompile>().configureEach {
-    options.release = 11
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
-}
 
 dependencies {
     // Self
@@ -28,8 +21,18 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework:spring-web")
     testImplementation("com.squareup.okhttp3:mockwebserver")
+
+    // Gradle needs it to launch the Junit tests, and, unfortunately, spring-boot-starter-test in 2.x
+    // does NOT include the launcher, however, it includes the Junit engine, so, we need the launcher only
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.withType<JavaCompile> {
+tasks.withType<JavaCompile>().configureEach {
+    options.release = 11
     options.compilerArgs.add("-parameters")
 }
+
+tasks.withType<KotlinJvmCompile>().configureEach {
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+}
+

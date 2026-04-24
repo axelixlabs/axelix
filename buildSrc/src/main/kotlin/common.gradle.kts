@@ -11,6 +11,7 @@ val springBootTestPlatformVersion = "2.7.18"
 
 dependencies {
     // compileOnly
+
     // We intentionally use Jackson 2.13.5 for Spring Boot 2.7.x and 3.0.x compatibility:
     // Spring Boot 2 relies on Jackson 2.13 at minimum, and Spring Boot 3 relies on Jackson 2.19
     // at its base. Because of the current design we cannot move this dependency out of common.
@@ -19,4 +20,8 @@ dependencies {
     compileOnly("com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}")
 
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:$springBootTestPlatformVersion"))
+
+    // Gradle needs it to launch the Junit tests, and, unfortunately, spring-boot-starter-test in 2.x
+    // does NOT include the launcher, however, it includes the Junit engine, so, we need the launcher only
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
