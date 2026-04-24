@@ -45,6 +45,44 @@ tasks.withType<JavaCompile>().configureEach {
     options.release = 17
 }
 
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {}
+
+        val concurrencyTestsSuite = "concurrencyTest"
+
+        register<JvmTestSuite>(concurrencyTestsSuite) {
+
+            sources {
+                java {
+                    setSrcDirs(listOf("src/$concurrencyTestsSuite/java"))
+                }
+            }
+
+            useJUnitJupiter()
+
+            dependencies {
+                implementation("org.jetbrains.lincheck:lincheck:3.5")
+
+                // This is the dependency for the compiled production. Additional Test Suites do not have them
+                // in any of their Gradle configurations.
+                implementation(project())
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+
+                        // Soft-dependency on the default Test Suite (like basic junit unit/integration tests)
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 axelix {
     properties.put("version", rootProject.version.toString())
 }
