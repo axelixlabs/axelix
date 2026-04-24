@@ -54,4 +54,9 @@ public class CacheLookup {
     public Instant timestamp() {
         return timestamp;
     }
+
+    @Override
+    public String toString() {
+        return "CacheLookup{" + "outcome=" + outcome + ", timestamp=" + timestamp + '}';
+    }
 }

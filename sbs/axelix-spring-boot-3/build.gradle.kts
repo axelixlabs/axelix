@@ -1,6 +1,11 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
 plugins {
     id("shared")
     id("com.axelixlabs.axelix-internal")
+    // What version of Kotlin are we going to use here...?
+    kotlin("jvm") version "2.2.21"
 }
 
 val springBootVersion = "3.0.13"
@@ -54,8 +59,8 @@ testing {
         register<JvmTestSuite>(concurrencyTestsSuite) {
 
             sources {
-                java {
-                    setSrcDirs(listOf("src/$concurrencyTestsSuite/java"))
+                kotlin {
+                    setSrcDirs(listOf("src/$concurrencyTestsSuite/kotlin"))
                 }
             }
 
@@ -66,7 +71,9 @@ testing {
 
                 // This is the dependency for the compiled production. Additional Test Suites do not have them
                 // in any of their Gradle configurations.
-                implementation(project())
+                implementation(project(":sbs:axelix-spring-boot-3"))
+                implementation(platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}"))
+                implementation("org.springframework:spring-context")
             }
 
             targets {
@@ -82,6 +89,11 @@ testing {
     }
 }
 
+tasks {
+    withType(KotlinJvmCompile::class).configureEach {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
 
 axelix {
     properties.put("version", rootProject.version.toString())
