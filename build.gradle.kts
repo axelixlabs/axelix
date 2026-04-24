@@ -64,6 +64,18 @@ subprojects {
                     .readText(charset = StandardCharsets.UTF_8)
             )
         }
+
+        kotlin {
+            target("src/**/*.kt")
+            trimTrailingWhitespace()
+//            ktlint()
+
+            licenseHeader(
+                Paths
+                    .get("${rootDir.path}/LICENSE_HEADER")
+                    .readText(charset = StandardCharsets.UTF_8)
+            )
+        }
     }
 
     publishing {
