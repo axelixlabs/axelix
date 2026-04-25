@@ -15,20 +15,24 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package cache
+package com.axelixlabs.axelix.sbs.spring.core.cache
 
-import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultEnhancedCache
-import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCache
 import org.jetbrains.lincheck.datastructures.ModelCheckingOptions
 import org.jetbrains.lincheck.datastructures.Operation
 import org.jetbrains.lincheck.datastructures.Param
 import org.jetbrains.lincheck.datastructures.StressOptions
 import org.jetbrains.lincheck.datastructures.StringGen
+import org.jetbrains.lincheck.datastructures.verifier.LinearizabilityVerifier
 import org.junit.jupiter.api.Test
 import org.springframework.cache.concurrent.ConcurrentMapCache
 import java.util.concurrent.Callable
 
-class DefaultEnhancedCacheJavaTest {
+/**
+ * Lincheck test for [DefaultEnhancedCache]
+ *
+ * @author Mikhail Polivakha
+ */
+class DefaultEnhancedCacheTest {
 
     val delegate = DefaultEnhancedCache(ConcurrentMapCache("test-cache"))
     val subject =
@@ -67,7 +71,9 @@ class DefaultEnhancedCacheJavaTest {
 
     @Test
     fun test_StressTesting() {
-        StressOptions().check(subject::class)
+        StressOptions()
+            .verifier(LinearizabilityVerifier::class.java)
+            .check(subject::class)
     }
 
     @Test
