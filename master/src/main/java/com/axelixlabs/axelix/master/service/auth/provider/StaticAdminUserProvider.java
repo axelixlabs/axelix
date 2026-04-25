@@ -19,16 +19,14 @@ package com.axelixlabs.axelix.master.service.auth.provider;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
-import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.utils.Assert;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.StaticAdminCredentialsProperties;
-import com.axelixlabs.axelix.master.domain.UserEntity;
-import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
-import com.axelixlabs.axelix.master.service.state.UserManaged;
 
 /**
  * {@link UserProvider} that authenticates a given user by the static pair of the username/password.
@@ -38,40 +36,24 @@ import com.axelixlabs.axelix.master.service.state.UserManaged;
 public class StaticAdminUserProvider implements UserProvider {
 
     private final StaticAdminCredentialsProperties staticCredentialsConfig;
-    private final UserManaged userManaged;
 
-    public StaticAdminUserProvider(StaticAdminCredentialsProperties staticCredentialsConfig, UserManaged userManaged) {
+    public StaticAdminUserProvider(StaticAdminCredentialsProperties staticCredentialsConfig) {
+        Assert.notNull(staticCredentialsConfig.getUsername(), "username is required when static-admin is enabled");
+        Assert.notNull(staticCredentialsConfig.getPassword(), "password is required when static-admin is enabled");
         this.staticCredentialsConfig = staticCredentialsConfig;
-        this.userManaged = userManaged;
     }
 
     @Override
-    public User load(String username) throws UserNotFoundException {
-        if (Objects.equals(staticCredentialsConfig.getUsername(), username)) {
+    public @Nullable User load(String username, String password) {
+
+        if (Objects.equals(staticCredentialsConfig.getUsername(), username)
+                && Objects.equals(staticCredentialsConfig.getPassword(), password)) {
             return new DefaultUser(
                     staticCredentialsConfig.getUsername(),
                     staticCredentialsConfig.getPassword(),
                     Set.of(DefaultRole.SUPER_ADMIN));
         }
 
-        UserEntity user =
-                userManaged.getUserByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
-
-        if (user.password() == null) {
-            throw new UserNotFoundException(username);
-        }
-
-        return new DefaultUser(
-                user.username(), user.password(), extractRoles(user.roles().values()));
-    }
-
-    private Set<Role> extractRoles(Set<String> roles) {
-        return roles.stream()
-                .map(role -> switch (role.toLowerCase()) {
-                    case "admin" -> DefaultRole.ADMIN;
-                    case "editor" -> DefaultRole.EDITOR;
-                    default -> DefaultRole.VIEWER;
-                })
-                .collect(Collectors.toSet());
+        return null;
     }
 }

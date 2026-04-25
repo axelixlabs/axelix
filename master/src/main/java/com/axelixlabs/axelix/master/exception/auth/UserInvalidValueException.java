@@ -17,21 +17,19 @@
  */
 package com.axelixlabs.axelix.master.exception.auth;
 
-import com.axelixlabs.axelix.master.repository.UserRepository;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Thrown in case the user id is not found by {@link UserRepository}.
+ * Thrown in case one of the provided user field values is invalid.
  *
- * @see UserRepository
  * @author Sergey Cherkasov
  */
-public class UserIdNotFoundException extends RuntimeException {
-
-    public UserIdNotFoundException(String id) {
-        super("User with id '%s' is not found".formatted(id));
+public class UserInvalidValueException extends RuntimeException {
+    public UserInvalidValueException(@Nullable String value) {
+        super("Invalid user field value: %s".formatted(value));
     }
 
-    public UserIdNotFoundException(final String id, final Throwable cause) {
-        super(id, cause);
+    public UserInvalidValueException(final String value, final Throwable cause) {
+        super(value, cause);
     }
 }

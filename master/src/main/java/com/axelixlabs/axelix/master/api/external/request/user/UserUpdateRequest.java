@@ -34,9 +34,9 @@ import org.jspecify.annotations.Nullable;
  */
 public record UserUpdateRequest(
         String id,
-        @Nullable String username,
+        String username,
         @Nullable String email,
-        @Nullable Set<String> roles,
+        Set<String> roles,
         @Nullable String password) {
 
     @Override

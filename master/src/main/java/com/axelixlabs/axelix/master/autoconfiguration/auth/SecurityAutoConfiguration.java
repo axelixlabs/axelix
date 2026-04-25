@@ -56,14 +56,16 @@ import com.axelixlabs.axelix.master.service.auth.oauth.JmesPathOidcRoleExtractor
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcRoleExtractor;
+import com.axelixlabs.axelix.master.service.auth.provider.DatabaseUserProvider;
 import com.axelixlabs.axelix.master.service.auth.provider.StaticAdminUserProvider;
-import com.axelixlabs.axelix.master.service.state.UserManaged;
+import com.axelixlabs.axelix.master.service.state.UserService;
 
 /**
  * Autoconfiguration for security.
  *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 @AutoConfiguration
 public class SecurityAutoConfiguration {
@@ -159,8 +161,13 @@ public class SecurityAutoConfiguration {
 
         @Bean
         public StaticAdminUserProvider staticCredentialsUserProvider(
-                StaticAdminCredentialsProperties staticCredentialsConfig, UserManaged userManaged) {
-            return new StaticAdminUserProvider(staticCredentialsConfig, userManaged);
+                StaticAdminCredentialsProperties staticCredentialsConfig) {
+            return new StaticAdminUserProvider(staticCredentialsConfig);
+        }
+
+        @Bean
+        public DatabaseUserProvider databaseUserProvider(UserService userService, PasswordEncoder passwordEncoder) {
+            return new DatabaseUserProvider(userService, passwordEncoder);
         }
     }
 

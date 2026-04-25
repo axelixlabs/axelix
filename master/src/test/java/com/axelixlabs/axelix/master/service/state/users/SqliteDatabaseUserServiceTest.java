@@ -15,28 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.provider;
+package com.axelixlabs.axelix.master.service.state.users;
 
-import org.jspecify.annotations.Nullable;
-
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.service.state.DatabaseUserService;
 
 /**
- * SPI interface that is capable to load the {@link User} by his/her username.
+ * SQLite integration tests for {@link DatabaseUserService}.
  *
- * @since 16.07.25
- * @author Mikhail Polivakha
+ * @see DatabaseUserService
  * @author Sergey Cherkasov
  */
-public interface UserProvider {
-
-    /**
-     * Load user by username.
-     *
-     * @param username by which the user will be loaded.
-     * @param password the user's password.
-     * @return the loaded {@link User}.
-     */
-    @Nullable
-    User load(String username, String password);
-}
+class SqliteDatabaseUserServiceTest extends DatabaseUserServiceTest {}
