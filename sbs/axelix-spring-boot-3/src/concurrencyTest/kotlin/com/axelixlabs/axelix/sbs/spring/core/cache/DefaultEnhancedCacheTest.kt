@@ -17,66 +17,54 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache
 
-import org.jetbrains.lincheck.datastructures.ModelCheckingOptions
-import org.jetbrains.lincheck.datastructures.Operation
-import org.jetbrains.lincheck.datastructures.Param
-import org.jetbrains.lincheck.datastructures.StressOptions
-import org.jetbrains.lincheck.datastructures.StringGen
+import java.util.concurrent.Callable
+import org.jetbrains.lincheck.datastructures.*
 import org.jetbrains.lincheck.datastructures.verifier.LinearizabilityVerifier
 import org.junit.jupiter.api.Test
 import org.springframework.cache.concurrent.ConcurrentMapCache
-import java.util.concurrent.Callable
 
 /**
- * Lincheck test for [DefaultEnhancedCache]
+ * Lincheck test for [DefaultEnhancedCache].
  *
  * @author Mikhail Polivakha
  */
+@Param(name = "value", gen = StringGen::class)
+@Param(name = "key", gen = StringGen::class, conf = "1:3")
 class DefaultEnhancedCacheTest {
 
-    val subject =
+  val delegate = DefaultEnhancedCache(ConcurrentMapCache("test-cache"))
 
-        @Param(name = "value", gen = StringGen::class)
-        @Param(name = "key", gen = StringGen::class, conf = "1:3")
-        object : DefaultEnhancedCache(ConcurrentMapCache("test-cache")) {
+  @Operation fun getValueWrapper(@Param(name = "key") key: Any) = delegate.get(key)
 
-        @Operation
-        fun getValueWrapper(@Param(name = "key") key: Any) = super.get(key)
+  @Operation fun getWithType(@Param(name = "key") key: Any) = delegate.get(key, String::class.java)
 
-        @Operation
-        fun getWithType(@Param(name = "key") key: Any) = super.get(key, String::class.java)
+  @Operation
+  fun getWithValueLoader(@Param(name = "key") key: Any) =
+      delegate.get(key, Callable { "loaded value" })
 
-        @Operation
-        fun getWithValueLoader(@Param(name = "key") key: Any) = super.get(key, Callable { "loaded value" })
+  @Operation
+  fun put(@Param(name = "key") key: Any, @Param(name = "value") value: Any?) =
+      delegate.put(key, value)
 
-        @Operation
-        override fun put(@Param(name = "key") key: Any, @Param(name = "value") value: Any?) = super.put(key, value)
+  @Operation fun evict(@Param(name = "key") key: Any) = delegate.evict(key)
 
-        @Operation
-        override fun evict(@Param(name = "key") key: Any) = super.evict(key)
+  @Operation fun clear() = delegate.clear()
 
-        @Operation
-        override fun clear() = super.clear()
+  @Operation fun disable() = delegate.disable()
 
-        @Operation
-        override fun disable() = super.disable()
+  @Operation fun enable() = delegate.enable()
 
-        @Operation
-        override fun enable() = super.enable()
+  @Operation fun isEnabled() = delegate.isEnabled()
 
-        @Operation
-        override fun isEnabled() = super.isEnabled()
-    }
+  @Test
+  fun test_StressTesting() {
+    StressOptions()
+        .verifier(LinearizabilityVerifier::class.java)
+        .check(DefaultEnhancedCacheTest::class.java)
+  }
 
-    @Test
-    fun test_StressTesting() {
-        StressOptions()
-            .verifier(LinearizabilityVerifier::class.java)
-            .check(subject::class)
-    }
-
-    @Test
-    fun test_ModelChecking() {
-        ModelCheckingOptions().check(subject::class)
-    }
+  @Test
+  fun test_ModelChecking() {
+    ModelCheckingOptions().check(DefaultEnhancedCacheTest::class.java)
+  }
 }

@@ -68,7 +68,9 @@ subprojects {
         kotlin {
             target("src/**/*.kt")
             trimTrailingWhitespace()
-//            ktlint()
+            // TODO:
+            //  I would like to integrate detekt into spotless
+            //  but spotless does not support it as of now https://github.com/diffplug/spotless/issues/143
 
             licenseHeader(
                 Paths
