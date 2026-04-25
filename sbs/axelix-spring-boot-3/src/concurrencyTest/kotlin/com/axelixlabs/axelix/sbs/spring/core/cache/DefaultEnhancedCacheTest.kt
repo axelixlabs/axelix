@@ -34,39 +34,38 @@ import java.util.concurrent.Callable
  */
 class DefaultEnhancedCacheTest {
 
-    val delegate = DefaultEnhancedCache(ConcurrentMapCache("test-cache"))
     val subject =
 
         @Param(name = "value", gen = StringGen::class)
         @Param(name = "key", gen = StringGen::class, conf = "1:3")
-        object : EnhancedCache by delegate {
+        object : DefaultEnhancedCache(ConcurrentMapCache("test-cache")) {
 
         @Operation
-        fun getValueWrapper(@Param(name = "key") key: Any) = delegate.get(key)
+        fun getValueWrapper(@Param(name = "key") key: Any) = super.get(key)
 
         @Operation
-        fun getWithType(@Param(name = "key") key: Any) = delegate.get(key, String::class.java)
+        fun getWithType(@Param(name = "key") key: Any) = super.get(key, String::class.java)
 
         @Operation
-        fun getWithValueLoader(@Param(name = "key") key: Any) = delegate.get(key, Callable { "loaded value" })
+        fun getWithValueLoader(@Param(name = "key") key: Any) = super.get(key, Callable { "loaded value" })
 
         @Operation
-        override fun put(@Param(name = "key") key: Any, @Param(name = "value") value: Any?) = delegate.put(key, value)
+        override fun put(@Param(name = "key") key: Any, @Param(name = "value") value: Any?) = super.put(key, value)
 
         @Operation
-        override fun evict(@Param(name = "key") key: Any) = delegate.evict(key)
+        override fun evict(@Param(name = "key") key: Any) = super.evict(key)
 
         @Operation
-        override fun clear() = delegate.clear()
+        override fun clear() = super.clear()
 
         @Operation
-        override fun disable() = delegate.disable()
+        override fun disable() = super.disable()
 
         @Operation
-        override fun enable() = delegate.enable()
+        override fun enable() = super.enable()
 
         @Operation
-        override fun isEnabled() = delegate.isEnabled()
+        override fun isEnabled() = super.isEnabled()
     }
 
     @Test
