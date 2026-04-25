@@ -27,13 +27,13 @@ import com.axelixlabs.axelix.common.auth.core.Role;
  * @see Role
  * @author Sergey Cherkasov
  */
-public class RoleNotPresentException extends RuntimeException {
+public class UserRoleNotFoundException extends RuntimeException {
 
-    public RoleNotPresentException(@Nullable String role) {
+    public UserRoleNotFoundException(@Nullable String role) {
         super("Role '%s' is not allowed".formatted(role));
     }
 
-    public RoleNotPresentException(final String role, final Throwable cause) {
+    public UserRoleNotFoundException(final String role, final Throwable cause) {
         super(role, cause);
     }
 }

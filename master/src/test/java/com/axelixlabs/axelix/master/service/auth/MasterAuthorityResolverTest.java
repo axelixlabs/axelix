@@ -34,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Unit tests for {@link MasterAuthorityResolver}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public class MasterAuthorityResolverTest {
 
@@ -63,7 +64,7 @@ public class MasterAuthorityResolverTest {
                 // USERS_MANAGEMENT
                 Arguments.of("/users-management/create", HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT),
                 Arguments.of("/users-management/delete", HttpMethod.DELETE, DefaultAuthority.USERS_MANAGEMENT),
-                Arguments.of("/users-management/update", HttpMethod.PATCH, DefaultAuthority.USERS_MANAGEMENT),
+                Arguments.of("/users-management/update", HttpMethod.PUT, DefaultAuthority.USERS_MANAGEMENT),
 
                 // USERS_VIEW
                 Arguments.of("/users-management/feed", HttpMethod.GET, DefaultAuthority.USERS_VIEW),

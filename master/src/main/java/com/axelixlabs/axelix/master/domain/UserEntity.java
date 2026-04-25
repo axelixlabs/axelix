@@ -55,26 +55,6 @@ public record UserEntity(
                 this.id, this.username, this.email, this.password, this.roles, this.provider, lastLoginAt);
     }
 
-    public UserEntity withUsername(String username) {
-        return new UserEntity(
-                this.id, username, this.email, this.password, this.roles, this.provider, this.lastLoginAt);
-    }
-
-    public UserEntity withEmail(@Nullable String email) {
-        return new UserEntity(
-                this.id, this.username, email, this.password, this.roles, this.provider, this.lastLoginAt);
-    }
-
-    public UserEntity withPassword(@Nullable String password) {
-        return new UserEntity(
-                this.id, this.username, this.email, password, this.roles, this.provider, this.lastLoginAt);
-    }
-
-    public UserEntity withRoles(Roles roles) {
-        return new UserEntity(
-                this.id, this.username, this.email, this.password, roles, this.provider, this.lastLoginAt);
-    }
-
     public record Roles(Set<String> values) {
         public Roles {
             values = Set.copyOf(values);

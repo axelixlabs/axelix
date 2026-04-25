@@ -15,28 +15,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.service.auth.provider;
+package com.axelixlabs.axelix.master.exception.auth;
 
-import org.jspecify.annotations.Nullable;
-
-import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.repository.UserRepository;
 
 /**
- * SPI interface that is capable to load the {@link User} by his/her username.
+ * Thrown in case the user id is not found by {@link UserRepository}.
  *
- * @since 16.07.25
- * @author Mikhail Polivakha
+ * @see UserRepository
  * @author Sergey Cherkasov
  */
-public interface UserProvider {
+public class UserWithIdNotFoundException extends RuntimeException {
 
-    /**
-     * Load user by username.
-     *
-     * @param username by which the user will be loaded.
-     * @param password the user's password.
-     * @return the loaded {@link User}.
-     */
-    @Nullable
-    User load(String username, String password);
+    public UserWithIdNotFoundException(String id) {
+        super("User with id '%s' is not found".formatted(id));
+    }
+
+    public UserWithIdNotFoundException(final String id, final Throwable cause) {
+        super(id, cause);
+    }
 }
