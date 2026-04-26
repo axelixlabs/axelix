@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,8 +46,8 @@ public class DefaultEnhancedCache implements EnhancedCache {
     public DefaultEnhancedCache(@NonNull Cache delegate) {
         this.delegate = delegate;
         this.enabled = new AtomicBoolean(true);
-        // TODO: We need to find a way to allow for configuring those values
-        this.cacheLookupHistory = new SlidingWindow<>(200, Duration.ofSeconds(1));
+        // TODO: We need to find a way to allow for configuring this value
+        this.cacheLookupHistory = new SlidingWindow<>(200);
     }
 
     @Override

@@ -39,7 +39,7 @@ class SlidingWindowTest {
 
     @BeforeEach
     void setUp() {
-        slidingWindow = new SlidingWindow<>(CAPACITY, CLEANUP_INTERVAL);
+        slidingWindow = new SlidingWindow<>(CAPACITY);
     }
 
     @Test

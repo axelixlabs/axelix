@@ -56,8 +56,7 @@ public class TransactionMonitoringAutoConfiguration {
     public TransactionStatsCollector transactionStatsCollector(
             TransactionMonitoringConfigurationProperties properties) {
 
-        return new DefaultTransactionStatsCollector(
-                properties.getMaxTransactionsPerMethod(), properties.getCleanupInterval());
+        return new DefaultTransactionStatsCollector(properties.getMaxTransactionsPerMethod());
     }
 
     @Bean

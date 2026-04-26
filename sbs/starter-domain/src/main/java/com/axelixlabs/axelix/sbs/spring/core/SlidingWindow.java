@@ -17,13 +17,9 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core;
 
-import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -38,13 +34,10 @@ public class SlidingWindow<E> {
 
     private final ConcurrentLinkedDeque<E> deque;
     private final int capacity;
-    private static final ScheduledExecutorService CLEANER = Executors.newSingleThreadScheduledExecutor();
 
-    public SlidingWindow(int capacity, Duration cleanupInterval) {
+    public SlidingWindow(int capacity) {
         this.deque = new ConcurrentLinkedDeque<>();
         this.capacity = capacity;
-        // TODO: allow configuring the end-user scheduled executor service
-        CLEANER.scheduleWithFixedDelay(this::clear, 0L, cleanupInterval.toSeconds(), TimeUnit.SECONDS);
     }
 
     public void put(E element) {

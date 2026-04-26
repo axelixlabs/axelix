@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.transactions;
 
-import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.axelixlabs.axelix.sbs.spring.core.SlidingWindow;
@@ -36,18 +35,16 @@ public class DefaultTransactionStatsCollector implements TransactionStatsCollect
     private final ConcurrentHashMap<MethodClassKey, SlidingWindow<TransactionRecord>> statsMap =
             new ConcurrentHashMap<>();
     private final int maxTransactionsPerMethod;
-    private final Duration cleanupInterval;
 
-    public DefaultTransactionStatsCollector(int maxTransactionsPerMethod, Duration cleanupInterval) {
+    public DefaultTransactionStatsCollector(int maxTransactionsPerMethod) {
         this.maxTransactionsPerMethod = maxTransactionsPerMethod;
-        this.cleanupInterval = cleanupInterval;
     }
 
     @Override
     public void recordTransaction(MethodClassKey key, TransactionRecord transactionRecord) {
         statsMap.compute(key, (k, stats) -> {
             if (stats == null) {
-                stats = new SlidingWindow<>(maxTransactionsPerMethod, cleanupInterval);
+                stats = new SlidingWindow<>(maxTransactionsPerMethod);
             }
             stats.put(transactionRecord);
             return stats;
