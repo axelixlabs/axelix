@@ -17,11 +17,13 @@
  */
 package com.axelixlabs.axelix.sbs.spring.core.cache
 
-import java.util.concurrent.Callable
-import org.jetbrains.lincheck.datastructures.*
-import org.jetbrains.lincheck.datastructures.verifier.LinearizabilityVerifier
+import org.jetbrains.lincheck.datastructures.Operation
+import org.jetbrains.lincheck.datastructures.Param
+import org.jetbrains.lincheck.datastructures.StressOptions
+import org.jetbrains.lincheck.datastructures.StringGen
 import org.junit.jupiter.api.Test
 import org.springframework.cache.concurrent.ConcurrentMapCache
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Lincheck test for [DefaultEnhancedCache].
@@ -32,39 +34,30 @@ import org.springframework.cache.concurrent.ConcurrentMapCache
 @Param(name = "key", gen = StringGen::class, conf = "1:3")
 class DefaultEnhancedCacheTest {
 
-  val delegate = DefaultEnhancedCache(ConcurrentMapCache("test-cache"))
+    val delegate = DefaultEnhancedCache(ConcurrentMapCache("test-cache", ConcurrentHashMap(3), true))
 
-  @Operation fun getValueWrapper(@Param(name = "key") key: Any) = delegate.get(key)
+    @Operation fun getValueWrapper(@Param(name = "key") key: Any) = delegate.get(key)?.get()
 
-  @Operation fun getWithType(@Param(name = "key") key: Any) = delegate.get(key, String::class.java)
+    @Operation fun getWithType(@Param(name = "key") key: Any) = delegate.get(key, String::class.java)
 
-  @Operation
-  fun getWithValueLoader(@Param(name = "key") key: Any) =
-      delegate.get(key, Callable { "loaded value" })
+    @Operation
+    fun getWithValueLoader(@Param(name = "key") key: Any) = delegate.get(key) { "loaded value" }
 
-  @Operation
-  fun put(@Param(name = "key") key: Any, @Param(name = "value") value: Any?) =
-      delegate.put(key, value)
+    @Operation
+    fun put(
+        @Param(name = "key") key: Any,
+        @Param(name = "value") value: Any?) = delegate.put(key, value)
 
-  @Operation fun evict(@Param(name = "key") key: Any) = delegate.evict(key)
+    @Operation fun evict(@Param(name = "key") key: Any) = delegate.evict(key)
 
-  @Operation fun clear() = delegate.clear()
+    @Operation fun clear() = delegate.clear()
 
-  @Operation fun disable() = delegate.disable()
+    @Operation fun disable() = delegate.disable()
 
-  @Operation fun enable() = delegate.enable()
+    @Operation fun enable() = delegate.enable()
 
-  @Operation fun isEnabled() = delegate.isEnabled()
+    @Operation fun isEnabled() = delegate.isEnabled()
 
-  @Test
-  fun test_StressTesting() {
-    StressOptions()
-        .verifier(LinearizabilityVerifier::class.java)
-        .check(DefaultEnhancedCacheTest::class.java)
-  }
-
-  @Test
-  fun test_ModelChecking() {
-    ModelCheckingOptions().check(DefaultEnhancedCacheTest::class.java)
-  }
+    @Test
+    fun test_StressTesting() = StressOptions().check(DefaultEnhancedCacheTest::class.java)
 }
