@@ -32,6 +32,7 @@ import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.utils.TestResourceReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -119,11 +120,8 @@ class JmesPathOidcRoleExtractorTest {
             """);
         JmesPathOidcRoleExtractor extractor = new JmesPathOidcRoleExtractor(oidcClient, "roles[0]");
 
-        // when.
-        Role role = extractor.extractRole(tokens);
-
-        // then.
-        assertThat(role).isEqualTo(DefaultRole.VIEWER);
+        // when & then.
+        assertThatThrownBy(() -> extractor.extractRole(tokens)).isInstanceOf(OidcTokenExchangeException.class);
     }
 
     @Test
@@ -160,11 +158,8 @@ class JmesPathOidcRoleExtractorTest {
 
         JmesPathOidcRoleExtractor extractor = new JmesPathOidcRoleExtractor(oidcClient, "roles[0]");
 
-        // when.
-        Role role = extractor.extractRole(tokens);
-
-        // then.
-        assertThat(role).isEqualTo(DefaultRole.VIEWER);
+        // when & then.
+        assertThatThrownBy(() -> extractor.extractRole(tokens)).isInstanceOf(OidcTokenExchangeException.class);
     }
 
     private Tokens tokens(String idTokenPayloadJson) {

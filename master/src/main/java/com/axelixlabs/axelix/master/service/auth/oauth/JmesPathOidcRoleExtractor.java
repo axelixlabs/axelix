@@ -64,10 +64,10 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
      * First tries to evaluate the configured JMESPath expression against ID token claims,
      * then evaluates it against the userInfo endpoint response if needed.
      *
-     * @return extracted role, or DefaultRole.VIEWER (fallback).
+     * @return extracted role, or {@link DefaultRole#VIEWER} if JMES path expression is not configured
      */
     @Override
-    public Role extractRole(Tokens tokens) {
+    public Role extractRole(Tokens tokens) throws OidcTokenExchangeException {
         if (jmesPathExpression == null) {
             return DefaultRole.VIEWER;
         }
@@ -78,7 +78,13 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
             role = extractRoleFromUserInfo(tokens.accessToken());
         }
 
-        return role != null ? role : DefaultRole.VIEWER;
+        if (role == null) {
+            throw new OidcTokenExchangeException(String.format(
+                    "Failed to extract role from tokens. JMES path expression: '%s' - role not found in ID token nor UserInfo endpoint",
+                    jmesPathExpression));
+        }
+
+        return role;
     }
 
     @Nullable
