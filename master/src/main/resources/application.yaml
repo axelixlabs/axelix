@@ -32,6 +32,9 @@ management:
 axelix:
   master:
     discovery:
+      self:
+        eviction:
+          interval: 60000
       auto:
         enabled: true
         broadcast:

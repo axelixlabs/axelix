@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -49,6 +50,10 @@ public interface InstanceRepository extends ListCrudRepository<Instance, Instanc
     Set<Instance> findByNameLikeIgnoreCase(@Param("query") String query);
 
     @Modifying
-    @Query("DELETE FROM instances WHERE latest_hearth_beat IS NULL")
+    @Query("DELETE FROM instances WHERE latest_heart_beat IS NOT NULL AND latest_heart_beat < :threshold")
+    int deleteWhereHeartbeatOlderThan(@Param("threshold") Instant threshold);
+
+    @Modifying
+    @Query("DELETE FROM instances WHERE latest_heart_beat IS NULL")
     void deleteAllWithoutHeartbeat();
 }

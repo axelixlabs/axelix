@@ -5,6 +5,9 @@ axelix:
       static-resources:
         location: /application/dist/
     discovery:
+      self:
+        eviction:
+          interval: 60000
       auto:
         enabled: true
         broadcast:

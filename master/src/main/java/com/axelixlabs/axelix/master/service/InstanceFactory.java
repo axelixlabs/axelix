@@ -48,7 +48,7 @@ public interface InstanceFactory {
             String instanceId,
             String instanceName,
             String deploymentAt,
-            @Nullable Instant latestHearthBeat,
+            @Nullable Instant latestHeartBeat,
             String instanceActuatorUrl,
             BasicDiscoveryMetadata metadata);
 }

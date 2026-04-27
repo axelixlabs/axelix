@@ -44,7 +44,7 @@
       <column name="deployed_at" type="DATETIME">
         <constraints nullable="true"/>
       </column>
-      <column name="latest_hearth_beat" type="DATETIME">
+      <column name="latest_heart_beat" type="DATETIME">
          <constraints nullable="true"/>
       </column>
       <column name="status" type="VARCHAR(1000)">

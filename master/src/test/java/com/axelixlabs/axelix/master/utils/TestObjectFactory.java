@@ -47,6 +47,10 @@ public final class TestObjectFactory {
         return withUrl(id, DEFAULT_URL);
     }
 
+    public static Instance createInstance(String id, @Nullable Instant instant) {
+        return createInstanceWithHeartbeat(id, instant);
+    }
+
     public static Instance withName(String id, String name) {
         return createInstance(
                 id,
@@ -158,6 +162,25 @@ public final class TestObjectFactory {
                 Instance.VmFeatures.of(Arrays.stream(vmFeatures).collect(Collectors.toSet())));
     }
 
+    public static Instance createInstanceWithHeartbeat(String id, @Nullable Instant instant) {
+        return new Instance(
+                InstanceId.of(id),
+                "test-object-factory-instance",
+                "1.2.3-classifer-test",
+                "25",
+                "3.5.2",
+                "6.0.2",
+                null,
+                "BellSoft",
+                "df027cf",
+                Instant.now(),
+                instant,
+                DEFAULT_STATUS,
+                new MemoryUsage(1000L),
+                DEFAULT_URL,
+                Instance.VmFeatures.empty());
+    }
+
     public static Instance createInstance(
             String id,
             String url,
@@ -180,7 +203,7 @@ public final class TestObjectFactory {
                 jdkVendor,
                 "df027cf",
                 Instant.now(),
-                Instant.now(),
+                Instant.now().minusSeconds(60),
                 status,
                 new MemoryUsage(1000L),
                 url,
