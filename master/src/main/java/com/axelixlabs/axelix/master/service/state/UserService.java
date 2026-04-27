@@ -97,22 +97,28 @@ public interface UserService {
      *
      * <p>Field semantics:
      * <ul>
-     *   <li>{@code username} and {@code roles} are required and must not be {@code null}.</li>
+     *   <li>{@code username} is nullable: passing {@code null} <b>preserves</b> the existing username.</li>
      *   <li>{@code email} is nullable: passing {@code null} <b>clears</b> the existing email value.</li>
      *   <li>{@code password} is nullable: passing {@code null} <b>preserves</b> the previously stored password.</li>
+     *   <li>{@code roles} is nullable: passing {@code null} <b>preserves</b> the existing roles.</li>
      * </ul>
      *
      * @param id       Unique identifier of the user to update.
-     * @param username New login username. Must be unique and not blank.
-     * @param email    New email address, or {@code null} to clear the stored email. Must be unique and not blank.
+     * @param username New login username, or {@code null} to keep the existing username. Must be unique and not blank when provided.
+     * @param email    New email address, or {@code null} to clear the stored email. Must be unique and not blank when provided.
      * @param password New plain-text password (hashed server-side), or {@code null} to keep the existing password.
-     *                 Must not be blank when.
-     * @param roles    New set of role names. Replaces any roles previously assigned. Each role must not be blank or {@code null}.
+     *                 Must not be blank when provided.
+     * @param roles    New set of role names replacing any previously assigned, or {@code null} to keep the existing roles.
+     *                 Each role must not be blank or {@code null}.
      * @throws UserWithIdNotFoundException if no user with the given id exists.
      * @throws UserRoleNotFoundException if any of the provided role names does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
      */
     void updateUserPatch(
-            String id, String username, @Nullable String email, @Nullable String password, Set<String> roles)
+            String id,
+            @Nullable String username,
+            @Nullable String email,
+            @Nullable String password,
+            @Nullable Set<String> roles)
             throws UserRoleNotFoundException, UserWithIdNotFoundException;
 }

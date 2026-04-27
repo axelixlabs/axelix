@@ -109,22 +109,27 @@ public class DatabaseUserService implements UserService {
 
     @Override
     public void updateUserPatch(
-            String id, String username, @Nullable String email, @Nullable String password, Set<String> roles)
+            String id,
+            @Nullable String username,
+            @Nullable String email,
+            @Nullable String password,
+            @Nullable Set<String> roles)
             throws UserRoleNotFoundException, UserWithIdNotFoundException, UserInvalidValueException {
-
-        Set<String> validRoles =
-                roles.stream().map(this::validateAndNormalizeRole).collect(Collectors.toSet());
 
         UserEntity user = userRepository.findById(id).orElseThrow(() -> new UserWithIdNotFoundException(id));
 
-        String newPassword =
-                password != null ? passwordEncoder.encode(requireNonBlankTrimmed(password)) : user.password();
+        String newUsername = username != null ? requireNonBlankTrimmed(username) : user.username();
+        String newPassword = password != null ? passwordEncoder.encode(requireNonBlankTrimmed(password)) : user.password();
+        UserEntity.Roles newRoles = roles != null
+                ? new UserEntity.Roles(roles.stream().map(this::validateAndNormalizeRole).collect(Collectors.toSet()))
+                : user.roles();
+
         jdbcAggregateTemplate.update(new UserEntity(
                 id,
-                requireNonBlankTrimmed(username),
+                newUsername,
                 email == null ? null : requireNonBlankTrimmed(email),
                 newPassword,
-                new UserEntity.Roles(validRoles),
+                newRoles,
                 user.provider(),
                 user.lastLoginAt()));
     }

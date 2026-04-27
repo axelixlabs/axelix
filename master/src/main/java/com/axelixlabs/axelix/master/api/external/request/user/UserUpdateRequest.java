@@ -25,18 +25,18 @@ import org.jspecify.annotations.Nullable;
  * Request payload to update an existing managed user via the Users Management API.
  *
  * @param id       Unique identifier of the user to update.
- * @param username New username. Must be unique when provided.
- * @param email    New email address. Must be unique when provided.
- * @param roles    New set of role names.
- * @param password Plain-text new password. Hashed server-side before persistence.
+ * @param username New username. Must be unique when provided. {@code null} to keep the existing value.
+ * @param email    New email address. Must be unique when provided. {@code null} to clear the stored email.
+ * @param roles    New set of role names. {@code null} to keep the existing roles.
+ * @param password Plain-text new password. Hashed server-side before persistence. {@code null} to keep the existing password.
  *
  * @author Sergey Cherkasov
  */
 public record UserUpdateRequest(
         String id,
-        String username,
+        @Nullable String username,
         @Nullable String email,
-        Set<String> roles,
+        @Nullable Set<String> roles,
         @Nullable String password) {
 
     @Override
