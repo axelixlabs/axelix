@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
@@ -37,6 +38,7 @@ import com.axelixlabs.axelix.master.service.state.UserService;
  *
  * @author Sergey Cherkasov
  */
+@Transactional
 public class DatabaseUserProvider implements UserProvider {
 
     private final UserService userService;

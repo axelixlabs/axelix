@@ -41,7 +41,7 @@ public record UserUpdateRequest(
 
     @Override
     public String toString() {
-        return "UserUpdateRequest[id=" + id + ", username=" + username + ", email=" + email + ", roles=" + roles
+        return "UserUpdateRequest[id=" + id + ", username=[REDACTED], email=[REDACTED], roles=" + roles
                 + ", password=[REDACTED]" + ']';
     }
 }

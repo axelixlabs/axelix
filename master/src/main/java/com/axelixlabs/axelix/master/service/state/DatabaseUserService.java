@@ -34,11 +34,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
-import com.axelixlabs.axelix.master.exception.auth.UserWithIdNotFoundException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
-import com.axelixlabs.axelix.master.service.auth.Provider;
 
 /**
  * JDBC-based implementation of {@link UserService} that persists users in a relational database.
@@ -65,7 +64,7 @@ public class DatabaseUserService implements UserService {
 
     @Override
     public void create(
-            String username, @Nullable String email, @Nullable String password, String role, Provider provider)
+            String username, @Nullable String email, @Nullable String password, String role, UserOrigin provider)
             throws UserRoleNotFoundException, UserInvalidValueException {
 
         UserEntity userEntity = new UserEntity(
@@ -102,31 +101,31 @@ public class DatabaseUserService implements UserService {
 
     @Override
     public void updateLastLoginAt(String username) {
-        userRepository
-                .findByUsername(username)
-                .ifPresent(user -> jdbcAggregateTemplate.update(user.withLastLoginAt(Instant.now())));
+        userRepository.updateLastLoginAt(username, Instant.now());
     }
 
     @Override
     public void updateUserPatch(
             String id, String username, @Nullable String email, @Nullable String password, Set<String> roles)
-            throws UserRoleNotFoundException, UserWithIdNotFoundException, UserInvalidValueException {
+            throws UserRoleNotFoundException, UserInvalidValueException {
 
         Set<String> validRoles =
                 roles.stream().map(this::validateAndNormalizeRole).collect(Collectors.toSet());
 
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new UserWithIdNotFoundException(id));
-
-        String newPassword =
-                password != null ? passwordEncoder.encode(requireNonBlankTrimmed(password)) : user.password();
-        jdbcAggregateTemplate.update(new UserEntity(
-                id,
-                requireNonBlankTrimmed(username),
-                email == null ? null : requireNonBlankTrimmed(email),
-                newPassword,
-                new UserEntity.Roles(validRoles),
-                user.provider(),
-                user.lastLoginAt()));
+        if (password != null) {
+            userRepository.updateUserPatch(
+                    id,
+                    requireNonBlankTrimmed(username),
+                    email == null ? null : requireNonBlankTrimmed(email),
+                    passwordEncoder.encode(requireNonBlankTrimmed(password)),
+                    new UserEntity.Roles(validRoles));
+        } else {
+            userRepository.updateUserPatchWithoutPassword(
+                    id,
+                    requireNonBlankTrimmed(username),
+                    email == null ? null : requireNonBlankTrimmed(email),
+                    new UserEntity.Roles(validRoles));
+        }
     }
 
     private String requireNonBlankTrimmed(@Nullable String value) throws UserInvalidValueException {

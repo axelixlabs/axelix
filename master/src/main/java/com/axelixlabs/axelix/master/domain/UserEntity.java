@@ -25,8 +25,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import com.axelixlabs.axelix.master.service.auth.Provider;
-
 /**
  * Persistent user record for users created via the Users Management UI by a SUPER_ADMIN.
  *
@@ -35,7 +33,7 @@ import com.axelixlabs.axelix.master.service.auth.Provider;
  * @param email        Email address of the user, which may be {@code null}.
  * @param password     Hash of the user's password, which may be {@code null}.
  * @param roles        Names of the roles granted to this user (e.g. {@code ADMIN}, {@code EDITOR}, {@code VIEWER}).
- * @param provider     Origin of the user account (e.g. {@code OIDC/OAUTH2} provider username, or {@code LOCAL}).
+ * @param provider     Origin of the user account (e.g. {@code OAUTH2/OIDC} provider username, or {@code LOCAL}).
  * @param lastLoginAt  Timestamp of the most recent successful login. {@code null} until the user logs in for the first time.
  *
  * @author Sergey Cherkasov
@@ -47,13 +45,8 @@ public record UserEntity(
         @Nullable String email,
         @Nullable String password,
         Roles roles,
-        Provider provider,
+        UserOrigin provider,
         @Nullable Instant lastLoginAt) {
-
-    public UserEntity withLastLoginAt(Instant lastLoginAt) {
-        return new UserEntity(
-                this.id, this.username, this.email, this.password, this.roles, this.provider, lastLoginAt);
-    }
 
     public record Roles(Set<String> values) {
         public Roles {
@@ -63,7 +56,7 @@ public record UserEntity(
 
     @Override
     public String toString() {
-        return "User[id=" + id + ", username=" + username + ", email=" + email
+        return "User[id=" + id + ", username=[REDACTED], email=[REDACTED]"
                 + ", password=[REDACTED], roles=" + roles + ", provider=" + provider
                 + ", lastLoginAt=" + lastLoginAt + ']';
     }

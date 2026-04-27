@@ -17,8 +17,13 @@
  */
 package com.axelixlabs.axelix.master.repository;
 
+import java.time.Instant;
 import java.util.Optional;
 
+import org.jspecify.annotations.Nullable;
+
+import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 
@@ -32,4 +37,25 @@ import com.axelixlabs.axelix.master.domain.UserEntity;
 public interface UserRepository extends ListCrudRepository<UserEntity, String> {
 
     Optional<UserEntity> findByUsername(@Param("username") String username);
+
+    @Modifying
+    @Query("UPDATE users SET last_login_at = :lastLoginAt WHERE username = :username")
+    void updateLastLoginAt(@Param("username") String username, @Param("lastLoginAt") Instant lastLoginAt);
+
+    @Modifying
+    @Query("UPDATE users SET username = :username, email = :email, password = :password, roles = :roles WHERE id = :id")
+    void updateUserPatch(
+            @Param("id") String id,
+            @Param("username") String username,
+            @Param("email") @Nullable String email,
+            @Param("password") @Nullable String password,
+            @Param("roles") UserEntity.Roles roles);
+
+    @Modifying
+    @Query("UPDATE users SET username = :username, email = :email, roles = :roles WHERE id = :id")
+    void updateUserPatchWithoutPassword(
+            @Param("id") String id,
+            @Param("username") String username,
+            @Param("email") @Nullable String email,
+            @Param("roles") UserEntity.Roles roles);
 }

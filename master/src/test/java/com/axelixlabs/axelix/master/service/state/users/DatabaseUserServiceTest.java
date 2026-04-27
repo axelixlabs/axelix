@@ -31,11 +31,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
-import com.axelixlabs.axelix.master.exception.auth.UserWithIdNotFoundException;
 import com.axelixlabs.axelix.master.repository.UserRepository;
-import com.axelixlabs.axelix.master.service.auth.Provider;
 import com.axelixlabs.axelix.master.service.state.DatabaseUserService;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
@@ -69,7 +68,7 @@ abstract class DatabaseUserServiceTest {
     @Test
     void create_shouldPersistUser() {
         // when.
-        userService.create("alice", "alice@example.com", "plainPass", "ADMIN", Provider.LOCAL);
+        userService.create("alice", "alice@example.com", "plainPass", "ADMIN", UserOrigin.LOCAL);
 
         // then.
         List<UserEntity> users = userRepository.findAll();
@@ -80,7 +79,7 @@ abstract class DatabaseUserServiceTest {
         assertThat(saved.username()).isEqualTo("alice");
         assertThat(saved.email()).isEqualTo("alice@example.com");
         assertThat(saved.roles().values()).containsExactly("ADMIN");
-        assertThat(saved.provider()).isEqualTo(Provider.LOCAL);
+        assertThat(saved.provider()).isEqualTo(UserOrigin.LOCAL);
         assertThat(saved.password()).isNotEqualTo("plainPass"); // Hash password
         assertThat(passwordEncoder.matches("plainPass", saved.password())).isTrue();
         assertThat(saved.lastLoginAt()).isNull();
@@ -89,19 +88,19 @@ abstract class DatabaseUserServiceTest {
     @Test
     void create_shouldAllowNullEmailAndPassword() {
         // when.
-        userService.create("bob", null, null, "VIEWER", Provider.OIDC);
+        userService.create("bob", null, null, "VIEWER", UserOrigin.OIDC);
 
         // then.
         UserEntity saved = userRepository.findByUsername("bob").orElseThrow();
         assertThat(saved.email()).isNull();
         assertThat(saved.password()).isNull();
-        assertThat(saved.provider()).isEqualTo(Provider.OIDC);
+        assertThat(saved.provider()).isEqualTo(UserOrigin.OIDC);
     }
 
     @Test
     void create_shouldThrowWhenRoleIsNotAllowed() {
         // when.
-        assertThatThrownBy(() -> userService.create("alice", "alice@example.com", "p", "SUPER_ADMIN", Provider.LOCAL))
+        assertThatThrownBy(() -> userService.create("alice", "alice@example.com", "p", "SUPER_ADMIN", UserOrigin.LOCAL))
                 // then.
                 .isInstanceOf(UserRoleNotFoundException.class);
         assertThat(userRepository.findAll()).isEmpty();
@@ -110,7 +109,7 @@ abstract class DatabaseUserServiceTest {
     @Test
     void create_shouldThrowWhenRoleDoesNotExist() {
         // when.
-        assertThatThrownBy(() -> userService.create("alice", "alice@example.com", "p", "NOT_A_ROLE", Provider.LOCAL))
+        assertThatThrownBy(() -> userService.create("alice", "alice@example.com", "p", "NOT_A_ROLE", UserOrigin.LOCAL))
                 // then.
                 .isInstanceOf(UserRoleNotFoundException.class);
         assertThat(userRepository.findAll()).isEmpty();
@@ -119,7 +118,7 @@ abstract class DatabaseUserServiceTest {
     @Test
     void create_shouldThrowWhenUsernameIsBlank() {
         // when.
-        assertThatThrownBy(() -> userService.create("   ", "alice@example.com", "p", "VIEWER", Provider.LOCAL))
+        assertThatThrownBy(() -> userService.create("   ", "alice@example.com", "p", "VIEWER", UserOrigin.LOCAL))
                 // then.
                 .isInstanceOf(UserInvalidValueException.class);
         assertThat(userRepository.findAll()).isEmpty();
@@ -128,7 +127,7 @@ abstract class DatabaseUserServiceTest {
     @Test
     void create_shouldThrowWhenEmailIsBlank() {
         // when.
-        assertThatThrownBy(() -> userService.create("alice", "   ", "p", "VIEWER", Provider.LOCAL))
+        assertThatThrownBy(() -> userService.create("alice", "   ", "p", "VIEWER", UserOrigin.LOCAL))
                 // then.
                 .isInstanceOf(UserInvalidValueException.class);
         assertThat(userRepository.findAll()).isEmpty();
@@ -137,7 +136,7 @@ abstract class DatabaseUserServiceTest {
     @Test
     void create_shouldThrowWhenPasswordIsBlank() {
         // when.
-        assertThatThrownBy(() -> userService.create("alice", "alice@example.com", "   ", "VIEWER", Provider.LOCAL))
+        assertThatThrownBy(() -> userService.create("alice", "alice@example.com", "   ", "VIEWER", UserOrigin.LOCAL))
                 // then.
                 .isInstanceOf(UserInvalidValueException.class);
         assertThat(userRepository.findAll()).isEmpty();
@@ -146,7 +145,7 @@ abstract class DatabaseUserServiceTest {
     @Test
     void create_shouldThrowWhenRoleIsBlank() {
         // when.
-        assertThatThrownBy(() -> userService.create("alice", "alice@example.com", "p", "   ", Provider.LOCAL))
+        assertThatThrownBy(() -> userService.create("alice", "alice@example.com", "p", "   ", UserOrigin.LOCAL))
                 // then.
                 .isInstanceOf(UserInvalidValueException.class);
         assertThat(userRepository.findAll()).isEmpty();
@@ -154,7 +153,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void delete_shouldRemoveUser() {
-        userService.create("alice", "alice@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "alice@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -172,8 +171,8 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void getAll_shouldReturnAllUsers() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
-        userService.create("bob", "b@example.com", "p", "ADMIN", Provider.OIDC);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
+        userService.create("bob", "b@example.com", "p", "ADMIN", UserOrigin.OIDC);
 
         // when.
         List<UserEntity> all = userService.getAll();
@@ -190,7 +189,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void getUserByUsername_shouldReturnMatchingUser() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
 
         // when.
         Optional<UserEntity> found = userService.getUserByUsername("alice");
@@ -199,7 +198,7 @@ abstract class DatabaseUserServiceTest {
         assertThat(found).isPresent();
         assertThat(found.get().username()).isEqualTo("alice");
         assertThat(found.get().email()).isEqualTo("a@example.com");
-        assertThat(found.get().provider()).isEqualTo(Provider.LOCAL);
+        assertThat(found.get().provider()).isEqualTo(UserOrigin.LOCAL);
     }
 
     @Test
@@ -210,7 +209,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void getUserById_shouldReturnMatchingUser() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -220,7 +219,7 @@ abstract class DatabaseUserServiceTest {
         assertThat(found).isPresent();
         assertThat(found.get().id()).isEqualTo(existing.id());
         assertThat(found.get().email()).isEqualTo("a@example.com");
-        assertThat(found.get().provider()).isEqualTo(Provider.LOCAL);
+        assertThat(found.get().provider()).isEqualTo(UserOrigin.LOCAL);
     }
 
     @Test
@@ -231,7 +230,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void updateLastLoginAt_shouldSetLastLoginAtToNow() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         Instant before = Instant.now();
 
         // when.
@@ -244,7 +243,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void updateUserPatch_shouldUpdateAllProvidedFields() {
-        userService.create("oldName", "old@example.com", "oldPass", "VIEWER", Provider.LOCAL);
+        userService.create("oldName", "old@example.com", "oldPass", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("oldName").orElseThrow();
 
         // when.
@@ -260,7 +259,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void updateUserPatch_shouldClearEmailAndKeepPasswordWhenArgsAreNull() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -277,7 +276,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void updateUserPatch_shouldHashNewPassword() {
-        userService.create("alice", "a@example.com", "oldPass", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "oldPass", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
@@ -295,16 +294,8 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void updateUserPatch_shouldThrowWhenUserIdNotFound() {
-        // when. / then.
-        assertThatThrownBy(
-                        () -> userService.updateUserPatch("non-existent-id", "anyName", null, null, Set.of("VIEWER")))
-                .isInstanceOf(UserWithIdNotFoundException.class);
-    }
-
-    @Test
     void updateUserPatch_shouldThrowWhenRoleIsNotAllowed() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -317,7 +308,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void updateUserPatch_shouldThrowWhenUsernameIsBlank() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -331,7 +322,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void updateUserPatch_shouldThrowWhenEmailIsBlank() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -344,7 +335,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void updateUserPatch_shouldThrowWhenPasswordIsBlank() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -358,7 +349,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void updateUserPatch_shouldThrowWhenRolesContainBlank() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when. / then.
@@ -372,7 +363,7 @@ abstract class DatabaseUserServiceTest {
 
     @Test
     void updateUserPatch_shouldReplaceRolesCompletely() {
-        userService.create("alice", "a@example.com", "p", "VIEWER", Provider.LOCAL);
+        userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.

@@ -34,7 +34,6 @@ public record UserCreateRequest(
 
     @Override
     public String toString() {
-        return "UserCreateRequest[username=" + username + ", email=" + email + ", password=[REDACTED], role=" + role
-                + ']';
+        return "UserCreateRequest[username=[REDACTED], email=[REDACTED], password=[REDACTED], role=" + role + ']';
     }
 }

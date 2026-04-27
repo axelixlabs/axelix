@@ -34,6 +34,7 @@ import static com.axelixlabs.axelix.common.auth.core.InternalAuthorities.SELF_RE
  */
 public final class DefaultRole implements Role {
 
+    // TODO A task was created to remove ALL_ROLE_NAMES https://github.com/axelixlabs/axelix/issues/971
     public static final Set<String> ALL_ROLE_NAMES;
     public static final Role SUPER_ADMIN;
     public static final Role ADMIN;

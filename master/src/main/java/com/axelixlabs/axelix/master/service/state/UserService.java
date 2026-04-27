@@ -25,10 +25,9 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
-import com.axelixlabs.axelix.master.exception.auth.UserWithIdNotFoundException;
-import com.axelixlabs.axelix.master.service.auth.Provider;
 
 /**
  * Service that manages the lifecycle of users persisted by the Users Management API.
@@ -48,11 +47,11 @@ public interface UserService {
      * @param password Plain-text password (hashed server-side before persistence), or {@code null} for accounts that
      *                 do not use password auth. Must not be blank.
      * @param role     Role name to assign to the new user. Must not be blank or {@code null}.
-     * @param provider Origin of the account (e.g. {@link Provider#OIDC} {@link Provider#LOCAL}).
+     * @param provider Origin of the account (e.g. {@link UserOrigin#OIDC} {@link UserOrigin#LOCAL}).
      * @throws UserRoleNotFoundException if the provided role does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
      */
-    void create(String username, @Nullable String email, @Nullable String password, String role, Provider provider);
+    void create(String username, @Nullable String email, @Nullable String password, String role, UserOrigin provider);
 
     /**
      * Deletes the user with the given identifier. No-op if the user does not exist.
@@ -108,11 +107,10 @@ public interface UserService {
      * @param password New plain-text password (hashed server-side), or {@code null} to keep the existing password.
      *                 Must not be blank when.
      * @param roles    New set of role names. Replaces any roles previously assigned. Each role must not be blank or {@code null}.
-     * @throws UserWithIdNotFoundException if no user with the given id exists.
      * @throws UserRoleNotFoundException if any of the provided role names does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
      */
     void updateUserPatch(
             String id, String username, @Nullable String email, @Nullable String password, Set<String> roles)
-            throws UserRoleNotFoundException, UserWithIdNotFoundException;
+            throws UserRoleNotFoundException, UserInvalidValueException;
 }

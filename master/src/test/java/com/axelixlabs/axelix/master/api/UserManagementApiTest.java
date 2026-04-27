@@ -38,8 +38,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.axelixlabs.axelix.master.ApplicationEntrypoint;
 import com.axelixlabs.axelix.master.api.external.endpoint.UserManagementApi;
 import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.repository.UserRepository;
-import com.axelixlabs.axelix.master.service.auth.Provider;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
 import com.axelixlabs.axelix.master.utils.auth.ProtectedEndpointTests;
 
@@ -98,8 +98,8 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnAllManagedUsers() {
-        UserEntity alice = insertUser("alice", "alice@example.com", "aliceSecret", Set.of("ADMIN"), Provider.LOCAL);
-        UserEntity bob = insertUser("bob", "bob@example.com", null, Set.of("VIEWER"), Provider.OIDC);
+        UserEntity alice = insertUser("alice", "alice@example.com", "aliceSecret", Set.of("ADMIN"), UserOrigin.LOCAL);
+        UserEntity bob = insertUser("bob", "bob@example.com", null, Set.of("VIEWER"), UserOrigin.OIDC);
 
         // language=json
         String expectedFeed = """
@@ -117,7 +117,7 @@ public class UserManagementApiTest {
                     "username": "bob",
                     "email": "bob@example.com",
                     "roles": ["VIEWER"],
-                    "provider": "OIDC",
+                    "provider": "OAUTH2/OIDC",
                     "lastLoginAt": null
                   }
                 ]
@@ -162,7 +162,7 @@ public class UserManagementApiTest {
         assertThat(saved.username()).isEqualTo("newUser");
         assertThat(saved.email()).isEqualTo("newUser@example.com");
         assertThat(saved.roles().values()).containsExactly("EDITOR");
-        assertThat(saved.provider()).isEqualTo(Provider.LOCAL);
+        assertThat(saved.provider()).isEqualTo(UserOrigin.LOCAL);
         assertThat(saved.lastLoginAt()).isNull();
         assertThat(saved.password()).isNotEqualTo("plainPassword"); // Hash password
         assertThat(passwordEncoder.matches("plainPassword", saved.password())).isTrue();
@@ -258,7 +258,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnBadRequest_WhenCreateRequestUsernameIsDuplicate() {
-        insertUser("existingUser", "existing@example.com", "p", Set.of("VIEWER"), Provider.LOCAL);
+        insertUser("existingUser", "existing@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
 
         // language=json
         String request = """
@@ -282,7 +282,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnBadRequest_WhenCreateRequestEmailIsDuplicate() {
-        insertUser("user_test", "user_test@example.com", "p", Set.of("VIEWER"), Provider.LOCAL);
+        insertUser("user_test", "user_test@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
 
         // language=json
         String request = """
@@ -306,7 +306,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldDeleteUser() {
-        UserEntity user = insertUser("toDelete", "d@example.com", "p", Set.of("VIEWER"), Provider.LOCAL);
+        UserEntity user = insertUser("toDelete", "d@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
 
         // language=json
         String request = """
@@ -327,7 +327,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldUpdateAllUserFields() {
-        UserEntity user = insertUser("oldName", "old@example.com", "oldPass", Set.of("VIEWER"), Provider.LOCAL);
+        UserEntity user = insertUser("oldName", "old@example.com", "oldPass", Set.of("VIEWER"), UserOrigin.LOCAL);
 
         // language=json
         String request = """
@@ -357,7 +357,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldClearEmailAndKeepPassword_WhenUpdateRequestContainsNullPassword() {
-        UserEntity user = insertUser("keep", "keep@example.com", "keepPass", Set.of("VIEWER"), Provider.LOCAL);
+        UserEntity user = insertUser("keep", "keep@example.com", "keepPass", Set.of("VIEWER"), UserOrigin.LOCAL);
 
         // language=json
         String request = """
@@ -387,7 +387,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnBadRequest_WhenUpdateRolesContainSuperAdmin() {
-        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), Provider.LOCAL);
+        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
 
         // language=json
         String request = """
@@ -411,7 +411,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnBadRequest_WhenUpdateRolesContainBlank() {
-        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), Provider.LOCAL);
+        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
 
         // language=json
         String request = """
@@ -433,7 +433,7 @@ public class UserManagementApiTest {
 
     @Test
     void shouldReturnBadRequest_WhenUpdateRolesContainUnknownRole() {
-        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), Provider.LOCAL);
+        UserEntity user = insertUser("u", "u@example.com", "p", Set.of("VIEWER"), UserOrigin.LOCAL);
 
         // language=json
         String request = """
@@ -443,26 +443,6 @@ public class UserManagementApiTest {
                   "roles": ["NOT_A_REAL_ROLE"]
                 }
                 """.formatted(user.id());
-
-        // when.
-        ResponseEntity<Void> response = restTemplate
-                .withRole(SUPER_ADMIN)
-                .exchange(USERS_UPDATE_PATH, HttpMethod.PUT, defaultEntity(request), Void.class);
-
-        // then.
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    void shouldReturnBadRequest_WhenUpdateUserIdNotFound() {
-        // language=json
-        String request = """
-                {
-                  "id": "does-not-exist",
-                  "username": "whatever",
-                  "roles": ["VIEWER"]
-                }
-                """;
 
         // when.
         ResponseEntity<Void> response = restTemplate
@@ -525,7 +505,7 @@ public class UserManagementApiTest {
     }
 
     private UserEntity insertUser(
-            String username, String email, String password, Set<String> roles, Provider provider) {
+            String username, String email, String password, Set<String> roles, UserOrigin provider) {
         UserEntity entity = new UserEntity(
                 UUID.randomUUID().toString(),
                 username,

@@ -42,10 +42,9 @@ import com.axelixlabs.axelix.master.api.external.request.user.UserDeleteRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserUpdateRequest;
 import com.axelixlabs.axelix.master.api.external.response.UserResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
 import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
-import com.axelixlabs.axelix.master.exception.auth.UserWithIdNotFoundException;
-import com.axelixlabs.axelix.master.service.auth.Provider;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
 /**
@@ -87,7 +86,8 @@ public class UserManagementApi {
     public ResponseEntity<Void> createUser(@RequestBody UserCreateRequest request) {
         try {
 
-            userService.create(request.username(), request.email(), request.password(), request.role(), Provider.LOCAL);
+            userService.create(
+                    request.username(), request.email(), request.password(), request.role(), UserOrigin.LOCAL);
             return ResponseEntity.status(HttpStatus.CREATED).build();
 
         } catch (UserInvalidValueException
@@ -118,7 +118,6 @@ public class UserManagementApi {
             return ResponseEntity.noContent().build();
 
         } catch (UserInvalidValueException
-                | UserWithIdNotFoundException
                 | UserRoleNotFoundException
                 | UncategorizedSQLException
                 | DataIntegrityViolationException e) {

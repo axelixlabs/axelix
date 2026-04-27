@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.auth.core.User;
 
 /**
- * SPI interface that is capable to load the {@link User} by his/her username.
+ * SPI interface that is capable to load the {@link User} by his/her username and password credentials.
  *
  * @since 16.07.25
  * @author Mikhail Polivakha

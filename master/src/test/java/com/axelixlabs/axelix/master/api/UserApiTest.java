@@ -43,8 +43,8 @@ import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.CookieProperties;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.JwtProperties;
 import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.domain.UserOrigin;
 import com.axelixlabs.axelix.master.repository.UserRepository;
-import com.axelixlabs.axelix.master.service.auth.Provider;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -136,7 +136,7 @@ class UserApiTest {
 
     @Test
     void login_shouldAuthenticateUserFromDatabase() {
-        userService.create("db-user", "db-user@example.com", "db-password", "VIEWER", Provider.LOCAL);
+        userService.create("db-user", "db-user@example.com", "db-password", "VIEWER", UserOrigin.LOCAL);
         UserEntity user = userRepository.findByUsername("db-user").orElseThrow();
 
         LoginRequest loginRequest = new LoginRequest("db-user", "db-password");
@@ -155,7 +155,7 @@ class UserApiTest {
 
     @Test
     void login_shouldAuthenticateStaticAdmin_WhenDatabaseUserHasSameUsername_ButStaticAdminPasswordMatches() {
-        userService.create("admin", "db-admin@example.com", "db-password", "VIEWER", Provider.LOCAL);
+        userService.create("admin", "db-admin@example.com", "db-password", "VIEWER", UserOrigin.LOCAL);
         UserEntity user = userRepository.findByUsername("admin").orElseThrow();
 
         LoginRequest loginRequest = new LoginRequest("admin", "admin");
@@ -175,7 +175,7 @@ class UserApiTest {
     @Test
     void
             login_shouldAuthenticateDatabaseUser_WhenDatabaseUserHasSameUsernameAsStaticAdmin_ButDatabasePasswordMatches() {
-        userService.create("admin", "db-admin@example.com", "db-password", "VIEWER", Provider.LOCAL);
+        userService.create("admin", "db-admin@example.com", "db-password", "VIEWER", UserOrigin.LOCAL);
         UserEntity user = userRepository.findByUsername("admin").orElseThrow();
 
         LoginRequest loginRequest = new LoginRequest("admin", "db-password");
@@ -194,7 +194,7 @@ class UserApiTest {
 
     @Test
     void login_shouldReturnUnauthorized_WhenStaticAdminAndDatabaseUserShareUsername_ButPasswordMatchesNeither() {
-        userService.create("admin", "db-admin@example.com", "db-password", "VIEWER", Provider.LOCAL);
+        userService.create("admin", "db-admin@example.com", "db-password", "VIEWER", UserOrigin.LOCAL);
         UserEntity user = userRepository.findByUsername("admin").orElseThrow();
 
         LoginRequest loginRequest = new LoginRequest("admin", "wrong-password");

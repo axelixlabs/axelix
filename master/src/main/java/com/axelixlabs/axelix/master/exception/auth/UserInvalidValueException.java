@@ -19,9 +19,13 @@ package com.axelixlabs.axelix.master.exception.auth;
 
 import org.jspecify.annotations.Nullable;
 
+import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.service.state.UserService;
+
 /**
- * Thrown in case one of the provided user field values is invalid.
+ * Thrown if one of the provided values is invalid for writing to {@link UserEntity}.
  *
+ * @see UserService
  * @author Sergey Cherkasov
  */
 public class UserInvalidValueException extends RuntimeException {
