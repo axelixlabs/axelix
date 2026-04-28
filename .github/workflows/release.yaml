@@ -21,6 +21,7 @@ jobs:
   build-and-test-backend:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         java: [ 17, 21, 25 ]
@@ -47,6 +48,7 @@ jobs:
         run: ./gradlew clean build
 
   release-backend-artifacts:
+    needs: [build-and-test-backend]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -92,6 +94,7 @@ jobs:
         run: docker logout ${{ env.GITHUB_CONTAINER_REGISTRY }}
 
   release-frontend-artifacts:
+    needs: [ build-and-test-backend, release-backend-artifacts ]
     runs-on: ubuntu-latest
     env:
       # Vite Config
