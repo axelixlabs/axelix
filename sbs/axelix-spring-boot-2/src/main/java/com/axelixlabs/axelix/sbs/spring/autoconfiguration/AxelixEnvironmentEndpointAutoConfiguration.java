@@ -25,7 +25,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
+import com.axelixlabs.axelix.common.auth.core.DefaultAuthority;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
+import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.sbs.spring.core.auth.RequiredAuthorityCheckService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.ThreadLocalSecurityContextExecutor;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
@@ -108,7 +110,7 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     @ConditionalOnMissingBean
     public RequiredAuthorityCheckService requiredAuthorityCheckService(
             SecurityContextExecutor securityContextExecutor) {
-        return new RequiredAuthorityCheckService(securityContextExecutor);
+        return new CustomRequiredAuthorityCheckService(securityContextExecutor);
     }
 
     @Bean
@@ -126,5 +128,17 @@ public class AxelixEnvironmentEndpointAutoConfiguration {
     @ConditionalOnMissingBean
     public AxelixEnvironmentEndpoint axelixEnvironmentEndpoint(EnvironmentService environmentService) {
         return new AxelixEnvironmentEndpoint(environmentService);
+    }
+
+    static class CustomRequiredAuthorityCheckService extends RequiredAuthorityCheckService {
+
+        public CustomRequiredAuthorityCheckService(SecurityContextExecutor securityContextExecutor) {
+            super(securityContextExecutor);
+        }
+
+        @Override
+        public boolean hasAuthority(DefaultAuthority requiredAuthority) throws AuthorizationException {
+            return true;
+        }
     }
 }

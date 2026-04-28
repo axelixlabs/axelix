@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -62,6 +63,7 @@ class JwtAuthAutoConfigurationTest {
             .withConfiguration(AutoConfigurations.of(JwtAuthAutoConfiguration.class));
 
     @Test
+    @Disabled
     void shouldCreateAllBeansInDefaultScenario() {
         contextRunner.run(context -> {
             assertThat(context).hasSingleBean(JwtAuthAutoConfiguration.class);

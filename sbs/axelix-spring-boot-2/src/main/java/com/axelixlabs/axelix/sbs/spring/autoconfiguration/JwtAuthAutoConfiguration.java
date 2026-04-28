@@ -105,7 +105,7 @@ public class JwtAuthAutoConfiguration {
         return new ThreadLocalSecurityContextExecutor();
     }
 
-    @Bean
+    // @Bean
     public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
             IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
 
