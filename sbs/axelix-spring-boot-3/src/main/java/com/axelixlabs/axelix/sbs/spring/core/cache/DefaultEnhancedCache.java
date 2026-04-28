@@ -111,14 +111,14 @@ public class DefaultEnhancedCache implements EnhancedCache {
         T value = null;
 
         if (enabled.get()) {
-            AtomicBoolean miss = new AtomicBoolean();
+            boolean[] miss = {false};
 
             value = delegate.get(key, () -> {
-                miss.set(true);
+                miss[0] = true;
                 return valueLoader.call();
             });
 
-            cacheLookupHistory.put(miss.get() ? CacheLookup.miss() : CacheLookup.hit());
+            cacheLookupHistory.put(miss[0] ? CacheLookup.miss() : CacheLookup.hit());
         }
 
         return value;
