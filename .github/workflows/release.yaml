@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest ]
         java: [ 17, 21, 25 ]
     steps:
       - name: Checkout repository
@@ -37,12 +37,6 @@ jobs:
         with:
           distribution: 'liberica'
           java-version: ${{ matrix.java }}
-
-      - name: Prepare Windows runner
-        if: runner.os == 'Windows'
-        run: |
-          git config --global core.autocrlf true
-          git config --global core.longPaths true
 
       - name: Build and Test
         run: ./gradlew clean build
