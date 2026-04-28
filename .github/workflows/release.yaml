@@ -18,6 +18,34 @@ env:
   PGP_SIGNING_KEY_PASSPHRASE: ${{ secrets.PGP_SIGNING_KEY_PASSPHRASE }}
 
 jobs:
+  build-and-test-backend:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        java: [ 11, 17, 21, 25 ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'liberica'
+          java-version: ${{ matrix.java }}
+
+      - name: Prepare Windows runner
+        if: runner.os == 'Windows'
+        run: |
+          git config --global core.autocrlf true
+          git config --global core.longPaths true
+
+      - name: Build and Test
+        run: ./gradlew clean build
+
   release-backend-artifacts:
     runs-on: ubuntu-latest
     permissions:
