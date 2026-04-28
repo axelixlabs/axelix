@@ -52,7 +52,7 @@ export const UniversalModal = ({
     onClose,
     okText,
     loading,
-    displayCancel = true,
+    displayCancel = true
 }: PropsWithChildren<IProps>) => {
     const { t } = useTranslation();
 
@@ -77,6 +77,9 @@ export const UniversalModal = ({
                           }
                         : {}
                 }
+                mask={{
+                    blur: true,
+                }}
             >
                 {children}
             </Modal>

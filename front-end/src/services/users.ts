@@ -15,17 +15,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./scheduledTasks";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./dashboard";
-export * from "./wallboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./caches";
-export * from "./beans";
-export * from "./users";
-export * from "./auth";
-export * from "./gc";
+import {apiFetch} from "api";
+import type {ICreateUserRequestData, IEditUserRequestData} from "models";
+
+export const getUsers = () => {
+    return apiFetch.get("users-management/feed");
+};
+
+export const createUser = (data: ICreateUserRequestData) => {
+    return apiFetch.post("users-management/create", data);
+};
+
+export const deleteUser = (userId: string) => {
+    return apiFetch.delete(`users-management/delete`, {
+        data: {
+            id: userId,
+        },
+    });
+};
+
+export const editUser = (data: IEditUserRequestData) => {
+    return apiFetch.put(`users-management/update`, data)
+}
+

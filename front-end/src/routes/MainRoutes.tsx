@@ -20,12 +20,14 @@ import { Navigate, Route, Routes } from "react-router";
 
 import Loadable from "components";
 import { MainLayout } from "layout";
+import {UsersSiderMenu} from "layout/MainLayout/Siders";
 
 const GarbageCollector = Loadable(lazy(() => import("pages/GarbageCollector")));
 const ScheduledTasks = Loadable(lazy(() => import("pages/ScheduledTasks")));
 const Transactional = Loadable(lazy(() => import("pages/Transactional")));
 const Environment = Loadable(lazy(() => import("pages/Environment")));
 const ConfigProps = Loadable(lazy(() => import("pages/ConfigProps")));
+const UserProfile = Loadable(lazy(() => import("pages/UserProfile")));
 const Conditions = Loadable(lazy(() => import("pages/Conditions")));
 const ThreadDump = Loadable(lazy(() => import("pages/ThreadDump")));
 const Wallboard = Loadable(lazy(() => import("pages/Wallboard")));
@@ -35,6 +37,7 @@ const Details = Loadable(lazy(() => import("pages/Details")));
 const Metrics = Loadable(lazy(() => import("pages/Metrics")));
 const Caches = Loadable(lazy(() => import("pages/Caches")));
 const Beans = Loadable(lazy(() => import("pages/Beans")));
+const Users = Loadable(lazy(() => import("pages/Users")));
 const MCP = Loadable(lazy(() => import("pages/MCP")));
 
 export const MainRoutes = () => {
@@ -47,6 +50,11 @@ export const MainRoutes = () => {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/mcp-server" element={<MCP />} />
                     <Route path="*" element={<Navigate to="/wallboard" replace />} />
+                </Route>
+
+                <Route path="/" element={<MainLayout siderContent={<UsersSiderMenu />} />}>
+                    <Route path="/users" element={<Users />} />
+                    <Route path="/users/:username" element={<UserProfile />} />
                 </Route>
 
                 <Route element={<MainLayout />}>

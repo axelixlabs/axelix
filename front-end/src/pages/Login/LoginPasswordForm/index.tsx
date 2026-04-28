@@ -58,21 +58,21 @@ export const LoginPasswordForm = () => {
             <Form layout="vertical" onFinish={authenticate} autoComplete="off">
                 <Form.Item
                     key="username"
-                    label={t("Authentication.loginPasswordForm.username")}
+                    label={t("username")}
                     name="username"
                     required={false}
                     rules={[{ required: true, message: t("Authentication.loginPasswordForm.enterUsername") }]}
                 >
-                    <Input className={styles.LoginInput} />
+                    <Input />
                 </Form.Item>
                 <Form.Item
                     key="password"
-                    label={t("Authentication.loginPasswordForm.password")}
+                    label={t("password")}
                     name="password"
                     required={false}
                     rules={[{ required: true, message: t("Authentication.loginPasswordForm.enterPassword") }]}
                 >
-                    <Input.Password className={styles.LoginInput} />
+                    <Input.Password />
                 </Form.Item>
                 {loginData.error === EIgnoredErrors.INVALID_CREDENTIALS && (
                     <Alert

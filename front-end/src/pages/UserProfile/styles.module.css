@@ -1,0 +1,15 @@
+.BackwardWrapper {
+    display: inline-flex;
+    align-items: center;
+    column-gap: 8px;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.BackwardWrapper:hover {
+    color: var(--axelix-primary-green);
+}
+
+.FirstSectionUsername {
+    margin-block: 10px 30px;
+}

@@ -13,6 +13,8 @@
     "value": "Значение",
     "blog": "Блог",
     "unknownError": "Неизвестная ошибка. Попробуйте обновить страницу.",
+    "username": "Имя пользователя",
+    "password": "Пароль",
     "Details": {
         "downloadState": "Выгрузить состояние",
         "exportConfigurationOptions": "Список компонентов состояния для экспорта",
@@ -76,6 +78,8 @@
     "Header": {
         "dashboard": "Дашборд",
         "wallboard": "Панель",
+        "mcpServer": "Сервер MCP",
+        "users": "Пользователи",
         "Help": {
             "title": "Помощь",
             "about": "О программе",
@@ -114,9 +118,7 @@
         "welcome": "Добро пожаловать",
         "logout": "Выйти",
         "loginPasswordForm" : {
-            "username": "Имя пользователя",
             "enterUsername": "Введите имя пользователя",
-            "password": "Пароль",
             "enterPassword": "Введите пароль",
             "loginButtonText": "Войти"
         },
@@ -280,5 +282,29 @@
         "previewDuration": "Продолжительность: {{durationMs}} мс",
         "ms": "мс",
         "noQueries": "Нет запросов"
+    },
+    "Users": {
+        "lastLogin": "Последний вход",
+        "provider": "Провайдер",
+        "providers": "Провайдеры",
+        "role": "Роль",
+        "roles": "Роли",
+        "back": "Назад",
+        "userInformation": "Информация о пользователе",
+        "selectRoles": "Выберите роли",
+        "deleteUser": "Удалить пользователя",
+        "deleteModalDescription": "Вы уверены, что хотите удалить этого пользователя?",
+        "accessLog": "Журнал доступа",
+        "createUser": "Создать пользователя",
+        "userCreated": "Пользователь успешно создан",
+      "userEdited": "Данные пользователя успешно обновлены",
+      "userDeleted": "Пользователь успешно удалён",
+      "userNotFound": "Пользователь не найден",
+      "ValidationErrors": {
+            "username": "Пожалуйста, введите имя пользователя!",
+            "emailFormat": "Неверный формат email!",
+            "password": "Пожалуйста, введите пароль!",
+            "roles": "Пожалуйста, выберите роли!"
+        }
     }
 }

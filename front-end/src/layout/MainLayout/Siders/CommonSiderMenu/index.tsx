@@ -24,7 +24,7 @@ import { getItems } from "utils";
 
 import styles from "./styles.module.css";
 
-export const SiderMenu = () => {
+export const CommonSiderMenu = () => {
     const { t } = useTranslation();
 
     const { pathname } = useLocation();

@@ -1,0 +1,16 @@
+.Table {
+    box-shadow: var(--axelix-box-shadow-light);
+}
+
+.TableHeader,
+.TableRow {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.TableHeader:hover {
+    background-color: var(--axelix-primary-light-green);
+}
+
+.TableRow:hover {
+    color: currentcolor;
+}
