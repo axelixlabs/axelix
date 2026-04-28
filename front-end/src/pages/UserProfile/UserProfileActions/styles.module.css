@@ -1,0 +1,14 @@
+.MainWrapper {
+    display: flex;
+    column-gap: 8px;
+}
+
+/* TODO: Fix this in future */
+.DeleteUser {
+    background-color: #ff4d54;
+}
+
+/* TODO: Fix this in future */
+.DeleteUser:hover {
+    background-color: var(--axelix-primary-red) !important;
+}

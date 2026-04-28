@@ -1,0 +1,8 @@
+.Table {
+    box-shadow: var(--axelix-box-shadow-light);
+    width: min(800px, 100%);
+}
+
+.Label {
+    margin-left: 8px;
+}

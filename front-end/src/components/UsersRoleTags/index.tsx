@@ -15,17 +15,27 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-export * from "./scheduledTasks";
-export * from "./threadDump";
-export * from "./siderMenu";
-export * from "./dashboard";
-export * from "./wallboard";
-export * from "./loggers";
-export * from "./details";
-export * from "./metrics";
-export * from "./globals";
-export * from "./caches";
-export * from "./beans";
-export * from "./users";
-export * from "./auth";
-export * from "./gc";
+import { Tag } from "antd";
+
+import { ERoles } from "models";
+
+import styles from "./styles.module.css";
+
+interface IProps {
+    /**
+     * The roles granted to this user
+     */
+    roles: ERoles[];
+}
+
+export const UserRoleTags = ({ roles }: IProps) => {
+    return (
+        <div>
+            {roles.map((role) => (
+                <Tag variant="outlined" color="blue" key={role} className={styles.Tag}>
+                    {role}
+                </Tag>
+            ))}
+        </div>
+    );
+};

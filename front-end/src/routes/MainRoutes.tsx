@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+import { UsersSiderMenu } from "layout/MainLayout/Siders";
 import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router";
 
@@ -27,6 +28,7 @@ const ScheduledTasks = Loadable(lazy(() => import("pages/ScheduledTasks")));
 const Transactional = Loadable(lazy(() => import("pages/Transactional")));
 const Environment = Loadable(lazy(() => import("pages/Environment")));
 const ConfigProps = Loadable(lazy(() => import("pages/ConfigProps")));
+const UserProfile = Loadable(lazy(() => import("pages/UserProfile")));
 const Conditions = Loadable(lazy(() => import("pages/Conditions")));
 const ThreadDump = Loadable(lazy(() => import("pages/ThreadDump")));
 const Wallboard = Loadable(lazy(() => import("pages/Wallboard")));
@@ -36,6 +38,7 @@ const Details = Loadable(lazy(() => import("pages/Details")));
 const Metrics = Loadable(lazy(() => import("pages/Metrics")));
 const Caches = Loadable(lazy(() => import("pages/Caches")));
 const Beans = Loadable(lazy(() => import("pages/Beans")));
+const Users = Loadable(lazy(() => import("pages/Users")));
 const MCP = Loadable(lazy(() => import("pages/MCP")));
 
 export const MainRoutes = () => {
@@ -50,6 +53,11 @@ export const MainRoutes = () => {
                     <Route path="/dashboard" element={<Dashboard />} />
                     {settings.isMcpServerEnabled && <Route path="/mcp-server" element={<MCP />} />}
                     <Route path="*" element={<Navigate to="/wallboard" replace />} />
+                </Route>
+
+                <Route path="/" element={<MainLayout siderContent={<UsersSiderMenu />} />}>
+                    <Route path="/users" element={<Users />} />
+                    <Route path="/users/profile" element={<UserProfile />} />
                 </Route>
 
                 <Route element={<MainLayout />}>

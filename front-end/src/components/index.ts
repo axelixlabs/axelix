@@ -21,6 +21,7 @@ export { LinearProgress } from "./LinearProgress";
 export { UniversalModal } from "./UniversalModal";
 export { AccessProvider } from "./AccessProvider";
 export { HashNavigable } from "./HashNavigable";
+export { UserRoleTags } from "./UsersRoleTags";
 export { EmptyHandler } from "./EmptyHandler";
 export { InfoTooltip } from "./InfoTooltip";
 export { PageSearch } from "./PageSearch";

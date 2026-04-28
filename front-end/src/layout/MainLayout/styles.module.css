@@ -18,10 +18,6 @@
     padding-block: 10px; 
 }
 
-.HideSider {
-    display: none;
-}
-
 .Content {
     padding: 24px;
     background-color: var(--axelix-primary-white);
