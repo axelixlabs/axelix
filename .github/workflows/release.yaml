@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-        java: [ 11, 17, 21, 25 ]
+        java: [ 17, 21, 25 ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
