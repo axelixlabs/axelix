@@ -35,7 +35,7 @@ const UserProfile = () => {
     const navigate = useNavigate();
     const { message } = App.useApp();
 
-    const [user, setUser] = useState<IUser>(state?.user);
+    const [user, setUser] = useState<IUser | undefined>(state?.user);
 
     useEffect(() => {
         if (!user) {

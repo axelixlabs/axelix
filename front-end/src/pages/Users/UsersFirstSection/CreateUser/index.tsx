@@ -22,7 +22,13 @@ import {useTranslation} from "react-i18next";
 
 import {UniversalModal} from "components";
 import {extractErrorCode} from "helpers";
-import {ERoles, type ICreateUserRequestData, type IErrorResponse, StatelessRequest} from "models";
+import {
+    ERoles,
+    type ICreateUserFormFields,
+    type ICreateUserRequestData,
+    type IErrorResponse,
+    StatelessRequest
+} from "models";
 import {createUser} from "services";
 
 interface IProps {
@@ -38,7 +44,7 @@ export const CreateUser = ({fetchUsers}: IProps) => {
 
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [requestData, setRequestData] = useState(StatelessRequest.inactive());
-    const [form] = Form.useForm<ICreateUserRequestData>();
+    const [form] = Form.useForm<ICreateUserFormFields>();
 
     const rolesOptions = Object.values(ERoles).map((value) => ({
         label: value,
@@ -46,28 +52,33 @@ export const CreateUser = ({fetchUsers}: IProps) => {
     }))
 
     const handleSubmit = async (): Promise<void> => {
-        let values: ICreateUserRequestData;
+        let data: ICreateUserFormFields;
 
         try {
-            values = await form.validateFields();
+            data = await form.validateFields();
         } catch {
             return;
         }
 
+        const convertedData: ICreateUserRequestData = {
+            username: data.username,
+            email: data.email || null,
+            password: data.password,
+            role: data.role,
+        }
+
         setRequestData(StatelessRequest.loading());
 
-        createUser(values)
+        createUser(convertedData)
             .then(() => {
                 setRequestData(StatelessRequest.success());
                 message.success(t("Users.userCreated"));
-                fetchUsers()
+                setModalOpen(false);
+                form.resetFields();
+                fetchUsers();
             })
             .catch((error: AxiosError<IErrorResponse>) => {
                 setRequestData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
-            })
-            .finally(() => {
-                setModalOpen(false);
-                form.resetFields();
             })
     };
 

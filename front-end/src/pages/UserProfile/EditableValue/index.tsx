@@ -21,16 +21,17 @@ import {App, Button, Input, Form} from "antd";
 import {type Dispatch, type SetStateAction, useState} from "react";
 
 import styles from "./styles.module.css";
-import type {IUser, UserProfileEditableValueField} from "models";
+import {type IEditableUser, type IUser, StatelessRequest, type UserProfileEditableValueField} from "models";
 import {editUser} from "services";
 import {useTranslation} from "react-i18next";
 import {userProfileInputTypeMap} from "utils";
+import {emptyStringToNull, extractErrorCode} from "helpers";
 
 interface IProps {
     /**
      * The user data
      */
-    user: IUser;
+    user: IEditableUser;
 
     /**
      * Field that determines which user field is being changed
@@ -40,7 +41,7 @@ interface IProps {
     /**
      * The setter of user data
      */
-    setUser: Dispatch<SetStateAction<IUser>>
+    setUser: Dispatch<SetStateAction<IUser | undefined>>
 }
 
 export const EditableValue = ({user, field, setUser}: IProps) => {
@@ -48,40 +49,42 @@ export const EditableValue = ({user, field, setUser}: IProps) => {
     const {t} = useTranslation();
 
     const isPasswordField = field === "password";
-    const initialValue = !isPasswordField ? user[field] : "";
+    const initialValue = user[field];
     const {id, email, username, roles, provider, lastLoginAt} = user
 
     const [editingValue, setEditingValue] = useState<boolean>(false);
     const [actualValue, setActualValue] = useState<string>(initialValue);
+    const [requestData, setRequestData] = useState(StatelessRequest.inactive());
 
     const handleConfirm = (): void => {
+        setRequestData(StatelessRequest.loading());
+
         editUser({
             id: id,
-            email: email,
+            email: emptyStringToNull(email),
             username: username,
             roles: roles,
-            password: null,
-            [field]: actualValue
+            password: isPasswordField ? actualValue : null,
+            [field]: emptyStringToNull(actualValue)
         })
             .then(() => {
-                message.success(t("Users.userEdited"))
+                setRequestData(StatelessRequest.success());
+                message.success(t("Users.userEdited"));
+                setEditingValue(false);
                 if (!isPasswordField) {
                     setUser({
                         id: id,
                         username: username,
                         provider: provider,
                         lastLoginAt: lastLoginAt,
-                        email: email,
+                        email: emptyStringToNull(email),
                         roles: roles,
-                        [field]: actualValue
+                        [field]: emptyStringToNull(actualValue)
                     });
                 }
             })
-            .catch(() => {
-                setActualValue(initialValue)
-            })
-            .finally(() => {
-                setEditingValue(false);
+            .catch((error) => {
+                setRequestData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
             })
     };
 
@@ -138,6 +141,7 @@ export const EditableValue = ({user, field, setUser}: IProps) => {
                 icon={<CheckOutlined/>}
                 type="primary"
                 htmlType="submit"
+                loading={requestData.loading}
                 className={styles.ActionButton}
             />
         </Form>

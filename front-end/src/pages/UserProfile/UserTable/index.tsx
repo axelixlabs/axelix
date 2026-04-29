@@ -17,7 +17,7 @@
  */
 import {useTranslation} from "react-i18next";
 
-import type {IUser} from "models";
+import type {IEditableUser, IUser} from "models";
 
 import {EditableValue} from "../EditableValue";
 import {RolesSelect} from "../RolesSelect";
@@ -26,6 +26,7 @@ import styles from "./styles.module.css";
 
 import {EmailIcon, LockOutlinedIcon, ProfileIcon, ShieldIcon} from "assets";
 import type {Dispatch, SetStateAction} from "react";
+import {nullToEmptyString} from "helpers";
 
 interface IProps {
     /**
@@ -36,12 +37,17 @@ interface IProps {
     /**
      * The setter of user data
      */
-    setUser: Dispatch<SetStateAction<IUser>>;
+    setUser: Dispatch<SetStateAction<IUser | undefined>>;
 }
 
 
 export const UserTable = ({user, setUser}: IProps) => {
     const {t} = useTranslation();
+    const editableUser: IEditableUser = {
+        ...user,
+        email: nullToEmptyString(user.email),
+        password: ""
+    };
 
     return (
         <div className={`CustomizedTable ${styles.Table}`}>
@@ -53,7 +59,7 @@ export const UserTable = ({user, setUser}: IProps) => {
                     <ProfileIcon/> <span className={styles.Label}>{t("username")}</span>
                 </div>
                 <div className="RowChunk">
-                    <EditableValue user={user} field="username" setUser={setUser}/>
+                    <EditableValue user={editableUser} field="username" setUser={setUser}/>
                 </div>
             </div>
             <div className="TableRow">
@@ -61,7 +67,7 @@ export const UserTable = ({user, setUser}: IProps) => {
                     <EmailIcon/> <span className={styles.Label}>Email</span>
                 </div>
                 <div className="RowChunk">
-                    <EditableValue user={user} field="email" setUser={setUser}/>
+                    <EditableValue user={editableUser} field="email" setUser={setUser}/>
                 </div>
             </div>
             <div className="TableRow">
@@ -69,7 +75,7 @@ export const UserTable = ({user, setUser}: IProps) => {
                     <ShieldIcon/> <span className={styles.Label}>{t("Users.roles")}</span>
                 </div>
                 <div className="RowChunk">
-                    <RolesSelect user={user} setUser={setUser} />
+                    <RolesSelect user={editableUser} setUser={setUser} />
                 </div>
             </div>
 
@@ -78,7 +84,7 @@ export const UserTable = ({user, setUser}: IProps) => {
                     <LockOutlinedIcon/> <span className={styles.Label}>{t("password")}</span>
                 </div>
                 <div className="RowChunk">
-                    <EditableValue user={user} field="password" setUser={setUser}/>
+                    <EditableValue user={editableUser} field="password" setUser={setUser}/>
                 </div>
             </div>
         </div>

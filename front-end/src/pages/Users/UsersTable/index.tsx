@@ -49,13 +49,15 @@ export const UsersTable = ({ users }: IProps) => {
                     {users.map((user) => {
                         const { id, username, email, roles, lastLoginAt, provider } = user;
                         const parsedRoles = roles.join(", ");
-                        const formattedDate = dayjs(lastLoginAt).format("DD.MM.YYYY HH:mm");
+                        const formattedLastLogin = lastLoginAt
+                            ? dayjs(lastLoginAt).format("DD.MM.YYYY HH:mm")
+                            : "Not loggined yet";
 
                         return (
                             <Link to={id} state={{ user }} className={`TableRow ${styles.TableRow}`} key={id}>
                                 <div className="RowChunk">{username}</div>
                                 <div className="RowChunk">{email}</div>
-                                <div className="RowChunk">{formattedDate}</div>
+                                <div className="RowChunk">{formattedLastLogin}</div>
                                 <div className="RowChunk">{provider}</div>
                                 <div className="RowChunk">{parsedRoles}</div>
                             </Link>

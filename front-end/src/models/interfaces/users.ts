@@ -26,12 +26,12 @@ export interface IUser {
     /**
      * Email address of the user, which may be null
      */
-    email: string;
+    email: string | null;
 
     /**
      * Last login data of the most recent successful login. null if the user has never logged in
      */
-    lastLoginAt: string;
+    lastLoginAt: string | null
 
     /**
      * Origin of the user account
@@ -49,16 +49,16 @@ export interface IUser {
     username: string;
 }
 
-export interface ICreateUserRequestData {
+export interface ICreateUserFormFields {
     /**
      * Login name of the user
      */
     username: string;
 
     /**
-     * Email address of the user, which may be null
+     * Email address of the user
      */
-    email: string;
+    email: string | undefined;
 
     /**
      * Password of the user
@@ -68,7 +68,14 @@ export interface ICreateUserRequestData {
     /**
      * The roles granted to this user
      */
-    roles: ERoles[];
+    role: ERoles;
+}
+
+export interface ICreateUserRequestData extends Omit<ICreateUserFormFields, 'email'> {
+    /**
+     * Email address of the user, which may be null
+     */
+    email: string | null;
 }
 
 export interface IEditUserRequestData {
@@ -85,7 +92,7 @@ export interface IEditUserRequestData {
     /**
      * Email address of the user, which may be null
      */
-    email: string;
+    email: string | null;
 
     /**
      * Password of the user
@@ -108,4 +115,9 @@ export interface IUsersFilters {
      * Origins of users account
      */
     providers: EProvider[];
+}
+
+export interface IEditableUser extends Omit<IUser, "email"> {
+    email: string;
+    password: string;
 }

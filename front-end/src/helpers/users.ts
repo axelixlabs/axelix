@@ -38,10 +38,23 @@ export const filterUsers = (users: IUser[], search: string, filters: IUsersFilte
         }
 
         const lowerUsername = username.toLowerCase();
-        const lowerEmail = email.toLowerCase();
+        const lowerEmail = (email ?? "").toLowerCase();
+
         const matchesUsername = lowerUsername.includes(formattedSearch);
         const matchesEmail = lowerEmail.includes(formattedSearch);
 
         return matchesUsername || matchesEmail;
     });
+};
+
+export const nullToEmptyString = (value: string | null): string => {
+    return value ?? "";
+}
+
+export const emptyStringToNull = (value: string): string | null => {
+    if(value === "") {
+        return null;
+    }
+
+    return value
 };

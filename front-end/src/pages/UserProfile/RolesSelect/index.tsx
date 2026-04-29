@@ -21,66 +21,78 @@ import {App, Button, Form, Select, Tag} from "antd";
 import {type Dispatch, type SetStateAction, useState} from "react";
 import {useTranslation} from "react-i18next";
 
-import {ERoles, type IUser} from "models";
+import {ERoles, type IEditableUser, type IUser, StatelessRequest} from "models";
 
 import styles from "./styles.module.css";
 import {editUser} from "services";
+import {emptyStringToNull, extractErrorCode} from "../../../helpers";
 
 interface IProps {
     /**
      * The user data
      */
-    user: IUser;
+    user: IEditableUser;
 
     /**
      * The setter of user data
      */
-    setUser: Dispatch<SetStateAction<IUser>>;
+    setUser: Dispatch<SetStateAction<IUser | undefined>>;
 }
 
 export const RolesSelect = ({user, setUser}: IProps) => {
     const {t} = useTranslation();
     const {message} = App.useApp();
-    const {id, email, username, roles: initialRoles, provider, lastLoginAt} = user
+    const {
+        id,
+        email,
+        username,
+        roles: initialRoles,
+        provider,
+        lastLoginAt
+    } = user
 
     const [editingValue, setEditingValue] = useState<boolean>(false);
     const [actualRoles, setActualRoles] = useState<ERoles[]>(initialRoles);
+    const [requestData, setRequestData] = useState(StatelessRequest.inactive());
 
     const roleOptions = Object.values(ERoles).map((role) => ({
         value: role
     }))
 
     const handleConfirm = (): void => {
+        setRequestData(StatelessRequest.loading());
+
         editUser({
             id: id,
-            email: email,
+            email: emptyStringToNull(email),
             username: username,
             roles: actualRoles,
             password: null,
         })
             .then(() => {
-                message.success(t("Users.userEdited"))
+                setRequestData(StatelessRequest.success());
+                message.success(t("Users.userEdited"));
+                setEditingValue(false);
                 setUser({
                     id: id,
                     username: username,
                     provider: provider,
                     lastLoginAt: lastLoginAt,
-                    email: email,
+                    email: emptyStringToNull(email),
                     roles: actualRoles,
                 });
             })
-            .finally(() => {
-                setEditingValue(false);
+            .catch((error) => {
+                setRequestData(StatelessRequest.error(extractErrorCode(error?.response?.data)));
             })
     };
-
 
     if (!editingValue) {
         return (
             <div className={styles.PreviewWrapper}>
                 <div>
                     {actualRoles.map((role) => (
-                        <Tag variant="outlined" color="blue" className={styles.Tag}>
+                        <Tag variant="outlined" color="blue" key={role} className={styles.Tag}>
                             {role}
                         </Tag>
                     ))}
@@ -123,6 +135,7 @@ export const RolesSelect = ({user, setUser}: IProps) => {
                 icon={<CheckOutlined/>}
                 type="primary"
                 htmlType="submit"
+                loading={requestData.loading}
                 className={styles.ActionButton}
             />
         </Form>
