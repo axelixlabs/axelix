@@ -63,39 +63,38 @@ public class DatabaseUserService implements UserService {
     }
 
     @Override
-    public void create(
-            String username, @Nullable String email, @Nullable String password, String role, UserOrigin provider)
+    public void create(String username, @Nullable String email, String password, String role, UserOrigin userOrigin)
             throws UserRoleNotFoundException, UserInvalidValueException {
 
         UserEntity userEntity = new UserEntity(
                 UUID.randomUUID().toString(),
                 requireNonBlankTrimmed(username),
                 email == null ? null : requireNonBlankTrimmed(email),
-                password == null ? null : passwordEncoder.encode(requireNonBlankTrimmed(password)),
+                passwordEncoder.encode(requireNonBlankTrimmed(password)),
                 new UserEntity.Roles(Set.of(validateAndNormalizeRole(role))),
-                provider,
+                userOrigin,
                 null);
 
         jdbcAggregateTemplate.insert(userEntity);
     }
 
     @Override
-    public void delete(String id) {
+    public void deleteById(String id) {
         userRepository.deleteById(id);
     }
 
     @Override
-    public List<UserEntity> getAll() {
+    public List<UserEntity> findAll() {
         return userRepository.findAll();
     }
 
     @Override
-    public Optional<UserEntity> getUserByUsername(String username) {
+    public Optional<UserEntity> findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
     @Override
-    public Optional<UserEntity> getUserById(String id) {
+    public Optional<UserEntity> findUserById(String id) {
         return userRepository.findById(id);
     }
 
@@ -118,12 +117,6 @@ public class DatabaseUserService implements UserService {
                     requireNonBlankTrimmed(username),
                     email == null ? null : requireNonBlankTrimmed(email),
                     passwordEncoder.encode(requireNonBlankTrimmed(password)),
-                    new UserEntity.Roles(validRoles));
-        } else {
-            userRepository.updateUserPatchWithoutPassword(
-                    id,
-                    requireNonBlankTrimmed(username),
-                    email == null ? null : requireNonBlankTrimmed(email),
                     new UserEntity.Roles(validRoles));
         }
     }

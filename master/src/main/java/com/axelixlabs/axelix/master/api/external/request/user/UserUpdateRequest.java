@@ -28,7 +28,7 @@ import org.jspecify.annotations.Nullable;
  * @param username New username. Must be unique when provided.
  * @param email    New email address. Must be unique when provided.
  * @param roles    New set of role names.
- * @param password Plain-text new password. Hashed server-side before persistence.
+ * @param password Plain-text new password, or null, if it should not be changed.
  *
  * @author Sergey Cherkasov
  */
@@ -41,7 +41,7 @@ public record UserUpdateRequest(
 
     @Override
     public String toString() {
-        return "UserUpdateRequest[id=" + id + ", username=[REDACTED], email=[REDACTED], roles=" + roles
-                + ", password=[REDACTED]" + ']';
+        return "UserUpdateRequest[id=%s, username=[REDACTED], email=[REDACTED], roles=%s, password=[REDACTED]]"
+                .formatted(id, roles);
     }
 }

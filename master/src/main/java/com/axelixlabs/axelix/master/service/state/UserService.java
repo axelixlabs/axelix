@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.master.domain.UserEntity;
@@ -32,40 +33,42 @@ import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 /**
  * Service that manages the lifecycle of users persisted by the Users Management API.
  *
- * <p>Passwords supplied to this service are plain-text and are hashed by the implementation before persistence.
- * Usernames and emails are expected to be unique.
+ * <p>Passwords supplied to this service are plain-text and <strong>MUST</strong> be hashed by the
+ * implementation before persistence. Usernames and emails are expected to be unique.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
+@NullMarked
 public interface UserService {
 
     /**
      * Creates a new managed user from a Users Management API request.
      *
-     * @param username Login username of the new user. Must be unique and not blank or {@code null}.
-     * @param email    Email address of the new user, or {@code null} if not provided. Must be unique and not blank.
-     * @param password Plain-text password (hashed server-side before persistence), or {@code null} for accounts that
-     *                 do not use password auth. Must not be blank.
-     * @param role     Role name to assign to the new user. Must not be blank or {@code null}.
-     * @param provider Origin of the account (e.g. {@link UserOrigin#OIDC} {@link UserOrigin#LOCAL}).
+     * @param username   Login username of the new user. Must be unique.
+     * @param email      Email address of the new user, or {@code null} if not provided. If supplied, must be unique.
+     * @param password   Plain-text password (must be hashed server-side before persistence).
+     * @param role       Role name to assign to the new user. Must not be blank or {@code null}.
+     * @param userOrigin Origin of the account (e.g. {@link UserOrigin#OIDC} or {@link UserOrigin#LOCAL}).
+     *
      * @throws UserRoleNotFoundException if the provided role does not exist in the service.
      * @throws UserInvalidValueException if any of the provided string fields is blank.
      */
-    void create(String username, @Nullable String email, @Nullable String password, String role, UserOrigin provider);
+    void create(String username, @Nullable String email, String password, String role, UserOrigin userOrigin);
 
     /**
      * Deletes the user with the given identifier. No-op if the user does not exist.
      *
      * @param id Unique identifier of the user to delete.
      */
-    void delete(String id);
+    void deleteById(String id);
 
     /**
      * Returns all managed users.
      *
      * @return All persisted {@link UserEntity} records, or an empty list if none exist.
      */
-    List<UserEntity> getAll();
+    List<UserEntity> findAll();
 
     /**
      * Looks up a user by login username.
@@ -73,7 +76,7 @@ public interface UserService {
      * @param username Login username to search for.
      * @return The matching user, or {@link Optional#empty()} if no user with that username exists.
      */
-    Optional<UserEntity> getUserByUsername(String username);
+    Optional<UserEntity> findUserByUsername(String username);
 
     /**
      * Looks up a user by unique identifier.
@@ -81,7 +84,7 @@ public interface UserService {
      * @param id Unique identifier of the user.
      * @return The matching user, or {@link Optional#empty()} if no user with that id exists.
      */
-    Optional<UserEntity> getUserById(String id);
+    Optional<UserEntity> findUserById(String id);
 
     /**
      * Sets the user's {@code lastLoginAt} timestamp to {@link Instant#now()}.

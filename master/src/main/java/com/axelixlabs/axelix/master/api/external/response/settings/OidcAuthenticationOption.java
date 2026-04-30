@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.axelixlabs.axelix.common.utils.Lazy;
 
 /**
- * Authentication settings for OAuth2/OIDC provider.
+ * Authentication settings for OAuth2/OIDC userOrigin.
  *
  * @since 06.03.2026
  * @author Nikita Kirillov

@@ -33,7 +33,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @param email        Email address of the user, which may be {@code null}.
  * @param password     Hash of the user's password, which may be {@code null}.
  * @param roles        Names of the roles granted to this user (e.g. {@code ADMIN}, {@code EDITOR}, {@code VIEWER}).
- * @param provider     Origin of the user account (e.g. {@code OAUTH2/OIDC} provider username, or {@code LOCAL}).
+ * @param userOrigin   Origin of the user account.
  * @param lastLoginAt  Timestamp of the most recent successful login. {@code null} until the user logs in for the first time.
  *
  * @author Sergey Cherkasov
@@ -45,7 +45,7 @@ public record UserEntity(
         @Nullable String email,
         @Nullable String password,
         Roles roles,
-        UserOrigin provider,
+        UserOrigin userOrigin,
         @Nullable Instant lastLoginAt) {
 
     public record Roles(Set<String> values) {
@@ -57,7 +57,7 @@ public record UserEntity(
     @Override
     public String toString() {
         return "User[id=" + id + ", username=[REDACTED], email=[REDACTED]"
-                + ", password=[REDACTED], roles=" + roles + ", provider=" + provider
+                + ", password=[REDACTED], roles=" + roles + ", userOrigin=" + userOrigin
                 + ", lastLoginAt=" + lastLoginAt + ']';
     }
 }

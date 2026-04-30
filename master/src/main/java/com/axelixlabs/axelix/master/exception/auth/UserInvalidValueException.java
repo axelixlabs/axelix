@@ -29,11 +29,8 @@ import com.axelixlabs.axelix.master.service.state.UserService;
  * @author Sergey Cherkasov
  */
 public class UserInvalidValueException extends RuntimeException {
+
     public UserInvalidValueException(@Nullable String value) {
         super("Invalid user field value: %s".formatted(value));
-    }
-
-    public UserInvalidValueException(final String value, final Throwable cause) {
-        super(value, cause);
     }
 }

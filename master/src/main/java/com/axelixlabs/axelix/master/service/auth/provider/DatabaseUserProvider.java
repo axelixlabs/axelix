@@ -52,7 +52,7 @@ public class DatabaseUserProvider implements UserProvider {
     @Override
     public @Nullable User load(String username, String password) {
 
-        UserEntity user = userService.getUserByUsername(username).orElse(null);
+        UserEntity user = userService.findUserByUsername(username).orElse(null);
 
         if (user != null && user.password() != null && passwordEncoder.matches(password, user.password())) {
             userService.updateLastLoginAt(user.username());

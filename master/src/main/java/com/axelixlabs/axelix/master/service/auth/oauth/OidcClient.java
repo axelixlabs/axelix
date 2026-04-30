@@ -37,7 +37,7 @@ public interface OidcClient {
      * Exchanges an authorization code for an ID Token using the
      * Authorization Code Flow as defined in RFC 6749 Section 4.1.3.
      *
-     * @param code the authorization code received from the OIDC provider
+     * @param code the authorization code received from the OIDC userOrigin
      * @return the Tokens object containing id token and access token
      * @throws OidcTokenExchangeException if the exchange fails or the response is invalid
      */
@@ -64,9 +64,9 @@ public interface OidcClient {
             throws ExpiredJwtTokenException, InvalidJwtTokenException, JwtProcessingException;
 
     /**
-     * Verifies the given OAuth2 access token by calling the OIDC provider's userinfo_endpoint.
+     * Verifies the given OAuth2 access token by calling the OIDC userOrigin's userinfo_endpoint.
      *
-     * <p><b>Note:</b> This method requires the provider to support the userinfo_endpoint,
+     * <p><b>Note:</b> This method requires the userOrigin to support the userinfo_endpoint,
      * which is RECOMMENDED but not mandatory in OpenID Connect Discovery 1.0.
      * If the endpoint is not available, a {@link OidcTokenExchangeException} will be thrown.</p>
      *

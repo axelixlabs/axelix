@@ -29,7 +29,7 @@
       <column name="roles" type="TEXT">
         <constraints nullable="false"/>
       </column>
-      <column name="provider" type="TEXT">
+      <column name="user_origin" type="TEXT">
         <constraints nullable="false"/>
       </column>
       <column name="last_login_at" type="TIMESTAMP WITH TIME ZONE">

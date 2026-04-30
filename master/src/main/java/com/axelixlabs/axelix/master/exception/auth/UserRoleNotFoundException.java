@@ -32,8 +32,4 @@ public class UserRoleNotFoundException extends RuntimeException {
     public UserRoleNotFoundException(@Nullable String role) {
         super("Role '%s' is not allowed".formatted(role));
     }
-
-    public UserRoleNotFoundException(final String role, final Throwable cause) {
-        super(role, cause);
-    }
 }

@@ -43,19 +43,19 @@ public interface UserRepository extends ListCrudRepository<UserEntity, String> {
     void updateLastLoginAt(@Param("username") String username, @Param("lastLoginAt") Instant lastLoginAt);
 
     @Modifying
-    @Query("UPDATE users SET username = :username, email = :email, password = :password, roles = :roles WHERE id = :id")
+    @Query("""
+        UPDATE users
+        SET
+                username = :username,
+                email = :email,
+                password = COALESCE(:password, password),
+                roles = :roles
+        WHERE id = :id
+        """)
     void updateUserPatch(
             @Param("id") String id,
             @Param("username") String username,
             @Param("email") @Nullable String email,
             @Param("password") @Nullable String password,
-            @Param("roles") UserEntity.Roles roles);
-
-    @Modifying
-    @Query("UPDATE users SET username = :username, email = :email, roles = :roles WHERE id = :id")
-    void updateUserPatchWithoutPassword(
-            @Param("id") String id,
-            @Param("username") String username,
-            @Param("email") @Nullable String email,
             @Param("roles") UserEntity.Roles roles);
 }

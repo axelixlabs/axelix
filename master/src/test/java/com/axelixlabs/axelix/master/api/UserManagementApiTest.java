@@ -109,7 +109,7 @@ public class UserManagementApiTest {
                     "username": "alice",
                     "email": "alice@example.com",
                     "roles": ["ADMIN"],
-                    "provider": "LOCAL",
+                    "userOrigin": "LOCAL",
                     "lastLoginAt": null
                   },
                   {
@@ -117,7 +117,7 @@ public class UserManagementApiTest {
                     "username": "bob",
                     "email": "bob@example.com",
                     "roles": ["VIEWER"],
-                    "provider": "OAUTH2/OIDC",
+                    "userOrigin": "OAUTH2/OIDC",
                     "lastLoginAt": null
                   }
                 ]
@@ -162,7 +162,7 @@ public class UserManagementApiTest {
         assertThat(saved.username()).isEqualTo("newUser");
         assertThat(saved.email()).isEqualTo("newUser@example.com");
         assertThat(saved.roles().values()).containsExactly("EDITOR");
-        assertThat(saved.provider()).isEqualTo(UserOrigin.LOCAL);
+        assertThat(saved.userOrigin()).isEqualTo(UserOrigin.LOCAL);
         assertThat(saved.lastLoginAt()).isNull();
         assertThat(saved.password()).isNotEqualTo("plainPassword"); // Hash password
         assertThat(passwordEncoder.matches("plainPassword", saved.password())).isTrue();
@@ -356,7 +356,7 @@ public class UserManagementApiTest {
     }
 
     @Test
-    void shouldClearEmailAndKeepPassword_WhenUpdateRequestContainsNullPassword() {
+    void shouldKeepUserUnchanged_WhenUpdateRequestContainsNullPassword() {
         UserEntity user = insertUser("keep", "keep@example.com", "keepPass", Set.of("VIEWER"), UserOrigin.LOCAL);
 
         // language=json
@@ -379,8 +379,8 @@ public class UserManagementApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         UserEntity updated = userRepository.findById(user.id()).orElseThrow();
-        assertThat(updated.username()).isEqualTo("renamed");
-        assertThat(updated.email()).isNull();
+        assertThat(updated.username()).isEqualTo("keep");
+        assertThat(updated.email()).isEqualTo("keep@example.com");
         assertThat(updated.roles().values()).isEqualTo(user.roles().values());
         assertThat(updated.password()).isEqualTo(user.password());
     }

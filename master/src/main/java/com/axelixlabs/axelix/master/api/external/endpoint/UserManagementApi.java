@@ -75,7 +75,7 @@ public class UserManagementApi {
     @GetMapping(path = ApiPaths.UsersManagementApi.USERS_FEED)
     public ResponseEntity<List<UserResponse>> getUsersFeed() {
         List<UserResponse> users =
-                userService.getAll().stream().map(UserResponse::from).toList();
+                userService.findAll().stream().map(UserResponse::from).toList();
 
         return ResponseEntity.ok(users);
     }
@@ -103,7 +103,7 @@ public class UserManagementApi {
     @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DELETE)
     public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteRequest request) {
 
-        userService.delete(request.id());
+        userService.deleteById(request.id());
         return ResponseEntity.noContent().build();
     }
 

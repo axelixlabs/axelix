@@ -196,11 +196,11 @@ public class DefaultOidcClient implements OidcClient {
         }
 
         if (!(response.get("id_token") instanceof String idToken)) {
-            throw new OidcTokenExchangeException("Invalid or missing id_token in response from OIDC provider");
+            throw new OidcTokenExchangeException("Invalid or missing id_token in response from OIDC userOrigin");
         }
 
         if (!(response.get("access_token") instanceof String accessToken)) {
-            throw new OidcTokenExchangeException("Invalid or missing access_token in response from OIDC provider");
+            throw new OidcTokenExchangeException("Invalid or missing access_token in response from OIDC userOrigin");
         }
 
         return new Tokens(idToken, accessToken);
@@ -222,7 +222,7 @@ public class DefaultOidcClient implements OidcClient {
     }
 
     /**
-     * Fetches and constructs a public key from the OIDC provider's JWKS endpoint
+     * Fetches and constructs a public key from the OIDC userOrigin's JWKS endpoint
      * that corresponds to the given key ID.
      * <p>
      * The key is located by matching the provided {@code kid} against the keys

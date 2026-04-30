@@ -18,7 +18,7 @@
 package com.axelixlabs.axelix.master.exception.auth;
 
 /**
- * Exception thrown when the OIDC provider metadata cannot be retrieved
+ * Exception thrown when the OIDC userOrigin metadata cannot be retrieved
  * from the discovery endpoint ({@code /.well-known/openid-configuration}).
  *
  * @since 04.03.2026

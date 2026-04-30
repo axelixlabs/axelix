@@ -79,22 +79,22 @@ abstract class DatabaseUserServiceTest {
         assertThat(saved.username()).isEqualTo("alice");
         assertThat(saved.email()).isEqualTo("alice@example.com");
         assertThat(saved.roles().values()).containsExactly("ADMIN");
-        assertThat(saved.provider()).isEqualTo(UserOrigin.LOCAL);
+        assertThat(saved.userOrigin()).isEqualTo(UserOrigin.LOCAL);
         assertThat(saved.password()).isNotEqualTo("plainPass"); // Hash password
         assertThat(passwordEncoder.matches("plainPass", saved.password())).isTrue();
         assertThat(saved.lastLoginAt()).isNull();
     }
 
     @Test
-    void create_shouldAllowNullEmailAndPassword() {
+    void create_shouldAllowNullEmail() {
         // when.
-        userService.create("bob", null, null, "VIEWER", UserOrigin.OIDC);
+        userService.create("bob", null, "plainPass", "VIEWER", UserOrigin.OIDC);
 
         // then.
         UserEntity saved = userRepository.findByUsername("bob").orElseThrow();
         assertThat(saved.email()).isNull();
-        assertThat(saved.password()).isNull();
-        assertThat(saved.provider()).isEqualTo(UserOrigin.OIDC);
+        assertThat(passwordEncoder.matches("plainPass", saved.password())).isTrue();
+        assertThat(saved.userOrigin()).isEqualTo(UserOrigin.OIDC);
     }
 
     @Test
@@ -152,80 +152,80 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void delete_shouldRemoveUser() {
+    void deleteAllById_shouldRemoveUser() {
         userService.create("alice", "alice@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
-        userService.delete(existing.id());
+        userService.deleteById(existing.id());
 
         // then.
         assertThat(userRepository.findById(existing.id())).isEmpty();
     }
 
     @Test
-    void delete_shouldBeNoOpWhenUserDoesNotExist() {
+    void deleteAllById_shouldBeNoOpWhenUserDoesNotExist() {
         // when.
-        assertThatCode(() -> userService.delete("non-existent-id")).doesNotThrowAnyException();
+        assertThatCode(() -> userService.deleteById("non-existent-id")).doesNotThrowAnyException();
     }
 
     @Test
-    void getAll_shouldReturnAllUsers() {
+    void findAll_shouldReturnAllUsers() {
         userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         userService.create("bob", "b@example.com", "p", "ADMIN", UserOrigin.OIDC);
 
         // when.
-        List<UserEntity> all = userService.getAll();
+        List<UserEntity> all = userService.findAll();
 
         // then.
         assertThat(all).extracting(UserEntity::username).containsExactlyInAnyOrder("alice", "bob");
     }
 
     @Test
-    void getAll_shouldReturnEmptyListWhenNoUsers() {
+    void findAll_shouldReturnEmptyListWhenNoUsers() {
         // when. / then.
-        assertThat(userService.getAll()).isEmpty();
+        assertThat(userService.findAll()).isEmpty();
     }
 
     @Test
-    void getUserByUsername_shouldReturnMatchingUser() {
+    void findUserByUsername_shouldReturnMatchingUser() {
         userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
 
         // when.
-        Optional<UserEntity> found = userService.getUserByUsername("alice");
+        Optional<UserEntity> found = userService.findUserByUsername("alice");
 
         // then.
         assertThat(found).isPresent();
         assertThat(found.get().username()).isEqualTo("alice");
         assertThat(found.get().email()).isEqualTo("a@example.com");
-        assertThat(found.get().provider()).isEqualTo(UserOrigin.LOCAL);
+        assertThat(found.get().userOrigin()).isEqualTo(UserOrigin.LOCAL);
     }
 
     @Test
-    void getUserByUsername_shouldReturnEmptyWhenNotFound() {
+    void findUserByUsername_shouldReturnEmptyWhenNotFound() {
         // when. / then.
-        assertThat(userService.getUserByUsername("ghost")).isEmpty();
+        assertThat(userService.findUserByUsername("ghost")).isEmpty();
     }
 
     @Test
-    void getUserById_shouldReturnMatchingUser() {
+    void findUserById_shouldReturnMatchingUser() {
         userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
-        Optional<UserEntity> found = userService.getUserById(existing.id());
+        Optional<UserEntity> found = userService.findUserById(existing.id());
 
         // then.
         assertThat(found).isPresent();
         assertThat(found.get().id()).isEqualTo(existing.id());
         assertThat(found.get().email()).isEqualTo("a@example.com");
-        assertThat(found.get().provider()).isEqualTo(UserOrigin.LOCAL);
+        assertThat(found.get().userOrigin()).isEqualTo(UserOrigin.LOCAL);
     }
 
     @Test
-    void getUserById_shouldReturnEmptyWhenNotFound() {
+    void findUserById_shouldReturnEmptyWhenNotFound() {
         // when. / then.
-        assertThat(userService.getUserById("non-existent-id")).isEmpty();
+        assertThat(userService.findUserById("non-existent-id")).isEmpty();
     }
 
     @Test
@@ -258,7 +258,7 @@ abstract class DatabaseUserServiceTest {
     }
 
     @Test
-    void updateUserPatch_shouldClearEmailAndKeepPasswordWhenArgsAreNull() {
+    void updateUserPatch_shouldKeepExistingValuesWhenPasswordIsNull() {
         userService.create("alice", "a@example.com", "p", "VIEWER", UserOrigin.LOCAL);
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
@@ -268,8 +268,8 @@ abstract class DatabaseUserServiceTest {
 
         // then.
         UserEntity updated = userRepository.findById(existing.id()).orElseThrow();
-        assertThat(updated.username()).isEqualTo("renamed");
-        assertThat(updated.email()).isNull();
+        assertThat(updated.username()).isEqualTo("alice");
+        assertThat(updated.email()).isEqualTo("a@example.com");
         assertThat(updated.roles().values()).isEqualTo(existing.roles().values());
         assertThat(updated.password()).isEqualTo(existing.password());
     }
@@ -367,10 +367,11 @@ abstract class DatabaseUserServiceTest {
         UserEntity existing = userRepository.findByUsername("alice").orElseThrow();
 
         // when.
-        userService.updateUserPatch(existing.id(), existing.username(), null, null, Set.of("ADMIN"));
+        userService.updateUserPatch(existing.id(), existing.username(), existing.email(), "newPass", Set.of("ADMIN"));
 
         // then.
         UserEntity updated = userRepository.findById(existing.id()).orElseThrow();
         assertThat(updated.roles().values()).containsExactly("ADMIN");
+        assertThat(passwordEncoder.matches("newPass", updated.password())).isTrue();
     }
 }

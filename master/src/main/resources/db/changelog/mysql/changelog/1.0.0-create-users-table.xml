@@ -29,7 +29,7 @@
       <column name="roles" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="provider" type="VARCHAR(255)">
+      <column name="user_origin" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
       <column name="last_login_at" type="DATETIME">
