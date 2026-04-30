@@ -18,6 +18,7 @@
 package com.axelixlabs.axelix.master.service.auth.oauth;
 
 import com.axelixlabs.axelix.common.auth.core.Role;
+import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 
 /**
  * The component that is capable to extract the role that belongs to current user based on the pair of {@link Tokens}.
@@ -31,6 +32,8 @@ public interface OidcRoleExtractor {
      *
      * @param tokens the pair of tokens.
      * @return the role that is extracted. Never {@code null}.
+     * @throws OidcTokenExchangeException if the role cannot be extracted from neither
+     *                                    the ID token nor the UserInfo endpoint
      */
-    Role extractRole(Tokens tokens);
+    Role extractRole(Tokens tokens) throws OidcTokenExchangeException;
 }
