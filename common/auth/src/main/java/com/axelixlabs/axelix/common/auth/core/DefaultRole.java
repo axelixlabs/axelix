@@ -34,6 +34,8 @@ import static com.axelixlabs.axelix.common.auth.core.InternalAuthorities.SELF_RE
  */
 public final class DefaultRole implements Role {
 
+    // TODO A task was created to remove ALL_ROLE_NAMES https://github.com/axelixlabs/axelix/issues/971
+    public static final Set<String> ALL_ROLE_NAMES;
     public static final Role SUPER_ADMIN;
     public static final Role ADMIN;
     public static final Role EDITOR;
@@ -65,6 +67,8 @@ public final class DefaultRole implements Role {
                 "SUPER_ADMIN", Arrays.stream(DefaultAuthority.values()).collect(Collectors.toUnmodifiableSet()));
 
         MANAGED_SERVICE = new DefaultRole("MANAGED_SERVICE", Set.of(SELF_REGISTER_AUTHORITY));
+
+        ALL_ROLE_NAMES = Set.of(VIEWER.getName(), ADMIN.getName(), EDITOR.getName());
     }
 
     private final String name;

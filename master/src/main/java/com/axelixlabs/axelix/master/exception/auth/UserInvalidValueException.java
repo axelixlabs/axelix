@@ -15,26 +15,22 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.request.user;
+package com.axelixlabs.axelix.master.exception.auth;
 
 import org.jspecify.annotations.Nullable;
 
-/**
- * Request payload to create a new managed user via the Users Management API.
- *
- * @param username   Login name of the user to create.
- * @param email      The user email address, which may be {@code null}.
- * @param password   Plain-text password.
- * @param role       Name of the role to grant to the user.
- *
- * @author Sergey Cherkasov
- * @author Mikhail Polivakha
- */
-public record UserCreateRequest(String username, @Nullable String email, String password, String role) {
+import com.axelixlabs.axelix.master.domain.UserEntity;
+import com.axelixlabs.axelix.master.service.state.UserService;
 
-    @Override
-    public String toString() {
-        return "UserCreateRequest[username=[%s], email=[REDACTED], password=[REDACTED], role=%s]"
-                .formatted(username, role);
+/**
+ * Thrown if one of the provided values is invalid for writing to {@link UserEntity}.
+ *
+ * @see UserService
+ * @author Sergey Cherkasov
+ */
+public class UserInvalidValueException extends RuntimeException {
+
+    public UserInvalidValueException(@Nullable String value) {
+        super("Invalid user field value: %s".formatted(value));
     }
 }

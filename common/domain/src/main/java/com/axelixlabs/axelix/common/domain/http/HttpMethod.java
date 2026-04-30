@@ -25,6 +25,7 @@ package com.axelixlabs.axelix.common.domain.http;
 public enum HttpMethod {
     GET,
     POST,
-    DELETE,
-    PATCH
+    PUT,
+    PATCH,
+    DELETE
 }

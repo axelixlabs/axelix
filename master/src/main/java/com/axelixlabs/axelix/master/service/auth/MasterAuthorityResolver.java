@@ -36,6 +36,7 @@ import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
  * Implementation of {@link AuthorityResolver} that is supposed to handle master endpoints.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public class MasterAuthorityResolver implements AuthorityResolver {
 
@@ -49,7 +50,7 @@ public class MasterAuthorityResolver implements AuthorityResolver {
         // Users -> USERS_MANAGEMENT
         put(ApiPaths.UsersManagementApi.USERS_CREATE, HttpMethod.POST, DefaultAuthority.USERS_MANAGEMENT);
         put(ApiPaths.UsersManagementApi.USERS_DELETE, HttpMethod.DELETE, DefaultAuthority.USERS_MANAGEMENT);
-        put(ApiPaths.UsersManagementApi.USERS_UPDATE, HttpMethod.PATCH, DefaultAuthority.USERS_MANAGEMENT);
+        put(ApiPaths.UsersManagementApi.USERS_UPDATE, HttpMethod.PUT, DefaultAuthority.USERS_MANAGEMENT);
 
         // Users -> USERS_VIEW
         put(ApiPaths.UsersManagementApi.USERS_FEED, HttpMethod.GET, DefaultAuthority.USERS_VIEW);

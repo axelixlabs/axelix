@@ -15,26 +15,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.request.user;
+package com.axelixlabs.axelix.master.service.state.users;
 
-import org.jspecify.annotations.Nullable;
+import com.axelixlabs.axelix.master.service.state.DatabaseUserService;
 
 /**
- * Request payload to create a new managed user via the Users Management API.
+ * SQLite integration tests for {@link DatabaseUserService}.
  *
- * @param username   Login name of the user to create.
- * @param email      The user email address, which may be {@code null}.
- * @param password   Plain-text password.
- * @param role       Name of the role to grant to the user.
- *
+ * @see DatabaseUserService
  * @author Sergey Cherkasov
- * @author Mikhail Polivakha
  */
-public record UserCreateRequest(String username, @Nullable String email, String password, String role) {
-
-    @Override
-    public String toString() {
-        return "UserCreateRequest[username=[%s], email=[REDACTED], password=[REDACTED], role=%s]"
-                .formatted(username, role);
-    }
-}
+class SqliteDatabaseUserServiceTest extends DatabaseUserServiceTest {}

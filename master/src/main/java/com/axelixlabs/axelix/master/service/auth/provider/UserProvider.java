@@ -17,14 +17,16 @@
  */
 package com.axelixlabs.axelix.master.service.auth.provider;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 
 /**
- * SPI interface that is capable to load the {@link User} by his/her username.
+ * SPI interface that is capable to load the {@link User} by his/her username and password credentials.
  *
  * @since 16.07.25
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 public interface UserProvider {
 
@@ -32,8 +34,9 @@ public interface UserProvider {
      * Load user by username.
      *
      * @param username by which the user will be loaded.
+     * @param password the user's password.
      * @return the loaded {@link User}.
-     * @throws UserNotFoundException in case the user is not found.
      */
-    User load(String username) throws UserNotFoundException;
+    @Nullable
+    User load(String username, String password);
 }

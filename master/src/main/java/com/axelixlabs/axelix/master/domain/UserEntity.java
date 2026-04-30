@@ -30,10 +30,10 @@ import org.springframework.data.relational.core.mapping.Table;
  *
  * @param id           Unique identifier of the user (UUID generated in the service). Serves as the primary key.
  * @param username     Login name of the user.
- * @param email        Email address of the user.
- * @param password     Hash of the user's password.
+ * @param email        Email address of the user, which may be {@code null}.
+ * @param password     Hash of the user's password, which may be {@code null}.
  * @param roles        Names of the roles granted to this user (e.g. {@code ADMIN}, {@code EDITOR}, {@code VIEWER}).
- * @param provider     Origin of the user account (e.g. OIDC/OAuth2 provider name, or {@code LOCAL} for login/password).
+ * @param userOrigin   Origin of the user account.
  * @param lastLoginAt  Timestamp of the most recent successful login. {@code null} until the user logs in for the first time.
  *
  * @author Sergey Cherkasov
@@ -44,19 +44,20 @@ public record UserEntity(
         String username,
         @Nullable String email,
         @Nullable String password,
-        Set<String> roles,
-        String provider,
+        Roles roles,
+        UserOrigin userOrigin,
         @Nullable Instant lastLoginAt) {
 
-    public UserEntity withLastLoginAt(Instant lastLoginAt) {
-        return new UserEntity(
-                this.id, this.username, this.email, this.password, this.roles, this.provider, lastLoginAt);
+    public record Roles(Set<String> values) {
+        public Roles {
+            values = Set.copyOf(values);
+        }
     }
 
     @Override
     public String toString() {
-        return "User[id=" + id + ", username=" + username + ", email=" + email
-                + ", password=[REDACTED], roles=" + roles + ", provider=" + provider
+        return "User[id=" + id + ", username=[REDACTED], email=[REDACTED]"
+                + ", password=[REDACTED], roles=" + roles + ", userOrigin=" + userOrigin
                 + ", lastLoginAt=" + lastLoginAt + ']';
     }
 }

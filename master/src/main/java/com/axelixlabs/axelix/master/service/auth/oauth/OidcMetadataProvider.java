@@ -75,7 +75,7 @@ public class OidcMetadataProvider {
             return userInfoEndpoint;
         }
 
-        throw new OidcMetadataUnavailableException("OIDC provider at " + issuerUri
+        throw new OidcMetadataUnavailableException("OIDC userOrigin at " + issuerUri
                 + " does not provide a userinfo_endpoint. This endpoint is required for our authentication flow.");
     }
 
@@ -126,7 +126,7 @@ public class OidcMetadataProvider {
 
         if (userInfoEndpoint == null) {
             log.warn(
-                    "OIDC provider at {} does not provide a userinfo_endpoint. "
+                    "OIDC userOrigin at {} does not provide a userinfo_endpoint. "
                             + "MCP server OAuth2 authentication via userinfo_endpoint will not be available.",
                     issuerUri);
         }
@@ -146,9 +146,9 @@ public class OidcMetadataProvider {
     }
 
     /**
-     * DTO holds the resolved endpoints from the OIDC provider's discovery document.
+     * DTO holds the resolved endpoints from the OIDC userOrigin's discovery document.
      *
-     * @param jwksUri               URL of the OIDC provider's JWK Set, used to fetch public keys for token verification
+     * @param jwksUri               URL of the OIDC userOrigin's JWK Set, used to fetch public keys for token verification
      * @param tokenEndpoint         URL of the token endpoint, used to exchange the authorization code for an ID Token
      * @param authorizationEndpoint URL of the authorization endpoint, used to initiate the OAuth2 login flow.
      * @param userInfoEndpoint      URL of the userinfo_endpoint, used to obtain claims about the authenticated user.

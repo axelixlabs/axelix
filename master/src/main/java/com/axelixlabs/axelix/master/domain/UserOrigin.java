@@ -15,26 +15,34 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.api.external.request.user;
-
-import org.jspecify.annotations.Nullable;
+package com.axelixlabs.axelix.master.domain;
 
 /**
- * Request payload to create a new managed user via the Users Management API.
- *
- * @param username   Login name of the user to create.
- * @param email      The user email address, which may be {@code null}.
- * @param password   Plain-text password.
- * @param role       Name of the role to grant to the user.
+ * Origin of a managed user account.
  *
  * @author Sergey Cherkasov
- * @author Mikhail Polivakha
  */
-public record UserCreateRequest(String username, @Nullable String email, String password, String role) {
+public enum UserOrigin {
+    /**
+     * Account originated from an external OIDC/OAuth2 identity origin.
+     */
+    OIDC("OAUTH2/OIDC"),
 
-    @Override
-    public String toString() {
-        return "UserCreateRequest[username=[%s], email=[REDACTED], password=[REDACTED], role=%s]"
-                .formatted(username, role);
+    /**
+     * Account created and managed locally within Axelix (e.g. via the Users Management API).
+     */
+    LOCAL("LOCAL");
+
+    /**
+     * Human-readable label of this origin, suitable for display in the UI.
+     */
+    private final String displayName;
+
+    UserOrigin(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 }

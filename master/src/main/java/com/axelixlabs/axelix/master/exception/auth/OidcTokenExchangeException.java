@@ -20,7 +20,7 @@ package com.axelixlabs.axelix.master.exception.auth;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 
 /**
- * Exception thrown when the authorization code exchange with the OIDC provider fails.
+ * Exception thrown when the authorization code exchange with the OIDC userOrigin fails.
  *
  * @since 04.03.2026
  * @author Nikita Kirillov

@@ -17,23 +17,19 @@
  */
 package com.axelixlabs.axelix.master.exception.auth;
 
-import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
+import org.jspecify.annotations.Nullable;
+
+import com.axelixlabs.axelix.common.auth.core.Role;
 
 /**
- * Thrown in case the {@link User} is not found by {@link UserProvider}.
+ * Thrown if the role name is not found in the Axelix system {@link Role}.
  *
- * @see UserProvider
- * @since 16.07.25
- * @author Mikhail Polivakha
+ * @see Role
+ * @author Sergey Cherkasov
  */
-public class UserNotFoundException extends AuthenticationException {
+public class UserRoleNotFoundException extends RuntimeException {
 
-    public UserNotFoundException(final String username) {
-        super("User with username '%s' is not found".formatted(username));
-    }
-
-    public UserNotFoundException(final String message, final Throwable cause) {
-        super(message, cause);
+    public UserRoleNotFoundException(@Nullable String role) {
+        super("Role '%s' is not allowed".formatted(role));
     }
 }

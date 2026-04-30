@@ -20,11 +20,13 @@ package com.axelixlabs.axelix.master.service.auth.provider;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.common.utils.Assert;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.StaticAdminCredentialsProperties;
-import com.axelixlabs.axelix.master.exception.auth.UserNotFoundException;
 
 /**
  * {@link UserProvider} that authenticates a given user by the static pair of the username/password.
@@ -36,18 +38,22 @@ public class StaticAdminUserProvider implements UserProvider {
     private final StaticAdminCredentialsProperties staticCredentialsConfig;
 
     public StaticAdminUserProvider(StaticAdminCredentialsProperties staticCredentialsConfig) {
+        Assert.notNull(staticCredentialsConfig.getUsername(), "username is required when static-admin is enabled");
+        Assert.notNull(staticCredentialsConfig.getPassword(), "password is required when static-admin is enabled");
         this.staticCredentialsConfig = staticCredentialsConfig;
     }
 
     @Override
-    public User load(String username) throws UserNotFoundException {
-        if (Objects.equals(staticCredentialsConfig.getUsername(), username)) {
+    public @Nullable User load(String username, String password) {
+
+        if (Objects.equals(staticCredentialsConfig.getUsername(), username)
+                && Objects.equals(staticCredentialsConfig.getPassword(), password)) {
             return new DefaultUser(
                     staticCredentialsConfig.getUsername(),
                     staticCredentialsConfig.getPassword(),
                     Set.of(DefaultRole.SUPER_ADMIN));
-        } else {
-            throw new UserNotFoundException(username);
         }
+
+        return null;
     }
 }

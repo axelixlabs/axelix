@@ -17,9 +17,7 @@
  */
 package com.axelixlabs.axelix.master.api.external.endpoint;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,12 +25,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
@@ -42,6 +42,10 @@ import com.axelixlabs.axelix.master.api.external.request.user.UserDeleteRequest;
 import com.axelixlabs.axelix.master.api.external.request.user.UserUpdateRequest;
 import com.axelixlabs.axelix.master.api.external.response.UserResponse;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
+import com.axelixlabs.axelix.master.domain.UserOrigin;
+import com.axelixlabs.axelix.master.exception.auth.UserInvalidValueException;
+import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
+import com.axelixlabs.axelix.master.service.state.UserService;
 
 /**
  * The API to manage users (view, create, delete, update).
@@ -54,6 +58,12 @@ import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 @ExternalApiRestController
 public class UserManagementApi {
 
+    private final UserService userService;
+
+    public UserManagementApi(UserService userService) {
+        this.userService = userService;
+    }
+
     @DefaultApiResponse(summary = "Retrieve all users feed")
     @ApiResponse(
             description = "OK",
@@ -64,13 +74,8 @@ public class UserManagementApi {
                             array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
     @GetMapping(path = ApiPaths.UsersManagementApi.USERS_FEED)
     public ResponseEntity<List<UserResponse>> getUsersFeed() {
-        Instant lastLoginAt = Instant.now();
-        List<UserResponse> users = List.of(
-                new UserResponse("id-0", "alice", "alice@gmail.com", Set.of("ADMIN"), "OIDC/OAuth2", lastLoginAt),
-                new UserResponse("id-1", "bob", "bob@gmail.com", Set.of("EDITOR"), "Static", lastLoginAt),
-                new UserResponse("id-2", "carol", "carol@gmail.com", Set.of("VIEWER"), "OIDC/OAuth2", lastLoginAt),
-                new UserResponse("id-3", "dave", "dave@gmail.com", Set.of("ADMIN", "EDITOR"), "Static", lastLoginAt),
-                new UserResponse("id-4", "eve", "eve@gmail.com", Set.of("VIEWER"), "OIDC/OAuth2", lastLoginAt));
+        List<UserResponse> users =
+                userService.findAll().stream().map(UserResponse::from).toList();
 
         return ResponseEntity.ok(users);
     }
@@ -79,8 +84,18 @@ public class UserManagementApi {
     @ApiResponse(description = "Created", responseCode = "201")
     @PostMapping(path = ApiPaths.UsersManagementApi.USERS_CREATE)
     public ResponseEntity<Void> createUser(@RequestBody UserCreateRequest request) {
+        try {
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+            userService.create(
+                    request.username(), request.email(), request.password(), request.role(), UserOrigin.LOCAL);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        } catch (UserInvalidValueException
+                | UserRoleNotFoundException
+                | UncategorizedSQLException
+                | DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @DefaultApiResponse(summary = "Delete a user")
@@ -88,14 +103,25 @@ public class UserManagementApi {
     @DeleteMapping(path = ApiPaths.UsersManagementApi.USERS_DELETE)
     public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteRequest request) {
 
+        userService.deleteById(request.id());
         return ResponseEntity.noContent().build();
     }
 
     @DefaultApiResponse(summary = "Update a user")
     @ApiResponse(description = "No Content", responseCode = "204")
-    @PatchMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE)
+    @PutMapping(path = ApiPaths.UsersManagementApi.USERS_UPDATE)
     public ResponseEntity<Void> updateUser(@RequestBody UserUpdateRequest request) {
+        try {
+            userService.updateUserPatch(
+                    request.id(), request.username(), request.email(), request.password(), request.roles());
 
-        return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build();
+
+        } catch (UserInvalidValueException
+                | UserRoleNotFoundException
+                | UncategorizedSQLException
+                | DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 }

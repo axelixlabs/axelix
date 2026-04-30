@@ -42,7 +42,7 @@ import com.axelixlabs.axelix.master.service.transport.BadRequestException;
 /**
  * Controller handling the OAuth2 Authorization Code Flow callback.
  * <p>
- * After the user authenticates with the OIDC provider, the provider redirects
+ * After the user authenticates with the OIDC userOrigin, the userOrigin redirects
  * to this endpoint with an authorization code.
  * <p>
  *

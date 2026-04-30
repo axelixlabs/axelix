@@ -30,10 +30,10 @@ import static com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoCo
 /**
  * Configuration properties for OAuth2/OIDC authentication.
  *
- * @param issuerUri         the base URL of the OIDC provider. Used to discover endpoints
+ * @param issuerUri         the base URL of the OIDC userOrigin. Used to discover endpoints
  *                          via {@code /.well-known/openid-configuration}
  *
- * @param clientId          the client identifier issued during registration with the OIDC provider
+ * @param clientId          the client identifier issued during registration with the OIDC userOrigin
  *
  * @param clientSecret      the client secret issued during registration.
  *

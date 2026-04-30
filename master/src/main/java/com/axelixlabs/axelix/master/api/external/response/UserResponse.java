@@ -29,9 +29,9 @@ import com.axelixlabs.axelix.master.domain.UserEntity;
  *
  * @param id          Unique identifier of the user.
  * @param username    Login name of the user.
- * @param email       Email address of the user.
+ * @param email       Email address of the user, which may be {@code null}.
  * @param roles       The roles granted to this user.
- * @param provider    Origin of the user account (e.g. OIDC/OAuth2 provider name, or {@code LOCAL} for login/password).
+ * @param userOrigin  Origin of the user account.
  * @param lastLoginAt Timestamp of the most recent successful login. {@code null} if the user has never logged in.
  *
  * @author Sergey Cherkasov
@@ -41,11 +41,16 @@ public record UserResponse(
         String username,
         @Nullable String email,
         Set<String> roles,
-        String provider,
+        String userOrigin,
         @Nullable Instant lastLoginAt) {
 
     public static UserResponse from(UserEntity user) {
         return new UserResponse(
-                user.id(), user.username(), user.email(), user.roles(), user.provider(), user.lastLoginAt());
+                user.id(),
+                user.username(),
+                user.email(),
+                user.roles().values(),
+                user.userOrigin().getDisplayName(),
+                user.lastLoginAt());
     }
 }
