@@ -15,7 +15,23 @@ jobs:
         with:
           exclude-labels: "refactoring, dependencies"
 
+  check-pr-size:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Check PR size
+        uses: ./.github/actions/check-pr-size
+        with:
+          max-lines: '400'
+
   frontend-build:
+    needs: check-pr-size
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

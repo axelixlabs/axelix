@@ -1,0 +1,34 @@
+name: Check PR Size
+description: Check if PR is too large
+
+inputs:
+  max-lines:
+    description: Maximum number of lines allowed
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Check PR size
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const MAX_LINES = parseInt('${{ inputs.max-lines }}')
+
+          const { data: pr } = await github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number,
+          })
+
+          const totalLines = pr.additions + pr.deletions
+
+          if (totalLines > MAX_LINES) {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## PR is too large\n\nTotal lines: **${totalLines}**, limit: **${MAX_LINES}**.\n\nPlease split this PR into smaller parts.`
+            })
+            core.setFailed(`PR is too large: ${totalLines} lines, limit is ${MAX_LINES}`)
+          }
