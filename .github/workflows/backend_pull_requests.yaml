@@ -17,7 +17,23 @@ jobs:
         with:
           exclude-labels: "refactoring, dependencies"
 
+  check-pr-size:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Check PR size
+        uses: ./.github/actions/check-pr-size
+        with:
+          max-lines: '1500'
+
   backend-build:
+    needs: check-pr-size
     runs-on: ubuntu-latest
     env:
       NEXUS_USER: ${{ secrets.NEXUS_USER }}
