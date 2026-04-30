@@ -60,12 +60,6 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
         }
     }
 
-    /**
-     * First tries to evaluate the configured JMESPath expression against ID token claims,
-     * then evaluates it against the userInfo endpoint response if needed.
-     *
-     * @return extracted role, or {@link DefaultRole#VIEWER} if JMES path expression is not configured
-     */
     @Override
     public Role extractRole(Tokens tokens) throws OidcTokenExchangeException {
         if (jmesPathExpression == null) {

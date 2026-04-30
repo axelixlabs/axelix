@@ -109,7 +109,7 @@ class JmesPathOidcRoleExtractorTest {
     }
 
     @Test
-    void shouldReturnViewerWhenBothSourcesDoNotProvideRole() {
+    void shouldThrowWhenBothSourcesDoNotProvideRole() {
         // given.
         Tokens tokens = tokens("""
             { "sub" : "user123" }
@@ -149,7 +149,7 @@ class JmesPathOidcRoleExtractorTest {
     }
 
     @Test
-    void shouldReturnViewerWhenUserInfoRequestFails() {
+    void shouldThrowWhenUserInfoRequestFails() {
         // given.
         Tokens tokens = new Tokens("invalid.token.format", "test-access-token");
 
