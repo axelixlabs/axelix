@@ -80,17 +80,17 @@ public class DefaultCacheOperationsDispatcher implements CacheOperationsDispatch
 
     @Override
     public CachesFeed getAll() {
-        List<CachesFeed.CacheManager> feed = new ArrayList<>();
+        List<CachesFeed.CacheManagerDto> feed = new ArrayList<>();
 
         this.cacheManagers.forEach((cacheManagerName, enhancedCacheManager) -> {
-            feed.add(new CachesFeed.CacheManager(
+            feed.add(new CachesFeed.CacheManagerDto(
                     cacheManagerName,
                     enhancedCacheManager.getAll().stream()
                             .map(enhancedCache -> {
                                 boolean containsStats =
                                         !enhancedCache.getCacheLookups().isEmpty();
 
-                                return new CachesFeed.Cache(
+                                return new CachesFeed.CacheDto(
                                         enhancedCache.getName(),
                                         enhancedCache
                                                 .getNativeCache()

@@ -348,7 +348,7 @@ class DefaultCacheOperationsDispatcherTest {
         CachesFeed cachesFeed = dispatcher.getAll();
 
         // then.
-        CachesFeed.Cache cache = cachesFeed.getCacheManagers().stream()
+        CachesFeed.CacheDto cache = cachesFeed.getCacheManagers().stream()
                 .filter(cacheManager -> TEST_CACHE_MANAGER_1.equals(cacheManager.getName()))
                 .findFirst()
                 .orElseThrow()
@@ -371,7 +371,7 @@ class DefaultCacheOperationsDispatcherTest {
         CachesFeed cachesFeed = dispatcher.getAll();
 
         // then.
-        CachesFeed.Cache cache = cachesFeed.getCacheManagers().stream()
+        CachesFeed.CacheDto cache = cachesFeed.getCacheManagers().stream()
                 .filter(cacheManager -> TEST_CACHE_MANAGER_1.equals(cacheManager.getName()))
                 .findFirst()
                 .orElseThrow()

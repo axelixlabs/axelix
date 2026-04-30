@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public final class CachesFeed {
 
-    private final List<CacheManager> cacheManagers;
+    private final List<CacheManagerDto> cacheManagers;
 
     /**
      * Creates a new CachesFeed.
@@ -40,11 +40,11 @@ public final class CachesFeed {
      * @param cacheManagers The list of cache managers in the application.
      */
     @JsonCreator
-    public CachesFeed(@JsonProperty("cacheManagers") List<CacheManager> cacheManagers) {
+    public CachesFeed(@JsonProperty("cacheManagers") List<CacheManagerDto> cacheManagers) {
         this.cacheManagers = cacheManagers;
     }
 
-    public List<CacheManager> getCacheManagers() {
+    public List<CacheManagerDto> getCacheManagers() {
         return cacheManagers;
     }
 
@@ -73,10 +73,10 @@ public final class CachesFeed {
     /**
      * DTO that encapsulates a map of all caches inside the given cache manager.
      */
-    public static final class CacheManager {
+    public static final class CacheManagerDto {
 
         private final String name;
-        private final List<Cache> caches;
+        private final List<CacheDto> caches;
 
         /**
          * Creates a new CacheManager.
@@ -85,7 +85,7 @@ public final class CachesFeed {
          * @param caches The caches are identified by the cache name.
          */
         @JsonCreator
-        public CacheManager(@JsonProperty("name") String name, @JsonProperty("caches") List<Cache> caches) {
+        public CacheManagerDto(@JsonProperty("name") String name, @JsonProperty("caches") List<CacheDto> caches) {
             this.name = name;
             this.caches = caches;
         }
@@ -94,7 +94,7 @@ public final class CachesFeed {
             return name;
         }
 
-        public List<Cache> getCaches() {
+        public List<CacheDto> getCaches() {
             return caches;
         }
 
@@ -106,7 +106,7 @@ public final class CachesFeed {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            CacheManager that = (CacheManager) o;
+            CacheManagerDto that = (CacheManagerDto) o;
             return Objects.equals(name, that.name) && Objects.equals(caches, that.caches);
         }
 
@@ -124,7 +124,7 @@ public final class CachesFeed {
     /**
      * DTO that encapsulates the full cache name.
      */
-    public static final class Cache {
+    public static final class CacheDto {
 
         private final String name;
         private final String target;
@@ -140,7 +140,7 @@ public final class CachesFeed {
          * @param containsStats      The value will be {@code true} if the cache contains either hits or misses, otherwise it will be {@code false}.
          */
         @JsonCreator
-        public Cache(
+        public CacheDto(
                 @JsonProperty("name") String name,
                 @JsonProperty("target") String target,
                 @JsonProperty("enabled") boolean enabled,
@@ -172,7 +172,7 @@ public final class CachesFeed {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            Cache cache = (Cache) o;
+            CacheDto cache = (CacheDto) o;
             return enabled == cache.enabled
                     && containsStats == cache.containsStats
                     && Objects.equals(name, cache.name)

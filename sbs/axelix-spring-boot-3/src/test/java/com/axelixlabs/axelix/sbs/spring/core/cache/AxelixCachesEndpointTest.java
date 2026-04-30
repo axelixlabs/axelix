@@ -34,6 +34,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -46,8 +48,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.axelixlabs.axelix.common.api.caches.CachesFeed;
-import com.axelixlabs.axelix.common.api.caches.CachesFeed.Cache;
-import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheManager;
+import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheDto;
+import com.axelixlabs.axelix.common.api.caches.CachesFeed.CacheManagerDto;
 import com.axelixlabs.axelix.sbs.spring.core.Main;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,45 +93,43 @@ class AxelixCachesEndpointTest {
     // The bean definition in the context for cache manager has a type of CacheManager,
     // so we cannot do simple field injection via EnhancedCacheManager class.
     @Autowired
-    public AxelixCachesEndpointTest setMainCacheManager(org.springframework.cache.CacheManager mainCacheManager) {
+    public AxelixCachesEndpointTest setMainCacheManager(CacheManager mainCacheManager) {
         this.mainCacheManager = (EnhancedCacheManager) mainCacheManager;
         return this;
     }
 
     @Autowired
-    public AxelixCachesEndpointTest setClearCacheManager(
-            @Qualifier(CLEAR_CACHE_MANAGER) org.springframework.cache.CacheManager cacheManager) {
+    public AxelixCachesEndpointTest setClearCacheManager(@Qualifier(CLEAR_CACHE_MANAGER) CacheManager cacheManager) {
         this.clearCacheManager = (EnhancedCacheManager) cacheManager;
         return this;
     }
 
     @Autowired
-    public AxelixCachesEndpointTest setEnableCacheManager(
-            @Qualifier(ENABLE_CACHE_MANAGER) org.springframework.cache.CacheManager cacheManager) {
+    public AxelixCachesEndpointTest setEnableCacheManager(@Qualifier(ENABLE_CACHE_MANAGER) CacheManager cacheManager) {
         this.enableCacheManager = (EnhancedCacheManager) cacheManager;
         return this;
     }
 
     @Autowired
     public AxelixCachesEndpointTest setDisableCacheManager(
-            @Qualifier(DISABLE_CACHE_MANAGER) org.springframework.cache.CacheManager cacheManager) {
+            @Qualifier(DISABLE_CACHE_MANAGER) CacheManager cacheManager) {
         this.disableCacheManager = (EnhancedCacheManager) cacheManager;
         return this;
     }
 
     @Autowired
-    private Map<String, org.springframework.cache.CacheManager> allCacheManagers;
+    private Map<String, CacheManager> allCacheManagers;
 
     @Autowired
     private TestRestTemplate testRestTemplate;
 
     @BeforeEach
     void setUp() {
-        for (org.springframework.cache.CacheManager cacheManager : allCacheManagers.values()) {
+        for (CacheManager cacheManager : allCacheManagers.values()) {
             if (cacheManager instanceof EnhancedCacheManager enhancedCacheManager) {
                 enhancedCacheManager.enableAll();
                 for (String cacheName : enhancedCacheManager.getCacheNames()) {
-                    org.springframework.cache.Cache cache = enhancedCacheManager.getCache(cacheName);
+                    Cache cache = enhancedCacheManager.getCache(cacheName);
                     if (cache != null) {
                         cache.clear();
                     }
@@ -163,14 +163,14 @@ class AxelixCachesEndpointTest {
 
     @Test
     void get_shouldReturnCacheInformation() {
-        org.springframework.cache.Cache cache1 = mainCacheManager.getCache(TEST_CACHE_1);
+        Cache cache1 = mainCacheManager.getCache(TEST_CACHE_1);
         cache1.put("key1", "value1");
         cache1.put("key2", "value2");
         cache1.put("key3", "value3");
         cache1.get("key1");
         cache1.get("key2");
 
-        org.springframework.cache.Cache cache2 = mainCacheManager.getCache(TEST_CACHE_2);
+        Cache cache2 = mainCacheManager.getCache(TEST_CACHE_2);
         cache2.put("key", "value");
         cache2.get("key");
         cache2.get("notCache1");
@@ -179,7 +179,7 @@ class AxelixCachesEndpointTest {
         ResponseEntity<CachesFeed> response = testRestTemplate.getForEntity(rootPath(), CachesFeed.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        CacheManager cacheManager = getCacheManager(response.getBody(), MAIN_CACHE_MANAGER);
+        CacheManagerDto cacheManager = getCacheManager(response.getBody(), MAIN_CACHE_MANAGER);
         assertThat(cacheManager.getCaches()).hasSize(2);
 
         assertThat(cacheManager.getCaches().stream()
@@ -204,7 +204,7 @@ class AxelixCachesEndpointTest {
     @Test
     void clear_shouldEvictSingleEntry() {
         String key1 = "key1", key2 = "key2";
-        org.springframework.cache.Cache cache = clearCacheManager.getCache(TEST_CACHE_1);
+        Cache cache = clearCacheManager.getCache(TEST_CACHE_1);
         cache.put(key1, "value1");
         cache.put(key2, "value2");
 
@@ -219,7 +219,7 @@ class AxelixCachesEndpointTest {
     @Test
     void clear_shouldClearEntireCache() {
         String key1 = "key1", key2 = "key2";
-        org.springframework.cache.Cache cache = clearCacheManager.getCache(TEST_CACHE_1);
+        Cache cache = clearCacheManager.getCache(TEST_CACHE_1);
         cache.put(key1, "value1");
         cache.put(key2, "value2");
 
@@ -232,31 +232,10 @@ class AxelixCachesEndpointTest {
     }
 
     @Test
-    @Disabled // TODO In fact, we currently don't know what kind of cache exists
-    void clear_shouldReturnBadRequest_IfKeyDoesNotExist() {
-        ResponseEntity<Void> response = testRestTemplate.exchange(
-                path(CLEAR_CACHE_MANAGER, TEST_CACHE_1 + "/clear?key=nonExistingKey"),
-                HttpMethod.DELETE,
-                defaultEntity(),
-                Void.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    @Disabled // TODO In fact, we currently don't know what kind of cacheManager exists
-    void clear_shouldReturnBadRequest_cacheDoesNotExist() {
-        ResponseEntity<Void> response = testRestTemplate.exchange(
-                path(CLEAR_CACHE_MANAGER, "/nonExistentCache/clear"), HttpMethod.DELETE, defaultEntity(), Void.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
     void clear_shouldClearAllCaches() {
         String key1 = "key1", key2 = "key2";
-        org.springframework.cache.Cache cache1 = clearCacheManager.getCache(TEST_CACHE_1);
-        org.springframework.cache.Cache cache2 = clearCacheManager.getCache(TEST_CACHE_2);
+        Cache cache1 = clearCacheManager.getCache(TEST_CACHE_1);
+        Cache cache2 = clearCacheManager.getCache(TEST_CACHE_2);
         cache1.put(key1, "value1");
         cache2.put(key2, "value2");
 
@@ -270,8 +249,8 @@ class AxelixCachesEndpointTest {
 
     @Test
     void disable_onDisableAllCacheManager() {
-        org.springframework.cache.Cache cache1 = disableCacheManager.getCache(TEST_CACHE_1);
-        org.springframework.cache.Cache cache2 = disableCacheManager.getCache(TEST_CACHE_2);
+        Cache cache1 = disableCacheManager.getCache(TEST_CACHE_1);
+        Cache cache2 = disableCacheManager.getCache(TEST_CACHE_2);
         cache1.put("key1", "value1");
         cache2.put("key2", "value2");
 
@@ -290,7 +269,7 @@ class AxelixCachesEndpointTest {
 
     @Test
     void enable_shouldEnableCacheManager() {
-        org.springframework.cache.Cache cache = enableCacheManager.getCache(TEST_CACHE_1);
+        Cache cache = enableCacheManager.getCache(TEST_CACHE_1);
 
         // when.
         testRestTemplate.postForObject(path(ENABLE_CACHE_MANAGER, "/disable"), defaultEntity(), Void.class);
@@ -303,7 +282,7 @@ class AxelixCachesEndpointTest {
 
     @Test
     void enable_shouldEnableOnlySpecificCache() {
-        org.springframework.cache.Cache cache = enableCacheManager.getCache(TEST_CACHE_1);
+        Cache cache = enableCacheManager.getCache(TEST_CACHE_1);
 
         // when.
         testRestTemplate.postForObject(
@@ -320,8 +299,8 @@ class AxelixCachesEndpointTest {
     void disable_shouldDisableSpecifiedCache() {
         String targetEnabledCache = TEST_CACHE_1;
         String targetDisabledCache = TEST_CACHE_2;
-        org.springframework.cache.Cache enabledCache = disableCacheManager.getCache(targetEnabledCache);
-        org.springframework.cache.Cache disabledCache = disableCacheManager.getCache(targetDisabledCache);
+        Cache enabledCache = disableCacheManager.getCache(targetEnabledCache);
+        Cache disabledCache = disableCacheManager.getCache(targetDisabledCache);
         enabledCache.put("key1", "value");
         disabledCache.put("key1", "value");
 
@@ -342,11 +321,11 @@ class AxelixCachesEndpointTest {
         ResponseEntity<CachesFeed> response = testRestTemplate.getForEntity(rootPath(), CachesFeed.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        CacheManager cacheManager = getCacheManager(response.getBody(), MAIN_CACHE_MANAGER);
+        CacheManagerDto cacheManager = getCacheManager(response.getBody(), MAIN_CACHE_MANAGER);
 
         assertThat(cacheManager.getCaches()).hasSize(2);
 
-        Cache cache1Info = cacheManager.getCaches().stream()
+        CacheDto cache1Info = cacheManager.getCaches().stream()
                 .filter(c -> TEST_CACHE_1.equals(c.getName()))
                 .findFirst()
                 .orElseThrow();
@@ -354,7 +333,7 @@ class AxelixCachesEndpointTest {
         assertThat(cache1Info.getTarget()).isNotNull();
         assertThat(cache1Info.isContainsStats()).isFalse();
 
-        Cache cache2Info = cacheManager.getCaches().stream()
+        CacheDto cache2Info = cacheManager.getCaches().stream()
                 .filter(c -> TEST_CACHE_2.equals(c.getName()))
                 .findFirst()
                 .orElseThrow();
@@ -373,7 +352,7 @@ class AxelixCachesEndpointTest {
         ResponseEntity<CachesFeed> afterDisablingResponse = testRestTemplate.getForEntity(rootPath(), CachesFeed.class);
         assertThat(afterDisablingResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Cache disabledCache =
+        CacheDto disabledCache =
                 getCacheManager(afterDisablingResponse.getBody(), ENABLE_CACHE_MANAGER).getCaches().stream()
                         .filter(c -> TEST_CACHE_1.equals(c.getName()))
                         .findFirst()
@@ -386,10 +365,11 @@ class AxelixCachesEndpointTest {
         ResponseEntity<CachesFeed> afterEnablingResponse = testRestTemplate.getForEntity(rootPath(), CachesFeed.class);
         assertThat(afterEnablingResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Cache enabledCache = getCacheManager(afterEnablingResponse.getBody(), ENABLE_CACHE_MANAGER).getCaches().stream()
-                .filter(c -> TEST_CACHE_1.equals(c.getName()))
-                .findFirst()
-                .orElseThrow();
+        CacheDto enabledCache =
+                getCacheManager(afterEnablingResponse.getBody(), ENABLE_CACHE_MANAGER).getCaches().stream()
+                        .filter(c -> TEST_CACHE_1.equals(c.getName()))
+                        .findFirst()
+                        .orElseThrow();
         assertThat(enabledCache.isEnabled()).isTrue();
     }
 
@@ -401,7 +381,7 @@ class AxelixCachesEndpointTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        CacheManager cacheManager = getCacheManager(response.getBody(), DISABLE_CACHE_MANAGER);
+        CacheManagerDto cacheManager = getCacheManager(response.getBody(), DISABLE_CACHE_MANAGER);
 
         assertThat(cacheManager.getCaches())
                 .allSatisfy(cacheInfo -> assertThat(cacheInfo.isEnabled()).isFalse());
@@ -416,15 +396,15 @@ class AxelixCachesEndpointTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        CacheManager cacheManager = getCacheManager(response.getBody(), DISABLE_CACHE_MANAGER);
+        CacheManagerDto cacheManager = getCacheManager(response.getBody(), DISABLE_CACHE_MANAGER);
 
-        Cache cache1Info = cacheManager.getCaches().stream()
+        CacheDto cache1Info = cacheManager.getCaches().stream()
                 .filter(c -> TEST_CACHE_1.equals(c.getName()))
                 .findFirst()
                 .orElseThrow();
         assertThat(cache1Info.isEnabled()).isFalse();
 
-        Cache cache2Info = cacheManager.getCaches().stream()
+        CacheDto cache2Info = cacheManager.getCaches().stream()
                 .filter(c -> TEST_CACHE_2.equals(c.getName()))
                 .findFirst()
                 .orElseThrow();
@@ -508,17 +488,8 @@ class AxelixCachesEndpointTest {
         return (path.isEmpty() || path.charAt(0) == '/') ? path : "/" + path;
     }
 
-    private CacheManager getCacheManager(CachesFeed source, String cacheManagerName) {
-        if (source == null) {
-            throw new AssertionError("Expected non-null CachesFeed from response");
-        }
-
-        java.util.List<CacheManager> cacheManagers = source.getCacheManagers();
-        if (cacheManagers == null || cacheManagers.isEmpty()) {
-            throw new AssertionError("No cache managers present");
-        }
-
-        return cacheManagers.stream()
+    private CacheManagerDto getCacheManager(CachesFeed source, String cacheManagerName) {
+        return source.getCacheManagers().stream()
                 .filter(cm -> cacheManagerName.equals(cm.getName()))
                 .findFirst()
                 .orElseThrow();
@@ -540,22 +511,22 @@ class AxelixCachesEndpointTest {
 
         @Bean(name = MAIN_CACHE_MANAGER)
         @Primary
-        public org.springframework.cache.CacheManager testSubjectCacheManager() {
+        public CacheManager testSubjectCacheManager() {
             return new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2);
         }
 
         @Bean(name = CLEAR_CACHE_MANAGER)
-        public org.springframework.cache.CacheManager clearSubjectCacheManager() {
+        public CacheManager clearSubjectCacheManager() {
             return new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2);
         }
 
         @Bean(name = ENABLE_CACHE_MANAGER)
-        public org.springframework.cache.CacheManager enableSubjectCacheManager() {
+        public CacheManager enableSubjectCacheManager() {
             return new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2);
         }
 
         @Bean(name = DISABLE_CACHE_MANAGER)
-        public org.springframework.cache.CacheManager disableSubjectCacheManager() {
+        public CacheManager disableSubjectCacheManager() {
             return new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2);
         }
     }
