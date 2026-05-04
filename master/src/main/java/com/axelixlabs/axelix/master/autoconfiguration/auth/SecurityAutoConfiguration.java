@@ -20,7 +20,6 @@ package com.axelixlabs.axelix.master.autoconfiguration.auth;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -101,7 +100,6 @@ public class SecurityAutoConfiguration {
         }
 
         @Bean
-        @ConditionalOnMissingBean
         public JwtDecoderService jwtDecoderService(JwtProperties jwtProperties) {
             return new DefaultJwtDecoderService(jwtProperties.getAlgorithm(), jwtProperties.getSigningKey());
         }
@@ -140,7 +138,7 @@ public class SecurityAutoConfiguration {
     @AutoConfiguration
     @ConditionalOnProperty(prefix = STATIC_ADMIN_PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
     @EnableConfigurationProperties(StaticAdminCredentialsProperties.class)
-    static class StaticCredentialsConfig {
+    public static class StaticCredentialsConfig {
 
         @Bean
         public AuthenticationOption authSettingsStaticAdmin() {
