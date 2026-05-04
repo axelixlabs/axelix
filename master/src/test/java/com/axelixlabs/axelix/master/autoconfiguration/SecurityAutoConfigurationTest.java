@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -50,6 +51,7 @@ import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
 import com.axelixlabs.axelix.master.service.auth.provider.StaticAdminUserProvider;
+import com.axelixlabs.axelix.master.service.state.UserService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -248,7 +250,7 @@ class SecurityAutoConfigurationTest {
                             "axelix.master.auth.options.oauth2.issuer-uri=https://issuer.example",
                             "axelix.master.auth.options.oauth2.client-id=test-client",
                             "axelix.master.auth.options.oauth2.client-secret=test-secret",
-                            "axelix.master.auth.options.oauth2.redirect-uri=https://app.example/callback",
+                            "axelix.master.auth.options.oauth2.base-url=https://app.example",
                             "axelix.master.auth.options.oauth2.scopes=openid profile")
                     .withUserConfiguration(TestOAuth2DependenciesConfig.class)
                     .withConfiguration(AutoConfigurations.of(SecurityAutoConfiguration.OAuth2Config.class));
@@ -293,7 +295,7 @@ class SecurityAutoConfigurationTest {
                             "axelix.master.auth.options.oauth2.enabled=true",
                             "axelix.master.auth.options.oauth2.client-id=test-client",
                             "axelix.master.auth.options.oauth2.client-secret=test-secret",
-                            "axelix.master.auth.options.oauth2.redirect-uri=https://app.example/callback")
+                            "axelix.master.auth.options.oauth2.base-url=https://app.example/callback")
                     .withUserConfiguration(TestOAuth2DependenciesConfig.class)
                     .withConfiguration(AutoConfigurations.of(SecurityAutoConfiguration.OAuth2Config.class));
 
@@ -320,7 +322,7 @@ class SecurityAutoConfigurationTest {
                             "axelix.master.auth.options.oauth2.issuer-uri=https://issuer.example",
                             "axelix.master.auth.options.oauth2.client-id=test-client",
                             "axelix.master.auth.options.oauth2.client-secret=test-secret",
-                            "axelix.master.auth.options.oauth2.redirect-uri=https://app.example/callback",
+                            "axelix.master.auth.options.oauth2.base-url=https://app.example/callback",
                             "axelix.master.auth.options.oauth2.scopes=openid profile")
                     .withUserConfiguration(TestOAuth2DependenciesConfig.class)
                     .withConfiguration(AutoConfigurations.of(
@@ -344,6 +346,11 @@ class SecurityAutoConfigurationTest {
         @Bean
         public SecurityContextExecutor securityContextExecutor() {
             return new NoOpSecurityContextExecutor();
+        }
+
+        @Bean
+        public UserService userService() {
+            return Mockito.mock(UserService.class);
         }
     }
 
