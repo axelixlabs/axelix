@@ -42,10 +42,9 @@ axelix:
         role-authority-table: role_authorities
         role-components-table: role_components
   master:
-    discovery:
-      auto:
-        broadcast:
-          interval: "-"
+    self-registration:
+      eviction:
+        interval: 31536000000
     web:
       static-resources:
         location: classpath:/spa-dist/

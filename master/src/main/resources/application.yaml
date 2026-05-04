@@ -32,7 +32,7 @@ management:
 axelix:
   master:
     discovery:
-      self:
+      self-registration:
         eviction:
           interval: 60000
       auto:

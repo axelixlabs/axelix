@@ -5,7 +5,7 @@ axelix:
       static-resources:
         location: /application/dist/
     discovery:
-      self:
+      self-registration:
         eviction:
           interval: 60000
       auto:
