@@ -31,6 +31,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
@@ -91,8 +92,11 @@ public class SelfRegistrationJwtAuthorizationFilter extends OncePerRequestFilter
     @Nullable
     private String resolveToken(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
+        String bearerScheme = AuthenticationSchemes.BEARER.code() + " ";
+        if (header != null) {
+            if (header.startsWith(bearerScheme)) {
+                return header.substring(bearerScheme.length());
+            }
         }
         return null;
     }

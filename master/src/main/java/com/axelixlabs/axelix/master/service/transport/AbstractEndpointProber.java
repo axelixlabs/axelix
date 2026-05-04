@@ -30,6 +30,7 @@ import org.jspecify.annotations.NonNull;
 
 import org.springframework.http.HttpHeaders;
 
+import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoint;
@@ -48,8 +49,6 @@ import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
  * @author Mikhail Polivakha
  */
 public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
-
-    private static final String AUTHENTICATION_SCHEMA = "Bearer ";
 
     private final InstanceRegistry instanceRegistry;
     private final MessageDeserializationStrategy<O> messageDeserializationStrategy;
@@ -132,7 +131,7 @@ public abstract class AbstractEndpointProber<O> implements EndpointProber<O> {
                 .orElseThrow(() -> new IllegalStateException(
                         "Security Context is expected to be bound before invoking actuator endpoint"));
 
-        builder.header(HttpHeaders.AUTHORIZATION, AUTHENTICATION_SCHEMA + securityContext.token());
+        builder.header(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.code() + " " + securityContext.token());
 
         return builder.build();
     }

@@ -56,6 +56,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
+import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
@@ -337,7 +338,7 @@ class DefaultOidcClientTest {
                 public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
                     if ("/userinfo".equals(request.getPath()) && "GET".equals(request.getMethod())) {
                         String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
-                        if (("Bearer " + accessToken).equals(auth)) {
+                        if ((AuthenticationSchemes.BEARER.code() + " " + accessToken).equals(auth)) {
                             return new MockResponse()
                                     .setBody(jsonResponse)
                                     .addHeader("Content-Type", APPLICATION_JSON_VALUE)
@@ -354,7 +355,8 @@ class DefaultOidcClientTest {
             RecordedRequest userInfoRequest = mockWebServer.takeRequest();
             assertThat(userInfoRequest.getPath()).isEqualTo("/userinfo");
             assertThat(userInfoRequest.getMethod()).isEqualTo("GET");
-            assertThat(userInfoRequest.getHeader(HttpHeaders.AUTHORIZATION)).isEqualTo("Bearer " + accessToken);
+            assertThat(userInfoRequest.getHeader(HttpHeaders.AUTHORIZATION))
+                    .isEqualTo(AuthenticationSchemes.BEARER.code() + " " + accessToken);
         }
 
         @Test

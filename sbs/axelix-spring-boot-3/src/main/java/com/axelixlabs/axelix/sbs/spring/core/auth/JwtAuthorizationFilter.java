@@ -30,6 +30,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.Authority;
 import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
@@ -98,8 +99,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Nullable
     private String resolveToken(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
+        String bearerSchemeCode = AuthenticationSchemes.BEARER.code() + " ";
+        if (header != null) {
+            if (header.startsWith(bearerSchemeCode)) {
+                return header.substring(bearerSchemeCode.length());
+            }
         }
         return null;
     }

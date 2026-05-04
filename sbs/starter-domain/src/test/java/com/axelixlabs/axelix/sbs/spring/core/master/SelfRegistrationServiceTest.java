@@ -44,6 +44,7 @@ import com.axelixlabs.axelix.common.api.registration.BasicDiscoveryMetadata;
 import com.axelixlabs.axelix.common.api.registration.GitInfo;
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
 import com.axelixlabs.axelix.common.api.registration.ShortBuildInfo;
+import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
@@ -210,9 +211,9 @@ class SelfRegistrationServiceTest {
         assertThat(body).contains("http://localhost:8089/actuator");
 
         String authHeader = request.getHeader("Authorization");
-        assertThat(authHeader).startsWith("Bearer ");
+        assertThat(authHeader).startsWith(AuthenticationSchemes.BEARER.code() + " ");
 
-        String token = authHeader.substring("Bearer ".length());
+        String token = authHeader.substring(AuthenticationSchemes.BEARER.code().length() + 1);
 
         assertThatCode(() -> jwtDecoderService.decodeTokenToUser(token)).doesNotThrowAnyException();
     }
