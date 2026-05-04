@@ -34,11 +34,11 @@ axelix:
     discovery:
       self-registration:
         eviction:
-          interval: 60000
+          interval: "0 * * * * *"
       auto:
         enabled: true
         broadcast:
-          interval: 60000
+          interval: "0 * * * * *"
         platform: kubernetes
         kubernetes:
           kube-apiserver-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}

@@ -7,11 +7,11 @@ axelix:
     discovery:
       self-registration:
         eviction:
-          interval: 60000
+          interval: "0 * * * * *"
       auto:
         enabled: true
         broadcast:
-          interval: 60000
+          interval: "0 * * * * *"
         platform: kubernetes
         kubernetes:
           # Should be provided by the local-launch configuration
