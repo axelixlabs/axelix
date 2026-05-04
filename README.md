@@ -2,6 +2,7 @@
 ![Axelix Logo (Dark)](docs/static/img/logo-dark.svg#gh-dark-mode-only)
 
 [![License](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](LICENSE)
+[![Nightly Build](https://github.com/axelixlabs/axelix/actions/workflows/nightly.yaml/badge.svg)](https://github.com/axelixlabs/axelix/actions/workflows/nightly.yaml)
 
 Axelix is an open-source solution for debugging, testing, and monitoring Java/Kotlin Spring Boot applications in real time. It is designed to empower teams that develop and operate Spring Boot microservices.
 
