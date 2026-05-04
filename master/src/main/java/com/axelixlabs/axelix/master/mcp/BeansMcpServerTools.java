@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.mcp;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+import com.axelixlabs.axelix.master.mcp.auth.McpEndpoints;
 import org.springaicommunity.mcp.annotation.McpTool;
 import org.springaicommunity.mcp.annotation.McpTool.McpAnnotations;
 import org.springaicommunity.mcp.annotation.McpToolParam;
@@ -49,6 +50,7 @@ public class BeansMcpServerTools {
     }
 
     @McpTool(
+            name = McpEndpoints.BEANS_FEED_TOOL_NAME,
             title = "Beans Feed",
             description = """
             Get all Spring beans information for a specific instance.

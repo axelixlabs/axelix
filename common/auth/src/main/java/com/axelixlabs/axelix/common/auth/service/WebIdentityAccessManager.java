@@ -25,13 +25,16 @@ import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
- * The main entrypoint for evaluating the possibility of processing the request (both Authentication
- * and Authorization). So essentially this service is the entrypoint for IAM checks.
+ * The main entrypoint for evaluating the possibility of processing the HTTP request (both Authentication
+ * and Authorization). So essentially this service is the entrypoint for IAM checks for every HTTP request,
+ * presumably made from the browser.
+ *
+ * @see WebIdentityAccessManager Similar abstraction but for handling requests sent by the AI Agent.
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public interface IdentityAccessManager {
+public interface WebIdentityAccessManager {
 
     /**
      * Main entrypoint for IAM. In case any problem is encountered, then the corresponding exception is thrown.

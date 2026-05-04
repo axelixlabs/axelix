@@ -33,18 +33,18 @@ import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
- * Default {@link IdentityAccessManager}. Handles the entire IAM.
+ * Default {@link WebIdentityAccessManager}. Handles the entire IAM for HTTP requests.
  *
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public class DefaultIdentityAccessManager implements IdentityAccessManager {
+public class DefaultWebIdentityAccessManager implements WebIdentityAccessManager {
 
     private final JwtDecoderService jwtDecoderService;
     private final AuthorityResolver authorityResolver;
     private final Authorizer authorizer;
 
-    public DefaultIdentityAccessManager(
+    public DefaultWebIdentityAccessManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
         this.jwtDecoderService = jwtDecoderService;
         this.authorityResolver = authorityResolver;

@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.common.auth.core.SecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
-import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.common.domain.function.ThrowingCallable;
@@ -94,7 +94,7 @@ class SecurityAutoConfigurationTest {
                 assertThat(context).hasSingleBean(MasterAuthorityResolver.class);
                 assertThat(context).hasSingleBean(AuthorityResolver.class);
                 assertThat(context).hasSingleBean(Authorizer.class);
-                assertThat(context).hasSingleBean(IdentityAccessManager.class);
+                assertThat(context).hasSingleBean(WebIdentityAccessManager.class);
                 assertThat(context).hasSingleBean(JwtEncoderService.class);
                 assertThat(context).hasSingleBean(JwtDecoderService.class);
                 assertThat(context).hasSingleBean(CookieService.class);
@@ -161,7 +161,7 @@ class SecurityAutoConfigurationTest {
                 assertThat(context).hasNotFailed();
                 assertThat(context).hasSingleBean(JwtEncoderService.class);
                 assertThat(context).hasSingleBean(JwtDecoderService.class);
-                assertThat(context).hasSingleBean(IdentityAccessManager.class);
+                assertThat(context).hasSingleBean(WebIdentityAccessManager.class);
                 assertThat(context).hasSingleBean(AuthorityResolver.class);
                 assertThat(context).hasSingleBean(Authorizer.class);
             });

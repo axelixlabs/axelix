@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.filter;
 
 import java.util.Base64;
 
+import com.axelixlabs.axelix.master.filter.auth.McpAuthenticationFilter;
 import io.modelcontextprotocol.server.McpSyncServer;
 import org.junit.jupiter.api.Test;
 

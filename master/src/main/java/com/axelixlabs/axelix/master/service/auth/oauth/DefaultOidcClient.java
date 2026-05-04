@@ -166,7 +166,7 @@ public class DefaultOidcClient implements OidcClient {
             String userInfoBody = restClient
                     .get()
                     .uri(userInfoEndpoint)
-                    .header(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.code() + " " + accessToken)
+                    .header(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + accessToken)
                     .retrieve()
                     .body(String.class);
 

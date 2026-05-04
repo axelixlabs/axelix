@@ -55,6 +55,14 @@ import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
+import com.axelixlabs.axelix.common.auth.service.Authorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
+import com.axelixlabs.axelix.common.auth.service.DefaultWebIdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
+import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
+import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
@@ -363,7 +371,7 @@ class JwtAuthorizationFilterTest {
 
     private HttpEntity<Void> defaultEntity(String token) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.code() + " " + token);
+        headers.set(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.prefix() + token);
 
         return new HttpEntity<>(headers);
     }

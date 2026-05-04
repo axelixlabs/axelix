@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.mcp.auth.McpEndpoints;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -45,6 +46,7 @@ public class EnvironmentMcpServerTools {
     }
 
     @McpTool(
+            name = McpEndpoints.ENVIRONMENT_FEED_TOOL_NAME,
             title = "Properties",
             description = """
             Get all environment properties for a specific instance.

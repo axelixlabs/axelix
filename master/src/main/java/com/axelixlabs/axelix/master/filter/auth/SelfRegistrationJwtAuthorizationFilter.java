@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.filter;
+package com.axelixlabs.axelix.master.filter.auth;
 
 import java.io.IOException;
 
@@ -37,7 +37,7 @@ import com.axelixlabs.axelix.common.auth.core.DefaultSecurityContext;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
-import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
@@ -49,12 +49,12 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 @Order(FiltersOrder.SELF_REGISTRATION_JWT_AUTHORIZATION_FILTER)
 public class SelfRegistrationJwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final IdentityAccessManager identityAccessManager;
+    private final WebIdentityAccessManager webIdentityAccessManager;
     private final SecurityContextExecutor securityContextExecutor;
 
     public SelfRegistrationJwtAuthorizationFilter(
-            IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
-        this.identityAccessManager = identityAccessManager;
+            WebIdentityAccessManager webIdentityAccessManager, SecurityContextExecutor securityContextExecutor) {
+        this.webIdentityAccessManager = webIdentityAccessManager;
         this.securityContextExecutor = securityContextExecutor;
     }
 
@@ -78,7 +78,7 @@ public class SelfRegistrationJwtAuthorizationFilter extends OncePerRequestFilter
             throw new JwtProcessingException("Authorization token is missing");
         }
 
-        User user = identityAccessManager.verifyAccess(
+        User user = webIdentityAccessManager.verifyAccess(
                 request.getServletPath(), HttpMethod.valueOf(request.getMethod()), token);
 
         try {
@@ -94,7 +94,7 @@ public class SelfRegistrationJwtAuthorizationFilter extends OncePerRequestFilter
     @Nullable
     private String resolveToken(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String bearerScheme = AuthenticationSchemes.BEARER.code() + " ";
+        String bearerScheme = AuthenticationSchemes.BEARER.prefix();
         if (header != null) {
             if (header.startsWith(bearerScheme)) {
                 return header.substring(bearerScheme.length());

@@ -30,6 +30,7 @@ import com.axelixlabs.axelix.common.domain.http.DefaultHttpPayload;
 import com.axelixlabs.axelix.common.domain.http.HttpPayload;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.mcp.auth.McpEndpoints;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -48,6 +49,7 @@ public class CacheMcpServerTools {
     }
 
     @McpTool(
+            name = McpEndpoints.CACHES_FEED_TOOL_NAME,
             title = "Caches Feed",
             description = """
             Get the full list of configured caches for a specific instance.
@@ -81,6 +83,7 @@ public class CacheMcpServerTools {
     }
 
     @McpTool(
+            name = McpEndpoints.CLEAR_ALL_CACHES_TOOL_NAME,
             title = "Clear All Cache",
             description = """
             Clears ALL caches across ALL cache managers for a specific instance.
@@ -105,6 +108,7 @@ public class CacheMcpServerTools {
     }
 
     @McpTool(
+            name = McpEndpoints.CLEAR_SPECIFIC_CACHE_TOOL_NAME,
             title = "Clear Specific Cache",
             description = """
             Clears a specific cache entry identified by cache name (key) within a specific cache manager

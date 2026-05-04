@@ -93,7 +93,7 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
     }
 
     @Nullable
-    private Role extractRoleFromUserInfo(String accessToken) {
+    public Role extractRoleFromUserInfo(String accessToken) {
         try {
             String userInfo = oidcClient.validateAccessTokenAndExtractUserInfo(accessToken);
 

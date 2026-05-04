@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.mcp.auth.McpEndpoints;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -49,6 +50,7 @@ public class WallboardMcpServerTools {
     }
 
     @McpTool(
+            name = McpEndpoints.WALLBOARD_TOOL_NAME,
             title = "Instances Feed",
             description = """
             Fetch the comprehensive snapshot of all managed instances (also known as 'Wallboard', 'Grid', 'Instances List').

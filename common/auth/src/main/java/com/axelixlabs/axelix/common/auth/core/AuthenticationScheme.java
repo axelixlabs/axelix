@@ -21,6 +21,7 @@ package com.axelixlabs.axelix.common.auth.core;
  * The scheme of authentication, e.g. {@code Basic} or {@code Bearer}.
  *
  * @see AuthenticationSchemes
+ * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication#authentication_schemes">Developer Mozilla Doc</a>
  * @author Mikhail Polivakha
  */
 public interface AuthenticationScheme {
@@ -29,4 +30,8 @@ public interface AuthenticationScheme {
      * The codename of the authentication scheme.
      */
     String code();
+
+    default String prefix() {
+        return code() + " ";
+    }
 }

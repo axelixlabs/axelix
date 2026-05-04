@@ -338,7 +338,7 @@ class DefaultOidcClientTest {
                 public @NonNull MockResponse dispatch(@NonNull RecordedRequest request) {
                     if ("/userinfo".equals(request.getPath()) && "GET".equals(request.getMethod())) {
                         String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
-                        if ((AuthenticationSchemes.BEARER.code() + " " + accessToken).equals(auth)) {
+                        if ((AuthenticationSchemes.BEARER.prefix() + accessToken).equals(auth)) {
                             return new MockResponse()
                                     .setBody(jsonResponse)
                                     .addHeader("Content-Type", APPLICATION_JSON_VALUE)
@@ -358,7 +358,7 @@ class DefaultOidcClientTest {
             assertThat(userInfoRequest.getPath()).isEqualTo("/userinfo");
             assertThat(userInfoRequest.getMethod()).isEqualTo("GET");
             assertThat(userInfoRequest.getHeader(HttpHeaders.AUTHORIZATION))
-                    .isEqualTo(AuthenticationSchemes.BEARER.code() + " " + accessToken);
+                    .isEqualTo(AuthenticationSchemes.BEARER.prefix() + accessToken);
         }
 
         @Test

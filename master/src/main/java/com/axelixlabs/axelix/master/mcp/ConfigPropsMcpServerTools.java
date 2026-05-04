@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.mcp.auth.McpEndpoints;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
@@ -47,6 +48,7 @@ public class ConfigPropsMcpServerTools {
     }
 
     @McpTool(
+            name = McpEndpoints.CONFIG_PROPS_FEED_TOOL_NAME,
             title = "Config Props Beans",
             description = """
             Get all configuration properties for a specific instance.

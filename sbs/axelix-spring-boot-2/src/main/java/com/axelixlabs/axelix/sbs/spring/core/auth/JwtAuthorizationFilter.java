@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.ExpiredJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.InvalidJwtTokenException;
 import com.axelixlabs.axelix.common.auth.exception.JwtParsingException;
-import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
+import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
 import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 
 /**
@@ -55,15 +55,15 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
 @SuppressWarnings("NullAway") // TODO: Pending issue GH-42 – introduce exception translator and refactor this filter
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final IdentityAccessManager identityAccessManager;
+    private final WebIdentityAccessManager webIdentityAccessManager;
     private final SecurityContextExecutor securityContextExecutor;
     private final String baseActuatorPath;
 
     public JwtAuthorizationFilter(
-            IdentityAccessManager identityAccessManager,
+            WebIdentityAccessManager webIdentityAccessManager,
             SecurityContextExecutor securityContextExecutor,
             String baseActuatorPath) {
-        this.identityAccessManager = identityAccessManager;
+        this.webIdentityAccessManager = webIdentityAccessManager;
         this.securityContextExecutor = securityContextExecutor;
         this.baseActuatorPath = baseActuatorPath;
     }
@@ -85,7 +85,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             HttpMethod requestHttpMethod = HttpMethod.valueOf(request.getMethod());
 
-            User user = identityAccessManager.verifyAccess(request.getRequestURI(), requestHttpMethod, token);
+            User user = webIdentityAccessManager.verifyAccess(request.getRequestURI(), requestHttpMethod, token);
 
             securityContextExecutor.runWithinSecurityContext(
                     () -> filterChain.doFilter(request, response), new DefaultSecurityContext(user, token));
@@ -102,7 +102,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Nullable
     private String resolveToken(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String bearerCode = AuthenticationSchemes.BEARER.code() + " ";
+        String bearerCode = AuthenticationSchemes.BEARER.prefix();
         if (header != null) {
             if (header.startsWith(bearerCode)) {
                 return header.substring(bearerCode.length());
