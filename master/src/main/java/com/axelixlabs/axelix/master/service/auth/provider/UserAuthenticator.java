@@ -22,21 +22,22 @@ import org.jspecify.annotations.Nullable;
 import com.axelixlabs.axelix.common.auth.core.User;
 
 /**
- * SPI interface that is capable to load the {@link User} by his/her username and password credentials.
+ * SPI interface that is capable to authenticate the {@link User} by his/her username and password credentials.
  *
  * @since 16.07.25
  * @author Mikhail Polivakha
  * @author Sergey Cherkasov
  */
-public interface UserProvider {
+public interface UserAuthenticator {
 
     /**
-     * Load user by username.
+     * Authenticate user by username.
      *
-     * @param username by which the user will be loaded.
+     * @param username the user's username.
      * @param password the user's password.
-     * @return the loaded {@link User}.
+     *
+     * @return the authenticated {@link User}, or null, if the user with such credentials pair was not found.
      */
     @Nullable
-    User load(String username, String password);
+    User authenticate(String username, String password);
 }

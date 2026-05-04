@@ -29,22 +29,22 @@ import com.axelixlabs.axelix.common.utils.Assert;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.StaticAdminCredentialsProperties;
 
 /**
- * {@link UserProvider} that authenticates a given user by the static pair of the username/password.
+ * {@link UserAuthenticator} that authenticates a given user by the static pair of the username/password.
  *
  * @author Mikhail Polivakha
  */
-public class StaticAdminUserProvider implements UserProvider {
+public class StaticAdminUserAuthenticator implements UserAuthenticator {
 
     private final StaticAdminCredentialsProperties staticCredentialsConfig;
 
-    public StaticAdminUserProvider(StaticAdminCredentialsProperties staticCredentialsConfig) {
+    public StaticAdminUserAuthenticator(StaticAdminCredentialsProperties staticCredentialsConfig) {
         Assert.notNull(staticCredentialsConfig.getUsername(), "username is required when static-admin is enabled");
         Assert.notNull(staticCredentialsConfig.getPassword(), "password is required when static-admin is enabled");
         this.staticCredentialsConfig = staticCredentialsConfig;
     }
 
     @Override
-    public @Nullable User load(String username, String password) {
+    public @Nullable User authenticate(String username, String password) {
 
         if (Objects.equals(staticCredentialsConfig.getUsername(), username)
                 && Objects.equals(staticCredentialsConfig.getPassword(), password)) {

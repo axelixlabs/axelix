@@ -50,7 +50,7 @@ import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcMetadataProvider;
-import com.axelixlabs.axelix.master.service.auth.provider.StaticAdminUserProvider;
+import com.axelixlabs.axelix.master.service.auth.provider.StaticAdminUserAuthenticator;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -198,7 +198,7 @@ class SecurityAutoConfigurationTest {
             // when
             contextRunner.run(context -> {
                 // then
-                assertThat(context).hasSingleBean(StaticAdminUserProvider.class);
+                assertThat(context).hasSingleBean(StaticAdminUserAuthenticator.class);
                 assertThat(context)
                         .getBeans(AuthenticationOption.class)
                         .hasSize(1)

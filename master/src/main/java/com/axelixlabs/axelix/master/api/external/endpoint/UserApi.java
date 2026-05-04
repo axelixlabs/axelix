@@ -39,7 +39,7 @@ import com.axelixlabs.axelix.master.api.external.request.LoginRequest;
 import com.axelixlabs.axelix.master.api.external.swagger.DefaultApiResponse;
 import com.axelixlabs.axelix.master.exception.auth.InvalidCredentialsException;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
-import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
+import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
 
 /**
  * The API for working with users.
@@ -54,14 +54,17 @@ import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
 public class UserApi {
 
     private final CookieService cookieService;
-    private final List<UserProvider> userProviders;
+    private final List<UserAuthenticator> userAuthenticators;
     private final JwtEncoderService jwtEncoderService;
 
     private static final InvalidCredentialsException INVALID_CREDENTIALS_EXCEPTION = new InvalidCredentialsException();
 
-    public UserApi(CookieService cookieService, List<UserProvider> userProviders, JwtEncoderService jwtEncoderService) {
+    public UserApi(
+            CookieService cookieService,
+            List<UserAuthenticator> userAuthenticators,
+            JwtEncoderService jwtEncoderService) {
         this.cookieService = cookieService;
-        this.userProviders = userProviders;
+        this.userAuthenticators = userAuthenticators;
         this.jwtEncoderService = jwtEncoderService;
     }
 
@@ -89,8 +92,8 @@ public class UserApi {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
 
         User user = null;
-        for (UserProvider userProvider : userProviders) {
-            user = userProvider.load(loginRequest.username(), loginRequest.password());
+        for (UserAuthenticator userAuthenticator : userAuthenticators) {
+            user = userAuthenticator.authenticate(loginRequest.username(), loginRequest.password());
             if (user != null) {
                 break;
             }

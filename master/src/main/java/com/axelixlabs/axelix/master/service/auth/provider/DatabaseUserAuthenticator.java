@@ -34,23 +34,23 @@ import com.axelixlabs.axelix.master.exception.auth.UserRoleNotFoundException;
 import com.axelixlabs.axelix.master.service.state.UserService;
 
 /**
- * {@link UserProvider} that authenticates a given user against the users stored in the database.
+ * {@link UserAuthenticator} that authenticates a given user against the users stored in the database.
  *
  * @author Sergey Cherkasov
  */
 @Transactional
-public class DatabaseUserProvider implements UserProvider {
+public class DatabaseUserAuthenticator implements UserAuthenticator {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    public DatabaseUserProvider(UserService userService, PasswordEncoder passwordEncoder) {
+    public DatabaseUserAuthenticator(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public @Nullable User load(String username, String password) {
+    public @Nullable User authenticate(String username, String password) {
 
         UserEntity user = userService.findUserByUsername(username).orElse(null);
 
