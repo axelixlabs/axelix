@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -171,8 +172,11 @@ class JwtAuthAutoConfigurationTest {
     static class CustomJwtAuthorizationFilterConfig {
         @Bean
         public JwtAuthorizationFilter jwtAuthorizationFilter(
-                IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
-            return new CustomJwtAuthorizationFilter(identityAccessManager, securityContextExecutor);
+                IdentityAccessManager identityAccessManager,
+                SecurityContextExecutor securityContextExecutor,
+                WebEndpointProperties webEndpointProperties) {
+            return new CustomJwtAuthorizationFilter(
+                    identityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath());
         }
     }
 
@@ -197,8 +201,10 @@ class JwtAuthAutoConfigurationTest {
 
     static class CustomJwtAuthorizationFilter extends JwtAuthorizationFilter {
         public CustomJwtAuthorizationFilter(
-                IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
-            super(identityAccessManager, securityContextExecutor);
+                IdentityAccessManager identityAccessManager,
+                SecurityContextExecutor securityContextExecutor,
+                String baseActuatorPath) {
+            super(identityAccessManager, securityContextExecutor, baseActuatorPath);
         }
     }
 }

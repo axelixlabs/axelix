@@ -57,16 +57,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final IdentityAccessManager identityAccessManager;
     private final SecurityContextExecutor securityContextExecutor;
+    private final String baseActuatorPath;
 
     public JwtAuthorizationFilter(
-            IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
+            IdentityAccessManager identityAccessManager,
+            SecurityContextExecutor securityContextExecutor,
+            String baseActuatorPath) {
         this.identityAccessManager = identityAccessManager;
         this.securityContextExecutor = securityContextExecutor;
+        this.baseActuatorPath = baseActuatorPath;
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !request.getServletPath().startsWith("/actuator/axelix-");
+        return !request.getServletPath().startsWith(baseActuatorPath + "/axelix-");
     }
 
     @Override
@@ -79,10 +83,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         try {
             String token = resolveToken(request);
 
-            String requestPath = request.getRequestURI();
+            String relativePath = request.getServletPath().substring(baseActuatorPath.length());
+
             HttpMethod requestHttpMethod = HttpMethod.valueOf(request.getMethod());
 
-            User user = identityAccessManager.verifyAccess(requestPath, requestHttpMethod, token);
+            User user = identityAccessManager.verifyAccess(relativePath, requestHttpMethod, token);
 
             securityContextExecutor.runWithinSecurityContext(
                     () -> filterChain.doFilter(request, response), new DefaultSecurityContext(user, token));
