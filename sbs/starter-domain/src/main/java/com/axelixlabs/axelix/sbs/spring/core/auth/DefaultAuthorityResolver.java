@@ -35,6 +35,7 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  * Default {@link AuthorityResolver}. Determines the required {@link Authority} based on the request path.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 @NullMarked
 public class DefaultAuthorityResolver implements AuthorityResolver {
@@ -72,17 +73,30 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
 
     private final EndpointPathMatcher pathMatcher;
 
-    public DefaultAuthorityResolver(EndpointPathMatcher pathMatcher) {
+    private final String actuatorPathPrefix;
+
+    public DefaultAuthorityResolver(String actuatorPathPrefix, EndpointPathMatcher pathMatcher) {
         this.pathMatcher = pathMatcher;
+        this.actuatorPathPrefix = actuatorPathPrefix;
     }
 
     @Override
-    public Optional<Authority> resolve(String path, HttpMethod httpMethod) {
+    public Optional<Authority> resolve(String requestPath, HttpMethod httpMethod) {
 
         // TODO: well, technically we probably can resolve via simple map lookup, I guess...
         return PATH_MAPPINGS.entrySet().stream()
                 .filter(entry -> entry.getKey().httpMethod().equals(httpMethod))
-                .filter(entry -> pathMatcher.matches(entry.getKey().path().originalUrl(), path))
+                .filter(entry -> {
+                    if (requestPath.startsWith(actuatorPathPrefix)) {
+                        return pathMatcher.matches(
+                                entry.getKey().path().originalUrl(),
+                                requestPath.substring(actuatorPathPrefix.length()));
+
+                    } else {
+
+                        return pathMatcher.matches(entry.getKey().path().originalUrl(), requestPath);
+                    }
+                })
                 .map(Map.Entry::getValue)
                 .findFirst();
     }

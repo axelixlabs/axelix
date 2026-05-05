@@ -45,7 +45,7 @@ public class DefaultAuthorityResolverTest {
 
     @BeforeEach
     void setUp() {
-        authorityResolver = new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
+        authorityResolver = new DefaultAuthorityResolver("/actuator", (pathTemplate, actualPath) -> {
             PathPattern pattern = new PathPatternParser().parse(pathTemplate);
             return pattern.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
         });

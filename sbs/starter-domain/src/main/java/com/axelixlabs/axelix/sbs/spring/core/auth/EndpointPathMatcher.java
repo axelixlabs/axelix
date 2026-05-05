@@ -21,6 +21,7 @@ package com.axelixlabs.axelix.sbs.spring.core.auth;
  * Interface for matching request paths against endpoint URL patterns.
  *
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public interface EndpointPathMatcher {
 
@@ -29,9 +30,14 @@ public interface EndpointPathMatcher {
      *
      * @param endpointPattern the URL pattern defined for an endpoint
      *                        (e.g., {@code "/actuator/env/**"})
-     * @param requestPath     the actual incoming request path to evaluate
-     *                        (e.g., {@code "/actuator/env/spring.datasource.url"})
-     * @return {@code true} if the request path matches the endpoint pattern, {@code false} otherwise.
+     *
+     * @param requestPath     the relative incoming request path to evaluate
+     *                        (e.g., {@code "/axelix-beans"}). Note that "relative"
+     *                        in the current context means the path that has stripped
+     *                        actuator prefix (in most cases the actuator prefix is
+     *                        {@code /actuator}, but not always).
+     *
+     * @return {@code true}   if the endpoint pattern matches the request path, {@code false} otherwise.
      */
     boolean matches(String endpointPattern, String requestPath);
 }

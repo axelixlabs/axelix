@@ -80,8 +80,8 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AuthorityResolver authorityResolver() {
-        return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
+    public AuthorityResolver authorityResolver(WebEndpointProperties webEndpointProperties) {
+        return new DefaultAuthorityResolver(webEndpointProperties.getBasePath(), (pathTemplate, actualPath) -> {
             PathPattern parse = new PathPatternParser().parse(pathTemplate);
             return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
         });

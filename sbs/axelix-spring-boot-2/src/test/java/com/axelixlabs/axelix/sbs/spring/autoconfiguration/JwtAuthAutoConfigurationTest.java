@@ -189,7 +189,7 @@ class JwtAuthAutoConfigurationTest {
     static class CustomAuthorityResolver implements AuthorityResolver {
 
         @Override
-        public Optional<Authority> resolve(String path, HttpMethod httpMethod) {
+        public Optional<Authority> resolve(String requestPath, HttpMethod httpMethod) {
             return Optional.empty();
         }
     }

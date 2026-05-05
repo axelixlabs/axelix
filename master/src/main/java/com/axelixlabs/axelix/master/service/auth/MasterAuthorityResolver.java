@@ -80,13 +80,13 @@ public class MasterAuthorityResolver implements AuthorityResolver {
     }
 
     @Override
-    public Optional<Authority> resolve(String path, HttpMethod httpMethod) {
+    public Optional<Authority> resolve(String requestPath, HttpMethod httpMethod) {
 
-        if (path.startsWith(WebAutoConfiguration.EXTERNAL_API_PATH)) {
-            path = path.substring(WebAutoConfiguration.EXTERNAL_API_PATH.length());
+        if (requestPath.startsWith(WebAutoConfiguration.EXTERNAL_API_PATH)) {
+            requestPath = requestPath.substring(WebAutoConfiguration.EXTERNAL_API_PATH.length());
         }
 
-        PathContainer pathContainer = PathContainer.parsePath(path);
+        PathContainer pathContainer = PathContainer.parsePath(requestPath);
 
         for (RegisteredPattern registered : REGISTERED_PATTERNS) {
             if (registered.method == httpMethod && registered.pathPattern.matches(pathContainer)) {
