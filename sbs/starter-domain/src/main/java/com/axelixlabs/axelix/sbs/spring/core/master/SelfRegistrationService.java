@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import org.jspecify.annotations.NonNull;
 
 import com.axelixlabs.axelix.common.api.registration.SelfRegistrationMetadata;
+import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
@@ -52,7 +53,6 @@ import com.axelixlabs.axelix.sbs.spring.core.log.Logger;
 public class SelfRegistrationService implements Closeable {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String AUTHENTICATION_SCHEMA = "Bearer ";
     private static final PasswordlessUser TECH_USER =
             new PasswordlessUser("AXELIX.STARTER", Set.of(DefaultRole.MANAGED_SERVICE));
 
@@ -146,7 +146,7 @@ public class SelfRegistrationService implements Closeable {
             }
         }
 
-        builder.header(AUTHORIZATION_HEADER, AUTHENTICATION_SCHEMA + currentToken);
+        builder.header(AUTHORIZATION_HEADER, AuthenticationSchemes.BEARER.code() + " " + currentToken);
 
         return builder.build();
     }

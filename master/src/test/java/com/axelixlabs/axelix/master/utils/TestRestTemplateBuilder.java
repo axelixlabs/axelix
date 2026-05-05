@@ -29,6 +29,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
+import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.Role;
@@ -142,7 +143,7 @@ public class TestRestTemplateBuilder {
     private TestRestTemplate buildWithTokenInAuthorizationHeader(String token) {
         return new TestRestTemplate(new RestTemplateBuilder()
                 .rootUri(HOST + testTomcatServerPort)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token));
+                .defaultHeader(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.code() + " " + token));
     }
 
     private String generateToken(Role[] roles) {
