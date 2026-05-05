@@ -195,21 +195,6 @@ class JwtAuthorizationFilterTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
-    static Stream<Arguments> adminEndpoints() {
-        return Stream.of(
-                Arguments.of("/actuator/axelix-caches", HttpMethod.GET),
-                Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
-                Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
-                Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path("/clear-all"), HttpMethod.DELETE),
-                Arguments.of(path("/disable"), HttpMethod.POST),
-                Arguments.of(path("/enable"), HttpMethod.POST),
-                Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
-                Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
-                Arguments.of("/actuator/axelix-env", HttpMethod.GET),
-                Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
-    }
-
     @ParameterizedTest
     @MethodSource("editorEndpoints")
     void shouldAllowAccess_ForUserWithRoleEditor(String path, HttpMethod httpMethod) {
@@ -222,20 +207,6 @@ class JwtAuthorizationFilterTest {
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    static Stream<Arguments> editorEndpoints() {
-        return Stream.of(
-                Arguments.of("/actuator/axelix-caches", HttpMethod.GET),
-                Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
-                Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
-                Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path("/clear-all"), HttpMethod.DELETE),
-                Arguments.of(path("/disable"), HttpMethod.POST),
-                Arguments.of(path("/enable"), HttpMethod.POST),
-                Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
-                Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
-                Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
     }
 
     @ParameterizedTest
@@ -262,13 +233,6 @@ class JwtAuthorizationFilterTest {
         ResponseEntity<String> response = restTemplate.exchange(path, httpMethod, entity, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    static Stream<Arguments> viewerEndpoints() {
-        return Stream.of(
-                Arguments.of("/actuator/axelix-caches", HttpMethod.GET),
-                Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
-                Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
     }
 
     @Test
@@ -310,18 +274,6 @@ class JwtAuthorizationFilterTest {
         ResponseEntity<String> response = restTemplate.exchange(path, httpMethod, entity, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    }
-
-    static Stream<Arguments> notAuthorityForRole() {
-        return Stream.of(
-                Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
-                Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
-                Arguments.of(path("/clear-all"), HttpMethod.DELETE),
-                Arguments.of(path("/disable"), HttpMethod.POST),
-                Arguments.of(path("/enable"), HttpMethod.POST),
-                Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
-                Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
-                Arguments.of("/actuator/axelix-env", HttpMethod.GET));
     }
 
     @Test
@@ -418,6 +370,54 @@ class JwtAuthorizationFilterTest {
         assertThat(response).returns(HttpStatus.UNAUTHORIZED, ResponseEntity::getStatusCode);
     }
 
+    static Stream<Arguments> adminEndpoints() {
+        return Stream.of(
+            Arguments.of("/actuator/axelix-caches", HttpMethod.GET),
+            Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
+            Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
+            Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
+            Arguments.of(path("/clear-all"), HttpMethod.DELETE),
+            Arguments.of(path("/disable"), HttpMethod.POST),
+            Arguments.of(path("/enable"), HttpMethod.POST),
+            Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
+            Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
+            Arguments.of("/actuator/axelix-env", HttpMethod.GET),
+            Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
+    }
+
+    static Stream<Arguments> editorEndpoints() {
+        return Stream.of(
+            Arguments.of("/actuator/axelix-caches", HttpMethod.GET),
+            Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
+            Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
+            Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
+            Arguments.of(path("/clear-all"), HttpMethod.DELETE),
+            Arguments.of(path("/disable"), HttpMethod.POST),
+            Arguments.of(path("/enable"), HttpMethod.POST),
+            Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
+            Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
+            Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
+    }
+
+    static Stream<Arguments> viewerEndpoints() {
+        return Stream.of(
+            Arguments.of("/actuator/axelix-caches", HttpMethod.GET),
+            Arguments.of(path(TEST_CACHE_1), HttpMethod.GET),
+            Arguments.of("/actuator/axelix-beans", HttpMethod.GET));
+    }
+
+    static Stream<Arguments> notAuthorityForRole() {
+        return Stream.of(
+            Arguments.of(path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE),
+            Arguments.of(path(TEST_CACHE_1 + "/clear"), HttpMethod.DELETE),
+            Arguments.of(path("/clear-all"), HttpMethod.DELETE),
+            Arguments.of(path("/disable"), HttpMethod.POST),
+            Arguments.of(path("/enable"), HttpMethod.POST),
+            Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
+            Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
+            Arguments.of("/actuator/axelix-env", HttpMethod.GET));
+    }
+
     private HttpEntity<Void> defaultEntity(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, AuthenticationSchemes.BEARER.code() + " " + token);
@@ -436,10 +436,6 @@ class JwtAuthorizationFilterTest {
 
     private static String path(String relative) {
         return path(TEST_CACHE_MANAGER, relative);
-    }
-
-    private static String rootPath() {
-        return path("", "");
     }
 
     private static String path(String cacheManagerName, String relative) {
