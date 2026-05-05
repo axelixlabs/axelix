@@ -9,6 +9,8 @@
     /* TODO: Remove this magic number after layout improvement */
     height: calc(100vh - 281px);
     overflow: auto;
+    box-shadow: 0 -8px 4px -7px rgb(15 23 42 / 25%);
+    border-radius: var(--axelix-border-radius-large);
 }
 
 .ConditionsInnerWrapper {

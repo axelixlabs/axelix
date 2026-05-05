@@ -3,10 +3,6 @@
     border-top-right-radius: 0;
 }
 
-.AccordionWrapperStyles {
-    border-bottom: none;
-}
-
 .LabelWrapper {
     display: flex;
     align-items: flex-start;
