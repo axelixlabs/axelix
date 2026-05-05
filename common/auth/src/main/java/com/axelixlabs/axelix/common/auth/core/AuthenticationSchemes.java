@@ -22,7 +22,9 @@ package com.axelixlabs.axelix.common.auth.core;
  *
  * @author Mikhail Polivakha
  */
-public class AuthenticationSchemes {
+public final class AuthenticationSchemes {
+
+    private AuthenticationSchemes() {}
 
     public static final AuthenticationScheme BASIC = () -> "Basic";
     public static final AuthenticationScheme BEARER = () -> "Bearer";

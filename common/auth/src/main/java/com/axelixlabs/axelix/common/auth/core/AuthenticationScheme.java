@@ -18,7 +18,7 @@
 package com.axelixlabs.axelix.common.auth.core;
 
 /**
- * The scheme of authentication, e.g. {@code Baisc} or {@code Bearer}.
+ * The scheme of authentication, e.g. {@code Basic} or {@code Bearer}.
  *
  * @see AuthenticationSchemes
  * @author Mikhail Polivakha
