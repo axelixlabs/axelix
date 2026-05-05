@@ -29,16 +29,18 @@ import com.axelixlabs.axelix.common.domain.http.HttpMethod;
  * @since 28.07.2025
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
+ * @author Mikhail Polivakha
  */
 public interface AuthorityResolver {
 
     /**
-     * Resolves the required {@link Authority} for the given request path.
+     * Resolves the required {@link Authority} for the given request requestPath.
      *
-     * @param path        the request path (e.g. "/actuator/axelix-beans")
-     * @param httpMethod  the HTTP method (e.g. {@link HttpMethod#GET})
-     * @return an {@link Optional} containing the required {@link Authority},
-     * or {@link Optional#empty()} if no authority is associated with the path
+     * @param requestPath  the complete (i.e. not stripped) request path (e.g. "/actuator/axelix-beans").
+     * @param httpMethod   the HTTP method (e.g. {@link HttpMethod#GET}).
+     *
+     * @return             an {@link Optional} containing the required {@link Authority},
+     *                     or {@link Optional#empty()} if no authority is associated with the requestPath
      */
-    Optional<Authority> resolve(String path, HttpMethod httpMethod);
+    Optional<Authority> resolve(String requestPath, HttpMethod httpMethod);
 }

@@ -18,19 +18,17 @@
 package com.axelixlabs.axelix.sbs.spring.core.auth;
 
 import java.time.Duration;
-import java.util.List;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.server.PathContainer;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
-import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
 import com.axelixlabs.axelix.common.auth.service.Authorizer;
@@ -41,13 +39,6 @@ import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
 import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
 import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
-import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeanMetaInfoExtractor;
-import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
 
 /**
@@ -65,23 +56,6 @@ public class JwtAuthTestConfiguration {
     }
 
     @Bean
-    public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
-        return new DefaultConditionalBeanRefBuilder();
-    }
-
-    @Bean
-    public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
-        return new QualifiersPersistencePostProcessor();
-    }
-
-    @Bean
-    public BeanMetaInfoExtractor beanMetaInfoExtractor(
-            ConfigurableApplicationContext configurableApplicationContext,
-            ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-        return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
-    }
-
-    @Bean
     public JwtEncoderService jwtEncoderService(AuthProperties authProperties) {
         return new DefaultJwtEncoderService(
                 authProperties.getJwt().getAlgorithm(), authProperties.getJwt().getSigningKey(), Duration.ofHours(1));
@@ -95,7 +69,7 @@ public class JwtAuthTestConfiguration {
 
     @Bean
     public AuthorityResolver authorityResolver() {
-        return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
+        return new DefaultAuthorityResolver("/actuator", (pathTemplate, actualPath) -> {
             PathPattern parse = new PathPatternParser().parse(pathTemplate);
             return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
         });
@@ -107,17 +81,7 @@ public class JwtAuthTestConfiguration {
     }
 
     @Bean
-    public BeansFeedBuilder noOpBeanFeedBuilder() {
-        return () -> new BeansFeed(List.of());
-    }
-
-    @Bean
-    public AxelixBeansEndpoint axelixBeansEndpoint(BeansFeedBuilder noOpBeanFeedBuilder) {
-        return new AxelixBeansEndpoint(noOpBeanFeedBuilder);
-    }
-
-    @Bean
-    public IdentityAccessManager securityManager(
+    public IdentityAccessManager identityAccessManager(
             JwtDecoderService jwtDecoderService, AuthorityResolver authorityResolver, Authorizer authorizer) {
         return new DefaultIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
     }
@@ -130,9 +94,11 @@ public class JwtAuthTestConfiguration {
 
     @Bean
     public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-            IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
-        var registration = new FilterRegistrationBean<>(
-                new JwtAuthorizationFilter(identityAccessManager, securityContextExecutor));
+            IdentityAccessManager identityAccessManager,
+            SecurityContextExecutor securityContextExecutor,
+            WebEndpointProperties webEndpointProperties) {
+        var registration = new FilterRegistrationBean<>(new JwtAuthorizationFilter(
+                identityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath()));
         registration.setName("jwtAuthorizationFilter");
         return registration;
     }

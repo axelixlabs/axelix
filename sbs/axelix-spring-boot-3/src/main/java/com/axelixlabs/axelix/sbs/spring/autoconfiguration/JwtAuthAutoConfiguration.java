@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -52,7 +53,7 @@ import com.axelixlabs.axelix.sbs.spring.core.config.AuthProperties;
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "axelix.sbs.auth.jwt")
-@EnableConfigurationProperties // required for JwtAuthAutoConfigurationTest to run
+@EnableConfigurationProperties(WebEndpointProperties.class)
 public class JwtAuthAutoConfiguration {
 
     @Bean
@@ -79,10 +80,10 @@ public class JwtAuthAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AuthorityResolver authorityResolver() {
-        return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
+    public AuthorityResolver authorityResolver(WebEndpointProperties webEndpointProperties) {
+        return new DefaultAuthorityResolver(webEndpointProperties.getBasePath(), (pathTemplate, actualPath) -> {
             PathPattern parse = new PathPatternParser().parse(pathTemplate);
-            return parse.matchAndExtract(PathContainer.parsePath("/actuator" + actualPath)) != null;
+            return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
         });
     }
 
@@ -105,11 +106,14 @@ public class JwtAuthAutoConfiguration {
         return new ThreadLocalSecurityContextExecutor();
     }
 
-    // @Bean
+    @Bean
     public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-            IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
+            IdentityAccessManager identityAccessManager,
+            SecurityContextExecutor securityContextExecutor,
+            WebEndpointProperties webEndpointProperties) {
 
-        var jwtAuthorizationFilter = new JwtAuthorizationFilter(identityAccessManager, securityContextExecutor);
+        var jwtAuthorizationFilter = new JwtAuthorizationFilter(
+                identityAccessManager, securityContextExecutor, webEndpointProperties.getBasePath());
         var registration = new FilterRegistrationBean<>(jwtAuthorizationFilter);
         registration.setName("jwtAuthorizationFilter");
         return registration;

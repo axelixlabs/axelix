@@ -37,7 +37,8 @@ public interface IdentityAccessManager {
      * Main entrypoint for IAM. In case any problem is encountered, then the corresponding exception is thrown.
      * In case access is granted, the method returns the user identified by the bearer access token has been granted access.
      *
-     * @param requestPath       the context path of the request, e.g. {@code /api/external/anything} or {@code /actuator/axelix-beans}.
+     * @param requestPath       the complete (i.e. not stripped) context path of the request,
+     *                          e.g. {@code /api/external/anything} or {@code /actuator/axelix-beans}.
      * @param requestHttpMethod the HTTP method of the request.
      * @param token             the Bearer access token of the user.
      *

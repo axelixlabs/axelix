@@ -34,23 +34,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.PathContainer;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.util.pattern.PathPattern;
-import org.springframework.web.util.pattern.PathPatternParser;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
@@ -60,17 +55,10 @@ import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.auth.core.DefaultUser;
 import com.axelixlabs.axelix.common.auth.core.JwtAlgorithm;
 import com.axelixlabs.axelix.common.auth.core.Role;
-import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.core.User;
-import com.axelixlabs.axelix.common.auth.service.AuthorityResolver;
-import com.axelixlabs.axelix.common.auth.service.Authorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultAuthorizer;
-import com.axelixlabs.axelix.common.auth.service.DefaultIdentityAccessManager;
-import com.axelixlabs.axelix.common.auth.service.DefaultJwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.DefaultJwtEncoderService;
-import com.axelixlabs.axelix.common.auth.service.IdentityAccessManager;
-import com.axelixlabs.axelix.common.auth.service.JwtDecoderService;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
+import com.axelixlabs.axelix.sbs.spring.core.auth.JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration;
 import com.axelixlabs.axelix.sbs.spring.core.beans.AxelixBeansEndpoint;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeanMetaInfoExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
@@ -95,16 +83,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for {@link JwtAuthorizationFilter}.
- * <p>
- * The tests here assume that some actuator management endpoints are exposed, for instance via:
- * <pre>
- * management:
- *   endpoints:
- *     web:
- *       exposure:
- *         include:
- *           - axelix-beans
- * </pre>
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
@@ -117,10 +95,11 @@ import static org.assertj.core.api.Assertions.assertThat;
             "axelix.prop.test.name=axelix-beans",
         })
 @Import({
-    JwtAuthorizationFilterTest.JwtAuthorizationFilterTestConfiguration.class,
+    JwtAuthorizationFilterTestConfiguration.class,
     AxelixCachesEndpoint.class,
     DefaultCacheOperationsDispatcher.class,
-    EnvironmentTestConfig.class
+    EnvironmentTestConfig.class,
+    JwtAuthTestConfiguration.class
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class JwtAuthorizationFilterTest {
@@ -425,15 +404,6 @@ class JwtAuthorizationFilterTest {
         return new HttpEntity<>(headers);
     }
 
-    enum UnrecognizedAuthority implements Authority {
-        UNRECOGNIZED_AUTHORITY;
-
-        @Override
-        public String getName() {
-            return name();
-        }
-    }
-
     private static String path(String relative) {
         return path(TEST_CACHE_MANAGER, relative);
     }
@@ -449,12 +419,15 @@ class JwtAuthorizationFilterTest {
         return (path.isEmpty() || path.charAt(0) == '/') ? path : "/" + path;
     }
 
-    /**
-     * Minimal test configuration for {@link JwtAuthorizationFilter} integration testing.
-     *
-     * <p>Registers required beans including {@link JwtDecoderService}, and
-     * {@link JwtAuthorizationFilter} for use in the test suite.
-     */
+    enum UnrecognizedAuthority implements Authority {
+        UNRECOGNIZED_AUTHORITY;
+
+        @Override
+        public String getName() {
+            return name();
+        }
+    }
+
     @TestConfiguration
     static class JwtAuthorizationFilterTestConfiguration {
 
@@ -476,34 +449,6 @@ class JwtAuthorizationFilterTest {
         }
 
         @Bean
-        public JwtDecoderService jwtDecoderService(
-                final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-                final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
-            return new DefaultJwtDecoderService(algorithm, signingKey);
-        }
-
-        @Bean
-        JwtEncoderService jwtEncoderService(
-                final @Value("${axelix.sbs.auth.jwt.algorithm}") JwtAlgorithm algorithm,
-                final @Value("${axelix.sbs.auth.jwt.lifespan}") Duration lifespan,
-                final @Value("${axelix.sbs.auth.jwt.signing-key}") String signingKey) {
-            return new DefaultJwtEncoderService(algorithm, signingKey, lifespan);
-        }
-
-        @Bean
-        public AuthorityResolver authorityResolver() {
-            return new DefaultAuthorityResolver((pathTemplate, actualPath) -> {
-                PathPattern parse = new PathPatternParser().parse("/actuator" + pathTemplate);
-                return parse.matchAndExtract(PathContainer.parsePath(actualPath)) != null;
-            });
-        }
-
-        @Bean
-        public Authorizer authorizer() {
-            return new DefaultAuthorizer();
-        }
-
-        @Bean
         public BeansFeedBuilder noOpBeanFeedBuilder() {
             return () -> new BeansFeed(List.of());
         }
@@ -511,24 +456,6 @@ class JwtAuthorizationFilterTest {
         @Bean
         public AxelixBeansEndpoint axelixBeansEndpoint(BeansFeedBuilder noOpBeanFeedBuilder) {
             return new AxelixBeansEndpoint(noOpBeanFeedBuilder);
-        }
-
-        @Bean
-        public IdentityAccessManager securityManager(
-                JwtDecoderService jwtDecoderService,
-                AuthorityResolver authorityResolver,
-                Authorizer authorizer,
-                ConfigurableEnvironment environment) {
-            return new DefaultIdentityAccessManager(jwtDecoderService, authorityResolver, authorizer);
-        }
-
-        @Bean
-        public FilterRegistrationBean<JwtAuthorizationFilter> jwtAuthorizationFilterRegistration(
-                IdentityAccessManager identityAccessManager, SecurityContextExecutor securityContextExecutor) {
-            var registration = new FilterRegistrationBean<>(
-                    new JwtAuthorizationFilter(identityAccessManager, securityContextExecutor));
-            registration.setName("jwtAuthorizationFilter");
-            return registration;
         }
 
         @Bean
