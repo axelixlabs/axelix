@@ -44,12 +44,6 @@ public class DefaultAuthorityResolver implements AuthorityResolver {
     static {
         Map<ActuatorEndpoint, Authority> map = new LinkedHashMap<>();
 
-        // ENV_VALUES_READ
-        map.put(ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, DefaultAuthority.ENV_VALUES_READ);
-
-        // CONFIG_PROPS_VALUES_READ
-        map.put(ActuatorEndpoints.GET_CONFIG_PROPS, DefaultAuthority.CONFIG_PROPS_VALUES_READ);
-
         // SCHEDULED_TASKS_MODIFY
         map.put(ActuatorEndpoints.MODIFY_CRON_EXPRESSION_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);
         map.put(ActuatorEndpoints.MODIFY_INTERVAL_SCHEDULED_TASK, DefaultAuthority.SCHEDULED_TASKS_MODIFY);

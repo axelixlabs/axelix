@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -95,7 +94,6 @@ import static org.assertj.core.api.Assertions.assertThat;
         })
 @EnableConfigurationProperties(AxelixEnvironmentEndpointTest.AxelixPropTest.class)
 @Import({EnvironmentTestConfig.class, JwtAuthTestConfiguration.class})
-@Disabled // TODO pending https://github.com/axelixlabs/axelix/issues/956
 class AxelixEnvironmentEndpointTest {
 
     @Autowired

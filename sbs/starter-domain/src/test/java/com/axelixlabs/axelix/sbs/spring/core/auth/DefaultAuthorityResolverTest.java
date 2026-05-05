@@ -59,12 +59,6 @@ public class DefaultAuthorityResolverTest {
 
     private static Stream<Arguments> defaultAuthority() {
         return Stream.of(
-                // ENV_VALUES_READ
-                Arguments.of("/axelix-env", HttpMethod.GET, DefaultAuthority.ENV_VALUES_READ),
-
-                // CONFIG_PROPS_VALUES_READ
-                Arguments.of("/axelix-configprops", HttpMethod.GET, DefaultAuthority.CONFIG_PROPS_VALUES_READ),
-
                 // SCHEDULED_TASKS_MODIFY
                 Arguments.of(
                         "/axelix-scheduled-tasks/modify/cron-expression",
