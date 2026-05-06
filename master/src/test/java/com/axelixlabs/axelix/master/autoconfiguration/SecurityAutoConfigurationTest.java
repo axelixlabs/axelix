@@ -105,7 +105,8 @@ class SecurityAutoConfigurationTest {
         @Test
         void shouldFailWhenJwtAlgorithmPropertyIsMissing() {
             // given
-            ApplicationContextRunner contextRunner = new ApplicationContextRunner(SecurityAutoConfigurationTest::isolatedContext)
+            ApplicationContextRunner contextRunner = new ApplicationContextRunner(
+                            SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.signing-key=secret", "axelix.master.auth.jwt.lifespan=PT30M")
                     .withConfiguration(AutoConfigurations.of(
@@ -124,7 +125,8 @@ class SecurityAutoConfigurationTest {
         @Test
         void shouldFailWhenJwtSigningKeyPropertyIsMissing() {
             // given
-            ApplicationContextRunner contextRunner = new ApplicationContextRunner(SecurityAutoConfigurationTest::isolatedContext)
+            ApplicationContextRunner contextRunner = new ApplicationContextRunner(
+                            SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.algorithm=HMAC512", "axelix.master.auth.jwt.lifespan=PT30M")
                     .withConfiguration(AutoConfigurations.of(
@@ -143,7 +145,8 @@ class SecurityAutoConfigurationTest {
         @Test
         void shouldPassSuccessfullyWhenLifespanPropertyIsMissing() {
             // given
-            ApplicationContextRunner contextRunner = new ApplicationContextRunner(SecurityAutoConfigurationTest::isolatedContext)
+            ApplicationContextRunner contextRunner = new ApplicationContextRunner(
+                            SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.algorithm=HMAC512", "axelix.master.auth.jwt.signing-key=secret")
                     .withUserConfiguration(TestSecurityDependenciesConfig.class)
@@ -167,7 +170,8 @@ class SecurityAutoConfigurationTest {
         @Test
         void shouldFailWhenJwtAlgorithmIsNotSupported() {
             // given
-            ApplicationContextRunner contextRunner = new ApplicationContextRunner(SecurityAutoConfigurationTest::isolatedContext)
+            ApplicationContextRunner contextRunner = new ApplicationContextRunner(
+                            SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.algorithm=RSA512",
                             "axelix.master.auth.jwt.signing-key=secret",
