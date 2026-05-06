@@ -19,6 +19,7 @@ package com.axelixlabs.axelix.master.autoconfiguration;
 
 import java.util.Optional;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,7 +30,9 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.web.client.RestClient;
 
 import com.axelixlabs.axelix.common.auth.core.SecurityContext;
@@ -64,7 +67,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SecurityAutoConfigurationTest {
 
     private static ApplicationContextRunner baselineConfigAppContextRunner() {
-        return new ApplicationContextRunner()
+        return new ApplicationContextRunner(SecurityAutoConfigurationTest::isolatedContext)
                 .withPropertyValues(
                         "axelix.master.auth.jwt.algorithm=HMAC512",
                         "axelix.master.auth.jwt.signing-key=secret",
@@ -102,7 +105,7 @@ class SecurityAutoConfigurationTest {
         @Test
         void shouldFailWhenJwtAlgorithmPropertyIsMissing() {
             // given
-            ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+            ApplicationContextRunner contextRunner = new ApplicationContextRunner(SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.signing-key=secret", "axelix.master.auth.jwt.lifespan=PT30M")
                     .withConfiguration(AutoConfigurations.of(
@@ -121,7 +124,7 @@ class SecurityAutoConfigurationTest {
         @Test
         void shouldFailWhenJwtSigningKeyPropertyIsMissing() {
             // given
-            ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+            ApplicationContextRunner contextRunner = new ApplicationContextRunner(SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.algorithm=HMAC512", "axelix.master.auth.jwt.lifespan=PT30M")
                     .withConfiguration(AutoConfigurations.of(
@@ -140,7 +143,7 @@ class SecurityAutoConfigurationTest {
         @Test
         void shouldPassSuccessfullyWhenLifespanPropertyIsMissing() {
             // given
-            ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+            ApplicationContextRunner contextRunner = new ApplicationContextRunner(SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.algorithm=HMAC512", "axelix.master.auth.jwt.signing-key=secret")
                     .withUserConfiguration(TestSecurityDependenciesConfig.class)
@@ -164,7 +167,7 @@ class SecurityAutoConfigurationTest {
         @Test
         void shouldFailWhenJwtAlgorithmIsNotSupported() {
             // given
-            ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+            ApplicationContextRunner contextRunner = new ApplicationContextRunner(SecurityAutoConfigurationTest::isolatedContext)
                     .withPropertyValues(
                             "axelix.master.auth.jwt.algorithm=RSA512",
                             "axelix.master.auth.jwt.signing-key=secret",
@@ -386,5 +389,15 @@ class SecurityAutoConfigurationTest {
         public Optional<SecurityContext> getSecurityContext() {
             return Optional.empty();
         }
+    }
+
+    private static @NonNull AnnotationConfigApplicationContext isolatedContext() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        // Replace the standard environment with a mock or a blank one
+        StandardEnvironment cleanEnv = new StandardEnvironment();
+        cleanEnv.getPropertySources().remove(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
+        cleanEnv.getPropertySources().remove(StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
+        context.setEnvironment(cleanEnv);
+        return context;
     }
 }
