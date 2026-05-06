@@ -37,7 +37,7 @@ runs:
       # TODO:
       #   So we're effectively disabling the caches in PR Builds as well?
       #   Then why are we using gradle cache at all (action above)... We need to decide upon the strategy here
-      run: ./gradlew build --configuration-cache --build-cache
+      run: ./gradlew build --continue --configuration-cache --build-cache
       shell: bash
 
     - name: Upload test report in case of build failure
