@@ -30,7 +30,6 @@ import com.axelixlabs.axelix.common.auth.core.PasswordlessUser;
 import com.axelixlabs.axelix.common.auth.core.SecurityContextExecutor;
 import com.axelixlabs.axelix.common.auth.service.JwtEncoderService;
 import com.axelixlabs.axelix.master.domain.Instance;
-import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 /**
@@ -78,10 +77,6 @@ public class ShortPollingInstanceDiscoveryScheduler {
                 """, this.getClass().getSimpleName());
         }
 
-        Set<InstanceId> currentlyRegisteredIds = instanceRegistry.getAllIds();
-
         instanceRegistry.reload(discoveredInstances);
-
-        logger.debug("Registered instances: {}", currentlyRegisteredIds.size());
     }
 }

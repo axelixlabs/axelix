@@ -34,6 +34,7 @@ import com.axelixlabs.axelix.common.api.transform.KilobytesMemoryBaseUnitValueTr
 import com.axelixlabs.axelix.master.api.external.response.DashboardResponse;
 import com.axelixlabs.axelix.master.api.external.response.software.DistributionResponse;
 import com.axelixlabs.axelix.master.api.external.response.software.SoftwareDistributions;
+import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
@@ -53,10 +54,13 @@ class DefaultDashboardServiceTest {
     @Autowired
     private InstanceRegistry instanceRegistry;
 
+    @Autowired
+    private InstanceRepository instanceRepository;
+
     @BeforeEach
     void setUp() {
         // clear instanceRegistry before test
-        instanceRegistry.deRegisterAll(instanceRegistry.getAllIds());
+        instanceRepository.deleteAll();
 
         populateInstanceRegistry();
 

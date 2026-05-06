@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.master.domain.InstanceId;
  * must be thread safe.
  *
  * @see Instance
+ *
  * @author Mikhail Polivakha
  * @author Nikita Kirillov
  * @author Sergey Cherkasov
@@ -65,13 +66,6 @@ public interface InstanceRegistry {
     void deRegister(InstanceId instanceId);
 
     /**
-     * Deregisters all instances identified by the given instance IDs.
-     *
-     * @param instanceIds the collection of IDs of the instances to be deregistered.
-     */
-    void deRegisterAll(Collection<InstanceId> instanceIds);
-
-    /**
      * Get {@link Instance} by its id.
      *
      * @param instanceId the id of the instance to get.
@@ -86,13 +80,6 @@ public interface InstanceRegistry {
      * @return all instances that are managed by this registry.
      */
     List<Instance> getAll();
-
-    /**
-     * Get all instance IDs that are managed by this registry.
-     *
-     * @return all instance IDs that are managed by this registry.
-     */
-    Set<InstanceId> getAllIds();
 
     /**
      * @return average heap usage in bytes across all instances, or -1 if no instances registered.

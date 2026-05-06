@@ -51,6 +51,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import com.axelixlabs.axelix.common.auth.core.DefaultRole;
 import com.axelixlabs.axelix.common.domain.version.AxelixVersionDiscoverer;
 import com.axelixlabs.axelix.master.domain.Instance;
+import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.service.discovery.k8s.KubernetesServiceInstance;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 import com.axelixlabs.axelix.master.utils.TestRestTemplateBuilder;
@@ -94,14 +95,18 @@ class ShortPollingInstanceDiscoverySchedulerTest {
     @Autowired
     private TestRestTemplateBuilder restTemplate;
 
+    @Autowired
+    private InstanceRepository instanceRepository;
+
     @BeforeEach
     void setUp() throws IOException {
         if (mockWebServer != null) {
             mockWebServer.close();
         }
+        // TODO: Starting up a new web server on every test? Pretty overpowered for that...
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        instanceRegistry.deRegisterAll(instanceRegistry.getAllIds());
+        instanceRepository.deleteAll();
         uri = URI.create("http://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort());
     }
 

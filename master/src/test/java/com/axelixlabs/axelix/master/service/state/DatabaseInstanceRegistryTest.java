@@ -33,6 +33,7 @@ import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.Instance.VMFeature;
 import com.axelixlabs.axelix.master.domain.InstanceId;
 import com.axelixlabs.axelix.master.domain.MemoryUsage;
+import com.axelixlabs.axelix.master.repository.InstanceRepository;
 
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.withName;
@@ -54,10 +55,13 @@ abstract class DatabaseInstanceRegistryTest {
     @Autowired
     private InstanceRegistry instanceRegistry;
 
+    @Autowired
+    private InstanceRepository instanceRepository;
+
     @BeforeEach
     @AfterEach
     void setup() {
-        instanceRegistry.deRegisterAll(instanceRegistry.getAllIds());
+        instanceRepository.deleteAll();
     }
 
     @Test
@@ -191,10 +195,10 @@ abstract class DatabaseInstanceRegistryTest {
         assertThat(instanceRegistry.getAll()).hasSize(2);
 
         // when.
-        instanceRegistry.deRegisterAll(List.of(InstanceId.of("deregister-all-1"), InstanceId.of("deregister-all-2")));
+        instanceRepository.deleteAllById(List.of(InstanceId.of("deregister-all-1"), InstanceId.of("deregister-all-2")));
 
         // then.
-        assertThat(instanceRegistry.getAllIds()).isEmpty();
+        assertThat(instanceRepository.findAll()).isEmpty();
     }
 
     @Test
@@ -207,17 +211,6 @@ abstract class DatabaseInstanceRegistryTest {
         assertThat(instanceRegistry.getAll())
                 .extracting(Instance::id)
                 .containsOnly(InstanceId.of("test-id-1"), InstanceId.of("test-id-2"));
-    }
-
-    @Test
-    void getAllIds_shouldReturnOnlyIds() {
-        // given.
-        instanceRegistry.register(createInstance("test-id-1"));
-        instanceRegistry.register(createInstance("test-id-2"));
-
-        // when. / then.
-        Set<InstanceId> ids = instanceRegistry.getAllIds();
-        assertThat(ids).containsOnly(InstanceId.of("test-id-1"), InstanceId.of("test-id-2"));
     }
 
     @Test

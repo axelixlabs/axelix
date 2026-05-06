@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -78,11 +77,6 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
     }
 
     @Override
-    public void deRegisterAll(Collection<InstanceId> instanceIds) {
-        instanceRepository.deleteAllById(instanceIds);
-    }
-
-    @Override
     public Optional<Instance> get(InstanceId instanceId) {
         return instanceRepository.findById(instanceId);
     }
@@ -91,11 +85,6 @@ public class DatabaseInstanceRegistry implements InstanceRegistry {
     public List<Instance> getAll() {
         // No need to coping collections or anything - the domain instances are not proxied
         return instanceRepository.findAll();
-    }
-
-    @Override
-    public Set<InstanceId> getAllIds() {
-        return instanceRepository.findAllIds().stream().map(InstanceId::of).collect(Collectors.toSet());
     }
 
     @Override
