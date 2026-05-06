@@ -28,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -70,8 +71,7 @@ import com.axelixlabs.axelix.sbs.spring.core.cache.CacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheOperationsDispatcher;
 import com.axelixlabs.axelix.sbs.spring.core.cache.DefaultCacheSizeProvider;
 import com.axelixlabs.axelix.sbs.spring.core.cache.EnhancedCacheManager;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.config.EndpointsConfigurationProperties;
 import com.axelixlabs.axelix.sbs.spring.core.configprops.SmartSanitizingFunction;
 import com.axelixlabs.axelix.sbs.spring.core.env.AxelixEnvironmentEndpoint;
@@ -420,11 +420,6 @@ class JwtAuthorizationFilterTest {
     static class JwtAuthorizationFilterTestConfiguration {
 
         @Bean
-        public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
-            return new DefaultConditionalBeanRefBuilder();
-        }
-
-        @Bean
         public static QualifiersPersistencePostProcessor qualifiersPersistencePostProcessor() {
             return new QualifiersPersistencePostProcessor();
         }
@@ -432,8 +427,8 @@ class JwtAuthorizationFilterTest {
         @Bean
         public BeanMetaInfoExtractor beanMetaInfoExtractor(
                 ConfigurableApplicationContext configurableApplicationContext,
-                ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
+                ObjectProvider<ConditionalFeedBuilder> conditionalFeedBuilder) {
+            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalFeedBuilder);
         }
 
         @Bean

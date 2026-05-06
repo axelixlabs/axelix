@@ -21,8 +21,8 @@ import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -36,8 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalFeedBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
@@ -46,12 +45,13 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
  * Integration tests for {@link AxelixBeansEndpoint}.
  *
  * @author Mikhail Polivakha
+ * @author Sergey Cherkasov
  */
 @SpringBootTest(
         classes = AxelixBeansEndpointTest.CurrentConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"axelix.prop.test.name=axelix-beans"})
-@Import({BeansEndpoint.class, AxelixBeansEndpoint.class, ConditionsReportEndpoint.class})
+@Import({BeansEndpoint.class, AxelixBeansEndpoint.class})
 class AxelixBeansEndpointTest {
 
     @Autowired
@@ -66,11 +66,6 @@ class AxelixBeansEndpointTest {
         static final String CUSTOM_SUPPLIER = "customSupplier";
 
         @Bean
-        public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
-            return new DefaultConditionalBeanRefBuilder();
-        }
-
-        @Bean
         public BeansFeedBuilder testBeansFeedBuilder(
                 BeanMetaInfoExtractor beanMetaInfoExtractor,
                 ConfigurableApplicationContext configurableApplicationContext) {
@@ -80,8 +75,8 @@ class AxelixBeansEndpointTest {
         @Bean(BEAN_META_INFO_EXTRACTOR)
         public BeanMetaInfoExtractor beanMetaInfoExtractor(
                 ConfigurableApplicationContext configurableApplicationContext,
-                ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
+                ObjectProvider<ConditionalFeedBuilder> conditionalFeedBuilder) {
+            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalFeedBuilder);
         }
 
         @Bean(QUALIFIERS_PERSISTENCE_POST_PROCESSOR)
@@ -161,10 +156,10 @@ class AxelixBeansEndpointTest {
         assertThat(bean.isConfigPropsBean()).isFalse();
         assertThat(bean.getAutoConfigurationRef()).isNull();
         assertThat(bean.getAliases()).isEmpty();
-        assertThat(bean.getDependencies())
-                .hasSize(2)
-                .contains(new BeansFeed.BeanDependency(
-                        "conditionalBeanRefBuilder", false)); // second bean is the application context itself
+        assertThat(bean.getDependencies()).hasSize(1).singleElement().satisfies(dependency -> {
+            assertThat(dependency.getName()).isNotEmpty();
+            assertThat(dependency.isConfigPropsDependency()).isFalse(); // bean is the application context itself
+        });
         assertThat(bean.isLazyInit()).isFalse();
         assertThat(bean.isPrimary()).isFalse();
         assertThat(bean.getQualifiers()).isEmpty();

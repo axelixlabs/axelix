@@ -88,7 +88,10 @@ class BeansApiTest {
               "scope": "prototype",
               "className": "Jackson2ObjectMapperBuilder",
               "aliases": [],
-              "autoConfigurationRef" :"HibernateJpaConfiguration#entityManagerFactoryBuilder",
+              "autoConfigurationRef" : {
+                "className": "HibernateJpaConfiguration",
+                "methodName": "entityManagerFactoryBuilder"
+              },
               "proxyType" : "JDK_PROXY",
               "dependencies": [
                 {
@@ -196,7 +199,10 @@ class BeansApiTest {
                   "scope": "prototype",
                   "className": "Jackson2ObjectMapperBuilder",
                   "aliases": [],
-                  "autoConfigurationRef" :"HibernateJpaConfiguration#entityManagerFactoryBuilder",
+                  "autoConfigurationRef" : {
+                    "className": "HibernateJpaConfiguration",
+                    "methodName": "entityManagerFactoryBuilder"
+                  },
                   "proxyType" : "JDK_PROXY",
                   "dependencies": [
                     {

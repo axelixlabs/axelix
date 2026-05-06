@@ -34,6 +34,7 @@ import jakarta.persistence.Table;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -66,8 +67,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
 import com.axelixlabs.axelix.common.api.BeansFeed.ComponentVariant;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalFeedBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalTargetUnwrapper;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalFeedBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalTargetUnwrapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -111,7 +114,9 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.getQualifiers()).isEmpty();
-            assertThat(it.getAutoConfigurationRef()).isEqualTo("CacheAutoConfiguration");
+            assertThat(it.getAutoConfigurationRef()).isNotNull();
+            assertThat(it.getAutoConfigurationRef().getClassName()).isEqualTo("CacheAutoConfiguration");
+            assertThat(it.getAutoConfigurationRef().getMethodName()).isNull();
             assertThat(it.getBeanSource()).isInstanceOf(ComponentVariant.class);
         });
     }
@@ -125,7 +130,9 @@ class DefaultBeanMetaInfoExtractorTest {
             assertThat(it.isPrimary()).isFalse();
             assertThat(it.getProxyType()).isEqualTo(BeansFeed.ProxyType.NO_PROXYING);
             assertThat(it.getQualifiers()).isEmpty();
-            assertThat(it.getAutoConfigurationRef()).isEqualTo("CacheAutoConfiguration#cacheManagerCustomizers");
+            assertThat(it.getAutoConfigurationRef()).isNotNull();
+            assertThat(it.getAutoConfigurationRef().getClassName()).isEqualTo("CacheAutoConfiguration");
+            assertThat(it.getAutoConfigurationRef().getMethodName()).isEqualTo("cacheManagerCustomizers");
             assertThat(it.getBeanSource()).isInstanceOf(BeansFeed.BeanMethod.class);
             assertThat((BeansFeed.BeanMethod) it.getBeanSource()).satisfies(beanMethod -> {
                 assertThat(beanMethod.getEnclosingClassFullName()).isEqualTo(CacheAutoConfiguration.class.getName());
@@ -421,15 +428,22 @@ class DefaultBeanMetaInfoExtractorTest {
         }
 
         @Bean
-        public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
-            return new DefaultConditionalBeanRefBuilder();
+        public ConditionalTargetUnwrapper conditionalTargetUnwrapper() {
+            return new DefaultConditionalTargetUnwrapper();
+        }
+
+        @Bean
+        public ConditionalFeedBuilder conditionalFeedBuilder(
+                ConfigurableApplicationContext configurableApplicationContext,
+                ConditionalTargetUnwrapper conditionalTargetUnwrapper) {
+            return new DefaultConditionalFeedBuilder(configurableApplicationContext, conditionalTargetUnwrapper);
         }
 
         @Bean
         public BeanMetaInfoExtractor beanMetaInfoExtractor(
                 ConfigurableApplicationContext configurableApplicationContext,
-                ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
+                ObjectProvider<ConditionalFeedBuilder> conditionalFeedBuilder) {
+            return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalFeedBuilder);
         }
 
         @Entity

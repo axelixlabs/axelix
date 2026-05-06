@@ -84,7 +84,7 @@ public final class BeansFeed {
         private final Set<String> aliases;
 
         @Nullable
-        private final String autoConfigurationRef;
+        private final AutoConditionsRef autoConfigurationRef;
 
         private final Set<BeanDependency> dependencies;
 
@@ -107,9 +107,9 @@ public final class BeansFeed {
          * @param scope                 The scope of the bean.
          * @param className             The fully qualified class name of the bean.
          * @param aliases               The aliases of the given bean.
-         * @param autoConfigurationRef  The reference to an @AutoConfiguration class if it is annotated with conditions
-         *                              {@code className}, or, if it contains a method annotated with conditions,
-         *                              a reference to the class with the method specified {@code className#methodName}.
+         * @param autoConfigurationRef  The reference to an {@link @AutoConfiguration} class if it is annotated with condition
+         *                              or contains a method annotated with conditions. It may also be {@code null} when there
+         *                              are no conditions or when state tracking is disabled in the Axelix system
          * @param dependencies          The list of dependencies of this bean (i.e. other beans that this bean depends on).
          * @param isLazyInit            Whether the bean is lazily instantiated or eagerly.
          * @param isPrimary             Whether the bean is marked with BeanDefinition#isPrimary() primary marker.
@@ -122,9 +122,9 @@ public final class BeansFeed {
                 @JsonProperty("beanName") String beanName,
                 @JsonProperty("className") String className,
                 @JsonProperty("scope") String scope,
-                @JsonProperty("proxyType") ProxyType proxyType, // Нужно поменять на String
+                @JsonProperty("proxyType") ProxyType proxyType,
                 @JsonProperty("aliases") Set<String> aliases,
-                @JsonProperty("autoConfigurationRef") @Nullable String autoConfigurationRef,
+                @JsonProperty("autoConfigurationRef") @Nullable AutoConditionsRef autoConfigurationRef,
                 @JsonProperty("dependencies") Set<BeanDependency> dependencies,
                 @JsonProperty("isPrimary") boolean isPrimary,
                 @JsonProperty("isLazyInit") boolean isLazyInit,
@@ -167,7 +167,7 @@ public final class BeansFeed {
         }
 
         @Nullable
-        public String getAutoConfigurationRef() {
+        public AutoConditionsRef getAutoConfigurationRef() {
             return autoConfigurationRef;
         }
 
@@ -618,5 +618,57 @@ public final class BeansFeed {
 
         /** Bean is not proxied */
         NO_PROXYING
+    }
+
+    /**
+     * A link to the configuration class where all conditions matched successfully
+     */
+    public static final class AutoConditionsRef {
+        private final String className;
+
+        @Nullable
+        private final String methodName;
+
+        /**
+         * Create a new AutoConditionsRef
+         *
+         * @param className  the class name of the class on which either the conditional annotation resided, or
+         *                   that contained the {@link #methodName} on which the conditional annotation resided.
+         *                   Guaranteed to be present.
+         * @param methodName the name of the method on which the conditional annotation was put.
+         */
+        @JsonCreator
+        public AutoConditionsRef(
+                @JsonProperty("className") String className, @JsonProperty("methodName") @Nullable String methodName) {
+            this.className = className;
+            this.methodName = methodName;
+        }
+
+        public String getClassName() {
+            return className;
+        }
+
+        public @Nullable String getMethodName() {
+            return methodName;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            AutoConditionsRef that = (AutoConditionsRef) o;
+            return Objects.equals(className, that.className) && Objects.equals(methodName, that.methodName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(className, methodName);
+        }
+
+        @Override
+        public String toString() {
+            return "AutoConditionsRef{" + "className='" + className + '\'' + ", methodName='" + methodName + '\'' + '}';
+        }
     }
 }
