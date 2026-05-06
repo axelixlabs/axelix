@@ -62,7 +62,7 @@ public class ShortPollingInstanceDiscoveryScheduler {
         this.securityContextExecutor = securityContextExecutor;
     }
 
-    @Scheduled(cron = "${axelix.master.discovery.auto.broadcast.interval}")
+    @Scheduled(cron = "${axelix.master.discovery.auto.broadcast.schedule}")
     public void performDiscovery() {
 
         String token = jwtEncoderService.generateToken(TECH_USER, Duration.ofSeconds(300));

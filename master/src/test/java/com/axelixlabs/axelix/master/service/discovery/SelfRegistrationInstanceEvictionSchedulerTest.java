@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.axelixlabs.axelix.master.domain.Instance;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.repository.InstanceRepository;
 import com.axelixlabs.axelix.master.service.state.InstanceRegistry;
 
 import static com.axelixlabs.axelix.master.utils.TestObjectFactory.createInstance;
@@ -49,9 +50,12 @@ class SelfRegistrationInstanceEvictionSchedulerTest {
     @Autowired
     private SelfRegistrationInstanceEvictionScheduler selfRegistrationInstanceEvictionScheduler;
 
+    @Autowired
+    private InstanceRepository instanceRepository;
+
     @BeforeEach
     void setUp() {
-        instanceRegistry.deRegisterAll(instanceRegistry.getAllIds());
+        instanceRepository.deleteAll();
     }
 
     @Test

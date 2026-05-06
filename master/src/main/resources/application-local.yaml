@@ -7,11 +7,12 @@ axelix:
     discovery:
       self-registration:
         eviction:
-          interval: "0 * * * * *"
+          heartbeat-timeout: 45s
+          schedule: "0 * * * * *"
       auto:
         enabled: true
         broadcast:
-          interval: "0 * * * * *"
+          schedule: "0 * * * * *"
         platform: kubernetes
         kubernetes:
           # Should be provided by the local-launch configuration

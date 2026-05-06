@@ -45,10 +45,10 @@ axelix:
     discovery:
       auto:
         broadcast:
-          interval: "-"
+          schedule: "-"
       self-registration:
         eviction:
-          interval: "-"
+          schedule: "-"
     web:
       static-resources:
         location: classpath:/spa-dist/

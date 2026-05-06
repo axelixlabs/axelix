@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.master.service.discovery;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import org.slf4j.Logger;
@@ -44,16 +45,17 @@ public class SelfRegistrationInstanceEvictionScheduler {
      * Maximum time in seconds without a heartbeat before a self-registered instance
      * is considered stale and eligible for eviction. Default: 45 seconds
      */
-    @Value("${axelix.master.discovery.self-registration.eviction.heartbeat-timeout:45}")
-    private long heartbeatTimeout;
+    @SuppressWarnings("NullAway.Init")
+    @Value("${axelix.master.discovery.self-registration.eviction.heartbeat-timeout}")
+    private Duration heartbeatTimeout;
 
     public SelfRegistrationInstanceEvictionScheduler(InstanceRepository instanceRepository) {
         this.instanceRepository = instanceRepository;
     }
 
-    @Scheduled(cron = "${axelix.master.discovery.self-registration.eviction.interval}")
+    @Scheduled(cron = "${axelix.master.discovery.self-registration.eviction.schedule}")
     public void evictStaleInstances() {
-        Instant threshold = Instant.now().minusSeconds(heartbeatTimeout);
+        Instant threshold = Instant.now().minus(heartbeatTimeout);
         int evictedCount = instanceRepository.deleteWhereHeartbeatOlderThan(threshold);
 
         logger.debug("Evicted {} stale instances.", evictedCount);
