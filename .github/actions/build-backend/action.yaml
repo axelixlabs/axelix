@@ -34,8 +34,19 @@ runs:
       shell: bash
 
     - name: Gradle build
+      # TODO:
+      #   So we're effectively disabling the caches in PR Builds as well?
+      #   Then why are we using gradle cache at all (action above)... We need to decide upon the strategy here
       run: ./gradlew build --configuration-cache --build-cache
       shell: bash
+
+    - name: Upload test report in case of build failure
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: gradle-test-reports
+        path: 'build/reports/tests/test/aggregated-results' # Aggregated tests results will be stored there
+        retention-days: 3
 
     - name: Download and trust Nexus SSL certificate for Gradle
       if: ${{ inputs.deploy-to-nexus == 'true' }}
