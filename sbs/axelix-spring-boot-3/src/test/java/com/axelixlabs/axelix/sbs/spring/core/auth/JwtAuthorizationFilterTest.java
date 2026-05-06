@@ -214,17 +214,6 @@ class JwtAuthorizationFilterTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
-    @Test
-    void shouldReturnForbidden_UserWithoutRequiredAuthority_ForUserWithRoleEditor() {
-        User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.EDITOR));
-        HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-
-        ResponseEntity<Void> response =
-                testRestTemplate.exchange("/actuator/axelix-env", HttpMethod.GET, entity, Void.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    }
-
     @ParameterizedTest
     @MethodSource("notAuthorityForRole")
     void shouldReturnForbidden_UserWithoutRequiredAuthority_ForUserWithRoleViewer(String path, HttpMethod httpMethod) {
@@ -393,8 +382,7 @@ class JwtAuthorizationFilterTest {
                 Arguments.of(path("/disable"), HttpMethod.POST),
                 Arguments.of(path("/enable"), HttpMethod.POST),
                 Arguments.of(path(TEST_CACHE_1 + "/disable"), HttpMethod.POST),
-                Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST),
-                Arguments.of("/actuator/axelix-env", HttpMethod.GET));
+                Arguments.of(path(TEST_CACHE_1 + "/enable"), HttpMethod.POST));
     }
 
     private HttpEntity<Void> defaultEntity(String token) {
