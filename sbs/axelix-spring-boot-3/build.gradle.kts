@@ -64,8 +64,6 @@ testing {
                 }
             }
 
-            useJUnitJupiter()
-
             dependencies {
                 implementation("org.jetbrains.lincheck:lincheck:3.5")
 

@@ -11,6 +11,7 @@ plugins {
     id("pmd")
     id("signing")
     id("net.ltgt.errorprone") version "4.2.0"
+    id("test-report-aggregation")
 }
 
 allprojects {
@@ -22,9 +23,16 @@ allprojects {
     }
 }
 
+dependencies {
+    subprojects.forEach {
+        testReportAggregation(it)
+    }
+}
+
 subprojects {
 
     apply(plugin = "java")
+    // TODO: We do not need to apply maven-publish to all the subprojects actually
     apply(plugin = "maven-publish")
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "pmd")
@@ -198,6 +206,14 @@ subprojects {
         }
     }
 
+    testing {
+        suites {
+            withType<JvmTestSuite>().configureEach {
+                useJUnitJupiter()
+            }
+        }
+    }
+
     pmd {
         isIgnoreFailures = false
         isConsoleOutput = true
@@ -222,10 +238,6 @@ subprojects {
             }
         }
 
-        withType(Test::class.java).configureEach {
-            useJUnitPlatform()
-        }
-
         named<JavaCompile>("compileJava") {
             options.errorprone {
                 check("NullAway", CheckSeverity.ERROR)
@@ -236,7 +248,7 @@ subprojects {
         }
 
         check {
-            dependsOn("pmdMain", "pmdTest")
+            dependsOn(pmdMain, pmdTest)
         }
     }
 }
