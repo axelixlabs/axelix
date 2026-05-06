@@ -29,6 +29,12 @@ dependencies {
     }
 }
 
+tasks {
+    check {
+        dependsOn(testAggregateTestReport)
+    }
+}
+
 subprojects {
 
     apply(plugin = "java")
