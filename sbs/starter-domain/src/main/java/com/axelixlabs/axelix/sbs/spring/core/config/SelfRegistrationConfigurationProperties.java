@@ -108,7 +108,7 @@ public class SelfRegistrationConfigurationProperties implements Validateable {
 
     private void validateRequiredProperty(Object value, String propertyName) {
         Assert.notNull(
-                value, String.format("Property '%s' must be set when self-registartion is enabled", propertyName));
+                value, String.format("Property '%s' must be set when self-registration is enabled", propertyName));
     }
 
     private void validateUrl(String url, String propertyName) {

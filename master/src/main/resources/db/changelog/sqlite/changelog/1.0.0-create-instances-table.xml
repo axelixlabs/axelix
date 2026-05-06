@@ -44,7 +44,7 @@
       <column name="deployed_at" type="TEXT">
         <constraints nullable="true"/>
       </column>
-      <column name="latest_hearth_beat" type="TEXT">
+      <column name="latest_heart_beat" type="TEXT">
         <constraints nullable="true"/>
       </column>
       <column name="status" type="TEXT">

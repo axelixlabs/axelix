@@ -59,7 +59,7 @@ public class DefaultInstanceFactoryTest {
         assertThat(instance.jdkVendor()).isEqualTo("BellSoft");
         assertThat(instance.commitShaShort()).isEqualTo("a8b0929");
         assertThat(instance.deployedAt()).isEqualTo("2025-02-03T13:29:29Z");
-        assertThat(instance.latestHearthBeat().toString()).isEqualTo("2025-04-03T13:29:29Z");
+        assertThat(instance.latestHeartBeat().toString()).isEqualTo("2025-04-03T13:29:29Z");
         assertThat(instance.status()).isEqualTo(Instance.InstanceStatus.UP);
         assertThat(instance.memoryUsage().heap()).isEqualTo(12000.0);
         assertThat(instance.actuatorUrl()).isEqualTo("http://localhost:8080/actuator");

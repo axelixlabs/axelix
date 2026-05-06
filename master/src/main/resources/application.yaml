@@ -32,10 +32,14 @@ management:
 axelix:
   master:
     discovery:
+      self-registration:
+        eviction:
+          heartbeat-timeout: 45s
+          schedule: "0 * * * * *"
       auto:
         enabled: true
         broadcast:
-          interval: 60000
+          schedule: "0 * * * * *"
         platform: kubernetes
         kubernetes:
           kube-apiserver-url: https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS}

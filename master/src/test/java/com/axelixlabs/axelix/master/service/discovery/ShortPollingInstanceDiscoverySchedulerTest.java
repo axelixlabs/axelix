@@ -69,11 +69,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {
-            "axelix.master.discovery.auto.enabled=true",
-            "axelix.master.discovery.auto.platform=kubernetes",
-            "axelix.master.discovery.auto.broadcast.interval=1000"
-        })
+        properties = {"axelix.master.discovery.auto.enabled=true", "axelix.master.discovery.auto.platform=kubernetes"})
 class ShortPollingInstanceDiscoverySchedulerTest {
 
     private static MockWebServer mockWebServer;

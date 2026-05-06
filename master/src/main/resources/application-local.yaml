@@ -5,10 +5,14 @@ axelix:
       static-resources:
         location: /application/dist/
     discovery:
+      self-registration:
+        eviction:
+          heartbeat-timeout: 45s
+          schedule: "0 * * * * *"
       auto:
         enabled: true
         broadcast:
-          interval: 60000
+          schedule: "0 * * * * *"
         platform: kubernetes
         kubernetes:
           # Should be provided by the local-launch configuration
