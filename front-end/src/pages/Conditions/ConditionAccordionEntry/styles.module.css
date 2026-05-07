@@ -21,4 +21,9 @@
 
 .Message {
     word-break: break-all;
+    border: 1px dashed var(--axelix-medium-grey);
+    padding: 12px 16px;
+    background-color: var(--axelix-extra-light-grey);
+    border-radius: var(--axelix-border-radius-large);
+    margin-inline: 24px;
 }
