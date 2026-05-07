@@ -48,6 +48,7 @@ axelix:
           schedule: "-"
       self-registration:
         eviction:
+          heartbeat-timeout: 45s
           schedule: "-"
     web:
       static-resources:
