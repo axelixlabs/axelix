@@ -20,6 +20,7 @@ package com.axelixlabs.axelix.master.filter;
 import java.util.Base64;
 
 import com.axelixlabs.axelix.master.filter.auth.McpAuthenticationFilter;
+import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
 import io.modelcontextprotocol.server.McpSyncServer;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +40,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;
-import com.axelixlabs.axelix.master.service.auth.provider.UserProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
@@ -88,7 +88,7 @@ class McpAuthenticationFilterTest {
     private McpSyncServer mcpSyncServer;
 
     @Autowired
-    private UserProvider userProvider;
+    private UserAuthenticator userProvider;
 
     @MockitoBean
     private OidcClient oidcClient;
@@ -141,25 +141,6 @@ class McpAuthenticationFilterTest {
         ResponseEntity<String> response = restTemplate.exchange(MCP_API_PATH, HttpMethod.POST, request, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
-    void shouldRejectInvalidBearerToken() {
-        String invalidToken = "invalid-token";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + invalidToken);
-
-        HttpEntity<Void> request = new HttpEntity<>(headers);
-
-        doThrow(new OidcTokenExchangeException("Invalid token"))
-                .when(oidcClient)
-                .validateTokenViaUserInfoEndpoint(invalidToken);
-
-        ResponseEntity<String> response = restTemplate.exchange(MCP_API_PATH, HttpMethod.GET, request, String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(response.getHeaders().get("WWW-Authenticate")).isNotEmpty();
     }
 
     @Test

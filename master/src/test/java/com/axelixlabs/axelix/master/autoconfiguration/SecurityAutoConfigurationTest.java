@@ -48,7 +48,7 @@ import com.axelixlabs.axelix.master.api.external.response.settings.Authenticatio
 import com.axelixlabs.axelix.master.api.external.response.settings.LoginPasswordAuthenticationOption;
 import com.axelixlabs.axelix.master.api.external.response.settings.OidcAuthenticationOption;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.SecurityAutoConfiguration;
-import com.axelixlabs.axelix.master.filter.CookieBasedJwtAuthorizationFilter;
+import com.axelixlabs.axelix.master.filter.auth.CookieBasedJwtAuthorizationFilter;
 import com.axelixlabs.axelix.master.service.auth.CookieService;
 import com.axelixlabs.axelix.master.service.auth.MasterAuthorityResolver;
 import com.axelixlabs.axelix.master.service.auth.oauth.OidcClient;

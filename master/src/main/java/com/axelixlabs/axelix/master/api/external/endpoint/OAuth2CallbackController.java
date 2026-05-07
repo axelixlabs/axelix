@@ -85,7 +85,7 @@ public class OAuth2CallbackController {
 
         String username = oidcClient.validateIdTokenAndExtractUsername(tokens.idToken());
 
-        Role role = oidcRoleExtractor.extractRole(tokens);
+        Role role = oidcRoleExtractor.extractRole(tokens.accessToken());
 
         User user = new PasswordlessUser(username, Set.of(role));
 

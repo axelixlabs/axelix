@@ -61,16 +61,12 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
     }
 
     @Override
-    public Role extractRole(Tokens tokens) throws OidcTokenExchangeException {
+    public Role extractRole(String accessToken) throws OidcTokenExchangeException {
         if (jmesPathExpression == null) {
             return DefaultRole.VIEWER;
         }
 
-        Role role = extractRoleFromIdToken(tokens.idToken());
-
-        if (role == null) {
-            role = extractRoleFromUserInfo(tokens.accessToken());
-        }
+        Role role = extractRoleFromUserInfo(accessToken);
 
         if (role == null) {
             throw new OidcTokenExchangeException(String.format(
@@ -79,17 +75,6 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
         }
 
         return role;
-    }
-
-    @Nullable
-    private Role extractRoleFromIdToken(String idToken) {
-        try {
-            String json = decodeIdToken(idToken);
-            return extractRoleFromJson(json);
-        } catch (Exception e) {
-            log.debug("Failed to extract role from ID token: {}", e.getMessage());
-        }
-        return null;
     }
 
     @Nullable
@@ -125,12 +110,6 @@ public class JmesPathOidcRoleExtractor implements OidcRoleExtractor {
             log.warn("Failed to extract role from JSON: {}", e.getMessage());
         }
         return null;
-    }
-
-    private String decodeIdToken(String idToken) {
-        String[] parts = idToken.split("\\.");
-        byte[] decoded = decoder.decode(parts[1]);
-        return new String(decoded);
     }
 
     @Nullable

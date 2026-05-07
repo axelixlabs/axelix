@@ -277,19 +277,14 @@ public class DefaultOidcClient implements OidcClient {
      * Falls back to {@code sub} (subject) as a last resort it is always present per OIDC spec.
      */
     private String extractUsername(Claims claims) {
-        if (oAuth2Properties.usernameClaim() != null) {
-            String username = claims.get(oAuth2Properties.usernameClaim(), String.class);
-            if (username != null) {
-                return username;
-            }
-        }
-
         String preferredUsername = claims.get("preferred_username", String.class);
+
         if (preferredUsername != null) {
             return preferredUsername;
         }
 
         String name = claims.get("name", String.class);
+
         if (name != null) {
             return name;
         }

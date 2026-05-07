@@ -25,26 +25,18 @@ import com.axelixlabs.axelix.master.exception.auth.OidcTokenExchangeException;
  *
  * @author Mikhail Polivakha
  */
-// TODO: I am not sure that we need to inspect the id token here. We are not able to do that in MCP flow, since we do not have it.  
 public interface OidcRoleExtractor {
 
     /**
      * Determine the {@link Role} of the user identified by the {@link Tokens provided tokens pair}.
      *
-     * @param tokens the pair of tokens.
-     * @return the role that is extracted. Never {@code null}.
-     * @throws OidcTokenExchangeException if the role cannot be extracted from neither
-     *                                    the ID token nor the UserInfo endpoint
-     */
-    Role extractRole(Tokens tokens) throws OidcTokenExchangeException;
-
-    /**
-     * Determine the {@link Role} of the user identified by the {@link Tokens provided tokens pair}.
+     * @param accessToken the access token granted to the user. Using this access token, the implementation is
+     *                    supposed to determine the {@link Role} of the given user.
      *
-     * @param accessToken the pair of tokens.
      * @return the role that is extracted. Never {@code null}.
      * @throws OidcTokenExchangeException if the role cannot be extracted from neither
      *                                    the ID token nor the UserInfo endpoint
      */
     Role extractRole(String accessToken) throws OidcTokenExchangeException;
+
 }

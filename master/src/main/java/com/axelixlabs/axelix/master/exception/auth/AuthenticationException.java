@@ -29,11 +29,11 @@ public class AuthenticationException extends RuntimeException {
         super();
     }
 
-    public AuthenticationException(final String message) {
-        super(message);
+    public AuthenticationException(Throwable cause) {
+        super(cause);
     }
 
-    public AuthenticationException(final String message, final Throwable cause) {
-        super(message, cause);
+    public AuthenticationException(final String message) {
+        super(message);
     }
 }

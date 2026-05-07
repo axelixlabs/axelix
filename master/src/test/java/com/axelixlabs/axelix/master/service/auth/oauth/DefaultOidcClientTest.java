@@ -111,7 +111,7 @@ class DefaultOidcClientTest {
         String issuerUri = mockWebServer.url("").toString();
 
         OAuth2Properties oAuth2Properties =
-                new OAuth2Properties(issuerUri, CLIENT_ID, CLIENT_SECRET, issuerUri, null, null, null);
+                new OAuth2Properties(issuerUri, CLIENT_ID, CLIENT_SECRET, issuerUri, null, null);
 
         OidcMetadataProvider oidcMetadataProvider = mock(OidcMetadataProvider.class);
         when(oidcMetadataProvider.getTokenEndpoint()).thenReturn(issuerUri + "/token");

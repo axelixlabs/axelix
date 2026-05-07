@@ -18,11 +18,14 @@ import com.axelixlabs.axelix.common.utils.Assert;
 import com.axelixlabs.axelix.master.mcp.McpEndpoint;
 import com.axelixlabs.axelix.master.mcp.auth.handler.McpAuthenticationHandler;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Default implementation of the {@link McpIdentityAccessManager}.
  *
  * @author Mikhail Polivakha
  */
+@Component
 public class DefaultMcpIdentityAccessManager implements McpIdentityAccessManager {
 
     private final Map<AuthenticationScheme, McpAuthenticationHandler> mcpAuthenticationHandlers;
@@ -50,6 +53,7 @@ public class DefaultMcpIdentityAccessManager implements McpIdentityAccessManager
 
         Assert.notNull(mcpAuthenticationHandler, "Unable to find McpAuthenticationHandler to handle the authentication for this request, please report this to maintainers");
 
+        @SuppressWarnings("NullAway") // null away does not recognize custom not null assertion
         User authenticatedUser = mcpAuthenticationHandler.handleAuthentication(authorizationHeader.credential());
 
         Optional<McpEndpoint> mcpEndpoint = mcpEndpointResolver.resolve(jsonRpcRequest);

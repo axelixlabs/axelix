@@ -8,7 +8,6 @@ import com.axelixlabs.axelix.common.auth.core.AuthenticationScheme;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
-import com.axelixlabs.axelix.master.exception.auth.McpAuthenticationException;
 import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ public class BasicMcpAuthenticationHandler implements McpAuthenticationHandler {
             String[] parts = new String(decoder.decode(credential)).split(":", 2);
 
             if (parts.length != 2) {
-                throw new McpAuthenticationException("Invalid basic auth format");
+                throw new AuthenticationException("Invalid basic auth format");
             }
 
             String login = parts[0];
