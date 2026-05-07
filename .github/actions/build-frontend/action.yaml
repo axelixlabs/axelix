@@ -5,7 +5,7 @@ runs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version-file: ./front-end/nvmrc
+        node-version-file: ./front-end/.nvmrc
 
     - run: npm ci
       working-directory: ./front-end
