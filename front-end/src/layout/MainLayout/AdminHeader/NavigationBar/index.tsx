@@ -30,7 +30,7 @@ export const NavigationBar = () => {
                     to="/mcp-server"
                     className={({ isActive }) => `${styles.Link} ${isActive ? styles.ActiveLink : ""}`}
                 >
-                    MCP Server
+                    MCP
                 </NavLink>
                 <NavLink
                     to="/dashboard"
