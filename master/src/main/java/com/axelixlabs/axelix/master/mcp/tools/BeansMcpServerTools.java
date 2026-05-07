@@ -15,10 +15,12 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.mcp;
+package com.axelixlabs.axelix.master.mcp.tools;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
+import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 import org.springaicommunity.mcp.annotation.McpTool;
 import org.springaicommunity.mcp.annotation.McpTool.McpAnnotations;
 import org.springaicommunity.mcp.annotation.McpToolParam;
@@ -28,48 +30,47 @@ import org.springframework.stereotype.Service;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
-import com.axelixlabs.axelix.master.mcp.auth.McpEndpoints;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
- * MCP Tools for working with conditional evaluations.
+ * MCP Tools for working with Spring beans.
  *
  * @since 19.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
+@SuppressWarnings("NullAway")
 @Service
-public class ConditionsMcpServerTools {
+public class BeansMcpServerTools {
 
     private final EndpointInvoker endpointInvoker;
 
-    public ConditionsMcpServerTools(EndpointInvoker endpointInvoker) {
+    public BeansMcpServerTools(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
     }
 
     @McpTool(
-            name = McpEndpoints.CONDITIONS_FEED_TOOL_NAME,
-            title = "@Conditional Feed",
+            name = McpEndpoints.BEANS_FEED_TOOL_NAME,
+            title = "Beans Feed",
             description = """
-            Get @Conditional conditions evaluation report for a specific instance.
-            This endpoint returns which Spring Boot and custom auto-configurations were applied or skipped with explanation why.
-            Use this when user asks about auto-configuration, conditions or why a bean is either missing and user expects it to
-            be there, or the bean is present, but the user expects this bean to not be bootstrapped.
+            Get all Spring beans information for a specific instance.
+            Returns details about bean names, types, and dependencies.
+            Use this when the user asks about application context, specific beans,
+            dependencies, or services of a given instance.
 
             Because this Tool accepts "Instance ID" you probably will need to call 'getWallboard'
             tool to first retrieve the instances feed.
-        """,
+            """,
             annotations =
                     @McpAnnotations(
-                            title = "List that contain results of all @Conditional evaluations",
+                            title = "List of all the beans available in the ApplicationContext",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,
                             openWorldHint = false))
-    public String getInstanceConditions(@McpToolParam(description = "The instance ID") String instanceId) {
-        return new String(
-                endpointInvoker.invoke(
-                        InstanceId.of(instanceId), ActuatorEndpoints.GET_CONDITIONS, NoHttpPayload.INSTANCE),
-                StandardCharsets.UTF_8);
+    public String getInstanceBeans(@McpToolParam(description = "The instance ID") String instanceId) {
+        byte[] body =
+                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
+        return new String(Objects.requireNonNull(body), StandardCharsets.UTF_8);
     }
 }

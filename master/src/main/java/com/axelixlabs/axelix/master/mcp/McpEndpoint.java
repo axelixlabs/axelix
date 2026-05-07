@@ -1,4 +1,4 @@
-package com.axelixlabs.axelix.master.mcp.auth;
+package com.axelixlabs.axelix.master.mcp;
 
 import org.springaicommunity.mcp.annotation.McpTool;
 

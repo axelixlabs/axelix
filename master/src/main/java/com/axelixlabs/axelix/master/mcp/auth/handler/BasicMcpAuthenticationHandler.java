@@ -1,38 +1,38 @@
-package com.axelixlabs.axelix.master.filter.auth;
+package com.axelixlabs.axelix.master.mcp.auth.handler;
 
 import java.util.Base64;
 import java.util.Base64.Decoder;
+import java.util.Optional;
 
 import com.axelixlabs.axelix.common.auth.core.AuthenticationScheme;
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
 import com.axelixlabs.axelix.common.auth.core.User;
+import com.axelixlabs.axelix.master.exception.auth.AuthenticationException;
 import com.axelixlabs.axelix.master.exception.auth.McpAuthenticationException;
 import com.axelixlabs.axelix.master.service.auth.provider.UserAuthenticator;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Filter that authenticates requests to MCP endpoints using either OAuth2 Bearer tokens
- * or Basic Authentication.
+ * {@link McpAuthenticationHandler} that is capable to authenticate {@link AuthenticationSchemes#BASIC Basic auth} requests.
  *
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-public class McpBasicAuthFilter implements McpAuthenticationHandler {
+public class BasicMcpAuthenticationHandler implements McpAuthenticationHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(McpBasicAuthFilter.class);
-    private final UserAuthenticator userProvider;
+    private static final Logger log = LoggerFactory.getLogger(BasicMcpAuthenticationHandler.class);
 
+    private final UserAuthenticator userAuthenticator;
     private final Decoder decoder;
 
-    public McpBasicAuthFilter(UserAuthenticator userProvider) {
-        this.userProvider = userProvider;
+    public BasicMcpAuthenticationHandler(UserAuthenticator userAuthenticator) {
+        this.userAuthenticator = userAuthenticator;
         this.decoder = Base64.getDecoder();
     }
 
     @Override
-    public void handleAuthentication(String credential, HttpServletResponse response) {
+    public User handleAuthentication(String credential) {
         try {
             String[] parts = new String(decoder.decode(credential)).split(":", 2);
 
@@ -43,11 +43,13 @@ public class McpBasicAuthFilter implements McpAuthenticationHandler {
             String login = parts[0];
             String password = parts[1];
 
-            User authenticatedUser = userProvider.authenticate(login, password);
+            return Optional
+                .ofNullable(userAuthenticator.authenticate(login, password))
+                .orElseThrow(AuthenticationException::new);
 
-            // TODO: Introduce permissions check here
         } catch (Exception e) {
-            log.debug("Basic auth validation failed: {}", e.getMessage());
+            log.debug("Basic authentication for accessing the MCP failed: {}", e.getMessage());
+            throw new AuthenticationException();
         }
     }
 

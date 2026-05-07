@@ -1,6 +1,5 @@
 package com.axelixlabs.axelix.master.mcp.auth;
 
-import com.axelixlabs.axelix.common.auth.core.User;
 import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.common.auth.exception.JwtProcessingException;
 import com.axelixlabs.axelix.common.auth.service.WebIdentityAccessManager;
@@ -23,15 +22,12 @@ public interface McpIdentityAccessManager {
      * Please note that the user that is returned by this call, is the user that is using the AI Agent, i.e. it is not the user
      * that represents the AI Agent itself.
      *
-     * @param jsonRpcRequest          the body of the http request (in case of mcp client, this is a JSON-RPC request).
-     * @param authorizationHeader     the contents of the incoming http authorization header.
-     *
-     * @return                        the actual end-user (human) that was granted access.
-     *
+     * @param jsonRpcRequest      the body of the http request (in case of mcp client, this is a JSON-RPC request).
+     * @param authorizationHeader the contents of the incoming http authorization header.
      * @throws AuthorizationException in case the user is not authorized to access the given API.
      * @throws JwtProcessingException in case the implementation is unable to verify the validity
      *                                of the token or if the token is deemed invalid.
      */
-    User verifyAccess(String jsonRpcRequest, AuthorizationHeader authorizationHeader)
+    void verifyAccess(String jsonRpcRequest, AuthorizationHeader authorizationHeader)
         throws AuthorizationException, JwtProcessingException;
 }

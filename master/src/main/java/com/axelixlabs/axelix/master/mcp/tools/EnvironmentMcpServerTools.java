@@ -15,12 +15,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.axelixlabs.axelix.master.mcp;
+package com.axelixlabs.axelix.master.mcp.tools;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-
-import com.axelixlabs.axelix.master.mcp.auth.McpEndpoints;
 import org.springaicommunity.mcp.annotation.McpTool;
 import org.springaicommunity.mcp.annotation.McpTool.McpAnnotations;
 import org.springaicommunity.mcp.annotation.McpToolParam;
@@ -30,47 +26,46 @@ import org.springframework.stereotype.Service;
 import com.axelixlabs.axelix.common.domain.ActuatorEndpoints;
 import com.axelixlabs.axelix.common.domain.http.NoHttpPayload;
 import com.axelixlabs.axelix.master.domain.InstanceId;
+import com.axelixlabs.axelix.master.mcp.McpEndpoints;
 import com.axelixlabs.axelix.master.service.transport.EndpointInvoker;
 
 /**
- * MCP Tools for working with Spring beans.
+ * MCP Tools for working with environment properties.
  *
  * @since 19.02.2026
  * @author Nikita Kirillov
  * @author Mikhail Polivakha
  */
-@SuppressWarnings("NullAway")
 @Service
-public class BeansMcpServerTools {
+public class EnvironmentMcpServerTools {
 
     private final EndpointInvoker endpointInvoker;
 
-    public BeansMcpServerTools(EndpointInvoker endpointInvoker) {
+    public EnvironmentMcpServerTools(EndpointInvoker endpointInvoker) {
         this.endpointInvoker = endpointInvoker;
     }
 
     @McpTool(
-            name = McpEndpoints.BEANS_FEED_TOOL_NAME,
-            title = "Beans Feed",
+            name = McpEndpoints.ENVIRONMENT_FEED_TOOL_NAME,
+            title = "Properties",
             description = """
-            Get all Spring beans information for a specific instance.
-            Returns details about bean names, types, and dependencies.
-            Use this when the user asks about application context, specific beans,
-            dependencies, or services of a given instance.
+            Get all environment properties for a specific instance.
+            Returns application properties, system properties and environment variables.
+            Use this when user asks about configuration, properties, environment or anything
+            related to @Value/@ConditionalOnProperty usage within an instance.
 
             Because this Tool accepts "Instance ID" you probably will need to call 'getWallboard'
             tool to first retrieve the instances feed.
-            """,
+        """,
             annotations =
                     @McpAnnotations(
-                            title = "List of all the beans available in the ApplicationContext",
+                            title = "List of all the properties inside the Spring Boot application",
                             readOnlyHint = true,
                             destructiveHint = false,
                             idempotentHint = true,
                             openWorldHint = false))
-    public String getInstanceBeans(@McpToolParam(description = "The instance ID") String instanceId) {
-        byte[] body =
-                endpointInvoker.invoke(InstanceId.of(instanceId), ActuatorEndpoints.GET_BEANS, NoHttpPayload.INSTANCE);
-        return new String(Objects.requireNonNull(body), StandardCharsets.UTF_8);
+    public String getInstanceEnvironment(@McpToolParam(description = "The instance ID") String instanceId) {
+        return String.valueOf(endpointInvoker.invoke(
+                InstanceId.of(instanceId), ActuatorEndpoints.GET_ALL_ENV_PROPERTIES, NoHttpPayload.INSTANCE));
     }
 }

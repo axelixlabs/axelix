@@ -20,7 +20,10 @@ package com.axelixlabs.axelix.master.filter.auth;
 import java.io.IOException;
 import java.util.Set;
 
+import javax.security.sasl.AuthenticationException;
+
 import com.axelixlabs.axelix.common.auth.core.AuthenticationSchemes;
+import com.axelixlabs.axelix.common.auth.exception.AuthorizationException;
 import com.axelixlabs.axelix.master.api.external.ApiPaths;
 import com.axelixlabs.axelix.master.autoconfiguration.auth.properties.OAuth2Properties;
 import com.axelixlabs.axelix.master.autoconfiguration.web.WebAutoConfiguration;
@@ -89,7 +92,7 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
         AuthorizationHeader authorizationHeader = parseAuthHeader(authHeader);
 
         if (authorizationHeader == null) {
-            handleAuthorizationHeaderIsMissng(response);
+            handleAuthenticationProblem(response);
             return;
         }
 
@@ -97,13 +100,18 @@ public class McpAuthenticationFilter extends OncePerRequestFilter {
         // represented as InputStream is cached.
         String jsonRpcBody = new String(request.getInputStream().readAllBytes());
 
-        mcpIdentityAccessManager.verifyAccess(jsonRpcBody, authorizationHeader);
-
-        // if nothing is thrown, we expect that all IAM checks passed successfully
-        filterChain.doFilter(request, response);
+        try {
+            mcpIdentityAccessManager.verifyAccess(jsonRpcBody, authorizationHeader);
+            // if nothing is thrown, we expect that all IAM checks passed successfully
+            filterChain.doFilter(request, response);
+        } catch (AuthorizationException e) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        } catch (AuthenticationException e) {
+            handleAuthenticationProblem(response);
+        }
     }
 
-    private void handleAuthorizationHeaderIsMissng(@NonNull HttpServletResponse response) {
+    private void handleAuthenticationProblem(@NonNull HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         // If we received no auth token in a request from the MCP client while having the oauth2 flow enabled,

@@ -31,6 +31,7 @@ public interface Authorizer {
 
     /**
      * Authorizes the given {@link User} against the specified {@link AuthorizationRequest}.
+     * Normal exit signals that the request is authorized.
      *
      * @param user the user to authorize
      * @param authorizationRequest the request containing required authorities

@@ -1,4 +1,4 @@
-package com.axelixlabs.axelix.master.mcp.auth;
+package com.axelixlabs.axelix.master.mcp;
 
 /**
  * Class that holds all MCP Endpoints supported by the Axelix Master.
