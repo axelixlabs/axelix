@@ -17,6 +17,7 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -31,8 +32,7 @@ import com.axelixlabs.axelix.sbs.spring.core.beans.CachingBeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeanMetaInfoExtractor;
 import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalFeedBuilder;
 
 /**
  * Auto-configuration class for the beans custom actuator endpoint.
@@ -42,22 +42,16 @@ import com.axelixlabs.axelix.sbs.spring.core.conditions.DefaultConditionalBeanRe
  * @author Sergey Cherkasov
  * @author Mikhail Polivakha
  */
-@AutoConfiguration
+@AutoConfiguration(after = AxelixConditionsEndpointAutoConfiguration.class)
 @ConditionalOnAvailableEndpoint(endpoint = AxelixBeansEndpoint.class)
 public class AxelixBeansEndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
-        return new DefaultConditionalBeanRefBuilder();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public BeanMetaInfoExtractor beanMetaInfoExtractor(
             ConfigurableApplicationContext configurableApplicationContext,
-            ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
-        return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalBeanRefBuilder);
+            ObjectProvider<ConditionalFeedBuilder> conditionalFeedBuilder) {
+        return new DefaultBeanMetaInfoExtractor(configurableApplicationContext, conditionalFeedBuilder);
     }
 
     @Bean

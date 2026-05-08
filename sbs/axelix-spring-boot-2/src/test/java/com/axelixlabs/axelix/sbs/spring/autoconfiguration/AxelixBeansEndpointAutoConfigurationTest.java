@@ -17,7 +17,6 @@
  */
 package com.axelixlabs.axelix.sbs.spring.autoconfiguration;
 
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -33,7 +32,6 @@ import com.axelixlabs.axelix.sbs.spring.core.beans.BeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.CachingBeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.DefaultBeansFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.beans.QualifiersPersistencePostProcessor;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @since 09.02.2026
  * @author Nikita Kirillov
+ * @author Sergey Cherkasov
  */
 class AxelixBeansEndpointAutoConfigurationTest {
 
@@ -52,7 +51,6 @@ class AxelixBeansEndpointAutoConfigurationTest {
     @Test
     void shouldCreateAllBeansInDefaultScenario() {
         contextRunner.run(context -> {
-            assertThat(context).hasSingleBean(ConditionalBeanRefBuilder.class);
             assertThat(context).hasSingleBean(BeanMetaInfoExtractor.class);
             assertThat(context).hasSingleBean(AxelixBeansEndpoint.class);
             assertThat(context).hasSingleBean(QualifiersPersistencePostProcessor.class);
@@ -70,7 +68,6 @@ class AxelixBeansEndpointAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context).doesNotHaveBean(AxelixBeansEndpointAutoConfiguration.class);
                     assertThat(context).doesNotHaveBean(AxelixBeansEndpoint.class);
-                    assertThat(context).doesNotHaveBean(ConditionalBeanRefBuilder.class);
                     assertThat(context).doesNotHaveBean(BeanMetaInfoExtractor.class);
                     assertThat(context).doesNotHaveBean(BeansFeedBuilder.class);
                     assertThat(context).doesNotHaveBean(QualifiersPersistencePostProcessor.class);
@@ -85,7 +82,6 @@ class AxelixBeansEndpointAutoConfigurationTest {
         runnerWithoutCacheConfig.run(context -> {
             assertThat(context).doesNotHaveBean(AxelixBeansEndpointAutoConfiguration.class);
             assertThat(context).doesNotHaveBean(AxelixBeansEndpoint.class);
-            assertThat(context).doesNotHaveBean(ConditionalBeanRefBuilder.class);
             assertThat(context).doesNotHaveBean(BeanMetaInfoExtractor.class);
             assertThat(context).doesNotHaveBean(BeansFeedBuilder.class);
             assertThat(context).doesNotHaveBean(QualifiersPersistencePostProcessor.class);
@@ -95,26 +91,13 @@ class AxelixBeansEndpointAutoConfigurationTest {
     @Test
     void shouldHandleMultipleCustomBeans() {
         contextRunner
-                .withUserConfiguration(
-                        CustomConditionalBeanRefBuilderConfig.class,
-                        CustomBeanMetaInfoExtractorConfig.class,
-                        CustomAxelixBeansEndpointConfig.class)
+                .withUserConfiguration(CustomBeanMetaInfoExtractorConfig.class, CustomAxelixBeansEndpointConfig.class)
                 .run(context -> {
-                    assertThat(context.getBean(ConditionalBeanRefBuilder.class))
-                            .isExactlyInstanceOf(CustomConditionalBeanRefBuilder.class);
                     assertThat(context.getBean(BeanMetaInfoExtractor.class))
                             .isExactlyInstanceOf(CustomBeanMetaInfoExtractor.class);
                     assertThat(context.getBean(AxelixBeansEndpoint.class))
                             .isExactlyInstanceOf(CustomAxelixBeansEndpoint.class);
                 });
-    }
-
-    @TestConfiguration
-    static class CustomConditionalBeanRefBuilderConfig {
-        @Bean
-        public ConditionalBeanRefBuilder conditionalBeanRefBuilder() {
-            return new CustomConditionalBeanRefBuilder();
-        }
     }
 
     @TestConfiguration
@@ -130,13 +113,6 @@ class AxelixBeansEndpointAutoConfigurationTest {
         @Bean
         public AxelixBeansEndpoint axelixBeansEndpoint() {
             return new CustomAxelixBeansEndpoint();
-        }
-    }
-
-    static class CustomConditionalBeanRefBuilder implements ConditionalBeanRefBuilder {
-        @Override
-        public String buildBeanRefInternal(Class<?> beanClass, @Nullable String beanFactoryMethodName) {
-            return "";
         }
     }
 

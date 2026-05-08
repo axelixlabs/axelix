@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
+import com.axelixlabs.axelix.common.api.BeansFeed.AutoConditionsRef;
 import com.axelixlabs.axelix.common.api.BeansFeed.ProxyType;
 
 /**
@@ -35,7 +36,7 @@ import com.axelixlabs.axelix.common.api.BeansFeed.ProxyType;
 public final class BeanMetaInfo {
 
     @Nullable
-    private final String autoConfigurationRef;
+    private final AutoConditionsRef autoConfigurationRef;
 
     private final ProxyType proxyType;
     private final boolean isLazyInit;
@@ -44,7 +45,7 @@ public final class BeanMetaInfo {
     private final BeansFeed.BeanSource beanSource;
 
     public BeanMetaInfo(
-            @Nullable String autoConfigurationRef,
+            @Nullable AutoConditionsRef autoConfigurationRef,
             ProxyType proxyType,
             boolean isLazyInit,
             boolean isPrimary,
@@ -59,7 +60,7 @@ public final class BeanMetaInfo {
     }
 
     @Nullable
-    public String getAutoConfigurationRef() {
+    public AutoConditionsRef getAutoConfigurationRef() {
         return autoConfigurationRef;
     }
 

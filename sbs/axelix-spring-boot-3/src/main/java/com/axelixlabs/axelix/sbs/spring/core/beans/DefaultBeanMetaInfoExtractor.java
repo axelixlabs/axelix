@@ -19,20 +19,19 @@ package com.axelixlabs.axelix.sbs.spring.core.beans;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
@@ -41,7 +40,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
-import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalBeanRefBuilder;
+import com.axelixlabs.axelix.common.api.BeansFeed.AutoConditionsRef;
+import com.axelixlabs.axelix.common.api.ConditionsFeed;
+import com.axelixlabs.axelix.sbs.spring.core.conditions.ConditionalFeedBuilder;
 import com.axelixlabs.axelix.sbs.spring.core.utils.ProxyUtils;
 
 import static com.axelixlabs.axelix.common.api.BeansFeed.BeanMethod;
@@ -64,31 +65,30 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
 
     private final DefaultQualifiersRegistry qualifiersRegistry;
     private final ConfigurableListableBeanFactory beanFactory;
-    private final ConditionsReportEndpoint delegateConditions;
-    private final ConditionalBeanRefBuilder conditionalBeanRefBuilder;
+
+    @Nullable
+    private final List<ConditionsFeed.PositiveCondition> positiveConditions;
 
     public DefaultBeanMetaInfoExtractor(
             ConfigurableApplicationContext configurableApplicationContext,
-            ConditionalBeanRefBuilder conditionalBeanRefBuilder) {
+            ObjectProvider<ConditionalFeedBuilder> conditionalFeedBuilder) {
         this.beanFactory = configurableApplicationContext.getBeanFactory();
         this.qualifiersRegistry = DefaultQualifiersRegistry.INSTANCE;
-        this.delegateConditions = new ConditionsReportEndpoint(configurableApplicationContext);
-        this.conditionalBeanRefBuilder = conditionalBeanRefBuilder;
+        ConditionalFeedBuilder builder = conditionalFeedBuilder.getIfAvailable();
+        this.positiveConditions =
+                builder == null ? null : builder.buildConditionsFeed().getPositiveMatches();
     }
 
     @Override
     public BeanMetaInfo extract(String beanName, ConfigurableListableBeanFactory beanFactory) {
         BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
         Object bean = beanFactory.getBean(beanName);
-        Set<String> positiveConditionsKeys = conditionsKeys();
-
         Class<?> beanType = bean.getClass();
         ProxyType beanProxyingType = ProxyUtils.analyzeProxyType(beanType, beanType.isHidden());
-
         BeanSource beanSource = analyzeBeanSource(beanDefinition, beanName);
 
         return new BeanMetaInfo(
-                getConditionRef(positiveConditionsKeys, beanDefinition, beanSource, beanName, bean),
+                buildAutoConditionRef(beanDefinition, beanSource, beanName, bean),
                 beanProxyingType,
                 beanDefinition.isLazyInit(),
                 beanDefinition.isPrimary(),
@@ -181,43 +181,29 @@ public class DefaultBeanMetaInfoExtractor implements BeanMetaInfoExtractor {
         }
     }
 
-    private Set<String> conditionsKeys() {
-        return delegateConditions.conditions().getContexts().values().stream()
-                .flatMap(context -> {
-                    var positiveMatches = context.getPositiveMatches();
-
-                    if (positiveMatches != null) {
-                        return positiveMatches.keySet().stream();
-                    } else {
-                        return Stream.of();
-                    }
-                })
-                .collect(Collectors.toSet());
-    }
-
     @Nullable
-    private String getConditionRef(
-            Set<String> positiveConditionsKeys,
-            BeanDefinition beanDefinition,
-            BeanSource beanSource,
-            String beanName,
-            Object bean) {
+    private AutoConditionsRef buildAutoConditionRef(
+            BeanDefinition beanDefinition, BeanSource beanSource, String beanName, Object bean) {
 
-        Class<?> configPropsTarget;
-
-        if (beanSource.origin() == BeansFeed.BeanOrigin.BEAN_METHOD) {
-            configPropsTarget = extractEnclosingClass(beanDefinition, beanName);
-        } else {
-            configPropsTarget = bean.getClass();
-        }
-
-        String normalizedBeanName =
-                conditionalBeanRefBuilder.buildBeanRef(configPropsTarget, beanDefinition.getFactoryMethodName());
-
-        if (positiveConditionsKeys.contains(normalizedBeanName)) {
-            return normalizedBeanName;
-        } else {
+        if (positiveConditions == null) {
             return null;
         }
+
+        Class<?> aClass = beanSource.origin() == BeansFeed.BeanOrigin.BEAN_METHOD
+                ? extractEnclosingClass(beanDefinition, beanName)
+                : bean.getClass();
+
+        if (aClass == null) {
+            return null;
+        }
+
+        String shortName = ClassUtils.getShortName(ProxyUtils.resolveUserClass(aClass));
+
+        return positiveConditions.stream()
+                .filter(condition -> condition.getClassName().equals(shortName))
+                .filter(condition -> Objects.equals(condition.getMethodName(), beanDefinition.getFactoryMethodName()))
+                .map(condition -> new AutoConditionsRef(condition.getClassName(), condition.getMethodName()))
+                .findFirst()
+                .orElse(null);
     }
 }
