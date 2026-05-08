@@ -34,7 +34,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -44,7 +43,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
 import com.axelixlabs.axelix.common.api.BeansFeed;
@@ -101,15 +99,14 @@ import static org.assertj.core.api.Assertions.assertThat;
     EnvironmentTestConfig.class,
     JwtAuthTestConfiguration.class
 })
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class JwtAuthorizationFilterTest {
 
-    // Cache names under test
-    private static final String TEST_CACHE_1 = "cache1";
+    private static final String USER_NAME = "testUser";
+    private static final String PASSWORD = "testPassword";
 
-    private static final String TEST_CACHE_2 = "cache2";
-
-    private static final String TEST_CACHE_MANAGER = TEST_CACHE_2;
+    // Cache and CacheManager names under test
+    private static final String TEST_CACHE_1 = "cache";
+    private static final String MAIN_CACHE_MANAGER = "mainCacheManager";
 
     private EnhancedCacheManager cacheManager;
 
@@ -127,14 +124,10 @@ class JwtAuthorizationFilterTest {
     @BeforeEach
     void setUp() {
         cacheManager.enableAll();
-
         for (String cacheName : cacheManager.getCacheNames()) {
             cacheManager.getCache(cacheName).invalidate();
         }
     }
-
-    private static final String USER_NAME = "testUser";
-    private static final String PASSWORD = "testPassword";
 
     @Value("${axelix.sbs.auth.jwt.lifespan}")
     private Duration lifespan;
@@ -148,11 +141,9 @@ class JwtAuthorizationFilterTest {
     @ParameterizedTest
     @MethodSource("adminEndpoints")
     void shouldAllowAccess_ForUserWithRoleAdmin(String path, HttpMethod httpMethod) {
+        buildCache();
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.ADMIN));
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-        String key1 = "key1";
-        Cache cache = cacheManager.getCache(TEST_CACHE_1);
-        cache.put(key1, "value1");
 
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
 
@@ -162,12 +153,10 @@ class JwtAuthorizationFilterTest {
     @ParameterizedTest
     @MethodSource("adminEndpoints")
     void shouldAllowAccess_MultipleRoles(String path, HttpMethod httpMethod) {
+        buildCache();
         User user =
                 new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.ADMIN, DefaultRole.EDITOR, DefaultRole.VIEWER));
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-        String key1 = "key1";
-        Cache cache = cacheManager.getCache(TEST_CACHE_1);
-        cache.put(key1, "value1");
 
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
 
@@ -192,11 +181,9 @@ class JwtAuthorizationFilterTest {
     @ParameterizedTest
     @MethodSource("editorEndpoints")
     void shouldAllowAccess_ForUserWithRoleEditor(String path, HttpMethod httpMethod) {
+        buildCache();
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.EDITOR));
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-        String key1 = "key1";
-        Cache cache = cacheManager.getCache(TEST_CACHE_1);
-        cache.put(key1, "value1");
 
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
 
@@ -231,12 +218,9 @@ class JwtAuthorizationFilterTest {
     @ParameterizedTest
     @MethodSource("viewerEndpoints")
     void shouldAllowAccess_UserWithEmptyRoles(String path, HttpMethod httpMethod) {
+        buildCache();
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of());
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-
-        String key1 = "key1";
-        Cache cache = cacheManager.getCache(TEST_CACHE_1);
-        cache.put(key1, "value1");
 
         ResponseEntity<String> response = restTemplate.exchange(path, httpMethod, entity, String.class);
 
@@ -253,12 +237,9 @@ class JwtAuthorizationFilterTest {
     @ParameterizedTest
     @MethodSource("notAuthorityForRole")
     void shouldReturnForbidden_UserWithoutRequiredAuthority_ForUserWithRoleViewer(String path, HttpMethod httpMethod) {
+        buildCache();
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(DefaultRole.VIEWER));
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-
-        String key1 = "key1";
-        Cache cache = cacheManager.getCache(TEST_CACHE_1);
-        cache.put(key1, "value1");
 
         ResponseEntity<Void> response = testRestTemplate.exchange(path, httpMethod, entity, Void.class);
 
@@ -268,12 +249,9 @@ class JwtAuthorizationFilterTest {
     @ParameterizedTest
     @MethodSource("notAuthorityForRole")
     void shouldReturnForbidden_UserWithEmptyRoles(String path, HttpMethod httpMethod) {
+        buildCache();
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of());
         HttpEntity<Void> entity = defaultEntity(jwtEncoderService.generateToken(user));
-
-        String key1 = "key1";
-        Cache cache = cacheManager.getCache(TEST_CACHE_1);
-        cache.put(key1, "value1");
 
         ResponseEntity<String> response = restTemplate.exchange(path, httpMethod, entity, String.class);
 
@@ -307,13 +285,10 @@ class JwtAuthorizationFilterTest {
 
     @Test
     void shouldReturnForbidden_UserHasRoleWithInvalidAuthority() {
+        buildCache();
         Role role = new DefaultRole("VIEWER", Set.of(UnrecognizedAuthority.UNRECOGNIZED_AUTHORITY));
         User user = new DefaultUser(USER_NAME, PASSWORD, Set.of(role));
         String token = jwtEncoderService.generateToken(user);
-
-        String key1 = "key1";
-        Cache cache = cacheManager.getCache(TEST_CACHE_1);
-        cache.put(key1, "value1");
 
         ResponseEntity<Void> response = testRestTemplate.exchange(
                 path(TEST_CACHE_1 + "/clear?key=key1"), HttpMethod.DELETE, defaultEntity(token), Void.class);
@@ -393,7 +368,7 @@ class JwtAuthorizationFilterTest {
     }
 
     private static String path(String relative) {
-        return path(TEST_CACHE_MANAGER, relative);
+        return path(MAIN_CACHE_MANAGER, relative);
     }
 
     private static String path(String cacheManagerName, String relative) {
@@ -405,6 +380,10 @@ class JwtAuthorizationFilterTest {
 
     private static String prefixPathIfNeeded(String path) {
         return (path.isEmpty() || path.charAt(0) == '/') ? path : "/" + path;
+    }
+
+    private void buildCache() {
+        cacheManager.getCache(TEST_CACHE_1).put("key1", "value1");
     }
 
     enum UnrecognizedAuthority implements Authority {
@@ -473,9 +452,9 @@ class JwtAuthorizationFilterTest {
             return new CacheManagerBeanPostProcessor();
         }
 
-        @Bean(name = TEST_CACHE_MANAGER)
+        @Bean(name = MAIN_CACHE_MANAGER)
         public org.springframework.cache.CacheManager testSubjectCacheManager() {
-            return new ConcurrentMapCacheManager(TEST_CACHE_1, TEST_CACHE_2);
+            return new ConcurrentMapCacheManager(TEST_CACHE_1);
         }
     }
 }
